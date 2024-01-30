@@ -1,7 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-use Modules\Specialites\Http\Controllers\SpecialitesController;
+use Modules\Speciality\Http\Controllers\SpecialityController;
 
 /*
 |--------------------------------------------------------------------------
@@ -15,5 +15,5 @@ use Modules\Specialites\Http\Controllers\SpecialitesController;
 */
 
 Route::group([], function () {
-    Route::resource('specialites', SpecialitesController::class)->names('specialites');
+    Route::resource('speciality', SpecialityController::class)->names('speciality');
 });

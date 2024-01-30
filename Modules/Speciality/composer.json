@@ -1,5 +1,5 @@
 {
-    "name": "nwidart/specialites",
+    "name": "nwidart/speciality",
     "description": "",
     "authors": [
         {
@@ -17,15 +17,15 @@
     },
     "autoload": {
         "psr-4": {
-            "Modules\\Specialites\\": "",
-            "Modules\\Specialites\\App\\": "app/",
-            "Modules\\Specialites\\Database\\Factories\\": "database/factories/",
-            "Modules\\Specialites\\Database\\Seeders\\": "database/seeders/"
+            "Modules\\Speciality\\": "",
+            "Modules\\Speciality\\App\\": "app/",
+            "Modules\\Speciality\\Database\\Factories\\": "database/factories/",
+            "Modules\\Speciality\\Database\\Seeders\\": "database/seeders/"
         }
     },
     "autoload-dev": {
         "psr-4": {
-            "Modules\\Specialites\\Tests\\": "tests/"
+            "Modules\\Speciality\\Tests\\": "tests/"
         }
     }
 }

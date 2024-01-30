@@ -1,10 +1,10 @@
 <?php
 
-namespace Modules\Specialites\database\seeders;
+namespace Modules\Speciality\database\seeders;
 
 use Illuminate\Database\Seeder;
 
-class SpecialitesDatabaseSeeder extends Seeder
+class SpecialityDatabaseSeeder extends Seeder
 {
     /**
      * Run the database seeds.

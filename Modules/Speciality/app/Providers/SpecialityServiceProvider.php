@@ -1,15 +1,15 @@
 <?php
 
-namespace Modules\Specialites\app\Providers;
+namespace Modules\Speciality\app\Providers;
 
 use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\ServiceProvider;
 
-class SpecialitesServiceProvider extends ServiceProvider
+class SpecialityServiceProvider extends ServiceProvider
 {
-    protected string $moduleName = 'Specialites';
+    protected string $moduleName = 'Speciality';
 
-    protected string $moduleNameLower = 'specialites';
+    protected string $moduleNameLower = 'speciality';
 
     /**
      * Boot the application events.

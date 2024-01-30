@@ -1,20 +1,20 @@
 <?php
 
-namespace Modules\Specialites\Http\Controllers;
+namespace Modules\Speciality\Http\Controllers;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 
-class SpecialitesController extends Controller
+class SpecialityController extends Controller
 {
     /**
      * Display a listing of the resource.
      */
     public function index()
     {
-        return view('specialites::index');
+        return view('speciality::index');
     }
 
     /**
@@ -22,7 +22,7 @@ class SpecialitesController extends Controller
      */
     public function create()
     {
-        return view('specialites::create');
+        return view('speciality::create');
     }
 
     /**
@@ -38,7 +38,7 @@ class SpecialitesController extends Controller
      */
     public function show($id)
     {
-        return view('specialites::show');
+        return view('speciality::show');
     }
 
     /**
@@ -46,7 +46,7 @@ class SpecialitesController extends Controller
      */
     public function edit($id)
     {
-        return view('specialites::edit');
+        return view('speciality::edit');
     }
 
     /**

@@ -50,7 +50,6 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
  * @property-read int|null $supporter_count
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \Laravel\Sanctum\PersonalAccessToken> $tokens
  * @property-read int|null $tokens_count
- * @property-read \Illuminate\Database\Eloquent\Collection<int, \Modules\Api\Entities\UserDevice> $userDevices
  * @property-read int|null $user_devices_count
  * @method static \Modules\User\Database\factories\UserFactory factory($count = null, $state = [])
  * @method static \Illuminate\Database\Eloquent\Builder|User newModelQuery()
@@ -112,11 +111,6 @@ class User extends Authenticatable
     public function routeNotificationForFcm(): array|string
     {
         return $this->userDevices()->pluck('fcm_token')->toArray();
-    }
-
-    public function userDevices(): HasMany
-    {
-        return $this->hasMany(\Modules\Api\Entities\UserDevice::class);
     }
 
     public function lastName(): Attribute

@@ -129,13 +129,13 @@ class UserCreateOrUpdate extends Component
         if (!empty($this->userAvatar) && filter_var($this->userAvatar, FILTER_VALIDATE_URL)) {
             $user->avatar = $this->userAvatar;
         }
-        $selectedPermitionForUser =  Permission::whereName('USER_ACCESS')->first()->roles()->where('id', $this->selectedRoles)?->get();
+        $selectedPermitionForUser =  Role::where('id', $this->selectedRoles)?->get();
         if ($selectedPermitionForUser) {
             $user->syncRoles($selectedPermitionForUser);
         }
         $user->supporter()->sync($this->supporter);
         session()->flash('success', 'کاربر با موفقیت اضافه شد ، لطفا اطلاعات وزنی و بدنی مربوط به این کاربر را وارد کنید.');
-        return redirect()->route('admin.user.document', $user);
+        return redirect()->route('admin.user.index');
     }
 
     public function render()

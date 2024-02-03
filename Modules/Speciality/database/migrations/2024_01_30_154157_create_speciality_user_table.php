@@ -12,10 +12,8 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('speciality_user', function (Blueprint $table) {
-            $table->id();
             $table->foreignId('user_id')->nullOnDelete()->constrained();
             $table->foreignId('speciality_id')->nullOnDelete()->constrained();
-            $table->timestamps();
         });
     }
 

@@ -13,6 +13,7 @@ use Modules\User\Traits\MetaAttributeTrait;
 use Modules\User\Traits\UserAttributeTrait;
 use Illuminate\Database\Eloquent\Collection;
 use Modules\Package\Enum\PackageUserTypeEnum;
+use Modules\Speciality\app\Models\Speciality;
 use Modules\User\Database\factories\UserFactory;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -151,7 +152,7 @@ class User extends Authenticatable
     }
 
 
-    public function metaOptionsNames($meta_name) :string
+    public function metaOptionsNames($meta_name): string
     {
         $values =  $this->metaoptionsValues($meta_name);
         if (isset($values) && is_int($values)) {
@@ -163,9 +164,9 @@ class User extends Authenticatable
             }
             $returned_values = '';
             foreach ($options_name as $key =>  $options_name) {
-                $returned_values .= ($key == 0  ? '' : ',') . $options_name ;
-            } ;
-            return $returned_values ;
+                $returned_values .= ($key == 0  ? '' : ',') . $options_name;
+            };
+            return $returned_values;
         }
         return ' ---';
     }
@@ -173,13 +174,18 @@ class User extends Authenticatable
     public function metaoptionsValues($meta_value)
     {
 
-      if( isset($meta_value)) {
-           return json_decode($this->$meta_value?->last()?->meta_value, true);
-       }
+        if (isset($meta_value)) {
+            return json_decode($this->$meta_value?->last()?->meta_value, true);
+        }
     }
     public function metaOptionsName($meta_type, $metaOptions)
     {
 
         return  $this->$meta_type?->last()?->meta_key->getOptionName($metaOptions);
+    }
+
+    public function specialities()
+    {
+        return $this->belongsToMany(Speciality::class);
     }
 }

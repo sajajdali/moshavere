@@ -192,6 +192,7 @@ return [
         "userMobile" => "شماره تماس",
         "userName" => "نام ",
         "userLastName" => "نام خانوادگی",
+        "specialityTitle" => "نام تخصص",
 
     ],
 

@@ -33,7 +33,7 @@ class UpdateOrCreateSpeciality extends Component
                 'status' => $status,
                 'priority' => $this->priority,
             ]);
-            $this->message = 'تخصص با موفقیت اضافه شد';
+            $this->message = 'تخصص با موفقیت ویرایش شد';
         } else {
             $this->speciality = Speciality::create([
                 'title' => $this->specialityTitle,

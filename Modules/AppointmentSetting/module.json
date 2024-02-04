@@ -1,0 +1,11 @@
+{
+    "name": "AppointmentSetting",
+    "alias": "appointmentsetting",
+    "description": "",
+    "keywords": [],
+    "priority": 0,
+    "providers": [
+        "Modules\\AppointmentSetting\\app\\Providers\\AppointmentSettingServiceProvider"
+    ],
+    "files": []
+}

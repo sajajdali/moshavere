@@ -1,0 +1,11 @@
+{
+    "name": "Place",
+    "alias": "place",
+    "description": "",
+    "keywords": [],
+    "priority": 0,
+    "providers": [
+        "Modules\\Place\\app\\Providers\\PlaceServiceProvider"
+    ],
+    "files": []
+}

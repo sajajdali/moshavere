@@ -25,7 +25,6 @@ mix
     .js('Resources/assets/js/client-create.js', '../../public/assets/admin/js')
     .js('Resources/assets/js/colorpicker.js', '../../public/assets/admin/js')
     .js('Resources/assets/js/custom.js', '../../public/assets/admin/js')
-    .js('Resources/assets/js/pusher.js', '../../public/assets/admin/js')
     .js('Resources/assets/js/custom1.js', '../../public/assets/admin/js')
     .js('Resources/assets/js/echarts.js', '../../public/assets/admin/js')
     .js('Resources/assets/js/flot.js', '../../public/assets/admin/js')

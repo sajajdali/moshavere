@@ -3,6 +3,7 @@
 use Illuminate\Support\Facades\Route;
 use Modules\AppointmentSetting\Livewire\DoctorList;
 use Modules\AppointmentSetting\Livewire\GeneralSetting;
+use Modules\AppointmentSetting\Livewire\SpecialSectionSetting;
 
 /*
 |--------------------------------------------------------------------------
@@ -18,4 +19,5 @@ use Modules\AppointmentSetting\Livewire\GeneralSetting;
 Route::group([], function () {
     Route::get('appointment/setting/doctors', DoctorList::class)->name('appointment.doctor.list');
     Route::get('appointment/setting/{user}', GeneralSetting::class)->name('appointment.setting');
+    Route::get('appointment/setting/special/section/{user}', SpecialSectionSetting::class)->name('appointment.specialsection');
 });

@@ -15,3 +15,16 @@
     src: url('../fonts/woff/IRANSansX-Regular.woff') format('woff'),
     url('../fonts/woff2/IRANSansX-Regular.woff2') format('woff2');
 }
+@font-face {
+    font-family: 'Vazir-Bold';
+    font-style: normal;
+    font-weight: 700;
+    src: url('../fonts/ttf/Vazirmatn-Bold.ttf') format('tff'),
+}
+
+@font-face {
+    font-family: 'Vazir-Regular';
+    font-style: normal;
+    font-weight: 400;
+    src: url('../fonts/woff2/Vazirmatn-Regular.woff2') format('woff2'),
+}

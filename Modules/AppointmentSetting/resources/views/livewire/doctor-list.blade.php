@@ -63,10 +63,10 @@
                     <div class="row">
                         <h5 class="text-muted mt-1 mb-5">برای تنظیم زمان حضور، پزشک مورد نظر را انتخاب کنید</h5>
                         @foreach ($doctors as $key => $doctor)
-                            <div class="col-lg-6 col-md-12 col-xl-4 col-sm-12">
+                            <div class="col-lg-6 col-md-12 col-sm-12">
                                 <div class="card mb-5">
                                     <div class="card-body">
-                                            <div class="client-title mt-0">
+                                            <div class="client-title mt-0 flex-column flex-sm-row">
                                                 <figure class="rounded-circle align-self-start mb-0">
                                                     @if ($doctor->avatar)
                                                         <img src="{{ $doctor->avatar }}" alt="Generic placeholder image"
@@ -79,7 +79,7 @@
                                                         </svg>
                                                     @endif
                                                 </figure>
-                                                <div class="media-body">
+                                                <div class="media-body my-3 my-sm-0">
                                                     <h4 class="time-title p-0 mb-0 font-weight-semibold leading-normal">
                                                         <a href="{{route('admin.appointment.setting',['user' => $doctor->id])}}"
                                                             class="text-dark">{{ $doctor->fullName }}</a></h4>

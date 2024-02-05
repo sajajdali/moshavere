@@ -16,6 +16,7 @@
         "laravel-echo": "^1.15.3",
         "laravel-mix": "^6.0.6",
         "lodash": "^4.17.19",
+        "persian-date": "^1.1.0",
         "postcss": "^8.1.14",
         "pusher-js": "^8.4.0-rc2",
         "resolve-url-loader": "^5.0.0",

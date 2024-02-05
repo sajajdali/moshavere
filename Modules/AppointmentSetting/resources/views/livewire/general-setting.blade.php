@@ -8,32 +8,19 @@
         </div>
     </div>
     @include('admin::layouts.components.alert')
+    {{-- manage day of the week  --}}
     <div class="card">
-        <div class="card-body">
-            <div class="row">
-                <h3>روز های حضور</h3>
-                <hr>
-                <p>در این قسمت روز هایی که پزشک در مطب حضور دارد را انتخاب و سپس ساعت هار مربوط به هر روز را در آن وارد
-                    بکنید!</p>
-                <div class="card-body">
-                    <form wire:submit='addDayForDoctor' id="setting">
-                        @include('appointmentsetting::components.generalsetting.dayofperesent')
-
-
-                    </form>
-                </div>
-            </div>
-            <div class="text-end">
-                <button type="submit" form="setting" class="btn btn-success mt-5">ذخیره</button>
-            </div>
-        </div>
+        @include('appointmentsetting::components.generalsetting.dayofperesent')
     </div>
+    {{-- time for each appointmernt --}}
     <div class="card">
         <div class="card-body">
             {{-- section --}}
             <h3>زمان مورد نیاز برای <span class="text-primary">ویزیت</span> هر بیمار</h3>
             <hr style="opacity: 0.5">
             <div class="row">
+                {{-- TODO::alert Message --}}
+                <div class="alert alert-danger" role="alert"> <p class="text-danger"><strong>خطا!!</strong> در صورتی که روز را فعال کنید باید برای آن ساعت تعیین کنید.</p> </div>
                 <div class="col-md-4 pt-2">
                     <label class="text-primary" for="basic-url">مدت زمان مورد نیاز برای ویزیت هر بیمار</label>
                 </div>
@@ -47,20 +34,23 @@
                     </div>
                 </div>
                 <div class="d-flex  mt-2">
-                    <strong class="me-1"> نکته!! </strong>
                     <p class="text-muted">
-                        مدت زمان هر نوبت، برای محاسبه تعداد نوبت های هر روز استفاده میشود، برای اینکه در یک روز 8 ساعته
+                        <strong class="me-1"> نکته!! </strong> مدت زمان هر نوبت، برای محاسبه تعداد نوبت های هر روز
+                        استفاده میشود، برای اینکه در یک روز 8 ساعته
                         8 نوبت داشته باشید، مدت زمان ویزیت را 60 دقیقه تنظیم کنید.
                     </p>
                 </div>
             </div>
         </div>
     </div>
+    {{-- min time  --}}
     <div class="card">
         <div class="card-body">
             {{-- section --}}
             <h3><span class="text-primary">حداقل</span> زمان دریافت نوبت</h3>
             <hr style="opacity: 0.5">
+             {{-- TODO::alert Message --}}
+             <div class="alert alert-danger" role="alert"> <p class="text-danger"><strong>خطا!!</strong> در صورتی که روز را فعال کنید باید برای آن ساعت تعیین کنید.</p> </div>
             <div class="row">
                 <div class="col-md-5 pt-2">
                     <label class="text-primary" for="basic-url"> زمان دریافت نوبت</label>
@@ -75,19 +65,23 @@
                     </div>
                 </div>
                 <div class="d-flex  mt-2">
-                    <strong class="me-1"> نکته!! </strong>
-                    <p class="text-muted">در این قسمت میتوانید تنظیم بکنید کاربر در زمان دریافت نوبت، نزدیک ترین نوبت را
+
+                    <p class="text-muted"><strong class="me-1"> نکته!! </strong> در این قسمت میتوانید تنظیم بکنید
+                        کاربر در زمان دریافت نوبت، نزدیک ترین نوبت را
                         در چه زمانی بتواند دریافت بکند، در صورت قرار دادن عدد 0 کاربر میتواند برای همان رو نوبت دریافت
                         بکند</p>
                 </div>
             </div>
         </div>
     </div>
+    {{-- max time  --}}
     <div class="card">
         <div class="card-body">
             {{-- section --}}
             <h3><span class="text-primary">حداکثر</span> زمان دریافت نوبت</h3>
             <hr style="opacity: 0.5">
+             {{-- TODO::alert Message --}}
+             <div class="alert alert-danger" role="alert"> <p class="text-danger"><strong>خطا!!</strong> در صورتی که روز را فعال کنید باید برای آن ساعت تعیین کنید.</p> </div>
             <div class="row">
                 <div class="col-md-5 pt-2">
                     <label class="text-primary" for="basic-url"> بیمار حداکثر برای چند روز بعد بتواند نوبت دریافت
@@ -103,25 +97,26 @@
                     </div>
                 </div>
                 <div class="d-flex  mt-2">
-                    <strong class="me-1"> نکته!! </strong>
-                    <p class="text-muted">در این قسمت میتوانید تعیین کنید که اخرین نوبت تا چند روز آینده برای کاربران
+                    <p class="text-muted"><strong class="me-1"> نکته!! </strong> در این قسمت میتوانید تعیین کنید که
+                        اخرین نوبت تا چند روز آینده برای کاربران
                         قابلدریافت باشد</p>
                 </div>
             </div>
         </div>
     </div>
+    {{-- cancel time  --}}
     <div class="card">
         <div class="card-header border-bottom d-flex justify-content-between">
             <h3>امکان <span class="text-primary">کنسل</span> کردن نوبت </h3>
             <div class="main-toggle-group d-sm-flex align-items-center ms-0">
-                <div class="toggle toggle-lg toggle-primary my-1 off" wire:ignore.self
-                    data-bs-toggle="collapse" href="#saturdayTimeCollaps"
-                    role="button" aria-expanded="false" aria-controls="saturdayTimeCollaps">
+                <div class="toggle toggle-lg toggle-primary my-1 off" wire:ignore.self data-bs-toggle="collapse"
+                    href="#saturdayTimeCollaps" role="button" aria-expanded="false"
+                    aria-controls="saturdayTimeCollaps">
                     <span></span>
                 </div>
             </div>
         </div>
-        <div class="card-body collapse" id="saturdayTimeCollaps">
+        <div class="card-body collapse" id="saturdayTimeCollaps" wire:ignore.self>
             {{-- section --}}
             <div class="row">
                 <div class="col-md-3 pt-2">
@@ -137,21 +132,234 @@
                     </div>
                 </div>
                 <div class="d-flex  mt-2">
-                    <strong class="me-1"> نکته!! </strong>
-                    <p class="text-muted">بیمار از چند روز قبل از فرا رسیدن نوبت خود ، امکان کنسل کردن نوبت خود را داشته باشد!</p>
+
+                    <p class="text-muted"> <strong class="me-1"> نکته!! </strong> بیمار از چند روز قبل از فرا رسیدن
+                        نوبت خود ، امکان کنسل کردن نوبت خود را
+                        داشته باشد!</p>
                 </div>
             </div>
         </div>
     </div>
+    {{-- sunsection time  --}}
+    <div class="card">
+        <div class="card-header border-bottom d-flex justify-content-between">
+            <h3>زمان بندی و هزینه بخش ها</h3>
+            <div class="main-toggle-group d-sm-flex align-items-center ms-0">
+                <div class="toggle toggle-lg toggle-primary my-1 off" wire:ignore.self data-bs-toggle="collapse"
+                    href="#sectionTimeTimeCollaps" role="button" aria-expanded="false"
+                    aria-controls="sectionTimeTimeCollaps">
+                    <span></span>
+                </div>
+            </div>
+        </div>
+        <div class="card-body collapse" id="sectionTimeTimeCollaps" wire:ignore.self>
+            {{-- section --}}
+            <div class="row">
+                {{-- TODO:: --}}
+            </div>
+        </div>
+    </div>
+    {{-- end Date time  --}}
+    <div class="card">
+        <div class="card-header border-bottom d-flex justify-content-between">
+            <h3> تعیین پایان تاریخ نوبت دهی </h3>
+            <div class="main-toggle-group d-sm-flex align-items-center ms-0">
+                <div class="toggle toggle-lg toggle-primary my-1 off" wire:ignore.self data-bs-toggle="collapse"
+                    href="#EndDateTimeCollaps" role="button" aria-expanded="false"
+                    aria-controls="EndDateTimeCollaps">
+                    <span></span>
+                </div>
+            </div>
+        </div>
+        <div class="card-body collapse" id="EndDateTimeCollaps" wire:ignore.self>
+            {{-- section --}}
+            <div class="row">
+                <div class="col-md-3 pt-2">
+                    <label class="text-primary" for="basic-url">انتخاب تاریخ:</label>
+                </div>
+                <div class="col-md-9">
+                    <div class="input-group mb-3">
+                        <input type="text" class="form-control" id="endDatePicker">
+                    </div>
+                </div>
+                <div class="d-flex  mt-2">
+                    <p class="text-muted"> <strong class="me-1"> نکته!! </strong> نوبت دهی بهت از تاریخ انتخابی غیر
+                        فعال شود </p>
+                </div>
+            </div>
+        </div>
+    </div>
+    {{-- payment  --}}
+    <div class="card">
+        <div class="card-header border-bottom d-flex justify-content-between">
+            <h3>پرداخت آنلاین</h3>
+            <div class="main-toggle-group d-sm-flex align-items-center ms-0">
+                <div class="toggle toggle-lg toggle-primary my-1 off" wire:ignore.self data-bs-toggle="collapse"
+                    href="#paymentCollaps" role="button" aria-expanded="false" aria-controls="paymentCollaps">
+                    <span></span>
+                </div>
+            </div>
+        </div>
+        <div class="card-body collapse" id="paymentCollaps" wire:ignore.self>
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="d-flex align-items-center">
+                        <div class="main-toggle-group d-sm-flex align-items-center ms-0">
+                            <div class="toggle toggle-lg toggle-primary my-1 off" id="sitePaymentStatus"
+                                wire:ignore.self>
+                                <span></span>
+                            </div>
+                        </div>
+                        <span class="ms-2">فعال بودن پرداخت آنلاین در سایت</span>
+                    </div>
+                </div>
 
-</div>
+                <div class="col-md-6">
+                    <div class="d-flex align-items-center">
+                        <div class="main-toggle-group d-sm-flex align-items-center ms-0">
+                            <div class="toggle toggle-lg toggle-primary my-1 off" wire:ignore.self
+                                id="paymentOnInVoip">
+                                <span></span>
+                            </div>
+                        </div>
+                        <span class="ms-2">فعال بودن پرداخت آنلاین در ویپ</span>
+                    </div>
+                </div>
 
+            </div>
+            <div class="row mt-5">
+                <div class="d-none" id="paymentstatusSelect">
+                    <div class="row">
+                        <div class="col-md-5 pt-2">
+                            <label class="text-primary" for="basic-url"> وضعیت در صورت عدم پرداخت</label>
+                        </div>
+                        <div class="col-md-7">
+                            <div class="form-group">
+                                <select name="country" class="form-control form-select" id="default-dropdown"
+                                    data-bs-placeholder="Select Country">
+                                    <option label="انتخاب کنید..."></option>
+                                    <option value="br">نوبت ثبت شود</option>
+                                    <option value="cz">نوبت ثبت نشود</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="d-none" id="paymentPriceInput">
+                    <div class="row">
+                        <div class="col-md-5 pt-2">
+                            <label class="text-primary" for="basic-url"> مبلغ قابل پرداخت</label>
+                        </div>
+                        <div class="col-md-7">
+                            <div class="form-group">
+                                <input type="text" class="form-control" id="inputName"
+                                    placeholder="مبلغ به تومان">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {{-- check for other appointment  --}}
+    <div class="card">
+        <div class="card-header border-bottom d-flex justify-content-between">
+            <h3> عدم کنترل تداخل نوبت ها </h3>
+            <div class="main-toggle-group d-sm-flex align-items-center ms-0">
+                <div class="toggle toggle-lg toggle-primary my-1 off" wire:ignore.self data-bs-toggle="collapse"
+                    href="#checkForOtherAppointment" role="button" aria-expanded="false"
+                    aria-controls="checkForOtherAppointment">
+                    <span></span>
+                </div>
+            </div>
+        </div>
+        <div class="card-body collapse" id="checkForOtherAppointment" wire:ignore.self>
+            {{-- section --}}
+            <div class="row">
+
+                <p class="text-muted"> <strong class="me-1"> نکته!! </strong> با فعال سازی این قسمت، نوبت های این
+                    بخش بدون اینکه با سایر نوبت های همان روز
+                    پزشک بررسی شود ، ثبت میشود، به عبارتی ممکن است در یک زمان چند نوبت برای این پزشک ثبت شود </p>
+            </div>
+        </div>
+    </div>
 </div>
+</div>
+</div>
+@push('styles')
+    <style>
+        /* Define your styles here */
+        p {
+            font-size: medium !important;
+        }
+
+        label {
+            font-size: medium !important;
+        }
+
+        h3 {
+            font-family: 'Vazir-Regular';
+            font-size: 1.4rem;
+        }
+    </style>
+@endpush
 @push('scripts')
     <script>
         $(document).ready(function() {
             $('#type_food').on('click', function() {
                 @this.set('form.typeFood', $('#type_food').hasClass('on'));
+            });
+
+            function appearPeymentStatusDiv() {
+                $('#paymentstatusSelect').fadeIn();
+                $('#paymentstatusSelect').removeClass('d-none');
+            }
+
+            function appearPeymentPriceDiv() {
+                $('#paymentPriceInput').fadeIn();
+                $('#paymentPriceInput').removeClass('d-none');
+            }
+
+            function fadeOutPeymentStatusDiv() {
+                $('#paymentstatusSelect').fadeOut();
+                $('#paymentstatusSelect').addClass('d-none');
+            }
+
+            function fadeOutPeymentPriceDiv() {
+                $('#paymentPriceInput').fadeOut();
+                $('#paymentPriceInput').addClass('d-none');
+            }
+            $('#sitePaymentStatus').click(function(e) {
+                if ($('#sitePaymentStatus').hasClass('on')) {
+                    appearPeymentStatusDiv();
+                    appearPeymentPriceDiv();
+                } else {
+                    if ($('#paymentOnInVoip').hasClass('on')) {
+                        fadeOutPeymentStatusDiv();
+                    } else {
+                        fadeOutPeymentPriceDiv();
+                        fadeOutPeymentStatusDiv();
+                    }
+                }
+            });
+            $('#paymentOnInVoip').click(function(e) {
+                if ($('#paymentOnInVoip').hasClass('on')) {
+                    if ($('#paymentPriceInput').hasClass('d-none')) {
+                        appearPeymentPriceDiv();
+                    }
+                } else {
+                    if (!$('#sitePaymentStatus').hasClass('on')) {
+                        fadeOutPeymentPriceDiv();
+                    }
+                }
+            });
+            $('#endDatePicker').persianDatepicker({
+                initialValue: false,
+                format: 'L',
+                autoClose: true,
+                onSelect: function(unix) {
+                    @this.set('endDateForAppointments', $('#endDatePicker').val());
+                }
             });
         });
     </script>

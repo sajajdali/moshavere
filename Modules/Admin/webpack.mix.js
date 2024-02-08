@@ -1,5 +1,4 @@
 const mix = require('laravel-mix');
-
 /*
  |--------------------------------------------------------------------------
  | Mix Asset Management
@@ -43,7 +42,6 @@ mix
     .js('Resources/assets/js/jvectormap.js', '../../public/assets/admin/js')
     .copyDirectory('Resources/assets/js/landing.js', '../../public/assets/admin/js')
     .js('Resources/assets/js/mail-settings.js', '../../public/assets/admin/js')
-    .js('Resources/assets/js/map-leafleft.js', '../../public/assets/admin/js')
     .js('Resources/assets/js/mapelmaps.js', '../../public/assets/admin/js')
     .js('Resources/assets/js/morris.js', '../../public/assets/admin/js')
     .js('Resources/assets/js/nvd3.js', '../../public/assets/admin/js')
@@ -70,6 +68,7 @@ mix
     .js('Resources/assets/js/tooltip&popover.js', '../../public/assets/admin/js')
     .js('Resources/assets/js/TypeHead.js', '../../public/assets/admin/js')
     .js('Resources/assets/js/userlist.js', '../../public/assets/admin/js')
+    .js('Resources/assets/js/leaf.js', '../../public/assets/admin/js')
     .postCss('Resources/assets/css/animated.css', '../../public/assets/admin/css')
     .sass('Resources/assets/css/skin-modes.scss', '../../public/assets/admin/css')
     .sass('Resources/assets/scss/style.scss', '../../public/assets/admin/css')

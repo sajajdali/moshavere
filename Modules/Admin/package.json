@@ -25,6 +25,7 @@
     },
     "dependencies": {
         "browser-sync": "^2.11.2",
+        "leaflet": "^1.9.4",
         "persian-datepicker": "^1.2.0"
     }
 }

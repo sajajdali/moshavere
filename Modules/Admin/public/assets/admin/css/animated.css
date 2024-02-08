@@ -4,7 +4,7 @@
 Project        :   Rapo - HTML5 Bootstrap Admin Template
 Version        :   V.1
 Create Date    :   10/03/20
-Copyright      :   Spruko Technologies Private Limited 
+Copyright      :   Spruko Technologies Private Limited
 Author         :   Spruko
 Author URL     :   https://themeforest.net/user/spruko
 Support	       :   support@spruko.com
@@ -13,8 +13,6 @@ License        :   Licensed under ThemeForest License
 -------------------------------------------------------------------*/
 
 @charset "UTF-8";
-
-
 .animated {
     animation-duration: 1s;
     animation-fill-mode: both
@@ -1556,3 +1554,4 @@ License        :   Licensed under ThemeForest License
 .slideOutUp {
     animation-name: slideOutUp
 }
+

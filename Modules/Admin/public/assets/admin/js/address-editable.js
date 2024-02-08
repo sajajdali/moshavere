@@ -290,8 +290,8 @@ __webpack_require__.r(__webpack_exports__);
 /******/ 		// [resolve, reject, Promise] = chunk loading, 0 = chunk loaded
 /******/ 		var installedChunks = {
 /******/ 			"/public/assets/admin/js/address-editable": 0,
-/******/ 			"public/assets/admin/css/animated": 0,
 /******/ 			"public/assets/admin/css/style": 0,
+/******/ 			"public/assets/admin/css/animated": 0,
 /******/ 			"public/assets/admin/css/skin-modes": 0
 /******/ 		};
 /******/ 		
@@ -342,10 +342,10 @@ __webpack_require__.r(__webpack_exports__);
 /******/ 	// startup
 /******/ 	// Load entry module and return exports
 /******/ 	// This entry module depends on other loaded chunks and execution need to be delayed
-/******/ 	__webpack_require__.O(undefined, ["public/assets/admin/css/animated","public/assets/admin/css/style","public/assets/admin/css/skin-modes"], () => (__webpack_require__("./Resources/assets/js/address-editable.js")))
-/******/ 	__webpack_require__.O(undefined, ["public/assets/admin/css/animated","public/assets/admin/css/style","public/assets/admin/css/skin-modes"], () => (__webpack_require__("./Resources/assets/css/skin-modes.scss")))
-/******/ 	__webpack_require__.O(undefined, ["public/assets/admin/css/animated","public/assets/admin/css/style","public/assets/admin/css/skin-modes"], () => (__webpack_require__("./Resources/assets/scss/style.scss")))
-/******/ 	var __webpack_exports__ = __webpack_require__.O(undefined, ["public/assets/admin/css/animated","public/assets/admin/css/style","public/assets/admin/css/skin-modes"], () => (__webpack_require__("./Resources/assets/css/animated.css")))
+/******/ 	__webpack_require__.O(undefined, ["public/assets/admin/css/style","public/assets/admin/css/animated","public/assets/admin/css/skin-modes"], () => (__webpack_require__("./Resources/assets/js/address-editable.js")))
+/******/ 	__webpack_require__.O(undefined, ["public/assets/admin/css/style","public/assets/admin/css/animated","public/assets/admin/css/skin-modes"], () => (__webpack_require__("./Resources/assets/css/skin-modes.scss")))
+/******/ 	__webpack_require__.O(undefined, ["public/assets/admin/css/style","public/assets/admin/css/animated","public/assets/admin/css/skin-modes"], () => (__webpack_require__("./Resources/assets/scss/style.scss")))
+/******/ 	var __webpack_exports__ = __webpack_require__.O(undefined, ["public/assets/admin/css/style","public/assets/admin/css/animated","public/assets/admin/css/skin-modes"], () => (__webpack_require__("./Resources/assets/css/animated.css")))
 /******/ 	__webpack_exports__ = __webpack_require__.O(__webpack_exports__);
 /******/ 	
 /******/ })()

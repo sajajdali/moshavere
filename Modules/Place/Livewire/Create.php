@@ -10,6 +10,7 @@ class Create extends Component
     public array $counter = [
         'number' => 1,
     ];
+    public array $place = [];
     public $doctors;
     public array $doctor;
     public function addCounter($obj)
@@ -21,6 +22,9 @@ class Create extends Component
     {
         $this->counter[$obj] = $this->counter[$obj] - 1;
         $this->render();
+    }
+    public function UpdateOrCreatePlace() {
+        dd($this->place) ; 
     }
     public function mount()
     {

@@ -1,19 +1,33 @@
 import L from "leaflet";
 (function ($) {
-$(document).ready(function () {
-    const map = L.map('map', {
-        center: L.latLng(49.2125578, 16.62662018),
-        zoom: 14,
-    });
+    var app = new Mapp({
+        element: "#app",
+        presets: {
+          latlng: {
+            lat: 35.73249,
+            lng: 51.42268
+          },
+          zoom: 10
+        },
+        apiKey: "Your API Key"
+      });
+      app.addVectorLayers();
 
-    const key = 'qtXHQ5UHHxezmV7qRtuN';
+      // Add in a crosshair for the map
+      var crosshairIcon = L.icon({
+        iconUrl: 'https://cloud.son.ir/index.php/s/qVUHj7HJSr1A7MK/download',
+        iconSize:     [20, 20], // size of the icon
+        iconAnchor:   [10, 10], // point of the icon which will correspond to marker's location
+      });
+      var crosshairMarker = new L.marker(app.map.getCenter(), {icon: crosshairIcon, clickable:false});
+      crosshairMarker.addTo(app.map);
 
-    L.tileLayer(`https://api.maptiler.com/maps/streets-v2/{z}/{x}/{y}.png?key=${key}`,{ //style URL
-        tileSize: 512,
-        zoomOffset: -1,
-        minZoom: 1,
-        attribution: "\u003ca href=\"https://www.maptiler.com/copyright/\" target=\"_blank\"\u003e\u0026copy; MapTiler\u003c/a\u003e \u003ca href=\"https://www.openstreetmap.org/copyright\" target=\"_blank\"\u003e\u0026copy; OpenStreetMap contributors\u003c/a\u003e",
-        crossOrigin: true
-    }).addTo(map);
-    });
+      // Move the crosshair to the center of the map when the user pans
+      app.map.on('move', function(e) {
+        crosshairMarker.setLatLng(app.map.getCenter());
+      });
+
+      crosshairMarker.on('click', function(event){
+        console.log(event.latlng)
+      });
 })(jQuery);

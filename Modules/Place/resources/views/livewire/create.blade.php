@@ -17,19 +17,20 @@
                 </div>
                 <div class="col-md-10">
                     <div class="input-group mb-3">
-                        <input type="text" wire:model='place.name' class="form-control" aria-describedby="basic-addon3">
+                        <input type="text" wire:model='place.name' class="form-control"
+                            aria-describedby="basic-addon3">
                     </div>
                 </div>
             </div>
             <div class="row mb-4">
-                <label for="lastName" class=" text-primary">لوکشین مطب</label>
                 <div class="col-lg-12">
-                    <div class="card" id="map">
-                        <div class="card-header border-bottom">
-                            <div class="card-title">With Popup</div>
+                    <div id="testmap"></div>
+                    <div class="card">
+                        <div class="card-header">
+                            محل مطب بر روی نقشه
                         </div>
-                        <div class="card-body">
-                            <div class="h-500" id="leaflet2"></div>
+                        <div class="card-body" wire:ignore>
+                            <div class="h-500" id="mapdiv"></div>
                         </div>
                     </div>
                 </div>
@@ -77,8 +78,8 @@
                                         شماره ی - {{ $i + 1 }}
                                     @endif
                                 </label>
-                                <input type="text" class="form-control" id="placenumber-{{$i}}" wire:model='place.number.{{$i}}'
-                                    placeholder="شماره تماس">
+                                <input type="text" class="form-control" id="placenumber-{{ $i }}"
+                                    wire:model='place.number.{{ $i }}' placeholder="شماره تماس">
                             </div>
                         </div>
                     </div>
@@ -116,21 +117,21 @@
                     <hr style="opacity: 0.9">
                     <div class="form-group">
                         <label for="order">ترتیب نمایش :</label>
-                        <input type="number" class="form-control" id="order" wire:model='order'
+                        <input type="number" class="form-control" id="place.order" wire:model='place.order'
                             placeholder="اواویت نمایش مربوط به این مطب در صورتی که چند مطب داشته باشید را به عدد وارد کنید.">
                     </div>
                 </div>
                 <div class="col-12 mt-5">
                     <div class="checkbox">
                         <div class="custom-checkbox custom-control">
-                            <input type="checkbox" data-checkboxes="mygroup" class="custom-control-input" wire:model='status'
-                                id="checkbox-1">
+                            <input type="checkbox" data-checkboxes="mygroup" class="custom-control-input"
+                                wire:model='place.status' id="checkbox-1">
                             <label for="checkbox-1" class="custom-control-label ">فعال</label>
                         </div>
                     </div>
                 </div>
                 <div class="col-12 text-end">
-                    <button class="btn btn-success">ذخیره اطلاعات</button>
+                    <button wire:click='UpdateOrCreatePlace' class="btn btn-success">ذخیره اطلاعات</button>
                 </div>
             </div>
         </div>
@@ -146,10 +147,50 @@
             font-size: medium;
         }
     </style>
+    <link rel="stylesheet" href="https://cdn.map.ir/web-sdk/1.4.2/css/mapp.min.css">
+    <link rel="stylesheet" href="https://cdn.map.ir/web-sdk/1.4.2/css/fa/style.css">
 @endpush
 @push('scripts')
-    <script src="{{ admin_asset('js/leaf.js') }}"></script>
+    <script type="text/javascript" src="https://cdn.map.ir/web-sdk/1.4.2/js/mapp.min.js"></script>
+    <script src="{{ admin_asset('js/mapp.min.js') }}"></script>
+    <script src="{{ admin_asset('js/mapp.env.js') }}"></script>
     <script>
-        $(document).ready(function() {});
+        $(document).ready(function() {
+            var app = new Mapp({
+                element: '#mapdiv',
+                presets: {
+                    latlng: {
+                        lat: 35.712301,
+                        lng: 51.393013,
+                    },
+                    zoom: 12
+                },
+                apiKey: 'eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiIsImp0aSI6IjAwYjU3ZjUzYjk4OThlOGZlYmZlMjJhODc3NjM3ZGJlYzE5OGZmYzAzMmQ1MDdmODcxY2M5ZThlODM4N2ZkNjRiNzM3MWVlOWFmYjk1MWJlIn0.eyJhdWQiOiIyNjA5NSIsImp0aSI6IjAwYjU3ZjUzYjk4OThlOGZlYmZlMjJhODc3NjM3ZGJlYzE5OGZmYzAzMmQ1MDdmODcxY2M5ZThlODM4N2ZkNjRiNzM3MWVlOWFmYjk1MWJlIiwiaWF0IjoxNzA3NTQ3MzUyLCJuYmYiOjE3MDc1NDczNTIsImV4cCI6MTcxMDA1Mjk1Miwic3ViIjoiIiwic2NvcGVzIjpbImJhc2ljIl19.G_8eZJV03f9krGyP_nvkNXn9nODDK8VAf-lI9ESuZBPobkrPCceG02Y-nzosNEilZzZSGqW2yBjZE6PMZVcf81T53bMAlo6DmPaDGoqjAO88ZrL1tvhQ7KPBDBSkA4oODvSVGtA071CWpvUd7xdzoy0h-mEGmIdkY3Cs3MkPbCltrYXaK1LuDSE-4fz2HHeyswUAc8IHkoxKcze-FACfT_uifSijX6rfYfG4k9uXTNap41rKvmqZ1c4DSXkkHTc_2Pit1WUAX-y-ALxKtt22h8GQPv4FV-Bd_PJHp9g6U93QmKaeJdC0PCcnVOJHhHfGtme7I0zYAfmtgqDC5j2CAw'
+            });
+            app.addVectorLayers();
+            app.addZoomControls();
+            var crosshairIcon = {
+                iconUrl: 'https://nobat.selakteb.com/images/marker-icon.png',
+                iconSize: [25, 41], // size of the icon
+                iconAnchor: [12, 55], // point of the icon which will correspond to marker's location
+            };
+            app.map.on('click', function(e) {
+                var marker = app.addMarker({
+                    latlng: {
+                        lat: e.latlng.lat,
+                        lng: e.latlng.lng,
+                    },
+                    icon: crosshairIcon,
+                    popup: false,
+                    pan: false,
+                    draggable: true,
+                    history: false
+                });
+                var lat = e.latlng.lat;
+                var lon = e.latlng.lng;
+                @this.set('place.loc.lat', e.latlng.lat);
+                @this.set('place.loc.lng', e.latlng.lng);
+            });
+        });
     </script>
 @endpush

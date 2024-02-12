@@ -1,6 +1,6 @@
 <?php
 
-namespace Modules\AppointmentSetting\Livewire;
+namespace Modules\AppointmentSetting\Livewire\GeneralSetting;
 
 use Livewire\Component;
 use Livewire\Attributes\Url;
@@ -10,6 +10,7 @@ use Modules\User\Enum\UserMetaEnum;
 
 class DoctorList extends Component
 {
+
     use WithPagination ;
     public $isEdited;
     #[Url]
@@ -54,8 +55,9 @@ class DoctorList extends Component
             });
         })
         ->orderByDesc('id')->paginate(10);
-        return view('appointmentsetting::livewire.doctor-list', [
+        return view('appointmentsetting::livewire.general-setting.doctor-list', [
             'doctors' => $doctors
         ]);
     }
+
 }

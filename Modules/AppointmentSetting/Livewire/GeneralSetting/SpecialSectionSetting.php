@@ -1,12 +1,13 @@
 <?php
 
-namespace Modules\AppointmentSetting\Livewire;
+namespace Modules\AppointmentSetting\Livewire\GeneralSetting;
 
 use Livewire\Component;
 use Modules\User\Entities\User;
 
 class SpecialSectionSetting extends Component
 {
+
     public $doctor ;
 
     public function editGeneralSetting() {
@@ -23,6 +24,7 @@ class SpecialSectionSetting extends Component
     }
     public function render()
     {
-        return view('appointmentsetting::livewire.special-section-setting');
+        return view('appointmentsetting::livewire.general-setting.special-section-setting');
     }
+
 }

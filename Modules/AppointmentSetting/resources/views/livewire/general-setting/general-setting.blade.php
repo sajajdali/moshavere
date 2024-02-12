@@ -42,7 +42,7 @@
                 </div>
                 <div class="d-flex  mt-4">
                     <p class="text-muted">
-                        <strong class="me-1"> نکته!! </strong> با فعال سازی نوع ویزیت شما میتوانید 
+                        <strong class="me-1"> نکته!! </strong> با فعال سازی نوع ویزیت شما میتوانید
                     </p>
                 </div>
             </div>

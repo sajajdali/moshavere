@@ -39,14 +39,28 @@
                             <div class="row mb-4">
                                 <label for="search-name" class="col-md-2 form-label">نام پزشک</label>
                                 <div class="col-md-10">
-                                    <input class="form-control" id="search-name" wire:model="search.absenteeName"
+                                    <input class="form-control" id="search-name" wire:model="search.doctorName"
                                         placeholder="نام رژیم" type="text">
                                 </div>
                             </div>
                             <div class="row mb-4">
                                 <label for="search-name" class="col-md-2 form-label">نام بخش</label>
                                 <div class="col-md-10">
-                                    <input class="form-control" id="search-name" wire:model="search.absenteeName"
+                                    <input class="form-control" id="search-name" wire:model="search.sectionName"
+                                        placeholder="نام رژیم" type="text">
+                                </div>
+                            </div>
+                            <div class="row mb-4">
+                                <label for="search-name" class="col-md-2 form-label datePicker">تاریخ شروع</label>
+                                <div class="col-md-10">
+                                    <input class="form-control" id="search-name" wire:model="search.startDate"
+                                        placeholder="نام رژیم" type="text">
+                                </div>
+                            </div>
+                            <div class="row mb-4">
+                                <label for="search-name" class="col-md-2 form-label datePicker">تاریخ پایان</label>
+                                <div class="col-md-10">
+                                    <input class="form-control" id="search-name" wire:model="search.Enddate"
                                         placeholder="نام رژیم" type="text">
                                 </div>
                             </div>
@@ -123,5 +137,26 @@
         myCollapsible.addEventListener('hide.bs.collapse', function() {
             @this.set('searchPanel', '');
         })
+        $('.datePicker').each(function() {
+            if (!$(this).data('persianDatepickerInitialized')) {
+                var inp = $(this);
+                $(this).persianDatepicker({
+                    initialValue: false,
+                    format: 'L',
+                    autoClose: true,
+                    onSelect: function(unix) {
+                        if (inp.data('dateType') == 'start') {
+                            @this.set('dates.' + inp.data('counter') + '.start', inp
+                                .val());
+                        } else {
+                            @this.set('dates.' + inp.data('counter') + '.end', inp
+                                .val());
+
+                        }
+                    }
+                });
+                $(this).data('persianDatepickerInitialized', true); // Mark initialization
+            }
+        });
     </script>
 @endpush

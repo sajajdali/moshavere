@@ -8,6 +8,46 @@
         </div>
     </div>
     @include('admin::layouts.components.alert')
+
+    <div class="card">
+        <div class="card-body">
+            {{-- section --}}
+            <h3> نوع ویزیت </h3>
+            <hr style="opacity: 0.5">
+            <div class="row">
+                {{-- TODO::alert Message --}}
+                <div class="alert alert-danger" role="alert">
+                    <p class="text-danger"><strong>خطا!!</strong> در صورتی که روز را فعال کنید باید برای آن ساعت تعیین
+                        کنید.</p>
+                </div>
+                <div class="col-md-6 mt-3">
+                    <div class="main-toggle-group d-flex align-items-center ms-0">
+                        <div class="toggle toggle-lg toggle-primary my-1 off" wire:ignore.self>
+                            <span></span>
+                        </div>
+                        <div class="ms-2">
+                            <p class="text-muted m-0">حضوری</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6 mt-3">
+                    <div class="main-toggle-group d-flex align-items-center ms-0">
+                        <div class="toggle toggle-lg toggle-primary my-1 off" wire:ignore.self>
+                            <span></span>
+                        </div>
+                        <div class="ms-2">
+                            <p class="text-muted m-0">آنلاین</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="d-flex  mt-4">
+                    <p class="text-muted">
+                        <strong class="me-1"> نکته!! </strong> با فعال سازی نوع ویزیت شما میتوانید 
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
     {{-- manage day of the week  --}}
     <div class="card">
         @include('appointmentsetting::components.generalsetting.dayofperesent')
@@ -20,7 +60,10 @@
             <hr style="opacity: 0.5">
             <div class="row">
                 {{-- TODO::alert Message --}}
-                <div class="alert alert-danger" role="alert"> <p class="text-danger"><strong>خطا!!</strong> در صورتی که روز را فعال کنید باید برای آن ساعت تعیین کنید.</p> </div>
+                <div class="alert alert-danger" role="alert">
+                    <p class="text-danger"><strong>خطا!!</strong> در صورتی که روز را فعال کنید باید برای آن ساعت تعیین
+                        کنید.</p>
+                </div>
                 <div class="col-md-4 pt-2">
                     <label class="text-primary" for="basic-url">مدت زمان مورد نیاز برای ویزیت هر بیمار</label>
                 </div>
@@ -49,8 +92,11 @@
             {{-- section --}}
             <h3><span class="text-primary">حداقل</span> زمان دریافت نوبت</h3>
             <hr style="opacity: 0.5">
-             {{-- TODO::alert Message --}}
-             <div class="alert alert-danger" role="alert"> <p class="text-danger"><strong>خطا!!</strong> در صورتی که روز را فعال کنید باید برای آن ساعت تعیین کنید.</p> </div>
+            {{-- TODO::alert Message --}}
+            <div class="alert alert-danger" role="alert">
+                <p class="text-danger"><strong>خطا!!</strong> در صورتی که روز را فعال کنید باید برای آن ساعت تعیین کنید.
+                </p>
+            </div>
             <div class="row">
                 <div class="col-md-5 pt-2">
                     <label class="text-primary" for="basic-url"> زمان دریافت نوبت</label>
@@ -80,8 +126,11 @@
             {{-- section --}}
             <h3><span class="text-primary">حداکثر</span> زمان دریافت نوبت</h3>
             <hr style="opacity: 0.5">
-             {{-- TODO::alert Message --}}
-             <div class="alert alert-danger" role="alert"> <p class="text-danger"><strong>خطا!!</strong> در صورتی که روز را فعال کنید باید برای آن ساعت تعیین کنید.</p> </div>
+            {{-- TODO::alert Message --}}
+            <div class="alert alert-danger" role="alert">
+                <p class="text-danger"><strong>خطا!!</strong> در صورتی که روز را فعال کنید باید برای آن ساعت تعیین کنید.
+                </p>
+            </div>
             <div class="row">
                 <div class="col-md-5 pt-2">
                     <label class="text-primary" for="basic-url"> بیمار حداکثر برای چند روز بعد بتواند نوبت دریافت

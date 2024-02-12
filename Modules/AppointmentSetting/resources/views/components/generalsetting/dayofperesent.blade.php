@@ -1,11 +1,12 @@
 <div>
-    <div class="card-body">
+    <div class="card">
         <div class="card-header border-bottom">
             <h3>روز های حضور</h3>
         </div>
         <div class="row mt-3">
             <div class="card-body">
-                <p>در این قسمت روز هایی که پزشک در مطب حضور دارد را انتخاب و سپس ساعت هار مربوط به هر روز را در آن وارد
+                <p>در این قسمت روز هایی که پزشک در مطب حضور دارد را انتخاب و سپس ساعت هار مربوط به هر روز را در آن
+                    وارد
                     بکنید!</p>
                 <form wire:submit='addDayForDoctor' id="setting">
                     <div class="form-row">
@@ -25,7 +26,9 @@
                         <div class="collapse col-12 mt-2" id="saturdayTimeCollaps" wire:ignore.self>
                             <div class="card card-body">
                                 {{-- TODO::modify Error message --}}
-                                <div class="alert alert-danger" role="alert"> درصورت فعال سازی روز لطفا ساعت حضور در روز را تعیین کنید! </div>
+                                <div class="alert alert-danger" role="alert"> درصورت فعال سازی روز لطفا ساعت حضور
+                                    در
+                                    روز را تعیین کنید! </div>
                                 <div class="d-flex justify-content-between">
                                     <p class="text-muted">تعیین زمان حضور برای شنبه</p>
                                     <div>

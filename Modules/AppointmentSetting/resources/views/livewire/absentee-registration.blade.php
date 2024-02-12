@@ -75,8 +75,8 @@
                                     </label>
                                     <input type="text" class="form-control datePicker"
                                         id="absenteenumber-{{ $i }}"
-                                        wire:model='absentee.number.{{ $i }}'
-                                         data-dateType='start' data-counter="{{ $i + 1 }}" absenteeholder="انتخاب تاریخ شروع">
+                                        wire:model='absentee.number.{{ $i }}' data-dateType='start'
+                                        data-counter="{{ $i + 1 }}" absenteeholder="انتخاب تاریخ شروع">
                                 </div>
                             </div>
                             <div class="col-md-6">
@@ -86,8 +86,8 @@
                                     </label>
                                     <input type="text" class="form-control datePicker"
                                         id="absenteenumber-{{ $i }}"
-                                        wire:model='absentee.number.{{ $i }}'
-                                        data-dateType='end' data-counter="{{ $i + 1 }}" absenteeholder="انتخاب تاریخ شروع">
+                                        wire:model='absentee.number.{{ $i }}' data-dateType='end'
+                                        data-counter="{{ $i + 1 }}" absenteeholder="انتخاب تاریخ شروع">
                                 </div>
                             </div>
                         </div>
@@ -163,7 +163,25 @@
                 </form>
             </div>
             <div class="d-flex justify-content-center">
-
+                <div class="row">
+                    <h5>لیست پزشکان</h5>
+                    <p class="text-muted my-1">لطفا پزشک و یا پزشکانی که مایل هستید تاریه </p>
+                    @foreach ($doctors as $key => $doctorList)
+                        <div class="col-md-4">
+                            <div class="form-group mt-2">
+                                <div class="checkbox">
+                                    <div class="custom-checkbox custom-control">
+                                        <input type="checkbox" wire:model='doctor.{{ $doctorList->id }}'
+                                            @if (array_key_exists($doctorList->id, $doctor) && $doctor[$doctorList->id] == 'true') checked @endif data-checkboxes="mygroup"
+                                            class="custom-control-input" id="checkbox-{{ $key }}">
+                                        <label for="checkbox-{{ $key }}"
+                                            class="custom-control-label">{{ $doctorList->full_name }}</label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    @endforeach
+                </div>
             </div>
         </div>
     </div>
@@ -180,10 +198,12 @@
                             format: 'L',
                             autoClose: true,
                             onSelect: function(unix) {
-                                if(inp.data('dateType') == 'start') {
-                                    @this.set('dates.' + inp.data('counter')+'.start', inp.val());
-                                }else{
-                                    @this.set('dates.' + inp.data('counter')+'.end', inp.val());
+                                if (inp.data('dateType') == 'start') {
+                                    @this.set('dates.' + inp.data('counter') + '.start', inp
+                                        .val());
+                                } else {
+                                    @this.set('dates.' + inp.data('counter') + '.end', inp
+                                        .val());
 
                                 }
                             }

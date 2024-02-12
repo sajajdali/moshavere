@@ -1,14 +1,14 @@
 <?php
 
-namespace Modules\AppointmentSetting\Livewire;
+namespace Modules\AppointmentSetting\Livewire\Absentee;
 
 use Livewire\Component;
-use Livewire\Attributes\Url;
 use Spatie\Permission\Models\Role;
 use Modules\User\Enum\UserMetaEnum;
 
 class AbsenteeRegistration extends Component
 {
+
     public $step = 1;
 
 
@@ -115,8 +115,10 @@ class AbsenteeRegistration extends Component
     {
         $this->doctors = Role::find(3)->users;
     }
+
+
     public function render()
     {
-        return view('appointmentsetting::livewire.absentee-registration');
+        return view('appointmentsetting::livewire.absentee.absentee-registration');
     }
 }

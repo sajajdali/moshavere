@@ -1,10 +1,9 @@
 <?php
 
-namespace Modules\AppointmentSetting\Livewire;
+namespace Modules\AppointmentSetting\Livewire\GeneralSetting;
 
 use Livewire\Component;
 use Modules\User\Entities\User;
-
 
 class GeneralSetting extends Component
 {
@@ -72,6 +71,6 @@ class GeneralSetting extends Component
     public function render()
     {
 
-        return view('appointmentsetting::livewire.general-setting');
+        return view('appointmentsetting::livewire.general-setting.general-setting');
     }
 }

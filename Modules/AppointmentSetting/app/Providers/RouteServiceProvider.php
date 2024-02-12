@@ -50,7 +50,7 @@ class RouteServiceProvider extends ServiceProvider
         Route::middleware(['web', 'auth', 'admin'])
         ->prefix('admin')
         ->as('admin.')
-            ->group(module_path('AppointmentSetting', '/routes/livewire.php'));
+            ->group(module_path('AppointmentSetting', '/routes/admin.php'));
     }
 
     /**

@@ -1,8 +1,8 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-use Modules\Place\Http\Controllers\PlaceController;
 use Modules\Place\Livewire\Create;
+use Modules\Place\Livewire\CreateOrUpdate;
 
 /*
 |--------------------------------------------------------------------------
@@ -16,5 +16,5 @@ use Modules\Place\Livewire\Create;
 */
 
 Route::group([], function () {
-    Route::get('place/create', Create::class)->name('place.create');
+    Route::get('place/create', CreateOrUpdate::class)->name('place.create');
 });

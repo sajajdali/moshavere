@@ -5,7 +5,7 @@ namespace Modules\Place\Livewire;
 use Livewire\Component;
 use Spatie\Permission\Models\Role;
 
-class Create extends Component
+class CreateOrUpdate extends Component
 {
     public array $counter = [
         'number' => 1,
@@ -24,7 +24,7 @@ class Create extends Component
         $this->render();
     }
     public function UpdateOrCreatePlace() {
-        dd($this->place) ; 
+        dd($this->place) ;
     }
     public function mount()
     {
@@ -32,6 +32,6 @@ class Create extends Component
     }
     public function render()
     {
-        return view('place::livewire.create');
+        return view('place::livewire.create-or-update');
     }
 }

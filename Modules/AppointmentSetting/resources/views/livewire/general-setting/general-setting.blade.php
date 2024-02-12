@@ -153,6 +153,59 @@
             </div>
         </div>
     </div>
+    {{-- max appointment per day  --}}
+    <div class="card">
+        <div class="card-header border-bottom d-flex justify-content-between">
+            <h3>امکان دریافت حداکثر <span class="text-primary">دریافت نوبت</span></h3>
+            <div class="main-toggle-group d-sm-flex align-items-center ms-0">
+                <div class="toggle toggle-lg toggle-primary my-1 on" wire:ignore.self data-bs-toggle="collapse"
+                    href="#maximumAppointmentCanBePerchased" role="button" aria-expanded="false"
+                    aria-controls="maximumAppointmentCanBePerchased">
+                    <span></span>
+                </div>
+            </div>
+        </div>
+        <div class="card-body collapse show" id="maximumAppointmentCanBePerchased" wire:ignore.self>
+            {{-- section --}}
+            <div class="row">
+                <div class="col-md-3 pt-2">
+                    <label class="text-primary" for="basic-url">تعداد نوبت فعال در هر روز</label>
+                </div>
+                <div class="col-md-9 mb-1">
+                    <div class="input-group mb-3">
+                        <input type="number" class="form-control" id="basic-url" aria-describedby="basic-addon3"
+                            wire:model='gseting.maxAppDay'>
+                        <div class="input-group-prepend">
+                            <span class="input-group-text" id="basic-addon3">عدد</span>
+                        </div>
+                    </div>
+                    <span class="text-muted d-flex align-items-center"><i
+                            class="fa fa-exclamation-circle fa-lg text-light me-1" aria-hidden="true"></i>هر کاربر در
+                        هر روز بتواند چند نوتب دریافت بکند</span>
+                </div>
+                <div class="col-md-3 pt-2">
+                    <label class="text-primary" for="basic-url">تعداد نوبت فعال در کل</label>
+                </div>
+                <div class="col-md-9">
+                    <div class="input-group mb-3">
+                        <input type="number" class="form-control" id="basic-url" aria-describedby="basic-addon3"
+                        wire:model='gseting.maxAppTotall'>
+                        <div class="input-group-prepend">
+                            <span class="input-group-text" id="basic-addon3">عدد</span>
+                        </div>
+                    </div>
+                    <span class="text-muted d-flex align-items-center"><i
+                            class="fa fa-exclamation-circle fa-lg text-light me-1" aria-hidden="true"></i>هر کاربر
+                        بتواند در کل چند نوبت فعال داشته
+                        باشد</span>
+                </div>
+                <div class="d-flex  mt-2">
+                    <p class="text-muted"> <strong class="me-1"> نکته!! </strong> دقت کنید که حداکثر نوبت دریافتی در
+                        یک روز از تعداد کل نوبت ها (فیلد اول نسبت به دوم) بزرگ تر نباشد!</p>
+                </div>
+            </div>
+        </div>
+    </div>
     {{-- cancel time  --}}
     <div class="card">
         <div class="card-header border-bottom d-flex justify-content-between">
@@ -355,8 +408,9 @@
 @push('scripts')
     <script>
         $(document).ready(function() {
-            $('#type_food').on('click', function() {
-                @this.set('form.typeFood', $('#type_food').hasClass('on'));
+            //how to check if check boxes are checked
+            $('#exampleCheckbox').on('click', function() {
+                @this.set('gseting.dayOftheWeek', $('#exampleCheckbox').hasClass('on'));
             });
 
             function appearPeymentStatusDiv() {

@@ -73,11 +73,7 @@
                     <div class="row">
                         <div class="col-12">
                             <div class="form-group ">
-                                <label for="exampleInputPassword2">
-                                    @if ($i >= 1)
-                                        شماره ی - {{ $i + 1 }}
-                                    @endif
-                                </label>
+                                <label for="exampleInputPassword2">شماره تماس :</label>
                                 <input type="text" class="form-control" id="placenumber-{{ $i }}"
                                     wire:model='place.number.{{ $i }}' placeholder="شماره تماس">
                             </div>

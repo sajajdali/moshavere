@@ -66,31 +66,33 @@
                             <div class="col-lg-6 col-md-12 col-sm-12">
                                 <div class="card mb-5">
                                     <div class="card-body">
-                                            <div class="client-title mt-0 flex-column flex-sm-row">
-                                                <figure class="rounded-circle align-self-start mb-0">
-                                                    @if ($doctor->avatar)
-                                                        <img src="{{ $doctor->avatar }}" alt="Generic placeholder image"
-                                                            class="avatar brround avatar-lg me-3">
-                                                    @else
-                                                        <svg xmlns="http://www.w3.org/2000/svg" class="w-inner-icn"
-                                                            enable-background="new 0 0 24 24" viewBox="0 0 24 24">
-                                                            <path
-                                                                d="M14.6650391,13.3672485C16.6381226,12.3842773,17.9974365,10.3535767,18,8c0-3.3137207-2.6862793-6-6-6S6,4.6862793,6,8c0,2.3545532,1.3595581,4.3865967,3.3334961,5.3690186c-3.6583862,1.0119019-6.5859375,4.0562134-7.2387695,8.0479736c-0.0002441,0.0013428-0.0004272,0.0026855-0.0006714,0.0040283c-0.0447388,0.272583,0.1399536,0.5297852,0.4125366,0.5745239c0.272522,0.0446777,0.5297241-0.1400146,0.5744629-0.4125366c0.624939-3.8344727,3.6308594-6.8403931,7.465332-7.465332c4.9257812-0.8027954,9.5697632,2.5395508,10.3725586,7.465332C20.9594727,21.8233643,21.1673584,21.9995117,21.4111328,22c0.0281372,0.0001831,0.0562134-0.0021362,0.0839844-0.0068359h0.0001831c0.2723389-0.0458984,0.4558716-0.303833,0.4099731-0.5761719C21.2677002,17.5184937,18.411377,14.3986206,14.6650391,13.3672485z M12,13c-2.7614136,0-5-2.2385864-5-5s2.2385864-5,5-5c2.7600708,0.0032349,4.9967651,2.2399292,5,5C17,10.7614136,14.7614136,13,12,13z" />
-                                                        </svg>
-                                                    @endif
-                                                </figure>
-                                                <div class="media-body my-3 my-sm-0">
-                                                    <h4 class="time-title p-0 mb-0 font-weight-semibold leading-normal">
-                                                        <a href="{{route('admin.appointment.setting',['user' => $doctor->id])}}"
-                                                            class="text-dark">{{ $doctor->fullName }}</a></h4>
-                                                    <span></span>
-                                                </div>
-                                                <a  href="{{route('admin.appointment.setting',['user' => $doctor->id])}}" data-bs-toggle="tooltip" data-bs-placement="top"
-                                                    title="تنظمات روز های حضور"
-                                                    class="btn btn-info  d-block">
-                                                    <i class="fa fa-calendar"aria-hidden="true"></i> <span>تنظیمات روز های حضور</span>
-                                                </a>
+                                        <div class="client-title mt-0 flex-column flex-sm-row">
+                                            <figure class="rounded-circle align-self-start mb-0">
+                                                @if ($doctor->avatar)
+                                                    <img src="{{ $doctor->avatar }}" alt="Generic placeholder image"
+                                                        class="avatar brround avatar-lg me-3">
+                                                @else
+                                                    <svg xmlns="http://www.w3.org/2000/svg" class="w-inner-icn"
+                                                        enable-background="new 0 0 24 24" viewBox="0 0 24 24">
+                                                        <path
+                                                            d="M14.6650391,13.3672485C16.6381226,12.3842773,17.9974365,10.3535767,18,8c0-3.3137207-2.6862793-6-6-6S6,4.6862793,6,8c0,2.3545532,1.3595581,4.3865967,3.3334961,5.3690186c-3.6583862,1.0119019-6.5859375,4.0562134-7.2387695,8.0479736c-0.0002441,0.0013428-0.0004272,0.0026855-0.0006714,0.0040283c-0.0447388,0.272583,0.1399536,0.5297852,0.4125366,0.5745239c0.272522,0.0446777,0.5297241-0.1400146,0.5744629-0.4125366c0.624939-3.8344727,3.6308594-6.8403931,7.465332-7.465332c4.9257812-0.8027954,9.5697632,2.5395508,10.3725586,7.465332C20.9594727,21.8233643,21.1673584,21.9995117,21.4111328,22c0.0281372,0.0001831,0.0562134-0.0021362,0.0839844-0.0068359h0.0001831c0.2723389-0.0458984,0.4558716-0.303833,0.4099731-0.5761719C21.2677002,17.5184937,18.411377,14.3986206,14.6650391,13.3672485z M12,13c-2.7614136,0-5-2.2385864-5-5s2.2385864-5,5-5c2.7600708,0.0032349,4.9967651,2.2399292,5,5C17,10.7614136,14.7614136,13,12,13z" />
+                                                    </svg>
+                                                @endif
+                                            </figure>
+                                            <div class="media-body my-3 my-sm-0">
+                                                <h4 class="time-title p-0 mb-0 font-weight-semibold leading-normal">
+                                                    <a href="{{ route('admin.appointment.setting', ['user' => $doctor->id]) }}"
+                                                        class="text-dark">{{ $doctor->fullName }}</a>
+                                                </h4>
+                                                <span></span>
                                             </div>
+                                            <a href="{{ route('admin.appointment.setting', ['user' => $doctor->id]) }}"
+                                                data-bs-toggle="tooltip" data-bs-placement="top"
+                                                title="تنظمات روز های حضور" class="btn btn-info  d-block">
+                                                <i class="fa fa-calendar"aria-hidden="true"></i> <span>تنظیمات روز های
+                                                    حضور</span>
+                                            </a>
+                                        </div>
                                         <div class="d-flex align-items-center justify-content-center mt-4">
                                             <div
                                                 class="pe-4 border-end d-flex align-items-center justify-content-center">
@@ -122,33 +124,6 @@
                 {{ $doctors->links() }}
             </div>
         </div>
-        {{-- <div class="card-body">
-            <div class="form-row">
-                <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 mt-3">
-                    <div class="main-toggle-group d-sm-flex align-items-center ms-0">
-                        <div class="toggle toggle-lg toggle-success my-1 @if (isset($form['typeFood']) && $form['typeFood'] == \Modules\Diet\Enum\BasicFoodTypeEnum::COMBINED->value) on @else off @endif"
-                            id="type_food">
-                            <span></span>
-                        </div>
-                        <div class="ms-2">
-                            <p class="text-muted m-0">این غذا فقط به عنوان ترکیبی استفاده شود</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div> --}}
     </div>
 
 </div>
-@push('scripts')
-    <script>
-        $(document).ready(function() {
-            $('#type_food').on('click', function() {
-                @this.set('form.typeFood', $('#type_food').hasClass('on'));
-            });
-            Livewire.on('closeCollaps', function() {
-                $('#advanceSearch').removeClass('show');
-            });
-        });
-    </script>
-@endpush

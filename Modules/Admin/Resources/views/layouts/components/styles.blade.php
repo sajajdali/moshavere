@@ -4,7 +4,6 @@
 <!-- STYLE CSS -->
 <link href="{{ admin_asset('css/style.css') }}" rel="stylesheet" />
 <link href="{{ admin_asset('css/skin-modes.css') }}" rel="stylesheet" />
-<link href="{{ url('assets\admin\css\persian-datepicker.min.css') }}" rel="stylesheet">
 
 @yield('styles')
 

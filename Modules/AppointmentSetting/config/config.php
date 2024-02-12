@@ -43,6 +43,16 @@ return [
 
                 ],
             ],
+            [
+                'title' => 'ثبت عدم حضور',
+                'gate' => 'viewAny',
+                'policy_class' => \Modules\User\Entities\User::class,
+                'icon' => 'fe fe-slash',
+                'route' => 'admin.appointment.absentee',
+                'has_badge' => false,
+                'has_child' => false,
+                'children' => null,
+            ],
         ],
     ],
 ];

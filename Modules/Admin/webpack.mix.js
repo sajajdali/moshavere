@@ -70,6 +70,8 @@ mix
     .js('Resources/assets/js/userlist.js', '../../public/assets/admin/js')
     .js('Resources/assets/js/mapp.min.js', '../../public/assets/admin/js')
     .js('Resources/assets/js/mapp.env.js', '../../public/assets/admin/js')
+    .copyDirectory('Resources/assets/js/persian-date.min.js', '../../public/assets/admin/js')
+    .copyDirectory('Resources/assets/js/persian-datepicker.min.js', '../../public/assets/admin/js')
     .postCss('Resources/assets/css/animated.css', '../../public/assets/admin/css')
     .sass('Resources/assets/css/skin-modes.scss', '../../public/assets/admin/css')
     .sass('Resources/assets/scss/style.scss', '../../public/assets/admin/css')

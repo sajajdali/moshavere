@@ -2,6 +2,7 @@
 
 namespace Modules\Speciality\app\Models;
 
+use App\Enum\ActiveEnum;
 use Illuminate\Database\Eloquent\Model;
 use Modules\Speciality\Enum\SpecialityStatusEnum;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -15,10 +16,10 @@ class Speciality extends Model
      * The attributes that are mass assignable.
      */
     protected $guarded = ['id'];
-    protected $casts = ['status' => SpecialityStatusEnum::class] ;
+    protected $casts = ['status' => ActiveEnum::class] ;
 
     public function scopeFilterStatus($query,SpecialityStatusEnum $status){
-        return $query->whereStatus($status);
+        return $query->whereActive($status);
     }
 
     public function user() {

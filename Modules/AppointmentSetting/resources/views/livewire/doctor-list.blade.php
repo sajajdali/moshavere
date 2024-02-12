@@ -58,7 +58,7 @@
                     </button>
                 </form>
             </div>
-            @if (!empty($doctors))
+            @if ($doctors->count())
                 <div class="row mt-5">
                     <div class="row">
                         <h5 class="text-muted mt-1 mb-5">برای تنظیم زمان حضور، پزشک مورد نظر را انتخاب کنید</h5>
@@ -112,13 +112,17 @@
                 </div>
             @else
                 <div class="alert alert-primary alert-dismissible fade show" role="alert">
-                    <span class="alert-inner--text"><strong>پزشکی یافت نشد!!</strong> لطفا ابتدا پزشکان را به سایت
-                        اضافه کنید</span> <a href="{{ route('admin.user.create') }}" class="btn btn-success">اضافه
-                        کردن</a>
+                    <span class="alert-inner--text"><strong>پزشکی یافت نشد!!</strong>
+                        <br>
+                        لطفا ابتدا پزشکان را به سایت
+
+                        اضافه کنید</span>
                     <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close">
                         <span aria-hidden="true">×</span>
                     </button>
                 </div>
+                <a href="{{ route('admin.user.create') }}" class="btn btn-success">افزودن پزشک جدید
+                    </a>
             @endif
             <div class="d-flex justify-content-center">
                 {{ $doctors->links() }}

@@ -9,16 +9,21 @@ class GeneralSetting extends Component
 {
     public $doctor;
 
+    public array $gseting = [
+        'maxAppDay' => 1 ,
+        'maxAppTotall' => 1 ,
+    ];
+
     //day property
     public array $timeFrame = [];
     public array $counter = [
-        'saturday' => 1,
-        'sunday'   => 1,
-        'monday'   => 1,
-        'tuesday'  => 1,
-        'wednesday' => 1,
-        'thursday'  => 1,
-        'friday'   => 1,
+        'saturday'   => 1,
+        'sunday'     => 1,
+        'monday'     => 1,
+        'tuesday'    => 1,
+        'wednesday'  => 1,
+        'thursday'   => 1,
+        'friday'     => 1,
     ];
 
     //visit property

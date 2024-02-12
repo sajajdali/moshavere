@@ -120,15 +120,20 @@
                                                 <td>شنبه</td>
                                                 <td>ویزیت</td>
                                                 <td>
-                                                    <span class="bg-secondary text-white rounded-pill py-1 px-2">10:30 تا
+                                                    <span class="bg-secondary text-white rounded-pill py-1 px-2">10:30
+                                                        تا
                                                         12:30</span>
-                                                    <span class="bg-secondary text-white rounded-pill py-1 px-2">11:30 تا
+                                                    <span class="bg-secondary text-white rounded-pill py-1 px-2">11:30
+                                                        تا
                                                         13:30</span>
-                                                    <span class="bg-secondary text-white rounded-pill py-1 px-2">11:30 تا
+                                                    <span class="bg-secondary text-white rounded-pill py-1 px-2">11:30
+                                                        تا
                                                         13:30</span>
-                                                    <span class="bg-secondary text-white rounded-pill py-1 px-2">15:30 تا
+                                                    <span class="bg-secondary text-white rounded-pill py-1 px-2">15:30
+                                                        تا
                                                         16:30</span>
-                                                    <span class="bg-secondary text-white rounded-pill py-1 px-2">20:30 تا
+                                                    <span class="bg-secondary text-white rounded-pill py-1 px-2">20:30
+                                                        تا
                                                         21:30</span>
                                                 </td>
                                             </tr>
@@ -136,9 +141,11 @@
                                                 <td>یکشنبه</td>
                                                 <td>مشاوره</td>
                                                 <td>
-                                                    <span class="bg-secondary text-white rounded-pill py-1 px-2">10:30 تا
+                                                    <span class="bg-secondary text-white rounded-pill py-1 px-2">10:30
+                                                        تا
                                                         12:30</span>
-                                                    <span class="bg-secondary text-white rounded-pill py-1 px-2">11:30 تا
+                                                    <span class="bg-secondary text-white rounded-pill py-1 px-2">11:30
+                                                        تا
                                                         13:30</span>
                                                 </td>
                                             </tr>
@@ -188,15 +195,20 @@
                                                 <td>شنبه</td>
                                                 <td>ویزیت</td>
                                                 <td>
-                                                    <span class="bg-secondary text-white rounded-pill py-1 px-2">10:30 تا
+                                                    <span class="bg-secondary text-white rounded-pill py-1 px-2">10:30
+                                                        تا
                                                         12:30</span>
-                                                    <span class="bg-secondary text-white rounded-pill py-1 px-2">11:30 تا
+                                                    <span class="bg-secondary text-white rounded-pill py-1 px-2">11:30
+                                                        تا
                                                         13:30</span>
-                                                    <span class="bg-secondary text-white rounded-pill py-1 px-2">11:30 تا
+                                                    <span class="bg-secondary text-white rounded-pill py-1 px-2">11:30
+                                                        تا
                                                         13:30</span>
-                                                    <span class="bg-secondary text-white rounded-pill py-1 px-2">15:30 تا
+                                                    <span class="bg-secondary text-white rounded-pill py-1 px-2">15:30
+                                                        تا
                                                         16:30</span>
-                                                    <span class="bg-secondary text-white rounded-pill py-1 px-2">20:30 تا
+                                                    <span class="bg-secondary text-white rounded-pill py-1 px-2">20:30
+                                                        تا
                                                         21:30</span>
                                                 </td>
                                             </tr>
@@ -204,9 +216,11 @@
                                                 <td>یکشنبه</td>
                                                 <td>مشاوره</td>
                                                 <td>
-                                                    <span class="bg-secondary text-white rounded-pill py-1 px-2">10:30 تا
+                                                    <span class="bg-secondary text-white rounded-pill py-1 px-2">10:30
+                                                        تا
                                                         12:30</span>
-                                                    <span class="bg-secondary text-white rounded-pill py-1 px-2">11:30 تا
+                                                    <span class="bg-secondary text-white rounded-pill py-1 px-2">11:30
+                                                        تا
                                                         13:30</span>
                                                 </td>
                                             </tr>

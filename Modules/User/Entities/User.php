@@ -2,6 +2,8 @@
 
 namespace Modules\User\Entities;
 
+use Modules\AppointmentSetting\app\Models\AppointmentSetting;
+use Modules\User\Traits\UserRelationTrait;
 use Verta;
 use Laravel\Sanctum\HasApiTokens;
 use Spatie\Permission\Models\Role;
@@ -69,7 +71,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
  */
 class User extends Authenticatable
 {
-    use HasRoles, Notifiable, HasFactory, HasApiTokens, UserAttributeTrait, MetaAttributeTrait;
+    use HasRoles, Notifiable, HasFactory, HasApiTokens, UserAttributeTrait, MetaAttributeTrait , UserRelationTrait;
 
     protected $guarded = ['id'];
 
@@ -184,8 +186,5 @@ class User extends Authenticatable
         return  $this->$meta_type?->last()?->meta_key->getOptionName($metaOptions);
     }
 
-    public function specialities()
-    {
-        return $this->belongsToMany(Speciality::class);
-    }
+
 }

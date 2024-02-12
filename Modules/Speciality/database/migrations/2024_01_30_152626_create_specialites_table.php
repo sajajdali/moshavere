@@ -14,8 +14,8 @@ return new class extends Migration
         Schema::create('specialities', function (Blueprint $table) {
             $table->id();
             $table->string('title');
-            $table->tinyInteger('status');
-            $table->integer('priority');
+            $table->tinyInteger('active');
+            $table->integer('priority')->default(1);
             $table->timestamps();
         });
     }

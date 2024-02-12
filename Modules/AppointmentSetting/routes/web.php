@@ -2,7 +2,6 @@
 
 use Illuminate\Support\Facades\Route;
 use Modules\AppointmentSetting\Http\Controllers\AppointmentSettingController;
-use Modules\AppointmentSetting\Livewire\DoctorList;
 
 /*
 |--------------------------------------------------------------------------
@@ -16,5 +15,5 @@ use Modules\AppointmentSetting\Livewire\DoctorList;
 */
 
 Route::group([], function () {
-    Route::resource('appointmentsetting', DoctorList::class)->names('appointmentsetting');
+
 });

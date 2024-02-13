@@ -73,6 +73,16 @@ return [
 
                 ],
             ],
+            [
+                'title' => 'ثبت نوبت',
+                'gate' => 'viewAny',
+                'policy_class' => \Modules\User\Entities\User::class,
+                'icon' => 'fe fe-plus-circle',
+                'route' => 'admin.appointment.add.sectionList',
+                'has_badge' => false,
+                'has_child' => false,
+                'children' => null
+            ],
         ],
     ],
 ];

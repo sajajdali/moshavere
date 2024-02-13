@@ -3,6 +3,8 @@
 use Illuminate\Support\Facades\Route;
 use Modules\AppointmentSetting\Livewire\Absentee\AbsenteeList;
 use Modules\AppointmentSetting\Livewire\Absentee\AbsenteeRegistration;
+use Modules\AppointmentSetting\Livewire\AddAppointment\CreateOrUpdate;
+use Modules\AppointmentSetting\Livewire\AddAppointment\DocAndSectionList;
 use Modules\AppointmentSetting\Livewire\GeneralSetting\DoctorList;
 use Modules\AppointmentSetting\Livewire\GeneralSetting\GeneralSetting;
 use Modules\AppointmentSetting\Livewire\GeneralSetting\SpecialSectionSetting;
@@ -24,4 +26,7 @@ Route::group([], function () {
     Route::get('appointment/setting/absentee/list', AbsenteeList::class)->name('appointment.absentee.list');
     Route::get('appointment/setting/{user}', GeneralSetting::class)->name('appointment.setting');
     Route::get('appointment/setting/special/section/{user}', SpecialSectionSetting::class)->name('appointment.specialsection');
+    //add appointment
+    Route::get('appointment/add/{doctorId}/{sectionId}', CreateOrUpdate::class)->name('appointment.add.setTime');
+    Route::get('appointment/section/list', DocAndSectionList::class)->name('appointment.add.sectionList');
 });

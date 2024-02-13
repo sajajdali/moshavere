@@ -1,0 +1,199 @@
+<div>
+    <div class="page-header">
+        <div>
+            <h1 class="page-title">افزودن نوبت </h1>
+        </div>
+    </div>
+    @include('admin::layouts.components.alert')
+
+
+    <!-- ROW-2 OPEN -->
+    <div class="row">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-header border-bottom">
+                    <h3 class="card-title">انتخاب پزشک یا بخش</h3>
+                </div>
+                <div class="card-body p-6">
+                    <div class="panel panel-primary">
+                        <div>
+                            <div class="tabs-menu4 border-bottomo-sm">
+                                <!-- Tabs -->
+                                <nav class="nav d-sm-flex d-block">
+                                    <a class="nav-link border border-bottom-0 br-sm-5 me-2 active" data-bs-toggle="tab"
+                                        href="#doctors">
+                                        پزشک ها
+                                    </a>
+                                    <a class="nav-link border border-bottom-0 br-sm-5 me-2" data-bs-toggle="tab"
+                                        href="#sections">
+                                        بخش ها
+                                    </a>
+                                </nav>
+                            </div>
+                        </div>
+                        <div class="tab-content">
+                            {{-- doctor panel --}}
+                            <div class="tab-pane active " id="doctors">
+                                <div class="row">
+                                    <div class="col-md-12 col-xl-12">
+                                        <div class="card">
+                                            <div class="card-body">
+                                                <div class="row align-items-center">
+                                                    <div class="col-xl col-lg-6 col-md-12">
+                                                        جست و جو در پزشکان
+                                                    </div>
+                                                    <div class="col-xl-4 col-lg-6 col-md-12 mt-3 mt-lg-0">
+                                                        <div class="input-group">
+                                                            <input type="text" class="form-control"
+                                                                wire:model='search.doctors'
+                                                                placeholder="نام خانوادگی پزشک">
+                                                            <button wire:click='searchDoctors'
+                                                                class="btn ripple btn-info text-fixed-white input-group-text border-0"
+                                                                type="button">
+                                                                <span wire:target='searchDoctors'
+                                                                    wire:loading.remove>جست و جو</span>
+                                                                <span wire:target='searchDoctors' wire:loading
+                                                                    class="spinner-border spinner-border-sm"
+                                                                    role="status" aria-hidden="true"></span>
+                                                            </button>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    @foreach ($doctors as $key => $doctor)
+                                        <div class="col-md-4 col-sm-12">
+                                            <div class="card custom-card client-card border">
+                                                <div class="card-body">
+                                                    <div class="client-card-top">
+                                                        <div class="d-flex">
+                                                            <div class="rounded-circle align-self-start mb-0">
+                                                            </div>
+                                                            <div class="flex-fill my-1"> <a
+                                                                    href="javascript:void(0);">{{ $doctor->fullName }}</a>
+                                                                <p>متخصص داخلی</p>
+                                                            </div>
+                                                        </div>
+                                                        <button class="btn btn-warning w-100"
+                                                            wire:click='lunchDocModal({{ $doctor->id }})'>
+                                                            <div wire:loading.remove
+                                                                wire:target='lunchDocModal({{ $doctor->id }})'>
+                                                                <i class="fa fa-check" aria-hidden="true"></i>
+                                                                <span>افزودن نوبت</span>
+                                                            </div>
+                                                            <span wire:target='lunchDocModal({{ $doctor->id }})'
+                                                                wire:loading
+                                                                wire:target='lunchDocModal({{ $doctor->id }})'
+                                                                class="spinner-border spinner-border-sm" role="status"
+                                                                aria-hidden="true"></span>
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    @endforeach
+                                </div>
+                            </div>
+                            {{-- section panel  --}}
+                            <div class="tab-pane" id="sections">
+                                <div class="tab-pane  " id="sections">
+
+                                    <div class="row">
+                                        <div class="col-md-12 col-xl-12">
+                                            <div class="card">
+                                                <div class="card-body">
+                                                    <div class="row align-items-center">
+                                                        <div class="col-xl col-lg-6 col-md-12">
+                                                            جست و جو در بخش ها
+                                                        </div>
+                                                        <div class="col-xl-4 col-lg-6 col-md-12 mt-3 mt-lg-0">
+                                                            <div class="input-group">
+                                                                <input type="text" class="form-control"
+                                                                    wire:model='search.doctors' placeholder="نام بخش">
+                                                                <button wire:click='searchSection'
+                                                                    class="btn ripple btn-info text-fixed-white input-group-text border-0"
+                                                                    type="button">
+                                                                    <span wire:loading.remove>جست و جو</span>
+                                                                    <span wire:loading
+                                                                        class="spinner-border spinner-border-sm"
+                                                                        role="status" aria-hidden="true"></span>
+                                                                </button>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        {{-- TODO::addForeach --}}
+                                        <div class="col-md-4 col-sm-12">
+                                            <div class="card custom-card client-card border">
+                                                <div class="card-body">
+                                                    <div class="client-card-top">
+                                                        <div class="d-flex">
+                                                            <div class="rounded-circle align-self-start mb-0">
+                                                            </div>
+                                                            <div class="flex-fill my-1"> <a
+                                                                    href="javascript:void(0);">بخش پزشکی</a>
+                                                                <p>12 پزشک</p>
+                                                            </div>
+                                                        </div>
+                                                        <button class="btn btn-warning w-100">
+                                                            <i class="fa fa-check" aria-hidden="true"></i>
+                                                            <span>افزودن نوبت</span>
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        {{-- TODO::addForeach --}}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Modal -->
+    <div class="modal fade" id="setDocOrsectionMOdal" tabindex="-1" aria-labelledby="exampleModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">لطفا بخش/پزشک مورد نظر را انتخاب کنید</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="d-flex flex-column g-2">
+                        <a wire:click='addAppointment({{ 1 }})'
+                            class="badge rounded-pill bg-primary-gradient my-1 p-5 text-white"
+                            style="font-size: medium !important ; cursor: pointer;">ویزیت</a>
+                        <a wire:click='addAppointment({{ 1 }})'
+                            class="badge rounded-pill bg-info-gradient my-1 p-5 text-white"
+                            style="font-size: medium !important; cursor: pointer;">جراحی</a>
+                    </div>
+                    @if (isset($modalDate))
+                        {{-- content should be insite this if  --}}
+                    @endif
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">بیخیال</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+@push('scripts')
+    <script>
+        $(document).ready(function() {
+            Livewire.on('lunchModal', function() {
+                var myModal = new bootstrap.Modal(document.getElementById('setDocOrsectionMOdal'), {
+                    keyboard: false
+                });
+                myModal.show();
+            })
+        });
+    </script>
+@endpush

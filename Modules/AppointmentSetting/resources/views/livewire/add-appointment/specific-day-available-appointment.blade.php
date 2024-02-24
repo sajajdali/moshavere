@@ -13,11 +13,12 @@
             <div class="card custom-card">
                 <div class="card-header d-flex justify-content-between border-bottom">
                     <div>
-                        <button class="btn btn-light">
+                        <button class="btn btn-light" wire:click='previousDay'>
                             <i class="fa fa-arrow-right" aria-hidden="true"></i>
                         </button>
-                        <span> شنبه 1402:01:15 </span>
-                        <button class="btn btn-light">
+                        <input class="text-center" type="text" value="شنبه 1402:01:15" id="currentDate"
+                            style="max-width: fit-content">
+                        <button class="btn btn-light" wire:click='nextDay'>
                             <i class="fa fa-arrow-left" aria-hidden="true"></i>
                         </button>
                     </div>
@@ -206,7 +207,14 @@
                     $('.addSelectJs').select2();
                 }, 1000);
             })
-
+            $('#currentDate').persianDatepicker({
+                initialValue: false,
+                format: 'L',
+                autoClose: true,
+                onSelect: function(unix) {
+                    @this.set('currentDate', $('#currentDate').val());
+                }
+            });
         });
     </script>
 @endpush

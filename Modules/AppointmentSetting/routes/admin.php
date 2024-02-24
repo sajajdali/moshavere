@@ -9,6 +9,7 @@ use Modules\AppointmentSetting\Livewire\AddAppointment\DocAndSectionList;
 use Modules\AppointmentSetting\Livewire\GeneralSetting\SpecialSectionSetting;
 use Modules\AppointmentSetting\Livewire\AddAppointment\ListOfAvailableAppointment;
 use Modules\AppointmentSetting\Livewire\AddAppointment\SpecificDayAvailableAppointment;
+use Modules\AppointmentSetting\Livewire\UserAppointMentList\Index;
 
 /*
 |--------------------------------------------------------------------------
@@ -31,4 +32,7 @@ Route::group([], function () {
     Route::get('appointment/section/list', DocAndSectionList::class)->name('appointment.add.sectionList');
     Route::get('appointment/add/specificday/{date}', SpecificDayAvailableAppointment::class)->name('appointment.add.specificday');
     Route::get('appointment/add/{doctorId}/{sectionId}', ListOfAvailableAppointment::class)->name('appointment.add.setTime');
+    //List of appointment
+    Route::get('appointment/list', Index::class)->name('appointment.list');
+
 });

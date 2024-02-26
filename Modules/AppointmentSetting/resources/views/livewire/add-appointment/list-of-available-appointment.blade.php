@@ -59,32 +59,32 @@
                         <span class="badge rounded-pill bg-success-gradient my-1 w-100 text-white hover-zoom"
                             style="font-size: 14px !important ; cursor: pointer;">
                             {{-- TODO::change the Date to dynamic property that is the date of the day --}}
-                            <div wire:loading.remove wire:tartget='addAppointment({{'Date'}})' wire:click='addAppointment({{'Date'}})'>
+                            <div   wire:click='addAppointment({{'Date'}})'>
                                 <i class="fa fa-clock-o" aria-hidden="true"></i>
                                 <span>ساعت 10:10 تا 10:15</span>
                             </div>
-                            <span wire:loading wire:tartget='addAppointment({{'Date'}})' wire:click='addAppointment({{'Date'}})' class="spinner-border spinner-border-sm" role="status"
-                                aria-hidden="true"></span>
+                            {{-- <span wire:loading  wire:click='addAppointment({{'Date'}})' class="spinner-border spinner-border-sm" role="status"
+                                aria-hidden="true"></span> --}}
                         </span>
                         {{-- each time for day --}}
 
                         <span class="badge rounded-pill bg-success-gradient my-1 w-100 text-white hover-zoom"
                             style="font-size: 14px !important ; cursor: pointer;">
-                            <div wire:loading.remove wire:tartget='addAppointment({{'Date'}})' wire:click='addAppointment({{'Date'}})'>
+                            <div    wire:click='addAppointment({{'Date'}})'>
                                 <i class="fa fa-clock-o" aria-hidden="true"></i>
                                 <span>ساعت 10:15 تا 10:20</span>
                             </div>
-                            <span wire:loading wire:tartget='addAppointment({{'Date'}})' wire:click='addAppointment({{'Date'}})' class="spinner-border spinner-border-sm" role="status"
-                                aria-hidden="true"></span>
+                            {{-- <span wire:loading   wire:click='addAppointment({{'Date'}})' class="spinner-border spinner-border-sm" role="status"
+                                aria-hidden="true"></span> --}}
                         </span>
                         <span class="badge rounded-pill bg-success-gradient my-1 w-100 text-white hover-zoom"
                             style="font-size: 14px !important ; cursor: pointer;">
-                            <div wire:loading.remove wire:tartget='addAppointment({{'Date'}})' wire:click='addAppointment({{'Date'}})'>
+                            <div    wire:click='addAppointment({{'Date'}})'>
                                 <i class="fa fa-clock-o" aria-hidden="true"></i>
                                 <span>ساعت 10:30 تا 10:35</span>
                             </div>
-                            <span wire:loading wire:tartget='addAppointment({{'Date'}})' wire:click='addAppointment({{'Date'}})' class="spinner-border spinner-border-sm" role="status"
-                                aria-hidden="true"></span>
+                            {{-- <span wire:loading   wire:click='addAppointment({{'Date'}})' class="spinner-border spinner-border-sm" role="status"
+                                aria-hidden="true"></span> --}}
                         </span>
 
                     </div>
@@ -112,23 +112,23 @@
                         {{-- each time for day --}}
                         <span class="badge rounded-pill bg-success-gradient my-1 w-100 text-white hover-zoom"
                             style="font-size: 14px !important ; cursor: pointer;">
-                            <div wire:loading.remove wire:tartget='addAppointment({{'Date'}})' wire:click='addAppointment({{'Date'}})'>
+                            <div    wire:click='addAppointment({{'Date'}})'>
                                 <i class="fa fa-clock-o" aria-hidden="true"></i>
                                 <span>ساعت 10:10 تا 10:15</span>
                             </div>
-                            <span wire:loading wire:tartget='addAppointment({{'Date'}})' wire:click='addAppointment({{'Date'}})' class="spinner-border spinner-border-sm" role="status"
-                                aria-hidden="true"></span>
+                            {{-- <span wire:loading   wire:click='addAppointment({{'Date'}})' class="spinner-border spinner-border-sm" role="status"
+                                aria-hidden="true"></span> --}}
                         </span>
                         {{-- each time for day --}}
 
                         <span class="badge rounded-pill bg-success-gradient my-1 w-100 text-white hover-zoom"
                             style="font-size: 14px !important ; cursor: pointer;">
-                            <div wire:loading.remove wire:tartget='addAppointment({{'Date'}})' wire:click='addAppointment({{'Date'}})'>
+                            <div    wire:click='addAppointment({{'Date'}})'>
                                 <i class="fa fa-clock-o" aria-hidden="true"></i>
                                 <span>ساعت 10:15 تا 10:20</span>
                             </div>
-                            <span wire:loading wire:tartget='addAppointment({{'Date'}})' wire:click='addAppointment({{'Date'}})' class="spinner-border spinner-border-sm" role="status"
-                                aria-hidden="true"></span>
+                            {{-- <span wire:loading   wire:click='addAppointment({{'Date'}})' class="spinner-border spinner-border-sm" role="status"
+                                aria-hidden="true"></span> --}}
                         </span>
                     </div>
                 </div>
@@ -155,32 +155,32 @@
                         {{-- each time for day --}}
                         <span class="badge rounded-pill bg-success-gradient my-1 w-100 text-white hover-zoom"
                             style="font-size: 14px !important ; cursor: pointer;">
-                            <div wire:loading.remove wire:tartget='addAppointment({{'Date'}})' wire:click='addAppointment({{'Date'}})'>
+                            <div    wire:click='addAppointment({{'Date'}})'>
                                 <i class="fa fa-clock-o" aria-hidden="true"></i>
                                 <span>ساعت 10:10 تا 10:15</span>
                             </div>
-                            <span wire:loading  wire:tartget='addAppointment({{'Date'}})' wire:click='addAppointment({{'Date'}})' class="spinner-border spinner-border-sm" role="status"
-                                aria-hidden="true"></span>
+                            {{-- <span wire:loading    wire:click='addAppointment({{'Date'}})' class="spinner-border spinner-border-sm" role="status"
+                                aria-hidden="true"></span> --}}
                         </span>
                         {{-- each time for day --}}
 
                         <span class="badge rounded-pill bg-success-gradient my-1 w-100 text-white hover-zoom"
                             style="font-size: 14px !important ; cursor: pointer;">
-                            <div wire:loading.remove wire:tartget='addAppointment({{'Date'}})' wire:click='addAppointment({{'Date'}})'>
+                            <div    wire:click='addAppointment({{'Date'}})'>
                                 <i class="fa fa-clock-o" aria-hidden="true"></i>
                                 <span>ساعت 10:15 تا 10:20</span>
                             </div>
-                            <span wire:loading wire:tartget='addAppointment({{'Date'}})' wire:click='addAppointment({{'Date'}})' class="spinner-border spinner-border-sm" role="status"
-                                aria-hidden="true"></span>
+                            {{-- <span wire:loading   wire:click='addAppointment({{'Date'}})' class="spinner-border spinner-border-sm" role="status"
+                                aria-hidden="true"></span> --}}
                         </span>
                         <span class="badge rounded-pill bg-success-gradient my-1 w-100 text-white hover-zoom"
                             style="font-size: 14px !important ; cursor: pointer;">
-                            <div wire:loading.remove wire:tartget='addAppointment({{'Date'}})' wire:click='addAppointment({{'Date'}})'>
+                            <div    wire:click='addAppointment({{'Date'}})'>
                                 <i class="fa fa-clock-o" aria-hidden="true"></i>
                                 <span>ساعت 10:30 تا 10:35</span>
                             </div>
-                            <span wire:loading wire:tartget='addAppointment({{'Date'}})' wire:click='addAppointment({{'Date'}})' class="spinner-border spinner-border-sm" role="status"
-                                aria-hidden="true"></span>
+                            {{-- <span wire:loading   wire:click='addAppointment({{'Date'}})' class="spinner-border spinner-border-sm" role="status"
+                                aria-hidden="true"></span> --}}
                         </span>
 
                     </div>

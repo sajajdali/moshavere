@@ -3,8 +3,8 @@
         <div>
             <h1 class="page-title">لیست نوبت های ثبت شده</h1>
         </div>
-        <a href="{{route('admin.appointment.add.sectionList')}}" class="btn btn-primary" 
-            aria-expanded="false" aria-controls="customDate">افزودن نوبت</a>
+        <a href="{{ route('admin.appointment.add.sectionList') }}" class="btn btn-primary" aria-expanded="false"
+            aria-controls="customDate">افزودن نوبت</a>
     </div>
     @include('admin::layouts.components.alert')
 
@@ -18,9 +18,11 @@
                             data-bs-target="#advanceSearch" aria-expanded="false" aria-controls="advanceSearch">
                             جست و جوی پیشرفته
                         </button>
-                        @if (isset($searchPanel))
-                            <button class="btn btn-secondary ms-2" type="button" wire:click="resetProperties"
-                                wire:loading.class="bg-gray btn-loading disabled">نمایش همه
+                        @if (!empty($search))
+                            <button class="btn btn-secondary ms-2" wire:click="resetProperties" type="button"
+                                data-bs-toggle="collapse" data-bs-target="#advanceSearch" aria-expanded="false"
+                                aria-controls="advanceSearch" wire:loading.class="bg-gray btn-loading disabled">نمایش
+                                همه
                             </button>
                         @endif
                     </div>
@@ -28,7 +30,7 @@
                 </div>
                 {{-- search cards --}}
                 <div class="card-body">
-                    <div class="mb-5 collapse{{ $searchPanel }}" id="advanceSearch" wire:ignore>
+                    <div class="mb-5 collapse {{ $searchPanel }}" id="advanceSearch" wire:ignore>
                         <form class="form-horizontal example" autocomplete="off">
                             <div class="row mb-5">
                                 <div class="col-12 col-md-3">
@@ -42,17 +44,17 @@
                                 <div class=" col-12 col-md-9">
                                     <hr class="my-4">
                                 </div>
-                                <div class="collapse  row" id="userDataCollaps">
+                                <div class="collapse  show row" id="userDataCollaps">
                                     <div class="col-md-6 form-group">
                                         <label for="search-id" class=" form-label"><strong>ایدی</strong></label>
                                         <input class="form-control" id="search-id" wire:model="search.user_id"
-                                            placeholder="ایدی رژیم مورد نظر" type="text">
+                                            placeholder="ایدی کاربر مورد نظر" type="text">
 
                                     </div>
                                     <div class="col-md-6">
                                         <label for="search-Username" class="form-label"><strong>نام</strong></label>
                                         <input class="form-control" id="search-Username"
-                                            wire:model="search.user_first_name" placeholder="ایدی رژیم مورد نظر"
+                                            wire:model="search.user_first_name" placeholder="نام کاربر مورد نظر"
                                             type="text">
 
                                     </div>
@@ -60,7 +62,7 @@
                                         <label for="search-UserLname" class="form-label"><strong>نام
                                                 خانوادگی</strong></label>
                                         <input class="form-control" id="search-UserLname"
-                                            wire:model="search.user_last_name" placeholder="ایدی رژیم مورد نظر"
+                                            wire:model="search.user_last_name" placeholder="نام خانوادگی کاربر مورد نظر"
                                             type="text">
 
                                     </div>
@@ -68,8 +70,7 @@
                                         <label for="search-UserMobile" class="form-label"><strong>شماره
                                                 موبایل</strong></label>
                                         <input class="form-control" id="search-UserMobile"
-                                            wire:model="search.user_mobile" placeholder="ایدی رژیم مورد نظر"
-                                            type="text">
+                                            wire:model="search.user_mobile" placeholder="شماره تماس" type="text">
 
                                     </div>
                                 </div>
@@ -96,7 +97,8 @@
 
                                     </div>
                                     <div class="col-md-6">
-                                        <label for="search-id-appointment_set_date" class="form-label"><strong>زمان ثبت
+                                        <label for="search-id-appointment_set_date" class="form-label"><strong>زمان
+                                                ثبت
                                                 نوبت</strong></label>
                                         <input class="form-control" id="search-appointment_set_date"
                                             wire:model="search.appointment_set_date"
@@ -469,42 +471,7 @@
 
                                     </td>
                                 </tr>
-                                <tr class="text-center table-dark text-white">
-                                    <td>3</td>
-                                    <td class="p-4">
-                                        <label class="mt-1" for="checkbox-1">
-                                            <input class="" id="checkbox-1" type="checkbox" value=""
-                                                checked="">
-                                        </label>
-                                    </td>
-                                    <td>
-                                        <i class="fa fa-phone fa-2x" aria-hidden="true"></i>
-                                    </td>
-                                    <td>ادمسین</td>
-                                    <td>اصغر</td>
-                                    <td>093760208222</td>
-                                    <td>22</td>
-                                    <td>ممد</td>
-                                    <td>ویزیت</td>
-                                    <td>1402/01/25</td>
-                                    <td>1402/01/28</td>
-                                    <td>
-                                        <div class="btn-group mt-2 mb-2">
-                                            <button type="button" class="btn btn-primary dropdown-toggle"
-                                                data-bs-toggle="dropdown">
-                                                عملیات <span class="caret"></span>
-                                            </button>
-                                            <ul class="dropdown-menu" role="menu">
-                                                <li><a href="#" data-label="ویرایش">ویرایش</a>
-                                                </li>
-                                                <li><a class="delete_confirm_alert" href="#"
-                                                        data-label="ویرایش">حذف</a>
-                                                </li>
-                                            </ul>
-                                        </div>
 
-                                    </td>
-                                </tr>
                                 <tr>
                                     <td colspan="100%" class="text-center">
                                         <div class="alert alert-info">

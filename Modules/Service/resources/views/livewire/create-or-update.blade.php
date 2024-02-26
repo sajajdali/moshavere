@@ -25,7 +25,7 @@
                     <h3 class="card-title">افزودن بخش جدید</h3>
                 </div>
                 <div class="card-body">
-                    <form wire:submit='createSpeciality' class="form-horizontal">
+                    <form wire:submit='createSection' class="form-horizontal">
                         <div class="row mt-5 mb-3">
                             <label for="specialityName" class="col-md-3 form-label">نام بخش:</label>
                             <div class="col-md-9">
@@ -104,11 +104,7 @@
                         <div class="row">
                             <div class="form-group mt-3  d-flex justify-content-end">
                                 <div>
-                                    <button type="submit" class="btn btn-success">
-                                        <span wire:loading.remove>ذخیره</span>
-                                        <div wire:loading class="spinner-border spinner-border-sm text-light"
-                                            role="status">
-                                        </div>
+                                    <button type="submit" class="btn btn-success" wire:loading.class="bg-gray btn-loading disabled">ذخیره
                                     </button>
                                     <a type="button" href="{{ route('admin.speciality.index') }}"
                                         class="btn btn-secondary">بازگشت</a>

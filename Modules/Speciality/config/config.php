@@ -88,7 +88,7 @@ return [
                         'gate' => 'viewAny',
                         'policy_class' => \Modules\User\Entities\User::class,
                         'icon' => 'fa fa-list',
-                        'route' => '',
+                        'route' => 'admin.service.list',
                         'has_child' => false,
                         'children' => null,
                     ],

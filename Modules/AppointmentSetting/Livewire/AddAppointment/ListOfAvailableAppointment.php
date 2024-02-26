@@ -2,6 +2,7 @@
 
 namespace Modules\AppointmentSetting\Livewire\AddAppointment;
 
+use Carbon\Carbon;
 use Livewire\Component;
 use Hekmatinasser\Verta\Facades\Verta;
 
@@ -16,12 +17,14 @@ class ListOfAvailableAppointment extends Component
 
     public function GotoSpecificDay()
     {
-        $date = Verta::parse( $this->specificDayDate)->toCarbon()->timestamp;
+        $date = Verta::parse($this->specificDayDate)->toCarbon()->timestamp;
         return redirect()->route('admin.appointment.add.specificday', ['date' => $date]);
     }
 
     public function addAppointment($date)
     {
+        $date = Carbon::now();
+        return redirect()->route('admin.appointment.add.specificday', ['date' => $date]);
     }
     public function render()
     {

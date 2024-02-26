@@ -72,7 +72,10 @@ class GeneralSetting extends Component
             return redirect()->route('admin.appointment.specialsection', ['user' => $doctorId]);
         }
     }
-
+    public function saveSetting(){
+        session()->flash('success','تنظیمات با موفقیت ذخیره شد');
+        return redirect()->route('admin.appointment.doctor.list');
+    }
     public function render()
     {
 

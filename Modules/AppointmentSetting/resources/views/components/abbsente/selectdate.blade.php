@@ -39,17 +39,17 @@
                 </div>
                 <div class="collapse" id="collapseExample">
                     <div class="card card-body">
-                        <div class="row border-bottom">
+                        <div class="row border-bottom mb-3">
                             <h4>غیر فعال سازی یک روز</h4>
                             <p> برای غیر فعال سازی یک روز، تاریخ شروع را در روز مورد نظر قرار داده و روز گزینه ذخیره
                                 کلیک کنید.</p>
                         </div>
-                        <div class="row border-bottom mt-1">
+                        <div class="row border-bottom mt-1 mb-3">
                             <h4>غیر فعال سازی چندین روز</h4>
                             <p>برای غیر فعال سازی چندین روز ، میتوانید تاریخ شروع و پایان را انتخاب کنید و روز گزینه
                                 ذخیره کلیک کنید.</p>
                         </div>
-                        <div class="row border-bottom mt-1">
+                        <div class="row border-bottom mt-1 mb-3">
                             <h4>غیر فعال سازی چندین بازه زمانی</h4>
                             <p>برای غیر فعال سازی چندین بازه زمانی ، میتوانید روز گزینه اضافه کردن کلیک کنید و هر
                                 تعداد

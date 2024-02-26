@@ -11,6 +11,14 @@ class Index extends Component
     public array $search = [];
     public $searchPanel = "";
 
+    public function startSearch() {
+        $this->render();
+    }
+    public function resetProperties() {
+        $this->search = [];
+        $this->render();
+    }
+
     public function render()
     {
         $query = null;

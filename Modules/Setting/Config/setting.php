@@ -1,20 +1,6 @@
 <?php
 
 return [
-//    'base' => [
-//        'title' => 'تنظیمات پایه',
-//        'icon' => 'fa fa-gear',
-//        'settings' => [
-//            \Modules\Setting\Enum\SettingKeyEnum::BASE_TITLE,
-//        ],
-//    ],
-    'exercise' => [
-        'title' => 'ورزش‌ها',
-        'icon' => 'fa fa-futbol-o',
-        'settings' => [
-            \Modules\Setting\Enum\SettingKeyEnum::DEFAULT_EXERCISE_STATUS
-        ],
-    ],
     'sms' => [
         'title' => 'پیامک',
         'icon' => 'fa fa-mobile',

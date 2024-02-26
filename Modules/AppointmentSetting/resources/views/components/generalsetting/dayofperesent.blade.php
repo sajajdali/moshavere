@@ -26,9 +26,9 @@
                         <div class="collapse col-12 mt-2" id="saturdayTimeCollaps" wire:ignore.self>
                             <div class="card card-body">
                                 {{-- TODO::modify Error message --}}
-                                <div class="alert alert-danger" role="alert"> درصورت فعال سازی روز لطفا ساعت حضور
+                                {{-- <div class="alert alert-danger" role="alert"> درصورت فعال سازی روز لطفا ساعت حضور
                                     در
-                                    روز را تعیین کنید! </div>
+                                    روز را تعیین کنید! </div> --}}
                                 <div class="d-flex justify-content-between">
                                     <p class="text-muted">تعیین زمان حضور برای شنبه</p>
                                     <div>
@@ -481,8 +481,6 @@
                 </form>
             </div>
         </div>
-        <div class="text-end">
-            <button type="submit" form="setting" class="btn btn-success mt-5">ذخیره</button>
-        </div>
+   
     </div>
 </div>

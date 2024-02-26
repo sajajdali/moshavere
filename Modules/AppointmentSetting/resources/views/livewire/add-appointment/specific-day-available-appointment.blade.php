@@ -8,6 +8,13 @@
             data-bs-toggle="modal" data-bs-target="#changeDocmodal">
             تغییر پزشک و بخش</button>
     </div>
+    @if (isset($tempMessage))
+    <div class="alert alert-success" role="alert">
+        <i class="fa fa-check-square fa-xl" aria-hidden="true"></i>
+       {{$tempMessage}}
+      </div>
+    @endif
+
     <div class="row row-sm">
         <div class="col-md-12">
             <div class="card custom-card">
@@ -22,9 +29,13 @@
                             <i class="fa fa-arrow-left" aria-hidden="true"></i>
                         </button>
                     </div>
-                    <button class="btn btn-success">ثبت نوبت</button>
+                    <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#RegistrAnAppointment">ثبت
+                        نوبت</button>
                 </div>
-                <div class="card-body">
+                <div class="card-body" wire:loading.class="opacity-50">
+                    <div class="spinner-border text-primary position-absolute top-50 start-50 " role="status"
+                        wire:loading>
+                    </div>
                     <div class="table-responsive">
                         <table class="table table-bordered mbn table_appointment" id="appointment_content"
                             style="">
@@ -53,6 +64,7 @@
                                     </td>
                                     <td colspan="4" class="text-center">
                                         <button type="button" style="width: 124px" data-time-start="10:30"
+                                            data-bs-toggle="modal" data-bs-target="#RegistrAnAppointment"
                                             data-time-end="10:45" class="btn btn-sm btn-success btn-block">ثبت
                                             نوبت</button>
                                     </td>
@@ -64,6 +76,7 @@
                                     </td>
                                     <td colspan="4" class="text-center">
                                         <button type="button" style="width: 124px" data-time-start="10:45"
+                                            data-bs-toggle="modal" data-bs-target="#RegistrAnAppointment"
                                             data-time-end="11:00" class="btn btn-sm  btn-success btn-block">ثبت
                                             نوبت</button>
                                     </td>
@@ -194,7 +207,8 @@
             </div>
         </div>
     </div>
-    @include('appointmentsetting::components.addappointment.modal.changedocmodal')
+    <livewire:appointmentsetting::add-appointment.modal.change-doc-modal />
+    <livewire:appointmentsetting::add-appointment.modal.specific-day-appointment-registration-modal />
 </div>
 @push('scripts')
     <!-- SELECT2 JS -->
@@ -214,6 +228,15 @@
                 onSelect: function(unix) {
                     @this.set('currentDate', $('#currentDate').val());
                 }
+            });
+            Livewire.on('closeModal', function() {
+                var myModalEl = document.querySelector('#changeDocmodal')
+                var modal = bootstrap.Modal.getOrCreateInstance(myModalEl)
+                modal.hide();
+
+                var setAppModal = document.querySelector('#RegistrAnAppointment')
+                var setAppModalInst = bootstrap.Modal.getOrCreateInstance(setAppModal)
+                setAppModalInst.hide();
             });
         });
     </script>

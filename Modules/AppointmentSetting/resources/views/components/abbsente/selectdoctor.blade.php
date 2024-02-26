@@ -58,7 +58,9 @@
                             ویرایش
                             تاریخ نوبت دهی آنها هستید (غیر
                             فعال سازی یک تاریخ خاص) را انتخاب بکنید.<button id="checkAllButton"
-                                class="text-primary text-reset">انتخاب همه</button></p>
+                                class="text-primary text-reset">انتخاب همه</button>
+                            <button class="text-danger text-reset d-none" id="uncheckAllButton">لغو انتخاب</button>
+                        </p>
                     </div>
                     @foreach ($doctors as $key => $doctorList)
                         <div class="col-md-4">
@@ -78,9 +80,9 @@
                 </div>
             </div>
             {{-- TODO::alert Message --}}
-            <div class="alert alert-danger" role="alert">
+            {{-- <div class="alert alert-danger" role="alert">
                 <p class="text-danger"><strong class="me-2">خطا!!</strong>لطفا یک پزشک را انتخاب کنید</p>
-            </div>
+            </div> --}}
             <div class="row">
                 <div class="col-9"></div>
                 <div class="col-3 text-end">

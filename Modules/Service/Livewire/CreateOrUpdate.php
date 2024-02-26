@@ -9,8 +9,12 @@ class CreateOrUpdate extends Component
 {
     public $doctors;
     public array $doctor = [];
-    public $serviceImg ; 
+    public $serviceImg ;
 
+
+    public function createSection() {
+        return redirect()->route('admin.service.list')->with('success','بخش با موفقیت اضافه شد');
+    }
     public function mount() {
 
         $seciality = request()->route('speciality');

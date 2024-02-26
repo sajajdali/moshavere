@@ -16,10 +16,10 @@
             <hr style="opacity: 0.5">
             <div class="row">
                 {{-- TODO::alert Message --}}
-                <div class="alert alert-danger" role="alert">
+                {{-- <div class="alert alert-danger" role="alert">
                     <p class="text-danger"><strong>خطا!!</strong> در صورتی که روز را فعال کنید باید برای آن ساعت تعیین
                         کنید.</p>
-                </div>
+                </div> --}}
                 <div class="col-md-6 mt-3">
                     <div class="main-toggle-group d-flex align-items-center ms-0">
                         <div class="toggle toggle-lg toggle-primary my-1 off" wire:ignore.self>
@@ -60,10 +60,10 @@
             <hr style="opacity: 0.5">
             <div class="row">
                 {{-- TODO::alert Message --}}
-                <div class="alert alert-danger" role="alert">
+                {{-- <div class="alert alert-danger" role="alert">
                     <p class="text-danger"><strong>خطا!!</strong> در صورتی که روز را فعال کنید باید برای آن ساعت تعیین
                         کنید.</p>
-                </div>
+                </div> --}}
                 <div class="col-md-4 pt-2">
                     <label class="text-primary" for="basic-url">مدت زمان مورد نیاز برای ویزیت هر بیمار</label>
                 </div>
@@ -93,10 +93,10 @@
             <h3><span class="text-primary">حداقل</span> زمان دریافت نوبت</h3>
             <hr style="opacity: 0.5">
             {{-- TODO::alert Message --}}
-            <div class="alert alert-danger" role="alert">
+            {{-- <div class="alert alert-danger" role="alert">
                 <p class="text-danger"><strong>خطا!!</strong> در صورتی که روز را فعال کنید باید برای آن ساعت تعیین کنید.
                 </p>
-            </div>
+            </div> --}}
             <div class="row">
                 <div class="col-md-5 pt-2">
                     <label class="text-primary" for="basic-url"> زمان دریافت نوبت</label>
@@ -127,10 +127,10 @@
             <h3><span class="text-primary">حداکثر</span> زمان دریافت نوبت</h3>
             <hr style="opacity: 0.5">
             {{-- TODO::alert Message --}}
-            <div class="alert alert-danger" role="alert">
+            {{-- <div class="alert alert-danger" role="alert">
                 <p class="text-danger"><strong>خطا!!</strong> در صورتی که روز را فعال کنید باید برای آن ساعت تعیین کنید.
                 </p>
-            </div>
+            </div> --}}
             <div class="row">
                 <div class="col-md-5 pt-2">
                     <label class="text-primary" for="basic-url"> بیمار حداکثر برای چند روز بعد بتواند نوبت دریافت
@@ -189,7 +189,7 @@
                 <div class="col-md-9">
                     <div class="input-group mb-3">
                         <input type="number" class="form-control" id="basic-url" aria-describedby="basic-addon3"
-                        wire:model='gseting.maxAppTotall'>
+                            wire:model='gseting.maxAppTotall'>
                         <div class="input-group-prepend">
                             <span class="input-group-text" id="basic-addon3">عدد</span>
                         </div>
@@ -384,6 +384,11 @@
                     پزشک بررسی شود ، ثبت میشود، به عبارتی ممکن است در یک زمان چند نوبت برای این پزشک ثبت شود </p>
             </div>
         </div>
+    </div>
+
+    <div class="text-end mb-5 me-3">
+        <button type="submit" form="setting" wire:click='saveSetting' class="btn btn-success mt-5"><strong>ذخیره</strong></button>
+
     </div>
 </div>
 </div>

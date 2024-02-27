@@ -260,7 +260,7 @@
                                     <td class="p-4">
                                         <label class="mt-1" for="checkbox-1">
                                             <input class="" id="checkbox-1" type="checkbox" value=""
-                                                checked="">
+                                               >
                                         </label>
                                     </td>
                                     <td>
@@ -296,7 +296,7 @@
                                     <td class="p-4">
                                         <label class="mt-1" for="checkbox-1">
                                             <input class="" id="checkbox-1" type="checkbox" value=""
-                                                checked="">
+                                               >
                                         </label>
                                     </td>
                                     <td>
@@ -332,7 +332,7 @@
                                     <td class="p-4">
                                         <label class="mt-1" for="checkbox-1">
                                             <input class="" id="checkbox-1" type="checkbox" value=""
-                                                checked="">
+                                               >
                                         </label>
                                     </td>
                                     <td>
@@ -368,7 +368,7 @@
                                     <td class="p-4">
                                         <label class="mt-1" for="checkbox-1">
                                             <input class="" id="checkbox-1" type="checkbox" value=""
-                                                checked="">
+                                                >
                                         </label>
                                     </td>
                                     <td>
@@ -404,7 +404,7 @@
                                     <td class="p-4">
                                         <label class="mt-1" for="checkbox-1">
                                             <input class="" id="checkbox-1" type="checkbox" value=""
-                                                checked="">
+                                                >
                                         </label>
                                     </td>
                                     <td>
@@ -440,7 +440,7 @@
                                     <td class="p-4">
                                         <label class="mt-1" for="checkbox-1">
                                             <input class="" id="checkbox-1" type="checkbox" value=""
-                                                checked="">
+                                               >
                                         </label>
                                     </td>
                                     <td>

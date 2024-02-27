@@ -5,7 +5,7 @@
                 <h1 class="page-title">لیست مطب ها</h1>
             </div>
             <div class="ms-auto pageheader-btn">
-                <a href="{{ route('admin.service.create') }}" class="btn btn-info">افزودن بخش جدید</a>
+                <a href="{{ route('admin.service.create')}}" btn btn-info">افزودن مطب جدید</a>
             </div>
         </div>
         @include('admin::layouts.components.alert')

@@ -103,7 +103,7 @@
                                                     <li><a class="delete_confirm_alert" data-label="حذف " data-id="3"
                                                             href="#">حذف</a>
                                                     </li>
-                                                    <li><a href="#" data-label="ویرایش">ویرایش</a>
+                                                    <li><a href="{{ route('admin.service.create') }}" data-label="ویرایش">ویرایش</a>
                                                     </li>
                                                 </ul>
                                             </div>
@@ -127,7 +127,7 @@
                                                     <li><a class="delete_confirm_alert" data-label="حذف "
                                                             data-id="3" href="#">حذف</a>
                                                     </li>
-                                                    <li><a href="#" data-label="ویرایش">ویرایش</a>
+                                                    <li><a href="{{ route('admin.service.create') }}" data-label="ویرایش">ویرایش</a>
                                                     </li>
                                                 </ul>
                                             </div>

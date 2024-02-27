@@ -71,7 +71,6 @@ enum SettingKeyEnum: int implements EnumHasNameInterface, SettingTypeInterface, 
     public function options(): array
     {
         return match ($this) {
-            self::DEFAULT_EXERCISE_STATUS => ExercisePlanRequest::getArrayForSetting(),
             self::SUPPORT_USER_ROLE => User::adminSupportRoles(),
             default => []
         };

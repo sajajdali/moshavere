@@ -11,7 +11,6 @@
     @elseif($step == 2)
         @include('appointmentsetting::components.abbsente.selectdate')
     @endif
-
     {{-- modal --}}
     @include('appointmentsetting::components.abbsente.confirmmodal')
     {{-- modal --}}
@@ -60,8 +59,15 @@
             function selectcheckboxes() {
                 $('#checkAllButton').on('click', function() {
                     $('input[type="checkbox"]').prop('checked', true);
+                    $(this).addClass('d-none');
+                    $('#uncheckAllButton').removeClass('d-none');
                 });
             }
+            $('#uncheckAllButton').on('click', function() {
+                $('input[type="checkbox"]').prop('checked', false);
+                $(this).addClass('d-none');
+                $('#checkAllButton').removeClass('d-none');
+            });
         });
     </script>
 @endpush

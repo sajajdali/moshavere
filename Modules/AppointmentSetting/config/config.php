@@ -23,6 +23,16 @@ return [
         'priority' => 80,
         'children' => [//it is required
             [
+                'title' => 'لیست نوبت های ثبت شده',
+                'gate' => 'viewAny',
+                'policy_class' => \Modules\User\Entities\User::class,
+                'icon' => 'fe fe-bar-chart-2',
+                'route' => 'admin.appointment.list',
+                'has_badge' => false,
+                'has_child' => false,
+                'children' => null
+            ],
+            [
                 'title' => 'تنظیمات نوبت دهی',
                 'gate' => 'viewAny',
                 'policy_class' => \Modules\User\Entities\User::class,
@@ -72,6 +82,16 @@ return [
                     ],
 
                 ],
+            ],
+            [
+                'title' => 'ثبت نوبت',
+                'gate' => 'viewAny',
+                'policy_class' => \Modules\User\Entities\User::class,
+                'icon' => 'fe fe-plus-circle',
+                'route' => 'admin.appointment.add.sectionList',
+                'has_badge' => false,
+                'has_child' => false,
+                'children' => null
             ],
         ],
     ],

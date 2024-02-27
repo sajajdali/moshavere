@@ -1,4 +1,5 @@
 <?php
+
 namespace Modules\Setting\Livewire\Admin\Setting;
 
 use Livewire\Attributes\On;
@@ -10,7 +11,7 @@ use Livewire\Component;
 class Setting extends Component
 {
     #[Url]
-    public string $section = 'exercise';
+    public string $section = 'sms';
 
     public ?array $options = null;
 
@@ -48,7 +49,7 @@ class Setting extends Component
             \Modules\Setting\Entities\Setting::setVal((int) $key, $value);
         }
         \Modules\Setting\Entities\Setting::reBuild();
-        $this->dispatch('success-saving', message:'تنظیمات با موفقیت ذخیره شدند');
+        $this->dispatch('success-saving', message: 'تنظیمات با موفقیت ذخیره شدند');
     }
 
     public function mount()

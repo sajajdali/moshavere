@@ -4,7 +4,7 @@
             <h1 class="page-title">لیست عدم حضور های ثبت شده</h1>
         </div>
         <div class="ms-auto pageheader-btn">
-            <button class="btn btn-info">افزودن</button>
+            <a href="{{ route('admin.appointment.absentee') }}" class="btn btn-info">افزودن</a>
         </div>
     </div>
     @include('admin::layouts.components.alert')
@@ -33,35 +33,35 @@
                                 <label for="search-id" class="col-md-2 form-label">ایدی</label>
                                 <div class="col-md-10">
                                     <input class="form-control" id="search-id" wire:model="search.id"
-                                        placeholder="ایدی رژیم مورد نظر" type="text">
+                                        placeholder="ایدی پزشک مورد نظر" type="text">
                                 </div>
                             </div>
                             <div class="row mb-4">
                                 <label for="search-name" class="col-md-2 form-label">نام پزشک</label>
                                 <div class="col-md-10">
                                     <input class="form-control" id="search-name" wire:model="search.doctorName"
-                                        placeholder="نام رژیم" type="text">
+                                        placeholder="نام پزشک" type="text">
                                 </div>
                             </div>
                             <div class="row mb-4">
                                 <label for="search-name" class="col-md-2 form-label">نام بخش</label>
                                 <div class="col-md-10">
                                     <input class="form-control" id="search-name" wire:model="search.sectionName"
-                                        placeholder="نام رژیم" type="text">
+                                        placeholder="نام خانوادگی پزشک" type="text">
                                 </div>
                             </div>
                             <div class="row mb-4">
                                 <label for="search-name" class="col-md-2 form-label datePicker">تاریخ شروع</label>
                                 <div class="col-md-10">
-                                    <input class="form-control" id="search-name" wire:model="search.startDate"
-                                        placeholder="نام رژیم" type="text">
+                                    <input class="form-control datePicker" id="search-name"
+                                        wire:model="search.startDate" placeholder="تاریخ شروع عدم حضور" type="text">
                                 </div>
                             </div>
                             <div class="row mb-4">
                                 <label for="search-name" class="col-md-2 form-label datePicker">تاریخ پایان</label>
                                 <div class="col-md-10">
-                                    <input class="form-control" id="search-name" wire:model="search.Enddate"
-                                        placeholder="نام رژیم" type="text">
+                                    <input class="form-control datePicker" id="search-name" wire:model="search.Enddate"
+                                        placeholder="تاریخ پایان عدم حضور" type="text">
                                 </div>
                             </div>
                             <button class="btn btn-primary" type="button" wire:click="startSearch"
@@ -107,13 +107,14 @@
 
                                     </td>
                                 </tr>
-                                <tr>
+                                {{-- TODO::add this alert --}}
+                                {{-- <tr>
                                     <td colspan="100%" class="text-center">
                                         <div class="alert alert-info">
                                             هیچ موردی یافت نشد
                                         </div>
                                     </td>
-                                </tr>
+                                </tr> --}}
                             </tbody>
                         </table>
                     </div>

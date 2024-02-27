@@ -36,14 +36,14 @@
                                 <label for="search-id" class="col-md-2 form-label">ایدی</label>
                                 <div class="col-md-10">
                                     <input class="form-control" id="search-id" wire:model="search.id"
-                                        placeholder="ایدی رژیم مورد نظر" type="text">
+                                        placeholder="ایدی تخصص مورد نظر" type="text">
                                 </div>
                             </div>
                             <div class="row mb-4">
                                 <label for="search-name" class="col-md-2 form-label">نام تخصص</label>
                                 <div class="col-md-10">
                                     <input class="form-control" id="search-name" wire:model="search.specialityName"
-                                        placeholder="نام رژیم" type="text">
+                                        placeholder="نام تخصص" type="text">
                                 </div>
                             </div>
                             <div class="row mb-4">

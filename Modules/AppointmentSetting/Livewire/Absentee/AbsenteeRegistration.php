@@ -76,11 +76,15 @@ class AbsenteeRegistration extends Component
 
     public function storeForAllSection()
     {
-        //store setting for all sections
+         //store setting for all sections
+        session()->flash('success','تنظیمات با موفقیت ذخیره شد');
+        return redirect()->route('admin.appointment.absentee');
     }
     public function storeForSelectedsections()
     {
         //store setting for selected sections
+        session()->flash('success','تنظیمات با موفقیت ذخیره شد');
+        return redirect()->route('admin.appointment.absentee');
     }
 
     public function searchDoctor()

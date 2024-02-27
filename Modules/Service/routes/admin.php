@@ -2,6 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 use Modules\Service\Livewire\CreateOrUpdate;
+use Modules\Service\Livewire\Index;
 
 /*
 |--------------------------------------------------------------------------
@@ -16,4 +17,5 @@ use Modules\Service\Livewire\CreateOrUpdate;
 
 Route::group([], function () {
     Route::get('service/create', CreateOrUpdate::class)->name('service.create');
+    Route::get('service/list', Index::class)->name('service.list');
 });

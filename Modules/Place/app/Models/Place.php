@@ -5,14 +5,16 @@ namespace Modules\Place\app\Models;
 use App\Enum\ActiveEnum;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\SoftDeletes;
-use Modules\Place\Database\factories\PlaceFactory;
 use Modules\User\Entities\User;
 
 class Place extends Model
 {
 
+    const DETAIL_KEY_LOCATION = 'location';
+    const DETAIL_KEY_NUMBERS = 'numbers';
+    const DETAIL_KEY_LOCATION_LAT = 'location_lat';
+    const DETAIL_KEY_LOCATION_LNG = 'location_lng';
     use SoftDeletes;
     /**
      * The attributes that are mass assignable.

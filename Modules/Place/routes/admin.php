@@ -17,6 +17,8 @@ use Modules\Place\Livewire\Index;
 */
 
 Route::group([], function () {
-    Route::get('place/create', CreateOrUpdate::class)->name('place.create');
+    Route::get('place/index' , \Modules\Place\Livewire\PlaceList::class)->name('place.index')->can('viewAny' , \Modules\Place\app\Models\Place::class);
+    Route::get('place/create', CreateOrUpdate::class)->name('place.create')->can('create' , \Modules\Place\app\Models\Place::class);
+    Route::get('place/edit/{place}', CreateOrUpdate::class)->name('place.edit')->can('viewAny' , \Modules\Place\app\Models\Place::class);
     Route::get('place/list', Index::class)->name('place.list');
 });

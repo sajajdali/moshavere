@@ -4,6 +4,7 @@ namespace Modules\Place\app\Providers;
 
 use Illuminate\Support\Facades\Route;
 use Illuminate\Foundation\Support\Providers\RouteServiceProvider as ServiceProvider;
+use Modules\Place\app\Models\Place;
 
 class RouteServiceProvider extends ServiceProvider
 {
@@ -31,6 +32,10 @@ class RouteServiceProvider extends ServiceProvider
 
         $this->mapWebRoutes();
         $this->mapLivewireRoutes();
+        $this->bindingModel();
+    }
+    public function bindingModel() : void {
+        Route::model('place',Place::class);
     }
 
     /**

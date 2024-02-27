@@ -1,8 +1,8 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use Modules\Service\Livewire\ServiceList;
 use Modules\Service\Livewire\CreateOrUpdate;
-use Modules\Service\Livewire\Index;
 
 /*
 |--------------------------------------------------------------------------
@@ -17,5 +17,5 @@ use Modules\Service\Livewire\Index;
 
 Route::group([], function () {
     Route::get('service/create', CreateOrUpdate::class)->name('service.create');
-    Route::get('service/list', Index::class)->name('service.list');
+    Route::get('service/list', ServiceList::class)->name('service.list');
 });

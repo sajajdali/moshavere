@@ -5,7 +5,7 @@ namespace Modules\Service\Livewire;
 use Livewire\Component;
 use Livewire\Attributes\On;
 
-class Index extends Component
+class ServiceList extends Component
 {
     public  $search = [];
     public $searchPanel = "";
@@ -17,6 +17,6 @@ class Index extends Component
 
     public function render()
     {
-        return view('service::livewire.index');
+        return view('service::livewire.service-list');
     }
 }

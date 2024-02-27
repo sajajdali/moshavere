@@ -7,7 +7,8 @@
             <div class="ms-auto pageheader-btn">
                 <ol class="breadcrumb">
                     <li class="breadcrumb-item">افزودن بخش یا سرویس</li>
-                    <li class="breadcrumb-item active" aria-current="page"><a href="javascript:void(0);">تخصص ها</a></li>
+                    <li class="breadcrumb-item active" aria-current="page"><a href="{{ route('admin.service.list') }}">بخش
+                            ها</a></li>
                 </ol>
             </div>
         </div>
@@ -29,10 +30,10 @@
                         <div class="row mt-5 mb-3">
                             <label for="specialityName" class="col-md-3 form-label">نام بخش:</label>
                             <div class="col-md-9">
-                                <input class="form-control mb-1  @error('specialityTitle') is-invalid @enderror"
-                                    id="specialityName" wire:model='specialityTitle'
+                                <input class="form-control mb-1  @error('form.title') is-invalid @enderror"
+                                    id="specialityName" wire:model='form.title'
                                     placeholder="نام بخش یا سرویس مورد نظر را وارد کنید" type="text">
-                                @error('specialityTitle')
+                                @error('form.title')
                                     <span class="text-danger">{{ $message }}</span>
                                 @enderror
                             </div>
@@ -41,10 +42,17 @@
                             <label for="specialityName" class="col-md-3 form-label">زیر بخش:</label>
                             <div class="col-md-9">
                                 <div class="mb-3">
-                                    <select class="form-control select2 form-select" data-placeholder="">
+                                    <select class="form-control select2-show-search form-select" id="js-select2"
+                                        data-placeholder="بدون والد">
                                         <option label="بدون والد"></option>
-                                        <option value="January">ویزیت</option>
-                                        <option value="January">جراحی</option>
+                                        <option value="1">Chuck Testa</option>
+                                        <option value="2">Sage Cattabriga-Alosa</option>
+                                        <option value="3">Nikola Tesla</option>
+                                        <option value="4">Cattabriga-Alosa</option>
+                                        <option value="5">Nikola Alosa</option>
+                                        <option value="6">Chuck Testa</option>
+                                        <option value="7">Sage Cattabriga-Alosa</option>
+                                        <option value="8">Nikola Tesla</option>
                                     </select>
                                     <p class="text-muted">
                                         <i class="fa fa-info-circle" aria-hidden="true"></i>
@@ -103,23 +111,22 @@
                                 </div>
                             </div>
                         </div>
-                        @if (!empty($doctors))
+                        @if (!empty($fetchdata['doctors']))
                             <div class="row mt-5">
                                 <h4>پزشکان مربوط به این بخش</h4>
                                 <hr style="opacity: 0.9">
                                 <div class="row">
-                                    @foreach ($doctors as $key => $doctorList)
+                                    @foreach ($fetchdata['doctors'] as $key => $doctor)
                                         <div class="col-md-6">
                                             <div class="form-group mt-2">
                                                 <div class="checkbox">
                                                     <div class="custom-checkbox custom-control">
                                                         <input type="checkbox"
-                                                            wire:model='doctor.{{ $doctorList->id }}'
-                                                            @if (array_key_exists($doctorList->id, $doctor) && $doctor[$doctorList->id] == 'true') checked @endif
+                                                            wire:model='form.doctor.{{ $doctor->id }}'
                                                             data-checkboxes="mygroup" class="custom-control-input"
                                                             id="checkbox-{{ $key }}">
                                                         <label for="checkbox-{{ $key }}"
-                                                            class="custom-control-label">{{ $doctorList->full_name }}</label>
+                                                            class="custom-control-label">{{ $doctor->full_name }}</label>
                                                     </div>
                                                 </div>
                                             </div>
@@ -149,11 +156,21 @@
     <livewire:admin::file-manager-modal />
 </div>
 @push('scripts')
+    <script src="{{ admin_asset('plugins/select2/select2.full.min.js') }}"></script>
     <script>
-        Livewire.on('select_file', (param) => {
-            @this.set('serviceImg', param.url);
-            //close modal
-            $('#file-selector-modal').modal('hide');
+        $(document).ready(function() {
+            setTimeout(() => {
+                $('#js-select2').select2({
+                    'width': '100%',
+                });
+                // $('.select2-container').css('width', '100% !important');
+            }, 1000);
+            Livewire.on('select_file', (param) => {
+                @this.set('serviceImg', param.url);
+                //close modal
+                $('#file-selector-modal').modal('hide');
+            });
+
         });
     </script>
 @endpush

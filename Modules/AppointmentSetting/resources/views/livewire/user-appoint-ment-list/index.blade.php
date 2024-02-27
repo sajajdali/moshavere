@@ -471,14 +471,14 @@
 
                                     </td>
                                 </tr>
-
-                                <tr>
+                                {{-- TODO::set alert --}}
+                                {{-- <tr>
                                     <td colspan="100%" class="text-center">
                                         <div class="alert alert-info">
                                             هیچ موردی یافت نشد
                                         </div>
                                     </td>
-                                </tr>
+                                </tr> --}}
                             </tbody>
                         </table>
                     </div>

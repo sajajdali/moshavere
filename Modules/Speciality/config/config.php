@@ -63,6 +63,15 @@ return [
                 'has_child' => true,
                 'children' => [
                     [
+                        'title' => 'لیست',
+                        'gate' => 'viewAny',
+                        'policy_class' => \Modules\User\Entities\User::class,
+                        'icon' => 'fa fa-list',
+                        'route' => 'admin.place.list',
+                        'has_child' => false,
+                        'children' => null,
+                    ],
+                    [
                         'title' => 'اضافه کردن',
                         'gate' => 'viewAny',
                         'policy_class' => \Modules\User\Entities\User::class,
@@ -71,7 +80,6 @@ return [
                         'has_child' => false,
                         'children' => null,
                     ],
-
                 ],
             ],
             [

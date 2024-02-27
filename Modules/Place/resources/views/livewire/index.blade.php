@@ -1,9 +1,8 @@
 <div>
-
     <div>
         <div class="page-header">
             <div>
-                <h1 class="page-title">لیست بخش ها</h1>
+                <h1 class="page-title">لیست مطب ها</h1>
             </div>
             <div class="ms-auto pageheader-btn">
                 <a href="{{ route('admin.service.create') }}" class="btn btn-info">افزودن بخش جدید</a>
@@ -14,13 +13,13 @@
             <div class="col-lg-12">
                 <div class="card custom-card">
                     <div class="card-header d-flex justify-content-between border-bottom">
-                        <h3 class="card-title">مدیریت تخصص ها</h3>
+                        <h3 class="card-title">مدیریت مطب ها</h3>
                         <div class="card-options">
                             <button class="btn btn-primary" type="button" data-bs-toggle="collapse"
                                 data-bs-target="#advanceSearch" aria-expanded="false" aria-controls="advanceSearch">
                                 جست و جوی پیشرفته
                             </button>
-                            @if (isset($search['id']) || isset($search['specialityName']) || isset($search['status']))
+                            @if (! empty($search))
                                 <button class="btn btn-secondary ms-2" type="button" wire:click="resetProperties"
                                     wire:loading.class="bg-gray btn-loading disabled">نمایش همه
                                 </button>
@@ -35,14 +34,14 @@
                                     <label for="search-id" class="col-md-2 form-label">ایدی</label>
                                     <div class="col-md-10">
                                         <input class="form-control" id="search-id" wire:model="search.id"
-                                            placeholder="ایدی رژیم مورد نظر" type="text">
+                                            placeholder="ایدی مطب مورد نظر" type="text">
                                     </div>
                                 </div>
                                 <div class="row mb-4">
-                                    <label for="search-name" class="col-md-2 form-label">نام تخصص</label>
+                                    <label for="search-name" class="col-md-2 form-label">نام مطب</label>
                                     <div class="col-md-10">
                                         <input class="form-control" id="search-name" wire:model="search.specialityName"
-                                            placeholder="نام رژیم" type="text">
+                                            placeholder="نام مطب" type="text">
                                     </div>
                                 </div>
                                 <div class="row mb-4">
@@ -71,9 +70,8 @@
                                 <thead>
                                     <tr>
                                         <th scope="col">#</th>
-                                        <th scope="col">نام بخش</th>
+                                        <th scope="col">نام مطب</th>
                                         <th scope="col">وضعیت</th>
-                                        <th scope="col">زیربخش</th>
                                         <th scope="col">تعداد پزشکان</th>
                                         <th scope="col">عملیات</th>
                                     </tr>
@@ -82,16 +80,11 @@
                                     <tr class="text-center">
                                         <td>1</td>
                                         <td>
-                                            <a href="" type="button" data-bs-toggle="modal"
-                                                data-bs-target="#staticBackdrop">
-                                                <i class="fa fa-plus-square" aria-hidden="true"></i>
-                                                ویزیت
-                                            </a>
+                                            سعادت آباد
                                         </td>
                                         <td>
                                             <span class="badge rounded-pill bg-success p-3">فعال</span>
                                         </td>
-                                        <td> <span class="badge bg-secondary p-3">3 زیر بخش</span></td>
                                         <td>3</td>
                                         <td>
                                             <div class="btn-group mt-2 mb-2">
@@ -111,11 +104,10 @@
                                     </tr>
                                     <tr class="text-center">
                                         <td>2</td>
-                                        <td>جراحی</td>
+                                        <td>نیاوران</td>
                                         <td>
                                             <span class="badge rounded-pill bg-danger p-3">غیر فعال</span>
                                         </td>
-                                        <td> <span class="badge bg-secondary p-3"> بدون زیر بخش</span></td>
                                         <td>1</td>
                                         <td>
                                             <div class="btn-group mt-2 mb-2">
@@ -152,21 +144,8 @@
             </div>
         </div>
     </div>
-    @include('service::components.subsectionmodal')
 </div>
 @push('scripts')
     <script src="{{ admin_asset('plugins/sweet-alert/sweetalert.min.js') }}"></script>
     <script src="{{ admin_asset('plugins/sweet-alert/admin.sweetalert.js') }}"></script>
-
-    <script>
-        $('.click-section').click(function(e) {
-            // Find the plus and minus icons within the clicked div
-            var plusIcon = $(this).find('.plus');
-            var minusIcon = $(this).find('.minus');
-
-            // Toggle the visibility of the icons
-            plusIcon.toggleClass('d-none');
-            minusIcon.toggleClass('d-none');
-        });
-    </script>
 @endpush

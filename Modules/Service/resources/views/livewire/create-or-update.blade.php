@@ -37,6 +37,30 @@
                                 @enderror
                             </div>
                         </div>
+                        <div class="row mt-5 mb-3">
+                            <label for="specialityName" class="col-md-3 form-label">زیر بخش:</label>
+                            <div class="col-md-9">
+                                <div class="mb-3">
+                                    <select class="form-control select2 form-select" data-placeholder="">
+                                        <option label="بدون والد"></option>
+                                        <option value="January">ویزیت</option>
+                                        <option value="January">جراحی</option>
+                                    </select>
+                                    <p class="text-muted">
+                                        <i class="fa fa-info-circle" aria-hidden="true"></i>
+                                        بخشی که مایل هستید این بخش، زیر بخش آن بخش باشد را انتخاب کنید.
+                                    </p>
+                                    <p class="text-muted">
+                                        <i class="fa fa-info-circle" aria-hidden="true"></i>
+                                        در صورتی که گزینه ی بدون والد را انتخاب کنید ، این بخش به عنوان یک بخش اصلی
+                                        اضافه میشود.
+                                    </p>
+                                </div>
+                                @error('specialityTitle')
+                                    <span class="text-danger">{{ $message }}</span>
+                                @enderror
+                            </div>
+                        </div>
                         <div class="row mt-4 mb-3">
                             <label for="priority" class="col-md-3 form-label">ترتیب نمایش:</label>
                             <div class="col-md-9">
@@ -45,7 +69,10 @@
                                 @error('priority')
                                     <span class="text-danger">{{ $message }}</span>
                                 @enderror
-                                <p class="text-muted">بخش ها به ترتب شماره گذاری نمایش داده میشوند.</p>
+                                <p class="text-muted">
+                                    <i class="fa fa-info-circle" aria-hidden="true"></i>
+                                    بخش ها به ترتب شماره گذاری نمایش داده میشوند.
+                                </p>
                             </div>
                         </div>
                         <div class="row">
@@ -86,7 +113,8 @@
                                             <div class="form-group mt-2">
                                                 <div class="checkbox">
                                                     <div class="custom-checkbox custom-control">
-                                                        <input type="checkbox" wire:model='doctor.{{ $doctorList->id }}'
+                                                        <input type="checkbox"
+                                                            wire:model='doctor.{{ $doctorList->id }}'
                                                             @if (array_key_exists($doctorList->id, $doctor) && $doctor[$doctorList->id] == 'true') checked @endif
                                                             data-checkboxes="mygroup" class="custom-control-input"
                                                             id="checkbox-{{ $key }}">
@@ -104,7 +132,8 @@
                         <div class="row">
                             <div class="form-group mt-3  d-flex justify-content-end">
                                 <div>
-                                    <button type="submit" class="btn btn-success" wire:loading.class="bg-gray btn-loading disabled">ذخیره
+                                    <button type="submit" class="btn btn-success"
+                                        wire:loading.class="bg-gray btn-loading disabled">ذخیره
                                     </button>
                                     <a type="button" href="{{ route('admin.speciality.index') }}"
                                         class="btn btn-secondary">بازگشت</a>

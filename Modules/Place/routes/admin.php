@@ -3,6 +3,7 @@
 use Illuminate\Support\Facades\Route;
 use Modules\Place\Livewire\Create;
 use Modules\Place\Livewire\CreateOrUpdate;
+use Modules\Place\Livewire\Index;
 
 /*
 |--------------------------------------------------------------------------
@@ -17,4 +18,5 @@ use Modules\Place\Livewire\CreateOrUpdate;
 
 Route::group([], function () {
     Route::get('place/create', CreateOrUpdate::class)->name('place.create');
+    Route::get('place/list', Index::class)->name('place.list');
 });

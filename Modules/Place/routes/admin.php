@@ -1,9 +1,8 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-use Modules\Place\Livewire\Create;
 use Modules\Place\Livewire\CreateOrUpdate;
-use Modules\Place\Livewire\Index;
+use Modules\Place\Livewire\PlaceList;
 
 /*
 |--------------------------------------------------------------------------
@@ -17,8 +16,7 @@ use Modules\Place\Livewire\Index;
 */
 
 Route::group([], function () {
-    Route::get('place/index' , \Modules\Place\Livewire\PlaceList::class)->name('place.index')->can('viewAny' , \Modules\Place\app\Models\Place::class);
-    Route::get('place/create', CreateOrUpdate::class)->name('place.create')->can('create' , \Modules\Place\app\Models\Place::class);
-    Route::get('place/edit/{place}', CreateOrUpdate::class)->name('place.edit')->can('viewAny' , \Modules\Place\app\Models\Place::class);
-    Route::get('place/list', Index::class)->name('place.list');
+    Route::get('place/create', CreateOrUpdate::class)->name('place.create')->can('create', \Modules\Place\app\Models\Place::class);
+    Route::get('place/edit/{place}', CreateOrUpdate::class)->name('place.edit')->can('viewAny', \Modules\Place\app\Models\Place::class);
+    Route::get('place/list', PlaceList::class)->name('place.list')->can('viewAny', \Modules\Place\app\Models\Place::class);
 });

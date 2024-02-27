@@ -37,22 +37,23 @@ class CreateOrUpdate extends Component
 
     public function addCounter()
     {
-        $this->counter = ++ $this->counter;
+        $this->counter = ++$this->counter;
         $this->render();
     }
     public function removeCounter()
     {
-        $this->counter = -- $this->counter;
+        $this->counter = --$this->counter;
         array_pop($this->form['numbers']);
         $this->render();
     }
-    public function updateOrCreate() {
+    public function updateOrCreate()
+    {
 
         $this->validate();
 
         $modelCreateOrUpdate = [
             'title' => $this->form['name'] ?? '',
-            'priority' =>$this->computData['priority'] ?? 1,
+            'priority' => $this->computData['priority'] ?? 1,
             'active' => $this->form['active'],
         ];
 
@@ -61,10 +62,10 @@ class CreateOrUpdate extends Component
         } else {
             $detail = null;
         }
-        if (isset($this->form['numbers'])){
+        if (isset($this->form['numbers'])) {
             $detail[Place::DETAIL_KEY_NUMBERS] = $this->form['numbers'];
         }
-        if (isset($this->form['place']['loc']['lat']) && isset($this->form['place']['loc']['lng'])){
+        if (isset($this->form['place']['loc']['lat']) && isset($this->form['place']['loc']['lng'])) {
             $detail[Place::DETAIL_KEY_LOCATION] = [
                 Place::DETAIL_KEY_LOCATION_LAT => $this->form['place']['loc']['lat'],
                 Place::DETAIL_KEY_LOCATION_LNG => $this->form['place']['loc']['lng'],
@@ -81,9 +82,9 @@ class CreateOrUpdate extends Component
 
             $message = 'لوکیشن با موفقیت اضافه شد';
         }
-        if (isset($this->form['doctor'])) {
+        if (isset($this->form['doctors'])) {
             $syncArr = [];
-            foreach ($this->form['doctor'] as $userId => $value) {
+            foreach ($this->form['doctors'] as $userId => $value) {
                 //check if check box checked
                 if ($value) {
                     $syncArr[] = $userId;
@@ -91,15 +92,14 @@ class CreateOrUpdate extends Component
             }
             $this->place->user()->sync($syncArr);
         }
-        return redirect()->route('admin.place.index')->with('success', $message);
-
-
+        return redirect()->route('admin.place.list')->with('success', $message);
     }
     public function mount()
     {
         $this->fetchData['doctors'] = Role::find(3)->users;
+
         $place = request()->route('place');
-        if ($place instanceof Place){
+        if ($place instanceof Place) {
             $this->authorize('update', $place);
             $this->isEdited = true;
             $this->place = $place;
@@ -107,13 +107,15 @@ class CreateOrUpdate extends Component
             $this->form['numbers'] = $place['detail']['numbers'] ?? '';
             $this->counter = count($this->form['numbers']);
             $this->form['priority'] = $place['priority'];
-            $this->form['active'] = $place['active'] == ActiveEnum::ACTIVE ;
-            $this->form['doctors'] = $this->place->user;
-            dd($this->place->user()->pluck('user_id')->toArray());
-
+            $this->form['active'] = $place['active'] == ActiveEnum::ACTIVE;
+            $doctores = $this->place->user->pluck('id')->toArray();
+            foreach ($doctores as $value) {
+                $this->form['doctors'][$value] = true ;
+            }
+            $this->form['loc']['lat'] = $place->detail['location']['location_lat'];
+            $this->form['loc']['lng'] =  $place->detail['location']['location_lng'];
         } else {
             $this->form['priority'] = Place::maxPriority();
-
         }
     }
     public function render()

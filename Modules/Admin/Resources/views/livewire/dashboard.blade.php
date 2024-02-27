@@ -14,7 +14,7 @@
     </div>
     @include('admin::layouts.components.alert')
     <div class="row">
-        <div class="col-lg-6 col-sm-12 col-md-6 col-xl-3">
+        <div class="col-md-6">
             <div class="card overflow-hidden">
                 <div class="card-body">
                     <div class="card-header d-flex justify-content-between py-0">
@@ -84,7 +84,7 @@
                 </div>
             </div>
         </div>
-        <div class="col-lg-6 col-md-12">
+        <div class="col-md-6">
             <div class="card">
                 <div class="card-header border-bottom">
                     <h3 class="card-title">گزارش نوبت ها</h3>

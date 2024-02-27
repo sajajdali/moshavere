@@ -17,11 +17,12 @@
                 </div>
                 <div class="col-md-10">
                     <div class="input-group mb-3">
-                        <input type="text" wire:model='form.name' class="form-control @error('form.name') is-invalid @enderror"
+                        <input type="text" wire:model='form.name'
+                            class="form-control @error('form.name') is-invalid @enderror"
                             aria-describedby="basic-addon3">
                         @error('form.name')
-                        <div id="validationName"
-                             class="invalid-feedback d-block">{{ $message }}</div>@enderror
+                            <div id="validationName" class="invalid-feedback d-block">{{ $message }}</div>
+                        @enderror
                     </div>
                 </div>
             </div>
@@ -91,12 +92,15 @@
                             <div class="row">
                                 <p class="text-muted my-1">لطفا پزشکان مرتبط با این مطب را انتخاب کنید</p>
                                 @foreach ($fetchData['doctors'] as $key => $doctorList)
+                                    @if ($doctorList->id == 2)
+                                        @continue
+                                    @endif
                                     <div class="col-md-4">
                                         <div class="form-group mt-2">
                                             <div class="checkbox">
                                                 <div class="custom-checkbox custom-control">
-                                                    <input type="checkbox" wire:model='form.doctors.{{ $doctorList->id }}'
-                                                        @if (array_key_exists($doctorList->id, $form['doctors']) && $form['doctors'][$doctorList->id] == 'true') checked @endif
+                                                    <input type="checkbox"
+                                                        wire:model='form.doctors.{{ $doctorList->id }}'
                                                         data-checkboxes="mygroup" class="custom-control-input"
                                                         id="checkbox-{{ $key }}">
                                                     <label for="checkbox-{{ $key }}"
@@ -115,7 +119,8 @@
                     <hr style="opacity: 0.9">
                     <div class="form-group">
                         <label for="order">ترتیب نمایش :</label>
-                        <input wire:key="prioruty" type="text" class="form-control" id="placeorder" wire:model='form.priority'
+                        <input wire:key="prioruty" type="text" class="form-control" id="placeorder"
+                            wire:model='form.priority'
                             placeholder="اواویت نمایش مربوط به این مطب در صورتی که چند مطب داشته باشید را به عدد وارد کنید.">
                     </div>
                 </div>
@@ -123,21 +128,21 @@
                     <div class="checkbox">
                         <div class="custom-checkbox custom-control">
                             <input type="checkbox" data-checkboxes="mygroup" class="custom-control-input"
-                                wire:model='form.active' id="checkbox-1">
-                            <label for="checkbox-1" class="custom-control-label ">فعال</label>
+                                wire:model='form.active' id="activeCheckbox">
+                            <label for="activeCheckbox" class="custom-control-label ">فعال</label>
                         </div>
                     </div>
                 </div>
-                @if($errors->any())
-                <div class="alert alert-danger mt-4" role="alert">
-                    <p class="text-danger"><strong>خطا!!</strong>لطفا اخطارهای بوجود امده را در قسمت بالا برطرف کنید</p>
-                </div>
+                @if ($errors->any())
+                    <div class="alert alert-danger mt-4" role="alert">
+                        <p class="text-danger"><strong>خطا!!</strong>لطفا اخطارهای بوجود امده را در قسمت بالا برطرف کنید
+                        </p>
+                    </div>
                 @endif
                 <div class="col-12 text-end">
-                    <button type="submit" class="btn btn-primary"
-                            wire:loading.class="bg-gray btn-loading disabled"
-                            wire:click="updateOrCreate">
-                        @if($isEdited)
+                    <button type="submit" class="btn btn-primary" wire:loading.class="bg-gray btn-loading disabled"
+                        wire:click="updateOrCreate">
+                        @if ($isEdited)
                             ویرایش اطلاعات
                         @else
                             ‌ذخیره اطلاعات
@@ -166,7 +171,6 @@
     <script src="{{ admin_asset('js/mapp.min.js') }}"></script>
     <script src="{{ admin_asset('js/mapp.env.js') }}"></script>
     <script>
-
         $(document).ready(function() {
             var crosshairIcon = {
                 iconUrl: 'https://nobat.selakteb.com/images/marker-icon.png',
@@ -184,20 +188,21 @@
                 },
                 apiKey: 'eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiIsImp0aSI6IjAwYjU3ZjUzYjk4OThlOGZlYmZlMjJhODc3NjM3ZGJlYzE5OGZmYzAzMmQ1MDdmODcxY2M5ZThlODM4N2ZkNjRiNzM3MWVlOWFmYjk1MWJlIn0.eyJhdWQiOiIyNjA5NSIsImp0aSI6IjAwYjU3ZjUzYjk4OThlOGZlYmZlMjJhODc3NjM3ZGJlYzE5OGZmYzAzMmQ1MDdmODcxY2M5ZThlODM4N2ZkNjRiNzM3MWVlOWFmYjk1MWJlIiwiaWF0IjoxNzA3NTQ3MzUyLCJuYmYiOjE3MDc1NDczNTIsImV4cCI6MTcxMDA1Mjk1Miwic3ViIjoiIiwic2NvcGVzIjpbImJhc2ljIl19.G_8eZJV03f9krGyP_nvkNXn9nODDK8VAf-lI9ESuZBPobkrPCceG02Y-nzosNEilZzZSGqW2yBjZE6PMZVcf81T53bMAlo6DmPaDGoqjAO88ZrL1tvhQ7KPBDBSkA4oODvSVGtA071CWpvUd7xdzoy0h-mEGmIdkY3Cs3MkPbCltrYXaK1LuDSE-4fz2HHeyswUAc8IHkoxKcze-FACfT_uifSijX6rfYfG4k9uXTNap41rKvmqZ1c4DSXkkHTc_2Pit1WUAX-y-ALxKtt22h8GQPv4FV-Bd_PJHp9g6U93QmKaeJdC0PCcnVOJHhHfGtme7I0zYAfmtgqDC5j2CAw'
             });
-            // app.addMarker({
-            //     latlng: {
-            //         lat: 35.786442157435,
-            //         lng: 51.498822688591,
-            //     },
-            //     icon: crosshairIcon,
-            //     popup: false,
-            //     pan: false,
-            //     draggable: true,
-            //     history: false
-            // });
+            if ({{ array_key_exists('loc', $form) }}) {
+                app.addMarker({
+                    latlng: {
+                        lat: {{ (float) $form['loc']['lat'] }},
+                        lng: {{ (float) $form['loc']['lng'] }},
+                    },
+                    icon: crosshairIcon,
+                    popup: false,
+                    pan: false,
+                    draggable: true,
+                    history: false
+                });
+            }
             app.addVectorLayers();
             app.addZoomControls();
-
             app.map.on('click', function(e) {
                 var marker = app.addMarker({
                     latlng: {

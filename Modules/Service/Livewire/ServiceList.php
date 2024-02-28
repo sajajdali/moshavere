@@ -3,12 +3,38 @@
 namespace Modules\Service\Livewire;
 
 use Livewire\Component;
+use App\Enum\ActiveEnum;
 use Livewire\Attributes\On;
+use Livewire\WithPagination;
+use Modules\Service\app\Models\Service;
 
 class ServiceList extends Component
 {
-    public  $search = [];
+    use WithPagination;
+    public  $search = [
+        'id' => null,
+        'title' => null,
+        'active' => null,
+    ];
+    public array $fetchData = [];
     public $searchPanel = "";
+    public function startSearch()
+    {
+        $this->render();
+    }
+    public function resetProperties()
+    {
+        $this->search = [
+            'id' => null,
+            'placeName' => null,
+            'active' => null,
+        ];
+        $this->searchPanel = null;
+    }
+
+    public function passModalData(Service $service) {
+        $this->fetchData['modal'] = $service->subSection() ;
+    }
 
     #[On('delete')]
     public function delete() {
@@ -17,6 +43,38 @@ class ServiceList extends Component
 
     public function render()
     {
-        return view('service::livewire.service-list');
+        $query =  Service::orderBy('priority','asc');
+        $searchCriteria = [
+            'idSearch' => [
+                'condition' => $this->search['id'],
+                'callback' => function ($query) {
+                    return $query->whereId($this->search['id']);
+                },
+            ],
+            'ServiceName' => [
+                'condition' => $this->search['title'],
+                'callback' => function ($query) {
+                    return $query->where('title', 'LIKE', '%' . $this->search['title'] . '%');
+                },
+            ],
+            'activeStatus' => [
+                'condition' => $this->search['active'],
+                'callback' => function ($query) {
+                    return $query->where('active', ActiveEnum::tryFrom((int) $this->search['active']));
+                },
+            ],
+        ];
+
+        foreach ($searchCriteria as $property => $config) {
+            $condition = $config['condition'];
+            $callback = $config['callback'];
+            if ($condition) {
+                $query->when($condition, $callback);
+            }
+        }
+
+
+        return view('service::livewire.service-list',
+            ['services' => $query->paginate(10)]);
     }
 }

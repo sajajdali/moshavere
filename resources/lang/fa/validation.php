@@ -193,6 +193,11 @@ return [
         "userName" => "نام ",
         "userLastName" => "نام خانوادگی",
         "specialityTitle" => "نام تخصص",
+        "form.title" => "عنوان",
+        "form.parentId" => "والد",
+        "form.priority" => "ترتیب نمایش",
+        "form.img" => "تصویر",
+        "form.active" => "وضعیت",
 
     ],
 

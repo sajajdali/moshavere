@@ -16,6 +16,8 @@ use Modules\Service\Livewire\CreateOrUpdate;
 */
 
 Route::group([], function () {
-    Route::get('service/create', CreateOrUpdate::class)->name('service.create');
-    Route::get('service/list', ServiceList::class)->name('service.list');
+    Route::get('service/craete', CreateOrUpdate::class)->name('service.create')->can('create', \Modules\Place\app\Models\Service::class);
+    Route::get('service/edit/{service}', CreateOrUpdate::class)->name('service.edit')->can('viewAny', \Modules\Place\app\Models\Service::class);
+    Route::get('service/list', ServiceList::class)->name('service.list')->can('viewAny', \Modules\Place\app\Models\Service::class);
+
 });

@@ -14,8 +14,8 @@ return new class extends Migration
         Schema::create('services', function (Blueprint $table) {
             $table->id();
             $table->string('title');
-            $table->foreignIdFor(\Modules\Service\app\Models\Service::class  ,'parent_id')->constrained('services')->cascadeOnDelete()->nullable();
-            $table->string('icon');
+            $table->foreignIdFor(\Modules\Service\app\Models\Service::class  ,'parent_id')->nullable()->constrained('services')->cascadeOnDelete();
+            $table->string('icon')->nullable();
             $table->integer('priority')->default(1);
             $table->tinyInteger('active')->default(1);
             $table->softDeletes();

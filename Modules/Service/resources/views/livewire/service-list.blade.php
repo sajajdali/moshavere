@@ -35,20 +35,20 @@
                                     <label for="search-id" class="col-md-2 form-label">ایدی</label>
                                     <div class="col-md-10">
                                         <input class="form-control" id="search-id" wire:model="search.id"
-                                            placeholder="ایدی رژیم مورد نظر" type="text">
+                                            placeholder="ایدی بخش مورد نظر" type="text">
                                     </div>
                                 </div>
                                 <div class="row mb-4">
-                                    <label for="search-name" class="col-md-2 form-label">نام تخصص</label>
+                                    <label for="search-name" class="col-md-2 form-label">نام بخش</label>
                                     <div class="col-md-10">
-                                        <input class="form-control" id="search-name" wire:model="search.specialityName"
-                                            placeholder="نام رژیم" type="text">
+                                        <input class="form-control" id="search-name" wire:model="search.title"
+                                            placeholder="نام بخش" type="text">
                                     </div>
                                 </div>
                                 <div class="row mb-4">
                                     <label class="form-label col-md-2" for="default-dropdown">وضعیت</label>
                                     <div class="col-md-10">
-                                        <select wire:model='search.status' name="country"
+                                        <select wire:model='search.active' name="country"
                                             class="form-control form-select" id="default-dropdown"
                                             data-bs-placeholder="انتخاب کنید..">
                                             <option label="انتخاب کنید"></option>
@@ -79,68 +79,64 @@
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    <tr class="text-center">
-                                        <td>1</td>
-                                        <td>
-                                            <a href="" type="button" data-bs-toggle="modal"
-                                                data-bs-target="#staticBackdrop">
-                                                <i class="fa fa-plus-square" aria-hidden="true"></i>
-                                                ویزیت
-                                            </a>
-                                        </td>
-                                        <td>
-                                            <span class="badge rounded-pill bg-success p-3">فعال</span>
-                                        </td>
-                                        <td> <span class="badge bg-secondary p-3">3 زیر بخش</span></td>
-                                        <td>3</td>
-                                        <td>
-                                            <div class="btn-group mt-2 mb-2">
-                                                <button type="button" class="btn btn-primary dropdown-toggle"
-                                                    data-bs-toggle="dropdown">
-                                                    عملیات <span class="caret"></span>
-                                                </button>
-                                                <ul class="dropdown-menu" role="menu">
-                                                    <li><a class="delete_confirm_alert" data-label="حذف " data-id="3"
-                                                            href="#">حذف</a>
-                                                    </li>
-                                                    <li><a href="{{ route('admin.service.create') }}" data-label="ویرایش">ویرایش</a>
-                                                    </li>
-                                                </ul>
-                                            </div>
-                                        </td>
-                                    </tr>
-                                    <tr class="text-center">
-                                        <td>2</td>
-                                        <td>جراحی</td>
-                                        <td>
-                                            <span class="badge rounded-pill bg-danger p-3">غیر فعال</span>
-                                        </td>
-                                        <td> <span class="badge bg-secondary p-3"> بدون زیر بخش</span></td>
-                                        <td>1</td>
-                                        <td>
-                                            <div class="btn-group mt-2 mb-2">
-                                                <button type="button" class="btn btn-primary dropdown-toggle"
-                                                    data-bs-toggle="dropdown">
-                                                    عملیات <span class="caret"></span>
-                                                </button>
-                                                <ul class="dropdown-menu" role="menu">
-                                                    <li><a class="delete_confirm_alert" data-label="حذف "
-                                                            data-id="3" href="#">حذف</a>
-                                                    </li>
-                                                    <li><a href="{{ route('admin.service.create') }}" data-label="ویرایش">ویرایش</a>
-                                                    </li>
-                                                </ul>
-                                            </div>
-                                        </td>
-                                    </tr>
-                                    {{-- <tr>
-                                        <td colspan="100%" class="text-center">
-                                            <div class="alert alert-info">
-                                                هیچ موردی یافت نشد
-                                            </div>
-                                        </td>
-                                    </tr> --}}
+                                    @if (isset($services))
+                                        @foreach ($services as $service)
+                                            @if (! empty($service->parent_id))
+                                                @continue
+                                            @endif
+                                            <tr class="text-center">
+                                                <td>{{ $service->id }}</td>
+                                                <td>
+                                                    @if ($service->subSection()?->count() != 0)
+                                                        <a wire:click='passModalData({{ $service->id }})'
+                                                            href="" type="button" data-bs-toggle="modal"
+                                                            data-bs-target="#staticBackdrop">
+                                                            <i class="fa fa-plus-square" aria-hidden="true"></i>
+                                                            {{ $service->title }}
+                                                        </a>
+                                                    @else
+                                                        {{ $service->title }}
+                                                    @endif
 
+                                                </td>
+                                                <td>
+                                                    {!! $service->active->getBadge() !!}
+                                                </td>
+                                                <td> <span
+                                                        class="badge bg-secondary p-3">{{ $service->subSection()?->count() ?? 0 }}</span>
+                                                </td>
+                                                <td>{{ $service->user?->count() ?? 0 }} </td>
+                                                <td>
+                                                    <div class="btn-group mt-2 mb-2">
+                                                        <button type="button" class="btn btn-primary dropdown-toggle"
+                                                            data-bs-toggle="dropdown">
+                                                            عملیات <span class="caret"></span>
+                                                        </button>
+                                                        <ul class="dropdown-menu" role="menu">
+                                                            @can('delete', $service)
+                                                                <li><a class="delete_confirm_alert" data-label="حذف "
+                                                                        data-id="{{ $service->id }}" href="#">حذف</a>
+                                                                </li>
+                                                            @endcan
+                                                            @can('update', $service)
+                                                                <li><a href="{{ route('admin.service.edit', ['service' => $service]) }}"
+                                                                        data-label="ویرایش">ویرایش</a>
+                                                                </li>
+                                                            @endcan
+                                                        </ul>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        @endforeach
+                                    @else
+                                        <tr>
+                                            <td colspan="100%" class="text-center">
+                                                <div class="alert alert-info">
+                                                    هیچ موردی یافت نشد
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    @endif
                                 </tbody>
                             </table>
                         </div>

@@ -9,17 +9,17 @@
     </div>
     @include('admin::layouts.components.alert')
 
-    <div class="card">
+    <div class="card   @if ($errors->has('form.visitType.absente') || $errors->has('form.visitType.online')) border border-danger @endif">
         <div class="card-body">
             {{-- section --}}
             <h3> نوع ویزیت </h3>
             <hr style="opacity: 0.5">
             <div class="row">
                 @if ($errors->has('form.visitType.absente') || $errors->has('form.visitType.online'))
-                <div class="alert alert-danger" role="alert">
-                    <p class="text-danger"><strong>خطا!!</strong> لطفا نوع ویزیت را تعیین کنید</p>
-                </div>
-            @endif
+                    <div class="alert alert-danger" role="alert">
+                        <p class="text-danger"><strong>خطا!!</strong> لطفا نوع ویزیت را تعیین کنید</p>
+                    </div>
+                @endif
                 <div class="col-md-6 mt-3">
                     <div class="main-toggle-group d-flex align-items-center ms-0">
                         <div class="toggle toggle-lg toggle-primary my-1 off customCheckbox" wire:ignore.self
@@ -50,24 +50,24 @@
         @include('appointmentsetting::components.generalsetting.dayofperesent')
     </div>
     {{-- time for each appointmernt --}}
-    <div class="card">
-        <div class="card-body">
+    <div class="card  @error('form.visitTime') border border-danger @enderror">
+        <div class="card-body ">
             {{-- section --}}
             <h3>زمان مورد نیاز برای <span class="text-primary">ویزیت</span> هر بیمار</h3>
             <hr style="opacity: 0.5">
             <div class="row">
-                {{-- TODO::alert Message --}}
-                {{-- <div class="alert alert-danger" role="alert">
-                    <p class="text-danger"><strong>خطا!!</strong> در صورتی که روز را فعال کنید باید برای آن ساعت تعیین
-                        کنید.</p>
-                </div> --}}
+                @error('form.visitTime')
+                    <div class="alert alert-danger" role="alert">
+                        <p class="text-danger"><strong>خطا!!</strong> {{ $message }}.</p>
+                    </div>
+                @enderror
                 <div class="col-md-4 pt-2">
                     <label class="text-primary" for="basic-url">مدت زمان مورد نیاز برای ویزیت هر بیمار</label>
                 </div>
                 <div class="col-md-8">
                     <div class="input-group mb-3">
-                        <input type="number" class="form-control" id="basic-url" aria-describedby="basic-addon3"
-                            wire:model='form.visitTime'>
+                        <input type="number" class="form-control @error('form.visitTime') is-invalid @enderror"
+                            id="basic-url" aria-describedby="basic-addon3" wire:model='form.visitTime'>
                         <div class="input-group-prepend">
                             <span class="input-group-text" id="basic-addon3">مدت زمان به دقیقه</span>
                         </div>
@@ -84,24 +84,26 @@
         </div>
     </div>
     {{-- min time  --}}
-    <div class="card">
-        <div class="card-body">
+    <div class="card @error('form.minDayAvaialbe') border border-danger @enderror">
+        <div class="card-body ">
             {{-- section --}}
             <h3><span class="text-primary">حداقل</span> زمان دریافت نوبت</h3>
             <hr style="opacity: 0.5">
             {{-- TODO::alert Message --}}
-            {{-- <div class="alert alert-danger" role="alert">
-                <p class="text-danger"><strong>خطا!!</strong> در صورتی که روز را فعال کنید باید برای آن ساعت تعیین کنید.
-                </p>
-            </div> --}}
+            @error('form.minDayAvaialbe')
+                <div class="alert alert-danger" role="alert">
+                    <p class="text-danger">{{ $message }}
+                    </p>
+                </div>
+            @enderror
             <div class="row">
                 <div class="col-md-5 pt-2">
                     <label class="text-primary" for="basic-url"> زمان دریافت نوبت</label>
                 </div>
                 <div class="col-md-7">
                     <div class="input-group mb-3">
-                        <input type="number" class="form-control" id="basic-url" aria-describedby="basic-addon3"
-                            wire:model='form.minDayAvaialbe'>
+                        <input type="number" class="form-control  @error('form.minDayAvaialbe') is-invalid @enderror "
+                            id="basic-url" aria-describedby="basic-addon3" wire:model='form.minDayAvaialbe'>
                         <div class="input-group-prepend">
                             <span class="input-group-text" id="basic-addon3">روز</span>
                         </div>
@@ -118,16 +120,17 @@
         </div>
     </div>
     {{-- max time  --}}
-    <div class="card">
-        <div class="card-body">
+    <div class="card @error('form.maxDayAvaialbe') border border-danger @enderror">
+        <div class="card-body ">
             {{-- section --}}
             <h3><span class="text-primary">حداکثر</span> زمان دریافت نوبت</h3>
             <hr style="opacity: 0.5">
-            {{-- TODO::alert Message --}}
-            {{-- <div class="alert alert-danger" role="alert">
-                <p class="text-danger"><strong>خطا!!</strong> در صورتی که روز را فعال کنید باید برای آن ساعت تعیین کنید.
-                </p>
-            </div> --}}
+            @error('form.maxDayAvaialbe')
+                <div class="alert alert-danger" role="alert">
+                    <p class="text-danger">{{ $message }}
+                    </p>
+                </div>
+            @enderror
             <div class="row">
                 <div class="col-md-5 pt-2">
                     <label class="text-primary" for="basic-url"> بیمار حداکثر برای چند روز بعد بتواند نوبت دریافت
@@ -135,8 +138,8 @@
                 </div>
                 <div class="col-md-7">
                     <div class="input-group mb-3">
-                        <input type="number" class="form-control" id="basic-url" aria-describedby="basic-addon3"
-                            wire:model='form.maxDayAvaialbe'>
+                        <input type="number" class="form-control  @error('form.maxDayAvaialbe') is-invalid @enderror"
+                            id="basic-url" aria-describedby="basic-addon3" wire:model='form.maxDayAvaialbe'>
                         <div class="input-group-prepend">
                             <span class="input-group-text" id="basic-addon3">روز آینده</span>
                         </div>
@@ -151,11 +154,11 @@
         </div>
     </div>
     {{-- max appointment per day  --}}
-    <div class="card">
+    <div class="card  @error('form.maxAvailabeAppointment.*') border border-danger @enderror">
         <div class="card-header border-bottom d-flex justify-content-between">
             <h3>امکان دریافت حداکثر <span class="text-primary">دریافت نوبت</span></h3>
             <div class="main-toggle-group d-sm-flex align-items-center ms-0">
-                <div class="toggle toggle-lg toggle-primary my-1 on customCheckbox"
+                <div class="toggle toggle-lg toggle-primary my-1 off customCheckbox"
                     data-id="maxAvailabeAppointment.status" wire:ignore.self data-bs-toggle="collapse"
                     href="#maximumAppointmentCanBePerchased" role="button" aria-expanded="false"
                     aria-controls="maximumAppointmentCanBePerchased">
@@ -163,49 +166,59 @@
                 </div>
             </div>
         </div>
-        <div class="card-body collapse show" id="maximumAppointmentCanBePerchased" wire:ignore.self>
-            {{-- section --}}
-            <div class="row">
-                <div class="col-md-3 pt-2">
-                    <label class="text-primary" for="basic-url">تعداد نوبت فعال در هر روز</label>
-                </div>
-                <div class="col-md-9 mb-1">
-                    <div class="input-group mb-3">
-                        <input type="number" class="form-control" id="basic-url" aria-describedby="basic-addon3"
-                            wire:model='form.maxAvailabeAppointment.eachDay'>
-                        <div class="input-group-prepend">
-                            <span class="input-group-text" id="basic-addon3">عدد</span>
-                        </div>
+        <div class="collapse " id="maximumAppointmentCanBePerchased" wire:ignore.self>
+            <div class="card-body">
+                @error('form.maxAvailabeAppointment.*')
+                    <div class="alert alert-danger" role="alert">
+                        <p class="text-danger"> لطفا تعداد نوبت را مشخص کنید!!
+                        </p>
                     </div>
-                    <span class="text-muted d-flex align-items-center"><i
-                            class="fa fa-exclamation-circle fa-lg text-light me-1" aria-hidden="true"></i>هر کاربر در
-                        هر روز بتواند چند نوتب دریافت بکند</span>
-                </div>
-                <div class="col-md-3 pt-2">
-                    <label class="text-primary" for="basic-url">تعداد نوبت فعال در کل</label>
-                </div>
-                <div class="col-md-9">
-                    <div class="input-group mb-3">
-                        <input type="number" class="form-control" id="basic-url" aria-describedby="basic-addon3"
-                            wire:model='form.maxAvailabeAppointment.totall'>
-                        <div class="input-group-prepend">
-                            <span class="input-group-text" id="basic-addon3">عدد</span>
-                        </div>
+                @enderror
+                {{-- section --}}
+                <div class="row">
+                    <div class="col-md-3 pt-2">
+                        <label class="text-primary" for="basic-url">تعداد نوبت فعال در هر روز</label>
                     </div>
-                    <span class="text-muted d-flex align-items-center"><i
-                            class="fa fa-exclamation-circle fa-lg text-light me-1" aria-hidden="true"></i>هر کاربر
-                        بتواند در کل چند نوبت فعال داشته
-                        باشد</span>
-                </div>
-                <div class="d-flex  mt-2">
-                    <p class="text-muted"> <strong class="me-1"> نکته!! </strong> دقت کنید که حداکثر نوبت دریافتی در
-                        یک روز از تعداد کل نوبت ها (فیلد اول نسبت به دوم) بزرگ تر نباشد!</p>
+                    <div class="col-md-9 mb-1">
+                        <div class="input-group mb-3">
+                            <input type="number" class="form-control" id="basic-url"
+                                aria-describedby="basic-addon3" wire:model='form.maxAvailabeAppointment.eachDay'>
+                            <div class="input-group-prepend">
+                                <span class="input-group-text" id="basic-addon3">عدد</span>
+                            </div>
+                        </div>
+                        <span class="text-muted d-flex align-items-center"><i
+                                class="fa fa-exclamation-circle fa-lg text-light me-1" aria-hidden="true"></i>هر کاربر
+                            در
+                            هر روز بتواند چند نوتب دریافت بکند</span>
+                    </div>
+                    <div class="col-md-3 pt-2">
+                        <label class="text-primary" for="basic-url">تعداد نوبت فعال در کل</label>
+                    </div>
+                    <div class="col-md-9">
+                        <div class="input-group mb-3">
+                            <input type="number" class="form-control" id="basic-url"
+                                aria-describedby="basic-addon3" wire:model='form.maxAvailabeAppointment.totall'>
+                            <div class="input-group-prepend">
+                                <span class="input-group-text" id="basic-addon3">عدد</span>
+                            </div>
+                        </div>
+                        <span class="text-muted d-flex align-items-center"><i
+                                class="fa fa-exclamation-circle fa-lg text-light me-1" aria-hidden="true"></i>هر کاربر
+                            بتواند در کل چند نوبت فعال داشته
+                            باشد</span>
+                    </div>
+                    <div class="d-flex  mt-2">
+                        <p class="text-muted"> <strong class="me-1"> نکته!! </strong> دقت کنید که حداکثر نوبت
+                            دریافتی در
+                            یک روز از تعداد کل نوبت ها (فیلد اول نسبت به دوم) بزرگ تر نباشد!</p>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
     {{-- cancel time  --}}
-    <div class="card">
+    <div class="card @error('form.cancel.day') border border-danger @enderror">
         <div class="card-header border-bottom d-flex justify-content-between">
             <h3>امکان <span class="text-primary">کنسل</span> کردن نوبت </h3>
             <div class="main-toggle-group d-sm-flex align-items-center ms-0">
@@ -217,6 +230,12 @@
             </div>
         </div>
         <div class="card-body collapse" id="saturdayTimeCollaps" wire:ignore.self>
+            @error('form.cancel.day')
+                <div class="alert alert-danger" role="alert">
+                    <p class="text-danger"> مشخص کنید که از چند روز قبل از فرا رسیدن زمان نوبت امکان کنسل کردن باشد!!
+                    </p>
+                </div>
+            @enderror
             {{-- section --}}
             <div class="row">
                 <div class="col-md-3 pt-2">
@@ -224,8 +243,8 @@
                 </div>
                 <div class="col-md-9">
                     <div class="input-group mb-3">
-                        <input type="number" class="form-control" id="basic-url" aria-describedby="basic-addon3"
-                            wire:model='form.cancel.day'>
+                        <input type="number" class="form-control  @error('form.cancel.day') is-invalid @enderror"
+                            id="basic-url" aria-describedby="basic-addon3" wire:model='form.cancel.day'>
                         <div class="input-group-prepend">
                             <span class="input-group-text" id="basic-addon3">روز آینده</span>
                         </div>
@@ -260,7 +279,7 @@
         </div>
     </div>
     {{-- end Date time  --}}
-    <div class="card">
+    <div class="card  @error('form.endAppointment.date') border border-danger @enderror">
         <div class="card-header border-bottom d-flex justify-content-between">
             <h3> تعیین پایان تاریخ نوبت دهی </h3>
             <div class="main-toggle-group d-sm-flex align-items-center ms-0">
@@ -273,13 +292,21 @@
         </div>
         <div class="card-body collapse" id="EndDateTimeCollaps" wire:ignore.self>
             {{-- section --}}
+            @error('form.endAppointment.date')
+                <div class="alert alert-danger" role="alert">
+                    <p class="text-danger"> لطفا تاریخ را انتخاب کنید!!
+                    </p>
+                </div>
+            @enderror
             <div class="row">
                 <div class="col-md-3 pt-2">
                     <label class="text-primary" for="basic-url">انتخاب تاریخ:</label>
                 </div>
                 <div class="col-md-9">
                     <div class="input-group mb-3">
-                        <input type="text" class="form-control" id="endDatePicker">
+                        <input type="text"
+                            class="form-control @error('form.endAppointment.date') is-invalid @enderror"
+                            id="endDatePicker">
                     </div>
                 </div>
                 <div class="d-flex  mt-2">
@@ -290,24 +317,30 @@
         </div>
     </div>
     {{-- payment  --}}
-    <div class="card">
+    <div class="card @error('form.onlinePayment.*') border border-danger @enderror">
         <div class="card-header border-bottom d-flex justify-content-between">
             <h3>پرداخت آنلاین</h3>
             <div class="main-toggle-group d-sm-flex align-items-center ms-0">
                 <div class="toggle toggle-lg toggle-primary my-1 off customCheckbox"
-                    data-id="form.onlinePayment.status" wire:ignore.self data-bs-toggle="collapse"
+                    data-id="onlinePayment.status" wire:ignore.self data-bs-toggle="collapse"
                     href="#paymentCollaps" role="button" aria-expanded="false" aria-controls="paymentCollaps">
                     <span></span>
                 </div>
             </div>
         </div>
         <div class="card-body collapse" id="paymentCollaps" wire:ignore.self>
+            @error('form.onlinePayment.*')
+            <div class="alert alert-danger" role="alert">
+                <p class="text-danger"> لطفا مقدار را وارد کنید!!
+                </p>
+            </div>
+            @enderror
             <div class="row">
                 <div class="col-md-6">
                     <div class="d-flex align-items-center">
                         <div class="main-toggle-group d-sm-flex align-items-center ms-0">
                             <div class="toggle toggle-lg toggle-primary my-1 off customCheckbox"
-                                data-id="form.onlinePayment.online.status" form.onlinePayment.status
+                                data-id="onlinePayment.online.status"
                                 id="sitePaymentStatus" wire:ignore.self>
                                 <span></span>
                             </div>
@@ -320,7 +353,7 @@
                     <div class="d-flex align-items-center">
                         <div class="main-toggle-group d-sm-flex align-items-center ms-0">
                             <div class="toggle toggle-lg toggle-primary my-1 off customCheckbox"
-                                data-id="form.onlinePayment.voip.status" wire:ignore.self id="paymentOnInVoip">
+                                data-id="onlinePayment.voip.status" wire:ignore.self id="paymentOnInVoip">
                                 <span></span>
                             </div>
                         </div>
@@ -329,7 +362,7 @@
                 </div>
 
             </div>
-            <div class="row mt-5">
+            <div class="row mt-5" wire:ignore>
                 <div class="d-none" id="paymentstatusSelect">
                     <div class="row">
                         <div class="col-md-5 pt-2">
@@ -337,7 +370,7 @@
                         </div>
                         <div class="col-md-7">
                             <div class="form-group">
-                                <select name="country" class="form-control form-select" id="default-dropdown"
+                                <select name="country" class="form-control form-select  @error('form.onlinePayment.notPayingStatus') is-invalid @enderror" id="default-dropdown"
                                     wire:model='form.onlinePayment.notPayingStatus'
                                     data-bs-placeholder="انتخاب کنید...">
                                     <option label="انتخاب کنید..."></option>
@@ -355,7 +388,7 @@
                         </div>
                         <div class="col-md-7">
                             <div class="form-group">
-                                <input type="text" class="form-control" id="inputName"
+                                <input type="text" class="form-control  @error('form.onlinePayment.Price') is-invalid @enderror" id="inputName"
                                     wire:model='form.onlinePayment.Price' placeholder="مبلغ به تومان">
                             </div>
                         </div>
@@ -477,7 +510,7 @@
                 format: 'L',
                 autoClose: true,
                 onSelect: function(unix) {
-                    @this.set('form.endAppointment.status', $('#endDatePicker').val());
+                    @this.set('form.endAppointment.date', $('#endDatePicker').val());
                 }
             });
         });

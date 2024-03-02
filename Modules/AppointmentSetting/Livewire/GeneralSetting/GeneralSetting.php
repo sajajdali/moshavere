@@ -3,6 +3,7 @@
 namespace Modules\AppointmentSetting\Livewire\GeneralSetting;
 
 use Livewire\Component;
+use Illuminate\Validation\Rule;
 use Modules\User\Entities\User;
 
 class GeneralSetting extends Component
@@ -14,7 +15,10 @@ class GeneralSetting extends Component
     maxDayAvaialbe
     maxAvailabeAppointment
     */
-    public array $form = [];
+    public array $form = [
+        'minDayAvaialbe' => 0,
+        'maxDayAvaialbe' => 90,
+    ];
 
     //day property
     public array $timeFrame = [];
@@ -42,10 +46,45 @@ class GeneralSetting extends Component
     }
     public function rules()
     {
-        return [
-            'form.visitType.absente' => 'required_without_all:form.visitType.online',
-            'form.visitType.online' => 'required_without_all:form.visitType.absente',
+        //validation for each day time frame
+        $dayRules = [];
+        foreach ($this->counter as $dayName => $counter) {
+            //if that day is active
+            if (isset($this->form['visitType'][$dayName]) && (isset($this->form['visitType'][$dayName]) == 'true')) {
+                for ($i = 0; $i < $counter; $i++) {
+                    $dayRules['form.timeFrame.' . $dayName . '.' . $i . '.start'] = 'required';
+                    $dayRules['form.timeFrame.' . $dayName . '.' . $i . '.end']   = 'required';
+                }
+            }
+        }
+        $rules  = [
+            'form.visitType.absente'    => 'required_without_all:form.visitType.online',
+            'form.visitType.online'     => 'required_without_all:form.visitType.absente',
+            'form.visitTime'            => 'required',
+            'form.minDayAvaialbe'       => 'required|integer',
+            'form.maxDayAvaialbe'       => 'required|integer',
+            'form.maxAvailabeAppointment.eachDay' => 'required_if:form.maxAvailabeAppointment.status,true',
+            'form.maxAvailabeAppointment.totall'  => 'required_if:form.maxAvailabeAppointment.status,true',
+            'form.cancel.day'                     => 'required_if:form.cancel.status,true',
+            'form.endAppointment.date'            => 'required_if:form.endAppointment.status,true',
+            'form.onlinePayment.Price'            => [
+                Rule::requiredIf(function () {
+                    return isset($this->form['onlinePayment']['status']) && $this->form['onlinePayment']['status'] == true &&
+                        ((isset($this->form['onlinePayment']['online']['status']) && $this->form['onlinePayment']['online']['status'] == true) ||
+                            (isset($this->form['onlinePayment']['voip']['status']) && $this->form['onlinePayment']['voip']['status'] == true)
+                        );
+                }),
+            ],
+            'form.onlinePayment.notPayingStatus'  => [
+                Rule::requiredIf(function () {
+                    return isset($this->form['onlinePayment']['status']) && $this->form['onlinePayment']['status'] == true &&
+                        ((isset($this->form['onlinePayment']['online']['status']) && $this->form['onlinePayment']['online']['status'] == true)
+                        );
+                }),
+            ],
         ];
+
+        return array_merge($dayRules,  $rules);
     }
     public function saveSetting()
     {

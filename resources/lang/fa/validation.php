@@ -198,6 +198,8 @@ return [
         "form.priority" => "ترتیب نمایش",
         "form.img" => "تصویر",
         "form.active" => "وضعیت",
+        "form.visitTime" => "مدت زمان مورد نیاز برای ویزیت",
+        "form.minDayAvaialbe" => "حداقل زمان دریافت نوبت",
 
     ],
 

@@ -5,6 +5,12 @@
         </div>
         <div class="row mt-3">
             <div class="card-body">
+                @error('form.timeFrame.*')
+                    <div class="alert alert-danger" role="alert">
+                        <p class="text-danger"><strong>خطا!!</strong>در صورتی که یک روز را فعال میکنید ، باید برای آن ساعت
+                            تعیین کنید</p>
+                    </div>
+                @enderror
                 <p>در این قسمت روز هایی که پزشک در مطب حضور دارد را انتخاب و سپس ساعت هار مربوط به هر روز را در آن
                     وارد
                     بکنید!</p>
@@ -24,7 +30,7 @@
                         </div>
                     </div>
                     <div class="collapse col-12 mt-2" id="saturdayTimeCollaps" wire:ignore.self>
-                        <div class="card card-body">
+                        <div class="card card-body @if ($errors->has('form.timeFrame.saturday.*')) border border-danger @endif">
                             {{-- TODO::modify Error message --}}
                             {{-- <div class="alert alert-danger" role="alert"> درصورت فعال سازی روز لطفا ساعت حضور
                                     در
@@ -65,13 +71,13 @@
                                 <div class="row">
                                     <div class="col-12 col-md-6">
                                         <label for="input-time" class="form-label">از ساعت</label>
-                                        <input wire:model='form.form.timeFrame.saturday.{{ $i }}.start' type="time" wire:ignore.self
-                                            class="form-control" id="input-time">
+                                        <input wire:model='form.timeFrame.saturday.{{ $i }}.start'
+                                            type="time" wire:ignore.self class="form-control" id="input-time">
                                     </div>
                                     <div class="col-12 col-md-6"> <label for="input-label" class="form-label">تا
                                             ساعت:</label>
-                                        <input wire:model='form.form.timeFrame.saturday.{{ $i }}.end' type="time" wire:ignore.self
-                                            class="form-control" id="input-time">
+                                        <input wire:model='form.timeFrame.saturday.{{ $i }}.end'
+                                            type="time" wire:ignore.self class="form-control" id="input-time">
                                     </div>
                                 </div>
                             @endfor
@@ -95,7 +101,7 @@
                         </div>
                     </div>
                     <div class="collapse col-12 mt-2" id="sundayTimeCollaps" wire:ignore.self>
-                        <div class="card card-body">
+                        <div class="card card-body @if ($errors->has('form.timeFrame.sunday.*')) border border-danger @endif">
                             <div class="d-flex justify-content-between">
                                 <p class="text-muted">تعیین زمان حضور برای یک شنبه</p>
                                 <div>
@@ -132,13 +138,13 @@
                                 <div class="row">
                                     <div class="col-12 col-md-6">
                                         <label for="input-time" class="form-label">از ساعت</label>
-                                        <input wire:model='form.timeFrame.sunday.{{ $i }}.start' type="time" wire:ignore.self
-                                            class="form-control" id="input-time">
+                                        <input wire:model='form.timeFrame.sunday.{{ $i }}.start'
+                                            type="time" wire:ignore.self class="form-control" id="input-time">
                                     </div>
                                     <div class="col-12 col-md-6"> <label for="input-label" class="form-label">تا
                                             ساعت:</label>
-                                        <input wire:model='form.timeFrame.sunday.{{ $i }}.end' type="time" wire:ignore.self
-                                            class="form-control" id="input-time">
+                                        <input wire:model='form.timeFrame.sunday.{{ $i }}.end'
+                                            type="time" wire:ignore.self class="form-control" id="input-time">
                                     </div>
                                 </div>
                             @endfor
@@ -162,7 +168,7 @@
                         </div>
                     </div>
                     <div class="collapse col-12 mt-2" id="mondayTimeCollaps" wire:ignore.self>
-                        <div class="card card-body">
+                        <div class="card card-body @if ($errors->has('form.timeFrame.monday.*')) border border-danger @endif ">
                             <div class="d-flex justify-content-between">
                                 <p class="text-muted">تعیین زمان حضور برای دو شنبه</p>
                                 <div>
@@ -199,13 +205,13 @@
                                 <div class="row">
                                     <div class="col-12 col-md-6">
                                         <label for="input-time" class="form-label">از ساعت</label>
-                                        <input wire:model='form.timeFrame.monday.{{ $i }}.start' type="time" wire:ignore.self
-                                            class="form-control" id="input-time">
+                                        <input wire:model='form.timeFrame.monday.{{ $i }}.start'
+                                            type="time" wire:ignore.self class="form-control" id="input-time">
                                     </div>
                                     <div class="col-12 col-md-6"> <label for="input-label" class="form-label">تا
                                             ساعت:</label>
-                                        <input wire:model='form.timeFrame.monday.{{ $i }}.end' type="time" wire:ignore.self
-                                            class="form-control" id="input-time">
+                                        <input wire:model='form.timeFrame.monday.{{ $i }}.end'
+                                            type="time" wire:ignore.self class="form-control" id="input-time">
                                     </div>
                                 </div>
                             @endfor
@@ -229,7 +235,7 @@
                         </div>
                     </div>
                     <div class="collapse col-12 mt-2" id="tuesdayTimeCollaps" wire:ignore.self>
-                        <div class="card card-body">
+                        <div class="card card-body  @if ($errors->has('form.timeFrame.tuesday.*')) border border-danger @endif">
                             <div class="d-flex justify-content-between">
                                 <p class="text-muted">تعیین زمان حضور برای سه شنبه</p>
                                 <div>
@@ -266,13 +272,13 @@
                                 <div class="row">
                                     <div class="col-12 col-md-6">
                                         <label for="input-time" class="form-label">از ساعت</label>
-                                        <input wire:model='form.timeFrame.tuesday.{{ $i }}.start' type="time" wire:ignore.self
-                                            class="form-control" id="input-time">
+                                        <input wire:model='form.timeFrame.tuesday.{{ $i }}.start'
+                                            type="time" wire:ignore.self class="form-control" id="input-time">
                                     </div>
                                     <div class="col-12 col-md-6"> <label for="input-label" class="form-label">تا
                                             ساعت:</label>
-                                        <input wire:model='form.timeFrame.tuesday.{{ $i }}.end' type="time" wire:ignore.self
-                                            class="form-control" id="input-time">
+                                        <input wire:model='form.timeFrame.tuesday.{{ $i }}.end'
+                                            type="time" wire:ignore.self class="form-control" id="input-time">
                                     </div>
                                 </div>
                             @endfor
@@ -296,7 +302,7 @@
                         </div>
                     </div>
                     <div class="collapse col-12 mt-2" id="wednesdayTimeCollaps" wire:ignore.self>
-                        <div class="card card-body">
+                        <div class="card card-body @if ($errors->has('form.timeFrame.wednesday.*')) border border-danger @endif">
                             <div class="d-flex justify-content-between">
                                 <p class="text-muted">تعیین زمان حضور برای چهارشنبه</p>
                                 <div>
@@ -338,8 +344,8 @@
                                     </div>
                                     <div class="col-12 col-md-6"> <label for="input-label" class="form-label">تا
                                             ساعت:</label>
-                                        <input wire:model='form.timeFrame.wednesday.{{ $i }}.end' type="time" wire:ignore.self
-                                            class="form-control" id="input-time">
+                                        <input wire:model='form.timeFrame.wednesday.{{ $i }}.end'
+                                            type="time" wire:ignore.self class="form-control" id="input-time">
                                     </div>
                                 </div>
                             @endfor
@@ -363,7 +369,7 @@
                         </div>
                     </div>
                     <div class="collapse col-12 mt-2" id="thursdayTimeCollaps" wire:ignore.self>
-                        <div class="card card-body">
+                        <div class="card card-body @if ($errors->has('form.timeFrame.thursday.*')) border border-danger @endif">
                             <div class="d-flex justify-content-between">
                                 <p class="text-muted">تعیین زمان حضور برای چهارشنبه</p>
                                 <div>
@@ -405,8 +411,8 @@
                                     </div>
                                     <div class="col-12 col-md-6"> <label for="input-label" class="form-label">تا
                                             ساعت:</label>
-                                        <input wire:model='form.timeFrame.thursday.{{ $i }}.end' type="time" wire:ignore.self
-                                            class="form-control" id="input-time">
+                                        <input wire:model='form.timeFrame.thursday.{{ $i }}.end'
+                                            type="time" wire:ignore.self class="form-control" id="input-time">
                                     </div>
                                 </div>
                             @endfor
@@ -430,7 +436,7 @@
                         </div>
                     </div>
                     <div class="collapse col-12 mt-2" id="fridayTimeCollaps" wire:ignore.self>
-                        <div class="card card-body">
+                        <div class="card card-body @if ($errors->has('form.timeFrame.friday.*')) border border-danger @endif">
                             <div class="d-flex justify-content-between">
                                 <p class="text-muted">تعیین زمان حضور برای جمعه</p>
                                 <div>
@@ -467,13 +473,13 @@
                                 <div class="row">
                                     <div class="col-12 col-md-6">
                                         <label for="input-time" class="form-label">از ساعت</label>
-                                        <input wire:model='form.timeFrame.friday.{{ $i }}.start' type="time" wire:ignore.self
-                                            class="form-control" id="input-time">
+                                        <input wire:model='form.timeFrame.friday.{{ $i }}.start'
+                                            type="time" wire:ignore.self class="form-control" id="input-time">
                                     </div>
                                     <div class="col-12 col-md-6"> <label for="input-label" class="form-label">تا
                                             ساعت:</label>
-                                        <input wire:model='form.timeFrame.friday.{{ $i }}.end' type="time" wire:ignore.self
-                                            class="form-control" id="input-time">
+                                        <input wire:model='form.timeFrame.friday.{{ $i }}.end'
+                                            type="time" wire:ignore.self class="form-control" id="input-time">
                                     </div>
                                 </div>
                             @endfor

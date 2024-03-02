@@ -3,7 +3,7 @@
         <div>
             <h1 class="page-title">
                 <span>تنظیمات زمان های حضور</span>
-                <strong class="text-primary">{{ $doctor->fullName }}</strong>
+                <strong class="text-primary">{{ $fetchData['doctor']->fullName }}</strong>
             </h1>
         </div>
     </div>
@@ -15,14 +15,15 @@
             <h3> نوع ویزیت </h3>
             <hr style="opacity: 0.5">
             <div class="row">
-                {{-- TODO::alert Message --}}
-                {{-- <div class="alert alert-danger" role="alert">
-                    <p class="text-danger"><strong>خطا!!</strong> در صورتی که روز را فعال کنید باید برای آن ساعت تعیین
-                        کنید.</p>
-                </div> --}}
+                @if ($errors->has('form.visitType.absente') || $errors->has('form.visitType.online'))
+                <div class="alert alert-danger" role="alert">
+                    <p class="text-danger"><strong>خطا!!</strong> لطفا نوع ویزیت را تعیین کنید</p>
+                </div>
+            @endif
                 <div class="col-md-6 mt-3">
                     <div class="main-toggle-group d-flex align-items-center ms-0">
-                        <div class="toggle toggle-lg toggle-primary my-1 off" wire:ignore.self>
+                        <div class="toggle toggle-lg toggle-primary my-1 off customCheckbox" wire:ignore.self
+                            data-id="visitType.absente">
                             <span></span>
                         </div>
                         <div class="ms-2">
@@ -31,7 +32,8 @@
                     </div>
                 </div>
                 <div class="col-md-6 mt-3">
-                    <div class="main-toggle-group d-flex align-items-center ms-0">
+                    <div class="main-toggle-group d-flex align-items-center ms-0 customCheckbox"
+                        data-id="visitType.online">
                         <div class="toggle toggle-lg toggle-primary my-1 off" wire:ignore.self>
                             <span></span>
                         </div>
@@ -39,11 +41,6 @@
                             <p class="text-muted m-0">آنلاین</p>
                         </div>
                     </div>
-                </div>
-                <div class="d-flex  mt-4">
-                    <p class="text-muted">
-                        <strong class="me-1"> نکته!! </strong> با فعال سازی نوع ویزیت شما میتوانید
-                    </p>
                 </div>
             </div>
         </div>
@@ -70,7 +67,7 @@
                 <div class="col-md-8">
                     <div class="input-group mb-3">
                         <input type="number" class="form-control" id="basic-url" aria-describedby="basic-addon3"
-                            wire:model='visitTime'>
+                            wire:model='form.visitTime'>
                         <div class="input-group-prepend">
                             <span class="input-group-text" id="basic-addon3">مدت زمان به دقیقه</span>
                         </div>
@@ -104,7 +101,7 @@
                 <div class="col-md-7">
                     <div class="input-group mb-3">
                         <input type="number" class="form-control" id="basic-url" aria-describedby="basic-addon3"
-                            wire:model='maxDayAvaialbe'>
+                            wire:model='form.minDayAvaialbe'>
                         <div class="input-group-prepend">
                             <span class="input-group-text" id="basic-addon3">روز</span>
                         </div>
@@ -139,7 +136,7 @@
                 <div class="col-md-7">
                     <div class="input-group mb-3">
                         <input type="number" class="form-control" id="basic-url" aria-describedby="basic-addon3"
-                            wire:model='maxDayAvaialbe'>
+                            wire:model='form.maxDayAvaialbe'>
                         <div class="input-group-prepend">
                             <span class="input-group-text" id="basic-addon3">روز آینده</span>
                         </div>
@@ -158,7 +155,8 @@
         <div class="card-header border-bottom d-flex justify-content-between">
             <h3>امکان دریافت حداکثر <span class="text-primary">دریافت نوبت</span></h3>
             <div class="main-toggle-group d-sm-flex align-items-center ms-0">
-                <div class="toggle toggle-lg toggle-primary my-1 on" wire:ignore.self data-bs-toggle="collapse"
+                <div class="toggle toggle-lg toggle-primary my-1 on customCheckbox"
+                    data-id="maxAvailabeAppointment.status" wire:ignore.self data-bs-toggle="collapse"
                     href="#maximumAppointmentCanBePerchased" role="button" aria-expanded="false"
                     aria-controls="maximumAppointmentCanBePerchased">
                     <span></span>
@@ -174,7 +172,7 @@
                 <div class="col-md-9 mb-1">
                     <div class="input-group mb-3">
                         <input type="number" class="form-control" id="basic-url" aria-describedby="basic-addon3"
-                            wire:model='gseting.maxAppDay'>
+                            wire:model='form.maxAvailabeAppointment.eachDay'>
                         <div class="input-group-prepend">
                             <span class="input-group-text" id="basic-addon3">عدد</span>
                         </div>
@@ -189,7 +187,7 @@
                 <div class="col-md-9">
                     <div class="input-group mb-3">
                         <input type="number" class="form-control" id="basic-url" aria-describedby="basic-addon3"
-                            wire:model='gseting.maxAppTotall'>
+                            wire:model='form.maxAvailabeAppointment.totall'>
                         <div class="input-group-prepend">
                             <span class="input-group-text" id="basic-addon3">عدد</span>
                         </div>
@@ -211,9 +209,9 @@
         <div class="card-header border-bottom d-flex justify-content-between">
             <h3>امکان <span class="text-primary">کنسل</span> کردن نوبت </h3>
             <div class="main-toggle-group d-sm-flex align-items-center ms-0">
-                <div class="toggle toggle-lg toggle-primary my-1 off" wire:ignore.self data-bs-toggle="collapse"
-                    href="#saturdayTimeCollaps" role="button" aria-expanded="false"
-                    aria-controls="saturdayTimeCollaps">
+                <div class="toggle toggle-lg toggle-primary my-1 off customCheckbox" data-id="cancel.status"
+                    wire:ignore.self data-bs-toggle="collapse" href="#saturdayTimeCollaps" role="button"
+                    aria-expanded="false" aria-controls="saturdayTimeCollaps">
                     <span></span>
                 </div>
             </div>
@@ -227,7 +225,7 @@
                 <div class="col-md-9">
                     <div class="input-group mb-3">
                         <input type="number" class="form-control" id="basic-url" aria-describedby="basic-addon3"
-                            wire:model='maxDayAvaialbe'>
+                            wire:model='form.cancel.day'>
                         <div class="input-group-prepend">
                             <span class="input-group-text" id="basic-addon3">روز آینده</span>
                         </div>
@@ -266,9 +264,9 @@
         <div class="card-header border-bottom d-flex justify-content-between">
             <h3> تعیین پایان تاریخ نوبت دهی </h3>
             <div class="main-toggle-group d-sm-flex align-items-center ms-0">
-                <div class="toggle toggle-lg toggle-primary my-1 off" wire:ignore.self data-bs-toggle="collapse"
-                    href="#EndDateTimeCollaps" role="button" aria-expanded="false"
-                    aria-controls="EndDateTimeCollaps">
+                <div class="toggle toggle-lg toggle-primary my-1 off customCheckbox" data-id="endAppointment.status"
+                    wire:ignore.self data-bs-toggle="collapse" href="#EndDateTimeCollaps" role="button"
+                    aria-expanded="false" aria-controls="EndDateTimeCollaps">
                     <span></span>
                 </div>
             </div>
@@ -296,7 +294,8 @@
         <div class="card-header border-bottom d-flex justify-content-between">
             <h3>پرداخت آنلاین</h3>
             <div class="main-toggle-group d-sm-flex align-items-center ms-0">
-                <div class="toggle toggle-lg toggle-primary my-1 off" wire:ignore.self data-bs-toggle="collapse"
+                <div class="toggle toggle-lg toggle-primary my-1 off customCheckbox"
+                    data-id="form.onlinePayment.status" wire:ignore.self data-bs-toggle="collapse"
                     href="#paymentCollaps" role="button" aria-expanded="false" aria-controls="paymentCollaps">
                     <span></span>
                 </div>
@@ -307,8 +306,9 @@
                 <div class="col-md-6">
                     <div class="d-flex align-items-center">
                         <div class="main-toggle-group d-sm-flex align-items-center ms-0">
-                            <div class="toggle toggle-lg toggle-primary my-1 off" id="sitePaymentStatus"
-                                wire:ignore.self>
+                            <div class="toggle toggle-lg toggle-primary my-1 off customCheckbox"
+                                data-id="form.onlinePayment.online.status" form.onlinePayment.status
+                                id="sitePaymentStatus" wire:ignore.self>
                                 <span></span>
                             </div>
                         </div>
@@ -319,8 +319,8 @@
                 <div class="col-md-6">
                     <div class="d-flex align-items-center">
                         <div class="main-toggle-group d-sm-flex align-items-center ms-0">
-                            <div class="toggle toggle-lg toggle-primary my-1 off" wire:ignore.self
-                                id="paymentOnInVoip">
+                            <div class="toggle toggle-lg toggle-primary my-1 off customCheckbox"
+                                data-id="form.onlinePayment.voip.status" wire:ignore.self id="paymentOnInVoip">
                                 <span></span>
                             </div>
                         </div>
@@ -338,7 +338,8 @@
                         <div class="col-md-7">
                             <div class="form-group">
                                 <select name="country" class="form-control form-select" id="default-dropdown"
-                                    data-bs-placeholder="Select Country">
+                                    wire:model='form.onlinePayment.notPayingStatus'
+                                    data-bs-placeholder="انتخاب کنید...">
                                     <option label="انتخاب کنید..."></option>
                                     <option value="br">نوبت ثبت شود</option>
                                     <option value="cz">نوبت ثبت نشود</option>
@@ -355,7 +356,7 @@
                         <div class="col-md-7">
                             <div class="form-group">
                                 <input type="text" class="form-control" id="inputName"
-                                    placeholder="مبلغ به تومان">
+                                    wire:model='form.onlinePayment.Price' placeholder="مبلغ به تومان">
                             </div>
                         </div>
                     </div>
@@ -368,9 +369,9 @@
         <div class="card-header border-bottom d-flex justify-content-between">
             <h3> عدم کنترل تداخل نوبت ها </h3>
             <div class="main-toggle-group d-sm-flex align-items-center ms-0">
-                <div class="toggle toggle-lg toggle-primary my-1 off" wire:ignore.self data-bs-toggle="collapse"
-                    href="#checkForOtherAppointment" role="button" aria-expanded="false"
-                    aria-controls="checkForOtherAppointment">
+                <div class="toggle toggle-lg toggle-primary my-1 off customCheckbox" data-id="interference.status"
+                    wire:ignore.self data-bs-toggle="collapse" href="#checkForOtherAppointment" role="button"
+                    aria-expanded="false" aria-controls="checkForOtherAppointment">
                     <span></span>
                 </div>
             </div>
@@ -385,13 +386,22 @@
             </div>
         </div>
     </div>
+    @error('*')
+        <div class="alert alert-danger" role="alert">
+            <p class="text-danger"><strong>خطا!!</strong> لطفا خطا های بالا را برطرف کنید!</p>
+        </div>
+    @enderror
 
     <div class="text-end mb-5 me-3">
-        <button type="submit" form="setting" wire:click='saveSetting' class="btn btn-success mt-5"><strong>ذخیره</strong></button>
+        <button type="submit" form="setting" wire:click='saveSetting'
+            wire:loading.class='btn-loading disabled btn-gray'
+            class="btn btn-success mt-5"><strong>ذخیره</strong></button>
 
     </div>
+
 </div>
 </div>
+
 </div>
 @push('styles')
     <style>
@@ -413,9 +423,10 @@
 @push('scripts')
     <script>
         $(document).ready(function() {
-            //how to check if check boxes are checked
-            $('#exampleCheckbox').on('click', function() {
-                @this.set('gseting.dayOftheWeek', $('#exampleCheckbox').hasClass('on'));
+            //pass the custom checkboxes values
+            $('.customCheckbox').on('click', function() {
+                var id = $(this).data('id');
+                @this.set('form.' + id, $(this).hasClass('on'));
             });
 
             function appearPeymentStatusDiv() {
@@ -466,7 +477,7 @@
                 format: 'L',
                 autoClose: true,
                 onSelect: function(unix) {
-                    @this.set('endDateForAppointments', $('#endDatePicker').val());
+                    @this.set('form.endAppointment.status', $('#endDatePicker').val());
                 }
             });
         });

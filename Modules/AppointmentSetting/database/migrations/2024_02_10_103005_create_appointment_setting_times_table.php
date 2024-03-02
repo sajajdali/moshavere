@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('appointment_setting_times', function (Blueprint $table) {
             $table->id();
-            $table->foreignIdFor(\Modules\AppointmentSetting\app\Models\AppointmentSetting::class)->constrained('appointment_settings')->cascadeOnDelete()->nullable();
+            $table->foreignIdFor(\Modules\AppointmentSetting\app\Models\AppointmentSetting::class)->nullable()->constrained('appointment_settings')->cascadeOnDelete();
             $table->tinyInteger('day_number')->default(0)->comment('0 = Saturday | 6 = friday');
             $table->time('start_at');
             $table->time('end_at');

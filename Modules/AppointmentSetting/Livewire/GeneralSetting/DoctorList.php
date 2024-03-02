@@ -13,6 +13,7 @@ class DoctorList extends Component
 
     use WithPagination ;
     public $isEdited;
+    
     #[Url]
     public $search = [];
     public $searchPanel = '';

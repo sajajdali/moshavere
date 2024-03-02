@@ -13,9 +13,9 @@ return new class extends Migration
     {
         Schema::create('appointment_settings', function (Blueprint $table) {
             $table->id();
-            $table->foreignIdFor(\Modules\User\Entities\User::class)->constrained()->cascadeOnDelete()->nullable();
-            $table->foreignIdFor(\Modules\Service\app\Models\Service::class)->constrained()->cascadeOnDelete()->nullable();
-            $table->foreignIdFor(\Modules\Place\app\Models\Place::class)->constrained()->cascadeOnDelete()->nullable();
+            $table->foreignIdFor(\Modules\User\Entities\User::class)->nullable()->constrained()->cascadeOnDelete();
+            $table->foreignIdFor(\Modules\Service\app\Models\Service::class)->nullable()->constrained()->cascadeOnDelete();
+            $table->foreignIdFor(\Modules\Place\app\Models\Place::class)->nullable()->constrained()->cascadeOnDelete();
             $table->integer('time_for_visit')->default(0);
             $table->integer('min_day_active')->default(0);
             $table->integer('max_day_active')->nullable();

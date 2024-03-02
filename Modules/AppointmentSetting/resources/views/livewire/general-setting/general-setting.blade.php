@@ -321,27 +321,26 @@
         <div class="card-header border-bottom d-flex justify-content-between">
             <h3>پرداخت آنلاین</h3>
             <div class="main-toggle-group d-sm-flex align-items-center ms-0">
-                <div class="toggle toggle-lg toggle-primary my-1 off customCheckbox"
-                    data-id="onlinePayment.status" wire:ignore.self data-bs-toggle="collapse"
-                    href="#paymentCollaps" role="button" aria-expanded="false" aria-controls="paymentCollaps">
+                <div class="toggle toggle-lg toggle-primary my-1 off customCheckbox" data-id="onlinePayment.status"
+                    wire:ignore.self data-bs-toggle="collapse" href="#paymentCollaps" role="button"
+                    aria-expanded="false" aria-controls="paymentCollaps">
                     <span></span>
                 </div>
             </div>
         </div>
         <div class="card-body collapse" id="paymentCollaps" wire:ignore.self>
             @error('form.onlinePayment.*')
-            <div class="alert alert-danger" role="alert">
-                <p class="text-danger"> لطفا مقدار را وارد کنید!!
-                </p>
-            </div>
+                <div class="alert alert-danger" role="alert">
+                    <p class="text-danger"> لطفا مقدار را وارد کنید!!
+                    </p>
+                </div>
             @enderror
             <div class="row">
                 <div class="col-md-6">
                     <div class="d-flex align-items-center">
                         <div class="main-toggle-group d-sm-flex align-items-center ms-0">
                             <div class="toggle toggle-lg toggle-primary my-1 off customCheckbox"
-                                data-id="onlinePayment.online.status"
-                                id="sitePaymentStatus" wire:ignore.self>
+                                data-id="onlinePayment.online.status" id="sitePaymentStatus" wire:ignore.self>
                                 <span></span>
                             </div>
                         </div>
@@ -370,8 +369,9 @@
                         </div>
                         <div class="col-md-7">
                             <div class="form-group">
-                                <select name="country" class="form-control form-select  @error('form.onlinePayment.notPayingStatus') is-invalid @enderror" id="default-dropdown"
-                                    wire:model='form.onlinePayment.notPayingStatus'
+                                <select name="country"
+                                    class="form-control form-select  @error('form.onlinePayment.notPayingStatus') is-invalid @enderror"
+                                    id="default-dropdown" wire:model='form.onlinePayment.notPayingStatus'
                                     data-bs-placeholder="انتخاب کنید...">
                                     <option label="انتخاب کنید..."></option>
                                     <option value="br">نوبت ثبت شود</option>
@@ -388,8 +388,9 @@
                         </div>
                         <div class="col-md-7">
                             <div class="form-group">
-                                <input type="text" class="form-control  @error('form.onlinePayment.Price') is-invalid @enderror" id="inputName"
-                                    wire:model='form.onlinePayment.Price' placeholder="مبلغ به تومان">
+                                <input type="text"
+                                    class="form-control  @error('form.onlinePayment.Price') is-invalid @enderror"
+                                    id="inputName" wire:model='form.onlinePayment.Price' placeholder="مبلغ به تومان">
                             </div>
                         </div>
                     </div>
@@ -397,7 +398,7 @@
             </div>
         </div>
     </div>
-    {{-- check for other appointment  --}}
+    {{-- interference  --}}
     <div class="card">
         <div class="card-header border-bottom d-flex justify-content-between">
             <h3> عدم کنترل تداخل نوبت ها </h3>
@@ -419,6 +420,26 @@
             </div>
         </div>
     </div>
+    {{-- active status  --}}
+    <div class="card">
+        <div class="card-header border-bottom d-flex justify-content-between">
+            <h3> وضعیت فعال بودن </h3>
+        </div>
+        <div class="card-body " wire:ignore.self>
+            {{-- section --}}
+            <div class="row">
+                <div class="selectgroup selectgroup-pills d-flex align-items-center">
+                    <label class="colorinput">
+                        <input name="color" type="checkbox" value="azure" class="colorinput-input"
+                            wire:model='form.avtive' checked />
+                        <span class="colorinput-color bg-azure"> </span>
+                    </label>
+                    <p class="card-sub-title mt-1 ms-2">فعال</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
     @error('*')
         <div class="alert alert-danger" role="alert">
             <p class="text-danger"><strong>خطا!!</strong> لطفا خطا های بالا را برطرف کنید!</p>

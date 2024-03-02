@@ -19,7 +19,7 @@ return new class extends Migration
             $table->integer('time_for_visit')->default(0);
             $table->integer('min_day_active')->default(0);
             $table->integer('max_day_active')->nullable();
-            $table->tinyInteger('cancellation_by_user')->default(1);
+            $table->integer('cancellation_by_user')->nullable()->default(0)->comment('null = for deactive | 0-1000 = number of the before canceled');
             $table->tinyInteger('last_day_active')->nullable();
             $table->tinyInteger('active_payment')->default(0)->comment('1 = active | 0 = deactivate');
             $table->tinyInteger('interference')->default(0);

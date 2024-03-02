@@ -33,7 +33,6 @@ class RouteServiceProvider extends ServiceProvider
         $this->mapWebRoutes();
         $this->mapLivewireRoutes();
     }
-
     /**
      * Define the "web" routes for the application.
      *
@@ -48,8 +47,8 @@ class RouteServiceProvider extends ServiceProvider
     protected function mapLivewireRoutes(): void
     {
         Route::middleware(['web', 'auth', 'admin'])
-        ->prefix('admin')
-        ->as('admin.')
+            ->prefix('admin')
+            ->as('admin.')
             ->group(module_path('AppointmentSetting', '/routes/admin.php'));
     }
 
@@ -65,5 +64,4 @@ class RouteServiceProvider extends ServiceProvider
             ->namespace($this->moduleNamespace)
             ->group(module_path('AppointmentSetting', '/routes/api.php'));
     }
-
 }

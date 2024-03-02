@@ -34,5 +34,4 @@ Route::group([], function () {
     Route::get('appointment/add/{doctorId}/{sectionId}', ListOfAvailableAppointment::class)->name('appointment.add.setTime');
     //List of appointment
     Route::get('appointment/list', Index::class)->name('appointment.list');
-
 });

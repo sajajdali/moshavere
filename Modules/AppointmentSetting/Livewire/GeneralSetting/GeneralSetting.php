@@ -3,13 +3,21 @@
 namespace Modules\AppointmentSetting\Livewire\GeneralSetting;
 
 use Livewire\Component;
+use App\Enum\ActiveEnum;
 use Illuminate\Validation\Rule;
 use Modules\User\Entities\User;
+use Modules\AppointmentSetting\app\Models\AppointmentSetting;
+use Modules\AppointmentSetting\app\Models\AppointmentSettingTime;
+use Modules\AppointmentSetting\app\Enum\AppintmentSettingDayNumber;
+use Modules\AppointmentSetting\app\Enum\AppintmentSettingInterface;
+use Modules\AppointmentSetting\app\Enum\AppintmentSettingPaymentStatus;
 
 class GeneralSetting extends Component
 {
-
+    public ?User $user;
     public array $fetchData = [];
+    public $isEdited = false;
+    public ?AppointmentSetting $appointment_setting;
     /*
     minDayAvaialbe
     maxDayAvaialbe
@@ -18,6 +26,7 @@ class GeneralSetting extends Component
     public array $form = [
         'minDayAvaialbe' => 0,
         'maxDayAvaialbe' => 90,
+        'avtive' => true,
     ];
 
     //day property
@@ -52,8 +61,8 @@ class GeneralSetting extends Component
             //if that day is active
             if (isset($this->form['visitType'][$dayName]) && (isset($this->form['visitType'][$dayName]) == 'true')) {
                 for ($i = 0; $i < $counter; $i++) {
-                    $dayRules['form.timeFrame.' . $dayName . '.' . $i . '.start'] = 'required';
-                    $dayRules['form.timeFrame.' . $dayName . '.' . $i . '.end']   = 'required';
+                    $dayRules['form.timeFrame.' . $dayName . '.' . $i . '.start'] = 'required|date_format:H:i';
+                    $dayRules['form.timeFrame.' . $dayName . '.' . $i . '.end']   = 'required|date_format:H:i';
                 }
             }
         }
@@ -89,14 +98,80 @@ class GeneralSetting extends Component
     public function saveSetting()
     {
         $this->validate();
+        $updateOrCreateModel = [
+            'user_id'               =>  $this->user->id,
+            'service_id'            =>  $this->fetchData['service_id'],
+            'place_id'              =>  $this->fetchData['place_id'],
+            'time_for_visit'        =>  isset($this->form['visitTime']) ? $this->form['visitTime'] : null,
+            'min_day_active'        =>  $this->form['minDayAvaialbe'],
+            'max_day_active'        =>  $this->form['maxDayAvaialbe'],
+            'cancellation_by_user'  =>  $this->form['cancel']['day'] ?? null,
+            'last_day_active'       =>  $this->form['endAppointment']['date'] ?? null,
+            'active_payment'        =>  isset($this->form['onlinePayment']['status']) ? AppintmentSettingPaymentStatus::tryFrom($this->form['onlinePayment']['status']) : 0,
+            'interference'          =>  isset($this->form['interference']['status']) ? AppintmentSettingInterface::tryFrom($this->form['interference']['status']) : AppintmentSettingInterface::getDefault(),
+            'avtive'                =>  ActiveEnum::tryFrom($this->form['avtive']),
+        ];
+
+        $DayTime = [];
+        foreach ($this->counter as $dayName => $counter) {
+            //if that day is active
+            if (isset($this->form['visitType'][$dayName]) && (isset($this->form['visitType'][$dayName]) == 'true')) {
+                for ($i = 0; $i < $counter; $i++) {
+                    $DayTime[$dayName][$i] = [
+                        'start' =>  $this->form['timeFrame'][$dayName][$i]['start'],
+                        'end' => $this->form['timeFrame'][$dayName][$i]['end']
+                    ];
+                }
+            }
+        }
+
+        if ($this->isEdited) {
+            $this->appointment_setting =  AppointmentSetting::update($updateOrCreateModel);
+        } else {
+            $this->appointment_setting =   AppointmentSetting::create($updateOrCreateModel);
+        }
+        $dayMolde = [];
+        foreach ($DayTime as $dayName => $values) {
+            if (count($values) > 1) {
+                $array_is_one = false;
+                foreach ($values as  $index =>  $eacchDayTime) {
+                    $dayMolde[$index] = [
+                        'appointment_setting_id' => $this->appointment_setting->id,
+                        'day_number' =>  AppintmentSettingDayNumber::getConstant($dayName),
+                        'start_at' =>   $eacchDayTime['start'],
+                        'end_at' =>     $eacchDayTime['end'],
+                    ];
+                }
+            } else {
+                $array_is_one = true;
+                $dayMolde = [
+                    'appointment_setting_id' => $this->appointment_setting->id,
+                    'day_number' =>  AppintmentSettingDayNumber::getConstant($dayName),
+                    'start_at' =>   $values[0]['start'],
+                    'end_at' =>     $values[0]['end'],
+                ];
+            }
+        }
+        if ($this->isEdited) {
+            AppointmentSettingTime::update($dayMolde);
+        } else {
+            if ($array_is_one) {
+                AppointmentSettingTime::create($dayMolde);
+            } else {
+                foreach ($dayMolde as $model) {
+                    AppointmentSettingTime::create($model);
+                }
+            }
+        }
     }
 
     public function mount()
     {
-        $doctorId = request()->route('user');
-
-        if (!empty($doctorId)) {
-            $this->fetchData['doctor'] = User::find($doctorId);
+        $this->fetchData['user'] = request()->route('user');
+        $this->fetchData['service_id']     = request()->has('service') ? request()->route('service') : null;
+        $this->fetchData['place_id']        = request()->has('place_id') ? request()->route('place_id') : null;
+        if (!empty($this->fetchData['user'])) {
+            $this->fetchData['doctor'] =  $this->fetchData['user'];
         } else {
             return redirect()->route('admin.appointment.doctor.list')->with('error', 'پزشک مورد نظر یافت نشد');
         }

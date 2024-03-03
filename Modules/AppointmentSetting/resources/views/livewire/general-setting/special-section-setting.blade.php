@@ -32,38 +32,39 @@
                                 <thead>
                                     <tr>
                                         <th>روز</th>
-                                        <th>نام بخش</th>
                                         <th>ساعت حضور</th>
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    <tr>
-                                        <td>شنبه</td>
-                                        <td>ویزیت</td>
-                                        <td>
-                                            <span class="bg-secondary text-white rounded-pill py-1 px-2">10:30 تا
-                                                12:30</span>
-                                            <span class="bg-secondary text-white rounded-pill py-1 px-2">11:30 تا
-                                                13:30</span>
-                                            <span class="bg-secondary text-white rounded-pill py-1 px-2">11:30 تا
-                                                13:30</span>
-                                            <span class="bg-secondary text-white rounded-pill py-1 px-2">15:30 تا
-                                                16:30</span>
-                                            <span class="bg-secondary text-white rounded-pill py-1 px-2">20:30 تا
-                                                21:30</span>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td>یکشنبه</td>
-                                        <td>مشاوره</td>
-                                        <td>
-                                            <span class="bg-secondary text-white rounded-pill py-1 px-2">10:30 تا
-                                                12:30</span>
-                                            <span class="bg-secondary text-white rounded-pill py-1 px-2">11:30 تا
-                                                13:30</span>
-                                        </td>
-                                    </tr>
-
+                                    @foreach ($this->GeneralTimes() as $appsetting)
+                                        @if (count($appsetting) > 1)
+                                            <tr>
+                                                <td>{{ $appsetting->first()->day_number->getName() }}</td>
+                                                <td>
+                                                    @foreach ($appsetting as $key => $eachDayTime)
+                                                        <span class="bg-secondary text-white rounded-pill p-2">از
+                                                            {{ \Carbon\Carbon::createFromFormat('H:i:s', $eachDayTime->start_at)->format('H:i') }}
+                                                            &nbsp;
+                                                            تا
+                                                            &nbsp;
+                                                            {{ \Carbon\Carbon::createFromFormat('H:i:s', $eachDayTime->end_at)->format('H:i') }}</span>
+                                                    @endforeach
+                                                </td>
+                                            </tr>
+                                        @else
+                                            <tr>
+                                                <td>{{ $appsetting->first()->day_number->getName() }}</td>
+                                                <td>
+                                                    <span class="bg-secondary text-white rounded-pill p-2">از
+                                                        {{ \Carbon\Carbon::createFromFormat('H:i:s', $appsetting->first()->start_at)->format('H:i') }}
+                                                        &nbsp;
+                                                        تا
+                                                        &nbsp;
+                                                        {{ \Carbon\Carbon::createFromFormat('H:i:s', $appsetting->first()->end_at)->format('H:i') }}</span>
+                                                </td>
+                                            </tr>
+                                        @endif
+                                    @endforeach
                                 </tbody>
                             </table>
                         </div>
@@ -76,6 +77,7 @@
         <div class="card-header border-bottom d-flex justify-content-between">
             <h4>بخش ها با تنظیمات <strong>اختصاصی</strong></h4>
         </div>
+        {{-- TODO::customize special time --}}
         <div class="card-body">
             {{-- section --}}
             <div class="row">

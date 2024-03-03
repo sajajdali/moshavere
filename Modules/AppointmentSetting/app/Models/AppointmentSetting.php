@@ -12,9 +12,10 @@ use Modules\User\Entities\User;
 
 class AppointmentSetting extends Model
 {
-    use HasFactory , SoftDeletes;
+    use HasFactory, SoftDeletes;
     protected $casts = [
         'active' => ActiveEnum::class,
+        'last_day_active' => 'date',
         'detail' => 'json',
     ];
     /**
@@ -22,13 +23,17 @@ class AppointmentSetting extends Model
      */
     protected $guarded = ['id'];
 
-    public function user() {
+    public function user()
+    {
         return $this->belongsToMany(User::class);
     }
-
+    public function times()
+    {
+        return $this->hasMany(AppointmentSettingTime::class);
+    }
     public function checkActive()
     {
-        return $this->active == ActiveEnum::ACTIVE->value ;
+        return $this->active == ActiveEnum::ACTIVE->value;
     }
     public function scopeActive(Builder $query): Builder
     {
@@ -39,5 +44,4 @@ class AppointmentSetting extends Model
     {
         return json_encode($value, JSON_UNESCAPED_UNICODE);
     }
-
 }

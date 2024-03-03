@@ -6,6 +6,7 @@ use Livewire\Component;
 use App\Enum\ActiveEnum;
 use Illuminate\Validation\Rule;
 use Modules\User\Entities\User;
+use Hekmatinasser\Verta\Facades\Verta;
 use Modules\AppointmentSetting\app\Models\AppointmentSetting;
 use Modules\AppointmentSetting\app\Models\AppointmentSettingTime;
 use Modules\AppointmentSetting\app\Enum\AppintmentSettingDayNumber;
@@ -98,6 +99,11 @@ class GeneralSetting extends Component
     public function saveSetting()
     {
         $this->validate();
+        $endAppointmentTime =  isset($this->form['endAppointment']['date']) ? Verta::parse($this->form['endAppointment']['date']) : null;
+        $detail = [
+            'visit_type_absente' => $this->form['visitType']['absente'],
+            'visit_type_online'  => $this->form['visitType']['online'],
+        ];
         $updateOrCreateModel = [
             'user_id'               =>  $this->user->id,
             'service_id'            =>  $this->fetchData['service_id'],
@@ -106,69 +112,74 @@ class GeneralSetting extends Component
             'min_day_active'        =>  $this->form['minDayAvaialbe'],
             'max_day_active'        =>  $this->form['maxDayAvaialbe'],
             'cancellation_by_user'  =>  $this->form['cancel']['day'] ?? null,
-            'last_day_active'       =>  $this->form['endAppointment']['date'] ?? null,
+            'last_day_active'       =>  $endAppointmentTime,
             'active_payment'        =>  isset($this->form['onlinePayment']['status']) ? AppintmentSettingPaymentStatus::tryFrom($this->form['onlinePayment']['status']) : 0,
             'interference'          =>  isset($this->form['interference']['status']) ? AppintmentSettingInterface::tryFrom($this->form['interference']['status']) : AppintmentSettingInterface::getDefault(),
             'avtive'                =>  ActiveEnum::tryFrom($this->form['avtive']),
+            'detail'                =>  $detail,
         ];
-
-        $DayTime = [];
-        foreach ($this->counter as $dayName => $counter) {
-            //if that day is active
-            if (isset($this->form['visitType'][$dayName]) && (isset($this->form['visitType'][$dayName]) == 'true')) {
-                for ($i = 0; $i < $counter; $i++) {
-                    $DayTime[$dayName][$i] = [
-                        'start' =>  $this->form['timeFrame'][$dayName][$i]['start'],
-                        'end' => $this->form['timeFrame'][$dayName][$i]['end']
-                    ];
-                }
-            }
-        }
 
         if ($this->isEdited) {
             $this->appointment_setting =  AppointmentSetting::update($updateOrCreateModel);
         } else {
             $this->appointment_setting =   AppointmentSetting::create($updateOrCreateModel);
         }
-        $dayMolde = [];
-        foreach ($DayTime as $dayName => $values) {
-            if (count($values) > 1) {
-                $array_is_one = false;
-                foreach ($values as  $index =>  $eacchDayTime) {
-                    $dayMolde[$index] = [
-                        'appointment_setting_id' => $this->appointment_setting->id,
-                        'day_number' =>  AppintmentSettingDayNumber::getConstant($dayName),
-                        'start_at' =>   $eacchDayTime['start'],
-                        'end_at' =>     $eacchDayTime['end'],
-                    ];
-                }
-            } else {
-                $array_is_one = true;
-                $dayMolde = [
-                    'appointment_setting_id' => $this->appointment_setting->id,
-                    'day_number' =>  AppintmentSettingDayNumber::getConstant($dayName),
-                    'start_at' =>   $values[0]['start'],
-                    'end_at' =>     $values[0]['end'],
+        $appointment_setting_times = [];
+        foreach ($this->form['timeFrame'] as $dayName => $timeFrameForEachDay) {
+            foreach ($timeFrameForEachDay as $key => $timeFrame) {
+                $appointment_setting_times[] = [
+                    'day_number' => AppintmentSettingDayNumber::getConstant($dayName),
+                    'start_at'  => $timeFrame['start'],
+                    'end_at'  => $timeFrame['end'],
                 ];
             }
         }
-        if ($this->isEdited) {
-            AppointmentSettingTime::update($dayMolde);
+        //store days and times
+        foreach ($appointment_setting_times as $objectForStore) {
+            $this->appointment_setting->times()->create($objectForStore);
+        }
+        return redirect()->route('admin.appointment.doctor.list')->with('success', 'تنظیمات با موفقیت ذخیره شد');
+    }
+    private function fillTheForm()
+    {
+        if (empty($this->fetchData['service_id'])) {
+            $apSet = AppointmentSetting::where('user_id', $this->fetchData['user']->id)->whereNull('service_id')->first();
         } else {
-            if ($array_is_one) {
-                AppointmentSettingTime::create($dayMolde);
-            } else {
-                foreach ($dayMolde as $model) {
-                    AppointmentSettingTime::create($model);
-                }
+            $apSet = AppointmentSetting::where('user_id', $this->fetchData['user']->id)->where('service_id', $this->fetchData['service_id'])->first();
+        }
+        $this->fillTheTime($apSet);
+        $this->form['visitType']['absente'] = $apSet->detail['visit_type_absente'];
+        $this->form['visitType']['online']  = $apSet->detail['visit_type_online'];
+        $this->form['visitTime']            = $apSet->time_for_visit;
+        $this->form['minDayAvaialbe']       = $apSet->min_day_active;
+        $this->form['maxDayAvaialbe']       = $apSet->max_day_active;
+        $this->form['cancel']['day']        = $apSet->cancellation_by_user;
+        $this->form['avtive']               = $apSet->avtive;
+        if (isset($apSet->last_day_active)) {
+            $this->form['endAppointment']['date'] = $apSet->last_day_active;
+        }
+        if (isset($apSet->active_payment)) {
+            $this->form['onlinePayment']['status'] = $apSet->active_payment;
+        }
+        if (isset($apSet->interference)) {
+            $this->form['interference']['status'] = $apSet->active_payment;
+        }
+    }
+    private function fillTheTime($apSet)
+    {
+        foreach ($apSet->times->groupBy('day_number') as $dayNumber => $eachDayColleciton) {
+            $this->form['visitType'][AppintmentSettingDayNumber::tryFrom($dayNumber)->getEnName()] = true;
+            foreach ($eachDayColleciton as $iterator => $value) {
+                $this->form['timeFrame'][AppintmentSettingDayNumber::tryFrom($dayNumber)->getEnName()][$iterator]['start'] = $value->start_at;
+                $this->form['timeFrame'][AppintmentSettingDayNumber::tryFrom($dayNumber)->getEnName()][$iterator]['end'] = $value->end_at;
             }
         }
     }
 
     public function mount()
     {
-        $this->fetchData['user'] = request()->route('user');
-        $this->fetchData['service_id']     = request()->has('service') ? request()->route('service') : null;
+        $this->fetchData['user']            = request()->route('user');
+        $this->fetchData['service_id']      = request()->has('service') ? request()->route('service') : null;
         $this->fetchData['place_id']        = request()->has('place_id') ? request()->route('place_id') : null;
         if (!empty($this->fetchData['user'])) {
             $this->fetchData['doctor'] =  $this->fetchData['user'];
@@ -176,17 +187,21 @@ class GeneralSetting extends Component
             return redirect()->route('admin.appointment.doctor.list')->with('error', 'پزشک مورد نظر یافت نشد');
         }
 
-        /**
-         * check if the setting for sections exist
-         * wich means this section is not the first time that set setting for
-         **/
+
+        //  check if the setting for sections exist
+        //   wich means this section is not the first time that set setting for
         $check_Setting_exist = false;
-        //TODO:: check if this Dr has setting and if it has , set this variable true ;
-        if (request()->has('edit')) {
+        if (AppointmentSetting::where('user_id', $this->fetchData['user']->id)->get()->isNotEmpty()) {
+            //setting exist
+            $check_Setting_exist = true;
+        }
+        if (session()->has('resetTheSetting')) {
             $check_Setting_exist = false;
+            $this->isEdited = true;
+            $this->fillTheForm();
         }
         if ($check_Setting_exist) {
-            return redirect()->route('admin.appointment.specialsection', ['user' => $doctorId]);
+            return redirect()->route('admin.appointment.specialsection', ['user' => $this->fetchData['user']]);
         }
     }
 

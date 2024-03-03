@@ -22,8 +22,8 @@
                 @endif
                 <div class="col-md-6 mt-3">
                     <div class="main-toggle-group d-flex align-items-center ms-0">
-                        <div class="toggle toggle-lg toggle-primary my-1 off customCheckbox" wire:ignore.self
-                            data-id="visitType.absente">
+                        <div class="toggle toggle-lg toggle-primary my-1 customCheckbox @if (isset($form['visitType']['absente']) && $form['visitType']['absente']) on @else off @endif"
+                            wire:ignore.self data-id="visitType.absente">
                             <span></span>
                         </div>
                         <div class="ms-2">
@@ -34,7 +34,8 @@
                 <div class="col-md-6 mt-3">
                     <div class="main-toggle-group d-flex align-items-center ms-0 customCheckbox"
                         data-id="visitType.online">
-                        <div class="toggle toggle-lg toggle-primary my-1 off" wire:ignore.self>
+                        <div class="toggle toggle-lg toggle-primary my-1 @if (isset($form['visitType']['online']) && $form['visitType']['online']) on @else off @endif"
+                            wire:ignore.self>
                             <span></span>
                         </div>
                         <div class="ms-2">
@@ -223,38 +224,42 @@
             <h3>امکان <span class="text-primary">کنسل</span> کردن نوبت </h3>
             <div class="main-toggle-group d-sm-flex align-items-center ms-0">
                 <div class="toggle toggle-lg toggle-primary my-1 off customCheckbox" data-id="cancel.status"
-                    wire:ignore.self data-bs-toggle="collapse" href="#saturdayTimeCollaps" role="button"
-                    aria-expanded="false" aria-controls="saturdayTimeCollaps">
+                    wire:ignore.self data-bs-toggle="collapse" href="#cancelCollapseSett" role="button"
+                    aria-expanded="false" aria-controls="cancelCollapseSett">
                     <span></span>
                 </div>
             </div>
         </div>
-        <div class="card-body collapse" id="saturdayTimeCollaps" wire:ignore.self>
-            @error('form.cancel.day')
-                <div class="alert alert-danger" role="alert">
-                    <p class="text-danger"> مشخص کنید که از چند روز قبل از فرا رسیدن زمان نوبت امکان کنسل کردن باشد!!
-                    </p>
-                </div>
-            @enderror
-            {{-- section --}}
-            <div class="row">
-                <div class="col-md-3 pt-2">
-                    <label class="text-primary" for="basic-url">چند روز قبل</label>
-                </div>
-                <div class="col-md-9">
-                    <div class="input-group mb-3">
-                        <input type="number" class="form-control  @error('form.cancel.day') is-invalid @enderror"
-                            id="basic-url" aria-describedby="basic-addon3" wire:model='form.cancel.day'>
-                        <div class="input-group-prepend">
-                            <span class="input-group-text" id="basic-addon3">روز آینده</span>
+        <div class="collapse" id="cancelCollapseSett" wire:ignore.self>
+            <div class="card-body">
+                @error('form.cancel.day')
+                    <div class="alert alert-danger" role="alert">
+                        <p class="text-danger"> مشخص کنید که از چند روز قبل از فرا رسیدن زمان نوبت امکان کنسل کردن باشد!!
+                        </p>
+                    </div>
+                @enderror
+                {{-- section --}}
+                <div class="row">
+                    <div class="col-md-3 pt-2">
+                        <label class="text-primary" for="basic-url">چند روز قبل</label>
+                    </div>
+                    <div class="col-md-9">
+                        <div class="input-group mb-3">
+                            <input type="number"
+                                class="form-control  @error('form.cancel.day') is-invalid @enderror" id="basic-url"
+                                aria-describedby="basic-addon3" wire:model='form.cancel.day'>
+                            <div class="input-group-prepend">
+                                <span class="input-group-text" id="basic-addon3">روز آینده</span>
+                            </div>
                         </div>
                     </div>
-                </div>
-                <div class="d-flex  mt-2">
+                    <div class="d-flex  mt-2">
 
-                    <p class="text-muted"> <strong class="me-1"> نکته!! </strong> بیمار از چند روز قبل از فرا رسیدن
-                        نوبت خود ، امکان کنسل کردن نوبت خود را
-                        داشته باشد!</p>
+                        <p class="text-muted"> <strong class="me-1"> نکته!! </strong> بیمار از چند روز قبل از فرا
+                            رسیدن
+                            نوبت خود ، امکان کنسل کردن نوبت خود را
+                            داشته باشد!</p>
+                    </div>
                 </div>
             </div>
         </div>

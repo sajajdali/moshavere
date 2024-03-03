@@ -357,21 +357,21 @@
                     {{-- thursday --}}
                     <div class="col-12">
                         <div class="main-toggle-group d-flex align-items-center ms-0">
-                            <div class="toggle toggle-lg toggle-primary my-1 off customCheckbox"
+                            <div class="toggle toggle-lg toggle-primary my-1 @if (isset($this->form['visitType']['thursday']) && $this->form['visitType']['thursday']) on @else off @endif  customCheckbox"
                                 data-id="visitType.thursday" wire:ignore.self id="thursday"
                                 data-bs-toggle="collapse" href="#thursdayTimeCollaps" role="button"
                                 aria-expanded="false" aria-controls="thursdayTimeCollaps">
                                 <span></span>
                             </div>
                             <div class="ms-2">
-                                <p class="text-muted m-0">چهارشنبه</p>
+                                <p class="text-muted m-0">پنج شنبه</p>
                             </div>
                         </div>
                     </div>
-                    <div class="collapse col-12 mt-2" id="thursdayTimeCollaps" wire:ignore.self>
+                    <div class="collapse col-12 mt-2 @if (isset($this->form['visitType']['thursday']) && $this->form['visitType']['thursday']) show @endif" id="thursdayTimeCollaps" wire:ignore.self>
                         <div class="card card-body @if ($errors->has('form.timeFrame.thursday.*')) border border-danger @endif">
                             <div class="d-flex justify-content-between">
-                                <p class="text-muted">تعیین زمان حضور برای چهارشنبه</p>
+                                <p class="text-muted">تعیین زمان حضور برای پنجشنبه</p>
                                 <div>
                                     <button type="button" data-bs-toggle="tooltip" data-bs-placement="top"
                                         title="اضافه کردن بازه ی زمانی" wire:click="addCounter('thursday')"

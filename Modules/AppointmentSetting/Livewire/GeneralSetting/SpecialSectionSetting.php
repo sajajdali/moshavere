@@ -4,27 +4,52 @@ namespace Modules\AppointmentSetting\Livewire\GeneralSetting;
 
 use Livewire\Component;
 use Modules\User\Entities\User;
+use Livewire\Attributes\Computed;
+use Modules\AppointmentSetting\app\Models\AppointmentSetting;
 
 class SpecialSectionSetting extends Component
 {
+    public array $form =  [];
+    public array $fetchData =  [];
+    public $doctor;
 
-    public $doctor ;
+    public function editGeneralSetting()
+    {
 
-    public function editGeneralSetting() {
-        return redirect()->route('admin.appointment.setting',['user'=> $this->doctor->id,'edit' => 'true']);
+        session()->flash('resetTheSetting', true);
+        return redirect()->route('admin.appointment.setting', ['user' => $this->doctor->id, 'edit' => 'true']);
     }
-    public function mount(){
-        $doctorId = request()->route('user');
-        if (! empty($doctorId)) {
-            $this->doctor = User::find($doctorId);
+    private function fillTheFechData()
+    {
+        $this->fetchData['GeneralAppointmentSetting'] = AppointmentSetting::where('user_id', $this->fetchData['user'])->whereNull('service_id')->first();
+        $this->fetchData['SpecialAppointmentSetting'] = AppointmentSetting::where('user_id', $this->fetchData['user'])->whereNotNull('service_id')->get();
+    }
 
-        } else {
-            return redirect()->route('admin.appointment.doctor.list')->with('error','پزشک مورد نظر یافت نشد') ;
+    #[Computed]
+    public function GeneralTimes()
+    {
+        return  $this->fetchData['GeneralAppointmentSetting']->times->groupBy('day_number');
+    }
+    #[Computed]
+    public function SpecialTimes()
+    {
+        if ($this->fetchData['SpecialAppointmentSetting']->isNotEmpty()) {
+            return  $this->fetchData['SpecialAppointmentSetting']->times->groupBy('day_number');
         }
+        return false;
+    }
+    public function mount()
+    {
+        $this->fetchData['user'] = request()->route('user');
+        if (!empty($this->fetchData['user'])) {
+            $this->doctor = User::find($this->fetchData['user']);
+        } else {
+            return redirect()->route('admin.appointment.doctor.list')->with('error', 'پزشک مورد نظر یافت نشد');
+        }
+        $this->fillTheFechData();
     }
     public function render()
     {
         return view('appointmentsetting::livewire.general-setting.special-section-setting');
     }
-
 }

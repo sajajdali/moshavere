@@ -37,8 +37,6 @@ enum AppintmentSettingDayNumber: int implements EnumHasDefaultInterface
                 return null;
         }
     }
-
-
     public  function getName()
     {
         return match ($this) {
@@ -49,6 +47,18 @@ enum AppintmentSettingDayNumber: int implements EnumHasDefaultInterface
             self::WEDNESDAY => 'چهارشنبه',
             self::THURSDAY  => 'پنجشنبه',
             self::FRIDAY    => 'جمعه',
+        };
+    }
+    public  function getEnName()
+    {
+        return match ($this) {
+            self::SATURDAY  => 'saturday',
+            self::SUNDAY    => 'sunday',
+            self::MONDAY    => 'monday',
+            self::TUESDAY   => 'tuesday',
+            self::WEDNESDAY => 'wednesday',
+            self::THURSDAY  => 'thursday',
+            self::FRIDAY    => 'friday',
         };
     }
 }

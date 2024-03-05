@@ -18,7 +18,7 @@
                     {{-- saturday --}}
                     <div class="col-12 mt-3">
                         <div class="main-toggle-group d-flex align-items-center ms-0">
-                            <div class="toggle toggle-lg toggle-primary my-1 off customCheckbox"
+                            <div class="toggle toggle-lg toggle-primary my-1 customCheckbox @if (isset($this->form['visitType']['saturday']) && $this->form['visitType']['saturday']) on @else off @endif"
                                 data-id="visitType.saturday" wire:ignore.self id="saturday" data-bs-toggle="collapse"
                                 href="#saturdayTimeCollaps" role="button" aria-expanded="false"
                                 aria-controls="saturdayTimeCollaps">
@@ -29,7 +29,7 @@
                             </div>
                         </div>
                     </div>
-                    <div class="collapse col-12 mt-2" id="saturdayTimeCollaps" wire:ignore.self>
+                    <div class="collapse @if (isset($this->form['visitType']['saturday']) && $this->form['visitType']['saturday']) show @endif col-12 mt-2" id="saturdayTimeCollaps" wire:ignore.self>
                         <div class="card card-body @if ($errors->has('form.timeFrame.saturday.*')) border border-danger @endif">
                             {{-- TODO::modify Error message --}}
                             {{-- <div class="alert alert-danger" role="alert"> درصورت فعال سازی روز لطفا ساعت حضور
@@ -89,7 +89,7 @@
                     {{-- sunday --}}
                     <div class="col-12">
                         <div class="main-toggle-group d-flex align-items-center ms-0">
-                            <div class="toggle toggle-lg toggle-primary my-1 off customCheckbox"
+                            <div class="toggle toggle-lg toggle-primary my-1  customCheckbox @if (isset($this->form['visitType']['sunday']) && $this->form['visitType']['sunday']) on @else off @endif"
                                 data-id="visitType.sunday" wire:ignore.self id="sunday" data-bs-toggle="collapse"
                                 href="#sundayTimeCollaps" role="button" aria-expanded="false"
                                 aria-controls="sundayTimeCollaps">
@@ -100,7 +100,7 @@
                             </div>
                         </div>
                     </div>
-                    <div class="collapse col-12 mt-2" id="sundayTimeCollaps" wire:ignore.self>
+                    <div class="collapse  @if (isset($this->form['visitType']['sunday']) && $this->form['visitType']['sunday']) show @endif col-12 mt-2" id="sundayTimeCollaps" wire:ignore.self>
                         <div class="card card-body @if ($errors->has('form.timeFrame.sunday.*')) border border-danger @endif">
                             <div class="d-flex justify-content-between">
                                 <p class="text-muted">تعیین زمان حضور برای یک شنبه</p>
@@ -156,7 +156,7 @@
                     {{-- monday --}}
                     <div class="col-12">
                         <div class="main-toggle-group d-flex align-items-center ms-0">
-                            <div class="toggle toggle-lg toggle-primary my-1 off customCheckbox"
+                            <div class="toggle toggle-lg toggle-primary my-1 customCheckbox @if (isset($this->form['visitType']['monday']) && $this->form['visitType']['monday']) on @else off @endif"
                                 data-id="visitType.monday" wire:ignore.self id="monday" data-bs-toggle="collapse"
                                 href="#mondayTimeCollaps" role="button" aria-expanded="false"
                                 aria-controls="mondayTimeCollaps">
@@ -167,7 +167,7 @@
                             </div>
                         </div>
                     </div>
-                    <div class="collapse col-12 mt-2" id="mondayTimeCollaps" wire:ignore.self>
+                    <div class="collapse   @if (isset($this->form['visitType']['monday']) && $this->form['visitType']['monday']) show @endif col-12 mt-2" id="mondayTimeCollaps" wire:ignore.self>
                         <div class="card card-body @if ($errors->has('form.timeFrame.monday.*')) border border-danger @endif ">
                             <div class="d-flex justify-content-between">
                                 <p class="text-muted">تعیین زمان حضور برای دو شنبه</p>
@@ -223,7 +223,7 @@
                     {{-- tuesday --}}
                     <div class="col-12">
                         <div class="main-toggle-group d-flex align-items-center ms-0">
-                            <div class="toggle toggle-lg toggle-primary my-1 off customCheckbox"
+                            <div class="toggle toggle-lg toggle-primary my-1  customCheckbox @if (isset($this->form['visitType']['tuesday']) && $this->form['visitType']['tuesday']) on @else off @endif"
                                 data-id="visitType.tuesday" wire:ignore.self id="tuesday" data-bs-toggle="collapse"
                                 href="#tuesdayTimeCollaps" role="button" aria-expanded="false"
                                 aria-controls="tuesdayTimeCollaps">
@@ -234,7 +234,7 @@
                             </div>
                         </div>
                     </div>
-                    <div class="collapse col-12 mt-2" id="tuesdayTimeCollaps" wire:ignore.self>
+                    <div class="collapse  @if (isset($this->form['visitType']['tuesday']) && $this->form['visitType']['tuesday']) show @endif  col-12 mt-2" id="tuesdayTimeCollaps" wire:ignore.self>
                         <div class="card card-body  @if ($errors->has('form.timeFrame.tuesday.*')) border border-danger @endif">
                             <div class="d-flex justify-content-between">
                                 <p class="text-muted">تعیین زمان حضور برای سه شنبه</p>
@@ -290,7 +290,7 @@
                     {{-- wednesday --}}
                     <div class="col-12">
                         <div class="main-toggle-group d-flex align-items-center ms-0">
-                            <div class="toggle toggle-lg toggle-primary my-1 off customCheckbox"
+                            <div class="toggle toggle-lg toggle-primary my-1  customCheckbox @if (isset($this->form['visitType']['wednesday']) && $this->form['visitType']['wednesday']) on @else off @endif"
                                 data-id="visitType.wednesday" wire:ignore.self id="wednesday"
                                 data-bs-toggle="collapse" href="#wednesdayTimeCollaps" role="button"
                                 aria-expanded="false" aria-controls="wednesdayTimeCollaps">
@@ -301,7 +301,7 @@
                             </div>
                         </div>
                     </div>
-                    <div class="collapse col-12 mt-2" id="wednesdayTimeCollaps" wire:ignore.self>
+                    <div class="collapse @if (isset($this->form['visitType']['wednesday']) && $this->form['visitType']['wednesday']) show @endif col-12 mt-2" id="wednesdayTimeCollaps" wire:ignore.self>
                         <div class="card card-body @if ($errors->has('form.timeFrame.wednesday.*')) border border-danger @endif">
                             <div class="d-flex justify-content-between">
                                 <p class="text-muted">تعیین زمان حضور برای چهارشنبه</p>
@@ -424,7 +424,7 @@
                     {{-- friday --}}
                     <div class="col-12 ">
                         <div class="main-toggle-group d-flex align-items-center ms-0">
-                            <div class="toggle toggle-lg toggle-primary my-1 off customCheckbox"
+                            <div class="toggle toggle-lg toggle-primary my-1 customCheckbox  @if (isset($this->form['visitType']['friday']) && $this->form['visitType']['friday']) on @else off @endif "
                                 data-id="visitType.friday" wire:ignore.self id="friday" data-bs-toggle="collapse"
                                 href="#fridayTimeCollaps" role="button" aria-expanded="false"
                                 aria-controls="fridayTimeCollaps">
@@ -435,7 +435,7 @@
                             </div>
                         </div>
                     </div>
-                    <div class="collapse col-12 mt-2" id="fridayTimeCollaps" wire:ignore.self>
+                    <div class="collapse @if (isset($this->form['visitType']['friday']) && $this->form['visitType']['friday']) show @endif  col-12 mt-2" id="fridayTimeCollaps" wire:ignore.self>
                         <div class="card card-body @if ($errors->has('form.timeFrame.friday.*')) border border-danger @endif">
                             <div class="d-flex justify-content-between">
                                 <p class="text-muted">تعیین زمان حضور برای جمعه</p>

@@ -62,17 +62,17 @@ class GeneralSetting extends Component
             //if that day is active
             if (isset($this->form['visitType'][$dayName]) && (isset($this->form['visitType'][$dayName]) == 'true')) {
                 for ($i = 0; $i < $counter; $i++) {
-                    $dayRules['form.timeFrame.' . $dayName . '.' . $i . '.start'] = 'required|date_format:H:i';
-                    $dayRules['form.timeFrame.' . $dayName . '.' . $i . '.end']   = 'required|date_format:H:i';
+                    $dayRules['form.timeFrame.' . $dayName . '.' . $i . '.start'] = 'required';
+                    $dayRules['form.timeFrame.' . $dayName . '.' . $i . '.end']   = 'required';
                 }
             }
         }
         $rules  = [
-            'form.visitType.absente'    => 'required_without_all:form.visitType.online',
-            'form.visitType.online'     => 'required_without_all:form.visitType.absente',
-            'form.visitTime'            => 'required',
-            'form.minDayAvaialbe'       => 'required|integer',
-            'form.maxDayAvaialbe'       => 'required|integer',
+            'form.visitType.absente'              => 'required_without_all:form.visitType.online',
+            'form.visitType.online'               => 'required_without_all:form.visitType.absente',
+            'form.visitTime'                      => 'required',
+            'form.minDayAvaialbe'                 => 'required|integer',
+            'form.maxDayAvaialbe'                 => 'required|integer',
             'form.maxAvailabeAppointment.eachDay' => 'required_if:form.maxAvailabeAppointment.status,true',
             'form.maxAvailabeAppointment.totall'  => 'required_if:form.maxAvailabeAppointment.status,true',
             'form.cancel.day'                     => 'required_if:form.cancel.status,true',
@@ -101,9 +101,22 @@ class GeneralSetting extends Component
         $this->validate();
         $endAppointmentTime =  isset($this->form['endAppointment']['date']) ? Verta::parse($this->form['endAppointment']['date']) : null;
         $detail = [
-            'visit_type_absente' => $this->form['visitType']['absente'],
-            'visit_type_online'  => $this->form['visitType']['online'],
+            'visit_type_absente'             => $this->form['visitType']['absente'],
+            'visit_type_online'              => $this->form['visitType']['online'],
+            'maxAvailabeAppointment-eachDay' => $this->form['maxAvailabeAppointment']['eachDay'],
+            'maxAvailabeAppointment-totall'  => $this->form['maxAvailabeAppointment']['totall'],
+            'payment'                        => [
+                'online'  => [
+                    'status'                     => isset($this->form['onlinePayment']['online']['status']) ? $this->form['onlinePayment']['online']['status'] : null,
+                    'notPayinStatus'             => isset($this->form['onlinePayment']['notPayingStatus']) ?  isset($this->form['onlinePayment']['notPayingStatus']) : null,
+                ],
+                'voip'   => [
+                    'status'                     => isset($this->form['onlinePayment']['voip']['status'])   ? $this->form['onlinePayment']['voip']['status']   : null
+                ],
+                'price'                          => isset($this->form['onlinePayment']['Price']) ? $this->form['onlinePayment']['Price'] : null,
+            ]
         ];
+        $online_payment = $this->form['onlinePayment']['online']['tatus'] ?? null;
         $updateOrCreateModel = [
             'user_id'               =>  $this->user->id,
             'service_id'            =>  $this->fetchData['service_id'],
@@ -113,14 +126,15 @@ class GeneralSetting extends Component
             'max_day_active'        =>  $this->form['maxDayAvaialbe'],
             'cancellation_by_user'  =>  $this->form['cancel']['day'] ?? null,
             'last_day_active'       =>  $endAppointmentTime,
-            'active_payment'        =>  isset($this->form['onlinePayment']['status']) ? AppintmentSettingPaymentStatus::tryFrom($this->form['onlinePayment']['status']) : 0,
+
+            'active_payment'        =>  isset($this->form['onlinePayment']['online']) ? AppintmentSettingPaymentStatus::tryFrom($this->form['onlinePayment']['status']) : 0,
             'interference'          =>  isset($this->form['interference']['status']) ? AppintmentSettingInterface::tryFrom($this->form['interference']['status']) : AppintmentSettingInterface::getDefault(),
             'avtive'                =>  ActiveEnum::tryFrom($this->form['avtive']),
             'detail'                =>  $detail,
         ];
 
         if ($this->isEdited) {
-            $this->appointment_setting =  AppointmentSetting::update($updateOrCreateModel);
+            $this->appointment_setting->update($updateOrCreateModel);
         } else {
             $this->appointment_setting =   AppointmentSetting::create($updateOrCreateModel);
         }
@@ -147,16 +161,21 @@ class GeneralSetting extends Component
         } else {
             $apSet = AppointmentSetting::where('user_id', $this->fetchData['user']->id)->where('service_id', $this->fetchData['service_id'])->first();
         }
+        $this->appointment_setting = $apSet;
+
         $this->fillTheTime($apSet);
-        $this->form['visitType']['absente'] = $apSet->detail['visit_type_absente'];
-        $this->form['visitType']['online']  = $apSet->detail['visit_type_online'];
-        $this->form['visitTime']            = $apSet->time_for_visit;
-        $this->form['minDayAvaialbe']       = $apSet->min_day_active;
-        $this->form['maxDayAvaialbe']       = $apSet->max_day_active;
-        $this->form['cancel']['day']        = $apSet->cancellation_by_user;
-        $this->form['avtive']               = $apSet->avtive;
+        $this->form['visitType']['absente']              = $apSet->detail['visit_type_absente'];
+        $this->form['visitType']['online']               = $apSet->detail['visit_type_online'];
+        $this->form['visitTime']                         = $apSet->time_for_visit;
+        $this->form['minDayAvaialbe']                    = $apSet->min_day_active;
+        $this->form['maxDayAvaialbe']                    = $apSet->max_day_active;
+        $this->form['maxAvailabeAppointment']['eachDay'] = $apSet->detail['maxAvailabeAppointment-eachDay'];
+        $this->form['maxAvailabeAppointment']['totall']  = $apSet->detail['maxAvailabeAppointment-totall'];
+        $this->form['cancel']['day']                     = $apSet->cancellation_by_user ?? null;
+        $this->form['avtive']                            = $apSet->avtive;
+
         if (isset($apSet->last_day_active)) {
-            $this->form['endAppointment']['date'] = $apSet->last_day_active;
+            $this->form['endAppointment']['date'] = verta($apSet->last_day_active)->format('Y/m/d');
         }
         if (isset($apSet->active_payment)) {
             $this->form['onlinePayment']['status'] = $apSet->active_payment;
@@ -164,11 +183,29 @@ class GeneralSetting extends Component
         if (isset($apSet->interference)) {
             $this->form['interference']['status'] = $apSet->active_payment;
         }
+        if (isset($apSet->detial['payment']['online'])) {
+            $this->form['onlinePayment']['online']['status'] = $apSet->detial['payment']['online']['status'];
+            $this->form['onlinePayment']['notPayingStatus'] = $apSet->detial['payment']['online']['notPayinStatus'];
+        }
+        if (isset($apSet->detial['payment']['voip'])) {
+            $this->form['onlinePayment']['voip']['status'] = $apSet->detial['payment']['voip']['status'];
+        }
+        if (isset($apSet->detial['payment']['price'])) {
+            $this->form['onlinePayment']['Price'] = $apSet->detial['payment']['price'];
+        }
+
+        // you was here
+        // check if payment store in database in proper way
+        // check in edit mode , payment status of check boxes whould be true and inputs are visible
+        //  check the js code for the input and call the dispatch method to appear them if its need to ;
+        // TODO
+
     }
     private function fillTheTime($apSet)
     {
         foreach ($apSet->times->groupBy('day_number') as $dayNumber => $eachDayColleciton) {
             $this->form['visitType'][AppintmentSettingDayNumber::tryFrom($dayNumber)->getEnName()] = true;
+            // TODO:: you was here !! add amounth for checked the check box for each day
             foreach ($eachDayColleciton as $iterator => $value) {
                 $this->form['timeFrame'][AppintmentSettingDayNumber::tryFrom($dayNumber)->getEnName()][$iterator]['start'] = $value->start_at;
                 $this->form['timeFrame'][AppintmentSettingDayNumber::tryFrom($dayNumber)->getEnName()][$iterator]['end'] = $value->end_at;
@@ -186,8 +223,6 @@ class GeneralSetting extends Component
         } else {
             return redirect()->route('admin.appointment.doctor.list')->with('error', 'پزشک مورد نظر یافت نشد');
         }
-
-
         //  check if the setting for sections exist
         //   wich means this section is not the first time that set setting for
         $check_Setting_exist = false;

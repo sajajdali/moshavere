@@ -159,7 +159,7 @@
         <div class="card-header border-bottom d-flex justify-content-between">
             <h3>امکان دریافت حداکثر <span class="text-primary">دریافت نوبت</span></h3>
             <div class="main-toggle-group d-sm-flex align-items-center ms-0">
-                <div class="toggle toggle-lg toggle-primary my-1 off customCheckbox"
+                <div class="toggle toggle-lg toggle-primary my-1 @if (isset($form['maxAvailabeAppointment']['eachDay']) && isset($form['maxAvailabeAppointment']['totall'])) on @else off @endif customCheckbox"
                     data-id="maxAvailabeAppointment.status" wire:ignore.self data-bs-toggle="collapse"
                     href="#maximumAppointmentCanBePerchased" role="button" aria-expanded="false"
                     aria-controls="maximumAppointmentCanBePerchased">
@@ -167,7 +167,8 @@
                 </div>
             </div>
         </div>
-        <div class="collapse " id="maximumAppointmentCanBePerchased" wire:ignore.self>
+        <div class="collapse @if (isset($form['maxAvailabeAppointment']['eachDay']) && isset($form['maxAvailabeAppointment']['totall'])) show @endif " id="maximumAppointmentCanBePerchased"
+            wire:ignore.self>
             <div class="card-body">
                 @error('form.maxAvailabeAppointment.*')
                     <div class="alert alert-danger" role="alert">
@@ -223,14 +224,15 @@
         <div class="card-header border-bottom d-flex justify-content-between">
             <h3>امکان <span class="text-primary">کنسل</span> کردن نوبت </h3>
             <div class="main-toggle-group d-sm-flex align-items-center ms-0">
-                <div class="toggle toggle-lg toggle-primary my-1 off customCheckbox" data-id="cancel.status"
-                    wire:ignore.self data-bs-toggle="collapse" href="#cancelCollapseSett" role="button"
-                    aria-expanded="false" aria-controls="cancelCollapseSett">
+                <div class="toggle toggle-lg toggle-primary my-1  customCheckbox @if (isset($form['cancel']['day'])) on  @else off @endif"
+                    data-id="cancel.status" wire:ignore.self data-bs-toggle="collapse" href="#cancelCollapseSett"
+                    role="button" aria-expanded="false" aria-controls="cancelCollapseSett">
                     <span></span>
                 </div>
             </div>
         </div>
-        <div class="collapse" id="cancelCollapseSett" wire:ignore.self>
+        <div class="collapse @if (isset($form['cancel']['day'])) show @endif " id="cancelCollapseSett"
+            wire:ignore.self>
             <div class="card-body">
                 @error('form.cancel.day')
                     <div class="alert alert-danger" role="alert">
@@ -264,7 +266,7 @@
             </div>
         </div>
     </div>
-    {{-- sunsection time  --}}
+    {{-- subsection time  --}}
     <div class="card">
         <div class="card-header border-bottom d-flex justify-content-between">
             <h3>زمان بندی و هزینه بخش ها</h3>
@@ -288,14 +290,16 @@
         <div class="card-header border-bottom d-flex justify-content-between">
             <h3> تعیین پایان تاریخ نوبت دهی </h3>
             <div class="main-toggle-group d-sm-flex align-items-center ms-0">
-                <div class="toggle toggle-lg toggle-primary my-1 off customCheckbox" data-id="endAppointment.status"
-                    wire:ignore.self data-bs-toggle="collapse" href="#EndDateTimeCollaps" role="button"
-                    aria-expanded="false" aria-controls="EndDateTimeCollaps">
+                <div class="toggle toggle-lg toggle-primary my-1 customCheckbox @if (isset($form['endAppointment']['date'])) on @else off @endif"
+                    data-id="endAppointment.status" wire:ignore.self data-bs-toggle="collapse"
+                    href="#EndDateTimeCollaps" role="button" aria-expanded="false"
+                    aria-controls="EndDateTimeCollaps">
                     <span></span>
                 </div>
             </div>
         </div>
-        <div class="card-body collapse" id="EndDateTimeCollaps" wire:ignore.self>
+        <div class="card-body collapse @if (isset($form['endAppointment']['date'])) show @endif " id="EndDateTimeCollaps"
+            wire:ignore.self>
             {{-- section --}}
             @error('form.endAppointment.date')
                 <div class="alert alert-danger" role="alert">
@@ -309,7 +313,7 @@
                 </div>
                 <div class="col-md-9">
                     <div class="input-group mb-3">
-                        <input type="text"
+                        <input type="text" wire:model='form.endAppointment.date'
                             class="form-control @error('form.endAppointment.date') is-invalid @enderror"
                             id="endDatePicker">
                     </div>
@@ -326,14 +330,16 @@
         <div class="card-header border-bottom d-flex justify-content-between">
             <h3>پرداخت آنلاین</h3>
             <div class="main-toggle-group d-sm-flex align-items-center ms-0">
-                <div class="toggle toggle-lg toggle-primary my-1 off customCheckbox" data-id="onlinePayment.status"
-                    wire:ignore.self data-bs-toggle="collapse" href="#paymentCollaps" role="button"
-                    aria-expanded="false" aria-controls="paymentCollaps">
+                <div class="toggle toggle-lg toggle-primary my-1  customCheckbox
+                @if (isset($this->form['onlinePayment']['online']['status']) || isset($this->form['onlinePayment']['voip']['status'])) on  @else off @endif"
+                    data-id="onlinePayment.status" wire:ignore.self data-bs-toggle="collapse" href="#paymentCollaps"
+                    role="button" aria-expanded="false" aria-controls="paymentCollaps">
                     <span></span>
                 </div>
             </div>
         </div>
-        <div class="card-body collapse" id="paymentCollaps" wire:ignore.self>
+        <div class="card-body collapse @if (isset($this->form['onlinePayment']['online']['status']) || isset($this->form['onlinePayment']['voip']['status'])) show @endif" id="paymentCollaps"
+            wire:ignore.self>
             @error('form.onlinePayment.*')
                 <div class="alert alert-danger" role="alert">
                     <p class="text-danger"> لطفا مقدار را وارد کنید!!
@@ -344,7 +350,10 @@
                 <div class="col-md-6">
                     <div class="d-flex align-items-center">
                         <div class="main-toggle-group d-sm-flex align-items-center ms-0">
-                            <div class="toggle toggle-lg toggle-primary my-1 off customCheckbox"
+                            <div class="toggle toggle-lg toggle-primary my-1  customCheckbox
+                            @if (isset($this->form['onlinePayment']['online']['status']) && $this->form['onlinePayment']['online']['status'] == true) on
+                                @else
+                                off @endif"
                                 data-id="onlinePayment.online.status" id="sitePaymentStatus" wire:ignore.self>
                                 <span></span>
                             </div>
@@ -356,7 +365,11 @@
                 <div class="col-md-6">
                     <div class="d-flex align-items-center">
                         <div class="main-toggle-group d-sm-flex align-items-center ms-0">
-                            <div class="toggle toggle-lg toggle-primary my-1 off customCheckbox"
+                            <div class="toggle toggle-lg toggle-primary my-1 customCheckbox
+                            @if (isset($this->form['onlinePayment']['voip']['status']) && $this->form['onlinePayment']['online']['status'] == true) on
+                                @else
+                                off @endif
+                            "
                                 data-id="onlinePayment.voip.status" wire:ignore.self id="paymentOnInVoip">
                                 <span></span>
                             </div>
@@ -379,8 +392,8 @@
                                     id="default-dropdown" wire:model='form.onlinePayment.notPayingStatus'
                                     data-bs-placeholder="انتخاب کنید...">
                                     <option label="انتخاب کنید..."></option>
-                                    <option value="br">نوبت ثبت شود</option>
-                                    <option value="cz">نوبت ثبت نشود</option>
+                                    <option value="submit">نوبت ثبت شود</option>
+                                    <option value="dontSubmit">نوبت ثبت نشود</option>
                                 </select>
                             </div>
                         </div>

@@ -2,26 +2,21 @@
 
 namespace Modules\User\Entities;
 
-use Modules\AppointmentSetting\app\Models\AppointmentSetting;
-use Modules\User\Traits\UserRelationTrait;
-use Verta;
 use Laravel\Sanctum\HasApiTokens;
 use Spatie\Permission\Models\Role;
 use Modules\User\Enum\UserMetaEnum;
 use Spatie\Permission\Traits\HasRoles;
+use Modules\Service\app\Models\Service;
 use Illuminate\Notifications\Notifiable;
-use Modules\Package\Entities\PackageUser;
+use Modules\User\Traits\UserRelationTrait;
 use Modules\User\Traits\MetaAttributeTrait;
 use Modules\User\Traits\UserAttributeTrait;
 use Illuminate\Database\Eloquent\Collection;
-use Modules\Package\Enum\PackageUserTypeEnum;
-use Modules\Speciality\app\Models\Speciality;
 use Modules\User\Database\factories\UserFactory;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
-use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 /**
  * Modules\User\Entities\User
@@ -71,7 +66,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
  */
 class User extends Authenticatable
 {
-    use HasRoles, Notifiable, HasFactory, HasApiTokens, UserAttributeTrait, MetaAttributeTrait , UserRelationTrait;
+    use HasRoles, Notifiable, HasFactory, HasApiTokens, UserAttributeTrait, MetaAttributeTrait, UserRelationTrait;
 
     protected $guarded = ['id'];
 
@@ -185,6 +180,8 @@ class User extends Authenticatable
 
         return  $this->$meta_type?->last()?->meta_key->getOptionName($metaOptions);
     }
-
-
+    public function service()
+    {
+        return $this->belongsToMany(Service::class);
+    }
 }

@@ -421,7 +421,7 @@
         <div class="card-header border-bottom d-flex justify-content-between">
             <h3> عدم کنترل تداخل نوبت ها </h3>
             <div class="main-toggle-group d-sm-flex align-items-center ms-0">
-                <div class="toggle toggle-lg toggle-primary my-1 off customCheckbox" data-id="interference.status"
+                <div class="toggle toggle-lg toggle-primary my-1 customCheckbox @if(isset($form['interface']['status']) && $form['interface']['status'] == 'true') on @else off @endif" data-id="interference.status"
                     wire:ignore.self data-bs-toggle="collapse" href="#checkForOtherAppointment" role="button"
                     aria-expanded="false" aria-controls="checkForOtherAppointment">
                     <span></span>
@@ -552,6 +552,13 @@
                     @this.set('form.endAppointment.date', $('#endDatePicker').val());
                 }
             });
+            if ({{ isset($form['onlinePayment']['voip']['status']) }}) {
+                appearPeymentPriceDiv();
+            }
+            if (
+                {{ isset($form['onlinePayment']['online']['status']) && $form['onlinePayment']['online']['status'] == 'ture' }}) {
+                appearPeymentStatusDiv();
+            }
         });
     </script>
 @endpush

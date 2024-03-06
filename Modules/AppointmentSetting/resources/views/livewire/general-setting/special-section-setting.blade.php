@@ -76,6 +76,9 @@
     <div class="card">
         <div class="card-header border-bottom d-flex justify-content-between">
             <h4>بخش ها با تنظیمات <strong>اختصاصی</strong></h4>
+            <button class="btn btn-info" type="button" data-bs-toggle="modal" data-bs-target="#changeDocmodal">
+                <i class="fa fa-plus fa-xl" aria-hidden="true"></i>
+                افزودن بخش با تنظیمات اختصاصی</button>
         </div>
         {{-- TODO::customize special time --}}
         <div class="card-body">
@@ -237,6 +240,7 @@
             </div>
         </div>
     </div>
+    <livewire:appointmentsetting::modal.service-and-doctor-modal />
 </div>
 
 @push('styles')
@@ -245,4 +249,16 @@
             font-size: medium;
         }
     </style>
+@endpush
+
+@push('scripts')
+    <script>
+        $(document).ready(function() {
+            Livewire.on('closeModal', function() {
+                var myModalEl = document.querySelector('#changeDocmodal')
+                var modal = bootstrap.Modal.getOrCreateInstance(myModalEl)
+                modal.hide();
+            });
+        });
+    </script>
 @endpush

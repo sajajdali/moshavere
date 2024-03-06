@@ -28,7 +28,7 @@ Route::group([], function () {
     Route::get('appointment/setting/absentee/list', AbsenteeList::class)->name('appointment.absentee.list');
     Route::get('appointment/setting/{user}', GeneralSetting::class)->name('appointment.setting');
     Route::get('appointment/setting/special/section/{user}', SpecialSectionSetting::class)->name('appointment.specialsection');
-    Route::get('appointment/setting/{user}/{place}/{service}', GeneralSetting::class)->name('appointment.setting.specialservice');
+    Route::get('appointment/setting/{user}/{service}', GeneralSetting::class)->name('appointment.setting.specialservice');
     //add appointment
     Route::get('appointment/section/list', DocAndSectionList::class)->name('appointment.add.sectionList');
     Route::get('appointment/add/specificday/{date}', SpecificDayAvailableAppointment::class)->name('appointment.add.specificday');

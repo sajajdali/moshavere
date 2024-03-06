@@ -9,10 +9,10 @@
             تغییر پزشک و بخش</button>
     </div>
     @if (isset($tempMessage))
-    <div class="alert alert-success" role="alert">
-        <i class="fa fa-check-square fa-xl" aria-hidden="true"></i>
-       {{$tempMessage}}
-      </div>
+        <div class="alert alert-success" role="alert">
+            <i class="fa fa-check-square fa-xl" aria-hidden="true"></i>
+            {{ $tempMessage }}
+        </div>
     @endif
 
     <div class="row row-sm">
@@ -207,7 +207,7 @@
             </div>
         </div>
     </div>
-    <livewire:appointmentsetting::add-appointment.modal.change-doc-modal />
+    <livewire:appointmentsetting::modal.service-and-doctor-modal />
     <livewire:appointmentsetting::add-appointment.modal.specific-day-appointment-registration-modal />
 </div>
 @push('scripts')

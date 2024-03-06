@@ -3,8 +3,10 @@
 namespace Modules\AppointmentSetting\Livewire\GeneralSetting;
 
 use Livewire\Component;
+use Livewire\Attributes\On;
 use Modules\User\Entities\User;
 use Livewire\Attributes\Computed;
+use Spatie\Permission\Models\Role;
 use Modules\AppointmentSetting\app\Models\AppointmentSetting;
 
 class SpecialSectionSetting extends Component
@@ -37,6 +39,12 @@ class SpecialSectionSetting extends Component
             return  $this->fetchData['SpecialAppointmentSetting']->times->groupBy('day_number');
         }
         return false;
+    }
+
+    #[On('docAndSection')]
+    public function redirectToSetting($section, $doctor)
+    {
+        return redirect()->route('admin.appointment.setting.specialservice',[$doctor,$section]);
     }
     public function mount()
     {

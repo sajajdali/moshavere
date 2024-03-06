@@ -68,6 +68,7 @@ class GeneralSetting extends Component
             }
         }
         $rules  = [
+            'form.timeFrame'                      => 'required',
             'form.visitType.absente'              => 'required_without_all:form.visitType.online',
             'form.visitType.online'               => 'required_without_all:form.visitType.absente',
             'form.visitTime'                      => 'required',
@@ -99,7 +100,7 @@ class GeneralSetting extends Component
     public function saveSetting()
     {
         $this->validate();
-        $endAppointmentTime =  isset($this->form['endAppointment']['date']) ? Verta::parse($this->form['endAppointment']['date']) : null;
+        $endAppointmentTime =  isset($this->form['endAppointment']['date']) ? Verta::parse($this->form['endAppointment']['date'])->toCarbon() : null;
         $detail = [
             'visit_type_absente'             => $this->form['visitType']['absente'],
             'visit_type_online'              => $this->form['visitType']['online'],
@@ -108,7 +109,7 @@ class GeneralSetting extends Component
             'payment'                        => [
                 'online'  => [
                     'status'                     => isset($this->form['onlinePayment']['online']['status']) ? $this->form['onlinePayment']['online']['status'] : null,
-                    'notPayinStatus'             => isset($this->form['onlinePayment']['notPayingStatus']) ?  isset($this->form['onlinePayment']['notPayingStatus']) : null,
+                    'notPayinStatus'             => isset($this->form['onlinePayment']['notPayingStatus']) ?  $this->form['onlinePayment']['notPayingStatus']  : null,
                 ],
                 'voip'   => [
                     'status'                     => isset($this->form['onlinePayment']['voip']['status'])   ? $this->form['onlinePayment']['voip']['status']   : null
@@ -128,7 +129,7 @@ class GeneralSetting extends Component
             'last_day_active'       =>  $endAppointmentTime,
 
             'active_payment'        =>  isset($this->form['onlinePayment']['online']) ? AppintmentSettingPaymentStatus::tryFrom($this->form['onlinePayment']['status']) : 0,
-            'interference'          =>  isset($this->form['interference']['status']) ? AppintmentSettingInterface::tryFrom($this->form['interference']['status']) : AppintmentSettingInterface::getDefault(),
+            'interference'          =>  isset($this->form['interference']['status'])  ? AppintmentSettingInterface::tryFrom($this->form['interference']['status']) : AppintmentSettingInterface::getDefault(),
             'avtive'                =>  ActiveEnum::tryFrom($this->form['avtive']),
             'detail'                =>  $detail,
         ];
@@ -149,9 +150,16 @@ class GeneralSetting extends Component
             }
         }
         //store days and times
-        foreach ($appointment_setting_times as $objectForStore) {
-            $this->appointment_setting->times()->create($objectForStore);
+        if ($this->isEdited) {
+            foreach ($appointment_setting_times as $objectForStore) {
+                $this->appointment_setting->times()->updateOrCreate($objectForStore);
+            }
+        } else {
+            foreach ($appointment_setting_times as $objectForStore) {
+                $this->appointment_setting->times()->create($objectForStore);
+            }
         }
+
         return redirect()->route('admin.appointment.doctor.list')->with('success', 'تنظیمات با موفقیت ذخیره شد');
     }
     private function fillTheForm()
@@ -181,19 +189,19 @@ class GeneralSetting extends Component
             $this->form['onlinePayment']['status'] = $apSet->active_payment;
         }
         if (isset($apSet->interference)) {
-            $this->form['interference']['status'] = $apSet->active_payment;
+            $this->form['interference']['status'] = $apSet->interference;
         }
-        if (isset($apSet->detial['payment']['online'])) {
-            $this->form['onlinePayment']['online']['status'] = $apSet->detial['payment']['online']['status'];
-            $this->form['onlinePayment']['notPayingStatus'] = $apSet->detial['payment']['online']['notPayinStatus'];
+        if (isset($apSet->detail['payment']['online'])) {
+            $this->form['onlinePayment']['online']['status'] = $apSet->detail['payment']['online']['status'];
+            $this->form['onlinePayment']['notPayingStatus']  = $apSet->detail['payment']['online']['notPayinStatus'];
         }
-        if (isset($apSet->detial['payment']['voip'])) {
-            $this->form['onlinePayment']['voip']['status'] = $apSet->detial['payment']['voip']['status'];
+        if (isset($apSet->detail['payment']['voip'])) {
+            $this->form['onlinePayment']['voip']['status'] = $apSet->detail['payment']['voip']['status'];
         }
-        if (isset($apSet->detial['payment']['price'])) {
-            $this->form['onlinePayment']['Price'] = $apSet->detial['payment']['price'];
+        if (isset($apSet->detail['payment']['price'])) {
+            $this->form['onlinePayment']['Price'] = $apSet->detail['payment']['price'];
         }
-
+        // dd($apSet->detail);
         // you was here
         // check if payment store in database in proper way
         // check in edit mode , payment status of check boxes whould be true and inputs are visible
@@ -217,7 +225,6 @@ class GeneralSetting extends Component
     {
         $this->fetchData['user']            = request()->route('user');
         $this->fetchData['service_id']      = request()->has('service') ? request()->route('service') : null;
-        $this->fetchData['place_id']        = request()->has('place_id') ? request()->route('place_id') : null;
         if (!empty($this->fetchData['user'])) {
             $this->fetchData['doctor'] =  $this->fetchData['user'];
         } else {

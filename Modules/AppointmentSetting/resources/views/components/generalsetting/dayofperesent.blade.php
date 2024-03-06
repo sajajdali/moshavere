@@ -1,10 +1,15 @@
 <div>
-    <div class="card">
+    <div class="card @error('form.timeFrame') border border-danger @enderror">
         <div class="card-header border-bottom">
             <h3>روز های حضور</h3>
         </div>
         <div class="row mt-3">
             <div class="card-body">
+                @error('form.timeFrame')
+                    <div class="alert alert-danger" role="alert">
+                        <p class="text-danger"><strong>خطا!!</strong>لطفا حداقل برای یک روز زمان حضور تعیین کنید</p>
+                    </div>
+                @enderror
                 @error('form.timeFrame.*')
                     <div class="alert alert-danger" role="alert">
                         <p class="text-danger"><strong>خطا!!</strong>در صورتی که یک روز را فعال میکنید ، باید برای آن ساعت
@@ -29,7 +34,8 @@
                             </div>
                         </div>
                     </div>
-                    <div class="collapse @if (isset($this->form['visitType']['saturday']) && $this->form['visitType']['saturday']) show @endif col-12 mt-2" id="saturdayTimeCollaps" wire:ignore.self>
+                    <div class="collapse @if (isset($this->form['visitType']['saturday']) && $this->form['visitType']['saturday']) show @endif col-12 mt-2"
+                        id="saturdayTimeCollaps" wire:ignore.self>
                         <div class="card card-body @if ($errors->has('form.timeFrame.saturday.*')) border border-danger @endif">
                             {{-- TODO::modify Error message --}}
                             {{-- <div class="alert alert-danger" role="alert"> درصورت فعال سازی روز لطفا ساعت حضور
@@ -100,7 +106,8 @@
                             </div>
                         </div>
                     </div>
-                    <div class="collapse  @if (isset($this->form['visitType']['sunday']) && $this->form['visitType']['sunday']) show @endif col-12 mt-2" id="sundayTimeCollaps" wire:ignore.self>
+                    <div class="collapse  @if (isset($this->form['visitType']['sunday']) && $this->form['visitType']['sunday']) show @endif col-12 mt-2"
+                        id="sundayTimeCollaps" wire:ignore.self>
                         <div class="card card-body @if ($errors->has('form.timeFrame.sunday.*')) border border-danger @endif">
                             <div class="d-flex justify-content-between">
                                 <p class="text-muted">تعیین زمان حضور برای یک شنبه</p>
@@ -167,7 +174,8 @@
                             </div>
                         </div>
                     </div>
-                    <div class="collapse   @if (isset($this->form['visitType']['monday']) && $this->form['visitType']['monday']) show @endif col-12 mt-2" id="mondayTimeCollaps" wire:ignore.self>
+                    <div class="collapse   @if (isset($this->form['visitType']['monday']) && $this->form['visitType']['monday']) show @endif col-12 mt-2"
+                        id="mondayTimeCollaps" wire:ignore.self>
                         <div class="card card-body @if ($errors->has('form.timeFrame.monday.*')) border border-danger @endif ">
                             <div class="d-flex justify-content-between">
                                 <p class="text-muted">تعیین زمان حضور برای دو شنبه</p>
@@ -234,7 +242,8 @@
                             </div>
                         </div>
                     </div>
-                    <div class="collapse  @if (isset($this->form['visitType']['tuesday']) && $this->form['visitType']['tuesday']) show @endif  col-12 mt-2" id="tuesdayTimeCollaps" wire:ignore.self>
+                    <div class="collapse  @if (isset($this->form['visitType']['tuesday']) && $this->form['visitType']['tuesday']) show @endif  col-12 mt-2"
+                        id="tuesdayTimeCollaps" wire:ignore.self>
                         <div class="card card-body  @if ($errors->has('form.timeFrame.tuesday.*')) border border-danger @endif">
                             <div class="d-flex justify-content-between">
                                 <p class="text-muted">تعیین زمان حضور برای سه شنبه</p>
@@ -301,7 +310,8 @@
                             </div>
                         </div>
                     </div>
-                    <div class="collapse @if (isset($this->form['visitType']['wednesday']) && $this->form['visitType']['wednesday']) show @endif col-12 mt-2" id="wednesdayTimeCollaps" wire:ignore.self>
+                    <div class="collapse @if (isset($this->form['visitType']['wednesday']) && $this->form['visitType']['wednesday']) show @endif col-12 mt-2"
+                        id="wednesdayTimeCollaps" wire:ignore.self>
                         <div class="card card-body @if ($errors->has('form.timeFrame.wednesday.*')) border border-danger @endif">
                             <div class="d-flex justify-content-between">
                                 <p class="text-muted">تعیین زمان حضور برای چهارشنبه</p>
@@ -368,7 +378,8 @@
                             </div>
                         </div>
                     </div>
-                    <div class="collapse col-12 mt-2 @if (isset($this->form['visitType']['thursday']) && $this->form['visitType']['thursday']) show @endif" id="thursdayTimeCollaps" wire:ignore.self>
+                    <div class="collapse col-12 mt-2 @if (isset($this->form['visitType']['thursday']) && $this->form['visitType']['thursday']) show @endif"
+                        id="thursdayTimeCollaps" wire:ignore.self>
                         <div class="card card-body @if ($errors->has('form.timeFrame.thursday.*')) border border-danger @endif">
                             <div class="d-flex justify-content-between">
                                 <p class="text-muted">تعیین زمان حضور برای پنجشنبه</p>
@@ -435,7 +446,8 @@
                             </div>
                         </div>
                     </div>
-                    <div class="collapse @if (isset($this->form['visitType']['friday']) && $this->form['visitType']['friday']) show @endif  col-12 mt-2" id="fridayTimeCollaps" wire:ignore.self>
+                    <div class="collapse @if (isset($this->form['visitType']['friday']) && $this->form['visitType']['friday']) show @endif  col-12 mt-2"
+                        id="fridayTimeCollaps" wire:ignore.self>
                         <div class="card card-body @if ($errors->has('form.timeFrame.friday.*')) border border-danger @endif">
                             <div class="d-flex justify-content-between">
                                 <p class="text-muted">تعیین زمان حضور برای جمعه</p>

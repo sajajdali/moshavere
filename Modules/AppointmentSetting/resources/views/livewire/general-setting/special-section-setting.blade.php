@@ -76,7 +76,7 @@
     <div class="card">
         <div class="card-header border-bottom d-flex justify-content-between">
             <h4>بخش ها با تنظیمات <strong>اختصاصی</strong></h4>
-            <button class="btn btn-info" type="button" data-bs-toggle="modal" data-bs-target="#changeDocmodal">
+            <button class="btn btn-info" type="button" data-bs-toggle="modal" data-bs-target="#ServiceAndPlaceModal">
                 <i class="fa fa-plus fa-xl" aria-hidden="true"></i>
                 افزودن بخش با تنظیمات اختصاصی</button>
         </div>
@@ -240,7 +240,7 @@
             </div>
         </div>
     </div>
-    <livewire:appointmentsetting::modal.service-and-doctor-modal />
+    <livewire:appointmentsetting::general-setting.modal.service-and-place-modal :doctor="$doctor" />
 </div>
 
 @push('styles')

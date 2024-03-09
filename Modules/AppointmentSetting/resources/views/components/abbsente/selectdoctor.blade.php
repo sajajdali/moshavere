@@ -62,6 +62,7 @@
                             <button class="text-danger text-reset d-none" id="uncheckAllButton">لغو انتخاب</button>
                         </p>
                     </div>
+                    <div id="checkForSpecialSectoion" class="alert alert-info d-none" role="alert"> در نظر داشته باشید که در صورتی که مایل هستید در یک بخش خاص تنظیمات اعمال شوند ، فقط باید یک پزشک را انتخاب کنید!! </div>
                     @foreach ($doctors as $key => $doctorList)
                         <div class="col-md-4">
                             <div class="form-group mt-2">

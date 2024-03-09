@@ -11,7 +11,8 @@ class ServiceAndPlaceModal extends Component
     public $search;
     public $step;
     public $doctor, $placeId;
-    public $fetchData;
+    public array $fetchData = [];
+    public array $form = [];
     public function dismisMOdal()
     {
         $this->step = 1;
@@ -35,18 +36,21 @@ class ServiceAndPlaceModal extends Component
     }
     public function showRelatedSection($placeId)
     {
-        // TODO::
-        // show related section to this place
+        $this->form['place'] = $placeId;
+        $this->step = $this->step + 1;
     }
 
     public function selectSection($serviceId)
     {
-        return redirect()->route('appointment.setting.specialservice', $this->doctor, $serviceId, $this->placeId);
+        $user       = $this->doctor->id;
+        $service    =  $serviceId;
+        $place      =  $this->form['place'];
+        session()->flash('resetTheSetting', true);
+        return redirect()->route('admin.appointment.setting.specialservice', [$user, $service, $place]);
     }
     public function mount()
     {
         $places =  Place::all();
-
         //check if there is multiple place
         if ($places->isNotEmpty() && $places->count() > 1) {
             $this->step = 1;
@@ -55,9 +59,8 @@ class ServiceAndPlaceModal extends Component
             $this->step = 2;
         }
     }
-    public function render()
+    public function handelSearch()
     {
-        //handel search
         if ($this->step == 1) {
             $query = Place::when(isset($this->search) && !empty($this->search), function ($query) {
                 return $query->where('title', 'LIKE', "%{$this->search}%");
@@ -67,10 +70,16 @@ class ServiceAndPlaceModal extends Component
                 return $query->where('title', 'LIKE', "%{$this->search}%");
             })->get()->take(10);
         }
+        return $query;
+    }
+    public function render()
+    {
+        //handel search
+        $retunrValue = $this->handelSearch();
 
         return view(
             'appointmentsetting::livewire.general-setting.modal.service-and-place-modal',
-            ['ServiceOrPlace' =>  $query]
+            ['ServiceOrPlace' =>  $retunrValue]
         );
     }
 }

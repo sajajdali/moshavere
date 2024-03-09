@@ -61,13 +61,32 @@
                     $('input[type="checkbox"]').prop('checked', true);
                     $(this).addClass('d-none');
                     $('#uncheckAllButton').removeClass('d-none');
+                    checkcheckboxLength();
                 });
             }
             $('#uncheckAllButton').on('click', function() {
                 $('input[type="checkbox"]').prop('checked', false);
                 $(this).addClass('d-none');
                 $('#checkAllButton').removeClass('d-none');
+                checkcheckboxLength();
+
             });
+            $('.custom-control-input').click(function() {
+                checkcheckboxLength();
+            });
+
+            function checkcheckboxLength() {
+                var numChecked = $('.custom-control-input:checked').length;
+                if (numChecked > 1) {
+                    $('.alert-info').fadeIn();
+                    $('.alert-info').removeClass('d-none');
+                } else {
+                    if (numChecked <= 1) {
+                        $('.alert-info').fadeOut();
+                        $('.alert-info').addClass('d-none');
+                    }
+                }
+            }
         });
     </script>
 @endpush

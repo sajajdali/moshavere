@@ -33,10 +33,11 @@ class SpecialSectionSetting extends Component
         return  $this->fetchData['GeneralAppointmentSetting']->times->groupBy('day_number');
     }
     #[Computed]
-    public function SpecialTimes()
+    public function SpecialTimes($AppointmentSettingId)
     {
-        if ($this->fetchData['SpecialAppointmentSetting']->isNotEmpty()) {
-            return  $this->fetchData['SpecialAppointmentSetting']->times->groupBy('day_number');
+        $appTime  = AppointmentSetting::find($AppointmentSettingId);
+        if (!empty($appTime)) {
+            return $appTime->times->groupBy('day_number');
         }
         return false;
     }
@@ -44,7 +45,25 @@ class SpecialSectionSetting extends Component
     #[On('docAndSection')]
     public function redirectToSetting($section, $doctor)
     {
-        return redirect()->route('admin.appointment.setting.specialservice',[$doctor,$section]);
+        return redirect()->route('admin.appointment.setting.specialservice', [$doctor, $section]);
+    }
+
+    public function editSpecialSection($AppointmentSettingId)
+    {
+        $appTime  = AppointmentSetting::find($AppointmentSettingId);
+        session()->flash('resetTheSetting', true);
+        return redirect()->route('admin.appointment.setting.specialservice', [$appTime->user_id, $appTime->service_id, $appTime->place_id]);
+    }
+
+    #[On('delete')]
+    public function deleteSpecialSectionSetting($model)
+    {
+        $appTime  = AppointmentSetting::find($model);
+        $appTime->times->map(function($q){
+            $q->delete();
+        });
+        $appTime->delete();
+        return redirect()->route('admin.appointment.specialsection',$this->doctor)->with('success','تنظیمات با موفقیت  حذف شد');
     }
     public function mount()
     {

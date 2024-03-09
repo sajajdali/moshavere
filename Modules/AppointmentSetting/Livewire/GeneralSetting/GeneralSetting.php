@@ -18,6 +18,7 @@ class GeneralSetting extends Component
     public ?User $user;
     public array $fetchData = [];
     public $isEdited = false;
+    public $isSpecialTimeEdited = false;
     public ?AppointmentSetting $appointment_setting;
     /*
     minDayAvaialbe
@@ -121,7 +122,7 @@ class GeneralSetting extends Component
         $updateOrCreateModel = [
             'user_id'               =>  $this->user->id,
             'service_id'            =>  $this->fetchData['service_id'],
-            'place_id'              =>  $this->fetchData['place_id'],
+            'place_id'              =>  $this->fetchData['place'],
             'time_for_visit'        =>  isset($this->form['visitTime']) ? $this->form['visitTime'] : null,
             'min_day_active'        =>  $this->form['minDayAvaialbe'],
             'max_day_active'        =>  $this->form['maxDayAvaialbe'],
@@ -135,7 +136,12 @@ class GeneralSetting extends Component
         ];
 
         if ($this->isEdited) {
-            $this->appointment_setting->update($updateOrCreateModel);
+            if ($this->isSpecialTimeEdited) {
+                //is user editing the times for special section
+                $this->appointment_setting->update($updateOrCreateModel);
+            } else {
+                $this->appointment_setting = AppointmentSetting::create($updateOrCreateModel);
+            }
         } else {
             $this->appointment_setting =   AppointmentSetting::create($updateOrCreateModel);
         }
@@ -151,10 +157,19 @@ class GeneralSetting extends Component
         }
         //store days and times
         if ($this->isEdited) {
-            foreach ($appointment_setting_times as $objectForStore) {
-                $this->appointment_setting->times()->updateOrCreate($objectForStore);
+            //is user editing the times
+            if ($this->isSpecialTimeEdited) {
+                //is user editing the times for special section
+                foreach ($appointment_setting_times as $objectForStore) {
+                    $this->appointment_setting->times()->updateOrCreate($objectForStore);
+                }
+            } else {
+                foreach ($appointment_setting_times as $objectForStore) {
+                    $this->appointment_setting->times()->create($objectForStore);
+                }
             }
         } else {
+            //user is not in edit mode
             foreach ($appointment_setting_times as $objectForStore) {
                 $this->appointment_setting->times()->create($objectForStore);
             }
@@ -165,9 +180,18 @@ class GeneralSetting extends Component
     private function fillTheForm()
     {
         if (empty($this->fetchData['service_id'])) {
-            $apSet = AppointmentSetting::where('user_id', $this->fetchData['user']->id)->whereNull('service_id')->first();
+            $apSet = AppointmentSetting::where('user_id', $this->fetchData['user']->id)
+                ->whereNull('service_id')
+                ->first();
         } else {
-            $apSet = AppointmentSetting::where('user_id', $this->fetchData['user']->id)->where('service_id', $this->fetchData['service_id'])->first();
+            $apSet = AppointmentSetting::where('user_id', $this->fetchData['user']->id)
+                ->where('service_id', $this->fetchData['service_id'])
+                ->first();
+            $this->isSpecialTimeEdited = true;
+            if (empty($apSet)) {
+                $apSet = AppointmentSetting::where('user_id', $this->fetchData['user']->id)->whereNull('service_id')->first();
+                $this->isSpecialTimeEdited = false;
+            }
         }
         $this->appointment_setting = $apSet;
 
@@ -223,8 +247,12 @@ class GeneralSetting extends Component
 
     public function mount()
     {
-        $this->fetchData['user']            = request()->route('user');
-        $this->fetchData['service_id']      = request()->has('service') ? request()->route('service') : null;
+        $this->fetchData['user']            =  request()->route('user');
+        $this->fetchData['service_id']      =  request()->route('service');
+        $this->fetchData['place']           =  request()->route('place');
+        if(isset(  $this->fetchData['place'])) {
+            $this->fetchData['place'] =   $this->fetchData['place']->id ; 
+        }
         if (!empty($this->fetchData['user'])) {
             $this->fetchData['doctor'] =  $this->fetchData['user'];
         } else {

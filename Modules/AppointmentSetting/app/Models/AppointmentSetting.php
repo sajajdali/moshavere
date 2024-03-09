@@ -3,12 +3,13 @@
 namespace Modules\AppointmentSetting\app\Models;
 
 use App\Enum\ActiveEnum;
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\SoftDeletes;
-use Modules\AppointmentSetting\Database\factories\AppointmentSettingFactory;
 use Modules\User\Entities\User;
+use Illuminate\Database\Eloquent\Model;
+use Modules\Service\app\Models\Service;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Modules\AppointmentSetting\Database\factories\AppointmentSettingFactory;
 
 class AppointmentSetting extends Model
 {
@@ -43,5 +44,9 @@ class AppointmentSetting extends Model
     protected function asJson($value)
     {
         return json_encode($value, JSON_UNESCAPED_UNICODE);
+    }
+    public function service()
+    {
+        return $this->belongsTo(Service::class);
     }
 }

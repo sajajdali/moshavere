@@ -29,6 +29,7 @@ class GeneralSetting extends Component
         'minDayAvaialbe' => 0,
         'maxDayAvaialbe' => 90,
         'avtive' => true,
+        'specialTimeCounter' => 1,
     ];
 
     //day property
@@ -43,8 +44,42 @@ class GeneralSetting extends Component
         'friday'     => 1,
     ];
 
+    public function updated($property, $value)
+    {
+        if (!$value) {
+            $dayType = '';
+            match ($property) {
+                'form.visitType.saturday'  => $dayType = 'saturday',
+                'form.visitType.sunday'    => $dayType = 'sunday',
+                'form.visitType.monday'    => $dayType = 'monday',
+                'form.visitType.tuesday'   => $dayType = 'tuesday',
+                'form.visitType.wednesday' => $dayType = 'wednesday',
+                'form.visitType.thursday'  => $dayType = 'thursday',
+                'form.visitType.friday'    => $dayType = 'friday',
+                default => $dayType = 'false',
+            };
+            if ($dayType !== 'false') {
+                if (!empty($this->fetchData['service_id'] && isset($this->appointment_setting)) && $this->appointment_setting->service_id == null) {
+                } elseif (isset($this->appointment_setting) && $this->appointment_setting->service_id != null && $this->isEdited) {
+                    if ($this->isSpecialTimeEdited) {
+                        $dayTimeValue = $this->appointment_setting->times()->where('day_number', AppintmentSettingDayNumber::getConstant($dayType))->first();
+                    }
+                    if (!empty($dayTimeValue)) {
+                        return $dayTimeValue->delete();
+                    }
+                }
+            }
+        }
+    }
 
-
+    public function specialDayaddCounter()
+    {
+        $this->form['specialTimeCounter'] =     $this->form['specialTimeCounter'] + 1;
+    }
+    public function specialDayremoveCounter()
+    {
+        $this->form['specialTimeCounter'] =     $this->form['specialTimeCounter'] - 1;
+    }
     public function addCounter($day)
     {
         $this->counter[$day] = $this->counter[$day] + 1;
@@ -100,13 +135,14 @@ class GeneralSetting extends Component
     }
     public function saveSetting()
     {
+
         $this->validate();
         $endAppointmentTime =  isset($this->form['endAppointment']['date']) ? Verta::parse($this->form['endAppointment']['date'])->toCarbon() : null;
         $detail = [
-            'visit_type_absente'             => $this->form['visitType']['absente'],
-            'visit_type_online'              => $this->form['visitType']['online'],
-            'maxAvailabeAppointment-eachDay' => $this->form['maxAvailabeAppointment']['eachDay'],
-            'maxAvailabeAppointment-totall'  => $this->form['maxAvailabeAppointment']['totall'],
+            'visit_type_absente'             => isset($this->form['visitType']['absente']) ? $this->form['visitType']['absente'] : null,
+            'visit_type_online'              => isset($this->form['visitType']['online']) ? $this->form['visitType']['online'] : null,
+            'maxAvailabeAppointment-eachDay' => isset($this->form['maxAvailabeAppointment']['eachDay']) ? $this->form['maxAvailabeAppointment']['eachDay'] : null,
+            'maxAvailabeAppointment-totall'  => isset($this->form['maxAvailabeAppointment']['totall']) ? $this->form['maxAvailabeAppointment']['totall'] : null,
             'payment'                        => [
                 'online'  => [
                     'status'                     => isset($this->form['onlinePayment']['online']['status']) ? $this->form['onlinePayment']['online']['status'] : null,
@@ -118,7 +154,7 @@ class GeneralSetting extends Component
                 'price'                          => isset($this->form['onlinePayment']['Price']) ? $this->form['onlinePayment']['Price'] : null,
             ]
         ];
-        $online_payment = $this->form['onlinePayment']['online']['tatus'] ?? null;
+
         $updateOrCreateModel = [
             'user_id'               =>  $this->user->id,
             'service_id'            =>  $this->fetchData['service_id'],
@@ -128,7 +164,6 @@ class GeneralSetting extends Component
             'max_day_active'        =>  $this->form['maxDayAvaialbe'],
             'cancellation_by_user'  =>  $this->form['cancel']['day'] ?? null,
             'last_day_active'       =>  $endAppointmentTime,
-
             'active_payment'        =>  isset($this->form['onlinePayment']['online']) ? AppintmentSettingPaymentStatus::tryFrom($this->form['onlinePayment']['status']) : 0,
             'interference'          =>  isset($this->form['interference']['status'])  ? AppintmentSettingInterface::tryFrom($this->form['interference']['status']) : AppintmentSettingInterface::getDefault(),
             'avtive'                =>  ActiveEnum::tryFrom($this->form['avtive']),
@@ -136,11 +171,15 @@ class GeneralSetting extends Component
         ];
 
         if ($this->isEdited) {
-            if ($this->isSpecialTimeEdited) {
-                //is user editing the times for special section
-                $this->appointment_setting->update($updateOrCreateModel);
+            if (isset($this->fetchData['service_id'])) {
+                if ($this->isSpecialTimeEdited) {
+                    //is user editing the times for special section
+                    $this->appointment_setting->update($updateOrCreateModel);
+                } else {
+                    $this->appointment_setting = AppointmentSetting::create($updateOrCreateModel);
+                }
             } else {
-                $this->appointment_setting = AppointmentSetting::create($updateOrCreateModel);
+                $this->appointment_setting->update($updateOrCreateModel);
             }
         } else {
             $this->appointment_setting =   AppointmentSetting::create($updateOrCreateModel);
@@ -148,24 +187,32 @@ class GeneralSetting extends Component
         $appointment_setting_times = [];
         foreach ($this->form['timeFrame'] as $dayName => $timeFrameForEachDay) {
             foreach ($timeFrameForEachDay as $key => $timeFrame) {
-                $appointment_setting_times[] = [
-                    'day_number' => AppintmentSettingDayNumber::getConstant($dayName),
-                    'start_at'  => $timeFrame['start'],
-                    'end_at'  => $timeFrame['end'],
-                ];
+                if (isset($this->form['visitType'][$dayName]) && $this->form['visitType'][$dayName] == 'ture') {
+                    $appointment_setting_times[] = [
+                        'day_number' => AppintmentSettingDayNumber::getConstant($dayName),
+                        'start_at'  => $timeFrame['start'],
+                        'end_at'  => $timeFrame['end'],
+                    ];
+                }
             }
         }
         //store days and times
         if ($this->isEdited) {
             //is user editing the times
-            if ($this->isSpecialTimeEdited) {
-                //is user editing the times for special section
-                foreach ($appointment_setting_times as $objectForStore) {
-                    $this->appointment_setting->times()->updateOrCreate($objectForStore);
+            if (isset($this->fetchData['service_id'])) {
+                if ($this->isSpecialTimeEdited) {
+                    //is user editing the times for special section
+                    foreach ($appointment_setting_times as $objectForStore) {
+                        $this->appointment_setting->times()->updateOrCreate($objectForStore);
+                    }
+                } else {
+                    foreach ($appointment_setting_times as $objectForStore) {
+                        $this->appointment_setting->times()->create($objectForStore);
+                    }
                 }
             } else {
                 foreach ($appointment_setting_times as $objectForStore) {
-                    $this->appointment_setting->times()->create($objectForStore);
+                    $this->appointment_setting->times()->updateOrCreate($objectForStore);
                 }
             }
         } else {
@@ -194,7 +241,6 @@ class GeneralSetting extends Component
             }
         }
         $this->appointment_setting = $apSet;
-
         $this->fillTheTime($apSet);
         $this->form['visitType']['absente']              = $apSet->detail['visit_type_absente'];
         $this->form['visitType']['online']               = $apSet->detail['visit_type_online'];
@@ -204,7 +250,7 @@ class GeneralSetting extends Component
         $this->form['maxAvailabeAppointment']['eachDay'] = $apSet->detail['maxAvailabeAppointment-eachDay'];
         $this->form['maxAvailabeAppointment']['totall']  = $apSet->detail['maxAvailabeAppointment-totall'];
         $this->form['cancel']['day']                     = $apSet->cancellation_by_user ?? null;
-        $this->form['avtive']                            = $apSet->avtive;
+        $this->form['avtive']                            = $apSet->active->value;
 
         if (isset($apSet->last_day_active)) {
             $this->form['endAppointment']['date'] = verta($apSet->last_day_active)->format('Y/m/d');
@@ -237,7 +283,6 @@ class GeneralSetting extends Component
     {
         foreach ($apSet->times->groupBy('day_number') as $dayNumber => $eachDayColleciton) {
             $this->form['visitType'][AppintmentSettingDayNumber::tryFrom($dayNumber)->getEnName()] = true;
-            // TODO:: you was here !! add amounth for checked the check box for each day
             foreach ($eachDayColleciton as $iterator => $value) {
                 $this->form['timeFrame'][AppintmentSettingDayNumber::tryFrom($dayNumber)->getEnName()][$iterator]['start'] = $value->start_at;
                 $this->form['timeFrame'][AppintmentSettingDayNumber::tryFrom($dayNumber)->getEnName()][$iterator]['end'] = $value->end_at;
@@ -250,8 +295,8 @@ class GeneralSetting extends Component
         $this->fetchData['user']            =  request()->route('user');
         $this->fetchData['service_id']      =  request()->route('service');
         $this->fetchData['place']           =  request()->route('place');
-        if(isset(  $this->fetchData['place'])) {
-            $this->fetchData['place'] =   $this->fetchData['place']->id ; 
+        if (isset($this->fetchData['place'])) {
+            $this->fetchData['place'] =   $this->fetchData['place']->id;
         }
         if (!empty($this->fetchData['user'])) {
             $this->fetchData['doctor'] =  $this->fetchData['user'];

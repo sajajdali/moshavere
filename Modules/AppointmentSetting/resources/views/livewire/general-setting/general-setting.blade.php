@@ -51,8 +51,8 @@
         @include('appointmentsetting::components.generalsetting.dayofperesent')
     </div>
     {{-- special time  --}}
-     <div class="card">
-            @include('appointmentsetting::components.generalsetting.specialdaytime')
+    <div class="card">
+        @include('appointmentsetting::components.generalsetting.specialdaytime')
     </div>
     {{-- time for each appointmernt --}}
     <div class="card  @error('form.visitTime') border border-danger @enderror">
@@ -504,6 +504,29 @@
             $('.customCheckbox').on('click', function() {
                 var id = $(this).data('id');
                 @this.set('form.' + id, $(this).hasClass('on'));
+            });
+
+            function addPersianDateClassForSpecialDate() {
+                $('.specialDate').persianDatepicker({
+                    initialValue: false,
+                    format: 'L',
+                    autoClose: true,
+                    onSelect: function(unix) {
+                        var specialDateValue = {};
+                        $('.specialDate').each(function(key, element) {
+                            var dataId = $(element).data('id');
+                            var value = $(element).val();
+                            specialDateValue[dataId] = value;
+                        });
+                        @this.set('form.specialDaydateValues', specialDateValue);
+                    }
+                });
+            }
+            addPersianDateClassForSpecialDate();
+            Livewire.on('loadPersianDatePicker', function() {
+                setTimeout(() => {
+                    addPersianDateClassForSpecialDate();
+                }, 1000);
             });
 
             function appearPeymentStatusDiv() {

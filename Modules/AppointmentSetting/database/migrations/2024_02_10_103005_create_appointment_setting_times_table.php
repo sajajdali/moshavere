@@ -17,6 +17,7 @@ return new class extends Migration
             $table->tinyInteger('day_number')->default(0)->comment('0 = Saturday | 6 = friday');
             $table->time('start_at');
             $table->time('end_at');
+            $table->date('special_date')->nullable()->default(null);
             $table->timestamps();
         });
     }

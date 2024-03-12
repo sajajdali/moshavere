@@ -30,14 +30,14 @@ class SpecialSectionSetting extends Component
     #[Computed]
     public function GeneralTimes()
     {
-        return  $this->fetchData['GeneralAppointmentSetting']->times()->whereNull('')->groupBy('day_number');
+        return  $this->fetchData['GeneralAppointmentSetting']->times()->whereNull('special_date')->get()->groupBy('day_number');
     }
     #[Computed]
     public function SpecialTimes($AppointmentSettingId)
     {
         $appTime  = AppointmentSetting::find($AppointmentSettingId);
         if (!empty($appTime)) {
-            return $appTime->times->groupBy('day_number');
+            return $appTime->times()->whereNull('special_date')->get()->groupBy('day_number');
         }
         return false;
     }
@@ -59,11 +59,11 @@ class SpecialSectionSetting extends Component
     public function deleteSpecialSectionSetting($model)
     {
         $appTime  = AppointmentSetting::find($model);
-        $appTime->times->map(function($q){
+        $appTime->times->map(function ($q) {
             $q->delete();
         });
         $appTime->delete();
-        return redirect()->route('admin.appointment.specialsection',$this->doctor)->with('success','تنظیمات با موفقیت  حذف شد');
+        return redirect()->route('admin.appointment.specialsection', $this->doctor)->with('success', 'تنظیمات با موفقیت  حذف شد');
     }
     public function mount()
     {

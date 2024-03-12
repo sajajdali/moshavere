@@ -242,7 +242,9 @@ class GeneralSetting extends Component
         } else {
             $this->appointment_setting =   AppointmentSetting::create($updateOrCreateModel);
         }
-
+        //  TODO :: when store button hit , the special time store 2x
+        // check the store method for special times
+        //  ----------------->>>>>>>>>>>>>>>>>>>
         $appointment_setting_times =  $this->storeTimes();
         //store days and times
         if ($this->isEdited) {
@@ -255,6 +257,7 @@ class GeneralSetting extends Component
                     }
                 } else {
                     foreach ($appointment_setting_times as $objectForStore) {
+                        dd($appointment_setting_times);
                         $this->appointment_setting->times()->create($objectForStore);
                     }
                 }

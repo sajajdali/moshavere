@@ -45,7 +45,7 @@ class GeneralSetting extends Component
      *specialDaySetting          : proprty is used in special day setting and its itrator for how many day has special setiing
      *specialTimeCounter         : proprty is used in special day settingو and its itrator for how many day has special time period for each dateTime
      *timeitrator                : is the itrator for time period in each section of special day
-     *specialDaydateValues : store the date of each special day (array) key: day iterator value: date in shamsi
+     *specialDaydateValues       : store the date of each special day (array) key: day iterator value: date in shamsi
     */
 
     //day property
@@ -137,11 +137,14 @@ class GeneralSetting extends Component
         if (isset($keyToValidate)) {
             for ($i = 0; $i < $keyToValidate; $i++) {
                 if (isset($specialDaydateValues[$i]) && !empty($specialDaydateValues[$i])) {
-                    $specialDayRules['form.specialDaytimeValues.' . $i . '.start'] = 'required';
-                    $specialDayRules['form.specialDaytimeValues.' . $i . '.end']   = 'required';
+                    for ($iterate = 0; $iterate <= $this->form['timeitrator'][$i]; $iterate++) {
+                        $specialDayRules["form.specialDaytimeValues.{$iterate}.{$i}.start"] = 'required';
+                        $specialDayRules["form.specialDaytimeValues.{$iterate}.{$i}.end"] =  'required';
+                    }
                 }
             }
         }
+
         // Merge the new rules with existing rules in the rules function
         return  $specialDayRules;
     }
@@ -190,6 +193,7 @@ class GeneralSetting extends Component
     }
     public function saveSetting()
     {
+
         $this->validate();
         $endAppointmentTime =  isset($this->form['endAppointment']['date']) ? Verta::parse($this->form['endAppointment']['date'])->toCarbon() : null;
         $detail = [
@@ -284,13 +288,17 @@ class GeneralSetting extends Component
         $specialTimes = [];
         if (isset($this->form['specialDaydateValues'])) {
             foreach ($this->form['specialDaydateValues'] as $key => $date) {
-                $carbon = Verta::parse($date)->toCarbon();
-                $specialTimes[] = [
-                    'day_number' => AppintmentSettingDayNumber::getConstant(strtolower($carbon->format('l'))),
-                    'start_at'  => $this->form['specialDaytimeValues'][$key]['start'],
-                    'end_at'    => $this->form['specialDaytimeValues'][$key]['end'],
-                    'special_date' => $carbon->format('Y/m/d'),
-                ];
+                foreach ($this->form['specialDaytimeValues'] as $index => $eachdayTimeArray) {
+                    $carbon = Verta::parse($date)->toCarbon();
+                    foreach ($eachdayTimeArray as $startAndEndDates) {
+                        $specialTimes[] = [
+                            'day_number' => AppintmentSettingDayNumber::getConstant(strtolower($carbon->format('l'))),
+                            'start_at'  => $startAndEndDates['start'],
+                            'end_at'    => $startAndEndDates['end'],
+                            'special_date' => $carbon->format('Y/m/d'),
+                        ];
+                    }
+                }
             }
         }
         return array_merge($specialTimes, $appointment_setting_times);
@@ -342,31 +350,30 @@ class GeneralSetting extends Component
         if (isset($apSet->detail['payment']['price'])) {
             $this->form['onlinePayment']['Price'] = $apSet->detail['payment']['price'];
         }
-        // dd($apSet->detail);
-        // you was here
-        // check if payment store in database in proper way
-        // check in edit mode , payment status of check boxes whould be true and inputs are visible
-        //  check the js code for the input and call the dispatch method to appear them if its need to ;
-        // TODO
-
     }
     private function fillTheTime($apSet)
     {
-        foreach ($apSet->times()->whereNull('special_date')->groupBy('day_number') as $dayNumber => $eachDayColleciton) {
+        foreach ($apSet->times()->whereNull('special_date')->get()->groupBy('day_number') as $dayNumber => $eachDayColleciton) {
             $this->form['visitType'][AppintmentSettingDayNumber::tryFrom($dayNumber)->getEnName()] = true;
             foreach ($eachDayColleciton as $iterator => $value) {
                 $this->form['timeFrame'][AppintmentSettingDayNumber::tryFrom($dayNumber)->getEnName()][$iterator]['start'] = $value->start_at;
                 $this->form['timeFrame'][AppintmentSettingDayNumber::tryFrom($dayNumber)->getEnName()][$iterator]['end'] = $value->end_at;
             }
         }
-
+        // special_date
         if ($apSet->times()->whereNotNull('special_date')->get()->isNotEmpty()) {
-            foreach ($apSet->times()->whereNotNull('special_date')->get()->groupBy('day_number')  as $spDayNum => $SpEachDayColleciton) {
-                $this->form['specialDaySetting'] = count($SpEachDayColleciton);
+            $sorted_special_day = $apSet->times()->whereNotNull('special_date')->get()->groupBy('day_number');
+            $this->form['specialDaySetting'] = count($sorted_special_day);
+            $i = 0;
+            foreach ($sorted_special_day  as $spDayNum => $SpEachDayColleciton) {
+                $this->form['specialDaydateValues'][$i] = verta($SpEachDayColleciton->first()->special_date)->format('Y/m/d');
                 foreach ($SpEachDayColleciton as $Spiterator => $Spvalue) {
-                    $this->form['specialDaytimeValues']['specialDaytimeValues'][$Spiterator]['start'] = $Spvalue->start_at;
-                    $this->form['specialDaytimeValues']['specialDaytimeValues'][$Spiterator]['end']   = $Spvalue->end_at;
+                    $this->form['specialDaytimeValues'][$Spiterator][$i]['start'] = $Spvalue->start_at;
+                    $this->form['specialDaytimeValues'][$Spiterator][$i]['end']   = $Spvalue->end_at;
+                    $this->form['specialTimeCounter'][$i] = count($sorted_special_day[$spDayNum]);
                 }
+                $this->form['timeitrator'][$i] = 0;
+                $i = $i + 1;
             }
         }
     }

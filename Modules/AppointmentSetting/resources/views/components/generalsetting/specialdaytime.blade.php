@@ -2,16 +2,17 @@
     <div class="card-header border-bottom d-flex justify-content-between">
         <h3> تغییر ساعت حضور برای<span class="text-primary"> یک روز خاص </span></h3>
         <div class="main-toggle-group d-sm-flex align-items-center ms-0">
-            <div class="toggle toggle-lg toggle-primary my-1  customCheckbox @if (isset($form['form.specialDaytimeValues'])) on  @else off @endif"
+            <div class="toggle toggle-lg toggle-primary my-1  customCheckbox @if (isset($form['specialDaytimeValues']) && count($form['specialDaytimeValues']) >= 1) on  @else off @endif"
                 data-id="specialDayTimeSetting" wire:ignore.self data-bs-toggle="collapse" href="#specialDayTimeSetting"
                 role="button" aria-expanded="false" aria-controls="specialDayTimeSetting">
                 <span></span>
             </div>
         </div>
     </div>
-    <div class="collapse @if (isset($form['form.specialDaytimeValues'])) show @endif " id="specialDayTimeSetting" wire:ignore.self>
+    <div class="collapse @if (isset($form['specialDaytimeValues']) && count($form['specialDaytimeValues']) >= 1) show @endif " id="specialDayTimeSetting" wire:ignore.self>
         <div class="card-body">
             @error('form.specialDaytimeValues.*')
+                {{ $message }}
                 <div class="alert alert-danger" role="alert">
                     <p class="text-danger"> در صورت انتخاب تاریخ ، لازم هست که ساعت های مخصوص آن روز را نیز انتخاب کنید
                     </p>
@@ -65,10 +66,8 @@
                             </div>
                             <div class="col-md-9">
                                 <div class="input-group mb-3">
-                                    <input type="text"
-                                        wire:model='form.specialDaydateValues.{{ $i }}'
-                                        data-id="{{ $i }}"
-                                        class="form-control specialDate">
+                                    <input type="text" wire:model='form.specialDaydateValues.{{ $i }}'
+                                        data-id="{{ $i }}" class="form-control specialDate">
                                 </div>
                             </div>
                             <div class="d-flex mt-2">
@@ -120,14 +119,20 @@
                         @for ($form['timeitrator'][$i]; $form['timeitrator'][$i] < $form['specialTimeCounter'][$i]; $form['timeitrator'][$i]++)
                             <div class="row">
                                 <div class="col-12 col-md-6">
-                                    <label for="input-time" class="form-label">از ساعت</label>
-                                    <input wire:model='form.specialDaytimeValues.{{ $form['timeitrator'][$i] }}.start'
-                                        type="time" wire:ignore.self class="form-control" id="input-time">
+                                    <label for="input-time-s-{{ $form['timeitrator'][$i] }}" class="form-label">از
+                                        ساعت</label>
+                                    <input
+                                        wire:model='form.specialDaytimeValues.{{ $form['timeitrator'][$i] }}.{{ $i }}.start'
+                                        type="time" wire:ignore.self class="form-control"
+                                        id="input-time-s-{{ $form['timeitrator'][$i] }}">
                                 </div>
-                                <div class="col-12 col-md-6"> <label for="input-label" class="form-label">تا
+                                <div class="col-12 col-md-6"> <label for="input-time-e-{{ $form['timeitrator'][$i] }}"
+                                        class="form-label">تا
                                         ساعت:</label>
-                                    <input wire:model='form.specialDaytimeValues.{{ $form['timeitrator'][$i] }}.end'
-                                        type="time" wire:ignore.self class="form-control" id="input-time">
+                                    <input
+                                        wire:model='form.specialDaytimeValues.{{ $form['timeitrator'][$i] }}.{{ $i }}.end'
+                                        type="time" wire:ignore.self class="form-control"
+                                        id="input-time-e-{{ $form['timeitrator'][$i] }}">
                                 </div>
                             </div>
                         @endfor

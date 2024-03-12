@@ -30,7 +30,7 @@ class SpecialSectionSetting extends Component
     #[Computed]
     public function GeneralTimes()
     {
-        return  $this->fetchData['GeneralAppointmentSetting']->times->groupBy('day_number');
+        return  $this->fetchData['GeneralAppointmentSetting']->times()->whereNull('')->groupBy('day_number');
     }
     #[Computed]
     public function SpecialTimes($AppointmentSettingId)

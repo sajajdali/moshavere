@@ -116,23 +116,23 @@
                                 @endif
                             </div>
                         </div>
-                        @for ($form['timeitrator'][$i]; $form['timeitrator'][$i] < $form['specialTimeCounter'][$i]; $form['timeitrator'][$i]++)
+                        @for ($j = $form['timeitrator'][$i]; $j < $form['specialTimeCounter'][$i]; $j++)
                             <div class="row">
                                 <div class="col-12 col-md-6">
-                                    <label for="input-time-s-{{ $form['timeitrator'][$i] }}" class="form-label">از
+                                    <label for="input-time-s-{{ $j }}" class="form-label">از
                                         ساعت</label>
                                     <input
-                                        wire:model='form.specialDaytimeValues.{{ $form['timeitrator'][$i] }}.{{ $i }}.start'
+                                        wire:model='form.specialDaytimeValues.{{ $i }}.{{ $j }}.start'
                                         type="time" wire:ignore.self class="form-control"
-                                        id="input-time-s-{{ $form['timeitrator'][$i] }}">
+                                        id="input-time-s-{{ $j }}">
                                 </div>
-                                <div class="col-12 col-md-6"> <label for="input-time-e-{{ $form['timeitrator'][$i] }}"
+                                <div class="col-12 col-md-6"> <label for="input-time-e-{{ $j }}"
                                         class="form-label">تا
                                         ساعت:</label>
                                     <input
-                                        wire:model='form.specialDaytimeValues.{{ $form['timeitrator'][$i] }}.{{ $i }}.end'
+                                        wire:model='form.specialDaytimeValues.{{ $i }}.{{ $j }}.end'
                                         type="time" wire:ignore.self class="form-control"
-                                        id="input-time-e-{{ $form['timeitrator'][$i] }}">
+                                        id="input-time-e-{{$j}}">
                                 </div>
                             </div>
                         @endfor

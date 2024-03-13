@@ -360,10 +360,11 @@ class GeneralSetting extends Component
         }
         // special_date
         if ($apSet->times()->whereNotNull('special_date')->get()->isNotEmpty()) {
-            $sorted_special_day = $apSet->times()->whereNotNull('special_date')->get()->groupBy('day_number');
+            $sorted_special_day = $apSet->times()->whereNotNull('special_date')->get()->groupBy('special_date');
             $this->form['specialDaySetting'] = count($sorted_special_day);
             $i = 0;
             foreach ($sorted_special_day  as $spDayNum => $SpEachDayColleciton) {
+
                 $this->form['specialDaydateValues'][$i] = verta($SpEachDayColleciton->first()->special_date)->format('Y/m/d');
                 foreach ($SpEachDayColleciton as $Spiterator => $Spvalue) {
                     $this->form['specialDaytimeValues'][$i][$Spiterator]['start'] = $Spvalue->start_at;

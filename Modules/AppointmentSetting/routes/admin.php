@@ -24,8 +24,6 @@ use Modules\AppointmentSetting\Livewire\UserAppointMentList\Index;
 
 Route::group([], function () {
     Route::get('appointment/setting/doctors', DoctorList::class)->name('appointment.doctor.list');
-    Route::get('appointment/setting/absentee', AbsenteeRegistration::class)->name('appointment.absentee');
-    Route::get('appointment/setting/absentee/list', AbsenteeList::class)->name('appointment.absentee.list');
     Route::get('appointment/setting/{user}', GeneralSetting::class)->name('appointment.setting');
     Route::get('appointment/setting/special/section/{user}', SpecialSectionSetting::class)->name('appointment.specialsection');
     Route::get('appointment/setting/{user}/{service}/{place}', GeneralSetting::class)->name('appointment.setting.specialservice');

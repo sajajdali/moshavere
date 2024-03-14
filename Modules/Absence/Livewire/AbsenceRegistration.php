@@ -1,17 +1,17 @@
 <?php
 
-namespace Modules\AppointmentSetting\Livewire\Absentee;
+namespace Modules\Absence\Livewire;
 
 use Livewire\Component;
+use Livewire\Attributes\Url;
 use Spatie\Permission\Models\Role;
 use Modules\User\Enum\UserMetaEnum;
 
-class AbsenteeRegistration extends Component
+class AbsenceRegistration extends Component
 {
 
+
     public $step = 1;
-
-
     #[Url]
     public $search = [];
 
@@ -62,7 +62,6 @@ class AbsenteeRegistration extends Component
     }
     public function lunchconfirmModal()
     {
-
 
         //TODO :: assign sections that relate to selected dorctors to this peroperty
         $this->selectedDoctorsSection = [
@@ -123,6 +122,6 @@ class AbsenteeRegistration extends Component
 
     public function render()
     {
-        return view('appointmentsetting::livewire.absentee.absentee-registration');
+        return view('absence::livewire.absence-registration');
     }
 }

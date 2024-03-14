@@ -1,12 +1,12 @@
 <?php
 
-namespace Modules\AppointmentSetting\Livewire\Absentee;
+namespace Modules\Absence\Livewire;
 
 use Livewire\Component;
 use Livewire\Attributes\On;
 use Livewire\Attributes\Url;
 
-class AbsenteeList extends Component
+class AbsenceList extends Component
 {
     public $searchPanel = "";
 
@@ -19,8 +19,9 @@ class AbsenteeList extends Component
     {
         //run delete command
     }
+
     public function render()
     {
-        return view('appointmentsetting::livewire.absentee.absentee-list');
+        return view('absence::livewire.absence-list');
     }
 }

@@ -1,0 +1,31 @@
+{
+    "name": "nwidart/absence",
+    "description": "",
+    "authors": [
+        {
+            "name": "Nicolas Widart",
+            "email": "n.widart@gmail.com"
+        }
+    ],
+    "extra": {
+        "laravel": {
+            "providers": [],
+            "aliases": {
+
+            }
+        }
+    },
+    "autoload": {
+        "psr-4": {
+            "Modules\\Absence\\": "",
+            "Modules\\Absence\\App\\": "app/",
+            "Modules\\Absence\\Database\\Factories\\": "database/factories/",
+            "Modules\\Absence\\Database\\Seeders\\": "database/seeders/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Modules\\Absence\\Tests\\": "tests/"
+        }
+    }
+}

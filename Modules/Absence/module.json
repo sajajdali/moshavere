@@ -1,0 +1,11 @@
+{
+    "name": "Absence",
+    "alias": "absence",
+    "description": "",
+    "keywords": [],
+    "priority": 0,
+    "providers": [
+        "Modules\\Absence\\app\\Providers\\AbsenceServiceProvider"
+    ],
+    "files": []
+}

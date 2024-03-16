@@ -21,22 +21,24 @@
                             aria-controls="selectSectionCollaps">ذخیره تنظیمات برای یک یا چند بخش</button>
                         <div class="collapse" id="selectSectionCollaps">
                             <div class="card card-body">
-                                @foreach ($selectedDoctorsSection as $key => $section)
-                                    <div class="col-md-4">
-                                        <div class="form-group mt-2">
-                                            <div class="checkbox">
-                                                <div class="custom-checkbox custom-control">
-                                                    <input type="checkbox"
-                                                        wire:model='selectedSection.{{ $section['id'] }}'
-                                                        data-checkboxes="mygroup" class="custom-control-input"
-                                                        id="checkbox-{{ $key }}">
-                                                    <label for="checkbox-{{ $key }}"
-                                                        class="custom-control-label">{{ $section['title'] }}</label>
+                                @if (isset($fetchData['selectedDoctorsSection']))
+                                    @foreach ($fetchData['selectedDoctorsSection'] as $key => $section)
+                                        <div class="col-md-4">
+                                            <div class="form-group mt-2">
+                                                <div class="checkbox">
+                                                    <div class="custom-checkbox custom-control">
+                                                        <input type="checkbox"
+                                                            wire:model='form.selectedSection.{{ $section['id'] }}'
+                                                            data-checkboxes="mygroup" class="custom-control-input"
+                                                            id="checkbox-{{ $key }}">
+                                                        <label for="checkbox-{{ $key }}"
+                                                            class="custom-control-label">{{ $section['title'] }}</label>
+                                                    </div>
                                                 </div>
                                             </div>
                                         </div>
-                                    </div>
-                                @endforeach
+                                    @endforeach
+                                @endif
                             </div>
                         </div>
 

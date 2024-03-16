@@ -62,15 +62,23 @@
                             <button class="text-danger text-reset d-none" id="uncheckAllButton">لغو انتخاب</button>
                         </p>
                     </div>
-                    <div id="checkForSpecialSectoion" class="alert alert-info d-none" role="alert"> در نظر داشته باشید که در صورتی که مایل هستید در یک بخش خاص تنظیمات اعمال شوند ، فقط باید یک پزشک را انتخاب کنید!! </div>
-                    @foreach ($doctors as $key => $doctorList)
+                    @error('form.doctor')
+                        <div class="alert alert-danger" role="alert">
+                            <strong>خطا!! </strong>
+                            <span>{{$message}}</span>
+                         </div>
+                    @enderror
+                    <div id="checkForSpecialSectoion" class="alert alert-info d-none" role="alert"> در نظر داشته باشید
+                        که در صورتی که مایل هستید در یک بخش خاص تنظیمات اعمال شوند ، فقط باید یک پزشک را انتخاب کنید!!
+                    </div>
+                    @foreach ($fetchData['doctors'] as $key => $doctorList)
                         <div class="col-md-4">
                             <div class="form-group mt-2">
                                 <div class="checkbox">
                                     <div class="custom-checkbox custom-control">
-                                        <input type="checkbox" wire:model='doctor.{{ $doctorList->id }}'
-                                            @if (array_key_exists($doctorList->id, $doctor) && $doctor[$doctorList->id] == 'true') checked @endif data-checkboxes="mygroup"
-                                            class="custom-control-input" id="checkbox-{{ $key }}">
+                                        <input type="checkbox" wire:model='form.doctor.{{ $doctorList->id }}'
+                                            {{-- @if (array_key_exists($doctorList->id, $form['doctor']) && $form['doctor'][$doctorList->id] == 'true') checked @endif --}} data-checkboxes="mygroup" class="custom-control-input"
+                                            id="checkbox-{{ $key }}">
                                         <label for="checkbox-{{ $key }}"
                                             class="custom-control-label">{{ $doctorList->full_name }}</label>
                                     </div>

@@ -9,7 +9,7 @@
         {{-- select doctor --}}
         @include('absence::components.selectdoctor')
     @elseif($step == 2)
-        @include("absence::components.selectdate")
+        @include('absence::components.selectdate')
     @endif
     {{-- modal --}}
     @include('absence::components.confirmmodal')
@@ -27,14 +27,7 @@
                             format: 'L',
                             autoClose: true,
                             onSelect: function(unix) {
-                                if (inp.data('dateType') == 'start') {
-                                    @this.set('dates.' + inp.data('counter') + '.start', inp
-                                        .val());
-                                } else {
-                                    @this.set('dates.' + inp.data('counter') + '.end', inp
-                                        .val());
-
-                                }
+                                @this.set('form.' + inp.data('counter'), inp.val());
                             }
                         });
                         $(this).data('persianDatepickerInitialized', true); // Mark initialization
@@ -63,17 +56,17 @@
                     $('#uncheckAllButton').removeClass('d-none');
                     checkcheckboxLength();
                 });
-            }
-            $('#uncheckAllButton').on('click', function() {
-                $('input[type="checkbox"]').prop('checked', false);
-                $(this).addClass('d-none');
-                $('#checkAllButton').removeClass('d-none');
-                checkcheckboxLength();
+                $('#uncheckAllButton').on('click', function() {
+                    $('input[type="checkbox"]').prop('checked', false);
+                    $(this).addClass('d-none');
+                    $('#checkAllButton').removeClass('d-none');
+                    checkcheckboxLength();
 
-            });
-            $('.custom-control-input').click(function() {
-                checkcheckboxLength();
-            });
+                });
+                $('.custom-control-input').click(function() {
+                    checkcheckboxLength();
+                });
+            }
 
             function checkcheckboxLength() {
                 var numChecked = $('.custom-control-input:checked').length;

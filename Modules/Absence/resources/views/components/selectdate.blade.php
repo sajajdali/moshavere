@@ -40,17 +40,17 @@
                 <div class="collapse" id="collapseExample">
                     <div class="card card-body">
                         <div class="row border-bottom mb-3">
-                            <h4>غیر فعال سازی یک روز</h4>
+                            <h4 class="mb-4">غیر فعال سازی یک روز</h4>
                             <p> برای غیر فعال سازی یک روز، تاریخ شروع را در روز مورد نظر قرار داده و روز گزینه ذخیره
                                 کلیک کنید.</p>
                         </div>
                         <div class="row border-bottom mt-1 mb-3">
-                            <h4>غیر فعال سازی چندین روز</h4>
+                            <h4 class="mb-4">غیر فعال سازی چندین روز</h4>
                             <p>برای غیر فعال سازی چندین روز ، میتوانید تاریخ شروع و پایان را انتخاب کنید و روز گزینه
                                 ذخیره کلیک کنید.</p>
                         </div>
                         <div class="row border-bottom mt-1 mb-3">
-                            <h4>غیر فعال سازی چندین بازه زمانی</h4>
+                            <h4 class="mb-4">غیر فعال سازی چندین بازه زمانی</h4>
                             <p>برای غیر فعال سازی چندین بازه زمانی ، میتوانید روز گزینه اضافه کردن کلیک کنید و هر
                                 تعداد
                                 بازه زمانی که مورد نیاز هست اضافه و روز گزینه ذخیره کلیک کنید.</p>
@@ -58,6 +58,12 @@
                     </div>
                 </div>
             </div>
+            @error('form.absence')
+                <div class="alert alert-danger mt-4" role="alert">
+                    <strong>خطا!! </strong>
+                    <span>{{ $message }}</span>
+                </div>
+            @enderror
             @for ($i = 0; $i < $counter['number']; $i++)
                 <div class="row">
                     <div class="col-12 mt-2">
@@ -68,9 +74,10 @@
                                         تاریخ شروع
                                     </label>
                                     <input type="text" class="form-control datePicker"
-                                        id="absenteenumber-{{ $i }}"
-                                        wire:model='absentee.number.{{ $i }}' data-dateType='start'
-                                        data-counter="{{ $i + 1 }}" absenteeholder="انتخاب تاریخ شروع">
+                                        id="absence.number-{{ $i }}"
+                                        wire:model='form.absence.{{ $i }}.start'
+                                        data-counter="absence.{{ $i }}.start"
+                                        placeholder="انتخاب تاریخ شروع">
                                 </div>
                             </div>
                             <div class="col-md-6">
@@ -79,9 +86,9 @@
                                         تاریخ پایان
                                     </label>
                                     <input type="text" class="form-control datePicker"
-                                        id="absenteenumber-{{ $i }}"
-                                        wire:model='absentee.number.{{ $i }}' data-dateType='end'
-                                        data-counter="{{ $i + 1 }}" absenteeholder="انتخاب تاریخ شروع">
+                                        id="absence.number-{{ $i }}"
+                                        wire:model='form.absence.{{ $i }}.end'
+                                        data-counter="absence.{{ $i }}.end" placeholder="انتخاب تاریخ شروع">
                                 </div>
                             </div>
                         </div>

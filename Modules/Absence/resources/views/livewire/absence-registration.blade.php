@@ -52,12 +52,20 @@
             function selectcheckboxes() {
                 $('#checkAllButton').on('click', function() {
                     $('input[type="checkbox"]').prop('checked', true);
+                    $('input[type="checkbox"]').prop('checked', true).each(function() {
+                        @this.ChangeCheckBoxesStatus($(this).attr('data-id'), true);
+
+                    });
                     $(this).addClass('d-none');
                     $('#uncheckAllButton').removeClass('d-none');
                     checkcheckboxLength();
                 });
                 $('#uncheckAllButton').on('click', function() {
                     $('input[type="checkbox"]').prop('checked', false);
+                    $('input[type="checkbox"]').prop('checked', false).each(function() {
+                        @this.ChangeCheckBoxesStatus($(this).attr('data-id'), false);
+
+                    });
                     $(this).addClass('d-none');
                     $('#checkAllButton').removeClass('d-none');
                     checkcheckboxLength();

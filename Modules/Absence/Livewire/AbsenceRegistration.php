@@ -4,6 +4,7 @@ namespace Modules\Absence\Livewire;
 
 use Livewire\Component;
 use Illuminate\Support\Arr;
+use Livewire\Attributes\On;
 use Livewire\Attributes\Url;
 use Illuminate\Validation\Rule;
 use Modules\User\Entities\User;
@@ -39,15 +40,23 @@ class AbsenceRegistration extends Component
         $this->counter[$obj] = $this->counter[$obj] - 1;
         if ($obj == 'number') {
             //remove the last array for validation
-            if(isset($this->form['absence'])) {
+            if (isset($this->form['absence'])) {
                 unset($this->form['absence'][(count($this->form['absence']) - 1)]);
             }
         }
         $this->render();
         $this->addjsclasses();
     }
+    public function ChangeCheckBoxesStatus($checkbox, $status)
+    {
+        // Update the checkbox value
+
+        $this->form['doctor'][$checkbox] = $status;
+        // dd($this->form);
+    }
     private function customCheckBoxValidate()
     {
+
         $validate = false;
         if (isset($this->form['doctor'])) {
             foreach ($this->form['doctor'] as $selectedDocs) {
@@ -109,6 +118,9 @@ class AbsenceRegistration extends Component
         }
 
         if (count($this->form['doctor']) <= 1) {
+            if (isset($this->fetchData['selectedDoctorsSection'])) {
+                unset($this->fetchData['selectedDoctorsSection']);
+            }
             foreach (Arr::flatten($this->form['doctor'])[0]->service as $service) {
                 $this->fetchData['selectedDoctorsSection'][] = [
                     'id'     => $service->id,
@@ -128,7 +140,7 @@ class AbsenceRegistration extends Component
             }
             $this->createAbsence($CreateModel);
 
-            return redirect()->route('admin.absence.list')->with('success', 'تنظیمات مات با موفقیت برای شما ذخیره شد');
+            return redirect()->route('admin.absence.list')->with('success', 'تنظیمات با موفقیت برای شما ذخیره شد');
         }
     }
     private function createAbsence($CreateModel)

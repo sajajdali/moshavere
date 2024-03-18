@@ -18,16 +18,16 @@
                             data-bs-target="#advanceSearch" aria-expanded="false" aria-controls="advanceSearch">
                             جست و جوی پیشرفته
                         </button>
-                        @if (isset($search['id']) || isset($search['absenteeName']) || isset($search['status']))
-                            <button class="btn btn-secondary ms-2" type="button" wire:click="resetProperties"
-                                wire:loading.class="bg-gray btn-loading disabled">نمایش همه
-                            </button>
+                        @if (isset($search['id']) || isset($search['doc_name']) || isset($search['service_name']) || isset($search['start_date']) || isset($search['end_date']))
+                        <button class="btn btn-secondary ms-2" type="button" wire:click="resetProperties"
+                            wire:loading.class="bg-gray btn-loading disabled">نمایش همه
+                        </button>
                         @endif
                     </div>
 
                 </div>
                 <div class="card-body">
-                    <div class="mb-5 collapse {{ $searchPanel }}" id="advanceSearch" wire:ignore>
+                    <div class="mb-5 collapse" id="advanceSearch" wire:ignore>
                         <form class="form-horizontal example" autocomplete="off">
                             <div class="row mb-4">
                                 <label for="search-id" class="col-md-2 form-label">ایدی</label>
@@ -37,30 +37,30 @@
                                 </div>
                             </div>
                             <div class="row mb-4">
-                                <label for="search-name" class="col-md-2 form-label">نام پزشک</label>
+                                <label for="search-doc_name" class="col-md-2 form-label">نام خانوادگی پزشک</label>
                                 <div class="col-md-10">
-                                    <input class="form-control" id="search-name" wire:model="search.doctorName"
+                                    <input class="form-control" id="search-doc_name" wire:model="search.doc_name"
                                         placeholder="نام پزشک" type="text">
                                 </div>
                             </div>
                             <div class="row mb-4">
-                                <label for="search-name" class="col-md-2 form-label">نام بخش</label>
+                                <label for="search-service_name" class="col-md-2 form-label">نام بخش</label>
                                 <div class="col-md-10">
-                                    <input class="form-control" id="search-name" wire:model="search.sectionName"
+                                    <input class="form-control" id="search-service_name" wire:model="search.service_name"
                                         placeholder="نام خانوادگی پزشک" type="text">
                                 </div>
                             </div>
                             <div class="row mb-4">
-                                <label for="search-name" class="col-md-2 form-label datePicker">تاریخ شروع</label>
+                                <label for="search-start_date" class="col-md-2 form-label datePicker">تاریخ شروع</label>
                                 <div class="col-md-10">
-                                    <input class="form-control datePicker" id="search-name"
-                                        wire:model="search.startDate" placeholder="تاریخ شروع عدم حضور" type="text">
+                                    <input class="form-control datePicker" id="search-start_date" data-name='start_date'
+                                        wire:model="search.start_date" placeholder="تاریخ شروع عدم حضور" type="text">
                                 </div>
                             </div>
                             <div class="row mb-4">
-                                <label for="search-name" class="col-md-2 form-label datePicker">تاریخ پایان</label>
+                                <label for="search-end_date" class="col-md-2 form-label datePicker">تاریخ پایان</label>
                                 <div class="col-md-10">
-                                    <input class="form-control datePicker" id="search-name" wire:model="search.Enddate"
+                                    <input class="form-control datePicker" id="search-end_date" wire:model="search.end_date" data-name='end_date'
                                         placeholder="تاریخ پایان عدم حضور" type="text">
                                 </div>
                             </div>
@@ -84,80 +84,81 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                <tr class="text-center">
-                                    <td>1</td>
-                                    <td>ممد</td>
-                                    <td>ویزیت</td>
-                                    <td>1402/01/25</td>
-                                    <td>1402/01/28</td>
-                                    <td>
-                                        <div class="btn-group mt-2 mb-2">
-                                            <button type="button" class="btn btn-primary dropdown-toggle"
-                                                data-bs-toggle="dropdown">
-                                                عملیات <span class="caret"></span>
-                                            </button>
-                                            <ul class="dropdown-menu" role="menu">
-                                                <li><a href="#" data-label="ویرایش">ویرایش</a>
-                                                </li>
-                                                <li><a class="delete_confirm_alert" href="#"
-                                                        data-label="ویرایش">حذف</a>
-                                                </li>
-                                            </ul>
-                                        </div>
+                                @if(! empty($absences))
+                                    @foreach ($absences as $key => $absence)
+                                    <tr class="text-center">
+                                        <td>{{$absence->id}}</td>
+                                        <td>{{$absence->user->full_name}}</td>
+                                        <td>{!! $absence->checkForService() !!}</td>
+                                        <td>{{{verta($absence->start_at)->format('Y/m/d')}}}</td>
+                                        <td>{{{verta($absence->end_at)->format('Y/m/d')}}}</td>
+                                        <td>
+                                            <div class="btn-group mt-2 mb-2">
+                                                @can('delete', $absence)
+                                                @endcan
+                                                <button type="button" class="btn btn-danger delete_confirm_alert"
+                                                    data-label="تنظیمات عدم حضور" data-id="{{ $absence->id }}">
+                                                    حذف
+                                                </button>
+                                            </div>
 
-                                    </td>
-                                </tr>
-                                {{-- TODO::add this alert --}}
-                                {{-- <tr>
-                                    <td colspan="100%" class="text-center">
-                                        <div class="alert alert-info">
-                                            هیچ موردی یافت نشد
-                                        </div>
-                                    </td>
-                                </tr> --}}
+                                        </td>
+                                    </tr>
+                                    @endforeach
+                                @else
+                                    <tr>
+                                        <td colspan="100%" class="text-center">
+                                            <div class="alert alert-info">
+                                                هیچ موردی یافت نشد
+                                            </div>
+                                        </td>
+                                    </tr>
+                                @endif
                             </tbody>
                         </table>
                     </div>
-                    {{-- <div>
-                        {{ $absentees->links() }}
-                    </div> --}}
+                    <div>
+                        {{ $absences->links() }}
+                    </div>
                 </div>
             </div>
         </div>
     </div>
 </div>
 @push('scripts')
-    <script src="{{ admin_asset('plugins/sweet-alert/sweetalert.min.js') }}"></script>
-    <script src="{{ admin_asset('plugins/sweet-alert/admin.sweetalert.js') }}"></script>
+<script src="{{ admin_asset('plugins/sweet-alert/sweetalert.min.js') }}"></script>
+<script src="{{ admin_asset('plugins/sweet-alert/admin.sweetalert.js') }}"></script>
 
-    <script>
-        var myCollapsible = document.getElementById('advanceSearch')
-        myCollapsible.addEventListener('show.bs.collapse', function() {
-            @this.set('searchPanel', 'show');
-        });
-        myCollapsible.addEventListener('hide.bs.collapse', function() {
-            @this.set('searchPanel', '');
-        })
-        $('.datePicker').each(function() {
-            if (!$(this).data('persianDatepickerInitialized')) {
-                var inp = $(this);
-                $(this).persianDatepicker({
-                    initialValue: false,
-                    format: 'L',
-                    autoClose: true,
-                    onSelect: function(unix) {
-                        if (inp.data('dateType') == 'start') {
-                            @this.set('dates.' + inp.data('counter') + '.start', inp
-                                .val());
-                        } else {
-                            @this.set('dates.' + inp.data('counter') + '.end', inp
-                                .val());
+<script>
+    var myCollapsible = document.getElementById('advanceSearch')
+    myCollapsible.addEventListener('show.bs.collapse', function() {
+        @this.set('searchPanel', 'show');
+    });
+    myCollapsible.addEventListener('hide.bs.collapse', function() {
+        @this.set('searchPanel', '');
+    })
+    $('.datePicker').each(function() {
+        if (!$(this).data('persianDatepickerInitialized')) {
+            var inp = $(this);
+            $(this).persianDatepicker({
+                initialValue: false
+                , format: 'L'
+                , autoClose: true
+                , onSelect: function(unix) {
+                    if (inp.data('dateType') == 'start') {
+                        @this.set('search.' + inp.data('name'), inp.val());
+                    } else {
+                        @this.set('search.' + inp.data('name'), inp.val());
 
-                        }
                     }
-                });
-                $(this).data('persianDatepickerInitialized', true); // Mark initialization
-            }
-        });
-    </script>
+                }
+            });
+            $(this).data('persianDatepickerInitialized', true); // Mark initialization
+        }
+    });
+    Livewire.on('closeCollaps',function(){
+        $('#advanceSearch').removeClass('show');
+        $('#advanceSearch').addClass('hide');
+    })
+</script>
 @endpush

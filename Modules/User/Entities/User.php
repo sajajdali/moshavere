@@ -17,6 +17,7 @@ use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
+use Modules\Absence\app\Models\Absence;
 
 /**
  * Modules\User\Entities\User
@@ -183,5 +184,9 @@ class User extends Authenticatable
     public function service()
     {
         return $this->belongsToMany(Service::class);
+    }
+    public function absence()
+    {
+        return $this->belongsToMany(Absence::class);
     }
 }

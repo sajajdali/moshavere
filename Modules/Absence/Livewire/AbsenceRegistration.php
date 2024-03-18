@@ -136,9 +136,9 @@ class AbsenceRegistration extends Component
                         'start_at' =>  Verta::parse($date['start'])->toCarbon(),
                         'end_at'   =>  Verta::parse($date['end'])->toCarbon(),
                     ];
+                    $this->createAbsence($CreateModel);
                 }
             }
-            $this->createAbsence($CreateModel);
 
             return redirect()->route('admin.absence.list')->with('success', 'تنظیمات با موفقیت برای شما ذخیره شد');
         }

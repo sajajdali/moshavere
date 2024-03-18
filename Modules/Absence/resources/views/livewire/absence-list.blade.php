@@ -84,7 +84,7 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                @if(! empty($absences))
+                                @if($absences->isNotEmpty())
                                     @foreach ($absences as $key => $absence)
                                     <tr class="text-center">
                                         <td>{{$absence->id}}</td>

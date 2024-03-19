@@ -4,6 +4,7 @@ namespace Modules\AppointmentSetting\app\Providers;
 
 use Illuminate\Support\Facades\Route;
 use Illuminate\Foundation\Support\Providers\RouteServiceProvider as ServiceProvider;
+use Modules\AppointmentSetting\app\Models\AppointmentSegment;
 use Modules\User\Entities\User;
 
 class RouteServiceProvider extends ServiceProvider
@@ -29,9 +30,9 @@ class RouteServiceProvider extends ServiceProvider
     public function map(): void
     {
         $this->mapApiRoutes();
-
         $this->mapWebRoutes();
         $this->mapLivewireRoutes();
+        $this->bindingModel();
     }
     /**
      * Define the "web" routes for the application.
@@ -63,5 +64,9 @@ class RouteServiceProvider extends ServiceProvider
             ->middleware('api')
             ->namespace($this->moduleNamespace)
             ->group(module_path('AppointmentSetting', '/routes/api.php'));
+    }
+    public function bindingModel(): void
+    {
+        Route::model('segment', AppointmentSegment::class);
     }
 }

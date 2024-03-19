@@ -50,6 +50,15 @@ return [
                         'has_child' => false,
                         'children' => null,
                     ],
+                    [
+                        'title' => 'بخش بندی نوبت (نواحی بدن)',
+                        'gate' => 'viewAny',
+                        'policy_class' => \Modules\User\Entities\User::class,
+                        'icon' => 'fa fa-list',
+                        'route' => 'admin.appointment.segment.list',
+                        'has_child' => false,
+                        'children' => null,
+                    ],
 
                 ],
             ],

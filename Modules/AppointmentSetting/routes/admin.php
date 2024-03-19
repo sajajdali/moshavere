@@ -9,6 +9,7 @@ use Modules\AppointmentSetting\Livewire\AddAppointment\DocAndSectionList;
 use Modules\AppointmentSetting\Livewire\GeneralSetting\SpecialSectionSetting;
 use Modules\AppointmentSetting\Livewire\AddAppointment\ListOfAvailableAppointment;
 use Modules\AppointmentSetting\Livewire\AddAppointment\SpecificDayAvailableAppointment;
+use Modules\AppointmentSetting\Livewire\Segment\SegmentCreateOrUpdate;
 use Modules\AppointmentSetting\Livewire\UserAppointMentList\Index;
 
 /*
@@ -33,4 +34,11 @@ Route::group([], function () {
     Route::get('appointment/add/{doctorId}/{sectionId}', ListOfAvailableAppointment::class)->name('appointment.add.setTime');
     //List of appointment
     Route::get('appointment/list', Index::class)->name('appointment.list');
+
+    //segments
+    Route::get('appointment/segment/list', \Modules\AppointmentSetting\Livewire\Segment\SegmentList::class)->name('appointment.segment.list')->can('viewAny', \Modules\AppointmentSetting\app\Models\AppointmentSegment::class);
+    Route::get('appointment/segment/create', SegmentCreateOrUpdate::class)->name('appointment.segment.create')->can('create', \Modules\AppointmentSetting\app\Models\AppointmentSegment::class) ;
+    Route::get('appointment/segment/edit/{segment}', SegmentCreateOrUpdate::class)->name('appointment.segment.edit')->can('edit', \Modules\AppointmentSetting\app\Models\AppointmentSegment::class) ;
+    //segments
+
 });

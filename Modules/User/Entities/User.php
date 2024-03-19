@@ -139,12 +139,12 @@ class User extends Authenticatable
     }
 
 
-    public function supporter(): belongsToMany
+    public function supporter()
     {
         return $this->belongsToMany(User::class, 'user_supports', 'user_id', 'support_id');
     }
 
-    public function my(): belongsToMany
+    public function my(): \Illuminate\Database\Eloquent\Relations\BelongsToMany
     {
         return $this->belongsToMany(User::class, 'user_supports', 'support_id', 'user_id');
     }

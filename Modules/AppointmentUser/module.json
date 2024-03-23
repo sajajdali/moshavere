@@ -1,0 +1,11 @@
+{
+    "name": "AppointmentUser",
+    "alias": "appointmentuser",
+    "description": "",
+    "keywords": [],
+    "priority": 0,
+    "providers": [
+        "Modules\\AppointmentUser\\app\\Providers\\AppointmentUserServiceProvider"
+    ],
+    "files": []
+}

@@ -1,0 +1,31 @@
+{
+    "name": "nwidart/appointmentuser",
+    "description": "",
+    "authors": [
+        {
+            "name": "Nicolas Widart",
+            "email": "n.widart@gmail.com"
+        }
+    ],
+    "extra": {
+        "laravel": {
+            "providers": [],
+            "aliases": {
+
+            }
+        }
+    },
+    "autoload": {
+        "psr-4": {
+            "Modules\\AppointmentUser\\": "",
+            "Modules\\AppointmentUser\\App\\": "app/",
+            "Modules\\AppointmentUser\\Database\\Factories\\": "database/factories/",
+            "Modules\\AppointmentUser\\Database\\Seeders\\": "database/seeders/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Modules\\AppointmentUser\\Tests\\": "tests/"
+        }
+    }
+}

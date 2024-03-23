@@ -3,6 +3,7 @@
 namespace Modules\User\Entities;
 
 use Laravel\Sanctum\HasApiTokens;
+use Modules\AppointmentSetting\app\Models\AppointmentSetting;
 use Spatie\Permission\Models\Role;
 use Modules\User\Enum\UserMetaEnum;
 use Spatie\Permission\Traits\HasRoles;
@@ -136,6 +137,11 @@ class User extends Authenticatable
     public function metas(): HasMany
     {
         return $this->hasMany(UserMeta::class);
+    }
+
+    public function appointmentSettings(): HasMany
+    {
+        return $this->hasMany(AppointmentSetting::class);
     }
 
 

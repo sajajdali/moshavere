@@ -2,9 +2,12 @@
 
 namespace Modules\AppointmentSetting\Livewire\GeneralSetting;
 
+use Illuminate\Support\Facades\Cache;
 use Livewire\Component;
 use App\Enum\ActiveEnum;
 use Illuminate\Validation\Rule;
+use Modules\AppointmentSetting\app\Jobs\CacheJob;
+use Modules\AppointmentSetting\app\Jobs\createCacheJob;
 use Modules\User\Entities\User;
 use Hekmatinasser\Verta\Facades\Verta;
 use Modules\AppointmentSetting\app\Models\AppointmentSetting;
@@ -163,8 +166,8 @@ class GeneralSetting extends Component
         }
         $rules  = [
             'form.timeFrame'                      => 'required',
-            'form.visitType.absente'              => 'required_without_all:form.visitType.online',
-            'form.visitType.online'               => 'required_without_all:form.visitType.absente',
+            'form.visitType.inPerson'              => 'required_without_all:form.visitType.online',
+            'form.visitType.online'               => 'required_without_all:form.visitType.inPerson',
             'form.visitTime'                      => 'required',
             'form.minDayAvaialbe'                 => 'required|integer',
             'form.maxDayAvaialbe'                 => 'required|integer',
@@ -197,7 +200,8 @@ class GeneralSetting extends Component
         $this->validate();
         $endAppointmentTime =  isset($this->form['endAppointment']['date']) ? Verta::parse($this->form['endAppointment']['date'])->toCarbon() : null;
         $detail = [
-            'visit_type_absente'             => isset($this->form['visitType']['absente']) ? $this->form['visitType']['absente'] : null,
+            'visit_type_inPerson'             => isset($this->form['visitType']['inPerson']) ? $this->form['visitType']['inPerson'] : null,
+            'visit_type_voip'             => isset($this->form['visitType']['voip']) ? $this->form['visitType']['voip'] : null,
             'visit_type_online'              => isset($this->form['visitType']['online']) ? $this->form['visitType']['online'] : null,
             'maxAvailabeAppointment-eachDay' => isset($this->form['maxAvailabeAppointment']['eachDay']) ? $this->form['maxAvailabeAppointment']['eachDay'] : null,
             'maxAvailabeAppointment-totall'  => isset($this->form['maxAvailabeAppointment']['totall']) ? $this->form['maxAvailabeAppointment']['totall'] : null,
@@ -269,6 +273,10 @@ class GeneralSetting extends Component
                 $this->appointment_setting->times()->updateOrCreate($objectForStore);
             }
         }
+
+        // make appointment log
+        CacheJob::dispatch($this->appointment_setting);
+
         return redirect()->route('admin.appointment.doctor.list')->with('success', 'تنظیمات با موفقیت ذخیره شد');
     }
     private function storeTimes()
@@ -319,8 +327,9 @@ class GeneralSetting extends Component
         }
         $this->appointment_setting = $apSet;
         $this->fillTheTime($apSet);
-        $this->form['visitType']['absente']              = $apSet->detail['visit_type_absente'];
-        $this->form['visitType']['online']               = $apSet->detail['visit_type_online'];
+        $this->form['visitType']['inPerson']              = $apSet->detail['visit_type_inPerson'] ?? false;
+        $this->form['visitType']['voip']              = $apSet->detail['visit_type_voip'] ?? false;
+        $this->form['visitType']['online']               = $apSet->detail['visit_type_online'] ?? false;
         $this->form['visitTime']                         = $apSet->time_for_visit;
         $this->form['minDayAvaialbe']                    = $apSet->min_day_active;
         $this->form['maxDayAvaialbe']                    = $apSet->max_day_active;

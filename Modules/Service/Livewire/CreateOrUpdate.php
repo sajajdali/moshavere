@@ -11,7 +11,10 @@ class CreateOrUpdate extends Component
 {
     public ?Service $service;
     public $isEdited = false;
-    public array $form = [];
+    public array $form = [
+        'parent_id' => null,
+        'doctors' => []
+    ];
     public array $fetchdata = [];
 
     public function rules()
@@ -29,7 +32,7 @@ class CreateOrUpdate extends Component
     {
         $this->validate();
 
-        //data for update Or create Service  
+        //data for update Or create Service
         $parentId = $this->form['parent_id'] == 0 || null ? null : $this->form['parent_id'];
         $active = $this->form['active'] == 'true' ? 1 : 0;
         $modelCreateOrUpdate = [
@@ -44,7 +47,7 @@ class CreateOrUpdate extends Component
         } else {
             $this->service =  Service::create($modelCreateOrUpdate);
         }
-        //add doctors to Service 
+        //add doctors to Service
         if (isset($this->form['doctors'])) {
             $syncArr = [];
             foreach ($this->form['doctors'] as $userId => $value) {

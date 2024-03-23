@@ -93,7 +93,7 @@ return [
                 ],
             ],
             [
-                'title' => 'ثبت نوبت',
+                'title' => 'ثبت نوبت (UI)',
                 'gate' => 'viewAny',
                 'policy_class' => \Modules\User\Entities\User::class,
                 'icon' => 'fe fe-plus-circle',

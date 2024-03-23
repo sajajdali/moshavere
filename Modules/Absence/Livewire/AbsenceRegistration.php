@@ -7,6 +7,8 @@ use Illuminate\Support\Arr;
 use Livewire\Attributes\On;
 use Livewire\Attributes\Url;
 use Illuminate\Validation\Rule;
+use Modules\AppointmentSetting\app\Jobs\CacheJob;
+use Modules\AppointmentSetting\app\Jobs\createCacheJob;
 use Modules\User\Entities\User;
 use Spatie\Permission\Models\Role;
 use Modules\User\Enum\UserMetaEnum;
@@ -150,8 +152,16 @@ class AbsenceRegistration extends Component
     public function storeForAllSection()
     {
         foreach ($this->form['absence'] as $key => $date) {
+            $doctorSelected = Arr::flatten($this->form['doctor'])[0];
+
+            // manage cache
+            foreach ($doctorSelected->appointmentSettings as $appointmentSetting){
+                CacheJob::dispatch($appointmentSetting);
+            }
+            // manage cache
+
             $CreateModel = [
-                'user_id' => (Arr::flatten($this->form['doctor'])[0])->id,
+                'user_id' => $doctorSelected->id,
                 'start_at' => Verta::parse($date['start'])->toCarbon(),
                 'end_at'   =>  Verta::parse($date['end'])->toCarbon(),
             ];
@@ -165,6 +175,7 @@ class AbsenceRegistration extends Component
         foreach ($this->form['selectedSection'] as $serviceId => $status) {
             if ($status) {
                 foreach ($this->form['absence'] as $key => $date) {
+
                     $services = [
                         'user_id' => (Arr::flatten($this->form['doctor'])[0])->id,
                         'service_id' => $serviceId,
@@ -175,7 +186,7 @@ class AbsenceRegistration extends Component
                 }
             }
         }
-        //store setting for selected sections
+
         session()->flash('success', 'تنظیمات با موفقیت ذخیره شد');
         return redirect()->route('admin.absence.list');
     }

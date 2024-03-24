@@ -17,7 +17,11 @@ class CreateOrUpdate extends Component
     public int $counter = 1;
     public array $form = [
         'active'    => true,
-        'doctors' => []
+        'doctors' => [] ,
+        'loc' => [
+            'lat' => '35.7219',
+            'lng' => '51.3347',
+        ]
     ];
     public array $fetchData = [];
 

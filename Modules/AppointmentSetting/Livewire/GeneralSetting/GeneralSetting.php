@@ -2,14 +2,15 @@
 
 namespace Modules\AppointmentSetting\Livewire\GeneralSetting;
 
-use Illuminate\Support\Facades\Cache;
 use Livewire\Component;
 use App\Enum\ActiveEnum;
 use Illuminate\Validation\Rule;
+use Modules\User\Entities\User;
+use Illuminate\Support\Facades\Cache;
+use Hekmatinasser\Verta\Facades\Verta;
 use Modules\AppointmentSetting\app\Jobs\CacheJob;
 use Modules\AppointmentSetting\app\Jobs\createCacheJob;
-use Modules\User\Entities\User;
-use Hekmatinasser\Verta\Facades\Verta;
+use Modules\AppointmentSetting\app\Models\AppointmentSegment;
 use Modules\AppointmentSetting\app\Models\AppointmentSetting;
 use Modules\AppointmentSetting\app\Models\AppointmentSettingTime;
 use Modules\AppointmentSetting\app\Enum\AppintmentSettingDayNumber;
@@ -65,25 +66,27 @@ class GeneralSetting extends Component
 
     public function updated($property, $value)
     {
-
+        $dayType = '';
+        match ($property) {
+            'form.visitType.saturday'  => $dayType = 'saturday',
+            'form.visitType.sunday'    => $dayType = 'sunday',
+            'form.visitType.monday'    => $dayType = 'monday',
+            'form.visitType.tuesday'   => $dayType = 'tuesday',
+            'form.visitType.wednesday' => $dayType = 'wednesday',
+            'form.visitType.thursday'  => $dayType = 'thursday',
+            'form.visitType.friday'    => $dayType = 'friday',
+            default => $dayType = 'false',
+        };
         if (!$value) {
-            $dayType = '';
-            match ($property) {
-                'form.visitType.saturday'  => $dayType = 'saturday',
-                'form.visitType.sunday'    => $dayType = 'sunday',
-                'form.visitType.monday'    => $dayType = 'monday',
-                'form.visitType.tuesday'   => $dayType = 'tuesday',
-                'form.visitType.wednesday' => $dayType = 'wednesday',
-                'form.visitType.thursday'  => $dayType = 'thursday',
-                'form.visitType.friday'    => $dayType = 'friday',
-                default => $dayType = 'false',
-            };
             if ($dayType !== 'false') {
-                if (!empty($this->fetchData['service_id'] && isset($this->appointment_setting)) && $this->appointment_setting->service_id == null) {
-                } elseif (isset($this->appointment_setting) && $this->appointment_setting->service_id != null && $this->isEdited) {
-                    if ($this->isSpecialTimeEdited) {
-                        $dayTimeValue = $this->appointment_setting->times()->where('day_number', AppintmentSettingDayNumber::getConstant($dayType))->first();
-                    }
+                if (isset($this->form['timeFrame'][$dayType])) {
+                    unset($this->form['timeFrame'][$dayType]);
+                }
+                if (isset($this->form['visitType'][$dayType])) {
+                    unset($this->form['visitType'][$dayType]);
+                }
+                if (isset($this->appointment_setting) && $this->isEdited) {
+                    $dayTimeValue = $this->appointment_setting->times()->where('day_number', AppintmentSettingDayNumber::getConstant($dayType))->first();
                     if (!empty($dayTimeValue)) {
                         return $dayTimeValue->delete();
                     }
@@ -114,6 +117,9 @@ class GeneralSetting extends Component
     public function removespecialDayTimeCounter($counter, $itrator)
     {
         $this->form[$counter][$itrator] =   $this->form[$counter][$itrator]  - 1;
+        if ($counter == 'specialTimeCounter') {
+            unset($this->form['specialDaytimeValues'][$itrator]);
+        }
         $this->render();
     }
     public function addCounter($day)
@@ -153,6 +159,7 @@ class GeneralSetting extends Component
     }
     public function rules()
     {
+
         //validation for each day time frame
         $dayRules = [];
         foreach ($this->counter as $dayName => $counter) {
@@ -175,6 +182,7 @@ class GeneralSetting extends Component
             'form.maxAvailabeAppointment.totall'  => 'required_if:form.maxAvailabeAppointment.status,true',
             'form.cancel.day'                     => 'required_if:form.cancel.status,true',
             'form.endAppointment.date'            => 'required_if:form.endAppointment.status,true',
+            'form.segments.value'                 => 'required_if:form.segments.status,true',
             'form.onlinePayment.Price'            => [
                 Rule::requiredIf(function () {
                     return isset($this->form['onlinePayment']['status']) && $this->form['onlinePayment']['status'] == true &&
@@ -194,18 +202,74 @@ class GeneralSetting extends Component
         $validateSpecialDate = $this->validateSpecialdate();
         return array_merge($dayRules,  $rules, $validateSpecialDate);
     }
+    private function checkForUnsetTheCheckBoxes()
+    {
+        if (isset($this->form['specialDayTimeSetting']) && ($this->form['specialDayTimeSetting']) == false) {
+            if (isset($this->form['specialDaydateValues'])) {
+                foreach ($this->form['specialDaydateValues'] as $key => $date) {
+                    $date =  $this->appointment_setting->times()->where('special_date', Verta::parse($date)->toCarbon())->first();
+                    if (!empty($date)) {
+                        $date->delete();
+                    }
+                }
+            }
+            unset($this->form['specialDaydateValues']);
+        }
+        if (isset($this->form['maxAvailabeAppointment']['status']) && ($this->form['maxAvailabeAppointment']['status']) == false) {
+            if (isset($this->form['maxAvailabeAppointment']['eachDay'])) {
+                unset($this->form['maxAvailabeAppointment']['eachDay']);
+            }
+            if (isset($this->form['maxAvailabeAppointment']['totall'])) {
+                unset($this->form['maxAvailabeAppointment']['totall']);
+            }
+        }
+        if (isset($this->form['cancel']['status'])  && $this->form['cancel']['status'] == false) {
+            if (isset($this->form['cancel']['day'])) {
+                unset($this->form['cancel']['day']);
+                unset($this->form['cancel']['status']);
+            }
+        }
+        if (isset($this->form['endAppointment']['status'])  && $this->form['endAppointment']['status'] == false) {
+            if (isset($this->form['endAppointment']['date'])) {
+                unset($this->form['endAppointment']['status']);
+                unset($this->form['endAppointment']['date']);
+            }
+        }
+        if (isset($this->form['onlinePayment']['status'])  && $this->form['onlinePayment']['status'] == false) {
+            if (isset($this->form['onlinePayment']['online']['status'])) {
+                unset($this->form['onlinePayment']['online']['status']);
+                unset($this->form['onlinePayment']['notPayingStatus']);
+            }
+            if (isset($this->form['onlinePayment']['online']['Price'])) {
+                unset($this->form['onlinePayment']['online']['Price']);
+            }
+            if (isset($this->form['onlinePayment']['voip']['status'])) {
+                unset($this->form['onlinePayment']['voip']['status']);
+            }
+        }
+        if (isset($this->form['interference']['status'])  && $this->form['interference']['status'] == false) {
+            unset($this->form['interference']['status']);
+        }
+        if (isset($this->form['segments']['status'])  && $this->form['segments']['status'] == false) {
+            $this->appointment_setting->segments()->detach();
+            unset($this->form['segments']['status']);
+            unset($this->form['segments']['value']);
+        }
+    }
     public function saveSetting()
     {
-
         $this->validate();
+        //if check box for each section is turned off , delete the inside the boxes
+        $this->checkForUnsetTheCheckBoxes();
         $endAppointmentTime =  isset($this->form['endAppointment']['date']) ? Verta::parse($this->form['endAppointment']['date'])->toCarbon() : null;
         $detail = [
             'visit_type_inPerson'             => isset($this->form['visitType']['inPerson']) ? $this->form['visitType']['inPerson'] : null,
-            'visit_type_voip'             => isset($this->form['visitType']['voip']) ? $this->form['visitType']['voip'] : null,
-            'visit_type_online'              => isset($this->form['visitType']['online']) ? $this->form['visitType']['online'] : null,
-            'maxAvailabeAppointment-eachDay' => isset($this->form['maxAvailabeAppointment']['eachDay']) ? $this->form['maxAvailabeAppointment']['eachDay'] : null,
-            'maxAvailabeAppointment-totall'  => isset($this->form['maxAvailabeAppointment']['totall']) ? $this->form['maxAvailabeAppointment']['totall'] : null,
-            'payment'                        => [
+            'visit_type_voip'                 => isset($this->form['visitType']['voip']) ? $this->form['visitType']['voip'] : null,
+            'visit_type_online'               => isset($this->form['visitType']['online']) ? $this->form['visitType']['online'] : null,
+            'maxAvailabeAppointment-eachDay'  => isset($this->form['maxAvailabeAppointment']['eachDay']) ? $this->form['maxAvailabeAppointment']['eachDay'] : null,
+            'maxAvailabeAppointment-totall'   => isset($this->form['maxAvailabeAppointment']['totall']) ? $this->form['maxAvailabeAppointment']['totall'] : null,
+            'payment'                         => [
+                'status'                      => isset($this->form['onlinePayment']['status']) ? $this->form['onlinePayment']['status']  : false,
                 'online'  => [
                     'status'                     => isset($this->form['onlinePayment']['online']['status']) ? $this->form['onlinePayment']['online']['status'] : null,
                     'notPayinStatus'             => isset($this->form['onlinePayment']['notPayingStatus']) ?  $this->form['onlinePayment']['notPayingStatus']  : null,
@@ -231,6 +295,8 @@ class GeneralSetting extends Component
             'avtive'                =>  ActiveEnum::tryFrom($this->form['avtive']),
             'detail'                =>  $detail,
         ];
+
+
 
         if ($this->isEdited) {
             if (isset($this->fetchData['service_id'])) {
@@ -273,7 +339,9 @@ class GeneralSetting extends Component
                 $this->appointment_setting->times()->updateOrCreate($objectForStore);
             }
         }
-
+        if (isset($this->form['segments']['status']) && $this->form['segments']['status'] == true) {
+            $this->appointment_setting->segments()->sync($this->form['segments']['value']);
+        }
         // make appointment log
         CacheJob::dispatch($this->appointment_setting);
 
@@ -326,6 +394,7 @@ class GeneralSetting extends Component
             }
         }
         $this->appointment_setting = $apSet;
+
         $this->fillTheTime($apSet);
         $this->form['visitType']['inPerson']              = $apSet->detail['visit_type_inPerson'] ?? false;
         $this->form['visitType']['voip']              = $apSet->detail['visit_type_voip'] ?? false;
@@ -356,6 +425,10 @@ class GeneralSetting extends Component
         }
         if (isset($apSet->detail['payment']['price'])) {
             $this->form['onlinePayment']['Price'] = $apSet->detail['payment']['price'];
+        }
+        if (!$apSet->segments->isEmpty()) {
+            $this->form['segments']['status'] = true;
+            $this->form['segments']['value'] = $apSet->segments->first()->id;
         }
     }
     private function fillTheTime($apSet)
@@ -414,6 +487,9 @@ class GeneralSetting extends Component
         }
         if ($check_Setting_exist) {
             return redirect()->route('admin.appointment.specialsection', ['user' => $this->fetchData['user']]);
+        }
+        if (AppointmentSegment::exists()) {
+            $this->fetchData['segments'] = AppointmentSegment::all();
         }
     }
 

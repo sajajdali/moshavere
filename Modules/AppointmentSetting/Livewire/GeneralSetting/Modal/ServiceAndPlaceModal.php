@@ -15,7 +15,7 @@ class ServiceAndPlaceModal extends Component
     public array $form = [];
     public function dismisMOdal()
     {
-        $this->step = 1;
+        $this->booted();
         $this->search = null;
     }
 
@@ -48,14 +48,15 @@ class ServiceAndPlaceModal extends Component
         session()->flash('resetTheSetting', true);
         return redirect()->route('admin.appointment.setting.specialservice', [$user, $service, $place]);
     }
-    public function mount()
+    public function booted()
     {
-        $places =  Place::all();
-        //check if there is multiple place
-        if ($places->isNotEmpty() && $places->count() > 1) {
+        if (Place::exists()) {
+            $place = Place::count();
+        }
+        if ($place  > 1) {
             $this->step = 1;
         } else {
-            $this->placeId =  $places->first();
+            $this->form['place'] =  Place::first()->id;
             $this->step = 2;
         }
     }

@@ -58,7 +58,7 @@
                     </button>
                 </form>
             </div>
-            @if ($doctors->count())
+            @if ($doctors->count() && $form['services'] != 'true' && $form['place'] != 'true')
                 <div class="row mt-5">
                     <div class="row">
                         <h5 class="text-muted mt-1 mb-5">برای تنظیم زمان حضور، پزشک مورد نظر را انتخاب کنید</h5>
@@ -110,7 +110,33 @@
                         @endforeach
                     </div>
                 </div>
-            @else
+            @elseif($form['services'])
+                <div class="alert alert-primary alert-dismissible fade show" role="alert">
+                    <span class="alert-inner--text"><strong>بخشی یافت نشد!!</strong>
+                        <br>
+                        لطفا ابتدا بخش به سیستم اضافه کنید
+
+                        اضافه کنید</span>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close">
+                        <span aria-hidden="true">×</span>
+                    </button>
+                </div>
+                <a href="{{ route('admin.service.create') }}" class="btn btn-success">افزودن بخش جدید
+                </a>
+            @elseif($form['place'])
+                <div class="alert alert-primary alert-dismissible fade show" role="alert">
+                    <span class="alert-inner--text"><strong>مطب یافت نشد!!</strong>
+                        <br>
+                        لطفا ابتدا مطب به سیستم اضافه کنید
+
+                        اضافه کنید</span>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close">
+                        <span aria-hidden="true">×</span>
+                    </button>
+                </div>
+                <a href="{{ route('admin.place.create') }}" class="btn btn-success">افزودن مطب جدید
+                </a>
+            @elseif($doctors->count() < 1)
                 <div class="alert alert-primary alert-dismissible fade show" role="alert">
                     <span class="alert-inner--text"><strong>پزشکی یافت نشد!!</strong>
                         <br>
@@ -122,7 +148,7 @@
                     </button>
                 </div>
                 <a href="{{ route('admin.user.create') }}" class="btn btn-success">افزودن پزشک جدید
-                    </a>
+                </a>
             @endif
             <div class="d-flex justify-content-center">
                 {{ $doctors->links() }}

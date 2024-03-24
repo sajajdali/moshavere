@@ -49,4 +49,7 @@ class AppointmentSetting extends Model
     {
         return $this->belongsTo(Service::class);
     }
+    public function segments() {
+        return $this->belongsToMany(AppointmentSegment::class,'appointment_segment_setting');
+    }
 }

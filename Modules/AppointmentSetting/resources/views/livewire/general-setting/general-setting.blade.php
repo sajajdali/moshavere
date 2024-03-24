@@ -282,7 +282,7 @@
     </div>
     {{-- segments  --}}
     <div class="card @error('form.segments.value') border border-danger @enderror">
-            @include('appointmentsetting::components.generalsetting.segments')
+        @include('appointmentsetting::components.generalsetting.segments')
     </div>
     {{-- end Date time  --}}
     <div class="card  @error('form.endAppointment.date') border border-danger @enderror">
@@ -367,10 +367,9 @@
                     <div class="d-flex align-items-center">
                         <div class="main-toggle-group d-sm-flex align-items-center ms-0">
                             <div class="toggle toggle-lg toggle-primary my-1 customCheckbox
-                            @if (isset($this->form['onlinePayment']['voip']['status']) && $this->form['onlinePayment']['online']['status'] == true) on
+                            @if (isset($this->form['onlinePayment']['voip']['status']) && $this->form['onlinePayment']['voip']['status'] == true) on
                                 @else
-                                off @endif
-                            "
+                                off @endif"
                                 data-id="onlinePayment.voip.status" wire:ignore.self id="paymentOnInVoip">
                                 <span></span>
                             </div>
@@ -381,10 +380,11 @@
 
             </div>
             <div class="row mt-5" wire:ignore>
-                <div class="d-none" id="paymentstatusSelect">
+                <div style="display:@if (isset($form['onlinePayment']['online']['status']) && $form['onlinePayment']['online']['status'] == 'true') block @else none @endif"
+                    id="paymentstatusSelect">
                     <div class="row">
                         <div class="col-md-5 pt-2">
-                            <label class="text-primary" for="basic-url"> وضعیت در صورت عدم پرداخت</label>
+                            <label class="text-primary" for="default-dropdown"> وضعیت در صورت عدم پرداخت</label>
                         </div>
                         <div class="col-md-7">
                             <div class="form-group">
@@ -400,7 +400,8 @@
                         </div>
                     </div>
                 </div>
-                <div class="d-none" id="paymentPriceInput">
+                <div style="display:  @if (isset($form['onlinePayment']['online']['status']) && isset($form['onlinePayment']['voip']['status'])) block  @else none @endif"
+                    id="paymentPriceInput">
                     <div class="row">
                         <div class="col-md-5 pt-2">
                             <label class="text-primary" for="basic-url"> مبلغ قابل پرداخت</label>
@@ -528,22 +529,18 @@
 
             function appearPeymentStatusDiv() {
                 $('#paymentstatusSelect').fadeIn();
-                $('#paymentstatusSelect').removeClass('d-none');
             }
 
             function appearPeymentPriceDiv() {
                 $('#paymentPriceInput').fadeIn();
-                $('#paymentPriceInput').removeClass('d-none');
             }
 
             function fadeOutPeymentStatusDiv() {
                 $('#paymentstatusSelect').fadeOut();
-                $('#paymentstatusSelect').addClass('d-none');
             }
 
             function fadeOutPeymentPriceDiv() {
                 $('#paymentPriceInput').fadeOut();
-                $('#paymentPriceInput').addClass('d-none');
             }
 
             $('#sitePaymentStatus').click(function(e) {
@@ -563,7 +560,7 @@
 
             $('#paymentOnInVoip').click(function(e) {
                 if ($('#paymentOnInVoip').hasClass('on')) {
-                    if ($('#paymentPriceInput').hasClass('d-none')) {
+                    if ($('#paymentPriceInput').css('display') === 'none') {
                         appearPeymentPriceDiv();
                     }
                 } else {
@@ -580,13 +577,6 @@
                     @this.set('form.endAppointment.date', $('#endDatePicker').val());
                 }
             });
-            @if (isset($form['onlinePayment']['voip']['status']))
-                appearPeymentPriceDiv();
-            @endif
-
-            @if (isset($form['onlinePayment']['online']['status']) && $form['onlinePayment']['online']['status'] == 'true')
-                appearPeymentStatusDiv();
-            @endif
         });
     </script>
 @endpush

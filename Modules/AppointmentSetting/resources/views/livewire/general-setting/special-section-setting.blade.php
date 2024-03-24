@@ -11,14 +11,11 @@
     <div class="card">
         <div class="card-header border-bottom d-flex flex-column flex-sm-row justify-content-between">
             <h4>ویرایش تنظیمات حضور در <strong>تمام بخش ها</strong></h4>
-            <button wire:click='editGeneralSetting' class="btn btn-info">
+            <button wire:click='editGeneralSetting' class="btn btn-info" wire:loading.class='disable btn-loading bg-gray'>
                 <div class="d-flex">
-                    <i wire:loading.remove wire:target='editGeneralSetting' class="fa fa-pencil-square-o fa-2x me-2"
-                        aria-hidden="true"></i>
-                    <span wire:loading.remove wire:target='editGeneralSetting'>ویرایش تنظیمات تمام بخش ها</span>
+                    <i class="fa fa-pencil-square-o fa-2x me-2" aria-hidden="true"></i>
+                    <span>ویرایش تنظیمات تمام بخش ها</span>
                 </div>
-                <span wire:loading wire:target='editGeneralSetting' class="spinner-border spinner-border-sm"
-                    role="status" aria-hidden="true"></span>
             </button>
         </div>
         <div class="card-body">

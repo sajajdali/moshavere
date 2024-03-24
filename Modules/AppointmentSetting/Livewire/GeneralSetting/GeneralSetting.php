@@ -118,7 +118,8 @@ class GeneralSetting extends Component
     {
         $this->form[$counter][$itrator] =   $this->form[$counter][$itrator]  - 1;
         if ($counter == 'specialTimeCounter') {
-            unset($this->form['specialDaytimeValues'][$itrator]);
+            $lastArr = count($this->form['specialDaytimeValues'][$itrator]);
+            unset($this->form['specialDaytimeValues'][$itrator][$lastArr - 1 ]);
         }
         $this->render();
     }
@@ -258,9 +259,9 @@ class GeneralSetting extends Component
     }
     public function saveSetting()
     {
-        $this->validate();
         //if check box for each section is turned off , delete the inside the boxes
         $this->checkForUnsetTheCheckBoxes();
+        $this->validate();
         $endAppointmentTime =  isset($this->form['endAppointment']['date']) ? Verta::parse($this->form['endAppointment']['date'])->toCarbon() : null;
         $detail = [
             'visit_type_inPerson'             => isset($this->form['visitType']['inPerson']) ? $this->form['visitType']['inPerson'] : null,

@@ -361,10 +361,12 @@ class AppointmentUserService
             'active_voip' => $appointmentSettings['detail']['visit_type_voip'] ?? false,
             'active_online' => $appointmentSettings['detail']['visit_type_online'] ?? false,
             'last_day' => $currentDate?->toDateString(),
+            'min_day_active' => $appointmentSettings?->min_day_active,
             'first_empty_day' => $firstEmptyDay,
             'last_day_active' => isset($appointmentSettings->last_day_active) ? $appointmentSettings->last_day_active->toDateString() : null,
             'last_day_in_log' => $lastDayInLog,
             'first_day_in_log' => $firstDayInLog?->toDateString(),
+            'interference' => $appointmentSettings->interference == 1,
         ];
 
         // Now $output contains the formatted output for the week with filled appointments and empty slots arranged

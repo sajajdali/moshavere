@@ -193,6 +193,6 @@ class User extends Authenticatable
     }
     public function absence()
     {
-        return $this->belongsToMany(Absence::class);
+        return $this->hasMany(Absence::class);
     }
 }

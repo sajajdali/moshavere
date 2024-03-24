@@ -343,8 +343,9 @@
                     </div>
                 </div>
                 <div class="d-flex  mt-2">
-                    <p class="text-muted"><strong class="me-1"> نکته!! </strong> نوبت دهی بهت از تاریخ انتخابی غیر
-                        فعال شود </p>
+                    <p class="text-muted"><strong class="me-1"> نکته!! </strong>
+                        تاریخ انتخابی شما اخرین روزی است که نوبت دهی فعال است و نوبت دهی از روز انخابی شما به بعد غیر فعال میشود.
+                          </p>
                 </div>
             </div>
         </div>

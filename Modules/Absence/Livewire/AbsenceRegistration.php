@@ -112,7 +112,7 @@ class AbsenceRegistration extends Component
             foreach ($this->form['doctor'] as $index =>  $doctor) {
                 if ($doctor) {
                     $this->form['doctor'][$index] = User::find($index);
-                    $services[] =  $this->form['doctor'][$index]->service;
+//                    $services[] =  $this->form['doctor'][$index]->service;
                 } else {
                     unset($this->form['doctor'][$index]);
                 }

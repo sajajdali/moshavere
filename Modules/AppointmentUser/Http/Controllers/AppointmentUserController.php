@@ -8,6 +8,8 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
 use Modules\AppointmentSetting\app\Models\AppointmentSetting;
 
 class AppointmentUserController extends Controller
@@ -15,6 +17,8 @@ class AppointmentUserController extends Controller
 
     public function test()
     {
+
+        return  app('AppointmentUserService')->listAppointments(AppointmentSetting::find(1));
 
 //        Cache::forget('appointmentList.1');
 //        dd(Cache::has('appointmentList.1'));

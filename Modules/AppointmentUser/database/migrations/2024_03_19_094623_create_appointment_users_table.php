@@ -21,9 +21,9 @@ return new class extends Migration
             $table->foreignIdFor(\Modules\User\Entities\User::class , 'agent_id')->nullable()->constrained('users')->cascadeOnDelete();
             $table->foreignIdFor(\Modules\User\Entities\User::class , 'operator_id')->nullable()->constrained('users')->cascadeOnDelete();
             $table->string('tracking_code' , 20)->nullable();
-            $table->tinyInteger('status')->default(0);
+            $table->tinyInteger('status')->default(1);
             $table->tinyInteger('type')->default(1)->comment('The main appointment or between patients');
-            $table->tinyInteger('kind')->default(0)->comment('in person - online - by phone of any kind');
+            $table->tinyInteger('kind')->default(1)->comment('in person - online - by phone of any kind');
             $table->time('start_time')->nullable();
             $table->time('end_time')->nullable();
             $table->timestamp('date_visit')->nullable();

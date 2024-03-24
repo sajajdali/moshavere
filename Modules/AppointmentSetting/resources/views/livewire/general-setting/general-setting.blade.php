@@ -9,8 +9,7 @@
     </div>
     @include('admin::layouts.components.alert')
 
-    <div
-        class="card   @if ($errors->has('form.visitType.inPerson') || $errors->has('form.visitType.online')) border border-danger @endif">
+    <div class="card   @if ($errors->has('form.visitType.inPerson') || $errors->has('form.visitType.online')) border border-danger @endif">
         <div class="card-body">
             {{-- section --}}
             <h3> نوع ویزیت </h3>
@@ -23,8 +22,7 @@
                 @endif
                 <div class="col-md-4 mt-3">
                     <div class="main-toggle-group d-flex align-items-center ms-0">
-                        <div
-                            class="toggle toggle-lg toggle-primary my-1 customCheckbox @if (isset($form['visitType']['inPerson']) && $form['visitType']['inPerson']) on @else off @endif"
+                        <div class="toggle toggle-lg toggle-primary my-1 customCheckbox @if (isset($form['visitType']['inPerson']) && $form['visitType']['inPerson']) on @else off @endif"
                             wire:ignore.self data-id="visitType.inPerson">
                             <span></span>
                         </div>
@@ -35,8 +33,7 @@
                 </div>
                 <div class="col-md-4 mt-3">
                     <div class="main-toggle-group d-flex align-items-center ms-0">
-                        <div
-                            class="toggle toggle-lg toggle-primary my-1 customCheckbox @if (isset($form['visitType']['online']) && $form['visitType']['online']) on @else off @endif"
+                        <div class="toggle toggle-lg toggle-primary my-1 customCheckbox @if (isset($form['visitType']['online']) && $form['visitType']['online']) on @else off @endif"
                             wire:ignore.self data-id="visitType.online">
                             <span></span>
                         </div>
@@ -47,8 +44,7 @@
                 </div>
                 <div class="col-md-4 mt-3">
                     <div class="main-toggle-group d-flex align-items-center ms-0">
-                        <div
-                            class="toggle toggle-lg toggle-primary my-1 customCheckbox @if (isset($form['visitType']['voip']) && $form['visitType']['voip']) on @else off @endif"
+                        <div class="toggle toggle-lg toggle-primary my-1 customCheckbox @if (isset($form['visitType']['voip']) && $form['visitType']['voip']) on @else off @endif"
                             wire:ignore.self data-id="visitType.voip">
                             <span></span>
                         </div>
@@ -76,9 +72,9 @@
             <hr style="opacity: 0.5">
             <div class="row">
                 @error('form.visitTime')
-                <div class="alert alert-danger" role="alert">
-                    <p class="text-danger"><strong>خطا!!</strong> {{ $message }}.</p>
-                </div>
+                    <div class="alert alert-danger" role="alert">
+                        <p class="text-danger"><strong>خطا!!</strong> {{ $message }}.</p>
+                    </div>
                 @enderror
                 <div class="col-md-4 pt-2">
                     <label class="text-primary" for="basic-url">مدت زمان مورد نیاز برای ویزیت هر بیمار</label>
@@ -86,7 +82,7 @@
                 <div class="col-md-8">
                     <div class="input-group mb-3">
                         <input type="number" class="form-control @error('form.visitTime') is-invalid @enderror"
-                               id="basic-url" aria-describedby="basic-addon3" wire:model='form.visitTime'>
+                            id="basic-url" aria-describedby="basic-addon3" wire:model='form.visitTime'>
                         <div class="input-group-prepend">
                             <span class="input-group-text" id="basic-addon3">مدت زمان به دقیقه</span>
                         </div>
@@ -110,10 +106,10 @@
             <hr style="opacity: 0.5">
             {{-- TODO::alert Message --}}
             @error('form.minDayAvaialbe')
-            <div class="alert alert-danger" role="alert">
-                <p class="text-danger">{{ $message }}
-                </p>
-            </div>
+                <div class="alert alert-danger" role="alert">
+                    <p class="text-danger">{{ $message }}
+                    </p>
+                </div>
             @enderror
             <div class="row">
                 <div class="col-md-5 pt-2">
@@ -122,7 +118,7 @@
                 <div class="col-md-7">
                     <div class="input-group mb-3">
                         <input type="number" class="form-control  @error('form.minDayAvaialbe') is-invalid @enderror "
-                               id="basic-url" aria-describedby="basic-addon3" wire:model='form.minDayAvaialbe'>
+                            id="basic-url" aria-describedby="basic-addon3" wire:model='form.minDayAvaialbe'>
                         <div class="input-group-prepend">
                             <span class="input-group-text" id="basic-addon3">روز</span>
                         </div>
@@ -145,10 +141,10 @@
             <h3><span class="text-primary">حداکثر</span> زمان دریافت نوبت</h3>
             <hr style="opacity: 0.5">
             @error('form.maxDayAvaialbe')
-            <div class="alert alert-danger" role="alert">
-                <p class="text-danger">{{ $message }}
-                </p>
-            </div>
+                <div class="alert alert-danger" role="alert">
+                    <p class="text-danger">{{ $message }}
+                    </p>
+                </div>
             @enderror
             <div class="row">
                 <div class="col-md-5 pt-2">
@@ -158,7 +154,7 @@
                 <div class="col-md-7">
                     <div class="input-group mb-3">
                         <input type="number" class="form-control  @error('form.maxDayAvaialbe') is-invalid @enderror"
-                               id="basic-url" aria-describedby="basic-addon3" wire:model='form.maxDayAvaialbe'>
+                            id="basic-url" aria-describedby="basic-addon3" wire:model='form.maxDayAvaialbe'>
                         <div class="input-group-prepend">
                             <span class="input-group-text" id="basic-addon3">روز آینده</span>
                         </div>
@@ -177,8 +173,7 @@
         <div class="card-header border-bottom d-flex justify-content-between">
             <h3>امکان دریافت حداکثر <span class="text-primary">دریافت نوبت</span></h3>
             <div class="main-toggle-group d-sm-flex align-items-center ms-0">
-                <div
-                    class="toggle toggle-lg toggle-primary my-1 @if (isset($form['maxAvailabeAppointment']['eachDay']) && isset($form['maxAvailabeAppointment']['totall'])) on @else off @endif customCheckbox"
+                <div class="toggle toggle-lg toggle-primary my-1 @if (isset($form['maxAvailabeAppointment']['eachDay']) && isset($form['maxAvailabeAppointment']['totall'])) on @else off @endif customCheckbox"
                     data-id="maxAvailabeAppointment.status" wire:ignore.self data-bs-toggle="collapse"
                     href="#maximumAppointmentCanBePerchased" role="button" aria-expanded="false"
                     aria-controls="maximumAppointmentCanBePerchased">
@@ -186,16 +181,14 @@
                 </div>
             </div>
         </div>
-        <div
-            class="collapse @if (isset($form['maxAvailabeAppointment']['eachDay']) && isset($form['maxAvailabeAppointment']['totall'])) show @endif "
-            id="maximumAppointmentCanBePerchased"
+        <div class="collapse @if (isset($form['maxAvailabeAppointment']['eachDay']) && isset($form['maxAvailabeAppointment']['totall'])) show @endif " id="maximumAppointmentCanBePerchased"
             wire:ignore.self>
             <div class="card-body">
                 @error('form.maxAvailabeAppointment.*')
-                <div class="alert alert-danger" role="alert">
-                    <p class="text-danger"> لطفا تعداد نوبت را مشخص کنید!!
-                    </p>
-                </div>
+                    <div class="alert alert-danger" role="alert">
+                        <p class="text-danger"> لطفا تعداد نوبت را مشخص کنید!!
+                        </p>
+                    </div>
                 @enderror
                 {{-- section --}}
                 <div class="row">
@@ -205,7 +198,7 @@
                     <div class="col-md-9 mb-1">
                         <div class="input-group mb-3">
                             <input type="number" class="form-control" id="basic-url"
-                                   aria-describedby="basic-addon3" wire:model='form.maxAvailabeAppointment.eachDay'>
+                                aria-describedby="basic-addon3" wire:model='form.maxAvailabeAppointment.eachDay'>
                             <div class="input-group-prepend">
                                 <span class="input-group-text" id="basic-addon3">عدد</span>
                             </div>
@@ -221,7 +214,7 @@
                     <div class="col-md-9">
                         <div class="input-group mb-3">
                             <input type="number" class="form-control" id="basic-url"
-                                   aria-describedby="basic-addon3" wire:model='form.maxAvailabeAppointment.totall'>
+                                aria-describedby="basic-addon3" wire:model='form.maxAvailabeAppointment.totall'>
                             <div class="input-group-prepend">
                                 <span class="input-group-text" id="basic-addon3">عدد</span>
                             </div>
@@ -245,8 +238,7 @@
         <div class="card-header border-bottom d-flex justify-content-between">
             <h3>امکان <span class="text-primary">کنسل</span> کردن نوبت </h3>
             <div class="main-toggle-group d-sm-flex align-items-center ms-0">
-                <div
-                    class="toggle toggle-lg toggle-primary my-1  customCheckbox @if (isset($form['cancel']['day'])) on  @else off @endif"
+                <div class="toggle toggle-lg toggle-primary my-1  customCheckbox @if (isset($form['cancel']['day'])) on  @else off @endif"
                     data-id="cancel.status" wire:ignore.self data-bs-toggle="collapse" href="#cancelCollapseSett"
                     role="button" aria-expanded="false" aria-controls="cancelCollapseSett">
                     <span></span>
@@ -254,13 +246,13 @@
             </div>
         </div>
         <div class="collapse @if (isset($form['cancel']['day'])) show @endif " id="cancelCollapseSett"
-             wire:ignore.self>
+            wire:ignore.self>
             <div class="card-body">
                 @error('form.cancel.day')
-                <div class="alert alert-danger" role="alert">
-                    <p class="text-danger"> مشخص کنید که از چند روز قبل از فرا رسیدن زمان نوبت امکان کنسل کردن باشد!!
-                    </p>
-                </div>
+                    <div class="alert alert-danger" role="alert">
+                        <p class="text-danger"> مشخص کنید که از چند روز قبل از فرا رسیدن زمان نوبت امکان کنسل کردن باشد!!
+                        </p>
+                    </div>
                 @enderror
                 {{-- section --}}
                 <div class="row">
@@ -270,8 +262,8 @@
                     <div class="col-md-9">
                         <div class="input-group mb-3">
                             <input type="number"
-                                   class="form-control  @error('form.cancel.day') is-invalid @enderror" id="basic-url"
-                                   aria-describedby="basic-addon3" wire:model='form.cancel.day'>
+                                class="form-control  @error('form.cancel.day') is-invalid @enderror" id="basic-url"
+                                aria-describedby="basic-addon3" wire:model='form.cancel.day'>
                             <div class="input-group-prepend">
                                 <span class="input-group-text" id="basic-addon3">روز آینده</span>
                             </div>
@@ -288,32 +280,16 @@
             </div>
         </div>
     </div>
-    {{-- subsection time  --}}
-    <div class="card">
-        <div class="card-header border-bottom d-flex justify-content-between">
-            <h3>زمان بندی و هزینه بخش ها</h3>
-            <div class="main-toggle-group d-sm-flex align-items-center ms-0">
-                <div class="toggle toggle-lg toggle-primary my-1 off" wire:ignore.self data-bs-toggle="collapse"
-                     href="#sectionTimeTimeCollaps" role="button" aria-expanded="false"
-                     aria-controls="sectionTimeTimeCollaps">
-                    <span></span>
-                </div>
-            </div>
-        </div>
-        <div class="card-body collapse" id="sectionTimeTimeCollaps" wire:ignore.self>
-            {{-- section --}}
-            <div class="row">
-                {{-- TODO:: --}}
-            </div>
-        </div>
+    {{-- segments  --}}
+    <div class="card @error('form.segments.value') border border-danger @enderror">
+            @include('appointmentsetting::components.generalsetting.segments')
     </div>
     {{-- end Date time  --}}
     <div class="card  @error('form.endAppointment.date') border border-danger @enderror">
         <div class="card-header border-bottom d-flex justify-content-between">
             <h3> تعیین پایان تاریخ نوبت دهی </h3>
             <div class="main-toggle-group d-sm-flex align-items-center ms-0">
-                <div
-                    class="toggle toggle-lg toggle-primary my-1 customCheckbox @if (isset($form['endAppointment']['date'])) on @else off @endif"
+                <div class="toggle toggle-lg toggle-primary my-1 customCheckbox @if (isset($form['endAppointment']['date'])) on @else off @endif"
                     data-id="endAppointment.status" wire:ignore.self data-bs-toggle="collapse"
                     href="#EndDateTimeCollaps" role="button" aria-expanded="false"
                     aria-controls="EndDateTimeCollaps">
@@ -321,15 +297,14 @@
                 </div>
             </div>
         </div>
-        <div class="card-body collapse @if (isset($form['endAppointment']['date'])) show @endif "
-             id="EndDateTimeCollaps"
-             wire:ignore.self>
+        <div class="card-body collapse @if (isset($form['endAppointment']['date'])) show @endif " id="EndDateTimeCollaps"
+            wire:ignore.self>
             {{-- section --}}
             @error('form.endAppointment.date')
-            <div class="alert alert-danger" role="alert">
-                <p class="text-danger"> لطفا تاریخ را انتخاب کنید!!
-                </p>
-            </div>
+                <div class="alert alert-danger" role="alert">
+                    <p class="text-danger"> لطفا تاریخ را انتخاب کنید!!
+                    </p>
+                </div>
             @enderror
             <div class="row">
                 <div class="col-md-3 pt-2">
@@ -338,14 +313,15 @@
                 <div class="col-md-9">
                     <div class="input-group mb-3">
                         <input type="text" wire:model='form.endAppointment.date'
-                               class="form-control @error('form.endAppointment.date') is-invalid @enderror"
-                               id="endDatePicker">
+                            class="form-control @error('form.endAppointment.date') is-invalid @enderror"
+                            id="endDatePicker">
                     </div>
                 </div>
                 <div class="d-flex  mt-2">
                     <p class="text-muted"><strong class="me-1"> نکته!! </strong>
-                        تاریخ انتخابی شما اخرین روزی است که نوبت دهی فعال است و نوبت دهی از روز انخابی شما به بعد غیر فعال میشود.
-                          </p>
+                        تاریخ انتخابی شما اخرین روزی است که نوبت دهی فعال است و نوبت دهی از روز انخابی شما به بعد غیر
+                        فعال میشود.
+                    </p>
                 </div>
             </div>
         </div>
@@ -357,21 +333,19 @@
             <div class="main-toggle-group d-sm-flex align-items-center ms-0">
                 <div class="toggle toggle-lg toggle-primary my-1  customCheckbox
                 @if (isset($this->form['onlinePayment']['online']['status']) || isset($this->form['onlinePayment']['voip']['status'])) on  @else off @endif"
-                     data-id="onlinePayment.status" wire:ignore.self data-bs-toggle="collapse" href="#paymentCollaps"
-                     role="button" aria-expanded="false" aria-controls="paymentCollaps">
+                    data-id="onlinePayment.status" wire:ignore.self data-bs-toggle="collapse" href="#paymentCollaps"
+                    role="button" aria-expanded="false" aria-controls="paymentCollaps">
                     <span></span>
                 </div>
             </div>
         </div>
-        <div
-            class="card-body collapse @if (isset($this->form['onlinePayment']['online']['status']) || isset($this->form['onlinePayment']['voip']['status'])) show @endif"
-            id="paymentCollaps"
+        <div class="card-body collapse @if (isset($this->form['onlinePayment']['online']['status']) || isset($this->form['onlinePayment']['voip']['status'])) show @endif" id="paymentCollaps"
             wire:ignore.self>
             @error('form.onlinePayment.*')
-            <div class="alert alert-danger" role="alert">
-                <p class="text-danger"> لطفا مقدار را وارد کنید!!
-                </p>
-            </div>
+                <div class="alert alert-danger" role="alert">
+                    <p class="text-danger"> لطفا مقدار را وارد کنید!!
+                    </p>
+                </div>
             @enderror
             <div class="row">
                 <div class="col-md-6">
@@ -381,7 +355,7 @@
                             @if (isset($this->form['onlinePayment']['online']['status']) && $this->form['onlinePayment']['online']['status'] == true) on
                                 @else
                                 off @endif"
-                                 data-id="onlinePayment.online.status" id="sitePaymentStatus" wire:ignore.self>
+                                data-id="onlinePayment.online.status" id="sitePaymentStatus" wire:ignore.self>
                                 <span></span>
                             </div>
                         </div>
@@ -397,7 +371,7 @@
                                 @else
                                 off @endif
                             "
-                                 data-id="onlinePayment.voip.status" wire:ignore.self id="paymentOnInVoip">
+                                data-id="onlinePayment.voip.status" wire:ignore.self id="paymentOnInVoip">
                                 <span></span>
                             </div>
                         </div>
@@ -415,9 +389,9 @@
                         <div class="col-md-7">
                             <div class="form-group">
                                 <select name="country"
-                                        class="form-control form-select  @error('form.onlinePayment.notPayingStatus') is-invalid @enderror"
-                                        id="default-dropdown" wire:model='form.onlinePayment.notPayingStatus'
-                                        data-bs-placeholder="انتخاب کنید...">
+                                    class="form-control form-select  @error('form.onlinePayment.notPayingStatus') is-invalid @enderror"
+                                    id="default-dropdown" wire:model='form.onlinePayment.notPayingStatus'
+                                    data-bs-placeholder="انتخاب کنید...">
                                     <option label="انتخاب کنید..."></option>
                                     <option value="submit">نوبت ثبت شود</option>
                                     <option value="dontSubmit">نوبت ثبت نشود</option>
@@ -434,8 +408,8 @@
                         <div class="col-md-7">
                             <div class="form-group">
                                 <input type="text"
-                                       class="form-control  @error('form.onlinePayment.Price') is-invalid @enderror"
-                                       id="inputName" wire:model='form.onlinePayment.Price' placeholder="مبلغ به تومان">
+                                    class="form-control  @error('form.onlinePayment.Price') is-invalid @enderror"
+                                    id="inputName" wire:model='form.onlinePayment.Price' placeholder="مبلغ به تومان">
                             </div>
                         </div>
                     </div>
@@ -448,8 +422,7 @@
         <div class="card-header border-bottom d-flex justify-content-between">
             <h3> عدم کنترل تداخل نوبت ها </h3>
             <div class="main-toggle-group d-sm-flex align-items-center ms-0">
-                <div
-                    class="toggle toggle-lg toggle-primary my-1 customCheckbox @if (isset($form['interface']['status']) && $form['interface']['status'] == 'true') on @else off @endif"
+                <div class="toggle toggle-lg toggle-primary my-1 customCheckbox @if (isset($form['interface']['status']) && $form['interface']['status'] == 'true') on @else off @endif"
                     data-id="interference.status" wire:ignore.self data-bs-toggle="collapse"
                     href="#checkForOtherAppointment" role="button" aria-expanded="false"
                     aria-controls="checkForOtherAppointment">
@@ -478,7 +451,7 @@
                 <div class="selectgroup selectgroup-pills d-flex align-items-center">
                     <label class="colorinput">
                         <input name="color" type="checkbox" value="azure" class="colorinput-input"
-                               wire:model='form.avtive' checked/>
+                            wire:model='form.avtive' checked />
                         <span class="colorinput-color bg-azure"> </span>
                     </label>
                     <p class="card-sub-title mt-1 ms-2">فعال</p>
@@ -488,15 +461,15 @@
     </div>
 
     @error('*')
-    <div class="alert alert-danger" role="alert">
-        <p class="text-danger"><strong>خطا!!</strong> لطفا خطا های بالا را برطرف کنید!</p>
-    </div>
+        <div class="alert alert-danger" role="alert">
+            <p class="text-danger"><strong>خطا!!</strong> لطفا خطا های بالا را برطرف کنید!</p>
+        </div>
     @enderror
 
     <div class="text-end mb-5 me-3">
         <button type="submit" form="setting" wire:click='saveSetting'
-                wire:loading.class='btn-loading disabled btn-gray'
-                class="btn btn-success mt-5"><strong>ذخیره</strong></button>
+            wire:loading.class='btn-loading disabled btn-gray'
+            class="btn btn-success mt-5"><strong>ذخیره</strong></button>
 
     </div>
 
@@ -523,12 +496,11 @@
 @endpush
 @push('scripts')
     <script>
-        $(document).ready(function () {
+        $(document).ready(function() {
             //pass the custom checkboxes values
-            $('.customCheckbox').on('click', function () {
+            $('.customCheckbox').on('click', function() {
                 var id = $(this).data('id');
-            @this.set('form.' + id, $(this).hasClass('on'))
-                ;
+                @this.set('form.' + id, $(this).hasClass('on'));
             });
 
             function addPersianDateClassForSpecialDate() {
@@ -536,21 +508,19 @@
                     initialValue: false,
                     format: 'L',
                     autoClose: true,
-                    onSelect: function (unix) {
+                    onSelect: function(unix) {
                         var specialDateValue = {};
-                        $('.specialDate').each(function (key, element) {
+                        $('.specialDate').each(function(key, element) {
                             var dataId = $(element).data('id');
                             var value = $(element).val();
                             specialDateValue[dataId] = value;
                         });
-                    @this.set('form.specialDaydateValues', specialDateValue)
-                        ;
+                        @this.set('form.specialDaydateValues', specialDateValue);
                     }
                 });
             }
-
             addPersianDateClassForSpecialDate();
-            Livewire.on('loadPersianDatePicker', function () {
+            Livewire.on('loadPersianDatePicker', function() {
                 setTimeout(() => {
                     addPersianDateClassForSpecialDate();
                 }, 1000);
@@ -576,7 +546,7 @@
                 $('#paymentPriceInput').addClass('d-none');
             }
 
-            $('#sitePaymentStatus').click(function (e) {
+            $('#sitePaymentStatus').click(function(e) {
                 if ($('#sitePaymentStatus').hasClass('on')) {
                     appearPeymentStatusDiv();
                     appearPeymentPriceDiv();
@@ -589,7 +559,9 @@
                     }
                 }
             });
-            $('#paymentOnInVoip').click(function (e) {
+
+
+            $('#paymentOnInVoip').click(function(e) {
                 if ($('#paymentOnInVoip').hasClass('on')) {
                     if ($('#paymentPriceInput').hasClass('d-none')) {
                         appearPeymentPriceDiv();
@@ -604,19 +576,17 @@
                 initialValue: false,
                 format: 'L',
                 autoClose: true,
-                onSelect: function (unix) {
-                @this.set('form.endAppointment.date', $('#endDatePicker').val())
-                    ;
+                onSelect: function(unix) {
+                    @this.set('form.endAppointment.date', $('#endDatePicker').val());
                 }
             });
             @if (isset($form['onlinePayment']['voip']['status']))
-            appearPeymentPriceDiv();
+                appearPeymentPriceDiv();
             @endif
 
             @if (isset($form['onlinePayment']['online']['status']) && $form['onlinePayment']['online']['status'] == 'true')
-            appearPeymentStatusDiv();
+                appearPeymentStatusDiv();
             @endif
-
         });
     </script>
 @endpush

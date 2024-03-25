@@ -92,9 +92,6 @@
                             <div class="row">
                                 <p class="text-muted my-1">لطفا پزشکان مرتبط با این مطب را انتخاب کنید</p>
                                 @foreach ($fetchData['doctors'] as $key => $doctorList)
-                                    @if ($doctorList->id == 2)
-                                        @continue
-                                    @endif
                                     <div class="col-md-4">
                                         <div class="form-group mt-2">
                                             <div class="checkbox">

@@ -190,8 +190,11 @@ class User extends Authenticatable
     {
         return $this->hasMany(AppointmentUser::class);
     }
-    public static function doctors()
+    public static function doctors($onlyActiveAppointment = false)
     {
+        if ($onlyActiveAppointment){
+            return Role::find(3)->users()->whereHas('appointmentSettings')->get();
+        }
         return Role::find(3)->users;
     }
 

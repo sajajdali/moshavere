@@ -42,3 +42,8 @@ function generateUniqueCode($length = 4 ,$onlyNumber = false)
 
     return $code;
 }
+
+function dateFormat($date)
+{
+    return verta($date)->format('d F Y');
+}

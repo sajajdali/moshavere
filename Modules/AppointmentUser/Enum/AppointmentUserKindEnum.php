@@ -2,9 +2,10 @@
 
 namespace Modules\AppointmentUser\Enum;
 use App\interface\EnumHasAdminBadgeInterface;
+use App\interface\EnumHasApiResultInterface;
 use App\interface\EnumHasNameInterface;
 
-enum AppointmentUserKindEnum: int implements EnumHasNameInterface , EnumHasAdminBadgeInterface
+enum AppointmentUserKindEnum: int implements EnumHasNameInterface , EnumHasAdminBadgeInterface , EnumHasApiResultInterface
 {
     case IN_PERSION = 1;
     case ONLINE = 2;
@@ -27,6 +28,7 @@ enum AppointmentUserKindEnum: int implements EnumHasNameInterface , EnumHasAdmin
         };
     }
 
+
     public function getAdminBadgeClass(): string
     {
         // TODO: Implement getAdminBadgeClass() method.
@@ -39,5 +41,13 @@ enum AppointmentUserKindEnum: int implements EnumHasNameInterface , EnumHasAdmin
             self::ONLINE => '<span class="badge bg-danger rounded-pill">آنلاین</span>',
             self::VOIP => '<span class="badge bg-info rounded-pill">تلفنی</span>',
         };
+    }
+
+    public function apiResult(): array
+    {
+        return [
+            'name' => $this->value,
+            'body' => $this->getName()
+        ];
     }
 }

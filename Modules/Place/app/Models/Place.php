@@ -49,4 +49,11 @@ class Place extends Model
         return json_encode($value, JSON_UNESCAPED_UNICODE);
     }
 
+    public function apiResult()
+    {
+        return [
+            'id' => $this->id,
+            'title' => $this->title
+        ];
+    }
 }

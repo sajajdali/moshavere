@@ -69,7 +69,7 @@ use Modules\Absence\app\Models\Absence;
  */
 class User extends Authenticatable
 {
-    use HasRoles, Notifiable, HasFactory, HasApiTokens, UserAttributeTrait, MetaAttributeTrait, UserRelationTrait;
+    use HasRoles, Notifiable, HasFactory, HasApiTokens, UserAttributeTrait, UserRelationTrait;
 
     protected $guarded = ['id'];
 
@@ -112,17 +112,6 @@ class User extends Authenticatable
     public function routeNotificationForFcm(): array|string
     {
         return $this->userDevices()->pluck('fcm_token')->toArray();
-    }
-
-    public function lastName(): Attribute
-    {
-        return Attribute::make(
-            get: fn () => $this->getMeta(UserMetaEnum::LAST_NAME)?->meta_value,
-            set: fn (string $value) => $this->metas()->updateOrCreate(
-                ['meta_key' => UserMetaEnum::LAST_NAME],
-                ['meta_value' => $value]
-            )
-        );
     }
 
 
@@ -200,5 +189,8 @@ class User extends Authenticatable
     public function appointments(): HasMany
     {
         return $this->hasMany(AppointmentUser::class );
+    }
+    public static function doctors() {
+        return Role::find(3)->users ; 
     }
 }

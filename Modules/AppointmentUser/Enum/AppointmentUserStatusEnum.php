@@ -1,32 +1,45 @@
 <?php
+
 namespace Modules\AppointmentUser\Enum;
 
 use App\interface\EnumHasApiResultInterface;
 use PhpParser\Node\Expr\Array_;
 
-enum AppointmentUserStatusEnum : int implements EnumHasApiResultInterface {
+enum AppointmentUserStatusEnum: int implements EnumHasApiResultInterface
+{
     case STATUS_PENDING = 0;
     case STATUS_SUCCESSFUL = 1;
     case STATUS_WAIT_PAYMENT = 2;
     case STATUS_CANCEL = 3;
+    case STATUS_ATTENDED = 4;
+    case STATUS_NOT_ATTENDED = 5;
 
     public function getName(): string
     {
-        return match($this) {
-            self::STATUS_PENDING => 'در انتظار',
-            self::STATUS_SUCCESSFUL => 'تایید شده',
+        return match ($this) {
+            self::STATUS_PENDING      => 'در انتظار',
+            self::STATUS_SUCCESSFUL   => 'تایید شده',
             self::STATUS_WAIT_PAYMENT => 'منتظر پرداخت',
-            self::STATUS_CANCEL => 'کنسل شده',
+            self::STATUS_CANCEL       => 'کنسل شده',
+            self::STATUS_ATTENDED     => 'حضور پیدا کرده',
+            self::STATUS_NOT_ATTENDED => 'عدم حضور',
+        };
+    }
+    public function getColor(): string
+    {
+        return match ($this) {
+            self::STATUS_PENDING => 'table-warning',
+            self::STATUS_SUCCESSFUL => 'table-success',
+            self::STATUS_WAIT_PAYMENT => 'table-info',
+            self::STATUS_CANCEL => 'table-danger',
         };
     }
 
-    public function apiResult() : array
+    public function apiResult(): array
     {
         return [
             'name' => $this->value,
             'body' => $this->getName()
         ];
     }
-
-
 }

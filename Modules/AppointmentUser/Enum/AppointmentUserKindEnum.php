@@ -27,6 +27,13 @@ enum AppointmentUserKindEnum: int implements EnumHasNameInterface , EnumHasAdmin
             self::VOIP => '<span class="badge bg-info rounded-pill">تلفنی</span>',
         };
     }
+    public function getIcon() {
+        return match($this) {
+            self::IN_PERSION => '<i class="fa fa-male fa-2x" aria-hidden="true"></i>',
+            self::ONLINE => '<i class="fa fa-laptop fa-2x" aria-hidden="true"></i>',
+            self::VOIP => '<i class="fa fa-phone fa-2x" aria-hidden="true"></i>',
+        };
+    }
 
 
     public function getAdminBadgeClass(): string

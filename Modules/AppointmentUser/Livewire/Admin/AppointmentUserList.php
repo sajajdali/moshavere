@@ -3,11 +3,181 @@
 namespace Modules\AppointmentUser\Livewire\Admin;
 
 use Livewire\Component;
+use Livewire\WithPagination;
+use Modules\User\Entities\User;
+use Livewire\Attributes\Computed;
+use Spatie\Permission\Models\Role;
+use Modules\User\Enum\UserMetaEnum;
+use Hekmatinasser\Verta\Facades\Verta;
+use Modules\Service\app\Models\Service;
+use Modules\AppointmentUser\app\Models\AppointmentUser;
+use Modules\AppointmentUser\Enum\AppointmentUserStatusEnum;
 
 class AppointmentUserList extends Component
 {
+    use WithPagination;
+    public array $search = [
+        'user_id'              => null,
+        'user_first_name'      => null,
+        'user_last_name'       => null,
+        'user_mobile'          => null,
+        'appointment_date'     => null,
+        'appointment_set_date' => null,
+        'AppointmentStatus'    => null,
+        'docNumber'            => null,
+        'setterAppointment'    => null,
+        'section_status'       => null,
+        'Doc_id'               => null,
+    ];
+    public array $fetchData = [];
+
+    public function startSearch()
+    {
+        $this->render();
+    }
+    public function resetProperties()
+    {
+        $this->search = [
+            'user_id'              => null,
+            'user_first_name'      => null,
+            'user_last_name'       => null,
+            'user_mobile'          => null,
+            'appointment_date'     => null,
+            'appointment_set_date' => null,
+            'AppointmentStatus'    => null,
+            'docNumber'            => null,
+            'setterAppointment'    => null,
+            'section_status'       => null,
+            'Doc_id'               => null,
+        ];
+        $this->resetPage();
+    }
+    #[Computed]
+    private function handleSearch()
+    {
+        $query = AppointmentUser::query();
+        $searchCriteria = [
+            'user_id_search' => [
+                'condition' => $this->search['user_id'],
+                'callback' => function ($query) {
+                    return $query->where('user_id', $this->search['user_id']);
+                },
+            ],
+            'user_first_name' => [
+                'condition' => $this->search['user_first_name'],
+                'callback' => function ($query) {
+                    return $query->whereHas('user', function ($q) {
+                        $q->whereHas('metas', function ($qq) {
+                            $qq->where([
+                                ['meta_key', UserMetaEnum::FIRST_NAME],
+                                ['meta_value', 'LIKE', "%{$this->search['user_first_name']}%"],
+                            ]);
+                        });
+                    });
+                },
+            ],
+            'user_last_name' => [
+                'condition' => $this->search['user_last_name'],
+                'callback' => function ($query) {
+                    return $query->whereHas('user', function ($q) {
+                        $q->whereHas('metas', function ($qq) {
+                            $qq->where([
+                                ['meta_key', UserMetaEnum::LAST_NAME],
+                                ['meta_value', 'LIKE', "%{$this->search['user_last_name']}%"],
+                            ]);
+                        });
+                    });
+                },
+            ],
+            'mobile' => [
+                'condition' => $this->search['user_mobile'],
+                'callback' => function ($query) {
+                    return $query->whereHas('user', function ($q) {
+                        $q->whereHas('metas', function ($qq) {
+                            $qq->where([
+                                ['meta_key', UserMetaEnum::MOBILE],
+                                ['meta_value', 'LIKE', "%{$this->search['user_mobile']}%"],
+                            ]);
+                        });
+                    });
+                },
+            ],
+            'appointment_date' => [
+                'condition' => $this->search['appointment_date'],
+                'callback' => function ($query) {
+                    return $query->where('date_visit', Verta::parse($this->search['user_id'])->toCarbon());
+                },
+            ],
+            'appointment_set_date' => [
+                'condition' => $this->search['appointment_set_date'],
+                'callback' => function ($query) {
+                    return $query->where('created_at', Verta::parse($this->search['appointment_set_date'])->toCarbon());
+                },
+            ],
+            'AppointmentStatus' => [
+                'condition' => $this->search['AppointmentStatus'],
+                'callback' => function ($query) {
+                    return $query->where('status', AppointmentUserStatusEnum::tryFrom($this->search['AppointmentStatus']));
+                },
+            ],
+            'docNumber' => [
+                'condition' => $this->search['docNumber'],
+                'callback' => function ($query) {
+                    return $query->whereHas('user', function ($q) {
+                        $q->whereHas('metas', function ($qq) {
+                            $qq->where([
+                                ['meta_key', UserMetaEnum::DOCUMENT_NUMBER],
+                                ['meta_value', 'LIKE', "%{$this->search['docNumber']}%"],
+                            ]);
+                        });
+                    });
+                },
+            ],
+            'setterAppointment' => [
+                'condition' => $this->search['setterAppointment'],
+                'callback' => function ($query) {
+                    return $query->whereJsonContains('details->appointment_via', $this->search['setterAppointment']);
+                },
+            ],
+            'section_status' => [
+                'condition' => $this->search['section_status'],
+                'callback' => function ($query) {
+                    return $query->where('service_id', $this->search['section_status']);
+                },
+            ],
+            'Doc_id' => [
+                'condition' => $this->search['Doc_id'],
+                'callback' => function ($query) {
+                    return $query->where('doctor_id', $this->search['Doc_id']);
+                },
+            ],
+        ];
+
+        foreach ($searchCriteria as $property => $config) {
+            $condition = $config['condition'];
+            $callback = $config['callback'];
+            if (!empty($condition)) {
+                $query->when($condition, $callback);
+            }
+        }
+        $appointments =  $query->paginate(10) ;
+        return $appointments;
+    }
+    public function mount()
+    {
+        // TODO::pass roles that can set appointmet in appointmentSetter property ;
+        $this->fetchData['appointmentSetter'] = Role::find(1)->users;
+        $this->fetchData['Services'] = Service::all();
+        $this->fetchData['doctors'] = User::doctors();
+    }
+
     public function render()
     {
-        return view('appointmentuser::livewire.admin.appointment-user-list');
+        // handle search pannel with defining new search Critera ;
+        $query = $this->handleSearch();
+        return view(
+            'appointmentuser::livewire.admin.appointment-user-list'
+
+        );
     }
 }

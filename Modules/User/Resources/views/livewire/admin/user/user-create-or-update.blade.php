@@ -95,10 +95,9 @@
 
                         <div class="form-row">
                             <div class="col-12">
-                                <label for="password_confirmation">نقش‌</label>
                                 @can('user')
                                     <br>
-                                    نقش‌های کاربری
+                                    <h5 class="mb-3">نقش‌های کاربری</h5>
                                     @foreach ($userRoles as $role)
                                         <div class="col-lg-12">
                                             <label class="ckbox" for="user_role_{{ $role->id }}">
@@ -113,16 +112,18 @@
                                         </div>
                                     @endforeach
                                     <br>
-                                    نقش‌های مدیریتی
-                                    @foreach ($adminRoles as $role)
-                                        <div class="col-lg-12">
-                                            <label class="ckbox" for="user_role_{{ $role->id }}">
-                                                <input value="{{ $role->id }}" type="checkbox"
-                                                    id="user_role_{{ $role->id }}"
-                                                    wire:model="selectedRoles"><span>{{ $role->name }}</span>
-                                            </label>
-                                        </div>
-                                    @endforeach
+                                    <h5 class="mb-3">نقش‌های مدیریتی</h5>
+                                    <div class="row">
+                                        @foreach ($adminRoles as $role)
+                                            <div class="col-md-3">
+                                                <label class="ckbox" for="user_role_{{ $role->id }}">
+                                                    <input value="{{ $role->id }}" type="checkbox"
+                                                        id="user_role_{{ $role->id }}"
+                                                        wire:model="selectedRoles"><span>{{ $role->name }}</span>
+                                                </label>
+                                            </div>
+                                        @endforeach
+                                    </div>
                                 @else
                                     <div class="alert alert-warning">
                                         شما فقط در نقش پیشفرض کاربری می‌توانید این کاربر را ایجاد کنید.

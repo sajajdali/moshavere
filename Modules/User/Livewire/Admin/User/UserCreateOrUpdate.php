@@ -45,7 +45,6 @@ class UserCreateOrUpdate extends Component
     {
         $this->userRoles = Permission::whereName('USER_ACCESS')->first()->roles;
         $this->adminRoles = Permission::whereName('ADMIN_ACCESS')->first()->roles;
-
         $supportUserRule = Role::firstWhere('id', setting(SettingKeyEnum::SUPPORT_USER_ROLE));
         if ($supportUserRule) {
             $supporterUser = $supportUserRule->users;

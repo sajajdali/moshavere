@@ -188,9 +188,11 @@ class User extends Authenticatable
 
     public function appointments(): HasMany
     {
-        return $this->hasMany(AppointmentUser::class );
+        return $this->hasMany(AppointmentUser::class);
     }
-    public static function doctors() {
-        return Role::find(3)->users ; 
+    public static function doctors()
+    {
+        return Role::find(3)->users;
     }
+
 }

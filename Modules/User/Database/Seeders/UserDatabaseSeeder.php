@@ -37,13 +37,20 @@ class UserDatabaseSeeder extends Seeder
         /** @var Role $role */
         $role = Role::create(['name' => 'مدیر']);
         /** @var Role $userDefaultRole */
-        $userDefaultRole = Role::create(['name' => 'کاربران']);
+        $userDefaultRole = Role::create(['name' => 'کاربر']);
         /** @var Role $doctores */
         $doctores_roles = Role::create(['name' => 'پزشک']);
+        /** @var Role $secretury */
+        $secretury_roles = Role::create(['name' => 'منشی']);
+        /** @var Role $operator */
+        $operator_roles = Role::create(['name' => 'اپراتور']);
+
         //create ADMIN and SUPER_ADMIN Permissions
-        $admin = Permission::create(['name' => 'ADMIN_ACCESS']);
-        $superAdmin = Permission::create(['name' => 'SUPER_ADMIN']);
-        $doctor_permission = Permission::create(['name' => 'DOCTOR']);
+        $admin                = Permission::create(['name' => 'ADMIN_ACCESS']);
+        $superAdmin           = Permission::create(['name' => 'SUPER_ADMIN']);
+        $doctor_permission    = Permission::create(['name' => 'DOCTOR']);
+        $secretury_permission = Permission::create(['name' => 'SECRETERY']);
+        $operator_permission  = Permission::create(['name' => 'OPERATOR']);
 
         //create User essential permissions
         $userPermission = Permission::create(['name' => 'USER_ACCESS']);
@@ -53,6 +60,10 @@ class UserDatabaseSeeder extends Seeder
         $role->givePermissionTo($superAdmin);
         $doctores_roles->givePermissionTo($admin);
         $doctores_roles->givePermissionTo($doctor_permission);
+        $secretury_roles->givePermissionTo($admin);
+        $secretury_roles->givePermissionTo($secretury_permission);
+        $operator_roles->givePermissionTo($admin);
+        $operator_roles->givePermissionTo($operator_permission);
         //assign User essential permissions to کاربران Role
         $userDefaultRole->givePermissionTo($userPermission);
         $userDefaultRole->givePermissionTo($userDefaultPermission);

@@ -81,7 +81,7 @@
                         <div class="table-responsive mb-3">
                             <table class="table text-nowrap text-md-nowrap table-bordered" wire:loading.class="op-0-3">
                                 <thead>
-                                    <tr>
+                                    <tr class="text-center">
                                         <th scope="col">#</th>
                                         <th scope="col">نام کاربر</th>
                                         <th scope="col">موبایل</th>
@@ -92,10 +92,10 @@
                                 <tbody>
                                     @if ($users->isNotEmpty())
                                         @foreach ($users as $user)
-                                            <tr wire:key="user_{{ $user->id }}">
+                                            <tr class="text-center" wire:key="user_{{ $user->id }}">
                                                 <td>{{ $user->id }}</td>
                                                 <td>
-                                                    <div class="media mt-4 profile-footer align-items-center">
+                                                    <div class="media mt-4 profile-footer align-items-center text-start">
                                                         <div class="media-user me-2">
                                                             <div class="main-img-user">
                                                                 <img alt="{{ $user->full_name }}"
@@ -106,11 +106,11 @@
                                                         </div>
                                                         <div class="media-body">
                                                             @can('documentte', $user)
-                                                                    <a href="{{ route('admin.user.document', $user) }}">
-                                                                        <h6 class="mb-0">
-                                                                            {{ $user->full_name }}
-                                                                        </h6>
-                                                                    </a>
+                                                                <a href="{{ route('admin.user.document', $user) }}">
+                                                                    <h6 class="mb-0">
+                                                                        {{ $user->full_name }}
+                                                                    </h6>
+                                                                </a>
                                                             @else
                                                                 <h6 class="mb-0 text-dark-light">
                                                                     {{ $user->full_name }}
@@ -138,6 +138,12 @@
                                                                     <li>
                                                                         <a href="{{ route('admin.user.edit', $user) }}">ویرایش</a>
                                                                     </li>
+                                                                    @if ($user->hasrole('پزشک'))
+                                                                        <li>
+                                                                            <a href="{{ route('admin.user.edit', $user) }}">ویرایش
+                                                                                اطلاعات پزشک</a>
+                                                                        </li>
+                                                                    @endif
                                                                 @endcan
                                                                 @can('documentte', $user)
                                                                     <li>

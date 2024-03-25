@@ -17,7 +17,7 @@ class CreateOrUpdate extends Component
     public int $counter = 1;
     public array $form = [
         'active'    => true,
-        'doctors' => [] ,
+        'doctors' => [],
         'loc' => [
             'lat' => '35.7219',
             'lng' => '51.3347',
@@ -101,7 +101,6 @@ class CreateOrUpdate extends Component
     public function mount()
     {
         $this->fetchData['doctors'] = Role::find(3)->users;
-
         $place = request()->route('place');
         if ($place instanceof Place) {
             $this->authorize('update', $place);
@@ -114,7 +113,7 @@ class CreateOrUpdate extends Component
             $this->form['active'] = $place['active'] == ActiveEnum::ACTIVE;
             $doctores = $this->place->user->pluck('id')->toArray();
             foreach ($doctores as $value) {
-                $this->form['doctors'][$value] = true ;
+                $this->form['doctors'][$value] = true;
             }
             $this->form['loc']['lat'] = $place->detail['location']['location_lat'];
             $this->form['loc']['lng'] =  $place->detail['location']['location_lng'];

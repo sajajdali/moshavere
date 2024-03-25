@@ -6,7 +6,6 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Modules\AppointmentSetting\app\Models\AppointmentSetting;
-use Modules\AppointmentUser\Database\factories\AppointmentUserFactory;
 use Modules\AppointmentUser\Enum\AppointmentUserKindEnum;
 use Modules\AppointmentUser\Enum\AppointmentUserStatusEnum;
 use Modules\AppointmentUser\Enum\AppointmentUserTypeEnum;
@@ -17,7 +16,7 @@ use Modules\User\Entities\User;
 class AppointmentUser extends Model
 {
     use HasFactory , SoftDeletes;
-
+    CONST DETAIL_APPOINTMENT_VIA = 'appointment_via';
     /**
      * The attributes that are mass assignable.
      */

@@ -85,12 +85,7 @@ class GeneralSetting extends Component
                 if (isset($this->form['visitType'][$dayType])) {
                     unset($this->form['visitType'][$dayType]);
                 }
-                if (isset($this->appointment_setting) && $this->isEdited) {
-                    $dayTimeValue = $this->appointment_setting->times()->where('day_number', AppintmentSettingDayNumber::getConstant($dayType))->first();
-                    if (!empty($dayTimeValue)) {
-                        return $dayTimeValue->delete();
-                    }
-                }
+                $this->counter[$dayType] = 1 ;
             }
         }
     }
@@ -112,14 +107,20 @@ class GeneralSetting extends Component
     public function addspecialDayTimeCounter($counter, $itrator)
     {
         $this->form[$counter][$itrator] =   $this->form[$counter][$itrator]  + 1;
+        if ($counter == 'specialTimeCounter') {
+            $lastArr = array_key_last($this->form['specialDaytimeValues'][$itrator]);
+            $lastArr == 1 ? $lastArr = $lastArr + 1 : '';
+            $this->form['specialDaytimeValues'][$itrator][$lastArr + 1]['start'] = '00:00';
+            $this->form['specialDaytimeValues'][$itrator][$lastArr + 1]['end']   = '00:00';
+        }
         $this->render();
     }
     public function removespecialDayTimeCounter($counter, $itrator)
     {
         $this->form[$counter][$itrator] =   $this->form[$counter][$itrator]  - 1;
         if ($counter == 'specialTimeCounter') {
-            $lastArr = count($this->form['specialDaytimeValues'][$itrator]);
-            unset($this->form['specialDaytimeValues'][$itrator][$lastArr - 1 ]);
+            $lastArr = array_key_last($this->form['specialDaytimeValues'][$itrator]);
+            unset($this->form['specialDaytimeValues'][$itrator][$lastArr + 1]);
         }
         $this->render();
     }
@@ -316,6 +317,7 @@ class GeneralSetting extends Component
         $appointment_setting_times =  $this->storeTimes();
         //store days and times
         if ($this->isEdited) {
+            $this->appointment_setting->times()->delete();
             //is user editing the times
             if (isset($this->fetchData['service_id'])) {
                 if ($this->isSpecialTimeEdited) {
@@ -325,7 +327,6 @@ class GeneralSetting extends Component
                     }
                 } else {
                     foreach ($appointment_setting_times as $objectForStore) {
-
                         $this->appointment_setting->times()->create($objectForStore);
                     }
                 }
@@ -436,6 +437,7 @@ class GeneralSetting extends Component
     {
         foreach ($apSet->times()->whereNull('special_date')->get()->groupBy('day_number') as $dayNumber => $eachDayColleciton) {
             $this->form['visitType'][AppintmentSettingDayNumber::tryFrom($dayNumber)->getEnName()] = true;
+            $this->counter[AppintmentSettingDayNumber::tryFrom($dayNumber)->getEnName()] = count($eachDayColleciton);
             foreach ($eachDayColleciton as $iterator => $value) {
                 $this->form['timeFrame'][AppintmentSettingDayNumber::tryFrom($dayNumber)->getEnName()][$iterator]['start'] = $value->start_at;
                 $this->form['timeFrame'][AppintmentSettingDayNumber::tryFrom($dayNumber)->getEnName()][$iterator]['end'] = $value->end_at;

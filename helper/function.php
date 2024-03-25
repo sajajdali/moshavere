@@ -24,3 +24,21 @@ function getCurrentSeason()
             return 'Unknown';
     }
 }
+
+function generateUniqueCode($length = 4 ,$onlyNumber = false)
+{
+    if ($onlyNumber){
+        $characters = '0123456789';
+    } else {
+        $characters = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+    }
+
+    $code = '';
+
+    // Generate a random code
+    for ($i = 0; $i < $length; $i++) {
+        $code .= $characters[rand(0, strlen($characters) - 1)];
+    }
+
+    return $code;
+}

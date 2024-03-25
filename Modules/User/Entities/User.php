@@ -4,6 +4,7 @@ namespace Modules\User\Entities;
 
 use Laravel\Sanctum\HasApiTokens;
 use Modules\AppointmentSetting\app\Models\AppointmentSetting;
+use Modules\AppointmentUser\app\Models\AppointmentUser;
 use Spatie\Permission\Models\Role;
 use Modules\User\Enum\UserMetaEnum;
 use Spatie\Permission\Traits\HasRoles;
@@ -194,5 +195,10 @@ class User extends Authenticatable
     public function absence()
     {
         return $this->hasMany(Absence::class);
+    }
+
+    public function appointments(): HasMany
+    {
+        return $this->hasMany(AppointmentUser::class );
     }
 }

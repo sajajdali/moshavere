@@ -1,9 +1,10 @@
 <?php
 
 namespace Modules\AppointmentUser\Enum;
+use App\interface\EnumHasApiResultInterface;
 use App\interface\EnumHasNameInterface;
 
-enum AppointmentUserTypeEnum: int implements EnumHasNameInterface
+enum AppointmentUserTypeEnum: int implements EnumHasNameInterface , EnumHasApiResultInterface
 {
     case MAIN__APPOINTMENT = 1;
     case BETWEEN_PATIENTS = 2;
@@ -14,5 +15,13 @@ enum AppointmentUserTypeEnum: int implements EnumHasNameInterface
             self::MAIN__APPOINTMENT => 'اصلی',
             self::BETWEEN_PATIENTS => 'بین مریض',
         };
+    }
+
+    public function apiResult(): array
+    {
+        return [
+            'name' => $this->value,
+            'body' => $this->getName()
+        ];
     }
 }

@@ -45,4 +45,12 @@ class Service extends Model
     {
         return Service::where('parent_id', $this->id)?->get();
     }
+
+    public function apiResult()
+    {
+        return [
+            'id' => $this->id,
+            'title' => $this->title
+        ];
+    }
 }

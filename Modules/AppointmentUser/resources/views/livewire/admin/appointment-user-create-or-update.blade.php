@@ -51,8 +51,7 @@
                                                                 <button
                                                                     class="btn ripple btn-secondary text-fixed-white input-group-text border-0"
                                                                     wire:click='ignoreSearch'
-                                                                    wire:loading.class='btn-loading btn-gray'
-                                                                    wire:target='ignoreSearch'>نمایش همه</button>
+                                                                    wire:loading.class='btn-loading btn-gray'>نمایش همه</button>
                                                             @else
                                                                 <button wire:click='searchDoctors'
                                                                     class="btn ripple btn-info text-fixed-white input-group-text border-0"
@@ -131,8 +130,7 @@
                                                                 <button
                                                                     class="btn ripple btn-secondary text-fixed-white input-group-text border-0"
                                                                     wire:click='ignoreSearch'
-                                                                    wire:loading.class='btn-loading btn-gray'
-                                                                    wire:target='ignoreSearch'>نمایش همه</button>
+                                                                    wire:loading.class='btn-loading btn-gray'>نمایش همه</button>
                                                             @else
                                                                 <button wire:click='searchService'
                                                                     wire:target='searchService'

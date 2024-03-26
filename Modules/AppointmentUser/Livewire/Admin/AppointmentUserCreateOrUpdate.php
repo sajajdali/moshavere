@@ -82,7 +82,7 @@ class AppointmentUserCreateOrUpdate extends Component
             })->orderByDesc('id')->get();
 
         $Services = Service::query()
-            ->when(isset($this->search['searchService']) && !empty($this->search['doctors']), function ($query) {
+            ->when(isset($this->search['searchService']) && !empty($this->search['searchService']), function ($query) {
                 return $query->where('title', 'LIKE', "%{$this->search['searchService']}%");
             })->orderByDesc('id')->get();;
         return view('appointmentuser::livewire.admin.appointment-user-create-or-update', [

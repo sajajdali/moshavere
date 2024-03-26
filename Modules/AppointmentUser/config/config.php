@@ -16,26 +16,7 @@ return [
             ],
         ],
     ],
-    'menu' => [
-        'title' => 'ثبت نوبت ها',
-        'gate' => ['appointment_user'],
-        'policy_class' => null,
-        'has_divider' => true,
-        'priority' => 80,
-        'children' => [//it is required
-
-            [
-                'title' => 'ثبت نوبت جدید',
-                'gate' => 'viewAny',
-                'policy_class' => \Modules\User\Entities\User::class,
-                'icon' => 'fe fe-plus-circle',
-                'route' => 'admin.appointment_user.create',
-                'has_badge' => false,
-                'has_child' => false,
-                'children' => null
-            ],
-        ],
-    ],
+    // menu can be find in Appointment Setting module
 
 
 ];

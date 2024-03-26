@@ -42,11 +42,8 @@ function generateUniqueCode($length = 4 ,$onlyNumber = false)
 
     return $code;
 }
-<<<<<<< HEAD
-=======
 
 function dateFormat($date)
 {
     return verta($date)->format('d F Y');
 }
->>>>>>> 84fa9bb952d8831d5932fd29890d27ad7f1a7f3c

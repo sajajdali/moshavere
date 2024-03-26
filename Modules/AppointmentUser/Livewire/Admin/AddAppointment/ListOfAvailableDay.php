@@ -1,12 +1,11 @@
 <?php
 
-namespace Modules\AppointmentSetting\Livewire\AddAppointment;
+namespace Modules\AppointmentUser\Livewire\Admin\AddAppointment;
 
-use Carbon\Carbon;
 use Livewire\Component;
 use Hekmatinasser\Verta\Facades\Verta;
 
-class ListOfAvailableAppointment extends Component
+class ListOfAvailableDay extends Component
 {
     public $specificDayDate;
     public function mount()
@@ -21,9 +20,9 @@ class ListOfAvailableAppointment extends Component
         return redirect()->route('admin.appointment.add.specificday', ['date' => $date]);
     }
 
- 
+
     public function render()
     {
-        return view('appointmentsetting::livewire.add-appointment.list-of-available-appointment');
+        return view('appointmentuser::livewire.admin.add-appointment.list-of-available-day');
     }
 }

@@ -133,7 +133,10 @@ class UserCreateOrUpdate extends Component
             $user->syncRoles($selectedPermitionForUser);
         }
         $user->supporter()->sync($this->supporter);
-        session()->flash('success', 'کاربر با موفقیت اضافه شد ، لطفا اطلاعات وزنی و بدنی مربوط به این کاربر را وارد کنید.');
+        if ($user->hasrole('پزشک')) {
+            return redirect()->route('admin.doctor.info', $user)->with('success', 'پزشک با موفقیت اضافه شد ، لطفا اطلاعات تکمیلی مربوط به پزشک را تکمیل نمایید');
+        }
+        session()->flash('success', 'کاربر با موفقیت اضافه شد.');
         return redirect()->route('admin.user.index');
     }
 

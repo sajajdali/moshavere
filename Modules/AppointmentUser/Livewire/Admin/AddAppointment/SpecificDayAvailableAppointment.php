@@ -1,15 +1,12 @@
 <?php
 
-namespace Modules\AppointmentSetting\Livewire\AddAppointment;
+namespace Modules\AppointmentUser\Livewire\Admin\AddAppointment;
 
 use Livewire\Component;
 use Livewire\Attributes\On;
 
 class SpecificDayAvailableAppointment extends Component
 {
-    public $currentDate;
-
-
     //this propery shouldNOT exist in the final product
     public $tempMessage = null;
 
@@ -36,7 +33,7 @@ class SpecificDayAvailableAppointment extends Component
     public function nextDay()
     {
         //go to next day
-        $this->tempMessage = null ; 
+        $this->tempMessage = null ;
     }
 
     #[On('closeModal')]
@@ -46,8 +43,9 @@ class SpecificDayAvailableAppointment extends Component
         sleep(2);
         $this->tempMessage = 'تغییرات با موفقیت اعمال شد';
     }
+
     public function render()
     {
-        return view('appointmentsetting::livewire.add-appointment.specific-day-available-appointment');
+        return view('appointmentuser::livewire.admin.add-appointment.specific-day-available-appointment');
     }
 }

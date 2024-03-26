@@ -119,7 +119,6 @@
                                                     <div class="custom-checkbox custom-control">
                                                         <input type="checkbox"
                                                             wire:model='form.doctors.{{ $doctor->id }}'
-                                                            @if (in_array($doctor->id, $form['doctors'])) checked @endif
                                                             data-checkboxes="mygroup" class="custom-control-input"
                                                             id="checkbox-{{ $key }}">
                                                         <label for="checkbox-{{ $key }}"

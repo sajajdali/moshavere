@@ -21,13 +21,13 @@ return [
         'policy_class' => null,
         'has_divider' => true,
         'priority' => 80,
-        'children' => [//it is required
+        'children' => [ //it is required
             [
                 'title' => 'لیست نوبت های ثبت شده',
                 'gate' => 'viewAny',
                 'policy_class' => \Modules\User\Entities\User::class,
                 'icon' => 'fe fe-bar-chart-2',
-                'route' => 'admin.appointment.list',
+                'route' => 'admin.appointment_user.list',
                 'has_badge' => false,
                 'has_child' => false,
                 'children' => null
@@ -93,11 +93,11 @@ return [
                 ],
             ],
             [
-                'title' => 'ثبت نوبت (UI)',
+                'title' => 'ثبت نوبت جدید',
                 'gate' => 'viewAny',
                 'policy_class' => \Modules\User\Entities\User::class,
                 'icon' => 'fe fe-plus-circle',
-                'route' => 'admin.appointment.add.sectionList',
+                'route' => 'admin.appointment_user.create',
                 'has_badge' => false,
                 'has_child' => false,
                 'children' => null

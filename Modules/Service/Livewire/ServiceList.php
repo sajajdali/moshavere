@@ -32,18 +32,22 @@ class ServiceList extends Component
         $this->searchPanel = null;
     }
 
-    public function passModalData(Service $service) {
-        $this->fetchData['modal'] = $service->subSection() ;
+    public function passModalData(Service $service)
+    {
+        $this->fetchData['modal'] = $service->subSection();
     }
 
     #[On('delete')]
-    public function delete() {
-        return redirect()->route('admin.service.list')->with('success','با موفقیت حذف شد');
+    public function delete($model)
+    {
+        $ser = Service::find($model);
+        $ser->delete();
+        return redirect()->route('admin.service.list')->with('success', 'با موفقیت حذف شد');
     }
 
     public function render()
     {
-        $query =  Service::orderBy('priority','asc');
+        $query =  Service::orderBy('priority', 'asc');
         $searchCriteria = [
             'idSearch' => [
                 'condition' => $this->search['id'],
@@ -74,7 +78,9 @@ class ServiceList extends Component
         }
 
 
-        return view('service::livewire.service-list',
-            ['services' => $query->paginate(10)]);
+        return view(
+            'service::livewire.service-list',
+            ['services' => $query->paginate(10)]
+        );
     }
 }

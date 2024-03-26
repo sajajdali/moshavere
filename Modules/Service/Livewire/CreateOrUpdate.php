@@ -2,8 +2,9 @@
 
 namespace Modules\Service\Livewire;
 
-use App\Enum\ActiveEnum;
 use Livewire\Component;
+use App\Enum\ActiveEnum;
+use Modules\User\Entities\User;
 use Spatie\Permission\Models\Role;
 use Modules\Service\app\Models\Service;
 
@@ -68,7 +69,11 @@ class CreateOrUpdate extends Component
         $this->form['img']       = $this->service->icon;
         $this->form['priority']  = $this->service->priority;
         $this->form['active']    =  $this->service->active == ActiveEnum::ACTIVE ? 'true' : 'false';
-        $this->form['doctors']    =  $this->service->user->pluck('id')->toArray() ;
+        $doctors =  $this->service->user->pluck('id')->toArray() ;
+        foreach ($doctors as $doc) {
+            $this->form['doctors'][$doc] =  true;
+        }
+
     }
     public function mount()
     {
@@ -81,7 +86,7 @@ class CreateOrUpdate extends Component
             $this->form['priority']      = Service::maxPriority();
             $this->form['active']        = 'true';
         }
-        $this->fetchdata['doctors']  = Role::find(3)->users;
+        $this->fetchdata['doctors']  = User::doctors();
         $this->fetchdata['services'] = Service::all();
     }
     public function render()

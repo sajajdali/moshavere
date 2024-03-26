@@ -160,11 +160,12 @@ class AppointmentUserList extends Component
                 $query->when($condition, $callback);
             }
         }
-        $appointments =  $query->paginate(10) ;
+        $appointments =  $query->paginate(10);
         return $appointments;
     }
     public function mount()
     {
+        
         // TODO::pass roles that can set appointmet in appointmentSetter property ;
         $this->fetchData['appointmentSetter'] = Role::find(1)->users;
         $this->fetchData['Services'] = Service::all();

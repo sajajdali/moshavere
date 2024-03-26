@@ -79,7 +79,7 @@
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    @if (isset($services))
+                                    @if ($services->isNotEmpty())
                                         @foreach ($services as $service)
                                             @if (!empty($service->parent_id))
                                                 @continue

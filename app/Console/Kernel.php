@@ -4,10 +4,12 @@ namespace App\Console;
 
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Foundation\Console\Kernel as ConsoleKernel;
+use Modules\AppointmentUser\app\Console\MakeCacheCommand;
 
 class Kernel extends ConsoleKernel
 {
     protected $commands = [
+        MakeCacheCommand::class
     ];
 
     /**

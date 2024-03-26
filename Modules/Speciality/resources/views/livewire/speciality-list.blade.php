@@ -4,7 +4,7 @@
             <h1 class="page-title">تمامی تخصص ها</h1>
         </div>
         <div class="ms-auto pageheader-btn">
-          <a class="btn btn-success" href="{{route('admin.speciality.manage')}}">اضافه کردن تخصص</a>
+            <a class="btn btn-success" href="{{ route('admin.speciality.manage') }}">اضافه کردن تخصص</a>
         </div>
     </div>
     <!-- PAGE-HEADER END -->
@@ -19,9 +19,7 @@
                             data-bs-target="#advanceSearch" aria-expanded="false" aria-controls="advanceSearch">
                             جست و جوی پیشرفته
                         </button>
-                        @if (isset($search['id']) ||
-                                isset($search['specialityName']) ||
-                                isset($search['status']))
+                        @if (isset($search['id']) || isset($search['specialityName']) || isset($search['status']))
                             <button class="btn btn-secondary ms-2" type="button" wire:click="resetProperties"
                                 wire:loading.class="bg-gray btn-loading disabled">نمایش همه
                             </button>
@@ -49,10 +47,13 @@
                             <div class="row mb-4">
                                 <label class="form-label col-md-2" for="default-dropdown">وضعیت</label>
                                 <div class="col-md-10">
-                                    <select wire:model='search.status' name="country" class="form-control form-select" id="default-dropdown" data-bs-placeholder="انتخاب کنید..">
+                                    <select wire:model='search.status' name="country" class="form-control form-select"
+                                        id="default-dropdown" data-bs-placeholder="انتخاب کنید..">
                                         <option label="انتخاب کنید"></option>
-                                        <option value={{Modules\Speciality\Enum\SpecialityStatusEnum::ACTIVE}}>فعال</option>
-                                        <option value={{Modules\Speciality\Enum\SpecialityStatusEnum::DEACTIVE}}>غیرفعال</option>
+                                        <option value={{ Modules\Speciality\Enum\SpecialityStatusEnum::ACTIVE }}>فعال
+                                        </option>
+                                        <option value={{ Modules\Speciality\Enum\SpecialityStatusEnum::DEACTIVE }}>
+                                            غیرفعال</option>
                                     </select>
                                 </div>
                             </div>
@@ -80,8 +81,8 @@
                                         <tr class="text-center">
                                             <td>{{ $speciality->id }}</td>
                                             <td>{{ $speciality->title }}</td>
-                                            <td>{!! $speciality->status->getBadge() !!}</td>
-                                            <td> {{$speciality->user()?->count() ?? 0}} </td>
+                                            <td>{!! $speciality->active->getBadge() !!}</td>
+                                            <td> {{ $speciality->user()?->count() ?? 0 }} </td>
                                             <td>
                                                 @canany(['update', 'delete'], $speciality)
                                                     <div class="btn-group mt-2 mb-2">
@@ -92,12 +93,12 @@
                                                         <ul class="dropdown-menu" role="menu">
                                                             @can('delete', $speciality)
                                                                 <li><a class="delete_confirm_alert" data-label="حذف "
-                                                                        data-id="{{ $speciality->id }}" href="#"
-                                                                        >حذف</a>
+                                                                        data-id="{{ $speciality->id }}" href="#">حذف</a>
                                                                 </li>
                                                             @endcan
                                                             @can('update', $speciality)
-                                                                <li><a href="{{route('admin.speciality.manage',['speciality'=>$speciality->id])}}" data-label="ویرایش">ویرایش</a>
+                                                                <li><a href="{{ route('admin.speciality.manage', ['speciality' => $speciality->id]) }}"
+                                                                        data-label="ویرایش">ویرایش</a>
                                                                 </li>
                                                             @endcan
                                                         </ul>

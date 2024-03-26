@@ -26,18 +26,22 @@ class UpdateOrCreateSpeciality extends Component
     public function createSpeciality()
     {
         $this->validate();
-        $status = $this->status == 'true' ? SpecialityStatusEnum::ACTIVE : SpecialityStatusEnum::DEACTIVE;
+        if ($this->status) {
+            $status =   SpecialityStatusEnum::ACTIVE;
+        } else {
+            $status =   SpecialityStatusEnum::DEACTIVE;
+        }
         if (isset($this->speciality)) {
             $this->speciality->update([
                 'title' => $this->specialityTitle,
-                'status' => $status,
+                'active' => $status,
                 'priority' => $this->priority,
             ]);
             $this->message = 'تخصص با موفقیت ویرایش شد';
         } else {
             $this->speciality = Speciality::create([
                 'title' => $this->specialityTitle,
-                'status' => $status,
+                'active' => $status,
                 'priority' => $this->priority,
             ]);
             $this->message = 'تخصص با موفقیت اضافه شد';

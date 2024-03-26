@@ -16,7 +16,7 @@ class Speciality extends Model
      * The attributes that are mass assignable.
      */
     protected $guarded = ['id'];
-    protected $casts = ['status' => ActiveEnum::class] ;
+    protected $casts = ['active' => SpecialityStatusEnum::class] ;
 
     public function scopeFilterStatus($query,SpecialityStatusEnum $status){
         return $query->whereActive($status);

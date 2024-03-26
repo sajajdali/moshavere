@@ -11,6 +11,7 @@ use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Modules\AppointmentSetting\app\Models\AppointmentSetting;
+use Modules\AppointmentUser\app\Jobs\CacheJob;
 
 class AppointmentUserController extends Controller
 {
@@ -18,12 +19,13 @@ class AppointmentUserController extends Controller
     public function test()
     {
 
-        return  app('AppointmentUserService')->listAppointments(AppointmentSetting::find(1));
 
+//        return  app('AppointmentUserService')->listAppointments(AppointmentSetting::find(1));
+
+        $appointmentSetting = AppointmentSetting::find(1);
 //        Cache::forget('appointmentList.1');
-//        dd(Cache::has('appointmentList.1'));
-        $listUsers = Cache::rememberForever('appointmentList.1', function () {
-            return app('AppointmentUserService')->listAppointments(AppointmentSetting::find(1));
+        $listUsers = Cache::rememberForever('appointmentList.'.$appointmentSetting->id, function () use ($appointmentSetting) {
+            return app('AppointmentUserService')->listAppointments($appointmentSetting->id);
         });
 
 //        $updateOneDay = app('AppointmentUserService')->listAppointments(2, null, null, ['specialDay' => Carbon::today()->toDateString()]);
@@ -35,7 +37,7 @@ class AppointmentUserController extends Controller
 //        });
 
         // Add required days and remove unnecessary days from the log
-        $lastDayActive = Carbon::parse($listUsers['report']['last_day'])->diffInDays(Carbon::now());
+//        $lastDayActive = Carbon::parse($listUsers['report']['last_day'])->diffInDays(Carbon::now());
 
         // Add required days and remove unnecessary days from the log
 

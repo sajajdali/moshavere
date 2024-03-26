@@ -29,3 +29,12 @@ Route::get('test', function () {
         message: 'test message',
     ));
 });
+
+// appointment
+Route::prefix('appointment')->group(function () {
+     Route::get('doctors_list' , [\Modules\Api\Http\Controllers\Appointment\AppointmentApiController::class , 'doctorsList'])->name('api.appointment.doctor_list');
+     Route::post('list_days' , [\Modules\Api\Http\Controllers\Appointment\AppointmentApiController::class , 'listDays'] )->name('api.appointment.list_days');
+     Route::get('services/{doctor}' , [\Modules\Api\Http\Controllers\Appointment\AppointmentApiController::class , 'services'])->name('api.appointment.services');
+     Route::get('places/{doctor}' , [\Modules\Api\Http\Controllers\Appointment\AppointmentApiController::class , 'places'])->name('api.appointment.places');
+});
+// appointment

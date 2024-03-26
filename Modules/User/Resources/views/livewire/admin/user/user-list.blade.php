@@ -140,7 +140,7 @@
                                                                     </li>
                                                                     @if ($user->hasrole('پزشک'))
                                                                         <li>
-                                                                            <a href="{{ route('admin.user.edit', $user) }}">ویرایش
+                                                                            <a href="{{ route('admin.doctor.info', $user) }}">ویرایش
                                                                                 اطلاعات پزشک</a>
                                                                         </li>
                                                                     @endif

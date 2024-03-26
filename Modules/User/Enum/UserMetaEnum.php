@@ -17,6 +17,16 @@ enum UserMetaEnum: int implements EnumHasNameInterface
     case DOCUMENT_NUMBER = 8;
     case MOBILE = 9;
 
+     // doctor Enum
+    case SPECIALITY_TYPE = 10;
+    case DOC_BIOGRAPHY = 11;
+    case LICENCE_NUMBER = 12;
+    case DOC_ADDRESS = 13;
+    case DOCTOR_ORDER = 14;
+    case ACTIVE_APPOINTMENT = 15;
+    case BAN_USER = 16;
+
+
 
     public static function keys(): array
     {
@@ -36,6 +46,4 @@ enum UserMetaEnum: int implements EnumHasNameInterface
             self::DOCUMENT_NUMBER => 'شماره پرونده',
         };
     }
-
-
 }

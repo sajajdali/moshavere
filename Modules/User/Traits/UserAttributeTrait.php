@@ -16,7 +16,7 @@ trait UserAttributeTrait
             )
         );
     }
-   
+
     public function lastName(): Attribute
     {
         return Attribute::make(
@@ -80,6 +80,57 @@ trait UserAttributeTrait
         return Attribute::make(
             get: fn () => $this->getMeta(UserMetaEnum::GENDER)?->meta_value,
             set: fn ($value) => $this->metas()->create(['meta_key' => UserMetaEnum::GENDER, 'meta_value' => $value])
+        );
+    }
+
+    // DOCTOR ATTRIBUTE
+    public function specialityType(): Attribute
+    {
+        return Attribute::make(
+            get: fn () => $this->getMeta(UserMetaEnum::SPECIALITY_TYPE)?->meta_value,
+            set: fn ($value) => $this->metas()->updateOrCreate(['meta_key' => UserMetaEnum::SPECIALITY_TYPE, 'meta_value' => $value])
+        );
+    }
+    public function docBiography(): Attribute
+    {
+        return Attribute::make(
+            get: fn () => $this->getMeta(UserMetaEnum::DOC_BIOGRAPHY)?->meta_value,
+            set: fn ($value) => $this->metas()->updateOrCreate(['meta_key' => UserMetaEnum::DOC_BIOGRAPHY, 'meta_value' => $value])
+        );
+    }
+    public function licenceNumber(): Attribute
+    {
+        return Attribute::make(
+            get: fn () => $this->getMeta(UserMetaEnum::LICENCE_NUMBER)?->meta_value,
+            set: fn ($value) => $this->metas()->updateOrCreate(['meta_key' => UserMetaEnum::LICENCE_NUMBER, 'meta_value' => $value])
+        );
+    }
+    public function docAddress(): Attribute
+    {
+        return Attribute::make(
+            get: fn () => $this->getMeta(UserMetaEnum::DOC_ADDRESS)?->meta_value,
+            set: fn ($value) => $this->metas()->updateOrCreate(['meta_key' => UserMetaEnum::DOC_ADDRESS, 'meta_value' => $value])
+        );
+    }
+    public function docOrder(): Attribute
+    {
+        return Attribute::make(
+            get: fn () => $this->getMeta(UserMetaEnum::DOCTOR_ORDER)?->meta_value,
+            set: fn ($value) => $this->metas()->updateOrCreate(['meta_key' => UserMetaEnum::DOCTOR_ORDER, 'meta_value' => $value])
+        );
+    }
+    public function activeAppointment(): Attribute
+    {
+        return Attribute::make(
+            get: fn () => $this->getMeta(UserMetaEnum::ACTIVE_APPOINTMENT)?->meta_value,
+            set: fn ($value) => $this->metas()->updateOrCreate(['meta_key' => UserMetaEnum::ACTIVE_APPOINTMENT, 'meta_value' => $value])
+        );
+    }
+    public function banUser(): Attribute
+    {
+        return Attribute::make(
+            get: fn () => $this->getMeta(UserMetaEnum::BAN_USER)?->meta_value,
+            set: fn ($value) => $this->metas()->updateOrCreate(['meta_key' => UserMetaEnum::BAN_USER, 'meta_value' => $value])
         );
     }
 }

@@ -14,7 +14,7 @@
             <div class="col-lg-12">
                 <div class="card custom-card">
                     <div class="card-header d-flex justify-content-between border-bottom">
-                        <h3 class="card-title">مدیریت تخصص ها</h3>
+                        <h3 class="card-title">مدیریت بخش ها</h3>
                         <div class="card-options">
                             <button class="btn btn-primary" type="button" data-bs-toggle="collapse"
                                 data-bs-target="#advanceSearch" aria-expanded="false" aria-controls="advanceSearch">
@@ -81,7 +81,7 @@
                                 <tbody>
                                     @if (isset($services))
                                         @foreach ($services as $service)
-                                            @if (! empty($service->parent_id))
+                                            @if (!empty($service->parent_id))
                                                 @continue
                                             @endif
                                             <tr class="text-center">

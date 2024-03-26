@@ -25,6 +25,27 @@ class DashboardController extends Controller
         return $this->ok([
             'status' => true,
             'appointments' => AppointmentUserResource::collection($appointments),
+<<<<<<< HEAD
+=======
+            'purchased_courses' => [],
+            'courses' => [] ,
+            'news' => [
+                [
+                    'link' => '',
+                    'date' => '1402/12/11',
+                    'title' => "رژیم غذایی تخمدان پلی کیستیک",
+                    'body'  => "PCOS و رژیم غذایی: 7 نکته کلیدی در رژیم غذایی تخمدان پلی کیستیک سندروم تخمدان پلی کیستیک (PCOS) یک اختلال",
+                    'image' => "https://jesmino.com/wp-content/uploads/2024/02/سندرم-پلی-کیستیک-300x191.jpg"
+                ],
+                [
+                    'link' => '',
+                    'date' => '1402/12/11',
+                    'title' => "رژیم غذایی تخمدان پلی کیستیک",
+                    'body'  => "PCOS و رژیم غذایی: 7 نکته کلیدی در رژیم غذایی تخمدان پلی کیستیک سندروم تخمدان پلی کیستیک (PCOS) یک اختلال",
+                    'image' => "https://jesmino.com/wp-content/uploads/2024/02/سندرم-پلی-کیستیک-300x191.jpg"
+                ]
+            ]
+>>>>>>> 84fa9bb952d8831d5932fd29890d27ad7f1a7f3c
         ]);
     }
 

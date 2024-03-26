@@ -8,6 +8,7 @@ use Modules\Absence\app\Models\Absence;
 use Modules\AppointmentSetting\app\Models\AppointmentSetting;
 use Modules\AppointmentSetting\app\Models\AppointmentSettingTime;
 use Modules\AppointmentUser\app\Models\AppointmentUser;
+use Verta;
 
 class AppointmentUserService
 {
@@ -75,8 +76,7 @@ class AppointmentUserService
         }
 
         if (!$specialDaySelected) {
-            $appointmentSetting->max_day_active = 10;
-            $startDate = Carbon::today()->subDays(0);
+            $startDate = Carbon::today()->subDays(20);
             $endDate = Carbon::today()->addDays($appointmentSetting->max_day_active ?? 90); // Adjust the number of days as needed
         }
 
@@ -126,6 +126,7 @@ class AppointmentUserService
             // Initialize the day's output
             $dayOutput = [
                 'status' => true,
+                'day_number' => verta($currentDate)->format("l m/d"),
                 'is_holiday'    => false,
                 'empty_appoints' => 0,
                 'times' => [],
@@ -242,7 +243,8 @@ class AppointmentUserService
                             else {
 
                                 $dayOutput['times'][] = [
-                                    'status' => true,
+                                    'status' => !$currentDate->isPast(),
+                                    'timestamp' => $currentDate->copy()->setTime($startTime->hour , $startTime->minute)->timestamp,
                                     'from' => $startTime->toTimeString(),
                                     'until' => $until->toTimeString(),
                                 ];
@@ -250,9 +252,10 @@ class AppointmentUserService
                                 $startTime = $until->subMinutes($timeForVisit);
 
                                 // set first empty day in log
-                                if (!$firstEmptyDay) {
+                                if (!$firstEmptyDay && !$currentDate->isPast()) {
                                     $firstEmptyDay = [
-                                        'day' => $currentDate->toDateString(),
+                                        'day' => verta($currentDate)->format("Y-m-d"),
+                                        'timestamp' => $currentDate->copy()->setTime($startTime->hour , $startTime->minute)->timestamp,
                                         'from' => $startTime->copy()->toTimeString(),
                                         'until' => $startTime->copy()->addMinutes($timeForVisit)->toTimeString()
                                     ];
@@ -279,23 +282,23 @@ class AppointmentUserService
                                     } else {
 
                                         $dayOutput['times'][] = [
-                                            'status' => true,
+                                            'status' => !$currentDate->isPast(),
+                                            'timestamp' => $startDate->copy()->timestamp,
                                             'from' => $startTime->copy()->toTimeString(),
                                             'until' => $startTime->copy()->addMinutes($timeForVisit)->toTimeString(),
                                         ];
                                         $dayOutput['empty_appoints']++;
 
                                         // set first empty day in log
-                                        if (!$firstEmptyDay) {
+                                        if (!$firstEmptyDay && !$currentDate->isPast()) {
                                             $firstEmptyDay = [
-                                                'day' => $currentDate->toDateString(),
+                                                'timestamp' => $currentDate->copy()->setTime($startTime->hour , $startTime->minute)->timestamp,
+                                                'day' => verta($currentDate)->format("Y-m-d"),
                                                 'from' => $startTime->copy()->toTimeString(),
                                                 'until' => $startTime->copy()->addMinutes($timeForVisit)->toTimeString()
                                             ];
                                         }
-
                                     }
-
 
                                 } else {
                                     $startTime->subMinutes($overlaps['overLapTime']);
@@ -319,7 +322,6 @@ class AppointmentUserService
                     $dayOutput['status'] = false;
                     $dayOutput['empty_appoints'] = 0;
                 }
-
 
                 // Fill the slots with appointments
             } else {
@@ -362,7 +364,7 @@ class AppointmentUserService
             'active_online' => $appointmentSettings['detail']['visit_type_online'] ?? false,
             'last_day' => $currentDate?->toDateString(),
             'min_day_active' => $appointmentSettings?->min_day_active,
-            'first_empty_day' => $firstEmptyDay,
+            'first_empty_dayee' => $firstEmptyDay,
             'last_day_active' => isset($appointmentSettings->last_day_active) ? $appointmentSettings->last_day_active->toDateString() : null,
             'last_day_in_log' => $lastDayInLog,
             'first_day_in_log' => $firstDayInLog?->toDateString(),

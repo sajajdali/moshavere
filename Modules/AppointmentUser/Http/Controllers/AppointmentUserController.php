@@ -11,6 +11,7 @@ use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Modules\AppointmentSetting\app\Models\AppointmentSetting;
+use Modules\AppointmentUser\app\Jobs\CacheJob;
 
 class AppointmentUserController extends Controller
 {
@@ -18,10 +19,10 @@ class AppointmentUserController extends Controller
     public function test()
     {
 
-        return  app('AppointmentUserService')->listAppointments(AppointmentSetting::find(1));
 
-//        Cache::forget('appointmentList.1');
-//        dd(Cache::has('appointmentList.1'));
+//        return  app('AppointmentUserService')->listAppointments(AppointmentSetting::find(1));
+
+        Cache::forget('appointmentList.1');
         $listUsers = Cache::rememberForever('appointmentList.1', function () {
             return app('AppointmentUserService')->listAppointments(AppointmentSetting::find(1));
         });

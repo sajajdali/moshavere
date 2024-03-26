@@ -1,7 +1,8 @@
 <?php
 
-namespace Modules\AppointmentSetting\app\Jobs;
+namespace Modules\AppointmentUser\app\Jobs;
 
+use Carbon\Carbon;
 use Illuminate\Bus\Queueable;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Queue\InteractsWithQueue;
@@ -17,17 +18,12 @@ class CacheJob implements ShouldQueue
     public AppointmentSetting $appointmentSetting;
 
     /**
-     * @param AppointmentSetting $appointmentSetting
+     * Create a new job instance.
      */
     public function __construct(AppointmentSetting $appointmentSetting)
     {
         $this->appointmentSetting = $appointmentSetting;
     }
-
-    /**
-     * Create a new job instance.
-     */
-
 
     /**
      * Execute the job.
@@ -39,5 +35,8 @@ class CacheJob implements ShouldQueue
         Cache::rememberForever($cacheName, function () {
             return app('AppointmentUserService')->listAppointments($this->appointmentSetting);
         });
+        $this->appointmentSetting->update([
+            'updated_log_at' => Carbon::now()
+        ]);
     }
 }

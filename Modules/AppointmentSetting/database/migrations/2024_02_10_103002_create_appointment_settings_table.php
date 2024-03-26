@@ -25,6 +25,7 @@ return new class extends Migration
             $table->tinyInteger('interference')->default(0);
             $table->tinyInteger('active')->default(1);
             $table->json('detail')->nullable();
+            $table->timestamp('updated_log_at')->nullable();
             $table->softDeletes();
             $table->timestamps();
         });

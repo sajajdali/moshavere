@@ -129,24 +129,24 @@ class AppointmentApiController extends Controller
                             $result[$dayNumber][] = [
                                 'status' => true,
                                 'time_stamp' => $time['timestamp'],
-                                'from' => str_replace(':00', '', $time['from']),
-                                'until' => str_replace(':00', '', $time['until']),
+                                'from' =>  substr($time['from'], 0, -3),
+                                'until' => substr($time['until'], 0, -3),
                             ];
                             if (count($firstTwoEmpty) < 2) {
                                 $vertaDateTime = Verta::createTimestamp($time['timestamp']);
                                 $firstTwoEmpty[] = [
                                     'persian_date' => $vertaDateTime->format('ساعت H روز l m/d'),
                                     'time_stamp' => $time['timestamp'],
-                                    'from' => str_replace(':00', '', $time['from']),
-                                    'until' => str_replace(':00', '', $time['until']),
+                                    'from' => substr($time['from'], 0, -3),
+                                    'until' => substr($time['until'], 0, -3),
                                 ];
                             }
                             // If two matches are found, break out of the loop
                         } else {
                             $result[$dayNumber][] = [
                                 'status' => false,
-                                'from' => str_replace(':00', '', $time['from']),
-                                'until' => str_replace(':00', '', $time['until']),
+                                'from' => substr($time['from'], 0, -3),
+                                'until' => substr($time['until'], 0, -3),
                             ];
                         }
                     }

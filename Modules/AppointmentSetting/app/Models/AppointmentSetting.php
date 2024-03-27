@@ -17,6 +17,7 @@ class AppointmentSetting extends Model
     protected $casts = [
         'active' => ActiveEnum::class,
         'last_day_active' => 'date',
+        'interference' => 'boolean',
         'detail' => 'json',
     ];
     /**

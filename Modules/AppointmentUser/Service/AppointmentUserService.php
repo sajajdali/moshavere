@@ -377,10 +377,14 @@ class AppointmentUserService
         return $output;
     }
 
-    public function isAppointmentTimeAvailable($startDateTime, $endDateTime, $dateVisit, $doctorId)
+    public function isAppointmentTimeAvailable($startDateTime, $endDateTime, $dateVisit,AppointmentSetting $appointmentSetting)
     {
         // Check if there are any overlapping appointments
-        $existingAppointments = AppointmentUser::where('doctor_id', $doctorId)
+        $existingAppointments = AppointmentUser::where('doctor_id', $appointmentSetting->user_id);
+        if (!$appointmentSetting->interference){
+            $existingAppointments->where('appointment_setting_id', $appointmentSetting->id);
+        }
+        $existingAppointments = $existingAppointments
             ->whereDate('date_visit', $dateVisit)
             ->where(function ($query) use ($startDateTime, $endDateTime) {
                 $query->where(function ($q) use ($startDateTime, $endDateTime) {
@@ -400,8 +404,8 @@ class AppointmentUserService
     {
         // check exist appointment
         $dateAppointment = (Carbon::createFromTimestamp($appointmentData['timestamp']));
-        $checkTimeAvailable = $this->isAppointmentTimeAvailable($dateAppointment->toTimeString(), $dateAppointment->copy()->addMinutes($appointmentSetting->time_for_visit)->toTimeString(), $dateAppointment->toDateString(), $appointmentSetting->user_id);
-        dd($checkTimeAvailable , $dateAppointment->toTimeString(), $dateAppointment->copy()->addMinutes($appointmentSetting->time_for_visit)->toTimeString(), $dateAppointment->toDateString(), $appointmentSetting->doctor_id);
+        $checkTimeAvailable = $this->isAppointmentTimeAvailable($dateAppointment->toTimeString(), $dateAppointment->copy()->addMinutes($appointmentSetting->time_for_visit)->toTimeString(), $dateAppointment->toDateString(), $appointmentSetting);
+        dd($checkTimeAvailable , $dateAppointment->toTimeString(), $dateAppointment->copy()->addMinutes($appointmentSetting->time_for_visit)->toTimeString(), $dateAppointment->toDateString());
         //        $appointmentLists->where('start_time', '>', $dateAppointment)->where('end_time',);
 
 

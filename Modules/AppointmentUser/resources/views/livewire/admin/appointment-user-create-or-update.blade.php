@@ -93,15 +93,15 @@
                                                             </div>
                                                         </div>
                                                         <button class="btn btn-warning w-100"
-                                                            wire:click='PlaceModal({{ $doctor->id }})'>
+                                                            wire:click='docSelected({{ $doctor->id }})'>
                                                             <div wire:loading.remove
-                                                                wire:target='PlaceModal({{ $doctor->id }})'>
+                                                                wire:target='docSelected({{ $doctor->id }})'>
                                                                 <i class="fa fa-check" aria-hidden="true"></i>
                                                                 <span>افزودن نوبت</span>
                                                             </div>
-                                                            <span wire:target='PlaceModal({{ $doctor->id }})'
+                                                            <span wire:target='docSelected({{ $doctor->id }})'
                                                                 wire:loading
-                                                                wire:target='PlaceModal({{ $doctor->id }})'
+                                                                wire:target='docSelected({{ $doctor->id }})'
                                                                 class="spinner-border spinner-border-sm" role="status"
                                                                 aria-hidden="true"></span>
                                                         </button>
@@ -155,13 +155,13 @@
                                                             <div class="rounded-circle align-self-start mb-0">
                                                             </div>
                                                             <div class="flex-fill my-1"> <a
-                                                                    href="javascript:void(0);">{{ $service->title }}</a>
+                                                                    href="{{route('admin.service.list')}}">{{ $service->title }}</a>
                                                                 <p class="mt-2 ms-1">{{ $service->user->count() }} پزشک
                                                                 </p>
                                                             </div>
                                                         </div>
                                                         <button class="btn btn-warning w-100"
-                                                            wire:click='lunchServiceDocModal({{ $service->id }})'>
+                                                            wire:click='serviceSelectedFromServiceSection({{ $service->id }})'>
                                                             <i class="fa fa-check" aria-hidden="true"></i>
                                                             <span>افزودن نوبت</span>
                                                         </button>
@@ -179,8 +179,8 @@
         </div>
     </div>
     <!-- Modal -->
-    <div class="modal fade" id="setDocOrsectionMOdal" tabindex="-1" aria-labelledby="exampleModalLabel"
-        aria-hidden="true">
+    {{-- <div class="modal fade" id="setDocOrsectionMOdal" tabindex="-1" aria-labelledby="exampleModalLabel"
+        aria-hidden="true" wire:ignore.self>
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
@@ -190,91 +190,98 @@
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    @foreach ($form['modalStatus'] as $wichPartSelected => $status)
-                        @if ($status)
-                            @if ($wichPartSelected == 'selectDoctor')
-                                @if (isset($form['doctorServices']) && count($form['doctorServices']))
-                                    <div class="d-flex flex-column g-3">
-                                        @foreach ($form['doctorServices'] as $service)
-                                            <a wire:click='addAppointment({{ $service->id }})'
-                                                class="badge bg-primary-gradient my-1 p-5 text-white"
-                                                style="font-size: medium !important ; cursor: pointer;">{{ $service->title }}</a>
-                                        @endforeach
-                                    </div>
-                                @else
-                                    <div class="alert alert-warning" role="alert">
-                                        <span class="alert-inner--icon me-2"><i class="fe fe-info"></i></span>
-                                        <span class="alert-inner--text"><strong>هیچ بخشی برای این پزشک تعریف نشده
-                                                است</strong>
-                                            <br>
-                                            لطفا ابتدا برای این پزشک بخش بندی و تنظیمات را انجام دهید تا بتوانید اقدام
-                                            به ثبت
-                                            نوبت
-                                            نمایید</span>
-                                    </div>
-                                @endif
-                            @elseif($wichPartSelected == 'selectService')
-                                @if (isset($form['ServiceDoctors']) && $form['ServiceDoctors']->isNotEmpty())
-                                    <div class="d-flex flex-column g-3">
-                                        @foreach ($form['ServiceDoctors'] as $doc)
-                                            <a wire:click='addAppointment({{ $doc->id }})'
-                                                class="badge bg-primary-gradient my-1 p-5 text-white"
-                                                style="font-size: medium !important ; cursor: pointer;">{{ $doc->fullName }}</a>
-                                        @endforeach
-                                    </div>
-                                @else
-                                    <div class="alert alert-warning" role="alert">
-                                        <span class="alert-inner--icon me-2"><i class="fe fe-info"></i></span>
-                                        <span class="alert-inner--text"><strong>هیچ پزشکی برای این بخش تعریف نشده
-                                                است</strong>
-                                            <br>
-                                            لطفا ابتدا برای این بخش ، پزشک انتخاب کنید و تنظیمات را انجام دهید تا
-                                            بتوانید اقدام
-                                            به ثبت
-                                            نوبت
-                                            نمایید</span>
-                                    </div>
-                                @endif
-                            @elseif($wichPartSelected == 'selectPlace')
-                                @if (isset($form['place']) && $form['place']->isNotEmpty())
-                                    <div class="d-flex flex-column g-3">
-                                        @foreach ($form['place'] as $place)
-                                            <a wire:click='addAppointment({{ $place->id }})'
-                                                class="badge bg-primary-gradient my-1 p-5 text-white"
-                                                style="font-size: medium !important ; cursor: pointer;">{{ $place->title }}</a>
-                                        @endforeach
-                                    </div>
-                                @else
-                                    <div class="alert alert-warning" role="alert">
-                                        <span class="alert-inner--icon me-2"><i class="fe fe-info"></i></span>
-                                        <span class="alert-inner--text"><strong>هیچ مطبی برای تعریف نشده
-                                                است</strong>
-                                            <br>
-                                            لطفا ابتدا یک مطب به سیستتم اضافه کرده و تنظیمات زمان های حضور را از قسمت
-                                            تنظیمات نوبت دهی انجام دهید
-                                        </span>
-                                    </div>
+                    <div>
+                        @foreach ($form['modalStatus'] as $wichPartSelected => $status)
+                            @if ($status)
+                                @if ($wichPartSelected == 'selectDoctor')
+                                    @if (isset($form['doctorServices']) && count($form['doctorServices']))
+                                        <div class="d-flex flex-column g-3">
+                                            @foreach ($form['doctorServices'] as $service)
+                                                <a wire:click='addAppointment({{ $service->id }})'
+                                                    class="badge bg-primary-gradient my-1 p-5 text-white"
+                                                    style="font-size: medium !important ; cursor: pointer;">{{ $service->title }}</a>
+                                            @endforeach
+                                        </div>
+                                    @else
+                                        <div class="alert alert-warning" role="alert">
+                                            <span class="alert-inner--icon me-2"><i class="fe fe-info"></i></span>
+                                            <span class="alert-inner--text"><strong>هیچ بخشی برای این پزشک تعریف نشده
+                                                    است</strong>
+                                                <br>
+                                                لطفا ابتدا برای این پزشک بخش بندی و تنظیمات را انجام دهید تا بتوانید
+                                                اقدام
+                                                به ثبت
+                                                نوبت
+                                                نمایید</span>
+                                        </div>
+                                    @endif
+                                @elseif($wichPartSelected == 'selectService')
+                                    @if (isset($fetchData['ServiceList']) && $fetchData['ServiceList']->isNotEmpty())
+                                        <div class="d-flex flex-column g-3">
+                                            @foreach ($fetchData['ServiceList'] as $doc)
+                                                <a wire:click='addAppointment({{ $doc->id }})'
+                                                    class="badge bg-primary-gradient my-1 p-5 text-white"
+                                                    style="font-size: medium !important ; cursor: pointer;">{{ $doc->fullName }}</a>
+                                            @endforeach
+                                        </div>
+                                    @else
+                                        <div class="alert alert-warning" role="alert">
+                                            <span class="alert-inner--icon me-2"><i class="fe fe-info"></i></span>
+                                            <span class="alert-inner--text"><strong>هیچ پزشکی برای این بخش تعریف نشده
+                                                    است</strong>
+                                                <br>
+                                                لطفا ابتدا برای این بخش ، پزشک انتخاب کنید و تنظیمات را انجام دهید تا
+                                                بتوانید اقدام
+                                                به ثبت
+                                                نوبت
+                                                نمایید</span>
+                                        </div>
+                                    @endif
+                                @elseif($wichPartSelected == 'selectPlace')
+                                    @if (isset($fetchData['placeList']) && $fetchData['placeList']->isNotEmpty())
+                                        <div class="d-flex flex-column g-3">
+                                            @foreach ($fetchData['placeList'] as $place)
+                                                <a wire:click='placeSelected({{ $place->id }})'
+                                                    class="badge bg-primary-gradient my-1 p-5 text-white"
+                                                    style="font-size: medium !important ; cursor: pointer;">{{ $place->title }}</a>
+                                            @endforeach
+                                        </div>
+                                    @else
+                                        <div class="alert alert-warning" role="alert">
+                                            <span class="alert-inner--icon me-2"><i class="fe fe-info"></i></span>
+                                            <span class="alert-inner--text"><strong>هیچ مطبی برای تعریف نشده
+                                                    است</strong>
+                                                <br>
+                                                لطفا ابتدا یک مطب به سیستتم اضافه کرده و تنظیمات زمان های حضور را از
+                                                قسمت
+                                                تنظیمات نوبت دهی انجام دهید
+                                            </span>
+                                        </div>
+                                    @endif
                                 @endif
                             @endif
-                        @endif
-                    @endforeach
+                        @endforeach
+                    </div>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">بیخیال</button>
                 </div>
             </div>
         </div>
-    </div>
+    </div> --}}
+    @include('appointmentuser::components.addappointment.modal.doclistmodal')
+    @include('appointmentuser::components.addappointment.modal.placelistmodal')
+    @include('appointmentuser::components.addappointment.modal.servicelistmodal')
 </div>
 @push('scripts')
     <script>
         $(document).ready(function() {
-            Livewire.on('lunchModal', function() {
-                var myModal = new bootstrap.Modal(document.getElementById('setDocOrsectionMOdal'), {
+            Livewire.on('lunchmodal', function(name) {
+                var myModal = new bootstrap.Modal(document.getElementById(name.name), {
                     keyboard: false
                 });
                 myModal.show();
-            })
+            });
         });
     </script>
 @endpush

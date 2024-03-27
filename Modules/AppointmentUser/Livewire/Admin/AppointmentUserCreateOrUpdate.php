@@ -3,6 +3,7 @@
 namespace Modules\AppointmentUser\Livewire\Admin;
 
 use Livewire\Component;
+use Modules\AppointmentSetting\app\Models\AppointmentSetting;
 use Modules\User\Entities\User;
 use Spatie\Permission\Models\Role;
 use Modules\Place\app\Models\Place;
@@ -15,12 +16,11 @@ class AppointmentUserCreateOrUpdate extends Component
     public array $form = [
         'doctorSelected'    => null,
         'doctorServices' => [],
-        'modalTitle' => '',
-        'modalStatus' => [
-            'selectPlace'  => false,
-            'selectDoctor' => false,
-            'selectService' => false,
-        ],
+        'modalSelectedData' => [
+            'doctor' => null,
+            'serviec' => null,
+            'place' => null,
+        ]
     ];
     public array $fetchData = [];
     public $modalDate = null;
@@ -39,54 +39,80 @@ class AppointmentUserCreateOrUpdate extends Component
         $this->render();
     }
 
-    //pass data to the modal after doctor has been selected
-    public function PlaceModal(User $doctor)
+    //if user lunch modal from doctor section
+    public function docSelected(User $user)
     {
-        $this->form['modalStatus']['selectPlace'] =  true;
-        $this->form['doctorSelected'] = $doctor;
-        $this->form['place'] = $doctor->places;
-        $this->form['doctorServices'] = $doctor->service;
-        $this->form['modalTitle'] = 'انتخاب مطب';
-        // if (isset($this->form['place']) && $this->form['place']->count() == 1) {
-        //     return $this->lunchDocModal();
-        // }
-        $this->lunchmodal();
-    }
-    public function PlaceSelectred(Place $place) {
-        $this->form['selectedPlace'] = $place->id ;
-        $this->lunchDocModal();
-    }
-
-    public function lunchDocModal()
-    {
-        $this->form['modalStatus']['selectDoctor'] =  true;
-        $this->form['modalTitle'] = 'انتخاب پزشک';
-        $this->lunchmodal();
-    }
-    public function lunchServiceDocModal(Service $service)
-    {
-        $this->form['modalStatus']['selectService'] =  true;
-        $this->form['ServiceDoctors'] = $service->user;
-        $this->form['modalTitle'] = 'انتخاب بخش';
-        $this->lunchmodal();
-    }
-    private function lunchmodal()
-    {
-        $this->dispatch('lunchModal', true);
-    }
-
-    //select section from modal
-    public function addAppointment($id)
-    {
-        if ($this->form['modalStatus'] == 'doctorSelected') {
-            $serviceid = $id;
-            $doctorid =  $this->form['doctorSelected'];
+        $this->fetchData = [];
+        $this->form['modalSelectedData']['serviec'] = null;
+        $this->form['modalSelectedData']['place']   = null;
+        $this->form['modalSelectedData']['doctor'] = $user->id;
+        if (AppointmentSetting::where('user_id', $user->id)->exists()) {
+            $this->fetchData['placeList'] = $user->places;
+            $this->lunchmodal('placeModal');
         } else {
-            $doctorid  = $id;
-            $serviceid =  $this->form['doctorSelected'];
+            return redirect()->route('admin.appointment.doctor.list')->with('error', " تنظیمات روز های حضور برای {$user->fullName} تعریف نشده است");
         }
-        return redirect()->route('admin.appointment.add.setTime', ['doctorId' => $doctorid, 'sectionId' => $serviceid]);
     }
+
+    public function placeSelected(Place $place)
+    {
+        $this->form['modalSelectedData']['place'] = $place->id;
+        if (
+            !empty($this->form['modalSelectedData']['doctor']) &&
+            !empty($this->form['modalSelectedData']['place'])
+        ) {
+            $doctor = User::find($this->form['modalSelectedData']['doctor']);
+            $this->fetchData['ServiceList'] = $doctor->service;
+            return  $this->lunchmodal('serviceModal');
+        }
+        return  $this->lunchmodal('docModal');
+    }
+    public function serviceSelected(Service $service)
+    {
+        return redirect()->route(
+            'admin.appointment.add.setTime',
+            [
+                'doctorId' =>  $this->form['modalSelectedData']['doctor'],
+                'sectionId' => $service->id,
+                'placeId' => $this->form['modalSelectedData']['place']
+            ]
+        );
+    }
+    //if user lunch modal from service section
+    public function serviceSelectedFromServiceSection(Service $service)
+    {
+        $this->fetchData = [];
+        $this->form['modalSelectedData']['place']   = null;
+        $this->form['modalSelectedData']['doctor']  = null;
+        $this->form['modalSelectedData']['service'] = $service->id;
+        $this->fetchData['docList'] = $service->user;
+        $associatedService = Service::with('user.places')->find($service->id);
+        $this->fetchData['placeList'] = $associatedService->user->flatMap->places;
+        $this->lunchModal('placeModal');
+    }
+    public function docSelectedFrommodal(User $user)
+    {
+        $this->form['modalSelectedData']['doctor'] = $user->id;
+        if (
+            !empty($this->form['modalSelectedData']['place']) &&
+            !empty($this->form['modalSelectedData']['doctor']) &&
+            !empty($this->form['modalSelectedData']['service'])
+        ) {
+            return redirect()->route(
+                'admin.appointment.add.setTime',
+                [
+                    'doctorId' =>  $this->form['modalSelectedData']['doctor'],
+                    'sectionId' => $this->form['modalSelectedData']['service'],
+                    'placeId' => $this->form['modalSelectedData']['place']
+                ]
+            );
+        }
+    }
+    private function lunchmodal($name)
+    {
+        $this->dispatch('lunchmodal', name: $name);
+    }
+
 
     public function mount()
     {
@@ -96,14 +122,20 @@ class AppointmentUserCreateOrUpdate extends Component
     }
     public function render()
     {
-
         $doctors = User::doctors_query()
             ->when(isset($this->search['doctors']) && !empty($this->search['doctors']), function ($query) {
-                return $query->whereHas('metas', function ($q) {
-                    $q->where([
-                        ['meta_key', UserMetaEnum::FIRST_NAME],
-                        ['meta_value', 'LIKE', "%{$this->search['doctors']}%"],
-                    ]);
+                return $query->where(function ($q) {
+                    $q->whereHas('metas', function ($q) {
+                        $q->where([
+                            ['meta_key', UserMetaEnum::FIRST_NAME],
+                            ['meta_value', 'LIKE', "%{$this->search['doctors']}%"],
+                        ]);
+                    })->orWhereHas('metas', function ($q) {
+                        $q->where([
+                            ['meta_key', UserMetaEnum::LAST_NAME],
+                            ['meta_value', 'LIKE', "%{$this->search['doctors']}%"],
+                        ]);
+                    });
                 });
             })->orderByDesc('id')->get();
 

@@ -62,17 +62,17 @@
                                 {{-- each time for day --}}
                                 @foreach ($availableAppointments as $index => $eachDay)
                                     @continue($index > 2)
-                                    <span
-                                        class="badge rounded-pill bg-success-gradient my-1 w-100 text-white hover-zoom"
-                                        style="font-size: 15px !important ; cursor: pointer;">
+                                    <button type="button"
+                                        wire:click="GotoAppointmentList('{{ $eachDay['time_stamp'] }}' ,'{{$eachDay['from']}}')"
+                                        wire:loading.class='btn-loading bg-gray' wire:target="GotoAppointmentList('{{ $eachDay['time_stamp'] }}' ,'{{$eachDay['from']}}')"
+                                        class="badge rounded-pill btn-success-gradient my-1 w-100 text-white hover-zoom"
+                                        style="font-size: 15px !important ; cursor: pointer; ">
                                         <div>
                                             <i class="fa fa-clock-o" aria-hidden="true"></i>
                                             <span> &nbsp;<strong>{{ substr($eachDay['from'], 0, -3) }}</strong>
                                             </span>
                                         </div>
-                                        {{-- <span wire:loading  wire:click='addAppointment({{'Date'}})' class="spinner-border spinner-border-sm" role="status"
-                                aria-hidden="true"></span> --}}
-                                    </span>
+                                    </button>
                                 @endforeach
                                 {{-- each time for day --}}
                                 <div class="d-flex flex-column align-items-center justify-content-center my-1">

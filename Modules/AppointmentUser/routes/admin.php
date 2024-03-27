@@ -21,7 +21,7 @@ Route::group([], function () {
     Route::get('appointment_user/list', AppointmentUserList::class)->name('appointment_user.list')->can('viewAny', AppointmentUser::class);
     Route::get('appointment_user/create', AppointmentUserCreateOrUpdate::class)->name('appointment_user.create')->can('create', AppointmentUser::class) ;
     Route::get('appointment_user/edit/{appointment_user}', AppointmentUserCreateOrUpdate::class)->name('appointment_user.edit')->can('edit', AppointmentUser::class) ;
-    Route::get('appointment/add/specificday/{date}', SpecificDayAvailableAppointment::class)->name('appointment.add.specificday');
+    Route::get('appointment/add/specificday/{date}/{appId}', SpecificDayAvailableAppointment::class)->name('appointment.add.specificday');
     Route::get('appointment/add/{doctorId}/{sectionId}/{placeId}', ListOfAvailableDay::class)->name('appointment.add.setTime');
 
 

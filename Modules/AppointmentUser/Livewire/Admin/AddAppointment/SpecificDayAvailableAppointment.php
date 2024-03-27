@@ -4,6 +4,8 @@ namespace Modules\AppointmentUser\Livewire\Admin\AddAppointment;
 
 use Livewire\Component;
 use Livewire\Attributes\On;
+use Illuminate\Support\Facades\Cache;
+use Modules\AppointmentSetting\app\Models\AppointmentSetting;
 
 class SpecificDayAvailableAppointment extends Component
 {
@@ -16,24 +18,24 @@ class SpecificDayAvailableAppointment extends Component
             $property == 'currentDate' => $this->loadDifferentDayDetail(),
             default => '',
         };
-        $this->tempMessage = null ;
+        $this->tempMessage = null;
     }
 
     public function loadDifferentDayDetail()
     {
         // if date has been change , this functio would be call
-        $this->tempMessage = null ;
+        $this->tempMessage = null;
     }
     public function previousDay()
     {
         sleep(1);
         //go to previous day
-        $this->tempMessage = null ;
+        $this->tempMessage = null;
     }
     public function nextDay()
     {
         //go to next day
-        $this->tempMessage = null ;
+        $this->tempMessage = null;
     }
 
     #[On('closeModal')]
@@ -44,6 +46,14 @@ class SpecificDayAvailableAppointment extends Component
         $this->tempMessage = 'تغییرات با موفقیت اعمال شد';
     }
 
+    public function mount()
+    {
+        $app = AppointmentSetting::find(request()->route('appId'));
+        $date = AppointmentSetting::find(request()->route('date'));
+        $listOfAppointment = Cache::rememberForever('appointmentList.' . $app->id, function () use ($app) {
+            return app('AppointmentUserService')->listAppointments($app);
+        });
+    }
     public function render()
     {
         return view('appointmentuser::livewire.admin.add-appointment.specific-day-available-appointment');

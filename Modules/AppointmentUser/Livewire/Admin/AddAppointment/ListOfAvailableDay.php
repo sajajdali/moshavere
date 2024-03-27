@@ -22,9 +22,9 @@ class ListOfAvailableDay extends Component
             return redirect()->route('admin.appointment.doctor.list')->with('error','لطفا ابتدا تنظیمات حضور پزشک را ثبت کنید');
         }
         //        Cache::forget('appointmentList.1');
-                $listUsers = Cache::rememberForever('appointmentList.'.$appointmentSetting->id, function () use ($appointmentSetting) {
-                    return app('AppointmentUserService')->listAppointments($appointmentSetting->id);
-                });
+                // $listUsers = Cache::rememberForever('appointmentList.'.$appointmentSetting->id, function () use ($appointmentSetting) {
+                //     return app('AppointmentUserService')->listAppointments($appointmentSetting->id);
+                // });
     }
 
     public function GotoSpecificDay()

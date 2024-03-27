@@ -19,7 +19,7 @@
                 <div class="card-body">
                     <div class="card-header d-flex justify-content-between py-0">
                         <span>نوبت های امروز</span>
-                        <a href="{{ route('admin.appointment.list') }}">مشاهده همه</a>
+                        <a href="{{ route('admin.appointment_user.list') }}">مشاهده همه</a>
                     </div>
                 </div>
                 <div class="card-body">

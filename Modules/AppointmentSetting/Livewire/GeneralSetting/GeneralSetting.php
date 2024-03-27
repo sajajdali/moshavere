@@ -6,13 +6,10 @@ use Livewire\Component;
 use App\Enum\ActiveEnum;
 use Illuminate\Validation\Rule;
 use Modules\User\Entities\User;
-use Illuminate\Support\Facades\Cache;
 use Hekmatinasser\Verta\Facades\Verta;
-use Modules\AppointmentSetting\app\Jobs\CacheJob;
-use Modules\AppointmentSetting\app\Jobs\createCacheJob;
+use Modules\AppointmentUser\app\Jobs\CacheJob;
 use Modules\AppointmentSetting\app\Models\AppointmentSegment;
 use Modules\AppointmentSetting\app\Models\AppointmentSetting;
-use Modules\AppointmentSetting\app\Models\AppointmentSettingTime;
 use Modules\AppointmentSetting\app\Enum\AppintmentSettingDayNumber;
 use Modules\AppointmentSetting\app\Enum\AppintmentSettingInterface;
 use Modules\AppointmentSetting\app\Enum\AppintmentSettingPaymentStatus;
@@ -85,7 +82,7 @@ class GeneralSetting extends Component
                 if (isset($this->form['visitType'][$dayType])) {
                     unset($this->form['visitType'][$dayType]);
                 }
-                $this->counter[$dayType] = 1 ;
+                $this->counter[$dayType] = 1;
             }
         }
     }

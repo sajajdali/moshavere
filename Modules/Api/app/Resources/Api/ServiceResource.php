@@ -12,9 +12,10 @@ class ServiceResource extends JsonResource
     public function toArray($request): array
     {
         return [
-            'id'    => $this->id,
-            'title' => $this->title,
+            'id'        => $this->id,
+            'title'     => $this->title,
             'priority'  => $this->priority,
+            'icon'      => $this->icon ?? url('default/avatar.png'),
             'created_at'    => dateFormat($this->creted_at),
             'questions' => $this->questionList()
         ];

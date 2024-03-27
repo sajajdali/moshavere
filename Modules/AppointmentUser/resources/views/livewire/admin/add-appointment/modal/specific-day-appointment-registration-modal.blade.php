@@ -207,8 +207,8 @@
             </div>
         </div>
     </div>
-    <livewire:appointmentuser::admin.add-appointment.modal.service-and-doctor-modal />
-    <livewire:appointmentuser::admin.add-appointment.modal.specific-day-appointment-registration-modal />
+    <livewire:appointmentsetting::modal.service-and-doctor-modal />
+    <livewire:appointmentsetting::add-appointment.modal.specific-day-appointment-registration-modal />
 </div>
 @push('scripts')
     <!-- SELECT2 JS -->

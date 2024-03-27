@@ -23,7 +23,7 @@ class AppointmentApiController extends Controller
     public function doctorsList()
     {
         $user = auth()->user();
-        $doctors = User::doctors(onlyActiveAppointment: true);
+        $doctors = User::doctors_query()->whereHas('appointmentSettings')->get();
 
         return $this->ok([
                 'status' => true,
@@ -159,6 +159,15 @@ class AppointmentApiController extends Controller
         ];
     }
 
+    public function store(Request $request)
+    {
+        $appointmentSetting = AppointmentSetting::findOrFail($request->input('appointment_setting_id'));
+        $appointmentUser = [
+            'timestamp' => $request->input('timestamp'),
+        ];
+        $timestamp          = $request->input('timestamp');
+        app('AppointmentUserService')->storeAppointment($appointmentSetting , [] , $appointmentUser);
+    }
     public function listDays(Request $request)
     {
         $doctorId = $request->input('doctor_id');
@@ -193,6 +202,7 @@ class AppointmentApiController extends Controller
 
         return $this->ok([
             'status' => true,
+            'appointment_setting_id' => $appointmentSetting->id,
             'firstTwoEmpty' => $resultList['firstTwoEmpty'],
             'getListEmptyAppointment' => $resultList['listAppointments']
         ]);

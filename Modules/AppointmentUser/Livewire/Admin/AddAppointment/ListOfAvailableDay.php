@@ -2,6 +2,7 @@
 
 namespace Modules\AppointmentUser\Livewire\Admin\AddAppointment;
 
+use Carbon\Carbon;
 use Livewire\Component;
 use Illuminate\Support\Facades\Cache;
 use Hekmatinasser\Verta\Facades\Verta;
@@ -12,6 +13,18 @@ class ListOfAvailableDay extends Component
     public $specificDayDate;
     public array $fethData = [];
 
+
+    public function GotoSpecificDay()
+    {
+        $date = Verta::parse($this->specificDayDate)->toCarbon()->timestamp;
+        return redirect()->route('admin.appointment.add.specificday', ['date' => $date]);
+    }
+    public function GotoAppointmentList($time, $day)
+    {
+        $hour = explode(':', $day);
+        $date = Carbon::parse((int)$time)->setTime($hour[0], $hour[1])->timestamp;
+        return redirect()->route('admin.appointment.add.specificday', ['date' => $date,'appId' => $this->fethData['appointmentSetting']]);
+    }
     private function findFirstTreeAppointment($listOfAppointment)
     {
 
@@ -74,7 +87,6 @@ class ListOfAvailableDay extends Component
                 }
             }
         }
-        // dd($result);
         return $result;
     }
     public function mount()
@@ -94,19 +106,12 @@ class ListOfAvailableDay extends Component
         if (empty($appointmentSetting)) {
             return redirect()->route('admin.appointment.doctor.list')->with('error', 'لطفا ابتدا تنظیمات حضور پزشک را ثبت کنید');
         }
-        Cache::forget('appointmentList.' . $appointmentSetting->id);
         $listOfAppointment = Cache::rememberForever('appointmentList.' . $appointmentSetting->id, function () use ($appointmentSetting) {
             return app('AppointmentUserService')->listAppointments($appointmentSetting);
         });
         $this->fethData['firstTreeAvailableAppointment'] =  $this->findFirstTreeAppointment($listOfAppointment);
+        $this->fethData['appointmentSetting'] = $appointmentSetting->id ;
     }
-
-    public function GotoSpecificDay()
-    {
-        $date = Verta::parse($this->specificDayDate)->toCarbon()->timestamp;
-        return redirect()->route('admin.appointment.add.specificday', ['date' => $date]);
-    }
-
 
     public function render()
     {

@@ -258,7 +258,7 @@ class AppointmentApiController extends Controller
             'status' => true,
             'appointment_setting_id' => $appointmentSetting->id,
             'first_two_empty' => $resultList['firstTwoEmpty'],
-            'getList_empty_appointment' => $resultList['listAppointments']
+            'get_list_empty_appointment' => $resultList['listAppointments']
         ]);
     }
 

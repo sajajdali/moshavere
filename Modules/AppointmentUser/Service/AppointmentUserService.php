@@ -8,6 +8,7 @@ use Modules\Absence\app\Models\Absence;
 use Modules\AppointmentSetting\app\Models\AppointmentSetting;
 use Modules\AppointmentSetting\app\Models\AppointmentSettingTime;
 use Modules\AppointmentUser\app\Models\AppointmentUser;
+use Modules\AppointmentUser\Enum\AppointmentUserKindEnum;
 use Modules\AppointmentUser\Enum\AppointmentUserStatusEnum;
 use Modules\AppointmentUser\Enum\AppointmentVia;
 use Modules\AppointmentUser\Enum\model\AppointmentModel;
@@ -404,18 +405,35 @@ class AppointmentUserService
     }
 
 
-    private function checkActivePayment(AppointmentSetting $appointmentSetting)
+    private function paymentstatus(AppointmentSetting $appointmentSetting)
     {
+        $deadLineDelete = null;
+        $statusPayment = false;
+        $forcePayment = false;
+        $price = null;
+
         $detail = $appointmentSetting['detail'];
-        if (isset($detail['payment']) && isset($detail['payment']['online'])){
-            dd($detail['payment']);
+        if (isset($detail['payment']) && isset($detail['payment']['online']) && $detail['payment']['online']['status']){
+            $statusPayment = true;
+            if(isset($detail['payment']['online']['notPayinStatus']) && $detail['payment']['online']['notPayinStatus'] == AppointmentSetting::DETAIL_PAYMENT_NOT_PAY_STATUS_DONT_SUBMIT){
+                $deadLineDelete = Carbon::now()->addHours(4)->toDateTimeString();
+                $forcePayment = true;
+            }
+            $price = $detail['payment']['price'];
         }
+        return [
+            'status' => $statusPayment,
+            'deadline' => $deadLineDelete,
+            'force_payment' => $forcePayment,
+            'price' => $price
+        ];
     }
 
     public function storeAppointment(AppointmentSetting $appointmentSetting ,UserModelAppointment $userModelAppointment,AppointmentModel $appointmentData , $detail = [])
     {
         // check exist appointment
         $dateAppointment = Carbon::createFromTimestamp($appointmentData->timestamp);
+        $visitDateTime = Carbon::createFromTimestamp($appointmentData->timestamp);
         if ($appointmentData->appointmentVia == AppointmentVia::SELF && $dateAppointment->isPast()){
             return [
                 'status' => false,
@@ -435,20 +453,35 @@ class AppointmentUserService
             ];
         }
 
-        if ($this->checkActivePayment($appointmentSetting)){
-            dd("SA");
-        }
+        $paymentstatus = $this->paymentstatus($appointmentSetting);
+        // create payment link
+
         // store appointment
-        $appointmentSetting->appointmentUsers()->create([
+        $appointmentUserModel = [
             'service_id' => $appointmentData->serviceId,
             'place_id' => $appointmentData->placeId,
             'user_id' => $userModelAppointment->userModel->user->id,
             'doctor_id' => $appointmentSetting->user_id,
-            'agent_id'  => $appointmentData->agentId,
-            'operator_id'   => $appointmentData->operatorId,
+            'agent_id' => $appointmentData->agentId,
+            'operator_id' => $appointmentData->operatorId,
             'tracking_code' => AppointmentUser::generateTrackingCode(),
-            'status' => AppointmentUserStatusEnum::STATUS_SUCCESSFUL
-        ]);
+            'status' => AppointmentUserStatusEnum::STATUS_SUCCESSFUL,
+            'kind' => $appointmentData->kind,
+            'start_time' => $visitDateTime->toTimeString(),
+            'end_time' => $visitDateTime->copy()->addMinutes($appointmentSetting->time_for_visit)->toTimeString(),
+            'date_visit' => $visitDateTime->toDateTimeString(),
+            'user_ip' => ip(),
+
+        ];
+        if ($appointmentData->appointmentVia == AppointmentVia::SELF && $paymentstatus['status']){
+            $appointmentUserModel['deadline'] = $paymentstatus['deadline'];
+            if ($paymentstatus['force_payment']){
+                $appointmentUserModel['status'] = AppointmentUserStatusEnum::STATUS_WAIT_PAYMENT;
+            }
+        }
+        $appointmentUser = $appointmentSetting->appointmentUsers()->create($appointmentUserModel);
+        dd($appointmentUser);
+
 
         return [
             'status' => true,

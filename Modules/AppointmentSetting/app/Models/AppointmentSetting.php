@@ -15,12 +15,16 @@ use Modules\AppointmentSetting\Database\factories\AppointmentSettingFactory;
 class AppointmentSetting extends Model
 {
     use HasFactory, SoftDeletes;
+
+    const DETAIL_PAYMENT_NOT_PAY_STATUS_DONT_SUBMIT = 'dontSubmit';
+    const DETAIL_PAYMENT_NOT_PAY_STATUS_SUBMIT = 'submit';
     protected $casts = [
         'active' => ActiveEnum::class,
         'last_day_active' => 'date',
         'interference' => 'boolean',
         'detail' => 'json',
     ];
+
     /**
      * The attributes that are mass assignable.
      */

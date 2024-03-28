@@ -2,6 +2,7 @@
 
 namespace Modules\AppointmentUser\Enum\model;
 
+use Modules\AppointmentUser\Enum\AppointmentUserKindEnum;
 use Modules\AppointmentUser\Enum\AppointmentVia;
 
 class AppointmentModel
@@ -13,6 +14,7 @@ class AppointmentModel
     public ?int $placeId;
     public ?int $agentId;
     public ?int $operatorId;
+    public ?AppointmentUserKindEnum $kind;
 
     /**
      * @param int $timestamp
@@ -21,7 +23,7 @@ class AppointmentModel
      * @param int|null $serviceId
      * @param int|null $placeId
      */
-    public function __construct(int $timestamp, AppointmentVia $appointmentVia = AppointmentVia::SELF, bool $sendSmsToUser = true, ?int $serviceId = null, ?int $placeId = null , ?int $agentId = null,?int $operatorId = null)
+    public function __construct(int $timestamp, AppointmentVia $appointmentVia = AppointmentVia::SELF, bool $sendSmsToUser = true, ?int $serviceId = null, ?int $placeId = null , ?int $agentId = null,?int $operatorId = null , ?AppointmentUserKindEnum $kind = AppointmentUserKindEnum::IN_PERSION)
     {
         $this->timestamp = $timestamp;
         $this->appointmentVia = $appointmentVia;
@@ -30,6 +32,7 @@ class AppointmentModel
         $this->placeId = $placeId;
         $this->agentId = $agentId;
         $this->operatorId = $operatorId;
+        $this->kind = $kind;
     }
 
 

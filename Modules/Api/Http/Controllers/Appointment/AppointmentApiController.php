@@ -211,7 +211,7 @@ class AppointmentApiController extends Controller
         );
 
         $storeAppointment = app('AppointmentUserService')->storeAppointment($appointmentSetting , $userModelAppointment  , $appointmentModel );
-        if ($storeAppointment['status']){
+        if (!$storeAppointment['status']){
             return $this->requestException([
                 'status' => false,
                 'message' => $storeAppointment['message']
@@ -257,8 +257,8 @@ class AppointmentApiController extends Controller
         return $this->ok([
             'status' => true,
             'appointment_setting_id' => $appointmentSetting->id,
-            'firstTwoEmpty' => $resultList['firstTwoEmpty'],
-            'getListEmptyAppointment' => $resultList['listAppointments']
+            'first_two_empty' => $resultList['firstTwoEmpty'],
+            'getList_empty_appointment' => $resultList['listAppointments']
         ]);
     }
 

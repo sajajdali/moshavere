@@ -388,6 +388,7 @@ class AppointmentUserService
         if (!$appointmentSetting->interference){
             $existingAppointments->where('appointment_setting_id', $appointmentSetting->id);
         }
+
         $existingAppointments = $existingAppointments
             ->whereDate('date_visit', $dateVisit)
             ->where(function ($query) use ($startDateTime, $endDateTime) {
@@ -407,15 +408,29 @@ class AppointmentUserService
     public function storeAppointment(AppointmentSetting $appointmentSetting ,UserModelAppointment $userModelAppointment,AppointmentModel $appointmentData , $detail = [])
     {
         // check exist appointment
-
         $dateAppointment = Carbon::createFromTimestamp($appointmentData->timestamp);
-        $checkTimeAvailable = $this->isAppointmentTimeAvailable($dateAppointment->toTimeString(), $dateAppointment->copy()->addMinutes($appointmentSetting->time_for_visit)->toTimeString(), $dateAppointment->toDateString(), $appointmentSetting);
         if ($appointmentData->appointmentVia == AppointmentVia::SELF && $dateAppointment->isPast()){
             return [
                 'status' => false,
                 'message' => 'زمان ارسالی برای ثبت نوبت اشتباه است و لطفا مجدد اقدام کنید',
+                'route' => 'time'
             ];
         }
+
+
+        $checkTimeAvailable = $this->isAppointmentTimeAvailable($dateAppointment->toTimeString(), $dateAppointment->copy()->addMinutes($appointmentSetting->time_for_visit)->toTimeString(), $dateAppointment->toDateString(), $appointmentSetting);
+        if (!$checkTimeAvailable){
+            return [
+                'status' => false,
+                'message' => 'زمان انتخابی شما توسط شخصی دیگر پر شده است . لطفا یک زمان دیگر انتخاب کنید',
+                'route' => 'time'
+            ];
+        }
+
+        return [
+            'status' => true,
+            'message' => 'نوبت با موفقیت برای کاربر ثبت شد',
+        ];
 
 
         //        $appointmentLists->where('start_time', '>', $dateAppointment)->where('end_time',);

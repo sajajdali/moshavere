@@ -21,9 +21,11 @@ class ListOfAvailableDay extends Component
     }
     public function GotoAppointmentList($time, $day)
     {
-        $hour = explode(':', $day);
-        $date = Carbon::parse((int)$time)->setTime($hour[0], $hour[1])->timestamp;
-        return redirect()->route('admin.appointment.add.specificday', ['date' => $date,'appId' => $this->fethData['appointmentSetting']]);
+        $timeArray = explode(':', $day);
+        $passedDate =  verta(Carbon::parse((int)$time))->format('Y-m-d');
+        $passedHour = Carbon::createFromTimestamp((int)$time)->setTime($timeArray[0], $timeArray[1])->timestamp;
+
+        return redirect()->route('admin.appointment.add.specificday', ['appId' => $this->fethData['appointmentSetting'], 'date' => $passedDate, 'time' => $passedHour]);
     }
     private function findFirstTreeAppointment($listOfAppointment)
     {
@@ -110,7 +112,7 @@ class ListOfAvailableDay extends Component
             return app('AppointmentUserService')->listAppointments($appointmentSetting);
         });
         $this->fethData['firstTreeAvailableAppointment'] =  $this->findFirstTreeAppointment($listOfAppointment);
-        $this->fethData['appointmentSetting'] = $appointmentSetting->id ;
+        $this->fethData['appointmentSetting'] = $appointmentSetting->id;
     }
 
     public function render()

@@ -20,13 +20,15 @@
             <div class="card custom-card">
                 <div class="card-header d-flex justify-content-between border-bottom">
                     <div>
-                        <button class="btn btn-light" wire:click='previousDay'>
+                        <button class="btn btn-light" wire:click='previousDay' data-bs-toggle="tooltip"
+                            data-bs-placement="top" title="روز قبل">
                             <i class="fa fa-arrow-right" aria-hidden="true"></i>
                         </button>
-                        <input class="text-center" type="text" value="شنبه 1402:01:15" id="currentDate"
-                            style="max-width: fit-content">
+                        <input class="text-center" type="text" id="currentDate"
+                            placeholder="{{ $fetchData['selectedDateShamsiValue'] }}" style="max-width: fit-content">
                         <button class="btn btn-light" wire:click='nextDay'>
-                            <i class="fa fa-arrow-left" aria-hidden="true"></i>
+                            <i class="fa fa-arrow-left" aria-hidden="true" data-bs-toggle="tooltip"
+                                data-bs-placement="top" title="روز بعد"></i>
                         </button>
                     </div>
                     <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#RegistrAnAppointment">ثبت
@@ -50,156 +52,83 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                <tr>
-                                    <td colspan="6">
-                                        <div class="alert alert-avatar alert-primary alert-dismissible">
-                                            حضور از ساعت 6 عصر به بعد
-                                        </div>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td class="alert text-center bg-info ">1</td>
-                                    <td>
-                                        10:30 - 10:45
-                                    </td>
-                                    <td colspan="4" class="text-center">
-                                        <button type="button" style="width: 124px" data-time-start="10:30"
-                                            data-bs-toggle="modal" data-bs-target="#RegistrAnAppointment"
-                                            data-time-end="10:45" class="btn btn-sm btn-success btn-block">ثبت
-                                            نوبت</button>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td class="alert text-center bg-info">2</td>
-                                    <td>
-                                        10:45 - 11:00
-                                    </td>
-                                    <td colspan="4" class="text-center">
-                                        <button type="button" style="width: 124px" data-time-start="10:45"
-                                            data-bs-toggle="modal" data-bs-target="#RegistrAnAppointment"
-                                            data-time-end="11:00" class="btn btn-sm  btn-success btn-block">ثبت
-                                            نوبت</button>
-                                    </td>
-                                </tr>
-                                <tr class="table-success">
-                                    <td class="alert text-center bg-info ">3</td>
-                                    <td>
-                                        10:45 - 10:50
-                                    </td>
-                                    <td>
-                                        حامد ریسی
-                                    </td>
-                                    <td>
-                                        0937 60 20 827
-                                    </td>
-                                    <td>
-                                        ثبت شده
-                                    </td>
-                                    <td>
-                                        <div class="dropdown">
-                                            <button class="btn btn-danger dropdown-toggle" type="button"
-                                                id="dropdownMenuButton1" data-bs-toggle="dropdown"
-                                                aria-expanded="false">
-                                                عملیات
-                                            </button>
-                                            <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton1">
-                                                <li><a class="dropdown-item" href="#">ویرایش</a></li>
-                                                <li><a class="dropdown-item" href="#">حذف</a></li>
-                                            </ul>
-                                        </div>
-                                    </td>
-                                </tr>
-                                <tr class="table-primary">
-                                    <td class="alert text-center bg-info ">3</td>
-                                    <td>
-                                        10:45 - 10:50
-                                    </td>
-                                    <td>
-                                        پیمان یوسفی
-                                    </td>
-                                    <td>
-                                        0937 60 20 827
-                                    </td>
-                                    <td>
-                                        در انتظار
-                                    </td>
-                                    <td>
-                                        <div class="dropdown">
-                                            <button class="btn btn-danger dropdown-toggle" type="button"
-                                                id="dropdownMenuButton1" data-bs-toggle="dropdown"
-                                                aria-expanded="false">
-                                                عملیات
-                                            </button>
-                                            <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton1">
-                                                <li><a class="dropdown-item" href="#">ویرایش</a></li>
-                                                <li><a class="dropdown-item" href="#">حذف</a></li>
-                                            </ul>
-                                        </div>
-                                    </td>
-                                </tr>
-                                <tr class="table-warning">
-                                    <td class="alert text-center bg-info ">3</td>
-                                    <td>
-                                        10:45 - 10:50
-                                    </td>
-                                    <td>
-                                        صصیصیص صی
-                                    </td>
-                                    <td>
-                                        0937 60 20 827
-                                    </td>
-                                    <td>
-                                        پرداخت نکرده
-                                    </td>
-                                    <td>
-                                        <div class="dropdown">
-                                            <button class="btn btn-danger dropdown-toggle" type="button"
-                                                id="dropdownMenuButton1" data-bs-toggle="dropdown"
-                                                aria-expanded="false">
-                                                عملیات
-                                            </button>
-                                            <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton1">
-                                                <li><a class="dropdown-item" href="#">ویرایش</a></li>
-                                                <li><a class="dropdown-item" href="#">حذف</a></li>
-                                            </ul>
-                                        </div>
-                                    </td>
-                                </tr>
-                                <tr class="table-danger">
-                                    <td class="alert text-center bg-info ">3</td>
-                                    <td>
-                                        10:45 - 10:50
-                                    </td>
-                                    <td>
-                                        حامد ریسی
-                                    </td>
-                                    <td>
-                                        0937 60 20 827
-                                    </td>
-                                    <td>
-                                        لغو شده
-                                    </td>
-                                    <td>
-                                        <div class="dropdown">
-                                            <button class="btn btn-danger dropdown-toggle" type="button"
-                                                id="dropdownMenuButton1" data-bs-toggle="dropdown"
-                                                aria-expanded="false">
-                                                عملیات
-                                            </button>
-                                            <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton1">
-                                                <li><a class="dropdown-item" href="#">ویرایش</a></li>
-                                                <li><a class="dropdown-item" href="#">حذف</a></li>
-                                            </ul>
-                                        </div>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td colspan="6">
-                                        <div class="alert alert-avatar alert-primary alert-dismissible">
-                                            حضور تا ساعت 10 عصر
-                                        </div>
-                                    </td>
-                                </tr>
+                                @if (empty($fetchData['listOfAppointment']))
+                                    <tr>
+                                        <td colspan="6">
+                                            <div class="alert alert-avatar alert-primary alert-dismissible">
+                                                زمان حضور برای این تاریخ تعیین نشده است!!
+                                            </div>
+                                        </td>
+                                    </tr>
+                                @endif
+                                @foreach ($fetchData['listOfAppointment'] as $index => $avaiableTimes)
+                                    @continue($avaiableTimes['is_active'] == 'false')
+                                    @foreach ($avaiableTimes['times'] as $key => $eachTime)
+                                        @if ($loop->first)
+                                            <tr>
+                                                <td colspan="6">
+                                                    <div class="alert alert-avatar alert-primary alert-dismissible">
+                                                        حضور از ساعت {{ substr($eachTime['from'], 0, -6) }} عصر به بعد
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        @endif
+                                        @if ($eachTime['status'])
+                                            <tr>
+                                                <td class="alert text-center bg-info ">{{ $key + 1 }}</td>
+                                                <td>
+                                                    {{ substr($eachTime['from'], 0, -3) }} -
+                                                    {{ substr($eachTime['until'], 0, -3) }}
+                                                </td>
+                                                <td colspan="4" class="text-center">
+                                                    <button type="button" style="width: 124px" data-time-start="10:30"
+                                                        data-bs-toggle="modal" data-bs-target="#RegistrAnAppointment"
+                                                        data-time-end="10:45"
+                                                        class="btn btn-sm btn-success btn-block">ثبت
+                                                        نوبت</button>
+                                                </td>
+                                            </tr>
+                                        @else
+                                            {{-- <tr class="table-success">
+                                        <td class="alert text-center bg-info ">3</td>
+                                        <td>
+                                            10:45 - 10:50
+                                        </td>
+                                        <td>
+                                            حامد ریسی
+                                        </td>
+                                        <td>
+                                            0937 60 20 827
+                                        </td>
+                                        <td>
+                                            ثبت شده
+                                        </td>
+                                        <td>
+                                            <div class="dropdown">
+                                                <button class="btn btn-danger dropdown-toggle" type="button"
+                                                    id="dropdownMenuButton1" data-bs-toggle="dropdown"
+                                                    aria-expanded="false">
+                                                    عملیات
+                                                </button>
+                                                <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton1">
+                                                    <li><a class="dropdown-item" href="#">ویرایش</a></li>
+                                                    <li><a class="dropdown-item" href="#">حذف</a></li>
+                                                </ul>
+                                            </div>
+                                        </td>
+                                    </tr> --}}
+                                        @endif
+                                        @if ($loop->last)
+                                            <tr>
+                                                <td colspan="6">
+                                                    <div class="alert alert-avatar alert-primary alert-dismissible">
+                                                        حضور تا ساعت {{ substr($eachTime['until'], 0, -6) }} عصر
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        @endif
+                                    @endforeach
+                                @endforeach
                             </tbody>
                         </table>
                     </div>
@@ -207,6 +136,7 @@
             </div>
         </div>
     </div>
+
     <livewire:appointmentuser::admin.add-appointment.modal.service-and-doctor-modal />
     <livewire:appointmentuser::admin.add-appointment.modal.specific-day-appointment-registration-modal />
 </div>
@@ -226,7 +156,7 @@
                 format: 'L',
                 autoClose: true,
                 onSelect: function(unix) {
-                    @this.set('currentDate', $('#currentDate').val());
+                    @this.set('form.changeDate', $('#currentDate').val());
                 }
             });
             Livewire.on('closeModal', function() {

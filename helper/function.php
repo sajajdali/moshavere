@@ -47,3 +47,7 @@ function dateFormat($date)
 {
     return verta($date)->format('d F Y');
 }
+function appointmentUser()
+{
+    return app('appointmentUser');
+}

@@ -8,6 +8,10 @@ use Modules\Absence\app\Models\Absence;
 use Modules\AppointmentSetting\app\Models\AppointmentSetting;
 use Modules\AppointmentSetting\app\Models\AppointmentSettingTime;
 use Modules\AppointmentUser\app\Models\AppointmentUser;
+use Modules\AppointmentUser\Enum\AppointmentVia;
+use Modules\AppointmentUser\Enum\model\AppointmentModel;
+use Modules\AppointmentUser\Enum\model\MainUserModel;
+use Modules\AppointmentUser\Enum\model\UserModelAppointment;
 use Verta;
 
 class AppointmentUserService
@@ -400,15 +404,21 @@ class AppointmentUserService
 
 
 
-    public function storeAppointment(AppointmentSetting $appointmentSetting , $userData = [], $appointmentData = [])
+    public function storeAppointment(AppointmentSetting $appointmentSetting ,UserModelAppointment $userModelAppointment,AppointmentModel $appointmentData , $detail = [])
     {
         // check exist appointment
-        $dateAppointment = (Carbon::createFromTimestamp($appointmentData['timestamp']));
+
+        $dateAppointment = Carbon::createFromTimestamp($appointmentData->timestamp);
         $checkTimeAvailable = $this->isAppointmentTimeAvailable($dateAppointment->toTimeString(), $dateAppointment->copy()->addMinutes($appointmentSetting->time_for_visit)->toTimeString(), $dateAppointment->toDateString(), $appointmentSetting);
-        dd($checkTimeAvailable , $dateAppointment->toTimeString(), $dateAppointment->copy()->addMinutes($appointmentSetting->time_for_visit)->toTimeString(), $dateAppointment->toDateString());
+        if ($appointmentData->appointmentVia == AppointmentVia::SELF && $dateAppointment->isPast()){
+            return [
+                'status' => false,
+                'message' => 'زمان ارسالی برای ثبت نوبت اشتباه است و لطفا مجدد اقدام کنید',
+            ];
+        }
+
+
         //        $appointmentLists->where('start_time', '>', $dateAppointment)->where('end_time',);
-
-
     }
 
 

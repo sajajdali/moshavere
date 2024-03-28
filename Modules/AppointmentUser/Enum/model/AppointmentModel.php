@@ -1,0 +1,32 @@
+<?php
+
+namespace Modules\AppointmentUser\Enum\model;
+
+use Modules\AppointmentUser\Enum\AppointmentVia;
+
+class AppointmentModel
+{
+    public int $timestamp;
+    public AppointmentVia $appointmentVia;
+    public bool $sendSmsToUser;
+    public ?int $serviceId;
+    public ?int $placeId;
+
+    /**
+     * @param int $timestamp
+     * @param AppointmentVia $appointmentVia
+     * @param bool $sendSmsToUser
+     * @param int|null $serviceId
+     * @param int|null $placeId
+     */
+    public function __construct(int $timestamp, AppointmentVia $appointmentVia = AppointmentVia::SELF, bool $sendSmsToUser = true, ?int $serviceId = null, ?int $placeId = null)
+    {
+        $this->timestamp = $timestamp;
+        $this->appointmentVia = $appointmentVia;
+        $this->sendSmsToUser = $sendSmsToUser;
+        $this->serviceId = $serviceId;
+        $this->placeId = $placeId;
+    }
+
+
+}

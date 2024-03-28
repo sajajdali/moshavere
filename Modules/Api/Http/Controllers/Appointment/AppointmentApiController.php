@@ -74,6 +74,7 @@ class AppointmentApiController extends Controller
 
                             $firstTwoEmpty[$matchesFound]['time_stamp'] = $time['timestamp'];
                             $firstTwoEmpty[$matchesFound]['from'] = $time['from'];
+                            $firstTwoEmpty[$matchesFound]['status'] = true;
                             $firstTwoEmpty[$matchesFound]['until'] = $time['until'];
                             $firstTwoEmpty[$matchesFound]['persian_date'] = $vertaDateTime->format('ساعت H روز l m/d');
 
@@ -133,6 +134,7 @@ class AppointmentApiController extends Controller
                             // Increment the counter
                             $result[$dayNumber][] = [
                                 'status' => true,
+                                'persian_date' => null,
                                 'time_stamp' => $time['timestamp'],
                                 'from' =>  substr($time['from'], 0, -3),
                                 'until' => substr($time['until'], 0, -3),
@@ -140,6 +142,7 @@ class AppointmentApiController extends Controller
                             if (count($firstTwoEmpty) < 2) {
                                 $vertaDateTime = Verta::createTimestamp($time['timestamp']);
                                 $firstTwoEmpty[] = [
+                                    'status' => true,
                                     'persian_date' => $vertaDateTime->format('ساعت H روز l m/d'),
                                     'time_stamp' => $time['timestamp'],
                                     'from' => substr($time['from'], 0, -3),
@@ -207,7 +210,17 @@ class AppointmentApiController extends Controller
             placeId: $request->input('place_id')
         );
 
-        app('AppointmentUserService')->storeAppointment($appointmentSetting , $userModelAppointment  , $appointmentModel );
+        $storeAppointment = app('AppointmentUserService')->storeAppointment($appointmentSetting , $userModelAppointment  , $appointmentModel );
+        if ($storeAppointment['status']){
+            return $this->requestException([
+                'status' => false,
+                'message' => $storeAppointment['message']
+            ]);
+        }
+        return $this->created([
+            'status' => true,
+            'message' => $storeAppointment['message']
+        ]);
     }
     public function listDays(Request $request)
     {

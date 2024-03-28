@@ -11,6 +11,8 @@ class AppointmentModel
     public bool $sendSmsToUser;
     public ?int $serviceId;
     public ?int $placeId;
+    public ?int $agentId;
+    public ?int $operatorId;
 
     /**
      * @param int $timestamp
@@ -19,13 +21,15 @@ class AppointmentModel
      * @param int|null $serviceId
      * @param int|null $placeId
      */
-    public function __construct(int $timestamp, AppointmentVia $appointmentVia = AppointmentVia::SELF, bool $sendSmsToUser = true, ?int $serviceId = null, ?int $placeId = null)
+    public function __construct(int $timestamp, AppointmentVia $appointmentVia = AppointmentVia::SELF, bool $sendSmsToUser = true, ?int $serviceId = null, ?int $placeId = null , ?int $agentId = null,?int $operatorId = null)
     {
         $this->timestamp = $timestamp;
         $this->appointmentVia = $appointmentVia;
         $this->sendSmsToUser = $sendSmsToUser;
         $this->serviceId = $serviceId;
         $this->placeId = $placeId;
+        $this->agentId = $agentId;
+        $this->operatorId = $operatorId;
     }
 
 

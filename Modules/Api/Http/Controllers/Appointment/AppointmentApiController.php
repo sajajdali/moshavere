@@ -131,16 +131,17 @@ class AppointmentApiController extends Controller
 
 
                         if ($time['status']) {
+                            $vertaDateTime = Verta::createTimestamp($time['timestamp']);
                             // Increment the counter
                             $result[$dayNumber][] = [
                                 'status' => true,
-                                'persian_date' => null,
+                                'persian_date' => $vertaDateTime->format('ساعت H روز l m/d'),
                                 'time_stamp' => $time['timestamp'],
                                 'from' =>  substr($time['from'], 0, -3),
                                 'until' => substr($time['until'], 0, -3),
                             ];
                             if (count($firstTwoEmpty) < 2) {
-                                $vertaDateTime = Verta::createTimestamp($time['timestamp']);
+
                                 $firstTwoEmpty[] = [
                                     'status' => true,
                                     'persian_date' => $vertaDateTime->format('ساعت H روز l m/d'),

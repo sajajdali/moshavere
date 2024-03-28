@@ -3,6 +3,7 @@
 namespace Modules\AppointmentSetting\app\Models;
 
 use App\Enum\ActiveEnum;
+use Modules\AppointmentUser\app\Models\AppointmentUser;
 use Modules\User\Entities\User;
 use Illuminate\Database\Eloquent\Model;
 use Modules\Service\app\Models\Service;
@@ -52,5 +53,10 @@ class AppointmentSetting extends Model
     }
     public function segments() {
         return $this->belongsToMany(AppointmentSegment::class,'appointment_segment_setting');
+    }
+
+    public function appointmentUsers()
+    {
+        return $this->hasMany(AppointmentUser::class);
     }
 }

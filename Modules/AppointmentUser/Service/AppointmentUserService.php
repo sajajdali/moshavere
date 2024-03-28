@@ -8,6 +8,7 @@ use Modules\Absence\app\Models\Absence;
 use Modules\AppointmentSetting\app\Models\AppointmentSetting;
 use Modules\AppointmentSetting\app\Models\AppointmentSettingTime;
 use Modules\AppointmentUser\app\Models\AppointmentUser;
+use Modules\AppointmentUser\Enum\AppointmentUserStatusEnum;
 use Modules\AppointmentUser\Enum\AppointmentVia;
 use Modules\AppointmentUser\Enum\model\AppointmentModel;
 use Modules\AppointmentUser\Enum\model\MainUserModel;
@@ -403,7 +404,13 @@ class AppointmentUserService
     }
 
 
-
+    private function checkActivePayment(AppointmentSetting $appointmentSetting)
+    {
+        $detail = $appointmentSetting['detail'];
+        if (isset($detail['payment']) && isset($detail['payment']['online'])){
+            dd($detail['payment']);
+        }
+    }
 
     public function storeAppointment(AppointmentSetting $appointmentSetting ,UserModelAppointment $userModelAppointment,AppointmentModel $appointmentData , $detail = [])
     {
@@ -418,6 +425,7 @@ class AppointmentUserService
         }
 
 
+
         $checkTimeAvailable = $this->isAppointmentTimeAvailable($dateAppointment->toTimeString(), $dateAppointment->copy()->addMinutes($appointmentSetting->time_for_visit)->toTimeString(), $dateAppointment->toDateString(), $appointmentSetting);
         if (!$checkTimeAvailable){
             return [
@@ -426,6 +434,21 @@ class AppointmentUserService
                 'route' => 'time'
             ];
         }
+
+        if ($this->checkActivePayment($appointmentSetting)){
+            dd("SA");
+        }
+        // store appointment
+        $appointmentSetting->appointmentUsers()->create([
+            'service_id' => $appointmentData->serviceId,
+            'place_id' => $appointmentData->placeId,
+            'user_id' => $userModelAppointment->userModel->user->id,
+            'doctor_id' => $appointmentSetting->user_id,
+            'agent_id'  => $appointmentData->agentId,
+            'operator_id'   => $appointmentData->operatorId,
+            'tracking_code' => AppointmentUser::generateTrackingCode(),
+            'status' => AppointmentUserStatusEnum::STATUS_SUCCESSFUL
+        ]);
 
         return [
             'status' => true,

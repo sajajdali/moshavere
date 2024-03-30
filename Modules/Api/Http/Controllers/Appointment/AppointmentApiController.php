@@ -222,7 +222,8 @@ class AppointmentApiController extends Controller
         if (!$storeAppointment['status']){
             return $this->requestException([
                 'status' => false,
-                'message' => $storeAppointment['message']
+                'message' => $storeAppointment['message'],
+                'route' => $storeAppointment['route'] ?? null
             ]);
         }
         return $this->created($storeAppointment);

@@ -34,7 +34,7 @@ class AppointmentUserService
     }
 
 
-    public function isTimeRangeAvailable($from , $until, $existingTimeRanges)
+    public function isTimeRangeAvailable($from, $until, $existingTimeRanges)
     {
         foreach ($existingTimeRanges as $existingTimeRange) {
             $existingFrom = strtotime($existingTimeRange['from']);
@@ -44,9 +44,13 @@ class AppointmentUserService
             $betweenPatients = $existingTimeRange['type'] ?? 1;
 
             // Check for overlap
-            if ($betweenPatients == 1 && ($newFrom >= $existingFrom && $newFrom < $existingUntil) ||
-                ($newUntil > $existingFrom && $newUntil <= $existingUntil) ||
-                ($newFrom <= $existingFrom && $newUntil >= $existingUntil)) {
+            if ($betweenPatients == 1 &&
+                (
+                    ($newFrom >= $existingFrom && $newFrom < $existingUntil) ||
+                    ($newUntil > $existingFrom && $newUntil <= $existingUntil) ||
+                    ($newFrom <= $existingFrom && $newUntil >= $existingUntil)
+                )
+            ) {
 
                 // Calculate overlapped time in minutes
                 $overlapStart = max($existingFrom, $newFrom);
@@ -87,6 +91,7 @@ class AppointmentUserService
         if (!$specialDaySelected) {
 //            $startDate = Carbon::today()->subDays(20);
             $startDate = Carbon::today()->addDays(4);
+            $appointmentSetting->max_day_active = 5;
             $endDate = Carbon::today()->addDays($appointmentSetting->max_day_active ?? 90); // Adjust the number of days as needed
         }
 
@@ -120,14 +125,14 @@ class AppointmentUserService
         $output = [];
 
         // Iterate over the week starting from today
-        $firstDayInLog = $firstEmptyDay = $lastDayInLog  = null;
+        $firstDayInLog = $firstEmptyDay = $lastDayInLog = null;
 
         for ($currentDate = $startDate; $currentDate->lte($endDate); $currentDate->addDay()) {
-            $year   = verta($currentDate)->year;
-            $month  = verta($currentDate)->month;
-            $day    = verta($currentDate)->day;
+            $year = verta($currentDate)->year;
+            $month = verta($currentDate)->month;
+            $day = verta($currentDate)->day;
 
-            if ($appointmentSettings->last_day_active){
+            if ($appointmentSettings->last_day_active) {
                 if (Carbon::parse($appointmentSettings->last_day_active)->lt($currentDate)) {
                     break;
                 }
@@ -138,7 +143,7 @@ class AppointmentUserService
                 'status' => true,
                 'day_number' => verta($currentDate)->format("l m/d"),
                 'day_number_gmt' => $currentDate->toDateString(),
-                'is_holiday'    => false,
+                'is_holiday' => false,
                 'empty_appoints' => 0,
                 'times' => [],
             ];
@@ -189,17 +194,17 @@ class AppointmentUserService
                 foreach ($attendanceTimes as $attendanceTime) {
 
                     // In case of non-attendance
-                    $serviceId  = $appointmentSettings->service_id;
-                    $placeId    = $appointmentSettings->place_id;
+                    $serviceId = $appointmentSettings->service_id;
+                    $placeId = $appointmentSettings->place_id;
 
                     $absence = $appointmentSetting->user->absence()
                         ->whereDate('start_at', '<=', $currentDate)
                         ->whereDate('end_at', '>=', $currentDate);
 
-                    if ($serviceId){
+                    if ($serviceId) {
                         $absence->where('service_id', $serviceId);
                     }
-                    if ($placeId){
+                    if ($placeId) {
                         $absence->where('place_id', $placeId);
                     }
                     $absence = $absence->get();
@@ -214,11 +219,11 @@ class AppointmentUserService
                     // In case of non-attendance
 
                     // check holiday
-                    if ( $holidays->contains('date', $currentDate->toDateString())) {
+                    if ($holidays->contains('date', $currentDate->toDateString())) {
                         $dayOutput['is_holiday'] = true;
                         $dayOutput['status'] = true;
                         $dayOutput['empty_appoints'] = 0;
-                        if ($checkHoliday){
+                        if ($checkHoliday) {
                             $dayOutput['status'] = false;
                             break;
                         }
@@ -236,7 +241,8 @@ class AppointmentUserService
                     while ($startTime->lt($endTime)) {
                         // Let's check that the time has not over
 
-                        $overlaps = $this->isTimeRangeAvailable($startTime->toTimeString() , $startTime->copy()->addMinutes($timeForVisit), $dayOutput['times']);
+                        $overlaps = $this->isTimeRangeAvailable($startTime->toTimeString(), $startTime->copy()->addMinutes($timeForVisit), $dayOutput['times']);
+
 
 
                         if ($overlaps['status'] == false) {
@@ -244,20 +250,20 @@ class AppointmentUserService
 
                             // handle end time visit
                             if ($endTime->lt($until)) {
+
                                 $dayOutput['times'][] = [
                                     'status' => false,
                                     'from' => $startTime->toTimeString(),
                                     'until' => $endTime->toTimeString(),
                                     'gap' => true,
                                 ];
-                            }
-                            // handle end time visit
+                            } // handle end time visit
 
                             else {
 
                                 $dayOutput['times'][] = [
                                     'status' => !$currentDate->isPast(),
-                                    'timestamp' => $currentDate->copy()->setTime($startTime->hour , $startTime->minute)->timestamp,
+                                    'timestamp' => $currentDate->copy()->setTime($startTime->hour, $startTime->minute)->timestamp,
                                     'from' => $startTime->toTimeString(),
                                     'until' => $until->toTimeString(),
                                 ];
@@ -268,7 +274,7 @@ class AppointmentUserService
                                 if (!$firstEmptyDay && !$currentDate->isPast()) {
                                     $firstEmptyDay = [
                                         'day' => verta($currentDate)->format("Y-m-d"),
-                                        'timestamp' => $currentDate->copy()->setTime($startTime->hour , $startTime->minute)->timestamp,
+                                        'timestamp' => $currentDate->copy()->setTime($startTime->hour, $startTime->minute)->timestamp,
                                         'from' => $startTime->copy()->toTimeString(),
                                         'until' => $startTime->copy()->addMinutes($timeForVisit)->toTimeString()
                                     ];
@@ -279,7 +285,7 @@ class AppointmentUserService
                             if ($overlaps['overLapTime'] != 0 && $overlaps['overLapTime'] < $timeForVisit) {
 
                                 $startTime->addMinutes($overlaps['overLapTime']);
-                                $overlapsAgain = $this->isTimeRangeAvailable($startTime->toTimeString() , $startTime->copy()->addMinutes($timeForVisit)->toTimeString() , $dayOutput['times']);
+                                $overlapsAgain = $this->isTimeRangeAvailable($startTime->toTimeString(), $startTime->copy()->addMinutes($timeForVisit)->toTimeString(), $dayOutput['times']);
 
                                 if ($overlapsAgain['status'] == false) {
 
@@ -305,7 +311,7 @@ class AppointmentUserService
                                         // set first empty day in log
                                         if (!$firstEmptyDay && !$currentDate->isPast()) {
                                             $firstEmptyDay = [
-                                                'timestamp' => $currentDate->copy()->setTime($startTime->hour , $startTime->minute)->timestamp,
+                                                'timestamp' => $currentDate->copy()->setTime($startTime->hour, $startTime->minute)->timestamp,
                                                 'day' => verta($currentDate)->format("Y-m-d"),
                                                 'from' => $startTime->copy()->toTimeString(),
                                                 'until' => $startTime->copy()->addMinutes($timeForVisit)->toTimeString()
@@ -316,12 +322,13 @@ class AppointmentUserService
                                 } else {
                                     $startTime->subMinutes($overlaps['overLapTime']);
 
-                                    $getLastOverLapsTime = $this->isTimeRangeAvailable($startTime->toTimeString() , $startTime->copy()->addMinutes($timeForVisit)->toTimeString(), $dayOutput['times']);
+                                    $getLastOverLapsTime = $this->isTimeRangeAvailable($startTime->toTimeString(), $startTime->copy()->addMinutes($timeForVisit)->toTimeString(), $dayOutput['times']);
+                                    $startTimeOverLap = $getLastOverLapsTime['existingUntil'] == $overlapsAgain['existingUntil'] ? $startTime->copy()->toTimeString() : $overlaps['existingUntil'];
 
                                     $dayOutput['times'][] = [
                                         'status' => false,
-                                        'from' => $startTime->copy()->toTimeString(),
-                                        'until' => $getLastOverLapsTime['existingFrom'],
+                                        'from' => $startTimeOverLap,
+                                        'until' => $overlapsAgain['existingFrom'],
                                         'gap' => true
                                     ];
                                 }
@@ -389,11 +396,11 @@ class AppointmentUserService
         return $output;
     }
 
-    public function isAppointmentTimeAvailable($startDateTime, $endDateTime, $dateVisit,AppointmentSetting $appointmentSetting)
+    public function isAppointmentTimeAvailable($startDateTime, $endDateTime, $dateVisit, AppointmentSetting $appointmentSetting)
     {
         // Check if there are any overlapping appointments
         $existingAppointments = AppointmentUser::where('doctor_id', $appointmentSetting->user_id);
-        if (!$appointmentSetting->interference){
+        if (!$appointmentSetting->interference) {
             $existingAppointments->where('appointment_setting_id', $appointmentSetting->id);
         }
 
@@ -419,9 +426,9 @@ class AppointmentUserService
         $price = null;
 
         $detail = $appointmentSetting['detail'];
-        if (isset($detail['payment']) && isset($detail['payment']['online']) && $detail['payment']['online']['status']){
+        if (isset($detail['payment']) && isset($detail['payment']['online']) && $detail['payment']['online']['status']) {
             $statusPayment = true;
-            if(isset($detail['payment']['online']['notPayinStatus']) && $detail['payment']['online']['notPayinStatus'] == AppointmentSetting::DETAIL_PAYMENT_NOT_PAY_STATUS_DONT_SUBMIT){
+            if (isset($detail['payment']['online']['notPayinStatus']) && $detail['payment']['online']['notPayinStatus'] == AppointmentSetting::DETAIL_PAYMENT_NOT_PAY_STATUS_DONT_SUBMIT) {
                 $deadLineDelete = Carbon::now()->addHours(4)->toDateTimeString();
                 $forcePayment = true;
             }
@@ -449,14 +456,15 @@ class AppointmentUserService
             'total_cost' => $this->appointmentUser->details['payment'][AppointmentUser::DETAIL_PAYMENT_PRICE]
         ]);
     }
-    public function storeAppointment(AppointmentSetting $appointmentSetting ,UserModelAppointment $userModelAppointment,AppointmentModel $appointmentData , $detail = [])
+
+    public function storeAppointment(AppointmentSetting $appointmentSetting, UserModelAppointment $userModelAppointment, AppointmentModel $appointmentData, $detail = [])
     {
         // check exist appointment
         $detailAppointment = $detail;
         $detailDatabaseDB = [];
         $dateAppointment = Carbon::createFromTimestamp($appointmentData->timestamp);
         $visitDateTime = Carbon::createFromTimestamp($appointmentData->timestamp);
-        if ($appointmentData->appointmentVia == AppointmentVia::SELF && $dateAppointment->isPast()){
+        if ($appointmentData->appointmentVia == AppointmentVia::SELF && $dateAppointment->isPast()) {
             return [
                 'status' => false,
                 'message' => 'زمان ارسالی برای ثبت نوبت اشتباه است و لطفا مجدد اقدام کنید',
@@ -465,7 +473,7 @@ class AppointmentUserService
         }
 
         $checkTimeAvailable = $this->isAppointmentTimeAvailable($dateAppointment->toTimeString(), $dateAppointment->copy()->addMinutes($appointmentSetting->time_for_visit)->toTimeString(), $dateAppointment->toDateString(), $appointmentSetting);
-        if (!$checkTimeAvailable){
+        if (!$checkTimeAvailable) {
             return [
                 'status' => false,
                 'message' => 'زمان انتخابی شما توسط شخصی دیگر پر شده است . لطفا یک زمان دیگر انتخاب کنید',
@@ -500,10 +508,10 @@ class AppointmentUserService
         // handel payment
         $paymentLink = null;
         $smsTemplate = setting(SettingKeyEnum::SMS_APPOINTMENT_RECEIVING_SUCCESSFUL);
-        if ($appointmentData->appointmentVia == AppointmentVia::SELF && $paymentstatus['status']){
+        if ($appointmentData->appointmentVia == AppointmentVia::SELF && $paymentstatus['status']) {
             $smsTemplate = setting(SettingKeyEnum::SMS_APPOINTMENT_WAITING_PAYMENT);
             $appointmentUserModel['deadline'] = $paymentstatus['deadline'];
-            if ($paymentstatus['force_payment']){
+            if ($paymentstatus['force_payment']) {
                 $appointmentUserModel['status'] = AppointmentUserStatusEnum::STATUS_WAIT_PAYMENT;
             }
             $detailDatabaseDB['payment'] = [
@@ -515,7 +523,7 @@ class AppointmentUserService
         // detailDatabase
 
         // store question in DB
-        if (isset($detailAppointment[AppointmentUser::DETAIL_QUESTION])){
+        if (isset($detailAppointment[AppointmentUser::DETAIL_QUESTION])) {
             $detailDatabaseDB[AppointmentUser::DETAIL_QUESTION] = $detailAppointment[AppointmentUser::DETAIL_QUESTION];
         }
 

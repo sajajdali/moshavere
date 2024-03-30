@@ -25,18 +25,11 @@ class AppointmentUserController extends Controller
 
 //        return  app('AppointmentUserService')->listAppointments(AppointmentSetting::find(1));
 
-        $appointmentSetting = AppointmentSetting::find(1);
-        $appointmentUser = AppointmentUser::find(14);
-        $appointmentUser->shortLink()->create([
-            'transaction_code' => '323',
-            'link_code' => ShortLink::generateShortLinkCode(),
-            'link_url' => 'link_url',
-        ]);
-        dd($appointmentUser);
 
-//        Cache::forget('appointmentList.1');
+        $appointmentSetting = AppointmentSetting::find(1);
+        Cache::forget('appointmentList.'.$appointmentSetting->id);
         $listUsers = Cache::rememberForever('appointmentList.'.$appointmentSetting->id, function () use ($appointmentSetting) {
-            return app('AppointmentUserService')->listAppointments($appointmentSetting->id);
+            return app('AppointmentUserService')->listAppointments($appointmentSetting);
         });
 
 //        $updateOneDay = app('AppointmentUserService')->listAppointments(2, null, null, ['specialDay' => Carbon::today()->toDateString()]);

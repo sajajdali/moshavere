@@ -41,9 +41,10 @@ class AppointmentUserService
             $existingUntil = strtotime($existingTimeRange['until']);
             $newFrom = strtotime($from);
             $newUntil = strtotime($until);
+            $betweenPatients = $existingTimeRange['type'] ?? 1;
 
             // Check for overlap
-            if (($newFrom >= $existingFrom && $newFrom < $existingUntil) ||
+            if ($betweenPatients == 1 && ($newFrom >= $existingFrom && $newFrom < $existingUntil) ||
                 ($newUntil > $existingFrom && $newUntil <= $existingUntil) ||
                 ($newFrom <= $existingFrom && $newUntil >= $existingUntil)) {
 
@@ -84,7 +85,8 @@ class AppointmentUserService
         }
 
         if (!$specialDaySelected) {
-            $startDate = Carbon::today()->subDays(20);
+//            $startDate = Carbon::today()->subDays(20);
+            $startDate = Carbon::today()->addDays(4);
             $endDate = Carbon::today()->addDays($appointmentSetting->max_day_active ?? 90); // Adjust the number of days as needed
         }
 
@@ -171,6 +173,7 @@ class AppointmentUserService
                         $dayOutput['times'][] = [
                             'status' => false,
                             'from' => $appointment->start_time,
+                            'type' => $appointment->type->value,
                             'until' => $appointment->end_time,
                             'appointment_user_id' => $appointment->id,
                         ];
@@ -234,6 +237,7 @@ class AppointmentUserService
                         // Let's check that the time has not over
 
                         $overlaps = $this->isTimeRangeAvailable($startTime->toTimeString() , $startTime->copy()->addMinutes($timeForVisit), $dayOutput['times']);
+
 
                         if ($overlaps['status'] == false) {
                             $until = $startTime->copy()->addMinutes($timeForVisit);

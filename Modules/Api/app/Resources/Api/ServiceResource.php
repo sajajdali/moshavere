@@ -23,7 +23,7 @@ class ServiceResource extends JsonResource
 
     private function questionList()
     {
-        if ($this->id == 2){
+        if ($this->id == 1){
             return  [
                 [
                     'id' => 1,

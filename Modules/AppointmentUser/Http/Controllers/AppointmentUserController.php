@@ -3,6 +3,7 @@
 namespace Modules\AppointmentUser\Http\Controllers;
 
 use App\Http\Controllers\Controller;
+use App\ShortLink;
 use Carbon\Carbon;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -12,6 +13,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Modules\AppointmentSetting\app\Models\AppointmentSetting;
 use Modules\AppointmentUser\app\Jobs\CacheJob;
+use Modules\AppointmentUser\app\Models\AppointmentUser;
 
 class AppointmentUserController extends Controller
 {
@@ -20,9 +22,18 @@ class AppointmentUserController extends Controller
     {
 
 
+
 //        return  app('AppointmentUserService')->listAppointments(AppointmentSetting::find(1));
 
         $appointmentSetting = AppointmentSetting::find(1);
+        $appointmentUser = AppointmentUser::find(14);
+        $appointmentUser->shortLink()->create([
+            'transaction_code' => '323',
+            'link_code' => ShortLink::generateShortLinkCode(),
+            'link_url' => 'link_url',
+        ]);
+        dd($appointmentUser);
+
 //        Cache::forget('appointmentList.1');
         $listUsers = Cache::rememberForever('appointmentList.'.$appointmentSetting->id, function () use ($appointmentSetting) {
             return app('AppointmentUserService')->listAppointments($appointmentSetting->id);

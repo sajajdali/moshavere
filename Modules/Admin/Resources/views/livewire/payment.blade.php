@@ -16,7 +16,7 @@
                                 <div class="alert alert-info" role="alert">
                                     <span class="alert-inner--text"> {{$message}}</span>
                                 </div>
-                                <a href="https://webapp.jesmino.com/tr/{{$transaction->id}}"
+                                <a href="https://amiri.selakteb.com/appointment/{{$appointmentUser->id}}"
                                    class="login100-form-btn btn-primary">
                                     بازگشت به اپلیکیشن
                                 </a>
@@ -26,7 +26,7 @@
                                 <div class="alert alert-success" role="alert">
                                     <span class="alert-inner--text"> پرداخت شا با موفقیت انجام شد</span>
                                 </div>
-                                <a href="https://webapp.jesmino.com/tr/{{$transaction->id}}"
+                                <a href="https://amiri.selakteb.com/appointment/{{$appointmentUser->id}}"
                                    class="login100-form-btn btn-primary">
                                     بازگشت به اپلیکیشن
                                 </a>
@@ -36,34 +36,49 @@
                                 <div class="alert alert-danger" role="alert">
                                     <span class="alert-inner--text"> پرداخت شا با موفقیت انجام نشد</span>
                                 </div>
-                                <a href="https://webapp.jesmino.com/tr/{{$transaction->id}}"
+                                <a href="https://webapp.jesmino.com/appointment/{{$appointmentUser->id}}"
                                    class="login100-form-btn btn-primary">
                                     بازگشت به اپلیکیشن
                                 </a>
                             </div>
                         @else
+
                             <form class="login100-form validate-form ">
                                 <div class="text-center mb-4">
                                     <img src="{{asset('default/admin/logo.png')}}" alt="lockscreen image"
                                          class="avatar avatar-xxl brround mb-2">
-                                    <h4>پر داخت آنلاین</h4>
+                                    <h4>پر داخت آنلاین برای نوبت شماره {{$appointmentUser->tracking_code}}</h4>
                                 </div>
 
-                                <div class="container-login100-form-btn">
-                                    <button type="button" class="login100-form-btn btn-primary"
-                                            wire:loading.class="bg-gray btn-loading disabled"
-                                            wire:click="successfulPayment"
-                                    >
-                                        پرداخت موفقت
-                                    </button>
-                                </div>
-                                <div class="container-login100-form-btn">
-                                    <button type="button" class="login100-form-btn btn-danger"
-                                            wire:loading.class="bg-gray btn-loading disabled"
-                                            wire:click="paymentFailed">
-                                        پرداخت نا موفق
-                                    </button>
-                                </div>
+                                @if($appointmentUser->status == \Modules\AppointmentUser\Enum\AppointmentUserStatusEnum::STATUS_SUCCESSFUL)
+                                    <div>
+                                        <div class="alert alert-success" role="alert">
+                                            <span class="alert-inner--text"> پرداخت قبلا انجام شده است</span>
+                                        </div>
+                                        <a href="https://amiri.selakteb.com/appointment/{{$appointmentUser->id}}"
+                                           class="login100-form-btn btn-primary">
+                                            بازگشت به اپلیکیشن
+                                        </a>
+                                    </div>
+                                @else
+                                    <div class="container-login100-form-btn">
+                                        <button type="button" class="login100-form-btn btn-primary"
+                                                wire:loading.class="bg-gray btn-loading disabled"
+                                                wire:click="successfulPayment"
+                                        >
+                                            پرداخت موفقت
+                                        </button>
+                                    </div>
+                                    <div class="container-login100-form-btn">
+                                        <button type="button" class="login100-form-btn btn-danger"
+                                                wire:loading.class="bg-gray btn-loading disabled"
+                                                wire:click="paymentFailed">
+                                            پرداخت نا موفق
+                                        </button>
+                                    </div>
+                                @endif
+
+
                                 <div class="text-center pt-2">
                                     <!-- <span class="txt1">
                                         I Forgot

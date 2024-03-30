@@ -17,4 +17,6 @@ Route::group([], function () {
     Route::resource('appointmentuser', AppointmentUserController::class)->names('appointmentuser');
 
     Route::get('test' , [AppointmentUserController::class, 'test'])->name('appointmentuser.test');
+    Route::get('appointment/payment/{appointmentUser}', \Modules\AppointmentUser\Livewire\AppointmentUserPayment::class)->name('appointmentUser.payment');
+
 });

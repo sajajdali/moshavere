@@ -15,6 +15,7 @@ class AppointmentModel
     public ?int $agentId;
     public ?int $operatorId;
     public ?AppointmentUserKindEnum $kind;
+    public ?bool $smsToDoctor;
 
     /**
      * @param int $timestamp
@@ -23,7 +24,7 @@ class AppointmentModel
      * @param int|null $serviceId
      * @param int|null $placeId
      */
-    public function __construct(int $timestamp, AppointmentVia $appointmentVia = AppointmentVia::SELF, bool $sendSmsToUser = true, ?int $serviceId = null, ?int $placeId = null , ?int $agentId = null,?int $operatorId = null , ?AppointmentUserKindEnum $kind = AppointmentUserKindEnum::IN_PERSION)
+    public function __construct(int $timestamp, AppointmentVia $appointmentVia = AppointmentVia::SELF, bool $sendSmsToUser = true, ?int $serviceId = null, ?int $placeId = null , ?int $agentId = null,?int $operatorId = null , ?AppointmentUserKindEnum $kind = AppointmentUserKindEnum::IN_PERSION , ?bool $smsToDoctor = false)
     {
         $this->timestamp = $timestamp;
         $this->appointmentVia = $appointmentVia;
@@ -33,6 +34,7 @@ class AppointmentModel
         $this->agentId = $agentId;
         $this->operatorId = $operatorId;
         $this->kind = $kind;
+        $this->smsToDoctor = $smsToDoctor;
     }
 
 

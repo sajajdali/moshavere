@@ -210,7 +210,7 @@ class AppointmentApiController extends Controller
             appointmentVia: AppointmentVia::SELF,
             sendSmsToUser: true,
             serviceId: $request->input('service_id'),
-            placeId: $request->input('place_id')
+            placeId: $request->input('place_id'),
         );
 
         $storeAppointment = app('AppointmentUserService')->storeAppointment($appointmentSetting , $userModelAppointment  , $appointmentModel );
@@ -220,10 +220,7 @@ class AppointmentApiController extends Controller
                 'message' => $storeAppointment['message']
             ]);
         }
-        return $this->created([
-            'status' => true,
-            'message' => $storeAppointment['message']
-        ]);
+        return $this->created($storeAppointment);
     }
     public function listDays(Request $request)
     {

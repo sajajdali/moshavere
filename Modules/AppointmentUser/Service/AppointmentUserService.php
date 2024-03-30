@@ -8,12 +8,14 @@ use Modules\Absence\app\Models\Absence;
 use Modules\AppointmentSetting\app\Models\AppointmentSetting;
 use Modules\AppointmentSetting\app\Models\AppointmentSettingTime;
 use Modules\AppointmentUser\app\Models\AppointmentUser;
+use Modules\AppointmentUser\app\Notifications\AppointmentSmsNotification;
 use Modules\AppointmentUser\Enum\AppointmentUserKindEnum;
 use Modules\AppointmentUser\Enum\AppointmentUserStatusEnum;
 use Modules\AppointmentUser\Enum\AppointmentVia;
 use Modules\AppointmentUser\Enum\model\AppointmentModel;
 use Modules\AppointmentUser\Enum\model\MainUserModel;
 use Modules\AppointmentUser\Enum\model\UserModelAppointment;
+use Modules\Setting\Enum\SettingKeyEnum;
 use Verta;
 
 class AppointmentUserService
@@ -429,9 +431,24 @@ class AppointmentUserService
         ];
     }
 
+    public function handleSms(AppointmentUser $appointmentUser)
+    {
+    }
+
+    private function makeShortLink($appointmentUser)
+    {
+        $appointmentUser->shortLink()->create([
+            'transaction_code' => '323',
+            'paid_by' => TransactionPaidEnum::ONLINE,
+            'status' => TransactionStatusEnum::PENDING,
+            'cost' => $this->appointmentUser->details['payment'][AppointmentUser::DETAIL_PAYMENT_PRICE],
+            'total_cost' => $this->appointmentUser->details['payment'][AppointmentUser::DETAIL_PAYMENT_PRICE]
+        ]);
+    }
     public function storeAppointment(AppointmentSetting $appointmentSetting ,UserModelAppointment $userModelAppointment,AppointmentModel $appointmentData , $detail = [])
     {
         // check exist appointment
+        $detail = [];
         $dateAppointment = Carbon::createFromTimestamp($appointmentData->timestamp);
         $visitDateTime = Carbon::createFromTimestamp($appointmentData->timestamp);
         if ($appointmentData->appointmentVia == AppointmentVia::SELF && $dateAppointment->isPast()){
@@ -441,8 +458,6 @@ class AppointmentUserService
                 'route' => 'time'
             ];
         }
-
-
 
         $checkTimeAvailable = $this->isAppointmentTimeAvailable($dateAppointment->toTimeString(), $dateAppointment->copy()->addMinutes($appointmentSetting->time_for_visit)->toTimeString(), $dateAppointment->toDateString(), $appointmentSetting);
         if (!$checkTimeAvailable){
@@ -473,19 +488,49 @@ class AppointmentUserService
             'user_ip' => ip(),
 
         ];
+        $detail['payment'] = [
+            'status' => false,
+        ];
+
+        // handel payment
+        $paymentLink = null;
+        $smsTemplate = setting(SettingKeyEnum::SMS_APPOINTMENT_RECEIVING_SUCCESSFUL);
         if ($appointmentData->appointmentVia == AppointmentVia::SELF && $paymentstatus['status']){
+            $smsTemplate = setting(SettingKeyEnum::SMS_APPOINTMENT_WAITING_PAYMENT);
             $appointmentUserModel['deadline'] = $paymentstatus['deadline'];
             if ($paymentstatus['force_payment']){
                 $appointmentUserModel['status'] = AppointmentUserStatusEnum::STATUS_WAIT_PAYMENT;
             }
+            $detail['payment'] = [
+                'status' => true,
+                AppointmentUser::DETAIL_PAYMENT_PRICE => $paymentstatus['price'],
+            ];
+            $appointmentUserModel['details'] = $detail;
         }
-        $appointmentUser = $appointmentSetting->appointmentUsers()->create($appointmentUserModel);
-        dd($appointmentUser);
 
+
+        // store appointment in DB
+        $appointmentUser = $appointmentSetting->appointmentUsers()->create($appointmentUserModel);
+
+        // send sms
+        $appointmentUser->notify(new AppointmentSmsNotification($smsTemplate));
+
+        // create payment link
+        if ($appointmentData->appointmentVia == AppointmentVia::SELF && $paymentstatus['status']) {
+            $paymentLink = route('appointmentUser.payment', $appointmentUser);
+        }
+        // handel sms
+
+//        $this->makeShortLink($appointmentUser);
 
         return [
             'status' => true,
             'message' => 'نوبت با موفقیت برای کاربر ثبت شد',
+            'detail' => [
+                'tracking_code' => $appointmentUserModel['tracking_code'],
+                'appointment_user_id' => $appointmentUser->id,
+                'payment_link' => $paymentLink
+            ]
         ];
 
 

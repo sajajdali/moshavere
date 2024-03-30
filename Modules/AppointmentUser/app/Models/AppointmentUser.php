@@ -2,21 +2,26 @@
 
 namespace Modules\AppointmentUser\app\Models;
 
+use App\ShortLink;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Notifications\Notifiable;
 use Modules\AppointmentSetting\app\Models\AppointmentSetting;
 use Modules\AppointmentUser\Enum\AppointmentUserKindEnum;
 use Modules\AppointmentUser\Enum\AppointmentUserStatusEnum;
 use Modules\AppointmentUser\Enum\AppointmentUserTypeEnum;
 use Modules\Place\app\Models\Place;
 use Modules\Service\app\Models\Service;
+use Modules\Transaction\app\Models\Transaction;
 use Modules\User\Entities\User;
 
 class AppointmentUser extends Model
 {
-    use HasFactory , SoftDeletes;
+    use HasFactory , SoftDeletes , Notifiable;
     CONST DETAIL_APPOINTMENT_VIA = 'appointment_via';
+    CONST DETAIL_PAYMENT_PRICE= 'price';
+    CONST DETAIL_QUESTION= 'question';
     /**
      * The attributes that are mass assignable.
      */
@@ -68,6 +73,16 @@ class AppointmentUser extends Model
     public function agent()
     {
         return $this->belongsTo(User::class , 'agent_id' , 'id');
+    }
+
+    public function transaction(): \Illuminate\Database\Eloquent\Relations\MorphOne
+    {
+        return $this->morphOne(Transaction::class, 'transactionable');
+    }
+
+    public function shortLink(): \Illuminate\Database\Eloquent\Relations\MorphOne
+    {
+        return $this->morphOne(ShortLink::class, 'shortlinkable');
     }
 
 

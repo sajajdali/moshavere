@@ -21,7 +21,7 @@ enum SettingTypeEnum : string
             self::TEXTAREA => 'setting::admin.setting.component.text-area',
             self::EDITOR => 'setting::admin.setting.component.editor',
             self::RADIO => 'setting::admin.setting.component.radio',
-            self::SELECT => 'setting::admin.setting.component.select'
+            self::SELECT => 'setting::admin.setting.component.select',
         };
     }
 }

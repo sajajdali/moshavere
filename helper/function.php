@@ -47,3 +47,11 @@ function dateFormat($date)
 {
     return verta($date)->format('d F Y');
 }
+function dateFormatSimlpe($date)
+{
+    return verta($date)->format('Y/m/d');
+}
+function appointmentUser()
+{
+    return app('appointmentUser');
+}

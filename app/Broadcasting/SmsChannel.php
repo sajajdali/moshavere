@@ -21,7 +21,6 @@ class SmsChannel
      */
     public function join(User $user): array|bool
     {
-        //
     }
 
     /**

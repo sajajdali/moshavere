@@ -7,4 +7,10 @@
                placeholder="مقدار..."
                wire:model.live="textValue">
     </div>
+    @if($meta->getDescription())
+        <blockquote>
+            {!!  $meta->getDescription() !!}
+        </blockquote>
+        <hr>
+    @endif
 </div>

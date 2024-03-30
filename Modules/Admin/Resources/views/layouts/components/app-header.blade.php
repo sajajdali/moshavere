@@ -51,11 +51,11 @@
                                 <a href="#" data-bs-toggle="dropdown"
                                     class="nav-link pe-2 leading-none d-flex animate">
                                     <span>
-                                        <img src="{{ auth()->user()->avatar }}" alt="profile-user"
+                                        <img src="{{ auth()->user()?->avatar }}" alt="profile-user"
                                             class="avatar  profile-user brround cover-image">
                                     </span>
                                     <div class="text-center p-1 d-flex d-lg-none-max">
-                                        <h6 class="mb-0" id="profile-heading">{{ auth()->user()->full_name }}<i
+                                        <h6 class="mb-0" id="profile-heading">{{ auth()->user()?->full_name }}<i
                                                 class="user-angle ms-1 fa fa-angle-down "></i></h6>
                                     </div>
                                 </a>

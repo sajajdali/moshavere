@@ -3,6 +3,7 @@
 namespace Modules\AppointmentSetting\app\Models;
 
 use App\Enum\ActiveEnum;
+use Modules\AppointmentUser\app\Models\AppointmentUser;
 use Modules\User\Entities\User;
 use Illuminate\Database\Eloquent\Model;
 use Modules\Service\app\Models\Service;
@@ -14,11 +15,16 @@ use Modules\AppointmentSetting\Database\factories\AppointmentSettingFactory;
 class AppointmentSetting extends Model
 {
     use HasFactory, SoftDeletes;
+
+    const DETAIL_PAYMENT_NOT_PAY_STATUS_DONT_SUBMIT = 'dontSubmit';
+    const DETAIL_PAYMENT_NOT_PAY_STATUS_SUBMIT = 'submit';
     protected $casts = [
         'active' => ActiveEnum::class,
         'last_day_active' => 'date',
+        'interference' => 'boolean',
         'detail' => 'json',
     ];
+
     /**
      * The attributes that are mass assignable.
      */
@@ -51,5 +57,10 @@ class AppointmentSetting extends Model
     }
     public function segments() {
         return $this->belongsToMany(AppointmentSegment::class,'appointment_segment_setting');
+    }
+
+    public function appointmentUsers()
+    {
+        return $this->hasMany(AppointmentUser::class);
     }
 }

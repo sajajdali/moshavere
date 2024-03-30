@@ -23,24 +23,27 @@ class ServiceResource extends JsonResource
 
     private function questionList()
     {
-        if ($this->id == 2){
+        if ($this->id == 1){
             return  [
-                [
-                    'id' => 1,
-                    'title' => 'هفته دوم بارداری',
-                ],
-                [
-                    'id' => 2,
-                    'title' => 'هفته سوم بارداری'
-                ],
-                [
-                    'id' => 4,
-                    'title' => 'هفته چهارم بارداری'
-                ],
-                [
-                    'id' => 5,
-                    'title' => 'هفته پنجم بارداری'
-                ],
+                'question' => 'در هفته چندم بارداری هستید' ,
+                'options' => [
+                    [
+                        'id' => 1,
+                        'title' => 'هفته دوم بارداری',
+                    ],
+                    [
+                        'id' => 2,
+                        'title' => 'هفته سوم بارداری'
+                    ],
+                    [
+                        'id' => 4,
+                        'title' => 'هفته چهارم بارداری'
+                    ],
+                    [
+                        'id' => 5,
+                        'title' => 'هفته پنجم بارداری'
+                    ],
+                ]
             ];
         }
         return [];

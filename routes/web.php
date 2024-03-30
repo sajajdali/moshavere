@@ -14,5 +14,10 @@ use Illuminate\Support\Facades\Route;
 */
 
 Route::get('/', function () {
+
+    $template = setting(\Modules\Setting\Enum\SettingKeyEnum::SMS_APPOINTMENT_RECEIVING_SUCCESSFUL);
+    $appointmentUser = \Modules\AppointmentUser\app\Models\AppointmentUser::find(14);
+    $notify = $appointmentUser->notify(new \Modules\AppointmentUser\app\Notifications\AppointmentSmsNotification($template));
+    dd($notify , "sa");
     return view('welcome');
 });

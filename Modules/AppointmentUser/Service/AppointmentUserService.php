@@ -8,6 +8,14 @@ use Modules\Absence\app\Models\Absence;
 use Modules\AppointmentSetting\app\Models\AppointmentSetting;
 use Modules\AppointmentSetting\app\Models\AppointmentSettingTime;
 use Modules\AppointmentUser\app\Models\AppointmentUser;
+use Modules\AppointmentUser\app\Notifications\AppointmentSmsNotification;
+use Modules\AppointmentUser\Enum\AppointmentUserKindEnum;
+use Modules\AppointmentUser\Enum\AppointmentUserStatusEnum;
+use Modules\AppointmentUser\Enum\AppointmentVia;
+use Modules\AppointmentUser\Enum\model\AppointmentModel;
+use Modules\AppointmentUser\Enum\model\MainUserModel;
+use Modules\AppointmentUser\Enum\model\UserModelAppointment;
+use Modules\Setting\Enum\SettingKeyEnum;
 use Verta;
 
 class AppointmentUserService
@@ -33,9 +41,10 @@ class AppointmentUserService
             $existingUntil = strtotime($existingTimeRange['until']);
             $newFrom = strtotime($from);
             $newUntil = strtotime($until);
+            $betweenPatients = $existingTimeRange['type'] ?? 1;
 
             // Check for overlap
-            if (($newFrom >= $existingFrom && $newFrom < $existingUntil) ||
+            if ($betweenPatients == 1 && ($newFrom >= $existingFrom && $newFrom < $existingUntil) ||
                 ($newUntil > $existingFrom && $newUntil <= $existingUntil) ||
                 ($newFrom <= $existingFrom && $newUntil >= $existingUntil)) {
 
@@ -76,7 +85,8 @@ class AppointmentUserService
         }
 
         if (!$specialDaySelected) {
-            $startDate = Carbon::today()->subDays(20);
+//            $startDate = Carbon::today()->subDays(20);
+            $startDate = Carbon::today()->addDays(4);
             $endDate = Carbon::today()->addDays($appointmentSetting->max_day_active ?? 90); // Adjust the number of days as needed
         }
 
@@ -163,6 +173,7 @@ class AppointmentUserService
                         $dayOutput['times'][] = [
                             'status' => false,
                             'from' => $appointment->start_time,
+                            'type' => $appointment->type->value,
                             'until' => $appointment->end_time,
                             'appointment_user_id' => $appointment->id,
                         ];
@@ -226,6 +237,7 @@ class AppointmentUserService
                         // Let's check that the time has not over
 
                         $overlaps = $this->isTimeRangeAvailable($startTime->toTimeString() , $startTime->copy()->addMinutes($timeForVisit), $dayOutput['times']);
+
 
                         if ($overlaps['status'] == false) {
                             $until = $startTime->copy()->addMinutes($timeForVisit);
@@ -377,10 +389,15 @@ class AppointmentUserService
         return $output;
     }
 
-    public function isAppointmentTimeAvailable($startDateTime, $endDateTime, $dateVisit, $doctorId)
+    public function isAppointmentTimeAvailable($startDateTime, $endDateTime, $dateVisit,AppointmentSetting $appointmentSetting)
     {
         // Check if there are any overlapping appointments
-        $existingAppointments = AppointmentUser::where('doctor_id', $doctorId)
+        $existingAppointments = AppointmentUser::where('doctor_id', $appointmentSetting->user_id);
+        if (!$appointmentSetting->interference){
+            $existingAppointments->where('appointment_setting_id', $appointmentSetting->id);
+        }
+
+        $existingAppointments = $existingAppointments
             ->whereDate('date_visit', $dateVisit)
             ->where(function ($query) use ($startDateTime, $endDateTime) {
                 $query->where(function ($q) use ($startDateTime, $endDateTime) {
@@ -394,17 +411,142 @@ class AppointmentUserService
     }
 
 
+    private function paymentstatus(AppointmentSetting $appointmentSetting)
+    {
+        $deadLineDelete = null;
+        $statusPayment = false;
+        $forcePayment = false;
+        $price = null;
 
+        $detail = $appointmentSetting['detail'];
+        if (isset($detail['payment']) && isset($detail['payment']['online']) && $detail['payment']['online']['status']){
+            $statusPayment = true;
+            if(isset($detail['payment']['online']['notPayinStatus']) && $detail['payment']['online']['notPayinStatus'] == AppointmentSetting::DETAIL_PAYMENT_NOT_PAY_STATUS_DONT_SUBMIT){
+                $deadLineDelete = Carbon::now()->addHours(4)->toDateTimeString();
+                $forcePayment = true;
+            }
+            $price = $detail['payment']['price'];
+        }
+        return [
+            'status' => $statusPayment,
+            'deadline' => $deadLineDelete,
+            'force_payment' => $forcePayment,
+            'price' => $price
+        ];
+    }
 
-    public function storeAppointment(AppointmentSetting $appointmentSetting , $userData = [], $appointmentData = [])
+    public function handleSms(AppointmentUser $appointmentUser)
+    {
+    }
+
+    private function makeShortLink($appointmentUser)
+    {
+        $appointmentUser->shortLink()->create([
+            'transaction_code' => '323',
+            'paid_by' => TransactionPaidEnum::ONLINE,
+            'status' => TransactionStatusEnum::PENDING,
+            'cost' => $this->appointmentUser->details['payment'][AppointmentUser::DETAIL_PAYMENT_PRICE],
+            'total_cost' => $this->appointmentUser->details['payment'][AppointmentUser::DETAIL_PAYMENT_PRICE]
+        ]);
+    }
+    public function storeAppointment(AppointmentSetting $appointmentSetting ,UserModelAppointment $userModelAppointment,AppointmentModel $appointmentData , $detail = [])
     {
         // check exist appointment
-        $dateAppointment = (Carbon::createFromTimestamp($appointmentData['timestamp']));
-        $checkTimeAvailable = $this->isAppointmentTimeAvailable($dateAppointment->toTimeString(), $dateAppointment->copy()->addMinutes($appointmentSetting->time_for_visit)->toTimeString(), $dateAppointment->toDateString(), $appointmentSetting->user_id);
-        dd($checkTimeAvailable , $dateAppointment->toTimeString(), $dateAppointment->copy()->addMinutes($appointmentSetting->time_for_visit)->toTimeString(), $dateAppointment->toDateString(), $appointmentSetting->doctor_id);
+        $detailAppointment = $detail;
+        $detailDatabaseDB = [];
+        $dateAppointment = Carbon::createFromTimestamp($appointmentData->timestamp);
+        $visitDateTime = Carbon::createFromTimestamp($appointmentData->timestamp);
+        if ($appointmentData->appointmentVia == AppointmentVia::SELF && $dateAppointment->isPast()){
+            return [
+                'status' => false,
+                'message' => 'زمان ارسالی برای ثبت نوبت اشتباه است و لطفا مجدد اقدام کنید',
+                'route' => 'time'
+            ];
+        }
+
+        $checkTimeAvailable = $this->isAppointmentTimeAvailable($dateAppointment->toTimeString(), $dateAppointment->copy()->addMinutes($appointmentSetting->time_for_visit)->toTimeString(), $dateAppointment->toDateString(), $appointmentSetting);
+        if (!$checkTimeAvailable){
+            return [
+                'status' => false,
+                'message' => 'زمان انتخابی شما توسط شخصی دیگر پر شده است . لطفا یک زمان دیگر انتخاب کنید',
+                'route' => 'time'
+            ];
+        }
+
+        $paymentstatus = $this->paymentstatus($appointmentSetting);
+        // create payment link
+
+        // store appointment
+        $appointmentUserModel = [
+            'service_id' => $appointmentData->serviceId,
+            'place_id' => $appointmentData->placeId,
+            'user_id' => $userModelAppointment->userModel->user->id,
+            'doctor_id' => $appointmentSetting->user_id,
+            'agent_id' => $appointmentData->agentId,
+            'operator_id' => $appointmentData->operatorId,
+            'tracking_code' => AppointmentUser::generateTrackingCode(),
+            'status' => AppointmentUserStatusEnum::STATUS_SUCCESSFUL,
+            'kind' => $appointmentData->kind,
+            'start_time' => $visitDateTime->toTimeString(),
+            'end_time' => $visitDateTime->copy()->addMinutes($appointmentSetting->time_for_visit)->toTimeString(),
+            'date_visit' => $visitDateTime->toDateTimeString(),
+            'user_ip' => ip(),
+
+        ];
+        $detailDatabaseDB['payment'] = [
+            'status' => false,
+        ];
+
+        // handel payment
+        $paymentLink = null;
+        $smsTemplate = setting(SettingKeyEnum::SMS_APPOINTMENT_RECEIVING_SUCCESSFUL);
+        if ($appointmentData->appointmentVia == AppointmentVia::SELF && $paymentstatus['status']){
+            $smsTemplate = setting(SettingKeyEnum::SMS_APPOINTMENT_WAITING_PAYMENT);
+            $appointmentUserModel['deadline'] = $paymentstatus['deadline'];
+            if ($paymentstatus['force_payment']){
+                $appointmentUserModel['status'] = AppointmentUserStatusEnum::STATUS_WAIT_PAYMENT;
+            }
+            $detailDatabaseDB['payment'] = [
+                'status' => true,
+                AppointmentUser::DETAIL_PAYMENT_PRICE => $paymentstatus['price'],
+            ];
+        }
+
+        // detailDatabase
+
+        // store question in DB
+        if (isset($detailAppointment[AppointmentUser::DETAIL_QUESTION])){
+            $detailDatabaseDB[AppointmentUser::DETAIL_QUESTION] = $detailAppointment[AppointmentUser::DETAIL_QUESTION];
+        }
+
+        $appointmentUserModel['details'] = $detailDatabaseDB;
+
+        // store appointment in DB
+        $appointmentUser = $appointmentSetting->appointmentUsers()->create($appointmentUserModel);
+
+        // send sms
+        $appointmentUser->notify(new AppointmentSmsNotification($smsTemplate));
+
+        // create payment link
+        if ($appointmentData->appointmentVia == AppointmentVia::SELF && $paymentstatus['status']) {
+            $paymentLink = route('appointmentUser.payment', $appointmentUser);
+        }
+        // handel sms
+
+//        $this->makeShortLink($appointmentUser);
+
+        return [
+            'status' => true,
+            'message' => 'نوبت با موفقیت برای کاربر ثبت شد',
+            'detail' => [
+                'tracking_code' => $appointmentUserModel['tracking_code'],
+                'appointment_user_id' => $appointmentUser->id,
+                'payment_link' => $paymentLink
+            ]
+        ];
+
+
         //        $appointmentLists->where('start_time', '>', $dateAppointment)->where('end_time',);
-
-
     }
 
 

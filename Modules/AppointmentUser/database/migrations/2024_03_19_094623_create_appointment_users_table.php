@@ -28,6 +28,7 @@ return new class extends Migration
             $table->time('end_time')->nullable();
             $table->timestamp('date_visit')->nullable();
             $table->timestamp('visited_at')->nullable();
+            $table->timestamp('deadline_at')->nullable();
             $table->ipAddress('user_ip')->nullable();
             $table->json('details')->nullable();
             $table->softDeletes();

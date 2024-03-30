@@ -25,7 +25,8 @@ class ServiceResource extends JsonResource
     {
         if ($this->id == 1){
             return  [
-                [
+                'question' => 'در هفته چندم بارداری هستید' ,
+                'options' => [
                     'id' => 1,
                     'title' => 'هفته دوم بارداری',
                 ],

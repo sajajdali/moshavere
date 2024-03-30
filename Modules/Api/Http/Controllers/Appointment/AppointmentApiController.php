@@ -9,6 +9,7 @@ use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Cache;
 use Modules\Api\app\Http\Requests\Api\Requests\Appointment\StoreAppointmentUserRequest;
+use Modules\Api\app\Resources\Api\Appointments\AppointmentUserResource;
 use Modules\Api\app\Resources\Api\Appointments\DoctorResource;
 use Modules\Api\app\Resources\Api\PlaceResource;
 use Modules\Api\app\Resources\Api\ServiceResource;
@@ -262,9 +263,25 @@ class AppointmentApiController extends Controller
 
         return $this->ok([
             'status' => true,
+            'payment' => app('AppointmentUserService')->paymentstatus($appointmentSetting),
             'appointment_setting_id' => $appointmentSetting->id,
             'first_two_empty' => $resultList['firstTwoEmpty'],
             'get_list_empty_appointment' => $resultList['listAppointments']
+        ]);
+    }
+
+    public function tracking(AppointmentUser $appointmentUser)
+    {
+        $user = auth()->user();
+        if ($appointmentUser->user->id !== $user->id){
+            return $this->requestException([
+                'status' => false,
+                'message' => 'این نوبت متعلق به شما نیست'
+            ]);
+        }
+        return $this->ok([
+            'status' => true,
+            'appointmentUser' => AppointmentUserResource::make($appointmentUser),
         ]);
     }
 

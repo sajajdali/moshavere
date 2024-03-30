@@ -49,7 +49,7 @@ class Service extends Model
     public function apiResult()
     {
         return [
-            'id' => $this->id,
+            'id' => $this->id ,
             'title' => $this->title
         ];
     }

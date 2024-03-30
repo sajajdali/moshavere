@@ -52,8 +52,8 @@ class Place extends Model
     public function apiResult()
     {
         return [
-            'id' => $this->id,
-            'title' => $this->title
+            'id' => $this->id ?? null,
+            'title' => $this->title ?? null
         ];
     }
 }

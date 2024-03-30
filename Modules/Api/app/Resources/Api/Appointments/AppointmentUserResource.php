@@ -13,23 +13,41 @@ class AppointmentUserResource extends JsonResource
             'name' => $user?->name
         ];
     }
+
+    private function getServiceName()
+    {
+        return [
+            'id' => $this->service->id ?? null,
+            'title' => $this->service->title ?? null,
+        ];
+
+    }
+    private function getPlaceName()
+    {
+        return [
+            'id' => $this->place->id ?? null,
+            'title' => $this->place->title ?? null,
+        ];
+
+    }
+
     /**
      * Transform the resource into an array.
      */
     public function toArray($request): array
     {
         return [
-            'id'    => $this->id,
-            'service'   => $this->service->apiResult(),
-            'place' => $this->place->apiResult(),
-            'doctor'    =>  $this->apiResultUser($this->doctor),
+            'id' => $this->id,
+            'service' => $this->getServiceName(),
+            'place' => $this->getPlaceName(),
             'tracking_code' => $this->tracking_code,
             'status' => $this->status->apiResult(),
             'type' => $this->type->apiResult(),
             'kind' => $this->kind->apiResult(),
-            'start_time' => $this->start_time,
-            'end_time' => $this->end_time,
+            'start_time' => substr($this->start_time , 0 , -3),
+            'end_time' => substr($this->end_time, 0 , -3),
             'date_visit' => verta($this->date_visit)->format('%d %B %Y'),
+            'doctor'    => DoctorResource::make($this->doctor)
         ];
     }
 }

@@ -416,7 +416,7 @@ class AppointmentUserService
     }
 
 
-    private function paymentstatus(AppointmentSetting $appointmentSetting)
+    public function paymentstatus(AppointmentSetting $appointmentSetting)
     {
         $deadLineDelete = null;
         $statusPayment = false;

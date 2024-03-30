@@ -89,9 +89,7 @@ class AppointmentUserService
         }
 
         if (!$specialDaySelected) {
-//            $startDate = Carbon::today()->subDays(20);
-            $startDate = Carbon::today()->addDays(4);
-            $appointmentSetting->max_day_active = 5;
+            $startDate = Carbon::today()->subDays(20);
             $endDate = Carbon::today()->addDays($appointmentSetting->max_day_active ?? 90); // Adjust the number of days as needed
         }
 

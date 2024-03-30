@@ -7,6 +7,7 @@ use Livewire\Component;
 use Livewire\Attributes\On;
 use Illuminate\Support\Facades\Cache;
 use Hekmatinasser\Verta\Facades\Verta;
+use Livewire\Attributes\Computed;
 use Modules\AppointmentSetting\app\Models\AppointmentSetting;
 
 class SpecificDayAvailableAppointment extends Component
@@ -21,28 +22,46 @@ class SpecificDayAvailableAppointment extends Component
             return $this->loadDifferentDayDetail();
         }
     }
-
+    public function dateHasBeenChange()
+    {
+        $this->dispatch('dateHasBeenChange', newDate: verta($this->fetchData['selectedDate'])->format('Y-m-d'));
+    }
     public function loadDifferentDayDetail()
     {
         // if date has been change , this functio would be call
         $this->fetchData['selectedDate']      =  Verta::parse($this->form['changeDate'])->tocarbon();
-        $this->fetchData['listOfAppointment'] = $this->listOfAppointment($this->fetchData['RawlistOfAppointment']);
+        $this->dispatch('loadJs', true);
+        $this->dateHasBeenChange();
         $this->render();
     }
     public function previousDay()
     {
-        if (isset($this->fetchData['pdate']) && !empty($this->fetchData['pdate'])) {
-            $this->fetchData['pdate'] = $this->fetchData['pdate']->subDay();
-        } else {
-            $this->fetchData['pdate'] = $this->fetchData['selectedDate']->subDay();
-        }
-        dd($this->fetchData['RawlistOfAppointment']);
-        $this->ListOfAppointmentForPreviousDay($this->fetchData['RawlistOfAppointment']);
+        $privous_array = $this->fetchData['listOfAppointment'][($this->fetchData['showingAppointmentIndex'] - 1)];
+        $privous_array_date = Carbon::parse($privous_array['date']);
+        $this->fetchData['selectedDate'] = $privous_array_date;
+        $this->dispatch('loadJs', true);
+        $this->dateHasBeenChange();
+        $this->render();
     }
     public function nextDay()
     {
+        $privous_array = $this->fetchData['listOfAppointment'][($this->fetchData['showingAppointmentIndex'] + 1)];
+        $privous_array_date = Carbon::parse($privous_array['date']);
+        $this->fetchData['selectedDate'] = $privous_array_date;
+        $this->dispatch('loadJs', true);
+        $this->dateHasBeenChange();
+        $this->render();
     }
-
+    #[Computed]
+    public function ShowListOfAppointmentForSpecificDay()
+    {
+        foreach ($this->fetchData['listOfAppointment'] as $index => $avaiableTimes) {
+            if ($avaiableTimes['date'] == $this->fetchData['selectedDate']->format('Y-m-d')) {
+                $this->fetchData['showingAppointmentIndex'] = $index;
+                return $avaiableTimes['times'];
+            }
+        }
+    }
     #[On('closeModal')]
     public function addLoading()
     {
@@ -50,73 +69,82 @@ class SpecificDayAvailableAppointment extends Component
         sleep(2);
         $this->tempMessage = 'تغییرات با موفقیت اعمال شد';
     }
-
     private function listOfAppointment($listOfAppointment)
     {
 
-        $selectedDate = Carbon::parse($this->fetchData['selectedDate']); // Assuming $this->fetchData['selectedDate'] is a string representing the selected date
-
         $firstTwoEmpty = [];
-        $result = [];
+        $report = $listOfAppointment['report'];
+        $mainDaActive = $report['min_day_active'];
 
-        foreach ($listOfAppointment['data'] as $year => $months) {
-            foreach ($months as $month => $appointments) {
+        $isDay   = Carbon::now()->format('Y-m-d');
+
+        $result = [];
+        $temPResult = [];
+        foreach ($listOfAppointment['data'] as $yeay => $day) {
+            foreach ($day as $month => $appointments) {
                 foreach ($appointments as $day => $appointment) {
-                    $appointmentDate = Carbon::parse($appointment['day_number_gmt']);
-                    $index = 0;
-                    // if ($appointmentDate->startOfDay()->lt($selectedDate->startOfDay()) || $appointment['empty_appoints'] <= 0 || !$appointment['status']) {
-                    //     continue;
-                    // }
-                    $appointment['is_date_selected'] = false;
-                    if ($appointmentDate->eq($selectedDate)) {
-                        $appointment['is_date_selected'] = true;
-                    }
-                    $this->fetchData['selectedDateShamsiValue'] = verta($appointment['day_number_gmt'])->format('Y/m/d');
+                    $dayNumber = $appointment['day_number_gmt'];
                     foreach ($appointment['times'] as $time) {
                         if ($time['status']) {
-                            // $result['date'] = $appointment['day_number_gmt'] ;
-                            $result[$index]['is_active'] = false;
-                            $result[$index]['date'] = $appointmentDate->format('Y/m/d');
-                            if ($appointmentDate->eq($this->fetchData['selectedDate'])) {
-                                $result[$index]['is_active'] = true;
-                                $this->fetchData['selectedDateShamsiValue'] = $appointmentDate->format('Y/m/d');
-                            }
-                            $result[$index]['times'][] = [
+                            // Increment the counter
+                            $temPResult[] = [
                                 'status' => true,
                                 'time_stamp' => $time['timestamp'],
                                 'from' => $time['from'],
                                 'until' => $time['until'],
+                                'gap' => isset($time['gap']) ? true : false,
                             ];
-                            if (count($firstTwoEmpty) < 2) {
-                                $vertaDateTime = Verta::createTimestamp($time['timestamp']);
-                                $firstTwoEmpty[] = [
-                                    'persian_date' => $vertaDateTime->format('ساعت H روز l m/d'),
-                                    'time_stamp' => $time['timestamp'],
-                                    'from' => $time['from'],
-                                    'until' => $time['until'],
-                                ];
-                            }
+                            // If two matches are found, break out of the loop
+                        } else {
+                            $temPResult[] = [
+                                'status' => false,
+                                'from' => $time['from'],
+                                'until' => $time['until'],
+                                'appointment_user_id' => isset($time['appointment_user_id']) ? $time['appointment_user_id'] : null,
+                                'gap' => isset($time['gap']) ? true : false,
+                            ];
                         }
-                        $index = $index + 1;
                     }
+
+                    if (isset($temPResult)) {
+                        $result[] = [
+                            'date' => $dayNumber,
+                            'times' => $temPResult,
+                            'is_active' => $isDay == $dayNumber,
+                        ];
+                    }
+                    unset($temPResult);
                 }
             }
         }
         return $result;
     }
 
+    #[On('docHasChange')]
+    public function RebiuldCacheDataWithDoctorId($appId)
+    {
+        $app = AppointmentSetting::find($appId);
+        $this->fetchData['RawlistOfAppointment']  = Cache::rememberForever('appointmentList.' . $app->id, function () use ($app) {
+            return app('AppointmentUserService')->listAppointments($app);
+        });
+        // dd($this->fetchData['RawlistOfAppointment']);
+        $this->fetchData['listOfAppointment'] = $this->listOfAppointment($this->fetchData['RawlistOfAppointment']);;
+    }
     public function mount()
     {
         $app = AppointmentSetting::find(request()->route('appId'));
+        $this->fetchData['doc'] = $app->user;
         if (!empty(request()->route('date'))) {
             $this->fetchData['selectedDate']  = Verta::parse(request()->route('date'))->toCarbon();
         } else {
             return redirect()->back()->with('error', 'لطفا مجدد تاریخ را انتخاب کنید');
         }
         if ((request()->has('time'))) {
-            $this->fetchData['time'] = Carbon::createFromTimestamp((int) request()->get('time'))->format('H:i');
-            //lucch modal
+            $this->fetchData['time'] =  request()->get('time');
+            //lunch modal
         }
+        // TODO::inere pak kon
+        Cache::forget('appointmentList.' . $app->id);
         $this->fetchData['RawlistOfAppointment']  = Cache::rememberForever('appointmentList.' . $app->id, function () use ($app) {
             return app('AppointmentUserService')->listAppointments($app);
         });
@@ -124,6 +152,7 @@ class SpecificDayAvailableAppointment extends Component
     }
     public function render()
     {
+
         return view('appointmentuser::livewire.admin.add-appointment.specific-day-available-appointment');
     }
 }

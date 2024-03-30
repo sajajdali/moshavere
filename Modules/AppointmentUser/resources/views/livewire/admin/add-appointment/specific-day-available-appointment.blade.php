@@ -1,19 +1,14 @@
 <div>
     <div class="page-header">
         <div>
-            <h1 class="page-title">شما در حال افزودن نوبت برای دکتر <span class="text-danger">غلامعلی</span> در بخش <span
-                    class="text-danger">ستون فقرات</span> هستید </h1>
+            <h1 class="page-title"> افزودن نوبت برای دکتر <span
+                    class="text-danger">{{ $fetchData['doc']->fullName }}</span> </h1>
         </div>
         <button id="changeDocButton" class="btn btn-primary mt-3 mt-sm-0" type="button" class="btn btn-primary"
             data-bs-toggle="modal" data-bs-target="#changeDocmodal">
             تغییر پزشک و بخش</button>
     </div>
-    @if (isset($tempMessage))
-        <div class="alert alert-success" role="alert">
-            <i class="fa fa-check-square fa-xl" aria-hidden="true"></i>
-            {{ $tempMessage }}
-        </div>
-    @endif
+    @include('admin::layouts.components.alert')
 
     <div class="row row-sm">
         <div class="col-md-12">
@@ -25,7 +20,7 @@
                             <i class="fa fa-arrow-right" aria-hidden="true"></i>
                         </button>
                         <input class="text-center" type="text" id="currentDate"
-                            placeholder="{{ $fetchData['selectedDateShamsiValue'] }}" style="max-width: fit-content">
+                            value="{{ $fetchData['selectedDate'] }}" style="max-width: fit-content">
                         <button class="btn btn-light" wire:click='nextDay'>
                             <i class="fa fa-arrow-left" aria-hidden="true" data-bs-toggle="tooltip"
                                 data-bs-placement="top" title="روز بعد"></i>
@@ -52,18 +47,8 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                @if (empty($fetchData['listOfAppointment']))
-                                    <tr>
-                                        <td colspan="6">
-                                            <div class="alert alert-avatar alert-primary alert-dismissible">
-                                                زمان حضور برای این تاریخ تعیین نشده است!!
-                                            </div>
-                                        </td>
-                                    </tr>
-                                @endif
-                                @foreach ($fetchData['listOfAppointment'] as $index => $avaiableTimes)
-                                    @continue($avaiableTimes['is_active'] == 'false')
-                                    @foreach ($avaiableTimes['times'] as $key => $eachTime)
+                                @if (!empty($this->ShowListOfAppointmentForSpecificDay()))
+                                    @foreach ($this->ShowListOfAppointmentForSpecificDay() as $key => $eachTime)
                                         @if ($loop->first)
                                             <tr>
                                                 <td colspan="6">
@@ -73,7 +58,7 @@
                                                 </td>
                                             </tr>
                                         @endif
-                                        @if ($eachTime['status'])
+                                        @if ($eachTime['status'] == true)
                                             <tr>
                                                 <td class="alert text-center bg-info ">{{ $key + 1 }}</td>
                                                 <td>
@@ -81,42 +66,65 @@
                                                     {{ substr($eachTime['until'], 0, -3) }}
                                                 </td>
                                                 <td colspan="4" class="text-center">
-                                                    <button type="button" style="width: 124px" data-time-start="10:30"
-                                                        data-bs-toggle="modal" data-bs-target="#RegistrAnAppointment"
-                                                        data-time-end="10:45"
-                                                        class="btn btn-sm btn-success btn-block">ثبت
-                                                        نوبت</button>
+                                                    <div class="d-flex align-items-center">
+                                                        <button type="button" style="width: 124px"
+                                                            data-time-start="10:30" data-bs-toggle="modal"
+                                                            data-bs-target="#RegistrAnAppointment" data-time-end="10:45"
+                                                            class="btn btn-sm btn-success btn-block">ثبت
+                                                            نوبت</button>
+                                                        @if ($eachTime['gap'])
+                                                            <span class="text-danger ms-5">زمان نوبت کمتر از زمان ویزیت
+                                                                میباشد!</span>
+                                                        @endif
+                                                    </div>
                                                 </td>
                                             </tr>
-                                        @else
-                                            {{-- <tr class="table-success">
-                                        <td class="alert text-center bg-info ">3</td>
-                                        <td>
-                                            10:45 - 10:50
-                                        </td>
-                                        <td>
-                                            حامد ریسی
-                                        </td>
-                                        <td>
-                                            0937 60 20 827
-                                        </td>
-                                        <td>
-                                            ثبت شده
-                                        </td>
-                                        <td>
-                                            <div class="dropdown">
-                                                <button class="btn btn-danger dropdown-toggle" type="button"
-                                                    id="dropdownMenuButton1" data-bs-toggle="dropdown"
-                                                    aria-expanded="false">
-                                                    عملیات
-                                                </button>
-                                                <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton1">
-                                                    <li><a class="dropdown-item" href="#">ویرایش</a></li>
-                                                    <li><a class="dropdown-item" href="#">حذف</a></li>
-                                                </ul>
-                                            </div>
-                                        </td>
-                                    </tr> --}}
+                                        @elseif(isset($eachTime['appointment_user_id']))
+                                            @php
+                                                $ap = Modules\AppointmentUser\app\Models\AppointmentUser::find(
+                                                    $eachTime['appointment_user_id'],
+                                                );
+                                                $user = $ap->user;
+                                            @endphp
+                                            <tr
+                                                class=" @if ($ap->type == Modules\AppointmentUser\Enum\AppointmentUserTypeEnum::BETWEEN_PATIENTS) table-info @else {{ $ap->status->getColor() }} @endif text-center">
+                                                <td class="alert text-center bg-info ">3</td>
+                                                <td>
+                                                    {{ substr($eachTime['from'], 0, -3) }} -
+                                                    {{ substr($eachTime['until'], 0, -3) }}
+                                                </td>
+                                                <td>
+                                                    {{ $user->fullName }}
+                                                </td>
+                                                <td>
+                                                    {{ $user->mobile }}
+                                                </td>
+                                                <td>
+                                                    <span
+                                                        class="badge {{ $ap->status->getBadgeColor() }} rounded-pill">
+                                                        {{ $ap->status->getName() }}
+                                                    </span>
+                                                    @if ($ap->type == Modules\AppointmentUser\Enum\AppointmentUserTypeEnum::BETWEEN_PATIENTS)
+                                                        <span class="badge bg-info rounded-pill ms-1">
+                                                            <strong> {{ $ap->type->getName() }}</strong>
+                                                        </span>
+                                                    @endif
+                                                </td>
+                                                <td>
+                                                    <div class="dropdown">
+                                                        <button class="btn btn-danger dropdown-toggle" type="button"
+                                                            id="dropdownMenuButton1" data-bs-toggle="dropdown"
+                                                            aria-expanded="false">
+                                                            عملیات
+                                                        </button>
+                                                        <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton1">
+                                                            <li><a class="dropdown-item" 
+                                                                    href="#">ویرایش</a></li>
+                                                            <li><a class="dropdown-item" href="#">حذف</a></li>
+                                                        </ul>
+                                                    </div>
+                                                </td>
+                                            </tr>
                                         @endif
                                         @if ($loop->last)
                                             <tr>
@@ -128,7 +136,11 @@
                                             </tr>
                                         @endif
                                     @endforeach
-                                @endforeach
+                                @else
+                                    <div class="alert alert-avatar alert-warning alert-dismissible">
+                                        زمان حضور برای این تاریخ تعیین نشده است!!
+                                    </div>
+                                @endif
                             </tbody>
                         </table>
                     </div>
@@ -145,19 +157,20 @@
     <script src="{{ admin_asset('plugins/select2/select2.full.min.js') }}"></script>
     <script>
         $(document).ready(function() {
-            var myModalEl = document.getElementById('changeDocmodal')
-            myModalEl.addEventListener('show.bs.modal', function(event) {
+            function addJs() {
+                $('#currentDate').persianDatepicker({
+                    format: 'L',
+                    autoClose: true,
+                    onSelect: function(unix) {
+                        @this.set('form.changeDate', $('#currentDate').val());
+                    }
+                });
+            };
+            addJs();
+            Livewire.on('loadJs', function() {
                 setTimeout(() => {
-                    $('.addSelectJs').select2();
-                }, 1000);
-            })
-            $('#currentDate').persianDatepicker({
-                initialValue: false,
-                format: 'L',
-                autoClose: true,
-                onSelect: function(unix) {
-                    @this.set('form.changeDate', $('#currentDate').val());
-                }
+                    addJs();
+                }, 500);
             });
             Livewire.on('closeModal', function() {
                 var myModalEl = document.querySelector('#changeDocmodal')
@@ -168,6 +181,14 @@
                 var setAppModalInst = bootstrap.Modal.getOrCreateInstance(setAppModal)
                 setAppModalInst.hide();
             });
+            Livewire.on('dateHasBeenChange', function(newDate) {
+                var currentUrl = window.location.href;
+                var baseUrl = currentUrl.split('/').slice(0, -1).join('/');
+                var newUrl = baseUrl + '/' + newDate.newDate;
+                window.history.pushState({
+                    path: newUrl
+                }, '', newUrl);
+            })
         });
     </script>
 @endpush

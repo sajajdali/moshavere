@@ -36,7 +36,7 @@
                                 <div class="alert alert-danger" role="alert">
                                     <span class="alert-inner--text"> پرداخت شا با موفقیت انجام نشد</span>
                                 </div>
-                                <a href="https://webapp.jesmino.com/appointment/{{$appointmentUser->id}}"
+                                <a href="https://amiri.selakteb.com/appointment/{{$appointmentUser->id}}"
                                    class="login100-form-btn btn-primary">
                                     بازگشت به اپلیکیشن
                                 </a>

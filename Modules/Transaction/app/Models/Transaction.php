@@ -30,7 +30,7 @@ class Transaction extends Model
         $code = '';
 
         // Generate a random code
-        for ($i = 0; $i < 4; $i++) {
+        for ($i = 0; $i < 8; $i++) {
             $code .= $characters[rand(0, strlen($characters) - 1)];
         }
 

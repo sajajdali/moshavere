@@ -457,6 +457,7 @@ class AppointmentUserService
 
     public function storeAppointment(AppointmentSetting $appointmentSetting, UserModelAppointment $userModelAppointment, AppointmentModel $appointmentData, $detail = [])
     {
+
         // check exist appointment
         $detailAppointment = $detail;
         $detailDatabaseDB = [];
@@ -508,7 +509,7 @@ class AppointmentUserService
         $smsTemplate = setting(SettingKeyEnum::SMS_APPOINTMENT_RECEIVING_SUCCESSFUL);
         if ($appointmentData->appointmentVia == AppointmentVia::SELF && $paymentstatus['status']) {
             $smsTemplate = setting(SettingKeyEnum::SMS_APPOINTMENT_WAITING_PAYMENT);
-            $appointmentUserModel['deadline'] = $paymentstatus['deadline'];
+            $appointmentUserModel['deadline_at'] = $paymentstatus['deadline'];
             if ($paymentstatus['force_payment']) {
                 $appointmentUserModel['status'] = AppointmentUserStatusEnum::STATUS_WAIT_PAYMENT;
             }
@@ -519,6 +520,11 @@ class AppointmentUserService
         }
 
         // detailDatabase
+
+        $detailDatabaseDB[AppointmentUser::DETAIL_FOR_HIMSELF] = $userModelAppointment->forHimself;
+        if($userModelAppointment->forHimself == 2){
+            $detailDatabaseDB[AppointmentUser::DETAIL_SOMEONE] = $userModelAppointment->userSomeoneModel;
+        }
 
         // store question in DB
         if (isset($detailAppointment[AppointmentUser::DETAIL_QUESTION])) {

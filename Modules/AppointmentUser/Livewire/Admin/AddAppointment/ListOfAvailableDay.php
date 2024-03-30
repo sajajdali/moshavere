@@ -21,9 +21,11 @@ class ListOfAvailableDay extends Component
     }
     public function GotoAppointmentList($time, $day)
     {
-        $hour = explode(':', $day);
-        $date = Carbon::parse((int)$time)->setTime($hour[0], $hour[1])->timestamp;
-        return redirect()->route('admin.appointment.add.specificday', ['date' => $date,'appId' => $this->fethData['appointmentSetting']]);
+        $timeArray = explode(':', $day);
+        $passedDate =  verta(Carbon::parse($time))->format('Y-m-d');
+        $passedHour = Carbon::createFromTimestamp((int)$time)->setTime($timeArray[0], $timeArray[1])->timestamp;
+
+        return redirect()->route('admin.appointment.add.specificday', ['appId' => $this->fethData['appointmentSetting'], 'date' => $passedDate, 'time' => $passedHour]);
     }
     private function findFirstTreeAppointment($listOfAppointment)
     {
@@ -37,7 +39,7 @@ class ListOfAvailableDay extends Component
         $isYear  = verta()->addDays($mainDaActive)->year;
 
         $result = [];
-        $maxDay = 6;
+        $maxDay = 7;
         $DaysDisplayed = 0;
         foreach ($listOfAppointment['data'] as $yeay => $day) {
             if ($yeay < $isYear) {
@@ -76,12 +78,6 @@ class ListOfAvailableDay extends Component
                                 ];
                             }
                             // If two matches are found, break out of the loop
-                        } else {
-                            $result[$dayNumber][] = [
-                                'empty_appoints' => $appointment['empty_appoints'],
-                                'from' => $time['from'],
-                                'until' => $time['until'],
-                            ];
                         }
                     }
                 }
@@ -110,7 +106,7 @@ class ListOfAvailableDay extends Component
             return app('AppointmentUserService')->listAppointments($appointmentSetting);
         });
         $this->fethData['firstTreeAvailableAppointment'] =  $this->findFirstTreeAppointment($listOfAppointment);
-        $this->fethData['appointmentSetting'] = $appointmentSetting->id ;
+        $this->fethData['appointmentSetting'] = $appointmentSetting->id;
     }
 
     public function render()

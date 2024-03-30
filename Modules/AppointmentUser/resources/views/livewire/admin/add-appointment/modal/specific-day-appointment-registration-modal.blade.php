@@ -7,19 +7,19 @@
                     ثبت نوبت
                 </div>
                 <div class="modal-body">
-                    @if (isset($message))
-                        <div class="alert alert-success" role="alert">
-                            <i class="fa fa-check-square-o fa-xl me-1" aria-hidden="true"></i>
+                    @error('userNotExists')
+                        <div class="alert alert-danger" role="alert">
+                            <i class="fa fa-exclamation-triangle  fa-xl me-1" aria-hidden="true"></i>
                             {{ $message }}
                         </div>
-                    @endif
+                    @enderror
                     @if ($step == 1)
                         <div class="row">
                             <label for="inputPassword" class=" col-form-label">ثبت نوبت با شماره همراه </label>
                             <input type="text" placeholder="0912******"
-                                class="form-control @error('setProp.number') is-invalid @enderror" id="inputPassword"
-                                wire:model='setProp.number'>
-                            @error('setProp.number')
+                                class="form-control @error('form.number') is-invalid @enderror" id="inputPassword"
+                                wire:model='form.number'>
+                            @error('form.number')
                                 <span class="text-danger">{{ $message }}</span>
                             @enderror
                         </div>
@@ -30,9 +30,9 @@
                         <div class="row mb-4">
                             <label for="parvande" class=" col-form-label">ثبت نوبت با شماره پرونده </label>
                             <input type="text" placeholder="1234"
-                                class="form-control @error('setProp.document') is-invalid @enderror" id="parvande"
-                                wire:model='setProp.document'>
-                            @error('setProp.document')
+                                class="form-control @error('form.document_number') is-invalid @enderror" id="parvande"
+                                wire:model='form.document_number'>
+                            @error('form.document_number')
                                 <span class="text-danger">{{ $message }}</span>
                             @enderror
                         </div>
@@ -51,9 +51,9 @@
                                 <div class="mb-3">
                                     <label for="firs_name_addApp" class="form-label">نام کاربر</label>
                                     <input type="email"
-                                        class="form-control @error('setProp.first_name') is-invalid @enderror "
-                                        id="firs_name_addApp" wire:model='setProp.first_name'>
-                                    @error('setProp.first_name')
+                                        class="form-control @error('form.first_name') is-invalid @enderror "
+                                        id="firs_name_addApp" wire:model='form.first_name'>
+                                    @error('form.first_name')
                                         <span class="text-danger">{{ $message }}</span>
                                     @enderror
                                 </div>
@@ -62,9 +62,9 @@
                                 <div class="mb-3">
                                     <label for="last_name_addApp" class="form-label">نام خانوادگی کاربر</label>
                                     <input type="email"
-                                        class="form-control  @error('setProp.last_name') is-invalid @enderror "
-                                        id="last_name_addApp" wire:model='setProp.last_name'>
-                                    @error('setProp.last_name')
+                                        class="form-control  @error('form.last_name') is-invalid @enderror "
+                                        id="last_name_addApp" wire:model='form.last_name'>
+                                    @error('form.last_name')
                                         <span class="text-danger">{{ $message }}</span>
                                     @enderror
                                 </div>
@@ -73,7 +73,7 @@
                                 <label for="inputPassword" class="col-sm-3 col-form-label">شماره پرونده</label>
                                 <div class="col-sm-9">
                                     <input type="password" class="form-control" id="inputPassword"
-                                        wire:model='setProp.docNumber'>
+                                        wire:model='form.docNumber'>
                                 </div>
                             </div>
                         </div>
@@ -117,7 +117,7 @@
                             <div class="collapse row" id="detialCollaps">
                                 <div class="col-md-12">
                                     <label for="exampleFormControlTextarea1" class="form-label">توضیحات</label>
-                                    <textarea class="form-control" id="exampleFormControlTextarea1" rows="3" wire:model='setProp.description'></textarea>
+                                    <textarea class="form-control" id="exampleFormControlTextarea1" rows="3" wire:model='form.description'></textarea>
                                 </div>
                             </div>
                         </div>
@@ -136,7 +136,7 @@
                                 <div class="col-6">
                                     <div class="form-check">
                                         <input class="form-check-input" checked type="radio" value="true"
-                                            wire:model='setProp.appType' name="appTypeRAdio" id="flexRadioDefault1">
+                                            wire:model='form.appType' name="appTypeRAdio" id="flexRadioDefault1">
                                         <label class="form-check-label" for="flexRadioDefault1">
                                             نوبت اصلی
                                         </label>
@@ -145,7 +145,7 @@
                                 <div class="col-6">
                                     <div class="form-check">
                                         <input class="form-check-input" type="radio" name="appTypeRAdio"
-                                            value="fasle" wire:model='setProp.appType' id="flexRadioDefault2">
+                                            value="fasle" wire:model='form.appType' id="flexRadioDefault2">
                                         <label class="form-check-label" for="flexRadioDefault2">
                                             بین مریض
                                         </label>
@@ -168,7 +168,7 @@
                                 <div class="col-6">
                                     <div class="form-check">
                                         <input class="form-check-input" checked type="radio"
-                                            wire:model='setProp.smsType' value="true" name="smsStatusType"
+                                            wire:model='form.smsType' value="true" name="smsStatusType"
                                             id="smsStatusType1">
                                         <label class="form-check-label" for="smsStatusType1">
                                             پیامک ارسال شود
@@ -178,7 +178,7 @@
                                 <div class="col-6">
                                     <div class="form-check">
                                         <input class="form-check-input" type="radio" name="smsStatusType"
-                                            wire:model='setProp.smsType' value="false" id="smsStatusType2">
+                                            wire:model='form.smsType' value="false" id="smsStatusType2">
                                         <label class="form-check-label" for="smsStatusType2">
                                             پیامک ارسال نشود
                                         </label>

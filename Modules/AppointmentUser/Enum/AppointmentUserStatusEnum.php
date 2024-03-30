@@ -25,12 +25,23 @@ enum AppointmentUserStatusEnum: int implements EnumHasApiResultInterface
             self::STATUS_NOT_ATTENDED => 'عدم حضور',
         };
     }
+    public function getBadgeColor(): string
+    {
+        return match ($this) {
+            self::STATUS_PENDING      => 'bg-warning',
+            self::STATUS_SUCCESSFUL   => 'bg-success',
+            self::STATUS_WAIT_PAYMENT => 'bg-info',
+            self::STATUS_CANCEL       => 'bg-danger',
+            self::STATUS_ATTENDED     => 'bg-secondary',
+            self::STATUS_NOT_ATTENDED => 'bg-primary',
+        };
+    }
     public function getColor(): string
     {
         return match ($this) {
             self::STATUS_PENDING => 'table-warning',
             self::STATUS_SUCCESSFUL => 'table-success',
-            self::STATUS_WAIT_PAYMENT => 'table-info',
+            self::STATUS_WAIT_PAYMENT => 'table-primary',
             self::STATUS_CANCEL => 'table-danger',
         };
     }

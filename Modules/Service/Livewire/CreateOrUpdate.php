@@ -39,7 +39,7 @@ class CreateOrUpdate extends Component
         $modelCreateOrUpdate = [
             'title'         => $this->form['title']         ?? '',
             'parent_id'     => $parentId,
-            'icon'          => $this->form['img']            ?? 0,
+            'icon'          => $this->form['img']            ?? null,
             'priority'      => $this->form['priority']   ?? 1,
             'active'        => ActiveEnum::tryFrom($active),
         ];

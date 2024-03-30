@@ -452,7 +452,8 @@ class AppointmentUserService
     public function storeAppointment(AppointmentSetting $appointmentSetting ,UserModelAppointment $userModelAppointment,AppointmentModel $appointmentData , $detail = [])
     {
         // check exist appointment
-        $detail = [];
+        $detailAppointment = $detail;
+        $detailDatabaseDB = [];
         $dateAppointment = Carbon::createFromTimestamp($appointmentData->timestamp);
         $visitDateTime = Carbon::createFromTimestamp($appointmentData->timestamp);
         if ($appointmentData->appointmentVia == AppointmentVia::SELF && $dateAppointment->isPast()){
@@ -492,7 +493,7 @@ class AppointmentUserService
             'user_ip' => ip(),
 
         ];
-        $detail['payment'] = [
+        $detailDatabaseDB['payment'] = [
             'status' => false,
         ];
 
@@ -505,13 +506,20 @@ class AppointmentUserService
             if ($paymentstatus['force_payment']){
                 $appointmentUserModel['status'] = AppointmentUserStatusEnum::STATUS_WAIT_PAYMENT;
             }
-            $detail['payment'] = [
+            $detailDatabaseDB['payment'] = [
                 'status' => true,
                 AppointmentUser::DETAIL_PAYMENT_PRICE => $paymentstatus['price'],
             ];
-            $appointmentUserModel['details'] = $detail;
         }
 
+        // detailDatabase
+
+        // store question in DB
+        if (isset($detailAppointment[AppointmentUser::DETAIL_QUESTION])){
+            $detailDatabaseDB[AppointmentUser::DETAIL_QUESTION] = $detailAppointment[AppointmentUser::DETAIL_QUESTION];
+        }
+
+        $appointmentUserModel['details'] = $detailDatabaseDB;
 
         // store appointment in DB
         $appointmentUser = $appointmentSetting->appointmentUsers()->create($appointmentUserModel);

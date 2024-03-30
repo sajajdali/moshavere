@@ -14,6 +14,7 @@ use Modules\Api\app\Resources\Api\PlaceResource;
 use Modules\Api\app\Resources\Api\ServiceResource;
 use Modules\Api\Trait\ApiHandlerTrait;
 use Modules\AppointmentSetting\app\Models\AppointmentSetting;
+use Modules\AppointmentUser\app\Models\AppointmentUser;
 use Modules\AppointmentUser\Enum\AppointmentVia;
 use Modules\AppointmentUser\Enum\model\AppointmentModel;
 use Modules\AppointmentUser\Enum\model\UserModel;
@@ -32,7 +33,6 @@ class AppointmentApiController extends Controller
 
         return $this->ok([
                 'status' => true,
-                'name' => $user->id,
                 'doctors' => DoctorResource::collection($doctors)
             ]
         );
@@ -213,7 +213,12 @@ class AppointmentApiController extends Controller
             placeId: $request->input('place_id'),
         );
 
-        $storeAppointment = app('AppointmentUserService')->storeAppointment($appointmentSetting , $userModelAppointment  , $appointmentModel );
+        $detail = [];
+        if ($request->input('question')){
+            $detail[AppointmentUser::DETAIL_QUESTION] = $request->input('question');
+        }
+
+        $storeAppointment = app('AppointmentUserService')->storeAppointment($appointmentSetting , $userModelAppointment  , $appointmentModel , $detail );
         if (!$storeAppointment['status']){
             return $this->requestException([
                 'status' => false,

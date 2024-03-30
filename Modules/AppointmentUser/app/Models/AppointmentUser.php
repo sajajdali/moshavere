@@ -21,6 +21,7 @@ class AppointmentUser extends Model
     use HasFactory , SoftDeletes , Notifiable;
     CONST DETAIL_APPOINTMENT_VIA = 'appointment_via';
     CONST DETAIL_PAYMENT_PRICE= 'price';
+    CONST DETAIL_QUESTION= 'question';
     /**
      * The attributes that are mass assignable.
      */

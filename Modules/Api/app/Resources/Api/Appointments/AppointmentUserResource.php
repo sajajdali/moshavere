@@ -62,6 +62,7 @@ class AppointmentUserResource extends JsonResource
             'doctor'    => DoctorResource::make($this->doctor),
             'deadline_payment' => $this->deadline_at ? Carbon::parse($this->deadline_at)->diffForHumans(): null,
             'transaction' => $this->lastTransaction(),
+            'payment_status' => $this->details[AppointmentUser::DETAIL_PAYMENT],
             'payment_link' => route('appointmentUser.payment', $this),
         ];
     }

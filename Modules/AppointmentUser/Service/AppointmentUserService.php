@@ -436,7 +436,11 @@ class AppointmentUserService
             'status' => $statusPayment,
             'deadline' => $deadLineDelete,
             'force_payment' => $forcePayment,
-            'price' => $price
+            'price' => [
+                'int' => (int) $price,
+                'string' => number_format($price),
+                'currency' => 'ریال'
+            ]
         ];
     }
 
@@ -513,7 +517,7 @@ class AppointmentUserService
             if ($paymentstatus['force_payment']) {
                 $appointmentUserModel['status'] = AppointmentUserStatusEnum::STATUS_WAIT_PAYMENT;
             }
-            $detailDatabaseDB['payment'] = [
+            $detailDatabaseDB[AppointmentUser::DETAIL_PAYMENT] = [
                 'status' => true,
                 AppointmentUser::DETAIL_PAYMENT_PRICE => $paymentstatus['price'],
             ];

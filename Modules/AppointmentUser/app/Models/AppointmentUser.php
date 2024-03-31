@@ -24,6 +24,7 @@ class AppointmentUser extends Model
     CONST DETAIL_QUESTION= 'question';
     CONST DETAIL_SOMEONE= 'someone';
     CONST DETAIL_FOR_HIMSELF= 'for_himself';
+    CONST DETAIL_PAYMENT= 'payment';
 
     /**
      * The attributes that are mass assignable.

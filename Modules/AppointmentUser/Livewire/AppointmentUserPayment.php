@@ -27,14 +27,15 @@ class AppointmentUserPayment extends Component
 
         if ($this->appointmentUser->status == AppointmentUserStatusEnum::STATUS_WAIT_PAYMENT) {
 
+
             $this->status = 'showMessage';
             $this->message = 'پرداخت شما انجام شده و نوبت شما فعال شد';
             $this->transaction = $this->appointmentUser->transaction()->create([
                 'transaction_code' => Transaction::generateTransactionCode(),
                 'paid_by' => TransactionPaidEnum::ONLINE,
                 'status' => TransactionStatusEnum::SUCCESSFUL,
-                'cost' => $this->appointmentUser->details['payment'][AppointmentUser::DETAIL_PAYMENT_PRICE],
-                'total_cost' => $this->appointmentUser->details['payment'][AppointmentUser::DETAIL_PAYMENT_PRICE]
+                'cost' => $this->appointmentUser->details['payment'][AppointmentUser::DETAIL_PAYMENT_PRICE]['int'],
+                'total_cost' => $this->appointmentUser->details['payment'][AppointmentUser::DETAIL_PAYMENT_PRICE]['int']
             ]);
 
             $this->appointmentUser->update([
@@ -56,8 +57,8 @@ class AppointmentUserPayment extends Component
             'transaction_code' => Transaction::generateTransactionCode(),
             'paid_by' => TransactionPaidEnum::ONLINE,
             'status' => TransactionStatusEnum::PENDING,
-            'cost' => $this->appointmentUser->details['payment'][AppointmentUser::DETAIL_PAYMENT_PRICE],
-            'total_cost' => $this->appointmentUser->details['payment'][AppointmentUser::DETAIL_PAYMENT_PRICE]
+            'cost' => $this->appointmentUser->details['payment'][AppointmentUser::DETAIL_PAYMENT_PRICE]['int'],
+            'total_cost' => $this->appointmentUser->details['payment'][AppointmentUser::DETAIL_PAYMENT_PRICE]['int']
         ]);
         $this->status = 'failed';
     }

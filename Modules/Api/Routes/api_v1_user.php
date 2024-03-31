@@ -37,7 +37,6 @@ Route::prefix('appointment')->group(function () {
     Route::get('places/{doctor}' , [\Modules\Api\Http\Controllers\Appointment\AppointmentApiController::class , 'places'])->name('api.appointment.places');
     Route::get('list_days' , [\Modules\Api\Http\Controllers\Appointment\AppointmentApiController::class , 'listDays'] )->name('api.appointment.list_days');
     Route::post('store', [\Modules\Api\Http\Controllers\Appointment\AppointmentApiController::class, 'store'])->name('api.appointment.store');
-    Route::post('tracking/{appointmentUser}', [\Modules\Api\Http\Controllers\Appointment\AppointmentApiController::class, 'tracking'])->name('api.appointment.tracking');
-
+    Route::get('tracking/{appointmentUser}', [\Modules\Api\Http\Controllers\Appointment\AppointmentApiController::class, 'tracking'])->name('api.appointment.tracking');
 });
 // appointment

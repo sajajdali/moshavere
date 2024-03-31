@@ -11,7 +11,7 @@ class UserModel
     public ?string $lastName;
     public ?string $mobile;
     public ?int $gender;
-    public ?int $age;
+    public ?BirthdayModel $birthday;
     public ?string $nationalCode;
     public ?int $acquainted;
     public ?string $address;
@@ -27,14 +27,14 @@ class UserModel
      * @param string|null $address
      * @param string|null $city
      */
-    public function __construct(User $user = null ,?string $firstName = null, ?string $lastName = null, ?string $mobile = null, ?int $gender = null,?int $age = null, ?string $nationalCode = null, ?int $acquainted = null, ?string $address = null, ?string $city = null)
+    public function __construct(User $user = null ,?string $firstName = null, ?string $lastName = null, ?string $mobile = null, ?int $gender = null,?BirthdayModel $birthday = null, ?string $nationalCode = null, ?int $acquainted = null, ?string $address = null, ?string $city = null)
     {
         $this->user = $user;
         $this->firstName = $firstName;
         $this->lastName = $lastName;
         $this->mobile = $mobile;
         $this->gender = $gender;
-        $this->age = $age;
+        $this->birthday = $birthday;
         $this->nationalCode = $nationalCode;
         $this->acquainted = $acquainted;
         $this->address = $address;

@@ -133,4 +133,13 @@ trait UserAttributeTrait
             set: fn ($value) => $this->metas()->updateOrCreate(['meta_key' => UserMetaEnum::BAN_USER, 'meta_value' => $value])
         );
     }
+
+    public function birthday(): Attribute
+    {
+        $operator = UserMetaEnum::BIRTHDAY;
+        return Attribute::make(
+            get: fn() => $this->getMeta( $operator)?->meta_value,
+            set: fn ($value) => $this->metas()->create(['meta_key' => $operator, 'meta_value' => $value])
+        );
+    }
 }

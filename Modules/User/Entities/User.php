@@ -199,4 +199,15 @@ class User extends Authenticatable
         return Role::find(3)->users();
     }
 
+    public function age(): int
+    {
+        $birthDayData = $this->birthday;
+        if ($birthDayData == null) {
+            return 0;
+        }
+        $birthDay = json_decode($birthDayData);
+        $shamsiDate = Verta::parse("{$birthDay->year}/{$birthDay->month}/{$birthDay->day}");
+        return $shamsiDate->diff(now())->y;
+    }
+
 }

@@ -18,6 +18,7 @@ use Modules\AppointmentSetting\app\Models\AppointmentSetting;
 use Modules\AppointmentUser\app\Models\AppointmentUser;
 use Modules\AppointmentUser\Enum\AppointmentVia;
 use Modules\AppointmentUser\Enum\model\AppointmentModel;
+use Modules\AppointmentUser\Enum\model\BirthdayModel;
 use Modules\AppointmentUser\Enum\model\UserModel;
 use Modules\AppointmentUser\Enum\model\UserModelAppointment;
 use Modules\User\Entities\User;
@@ -185,7 +186,6 @@ class AppointmentApiController extends Controller
                 lastName: $request->input('someone_last_name'),
                 mobile: $request->input('someone_mobile'),
                 gender: $request->input('someone_gender'),
-                age: $request->input('someone_age'),
                 nationalCode: $request->input('someone_national_code')
             );
         }
@@ -196,7 +196,7 @@ class AppointmentApiController extends Controller
             firstName: $request->input('first_name'),
             lastName: $request->input('last_name'),
             gender: $request->input('gender'),
-            age: $request->input('age'),
+            birthday: new BirthdayModel(day: $request->input('birthday_day'), month: $request->input('birthday_month'), year: $request->input('birthday_year')),
             nationalCode: $request->input('national_code'),
             address: $request->input('address'),
             city: $request->input('city')

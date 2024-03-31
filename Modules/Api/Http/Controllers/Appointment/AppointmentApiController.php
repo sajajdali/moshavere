@@ -252,7 +252,7 @@ class AppointmentApiController extends Controller
         }
 
 
-//        Cache::forget('appointmentList.'.$appointmentSetting->id);
+        Cache::forget('appointmentList.'.$appointmentSetting->id);
         $listDays = Cache::rememberForever('appointmentList.' . $appointmentSetting->id, function () use ($appointmentSetting) {
             return app('AppointmentUserService')->listAppointments($appointmentSetting);
         });

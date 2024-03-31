@@ -5,6 +5,7 @@ namespace Modules\AppointmentUser\Service;
 use App\Event;
 use Carbon\Carbon;
 use Modules\Absence\app\Models\Absence;
+use Modules\Api\app\Resources\PriceResource;
 use Modules\AppointmentSetting\app\Models\AppointmentSetting;
 use Modules\AppointmentSetting\app\Models\AppointmentSettingTime;
 use Modules\AppointmentUser\app\Models\AppointmentUser;
@@ -436,11 +437,7 @@ class AppointmentUserService
             'status' => $statusPayment,
             'deadline' => $deadLineDelete,
             'force_payment' => $forcePayment,
-            'price' => [
-                'int' => (int) $price,
-                'string' => number_format($price),
-                'currency' => 'ریال'
-            ]
+            'price' => PriceResource::make(['price' => $price]),
         ];
     }
 

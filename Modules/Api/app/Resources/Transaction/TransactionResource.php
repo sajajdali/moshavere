@@ -3,6 +3,7 @@
 namespace Modules\Api\app\Resources\Transaction;
 
 use Illuminate\Http\Resources\Json\JsonResource;
+use Modules\Api\app\Resources\PriceResource;
 
 class TransactionResource extends JsonResource
 {
@@ -14,7 +15,7 @@ class TransactionResource extends JsonResource
         return [
             'id' => $this->id,
             'transaction_code' => $this->transaction_code,
-            'price' => $this->cost,
+            'price' => PriceResource::make(['price' => $this->cost]),
             'status' => [
                 'title' => $this->status->getName(),
                 'body' => $this->status->value

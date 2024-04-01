@@ -246,7 +246,7 @@ class AppointmentApiController extends Controller
 
         // in person
         else {
-
+            $appointmentSetting->where('detail->visit_type_inPerson', true);
         }
 
         if ($placesId) {

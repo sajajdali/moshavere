@@ -315,7 +315,7 @@ class AppointmentApiController extends Controller
         }
         return $this->ok([
             'status' => true,
-            'appointment_User' => AppointmentUserResource::make($appointmentUser),
+            'appointment_user' => AppointmentUserResource::make($appointmentUser),
         ]);
     }
 

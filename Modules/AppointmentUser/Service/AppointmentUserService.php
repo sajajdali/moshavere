@@ -463,8 +463,14 @@ class AppointmentUserService
         // check exist appointment
         $detailAppointment = $detail;
         $detailDatabaseDB = [];
-        $dateAppointment = Carbon::createFromTimestamp($appointmentData->timestamp);
-        $visitDateTime = Carbon::createFromTimestamp($appointmentData->timestamp);
+        if ($appointmentData->timestamp == null){
+            $dateAppointment = Carbon::now();
+            $visitDateTime = Carbon::now();
+        } else {
+            $dateAppointment = Carbon::createFromTimestamp($appointmentData->timestamp);
+            $visitDateTime = Carbon::createFromTimestamp($appointmentData->timestamp);
+        }
+
         if ($appointmentData->appointmentVia == AppointmentVia::SELF && $dateAppointment->isPast()) {
             return [
                 'status' => false,
@@ -502,6 +508,10 @@ class AppointmentUserService
             'user_ip' => ip(),
 
         ];
+        if ($appointmentData->kind == AppointmentUserKindEnum::ONLINE){
+            $appointmentUserModel['start_time'] = null;
+            $appointmentUserModel['end_time'] = null;
+        }
         $detailDatabaseDB['payment'] = [
             'status' => false,
         ];

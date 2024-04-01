@@ -7,7 +7,7 @@ use Modules\AppointmentUser\Enum\AppointmentVia;
 
 class AppointmentModel
 {
-    public int $timestamp;
+    public ?int $timestamp;
     public AppointmentVia $appointmentVia;
     public bool $sendSmsToUser;
     public ?int $serviceId;
@@ -18,13 +18,13 @@ class AppointmentModel
     public ?bool $smsToDoctor;
 
     /**
-     * @param int $timestamp
+     * @param ?int $timestamp
      * @param AppointmentVia $appointmentVia
      * @param bool $sendSmsToUser
      * @param int|null $serviceId
      * @param int|null $placeId
      */
-    public function __construct(int $timestamp, AppointmentVia $appointmentVia = AppointmentVia::SELF, bool $sendSmsToUser = true, ?int $serviceId = null, ?int $placeId = null , ?int $agentId = null,?int $operatorId = null , ?AppointmentUserKindEnum $kind = AppointmentUserKindEnum::IN_PERSION , ?bool $smsToDoctor = false)
+    public function __construct(?int $timestamp = null, AppointmentVia $appointmentVia = AppointmentVia::SELF, bool $sendSmsToUser = true, ?int $serviceId = null, ?int $placeId = null , ?int $agentId = null,?int $operatorId = null , ?AppointmentUserKindEnum $kind = AppointmentUserKindEnum::IN_PERSION , ?bool $smsToDoctor = false)
     {
         $this->timestamp = $timestamp;
         $this->appointmentVia = $appointmentVia;

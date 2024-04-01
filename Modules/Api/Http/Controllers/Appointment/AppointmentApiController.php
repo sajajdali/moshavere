@@ -219,7 +219,6 @@ class AppointmentApiController extends Controller
         if ($request->input('question')){
             $detail[AppointmentUser::DETAIL_QUESTION] = $request->input('question');
         }
-
         $storeAppointment = app('AppointmentUserService')->storeAppointment($appointmentSetting , $userModelAppointment  , $appointmentModel , $detail );
         if (!$storeAppointment['status']){
             return $this->requestException([
@@ -316,7 +315,7 @@ class AppointmentApiController extends Controller
         }
         return $this->ok([
             'status' => true,
-            'appointmentUser' => AppointmentUserResource::make($appointmentUser),
+            'appointment_User' => AppointmentUserResource::make($appointmentUser),
         ]);
     }
 

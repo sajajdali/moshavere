@@ -13,14 +13,14 @@ class StoreAppointmentUserRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'timestamp' => ['required']
+            'timestamp' => ['required_if:kind,1']
         ];
     }
 
     public function messages(): array
     {
         return [
-            'timestamp.required' => 'وارد کردن زمان نوبت اجباری است',
+            'timestamp.required_if' => 'وارد کردن زمان نوبت اجباری است',
         ];
     }    /**
      * Determine if the user is authorized to make this request.

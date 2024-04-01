@@ -5,6 +5,7 @@ namespace Modules\AppointmentUser\Service;
 use App\Event;
 use Carbon\Carbon;
 use Modules\Absence\app\Models\Absence;
+use Modules\Api\app\Resources\Api\SomeoneResource;
 use Modules\Api\app\Resources\PriceResource;
 use Modules\AppointmentSetting\app\Models\AppointmentSetting;
 use Modules\AppointmentSetting\app\Models\AppointmentSettingTime;
@@ -524,7 +525,7 @@ class AppointmentUserService
 
         $detailDatabaseDB[AppointmentUser::DETAIL_FOR_HIMSELF] = $userModelAppointment->forHimself;
         if($userModelAppointment->forHimself == 2){
-            $detailDatabaseDB[AppointmentUser::DETAIL_SOMEONE] = $userModelAppointment->userSomeoneModel;
+            $detailDatabaseDB[AppointmentUser::DETAIL_SOMEONE] = SomeoneResource::make( $userModelAppointment->userSomeoneModel);
         }
 
         // store question in DB

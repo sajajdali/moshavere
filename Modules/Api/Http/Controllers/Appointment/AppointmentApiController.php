@@ -16,6 +16,7 @@ use Modules\Api\app\Resources\Api\ServiceResource;
 use Modules\Api\Trait\ApiHandlerTrait;
 use Modules\AppointmentSetting\app\Models\AppointmentSetting;
 use Modules\AppointmentUser\app\Models\AppointmentUser;
+use Modules\AppointmentUser\Enum\AppointmentUserKindEnum;
 use Modules\AppointmentUser\Enum\AppointmentVia;
 use Modules\AppointmentUser\Enum\model\AppointmentModel;
 use Modules\AppointmentUser\Enum\model\BirthdayModel;
@@ -234,13 +235,29 @@ class AppointmentApiController extends Controller
         $doctorId = $request->get('doctor_id');
         $placesId = $request->get('places_id');
         $servicesId = $request->get('services_id');
+        $kind = $request->get('kind') ?? 1; // in person or online
 
         $appointmentSetting = AppointmentSetting::where('user_id', $doctorId);
+
+        // online
+        if ($kind == AppointmentUserKindEnum::ONLINE->value){
+            $appointmentSetting->where('detail->visit_type_online', true);
+        }
+
+        // in person
+        else {
+
+        }
+
         if ($placesId) {
             $appointmentSetting->where('place_id', $placesId);
+        } else{
+            $appointmentSetting->whereNull('place_id');
         }
         if ($servicesId) {
             $appointmentSetting->where('service_id', $servicesId);
+        } else {
+            $appointmentSetting->whereNull('service_id');
         }
         $appointmentSetting = $appointmentSetting->first();
 
@@ -248,6 +265,23 @@ class AppointmentApiController extends Controller
             return $this->requestException([
                 'status' => false,
                 'message' => 'هیچ اطلاعاتی یاف تشد'
+            ]);
+        }
+
+        if ($kind == AppointmentUserKindEnum::ONLINE->value){
+            return $this->ok([
+                'status' => true,
+                'payment' => app('AppointmentUserService')->paymentstatus($appointmentSetting),
+                'appointment_setting_id' => $appointmentSetting->id,
+                'messages' => [
+                    [
+                        'پس از ثبت درخواست امکان آپلود مدارک و طرح سوال فعال میگردد',
+                        'اگر باردار هستید و اولین بار هست که به ما مراجعه میکنید لطفا فرم بارداری رو تکمیل بفرمایید.اگر میخواهید اقدام به بارداری کنید لطفا فرم ویزیت را تکمیل بفرمایید.',
+                        'نوبت شما پس از تایید پزشک فعال میشود و در صورت عدم تایید وجه پرداختی عودت داده میشود'
+                    ]
+                ],
+                'first_two_empty' => null,
+                'get_list_empty_appointment' => null,
             ]);
         }
 
@@ -266,7 +300,8 @@ class AppointmentApiController extends Controller
             'payment' => app('AppointmentUserService')->paymentstatus($appointmentSetting),
             'appointment_setting_id' => $appointmentSetting->id,
             'first_two_empty' => $resultList['firstTwoEmpty'],
-            'get_list_empty_appointment' => $resultList['listAppointments']
+            'get_list_empty_appointment' => $resultList['listAppointments'],
+            'messages' => null
         ]);
     }
 

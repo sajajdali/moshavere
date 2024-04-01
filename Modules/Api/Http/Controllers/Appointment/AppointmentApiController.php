@@ -206,6 +206,7 @@ class AppointmentApiController extends Controller
         // full user model
         $userModelAppointment = new UserModelAppointment(userModel: $mainUser , forHimself: $foHimself , userSomeoneModel: $someoneModel);
 
+        $kind = $request->input('kind') == 2 ? AppointmentUserKindEnum::ONLINE : AppointmentUserKindEnum::IN_PERSION;
         // appointment model
         $appointmentModel = new AppointmentModel(
             timestamp: $request->input('timestamp'),
@@ -213,6 +214,7 @@ class AppointmentApiController extends Controller
             sendSmsToUser: true,
             serviceId: $request->input('service_id'),
             placeId: $request->input('place_id'),
+            kind: $kind
         );
 
         $detail = [];

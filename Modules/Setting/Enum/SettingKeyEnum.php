@@ -27,6 +27,10 @@ enum SettingKeyEnum: int implements EnumHasNameInterface, SettingTypeInterface, 
     case PAYMENT_PAYSTAR_TOKEN = 150;
     case PAYMENT_PAYSTAR_SIGN = 151;
     case WEIGHT_CHART_DESCRIPTION_APP = 120;
+    case VOIP_USERNAME = 160;
+    case VOIP_PASSWORD = 170;
+
+
 
     public function isSupportCache(): bool
     {
@@ -45,6 +49,8 @@ enum SettingKeyEnum: int implements EnumHasNameInterface, SettingTypeInterface, 
             self::PAYMENT_PAYSTAR_TOKEN => false,
             self::PAYMENT_PAYSTAR_SIGN => false,
             self::WEIGHT_CHART_DESCRIPTION_APP => false,
+            self::VOIP_USERNAME => false,
+            self::VOIP_PASSWORD => false,
             default => true
         };
     }
@@ -68,6 +74,10 @@ enum SettingKeyEnum: int implements EnumHasNameInterface, SettingTypeInterface, 
             self::SMS_APPOINTMENT_CANCEL => 'پیامک به کاربر پس از کنسل شدن نوبت',
             self::SMS_APPOINTMENT_TO_DOCTOR => 'پیامک به پزشک پز از دریافت نوبت توسط هر کاربر',
             self::SMS_APPOINTMENT_TO_OPERATOR => 'پیامک به اپراتور پس از دریافت هر نوبت',
+
+            // voip
+            self::VOIP_USERNAME => 'نام کاربری برای API ',
+            self::VOIP_PASSWORD => 'کلمه عبور برای API ',
             default => ''
         };
     }

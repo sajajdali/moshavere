@@ -4,6 +4,7 @@ namespace App\Http;
 
 use Illuminate\Foundation\Http\Kernel as HttpKernel;
 use Modules\Admin\Http\Middleware\AdminMiddleware;
+use Modules\Api\app\Http\Middleware\BasicAuth;
 
 class Kernel extends HttpKernel
 {
@@ -45,6 +46,9 @@ class Kernel extends HttpKernel
             \Illuminate\Routing\Middleware\ThrottleRequests::class.':api',
             \Illuminate\Routing\Middleware\SubstituteBindings::class,
         ],
+        'basicAuth' => [
+            BasicAuth::class
+        ]
     ];
 
     /**

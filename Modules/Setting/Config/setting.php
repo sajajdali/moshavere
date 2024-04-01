@@ -33,6 +33,14 @@ return [
             \Modules\Setting\Enum\SettingKeyEnum::PAYMENT_PAYSTAR_SIGN,
         ],
     ],
+    'voip' => [
+        'title' => 'تنظیمات Voip',
+        'icon' => 'fa fa-phone',
+        'settings' => [
+            \Modules\Setting\Enum\SettingKeyEnum::VOIP_USERNAME,
+            \Modules\Setting\Enum\SettingKeyEnum::VOIP_PASSWORD,
+        ],
+    ],
     'APP' => [
         'title' => 'تنظیمات اپ',
         'icon' => 'fa fa-gear',

@@ -41,3 +41,4 @@ Route::prefix('appointment')->group(function () {
     Route::get('tracking/{appointmentUser}', [\Modules\Api\Http\Controllers\Appointment\AppointmentApiController::class, 'tracking'])->name('api.appointment.tracking');
 });
 // appointment
+

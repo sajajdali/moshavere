@@ -56,5 +56,10 @@ class RouteServiceProvider extends ServiceProvider
             ->middleware(['api', 'auth:sanctum'])
             ->namespace($this->moduleNamespace)
             ->group(module_path('Api', '/Routes/api_v1_user.php'));
+
+        Route::prefix('api/v1')
+            ->middleware(['api', 'basicAuth'])
+            ->namespace($this->moduleNamespace)
+            ->group(module_path('Api', '/Routes/api_v1_voip.php'));
     }
 }

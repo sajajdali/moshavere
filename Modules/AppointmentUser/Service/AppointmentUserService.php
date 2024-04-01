@@ -244,7 +244,6 @@ class AppointmentUserService
                         $overlaps = $this->isTimeRangeAvailable($startTime->toTimeString(), $startTime->copy()->addMinutes($timeForVisit), $dayOutput['times']);
 
 
-
                         if ($overlaps['status'] == false) {
                             $until = $startTime->copy()->addMinutes($timeForVisit);
 
@@ -463,7 +462,7 @@ class AppointmentUserService
         // check exist appointment
         $detailAppointment = $detail;
         $detailDatabaseDB = [];
-        if ($appointmentData->timestamp == null){
+        if ($appointmentData->timestamp == null) {
             $dateAppointment = Carbon::now();
             $visitDateTime = Carbon::now();
         } else {
@@ -471,7 +470,7 @@ class AppointmentUserService
             $visitDateTime = Carbon::createFromTimestamp($appointmentData->timestamp);
         }
 
-        if ($appointmentData->appointmentVia == AppointmentVia::SELF && $dateAppointment->isPast()) {
+        if ($appointmentData->kind == AppointmentUserKindEnum::IN_PERSION && $appointmentData->appointmentVia == AppointmentVia::SELF && $dateAppointment->isPast()) {
             return [
                 'status' => false,
                 'message' => 'زمان ارسالی برای ثبت نوبت اشتباه است و لطفا مجدد اقدام کنید',
@@ -479,13 +478,15 @@ class AppointmentUserService
             ];
         }
 
-        $checkTimeAvailable = $this->isAppointmentTimeAvailable($dateAppointment->toTimeString(), $dateAppointment->copy()->addMinutes($appointmentSetting->time_for_visit)->toTimeString(), $dateAppointment->toDateString(), $appointmentSetting);
-        if (!$checkTimeAvailable) {
-            return [
-                'status' => false,
-                'message' => 'زمان انتخابی شما توسط شخصی دیگر پر شده است . لطفا یک زمان دیگر انتخاب کنید',
-                'route' => 'time'
-            ];
+        if ($appointmentData->kind == AppointmentUserKindEnum::IN_PERSION) {
+            $checkTimeAvailable = $this->isAppointmentTimeAvailable($dateAppointment->toTimeString(), $dateAppointment->copy()->addMinutes($appointmentSetting->time_for_visit)->toTimeString(), $dateAppointment->toDateString(), $appointmentSetting);
+            if (!$checkTimeAvailable) {
+                return [
+                    'status' => false,
+                    'message' => 'زمان انتخابی شما توسط شخصی دیگر پر شده است . لطفا یک زمان دیگر انتخاب کنید',
+                    'route' => 'time'
+                ];
+            }
         }
 
         $paymentstatus = $this->paymentstatus($appointmentSetting);
@@ -508,7 +509,7 @@ class AppointmentUserService
             'user_ip' => ip(),
 
         ];
-        if ($appointmentData->kind == AppointmentUserKindEnum::ONLINE){
+        if ($appointmentData->kind == AppointmentUserKindEnum::ONLINE) {
             $appointmentUserModel['start_time'] = null;
             $appointmentUserModel['end_time'] = null;
         }
@@ -534,8 +535,8 @@ class AppointmentUserService
         // detailDatabase
 
         $detailDatabaseDB[AppointmentUser::DETAIL_FOR_HIMSELF] = $userModelAppointment->forHimself;
-        if($userModelAppointment->forHimself == 2){
-            $detailDatabaseDB[AppointmentUser::DETAIL_SOMEONE] = SomeoneResource::make( $userModelAppointment->userSomeoneModel);
+        if ($userModelAppointment->forHimself == 2) {
+            $detailDatabaseDB[AppointmentUser::DETAIL_SOMEONE] = SomeoneResource::make($userModelAppointment->userSomeoneModel);
         }
 
         // store question in DB

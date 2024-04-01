@@ -4,11 +4,14 @@ namespace Modules\Api\Http\Controllers\Profile;
 
 use App\Http\Controllers\Controller;
 use Carbon\Carbon;
+use Modules\Api\app\Resources\Api\Appointments\AppointmentUserPaginateResource;
 use Modules\Api\app\Resources\Api\Appointments\AppointmentUserResource;
 use Modules\Api\Trait\ApiHandlerTrait;
 use Modules\Api\Transformers\Exercise\ExerciseRequestWithOutDetailResource;
 use Modules\Api\Transformers\Notification\NotificationResource;
 use Modules\Api\Transformers\Package\PackageUserResource;
+use Modules\AppointmentUser\Enum\AppointmentUserKindEnum;
+use Modules\AppointmentUser\Enum\AppointmentUserStatusEnum;
 use Modules\Diet\Enum\DietRequestStatusEnum;
 use Modules\Exercise\Enum\ExercisePlanRequestEnum;
 use Modules\Package\Enum\PackageTypeEnum;
@@ -44,6 +47,21 @@ class DashboardController extends Controller
                 ]
             ]
         ]);
+    }
+
+    public function appointmentList()
+    {
+        $type = request()->has('type') ? request()->get('type') : 1;
+        $kind = $type == "2" ? AppointmentUserKindEnum::ONLINE : AppointmentUserKindEnum::IN_PERSION;
+        $user = auth()->user();
+        $appointmentListInPerson = $user->appointments()
+            ->whereIn('status' ,[ AppointmentUserStatusEnum::STATUS_SUCCESSFUL ,AppointmentUserStatusEnum::STATUS_ATTENDED , AppointmentUserStatusEnum::STATUS_WAIT_PAYMENT , AppointmentUserStatusEnum::STATUS_NOT_ATTENDED])
+            ->where('kind' , $kind->value)
+            ->orderByDesc('date_visit')->paginate()
+        ;
+
+        return $this->ok(new AppointmentUserPaginateResource($appointmentListInPerson));
+
     }
 
 }

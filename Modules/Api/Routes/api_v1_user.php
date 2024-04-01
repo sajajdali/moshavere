@@ -20,6 +20,7 @@ Route::post('edit', 'UserController@edit');
 
 Route::prefix('profile')->group(function () {
     Route::get('dashboard', [\Modules\Api\Http\Controllers\Profile\DashboardController::class, 'index'])->name('dashboard');
+    Route::get('appointments', [\Modules\Api\Http\Controllers\Profile\DashboardController::class, 'appointmentList'])->name('appointment_list');
 });
 Route::get('test', function () {
     $user = auth()->user();

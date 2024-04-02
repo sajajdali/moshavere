@@ -96,7 +96,7 @@ class AppointmentApiController extends Controller
         return $firstTwoEmpty;
     }
 
-    private function getListEmptyAppointment( $data)
+    private function getListEmptyAppointment($data)
     {
         $firstTwoEmpty = [];
         $report = $data['report'];
@@ -151,7 +151,7 @@ class AppointmentApiController extends Controller
                                     'status' => true,
                                     'persian_date' => $vertaDateTime->format('ساعت H روز l m/d'),
                                     'time_stamp' => $time['timestamp'],
-                                    'from' =>  substr($time['from'], 0, -3),
+                                    'from' => substr($time['from'], 0, -3),
                                     'until' => substr($time['until'], 0, -3),
                                 ];
                             }
@@ -181,7 +181,7 @@ class AppointmentApiController extends Controller
         // If he wants to take the turn for someone else
         $foHimself = $request->input('form_himself');
         $someoneModel = null;
-        if ($foHimself == 2){
+        if ($foHimself == 2) {
             $someoneModel = new UserModel(
                 firstName: $request->input('someone_first_name'),
                 lastName: $request->input('someone_last_name'),
@@ -204,7 +204,7 @@ class AppointmentApiController extends Controller
         );
 
         // full user model
-        $userModelAppointment = new UserModelAppointment(userModel: $mainUser , forHimself: $foHimself , userSomeoneModel: $someoneModel);
+        $userModelAppointment = new UserModelAppointment(userModel: $mainUser, forHimself: $foHimself, userSomeoneModel: $someoneModel);
 
         $kind = $request->input('kind') == 2 ? AppointmentUserKindEnum::ONLINE : AppointmentUserKindEnum::IN_PERSION;
         // appointment model
@@ -218,11 +218,11 @@ class AppointmentApiController extends Controller
         );
 
         $detail = [];
-        if ($request->input('question')){
+        if ($request->input('question')) {
             $detail[AppointmentUser::DETAIL_QUESTION] = $request->input('question');
         }
-        $storeAppointment = app('AppointmentUserService')->storeAppointment($appointmentSetting , $userModelAppointment  , $appointmentModel , $detail );
-        if (!$storeAppointment['status']){
+        $storeAppointment = app('AppointmentUserService')->storeAppointment($appointmentSetting, $userModelAppointment, $appointmentModel, $detail);
+        if (!$storeAppointment['status']) {
             return $this->requestException([
                 'status' => false,
                 'message' => $storeAppointment['message'],
@@ -231,6 +231,7 @@ class AppointmentApiController extends Controller
         }
         return $this->created($storeAppointment);
     }
+
     public function listDays(Request $request)
     {
         $doctorId = $request->get('doctor_id');
@@ -241,18 +242,16 @@ class AppointmentApiController extends Controller
         $appointmentSetting = AppointmentSetting::where('user_id', $doctorId);
 
         // online
-        if ($kind == AppointmentUserKindEnum::ONLINE->value){
+        if ($kind == AppointmentUserKindEnum::ONLINE->value) {
             $appointmentSetting->where('detail->visit_type_online', true);
-        }
-
-        // in person
+        } // in person
         else {
             $appointmentSetting->where('detail->visit_type_inPerson', true);
         }
 
         if ($placesId) {
             $appointmentSetting->where('place_id', $placesId);
-        } else{
+        } else {
             $appointmentSetting->whereNull('place_id');
         }
         if ($servicesId) {
@@ -269,17 +268,15 @@ class AppointmentApiController extends Controller
             ]);
         }
 
-        if ($kind == AppointmentUserKindEnum::ONLINE->value){
+        if ($kind == AppointmentUserKindEnum::ONLINE->value) {
             return $this->ok([
                 'status' => true,
                 'payment' => app('AppointmentUserService')->paymentstatus($appointmentSetting),
                 'appointment_setting_id' => $appointmentSetting->id,
                 'messages' => [
-                    [
-                        'پس از ثبت درخواست امکان آپلود مدارک و طرح سوال فعال میگردد',
-                        'اگر باردار هستید و اولین بار هست که به ما مراجعه میکنید لطفا فرم بارداری رو تکمیل بفرمایید.اگر میخواهید اقدام به بارداری کنید لطفا فرم ویزیت را تکمیل بفرمایید.',
-                        'نوبت شما پس از تایید پزشک فعال میشود و در صورت عدم تایید وجه پرداختی عودت داده میشود'
-                    ]
+                    'پس از ثبت درخواست امکان آپلود مدارک و طرح سوال فعال میگردد',
+                    'اگر باردار هستید و اولین بار هست که به ما مراجعه میکنید لطفا فرم بارداری رو تکمیل بفرمایید.اگر میخواهید اقدام به بارداری کنید لطفا فرم ویزیت را تکمیل بفرمایید.',
+                    'نوبت شما پس از تایید پزشک فعال میشود و در صورت عدم تایید وجه پرداختی عودت داده میشود'
                 ],
                 'first_two_empty' => null,
                 'get_list_empty_appointment' => null,
@@ -287,14 +284,14 @@ class AppointmentApiController extends Controller
         }
 
 
-        Cache::forget('appointmentList.'.$appointmentSetting->id);
+        Cache::forget('appointmentList.' . $appointmentSetting->id);
         $listDays = Cache::rememberForever('appointmentList.' . $appointmentSetting->id, function () use ($appointmentSetting) {
             return app('AppointmentUserService')->listAppointments($appointmentSetting);
         });
 
 
 //        $firstTwoEmpty = $this->getFirstTwoEmpty($listDays);
-        $resultList = $this->getListEmptyAppointment( $listDays);
+        $resultList = $this->getListEmptyAppointment($listDays);
 
         return $this->ok([
             'status' => true,
@@ -309,7 +306,7 @@ class AppointmentApiController extends Controller
     public function tracking(AppointmentUser $appointmentUser)
     {
         $user = auth()->user();
-        if ($appointmentUser->user->id !== $user->id){
+        if ($appointmentUser->user->id !== $user->id) {
             return $this->requestException([
                 'status' => false,
                 'message' => 'این نوبت متعلق به شما نیست'

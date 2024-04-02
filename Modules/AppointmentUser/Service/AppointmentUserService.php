@@ -503,6 +503,11 @@ class AppointmentUserService
             'status' => false,
         ];
 
+        //description for app
+        if($appointmentData->description) {
+            $detailDatabaseDB[AppointmentUser::DETAIL_DESCRIPTION] =  $appointmentData->description;
+        }
+
         // handel payment
         $paymentLink = null;
         $smsTemplate = setting(SettingKeyEnum::SMS_APPOINTMENT_RECEIVING_SUCCESSFUL);

@@ -70,10 +70,11 @@
                                 </div>
                             </div>
                             <div class="col-md-12 row mt-2 mb-4">
-                                <label for="inputPassword" class="col-sm-3 col-form-label">شماره پرونده</label>
+                                <label for="document_number_registeration" class="col-sm-3 col-form-label">شماره
+                                    پرونده</label>
                                 <div class="col-sm-9">
-                                    <input type="password" class="form-control" id="inputPassword"
-                                        wire:model='form.docNumber'>
+                                    <input type="text" class="form-control" id="document_number_registeration"
+                                        wire:model='form.document_number'>
                                 </div>
                             </div>
                         </div>
@@ -81,27 +82,33 @@
                             <div class="col-md-4 mb-4">
                                 <a class="text-primary" data-bs-toggle="collapse" href="#timingCollaps" role="button"
                                     aria-expanded="false" aria-controls="timingCollaps">
-                                    <i class="fa fa-clock-o text-primary me-1" aria-hidden="true"></i>
-                                    <strong>زمان نوبت</strong>
+                                    <i class="fa fa-clock-o me-1 @error('form.time.from') text-danger @else text-primary @enderror" aria-hidden="true"></i>
+                                    <strong class="@error('form.time.from') text-danger @else text-primary @enderror">زمان نوبت</strong>
                                 </a>
                             </div>
                             <div class="col-md-8">
                                 <hr>
                             </div>
-                            <div class="collapse row" id="timingCollaps">
+                            <div class="collapse @if (!isset($form['time']['from'])) show @endif  row"
+                                id="timingCollaps">
                                 <div class="col-md-6">
                                     <div class="mb-3">
-                                        <input type="email" class="form-control" id="firs_name_addApp"
-                                            placeholder="ساعت شروع">
+                                        <input type="time" class="form-control" id="firs_name_addApp"
+                                            wire:model='form.time.from' placeholder="ساعت شروع">
                                     </div>
                                 </div>
                                 <div class="col-md-6">
                                     <div class="mb-3">
-                                        <input type="email" class="form-control" id="last_name_addApp"
-                                            placeholder="ساعت پایان">
+                                        <input type="time" class="form-control" id="last_name_addApp"
+                                            wire:model='form.time.until' placeholder="ساعت پایان">
                                     </div>
                                 </div>
                             </div>
+                            @error('form.time.from')
+                            <div class="col-12 mt-2">
+                                <span class="text-danger">لطفا زمان ویزیت را انتخاب کنید</span>
+                            </div>
+                        @enderror
                         </div>
                         <div class="row my-5">
                             <div class="col-md-4">
@@ -135,8 +142,9 @@
                             <div class="row collapse show mt-2" id="apptypeCollaps">
                                 <div class="col-6">
                                     <div class="form-check">
-                                        <input class="form-check-input" checked type="radio" value="true"
-                                            wire:model='form.appType' name="appTypeRAdio" id="flexRadioDefault1">
+                                        <input class="form-check-input" checked type="radio"
+                                            wire:model='form.appType' value="true" name="appTypeRAdio"
+                                            id="flexRadioDefault1">
                                         <label class="form-check-label" for="flexRadioDefault1">
                                             نوبت اصلی
                                         </label>
@@ -145,7 +153,7 @@
                                 <div class="col-6">
                                     <div class="form-check">
                                         <input class="form-check-input" type="radio" name="appTypeRAdio"
-                                            value="fasle" wire:model='form.appType' id="flexRadioDefault2">
+                                            wire:model='form.appType' value="false" id="flexRadioDefault2">
                                         <label class="form-check-label" for="flexRadioDefault2">
                                             بین مریض
                                         </label>
@@ -189,7 +197,8 @@
                     @endif
                     <div class="modal-footer">
                         <button type="button" class="btn btn-success" wire:click='numberSet'>ادامه</button>
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">بیخیال</button>
+                        <button type="button" class="btn btn-secondary" wire:click='dismisModal'
+                            data-bs-dismiss="modal">بیخیال</button>
                     </div>
 
                 </div>

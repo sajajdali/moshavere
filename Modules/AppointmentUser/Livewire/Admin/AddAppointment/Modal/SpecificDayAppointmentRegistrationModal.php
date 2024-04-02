@@ -2,9 +2,19 @@
 
 namespace Modules\AppointmentUser\Livewire\Admin\AddAppointment\Modal;
 
+use Carbon\Carbon;
 use Livewire\Component;
+use Livewire\Attributes\On;
 use Modules\User\Entities\User;
 use Modules\User\Enum\UserMetaEnum;
+use Illuminate\Support\Facades\Cache;
+use Modules\AppointmentUser\Enum\AppointmentVia;
+use Modules\AppointmentUser\Enum\model\UserModel;
+use Modules\AppointmentUser\app\Models\AppointmentUser;
+use Modules\AppointmentUser\Enum\model\AppointmentModel;
+use Modules\AppointmentUser\Enum\model\UserModelAppointment;
+use Modules\AppointmentSetting\app\Models\AppointmentSetting;
+use Modules\AppointmentSetting\app\Enum\AppintmentSettingPaymentStatus;
 
 class SpecificDayAppointmentRegistrationModal extends Component
 {
@@ -13,10 +23,35 @@ class SpecificDayAppointmentRegistrationModal extends Component
         "document" => null,
         "first_name" => null,
         "last_name" => null,
+        "appType" => true,
+        "smsType" => true,
     ];
+    // "appType" => keys : main , subMainApp ;
     public array $fetchData = [];
     public $step = 1;
+    public $appId;
+    public $appTime;
 
+    public function dismisModal()
+    {
+        $this->form = [
+            "number" => null,
+            "document" => null,
+            "first_name" => null,
+            "last_name" => null,
+            "appType" => true,
+            "smsType" => true,
+        ];
+        if (isset($this->fetchData['user'])) {
+            unset($this->fetchData['user']);
+        }
+        if (isset($this->form['time']['from'])) {
+            unset($this->form['time']['from']);
+            unset($this->form['time']['until']);
+        }
+
+        $this->step = 1;
+    }
     public function numberSet()
     {
         if ($this->step == 1) {
@@ -25,13 +60,30 @@ class SpecificDayAppointmentRegistrationModal extends Component
             $this->validate([
                 'form.first_name' => 'required',
                 'form.last_name' => 'required',
+                'form.time.from' => 'required',
             ]);
-            $this->dispatch('closeModal', true);
+
+            if (!isset($this->fetchData['user'])) {
+                $this->createUser();
+            }
+            $this->storeAppointmentByAdmin();
             $this->step = 1;
             $this->form = [
                 "number" => null,
                 "document" => null,
             ];
+        }
+    }
+    private function createUser()
+    {
+        $this->fetchData['user'] = User::create([
+            'mobile' => $this->fetchData['tempUser']['number'],
+            'password' => uniqId(),
+        ]);
+        $this->fetchData['user']->first_name = $this->form['first_name'];
+        $this->fetchData['user']->last_name = $this->form['last_name'];
+        if (isset($this->form['document_number'])) {
+            $this->fetchData['user']->document_number = $this->form['document_number'];
         }
     }
     private function findeOrCreateUser()
@@ -40,88 +92,116 @@ class SpecificDayAppointmentRegistrationModal extends Component
             'form.number' => 'required_if:form.document_number,null|digits:11|nullable',
             'form.document_number' => 'required_if:form.number,null',
         ]);
-
-        if (isset($this->form['mobile'])) {
-            $user = User::where('mobile', $this->form['mobile'])->first();
+        if (isset($this->form['number'])) {
+            $user = User::where('mobile', $this->form['number'])->first();
             if (!empty($user)) {
                 $this->fetchData['user'] = $user;
+                $this->fillUserInputs();
+                $this->step  = $this->step + 1;
             } else {
-                $this->fetchData['tempUser'] = $this->form['mobile'];
+                $this->fetchData['tempUser']['number'] = $this->form['number'];
+                if (isset($this->form['document_number'])) {
+                    $this->fetchData['tempUser']['document_number'] = $this->form['document_number'];
+                }
+                $this->step  = $this->step + 1;
             }
         } elseif (isset($this->form['document_number'])) {
-
             $user =  User::whereHas('metas', function ($q) {
                 return $q->where('meta_key', UserMetaEnum::DOCUMENT_NUMBER)->where('meta_value', $this->form['document_number']);
             })->first();
             if (!empty($user)) {
                 $this->fetchData['user'] = $user;
+                $this->fillUserInputs();
+                $this->step  = $this->step + 1;
             } else {
                 $this->addError('userNotExists', 'کاربری یافت نشد ، لطفا برای ایجاد کاربر با این شماره پرونده ، شماره تلفن را نیز وارد کنید!');
             }
         }
-        // $this->step  = $this->step + 1;
     }
-    // public function storeAppointmentByAdmin()
-    // {
-    //     $user = auth()->user();
-    //     $appointmentSetting = AppointmentSetting::findOrFail($request->input('appointment_setting_id'));
+    private function fillUserInputs()
+    {
+        if (isset($this->fetchData['user'])) {
+            $this->form['document']   =  $this->fetchData['user']->document_number;
+            $this->form['first_name'] =  $this->fetchData['user']->first_name;
+            $this->form['last_name']  =  $this->fetchData['user']->last_name;
+        }
+    }
+    #[On('time')]
+    public function setTime($from, $until)
+    {
+        $this->form['time']['from'] = $from;
+        $this->form['time']['until'] = $until;
+    }
 
-    //     // If he wants to take the turn for someone else
-    //     $foHimself = $request->input('form_himself');
-    //     $someoneModel = null;
-    //     if ($foHimself == 2) {
-    //         $someoneModel = new UserModel(
-    //             firstName: $request->input('someone_first_name'),
-    //             lastName: $request->input('someone_last_name'),
-    //             mobile: $request->input('someone_mobile'),
-    //             gender: $request->input('someone_gender'),
-    //             age: $request->input('someone_age'),
-    //             nationalCode: $request->input('someone_national_code')
-    //         );
-    //     }
+    public function storeAppointmentByAdmin()
+    {
+        $user = $this->fetchData['user'];
+        $appointmentSetting = AppointmentSetting::findOrFail($this->appId);
+        // If he wants to take the turn for someone else
+        $someoneModel = null;
+        $foHimself = 1;
+        // main user data
+        $mainUser = new UserModel(
+            user: $user,
+            firstName: $user->first_name,
+            lastName: $user->last_name,
+        );
+        $start_visit_time = explode(':', $this->form['time']['from']);
 
-    //     // main user data
-    //     $mainUser = new UserModel(
-    //         user: $user,
-    //         firstName: $request->input('first_name'),
-    //         lastName: $request->input('last_name'),
-    //         gender: $request->input('gender'),
-    //         age: $request->input('age'),
-    //         nationalCode: $request->input('national_code'),
-    //         address: $request->input('address'),
-    //         city: $request->input('city')
-    //     );
+        $appTime = $this->appTime->setTime($start_visit_time[0], $start_visit_time[1]);
+        // full user model
+        $userModelAppointment = new UserModelAppointment(userModel: $mainUser, forHimself: $foHimself, userSomeoneModel: $someoneModel);
 
-    //     // full user model
-    //     $userModelAppointment = new UserModelAppointment(userModel: $mainUser, forHimself: $foHimself, userSomeoneModel: $someoneModel);
+        // appointment model
+        $appointmentModel = new AppointmentModel(
+            timestamp: $appTime->timestamp,
+            appointmentVia: AppointmentVia::BY_ADMIN,
+            sendSmsToUser: isset($this->form['smsStatus']) ? $this->form['smsStatus'] : false,
+            serviceId: $this->appId->service?->id ?? null,
+            placeId: $this->appId->place?->id ?? null ,
+        description : isset($this->form['description']) ? $this->form['description'] : '',
+                );
 
-    //     // appointment model
-    //     $appointmentModel = new AppointmentModel(
-    //         timestamp: $request->input('timestamp'),
-    //         appointmentVia: AppointmentVia::SELF,
-    //         sendSmsToUser: true,
-    //         serviceId: $request->input('service_id'),
-    //         placeId: $request->input('place_id'),
-    //     );
 
-    //     $detail = [];
-    //     if ($request->input('question')) {
-    //         $detail[AppointmentUser::DETAIL_QUESTION] = $request->input('question');
-    //     }
+        $detail = [];
 
-    //     $storeAppointment = app('AppointmentUserService')->storeAppointment($appointmentSetting, $userModelAppointment, $appointmentModel, $detail);
-    // }
+        $storeAppointment = app('AppointmentUserService')->storeAppointment($appointmentSetting, $userModelAppointment, $appointmentModel, $detail);
+           return redirect()->route('admin.appointment.add.specificday',['appId' => $this->appId , 'date' => verta($appTime)->format('Y-m-d')])->with('success','نوبت با موفقیت افزوده شد');
+    }
+
+    public function closeModal()
+    {
+        $this->dispatch('closeModal', true);
+        $this->form = [
+            "number" => null,
+            "document" => null,
+            "first_name" => null,
+            "last_name" => null,
+            "appType" => true,
+            "smsType" => true,
+        ];
+        unset($this->fetchData['user']);
+    }
     public function messages()
     {
         return [
             'form.number.required_if' => 'لطفا یکی از فیلد ها را تکمیل کنید',
             'form.number.digits' => 'شماره موبایل صحیح نیست!',
-            'form.document.required_if' => 'لطفا یکی از فیلد ها را تکمیل کنید',
+            'form.document_number.required_if' => 'لطفا یکی از فیلد ها را تکمیل کنید',
             'form.first_name.required' => 'وارد کردن نام الزامی است',
             'form.last_name.required' => 'وارد کردن نام خانوادگی الزامی است',
         ];
     }
 
+    public function mount() {
+
+        if(isset($this->appTime)) {
+           $app =  AppointmentSetting::find($this->appId);
+            $this->form['time']['from'] = $this->appTime ;
+
+            $this->form['time']['until'] = Carbon::createFromTimeString($this->appTime)->copy()->addMinutes( $app->time_for_visit)->toTimeString() ;
+        }
+    }
     public function render()
     {
         return view('appointmentuser::livewire.admin.add-appointment.modal.specific-day-appointment-registration-modal');

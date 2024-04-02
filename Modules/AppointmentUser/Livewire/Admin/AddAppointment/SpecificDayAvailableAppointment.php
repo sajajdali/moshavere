@@ -14,7 +14,7 @@ class SpecificDayAvailableAppointment extends Component
 {
     //this propery shouldNOT exist in the final product
     public $tempMessage = null;
-    public array $fetchData = [];
+    public array $fetchData = ['showRegisterModal' => false];
     public array $form = [];
     public function updated($property)
     {
@@ -61,13 +61,6 @@ class SpecificDayAvailableAppointment extends Component
                 return $avaiableTimes['times'];
             }
         }
-    }
-    #[On('closeModal')]
-    public function addLoading()
-    {
-        //this function is just for appearing loading and should be deleted
-        sleep(2);
-        $this->tempMessage = 'تغییرات با موفقیت اعمال شد';
     }
     private function listOfAppointment($listOfAppointment)
     {
@@ -130,10 +123,18 @@ class SpecificDayAvailableAppointment extends Component
         // dd($this->fetchData['RawlistOfAppointment']);
         $this->fetchData['listOfAppointment'] = $this->listOfAppointment($this->fetchData['RawlistOfAppointment']);;
     }
+    public function passTimeToRegisterAppointmentModal($from,$until){
+        $this->dispatch('time',from:$from , until:$until);
+    }
+    public function lunchAppModal() {
+        $this->fetchData['showRegisterModal']= true ;
+    }
+
     public function mount()
     {
         $app = AppointmentSetting::find(request()->route('appId'));
         $this->fetchData['doc'] = $app->user;
+        $this->fetchData['appId'] = $app->id ;
         if (!empty(request()->route('date'))) {
             $this->fetchData['selectedDate']  = Verta::parse(request()->route('date'))->toCarbon();
         } else {
@@ -141,6 +142,7 @@ class SpecificDayAvailableAppointment extends Component
         }
         if ((request()->has('time'))) {
             $this->fetchData['time'] =  request()->get('time');
+            $this->lunchAppModal();
             //lunch modal
         }
         // TODO::inere pak kon

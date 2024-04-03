@@ -232,7 +232,7 @@ class AppointmentUserService
                     }
 
                     $startTime = Carbon::parse($attendanceTime->start_at);
-                    $endTime = Carbon::parse($attendanceTime->end_at);
+                    $endTime   = Carbon::parse($attendanceTime->end_at);
 
                     // Add time slots for each attendance time
 
@@ -493,6 +493,7 @@ class AppointmentUserService
             'tracking_code' => AppointmentUser::generateTrackingCode(),
             'status' => AppointmentUserStatusEnum::STATUS_SUCCESSFUL,
             'kind' => $appointmentData->kind,
+            'type' => $appointmentData->type,
             'start_time' => $visitDateTime->toTimeString(),
             'end_time' => $visitDateTime->copy()->addMinutes($appointmentSetting->time_for_visit)->toTimeString(),
             'date_visit' => $visitDateTime->toDateTimeString(),
@@ -510,7 +511,7 @@ class AppointmentUserService
 
         // handel payment
         $paymentLink = null;
-        $smsTemplate = setting(SettingKeyEnum::SMS_APPOINTMENT_RECEIVING_SUCCESSFUL);
+        $smsTemplate = setting(SettingKeyEnum::SMS_APPOINTMENT_RECEIVING_SUCCESSFUL) ;
         if ($appointmentData->appointmentVia == AppointmentVia::SELF && $paymentstatus['status']) {
             $smsTemplate = setting(SettingKeyEnum::SMS_APPOINTMENT_WAITING_PAYMENT);
             $appointmentUserModel['deadline'] = $paymentstatus['deadline'];
@@ -536,7 +537,9 @@ class AppointmentUserService
         $appointmentUser = $appointmentSetting->appointmentUsers()->create($appointmentUserModel);
 
         // send sms
-        $appointmentUser->notify(new AppointmentSmsNotification($smsTemplate));
+        if(isset($smsTemplate)) {
+            $appointmentUser->notify(new AppointmentSmsNotification($smsTemplate));
+        }
 
         // create payment link
         if ($appointmentData->appointmentVia == AppointmentVia::SELF && $paymentstatus['status']) {

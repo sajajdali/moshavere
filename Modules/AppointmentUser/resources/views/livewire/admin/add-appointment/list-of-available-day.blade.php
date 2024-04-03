@@ -1,7 +1,10 @@
 <div>
     <div class="page-header">
         <div>
-            <h1 class="page-title">شما در حال افزودن نوبت برای بخش "" و پزشک "" هستید </h1>
+            <h1 class="page-title">شما در حال افزودن نوبت برای بخش <span
+                    class="text-primary">{{ $fethData['service']?->title }}</span> و دکتر
+                <span class="text-primary">{{ $fethData['doctor']?->full_name }}</span> هستید.
+            </h1>
         </div>
         <button class="btn btn-primary" type="button" data-bs-toggle="collapse" data-bs-target="#customDate"
             aria-expanded="false" aria-controls="customDate">افزودن نوبت برای تاریخ انتخابی</button>
@@ -81,6 +84,9 @@
                                     <strong>.</strong>
                                 </div>
                                 <span class="badge rounded-pill bg-info-gradient my-1 w-100 text-white hover-zoom"
+                                    wire:loading.class='btn-loading bg-gray'
+                                    wire:target="GotoAppointmentList('{{ $dateOfDay }}')"
+                                    wire:click="GotoAppointmentList('{{ $dateOfDay }}')"
                                     style="font-size: 13px !important ; cursor: pointer;">
                                     <div>
                                         <i class="fa fa-clock-o" aria-hidden="true"></i>

@@ -8,10 +8,12 @@ use Livewire\Attributes\On;
 use Modules\User\Entities\User;
 use Modules\User\Enum\UserMetaEnum;
 use Illuminate\Support\Facades\Cache;
+use Hekmatinasser\Verta\Facades\Verta;
 use Modules\AppointmentUser\Enum\AppointmentVia;
 use Modules\AppointmentUser\Enum\model\UserModel;
 use Modules\AppointmentUser\app\Models\AppointmentUser;
 use Modules\AppointmentUser\Enum\model\AppointmentModel;
+use Modules\AppointmentUser\Enum\AppointmentUserTypeEnum;
 use Modules\AppointmentUser\Enum\model\UserModelAppointment;
 use Modules\AppointmentSetting\app\Models\AppointmentSetting;
 use Modules\AppointmentSetting\app\Enum\AppintmentSettingPaymentStatus;
@@ -23,14 +25,15 @@ class SpecificDayAppointmentRegistrationModal extends Component
         "document" => null,
         "first_name" => null,
         "last_name" => null,
-        "appType" => true,
-        "smsType" => true,
+        "appType" => 'main_app',
+        "smsType" => 'send',
     ];
     // "appType" => keys : main , subMainApp ;
     public array $fetchData = [];
     public $step = 1;
     public $appId;
     public $appTime;
+    public $appDate;
 
     public function dismisModal()
     {
@@ -146,27 +149,33 @@ class SpecificDayAppointmentRegistrationModal extends Component
             firstName: $user->first_name,
             lastName: $user->last_name,
         );
+        if (isset($this->appTime)) {
+            $start_visit_time = explode(':', $this->appTime);
+        }
         $start_visit_time = explode(':', $this->form['time']['from']);
+        $appTime = Verta::parse($this->appDate)->tocarbon()->setTime($start_visit_time[0], $start_visit_time[1]);
 
-        $appTime = $this->appTime->setTime($start_visit_time[0], $start_visit_time[1]);
         // full user model
         $userModelAppointment = new UserModelAppointment(userModel: $mainUser, forHimself: $foHimself, userSomeoneModel: $someoneModel);
 
+        $appointment_type = $this->form['appType'] == 'main_app' ? AppointmentUserTypeEnum::MAIN__APPOINTMENT : AppointmentUserTypeEnum::BETWEEN_PATIENTS;
+        $sms_status = $this->form['smsType'] == 'send' ? true : false;
         // appointment model
         $appointmentModel = new AppointmentModel(
             timestamp: $appTime->timestamp,
             appointmentVia: AppointmentVia::BY_ADMIN,
-            sendSmsToUser: isset($this->form['smsStatus']) ? $this->form['smsStatus'] : false,
+            sendSmsToUser: $sms_status,
             serviceId: $this->appId->service?->id ?? null,
-            placeId: $this->appId->place?->id ?? null ,
-        description : isset($this->form['description']) ? $this->form['description'] : '',
-                );
+            placeId: $this->appId->place?->id ?? null,
+            description: isset($this->form['description']) ? $this->form['description'] : '',
+            type: $appointment_type,
+        );
 
 
         $detail = [];
-
         $storeAppointment = app('AppointmentUserService')->storeAppointment($appointmentSetting, $userModelAppointment, $appointmentModel, $detail);
-           return redirect()->route('admin.appointment.add.specificday',['appId' => $this->appId , 'date' => verta($appTime)->format('Y-m-d')])->with('success','نوبت با موفقیت افزوده شد');
+        Cache::forget('appointmentList.' . $this->appId);
+        return redirect()->route('admin.appointment.add.specificday', ['appId' => $this->appId, 'date' => $this->appDate])->with('success', 'نوبت با موفقیت افزوده شد');
     }
 
     public function closeModal()
@@ -193,13 +202,15 @@ class SpecificDayAppointmentRegistrationModal extends Component
         ];
     }
 
-    public function mount() {
+    public function mount()
+    {
 
-        if(isset($this->appTime)) {
-           $app =  AppointmentSetting::find($this->appId);
-            $this->form['time']['from'] = $this->appTime ;
-
-            $this->form['time']['until'] = Carbon::createFromTimeString($this->appTime)->copy()->addMinutes( $app->time_for_visit)->toTimeString() ;
+        if (isset($this->appId)) {
+            $app =  AppointmentSetting::find($this->appId);
+        }
+        if (isset($this->appTime) && !empty($this->appTime)) {
+            $this->form['time']['from'] = $this->appTime;
+            $this->form['time']['until'] = Carbon::createFromTimeString($this->appTime)->copy()->addMinutes($app->time_for_visit)->toTimeString();
         }
     }
     public function render()

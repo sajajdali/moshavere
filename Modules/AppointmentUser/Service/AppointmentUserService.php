@@ -401,7 +401,7 @@ class AppointmentUserService
     public function isAppointmentTimeAvailable($startDateTime, $endDateTime, $dateVisit, AppointmentSetting $appointmentSetting)
     {
         // Check if there are any overlapping appointments
-        $existingAppointments = AppointmentUser::where('doctor_id', $appointmentSetting->user_id)->where('type',AppointmentUserTypeEnum::MAIN__APPOINTMENT);
+        $existingAppointments = AppointmentUser::where('doctor_id', $appointmentSetting->user_id)->where('type',AppointmentUserTypeEnum::MAIN__APPOINTMENT)->whereIn('status',AppointmentUserStatusEnum::confirmed());
         if (!$appointmentSetting->interference) {
             $existingAppointments->where('appointment_setting_id', $appointmentSetting->id);
         }

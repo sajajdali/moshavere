@@ -233,7 +233,6 @@ class SpecificDayAvailableAppointment extends Component
             return app('AppointmentUserService')->listAppointments($app);
         });
         $this->fetchData['listOfAppointment'] = $this->listOfAppointment($this->fetchData['RawlistOfAppointment']);
-        dd($this->fetchData['listOfAppointment']);
         if (request()->has('tracking_code')) {
             $this->edited['status'] = true;
             $this->edited['old_app'] = AppointmentUser::firstWhere('tracking_code', request()->get('tracking_code'));

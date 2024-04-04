@@ -115,7 +115,8 @@
                                                 );
                                                 $user = $ap->user;
                                             @endphp
-                                            <tr class="{{ $ap->getColor() }} text-center">
+                                            <tr
+                                                class="{{$ap->getColor()}} text-center">
                                                 <td class="alert text-center bg-info ">{{ $key + 1 }}</td>
                                                 <td>
                                                     {{ substr($eachTime['from'], 0, -3) }} -

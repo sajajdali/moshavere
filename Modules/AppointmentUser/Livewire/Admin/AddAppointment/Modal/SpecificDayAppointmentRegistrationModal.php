@@ -175,7 +175,7 @@ class SpecificDayAppointmentRegistrationModal extends Component
         $detail = [];
         $storeAppointment = app('AppointmentUserService')->storeAppointment($appointmentSetting, $userModelAppointment, $appointmentModel, $detail);
         Cache::forget('appointmentList.' . $this->appId);
-        return redirect()->route('admin.appointment.add.specificday', ['appId' => $this->appId, 'date' => $this->appDate])->with('success', 'نوبت با موفقیت افزوده شد');
+        return redirect()->route('admin.appointment.add.specificday', ['appId' => $this->appId, 'date' => $this->appDate])->with('success', $storeAppointment['message']);
     }
 
     public function closeModal()

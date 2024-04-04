@@ -1,8 +1,13 @@
 <div>
     <div class="page-header">
         <div>
-            <h1 class="page-title"> افزودن نوبت برای دکتر <span
-                    class="text-danger">{{ $fetchData['doc']->fullName }}</span> </h1>
+            @if (!$edited['status'])
+                <h1 class="page-title"> افزودن نوبت برای دکتر <span
+                        class="text-danger">{{ $fetchData['doc']->fullName }}</span> </h1>
+            @else
+                <h1 class="page-title">تغییر زمان نوبت</h1>
+            @endif
+
         </div>
         <button id="changeDocButton" class="btn btn-primary mt-3 mt-sm-0" type="button" class="btn btn-primary"
             data-bs-toggle="modal" data-bs-target="#changeDocmodal">
@@ -10,6 +15,11 @@
     </div>
     @include('admin::layouts.components.alert')
 
+    @if ($edited['status'])
+        <div class="col-md-12 alert alert-secondary fade show" role="alert">
+            شما در حال تغییر زمان نوبت "{{ $edited['old_app']->user->fullName }}" هستید!!
+        </div>
+    @endif
     <div class="row row-sm">
         <div class="col-md-12">
             <div class="card custom-card">
@@ -26,8 +36,11 @@
                                 data-bs-placement="top" title="روز بعد"></i>
                         </button>
                     </div>
-                    <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#RegistrAnAppointment">ثبت
-                        نوبت</button>
+                    @if (!$edited['status'])
+                        <button class="btn btn-success" data-bs-toggle="modal"
+                            data-bs-target="#RegistrAnAppointment">ثبت
+                            نوبت</button>
+                    @endif
                 </div>
                 <div class="card-body" wire:loading.class="opacity-50">
                     <div class="spinner-border text-primary position-absolute top-50 start-50 " role="status"
@@ -48,9 +61,7 @@
                             </thead>
                             <tbody>
                                 @if (!empty($this->ShowListOfAppointmentForSpecificDay()))
-
                                     @foreach ($this->ShowListOfAppointmentForSpecificDay() as $key => $eachTime)
-
                                         @if ($loop->first)
                                             <tr>
                                                 <td colspan="6">
@@ -71,7 +82,7 @@
                                                 <td colspan="4" class="text-center">
                                                     <div class="d-flex align-items-center">
                                                         @if ($edited['status'])
-                                                            <button type="button"  style="width: fit-content"
+                                                            <button type="button" style="width: fit-content"
                                                                 wire:click='changeAppointmentDate("{{ $eachTime['from'] }}","{{ $eachTime['until'] }}")'
                                                                 class="btn btn-sm btn-secondary btn-block"> تغییر ساعت
                                                                 نوبت به این ساعت</button>
@@ -104,8 +115,7 @@
                                                 );
                                                 $user = $ap->user;
                                             @endphp
-                                            <tr
-                                                class=" @if ($ap->type == Modules\AppointmentUser\Enum\AppointmentUserTypeEnum::BETWEEN_PATIENTS) table-info @else {{ $ap->status->getColor() }} @endif text-center">
+                                            <tr class="{{ $ap->getColor() }} text-center">
                                                 <td class="alert text-center bg-info ">{{ $key + 1 }}</td>
                                                 <td>
                                                     {{ substr($eachTime['from'], 0, -3) }} -
@@ -136,21 +146,70 @@
                                                             عملیات
                                                         </button>
                                                         <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton1">
-                                                            <li>
-                                                                @can('update', $ap)
+                                                            @can('update', $ap)
+                                                                <li>
                                                                     <a class="dropdown-item"
                                                                         wire:click='editAppointment("{{ $ap->id }}")'
                                                                         href="#">ویرایش</a>
-                                                                @endcan
-                                                            </li>
+                                                                </li>
+                                                                @if ($ap->type == Modules\AppointmentUser\Enum\AppointmentUserTypeEnum::MAIN__APPOINTMENT)
+                                                                    <li>
+                                                                        <a class="dropdown-item"
+                                                                            wire:click='changeAppointmentType("{{ $ap->id }}")'
+                                                                            href="#">
+                                                                            تبدیل به نوبت بین مریض
+                                                                        </a>
+                                                                    </li>
+                                                                @endif
+                                                            @endcan
                                                             <li>
                                                                 @can('delete', $ap)
                                                                     <a class=" dropdown-item delete_confirm_alert"
-                                                                        data-label="نوبت" data-id="{{ $ap->id }}"
-                                                                        href="#">حذف</a>
+                                                                        data-title="کنسل کردن نوبت"
+                                                                        data-description="آیا از کنسل کردن این نوبت مطمعن هستید؟"
+                                                                        data-confirmbtn="بله کنسل شود" data-label="نوبت"
+                                                                        data-id="{{ $ap->id }}" href="#">کنسل
+                                                                        کردن</a>
                                                                 </li>
                                                             @endcan
                                                         </ul>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        @elseif($eachTime['appointment_user_id'] == null)
+                                            <tr style="background-color: #f7dcdc;">
+                                                <td class="alert text-center bg-info ">
+                                                    {{ $key + 1 }}</td>
+                                                <td>
+                                                    {{ substr($eachTime['from'], 0, -3) }} -
+                                                    {{ substr($eachTime['until'], 0, -3) }}
+                                                </td>
+                                                <td colspan="4" class="text-center">
+                                                    <div class="d-flex align-items-center">
+                                                        @if ($edited['status'])
+                                                            <button type="button" style="width: fit-content"
+                                                                wire:click='changeAppointmentDate("{{ $eachTime['from'] }}","{{ $eachTime['until'] }}")'
+                                                                class="btn btn-sm btn-secondary btn-block"> تغییر ساعت
+                                                                نوبت به این ساعت</button>
+                                                            @if ($eachTime['gap'])
+                                                                <span class="text-danger ms-5">زمان نوبت کمتر از زمان
+                                                                    ویزیت
+                                                                    میباشد!</span>
+                                                            @endif
+                                                        @else
+                                                            <button type="button" style="width: 124px"
+                                                                data-time-start="10:30" data-bs-toggle="modal"
+                                                                data-bs-target="#RegistrAnAppointment"
+                                                                data-time-end="10:45"
+                                                                wire:click='passTimeToRegisterAppointmentModal("{{ $eachTime['from'] }}","{{ $eachTime['until'] }}")'
+                                                                class="btn btn-sm btn-success btn-block">ثبت
+                                                                نوبت</button>
+                                                            @if ($eachTime['gap'])
+                                                                <span class="text-danger ms-5">زمان نوبت کمتر از زمان
+                                                                    ویزیت
+                                                                    میباشد!</span>
+                                                            @endif
+                                                        @endif
                                                     </div>
                                                 </td>
                                             </tr>

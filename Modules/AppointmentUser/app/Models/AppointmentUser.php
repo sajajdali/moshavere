@@ -18,14 +18,14 @@ use Modules\User\Entities\User;
 
 class AppointmentUser extends Model
 {
-    use HasFactory , SoftDeletes , Notifiable;
-    CONST DETAIL_APPOINTMENT_VIA = 'appointment_via';
-    CONST DETAIL_PAYMENT_PRICE= 'price';
-    CONST DETAIL_QUESTION= 'question';
-    CONST DETAIL_DESCRIPTION= 'description';
-    CONST DETAIL_SOMEONE= 'someone';
-    CONST DETAIL_FOR_HIMSELF= 'for_himself';
-    CONST DETAIL_PAYMENT= 'payment';
+    use HasFactory, SoftDeletes, Notifiable;
+    const DETAIL_APPOINTMENT_VIA = 'appointment_via';
+    const DETAIL_PAYMENT_PRICE = 'price';
+    const DETAIL_QUESTION = 'question';
+    const DETAIL_DESCRIPTION = 'description';
+    const DETAIL_SOMEONE = 'someone';
+    const DETAIL_FOR_HIMSELF = 'for_himself';
+    const DETAIL_PAYMENT = 'payment';
 
     /**
      * The attributes that are mass assignable.
@@ -48,7 +48,7 @@ class AppointmentUser extends Model
     public static function generateTrackingCode(): string
     {
         do {
-            $uniqueCode = generateUniqueCode(8 , true);
+            $uniqueCode = generateUniqueCode(8, true);
         } while (static::where('tracking_code', $uniqueCode)->exists());
 
         // Insert the unique code into the "transaction" table
@@ -72,12 +72,12 @@ class AppointmentUser extends Model
 
     public function doctor()
     {
-        return $this->belongsTo(User::class , 'doctor_id' , 'id');
+        return $this->belongsTo(User::class, 'doctor_id', 'id');
     }
 
     public function agent()
     {
-        return $this->belongsTo(User::class , 'agent_id' , 'id');
+        return $this->belongsTo(User::class, 'agent_id', 'id');
     }
 
     public function transaction(): \Illuminate\Database\Eloquent\Relations\MorphOne
@@ -90,5 +90,15 @@ class AppointmentUser extends Model
         return $this->morphOne(ShortLink::class, 'shortlinkable');
     }
 
+    public function getColor()
+    {
 
+        return match ($this->status) {
+            AppointmentUserStatusEnum::STATUS_SUCCESSFUL =>   $this->type == AppointmentUserTypeEnum::MAIN__APPOINTMENT ? 'table-success' : "table-info",
+            AppointmentUserStatusEnum::STATUS_CANCEL => 'table-danger',
+            AppointmentUserStatusEnum::STATUS_WAIT_PAYMENT => 'table-info',
+            AppointmentUserStatusEnum::STATUS_ATTENDED => 'table-secondary',
+            AppointmentUserStatusEnum::STATUS_NOT_ATTENDED => 'table-primary',
+        };
+    }
 }

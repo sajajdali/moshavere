@@ -2,23 +2,24 @@
 
 namespace Modules\AppointmentUser\Service;
 
+use Verta;
 use App\Event;
 use Carbon\Carbon;
 use Modules\Absence\app\Models\Absence;
-use Modules\Api\app\Resources\Api\SomeoneResource;
+use Modules\Setting\Enum\SettingKeyEnum;
 use Modules\Api\app\Resources\PriceResource;
+use Modules\AppointmentUser\Enum\AppointmentVia;
+use Modules\Api\app\Resources\Api\SomeoneResource;
+use Modules\AppointmentUser\Enum\model\MainUserModel;
+use Modules\AppointmentUser\app\Models\AppointmentUser;
+use Modules\AppointmentUser\Enum\model\AppointmentModel;
+use Modules\AppointmentUser\Enum\AppointmentUserKindEnum;
+use Modules\AppointmentUser\Enum\AppointmentUserTypeEnum;
+use Modules\AppointmentUser\Enum\AppointmentUserStatusEnum;
+use Modules\AppointmentUser\Enum\model\UserModelAppointment;
 use Modules\AppointmentSetting\app\Models\AppointmentSetting;
 use Modules\AppointmentSetting\app\Models\AppointmentSettingTime;
-use Modules\AppointmentUser\app\Models\AppointmentUser;
 use Modules\AppointmentUser\app\Notifications\AppointmentSmsNotification;
-use Modules\AppointmentUser\Enum\AppointmentUserKindEnum;
-use Modules\AppointmentUser\Enum\AppointmentUserStatusEnum;
-use Modules\AppointmentUser\Enum\AppointmentVia;
-use Modules\AppointmentUser\Enum\model\AppointmentModel;
-use Modules\AppointmentUser\Enum\model\MainUserModel;
-use Modules\AppointmentUser\Enum\model\UserModelAppointment;
-use Modules\Setting\Enum\SettingKeyEnum;
-use Verta;
 
 class AppointmentUserService
 {
@@ -398,11 +399,10 @@ class AppointmentUserService
     public function isAppointmentTimeAvailable($startDateTime, $endDateTime, $dateVisit, AppointmentSetting $appointmentSetting)
     {
         // Check if there are any overlapping appointments
-        $existingAppointments = AppointmentUser::where('doctor_id', $appointmentSetting->user_id);
+        $existingAppointments = AppointmentUser::where('doctor_id', $appointmentSetting->user_id)->where('type',AppointmentUserTypeEnum::MAIN__APPOINTMENT);
         if (!$appointmentSetting->interference) {
             $existingAppointments->where('appointment_setting_id', $appointmentSetting->id);
         }
-
         $existingAppointments = $existingAppointments
             ->whereDate('date_visit', $dateVisit)
             ->where(function ($query) use ($startDateTime, $endDateTime) {

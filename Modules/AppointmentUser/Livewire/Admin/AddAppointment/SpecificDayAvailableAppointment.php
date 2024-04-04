@@ -5,11 +5,13 @@ namespace Modules\AppointmentUser\Livewire\Admin\AddAppointment;
 use Carbon\Carbon;
 use Livewire\Component;
 use Livewire\Attributes\On;
+use Livewire\Attributes\Computed;
 use Illuminate\Support\Facades\Cache;
 use Hekmatinasser\Verta\Facades\Verta;
-use Livewire\Attributes\Computed;
-use Modules\AppointmentSetting\app\Models\AppointmentSetting;
 use Modules\AppointmentUser\app\Models\AppointmentUser;
+use Modules\AppointmentUser\Enum\AppointmentUserTypeEnum;
+use Modules\AppointmentUser\Enum\AppointmentUserStatusEnum;
+use Modules\AppointmentSetting\app\Models\AppointmentSetting;
 
 class SpecificDayAvailableAppointment extends Component
 {
@@ -63,9 +65,9 @@ class SpecificDayAvailableAppointment extends Component
                 return $avaiableTimes['times'];
             }
         }
-        // when not in range
+        // when selected date is not exist in log date range
         $app = $this->fetchData['appointmentSetting'];
-        $newListTimes = app('AppointmentUserService')->listAppointments($app ,['specialDay' => $this->fetchData['selectedDate']->toDateString()] );
+        $newListTimes = app('AppointmentUserService')->listAppointments($app, ['specialDay' => $this->fetchData['selectedDate']->toDateString()]);
         return $this->listOfAppointment($newListTimes)[0]['times'];
     }
     private function listOfAppointment($listOfAppointment)
@@ -139,14 +141,39 @@ class SpecificDayAvailableAppointment extends Component
     }
 
     #[On('delete')]
-    public function deleteAppointment($model)
+    public function cancelAppointment($model)
     {
+        // TODO:: change this to cancel from delete
         $app = AppointmentUser::find($model);
-        $app->delete();
+        $app->update([
+            'status' => AppointmentUserStatusEnum::STATUS_CANCEL,
+        ]);
         Cache::forget('appointmentList.' .   $this->fetchData['appId']);
-        return redirect()->route('admin.appointment.add.specificday', ['appId' =>   $this->fetchData['appId'], 'date' => verta($this->fetchData['selectedDate'])->format('Y-m-d')])->with('success', 'نوبت با موفقیت افزوده شد');
+        return redirect()->route(
+            'admin.appointment.add.specificday',
+            [
+                'appId' =>   $this->fetchData['appId'],
+                'date' => verta($this->fetchData['selectedDate'])->format('Y-m-d')
+            ]
+        )->with('success', 'نوبت با موفقیت کنسل شد');
 
         // AppointmentUser::$
+    }
+
+    public function changeAppointmentType($appId)
+    {
+        $appUser = AppointmentUser::find($appId);
+        $appUser->update([
+            'type' => AppointmentUserTypeEnum::BETWEEN_PATIENTS,
+        ]);
+        Cache::forget('appointmentList.' . $this->fetchData['appId']);
+        return redirect()->route(
+            'admin.appointment.add.specificday',
+            [
+                'appId'         =>   $this->fetchData['appId'],
+                'date'          => verta($this->fetchData['selectedDate'])->format('Y-m-d'),
+            ]
+        )->with('success', 'وضعیت نوبت با موفقیت تغییر پیدا کرد');
     }
     public function editAppointment($id)
     {
@@ -160,17 +187,24 @@ class SpecificDayAvailableAppointment extends Component
             ]
         );
     }
-    private function editedMode()
-    {
-    }
     // when tracking_code is exist in url
     public function changeAppointmentDate($from, $until)
     {
-        $this->edited['old_app']->update([
+        // Update the date
+        $updateData = [
             'date_visit' => $this->fetchData['selectedDate']->todatetimestring(),
             'start_time' => $from,
             'end_time' => $until,
-        ]);
+        ];
+
+        // Check if the type needs to be updated
+        if ($this->edited['old_app']->type == AppointmentUserTypeEnum::BETWEEN_PATIENTS) {
+            $updateData['type'] = AppointmentUserTypeEnum::MAIN__APPOINTMENT;
+        }
+
+        // Update the appointment
+        $this->edited['old_app']->update($updateData);
+
         return redirect()->route('admin.appointment.add.specificday', [
             'appId' =>  $this->fetchData['appId'],
             'date' => verta($this->fetchData['selectedDate'])->format('Y-m-d')
@@ -194,16 +228,15 @@ class SpecificDayAvailableAppointment extends Component
         } else {
             $this->fetchData['time'] = null;
         }
-        // TODO::inere pak kon
-//        Cache::forget('appointmentList.' . $app->id);
+        Cache::forget('appointmentList.' .   $app->id);
         $this->fetchData['RawlistOfAppointment']  = Cache::rememberForever('appointmentList.' . $app->id, function () use ($app) {
             return app('AppointmentUserService')->listAppointments($app);
         });
         $this->fetchData['listOfAppointment'] = $this->listOfAppointment($this->fetchData['RawlistOfAppointment']);
+        dd($this->fetchData['listOfAppointment']);
         if (request()->has('tracking_code')) {
             $this->edited['status'] = true;
             $this->edited['old_app'] = AppointmentUser::firstWhere('tracking_code', request()->get('tracking_code'));
-            $this->editedMode();
         }
     }
     public function render()

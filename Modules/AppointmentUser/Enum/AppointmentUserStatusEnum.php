@@ -39,10 +39,10 @@ enum AppointmentUserStatusEnum: int implements EnumHasApiResultInterface
     public function getColor(): string
     {
         return match ($this) {
-            self::STATUS_PENDING => 'table-warning',
-            self::STATUS_SUCCESSFUL => 'table-success',
-            self::STATUS_WAIT_PAYMENT => 'table-primary',
-            self::STATUS_CANCEL => 'table-danger',
+            self::STATUS_CANCEL         => 'table-danger',
+            self::STATUS_PENDING        => 'table-warning',
+            self::STATUS_SUCCESSFUL     => 'table-success',
+            self::STATUS_WAIT_PAYMENT   => 'table-primary',
         };
     }
 

@@ -26,7 +26,8 @@ class UserModel
         public ?string $nationalCode = null,
         public ?int $acquainted = null,
         public ?string $address = null,
-        public ?string $city = null
+        public ?string $city = null,
+        public ?BirthdayModel $birthday = null
     ) {
     }
 

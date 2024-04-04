@@ -197,10 +197,10 @@ class AppointmentApiController extends Controller
             firstName: $request->input('first_name'),
             lastName: $request->input('last_name'),
             gender: $request->input('gender'),
-            birthday: new BirthdayModel(day: $request->input('birthday_day'), month: $request->input('birthday_month'), year: $request->input('birthday_year')),
             nationalCode: $request->input('national_code'),
             address: $request->input('address'),
-            city: $request->input('city')
+            city: $request->input('city'),
+            birthday: new BirthdayModel(day: $request->input('birthday_day'), month: $request->input('birthday_month'), year: $request->input('birthday_year'))
         );
 
         // full user model

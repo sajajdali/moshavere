@@ -63,6 +63,10 @@ class SpecificDayAvailableAppointment extends Component
                 return $avaiableTimes['times'];
             }
         }
+        // when not in range
+        $app = $this->fetchData['appointmentSetting'];
+        $newListTimes = app('AppointmentUserService')->listAppointments($app ,['specialDay' => $this->fetchData['selectedDate']->toDateString()] );
+        return $this->listOfAppointment($newListTimes)[0]['times'];
     }
     private function listOfAppointment($listOfAppointment)
     {
@@ -177,6 +181,7 @@ class SpecificDayAvailableAppointment extends Component
         $app = AppointmentSetting::find(request()->route('appId'));
         $this->fetchData['doc'] = $app->user;
         $this->fetchData['appId'] = $app->id;
+        $this->fetchData['appointmentSetting'] = $app;
         if (!empty(request()->route('date'))) {
             $this->fetchData['selectedDate']  = Verta::parse(request()->route('date'))->toCarbon();
         } else {
@@ -190,7 +195,7 @@ class SpecificDayAvailableAppointment extends Component
             $this->fetchData['time'] = null;
         }
         // TODO::inere pak kon
-        Cache::forget('appointmentList.' . $app->id);
+//        Cache::forget('appointmentList.' . $app->id);
         $this->fetchData['RawlistOfAppointment']  = Cache::rememberForever('appointmentList.' . $app->id, function () use ($app) {
             return app('AppointmentUserService')->listAppointments($app);
         });

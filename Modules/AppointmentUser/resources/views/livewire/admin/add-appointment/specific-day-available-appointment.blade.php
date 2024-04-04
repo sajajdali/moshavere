@@ -48,7 +48,9 @@
                             </thead>
                             <tbody>
                                 @if (!empty($this->ShowListOfAppointmentForSpecificDay()))
+
                                     @foreach ($this->ShowListOfAppointmentForSpecificDay() as $key => $eachTime)
+
                                         @if ($loop->first)
                                             <tr>
                                                 <td colspan="6">

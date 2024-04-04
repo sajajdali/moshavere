@@ -4,8 +4,10 @@ namespace Modules\AppointmentUser\Livewire\Admin\AddAppointment;
 
 use Carbon\Carbon;
 use Livewire\Component;
+use Modules\User\Entities\User;
 use Illuminate\Support\Facades\Cache;
 use Hekmatinasser\Verta\Facades\Verta;
+use Modules\Service\app\Models\Service;
 use Modules\AppointmentSetting\app\Models\AppointmentSetting;
 
 class ListOfAvailableDay extends Component
@@ -16,16 +18,20 @@ class ListOfAvailableDay extends Component
 
     public function GotoSpecificDay()
     {
-        $date = Verta::parse($this->specificDayDate)->toCarbon()->timestamp;
-        return redirect()->route('admin.appointment.add.specificday', ['date' => $date]);
+        $date = Verta::parse($this->specificDayDate)->format('Y-m-d');
+        return redirect()->route('admin.appointment.add.specificday', ['appId' => $this->fethData['appointmentSetting'], 'date' => $date]);
     }
-    public function GotoAppointmentList($time, $day)
+    public function GotoAppointmentList($time, $day = null)
     {
-        $timeArray = explode(':', $day);
+        if (!empty($day)) {
+            $timeArray = explode(':', $day);
+            $passedHour = Carbon::createFromTimestamp((int)$time)->setTime($timeArray[0], $timeArray[1])->timestamp;
+        }
         $passedDate =  verta(Carbon::parse($time))->format('Y-m-d');
-        $passedHour = Carbon::createFromTimestamp((int)$time)->setTime($timeArray[0], $timeArray[1])->timestamp;
-
-        return redirect()->route('admin.appointment.add.specificday', ['appId' => $this->fethData['appointmentSetting'], 'date' => $passedDate, 'time' => $passedHour]);
+        if (!empty($day)) {
+            return redirect()->route('admin.appointment.add.specificday', ['appId' => $this->fethData['appointmentSetting'], 'date' => $passedDate, 'time' => $passedHour]);
+        }
+        return redirect()->route('admin.appointment.add.specificday', ['appId' => $this->fethData['appointmentSetting'], 'date' => $passedDate]);
     }
     private function findFirstTreeAppointment($listOfAppointment)
     {
@@ -39,7 +45,7 @@ class ListOfAvailableDay extends Component
         $isYear  = verta()->addDays($mainDaActive)->year;
 
         $result = [];
-        $maxDay = 7;
+        $maxDay = 6;
         $DaysDisplayed = 0;
         foreach ($listOfAppointment['data'] as $yeay => $day) {
             if ($yeay < $isYear) {
@@ -87,17 +93,22 @@ class ListOfAvailableDay extends Component
     }
     public function mount()
     {
-        $serviceId =  request()->get('sectionId');
-        $doctorId  =  request()->get('doctorId');
-        $placeId   =  request()->get('placeId');
+        $serviceId =  request()->route('sectionId');
+        $doctorId  =  request()->route('doctorId');
+        $placeId   =  request()->route('placeId');
+
+        $this->fethData['service'] = Service::find($serviceId);
+        $this->fethData['doctor']  = User::find($doctorId);
         //check for special setting for special section
         $appointmentSetting = AppointmentSetting::where('service_id', $serviceId)
             ->where('place_id', $placeId)
             ->first();
+
         //check for general setting
         if (empty($appointmentSetting)) {
             $appointmentSetting = AppointmentSetting::where('user_id', $doctorId)->first();
         }
+
         // redirect user if setting dosent exist
         if (empty($appointmentSetting)) {
             return redirect()->route('admin.appointment.doctor.list')->with('error', 'لطفا ابتدا تنظیمات حضور پزشک را ثبت کنید');

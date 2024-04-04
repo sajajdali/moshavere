@@ -3,38 +3,35 @@
 namespace Modules\AppointmentUser\Enum\model;
 
 use Modules\AppointmentUser\Enum\AppointmentUserKindEnum;
+use Modules\AppointmentUser\Enum\AppointmentUserTypeEnum;
 use Modules\AppointmentUser\Enum\AppointmentVia;
 
 class AppointmentModel
 {
-    public ?int $timestamp;
-    public AppointmentVia $appointmentVia;
-    public bool $sendSmsToUser;
-    public ?int $serviceId;
-    public ?int $placeId;
-    public ?int $agentId;
-    public ?int $operatorId;
-    public ?AppointmentUserKindEnum $kind;
-    public ?bool $smsToDoctor;
+    // public ?string $description ;
 
     /**
-     * @param ?int $timestamp
+     * @param int $timestamp
      * @param AppointmentVia $appointmentVia
      * @param bool $sendSmsToUser
      * @param int|null $serviceId
      * @param int|null $placeId
+     * @param string|null $description
+     * @param AppointmentUserTypeEnum $type
      */
-    public function __construct(?int $timestamp = null, AppointmentVia $appointmentVia = AppointmentVia::SELF, bool $sendSmsToUser = true, ?int $serviceId = null, ?int $placeId = null , ?int $agentId = null,?int $operatorId = null , ?AppointmentUserKindEnum $kind = AppointmentUserKindEnum::IN_PERSION , ?bool $smsToDoctor = false)
-    {
-        $this->timestamp = $timestamp;
-        $this->appointmentVia = $appointmentVia;
-        $this->sendSmsToUser = $sendSmsToUser;
-        $this->serviceId = $serviceId;
-        $this->placeId = $placeId;
-        $this->agentId = $agentId;
-        $this->operatorId = $operatorId;
-        $this->kind = $kind;
-        $this->smsToDoctor = $smsToDoctor;
+    public function __construct(
+        public int $timestamp,
+        public AppointmentVia $appointmentVia = AppointmentVia::SELF,
+        public bool $sendSmsToUser = true,
+        public ?int $serviceId = null,
+        public  ?int $placeId = null,
+        public ?int $agentId = null,
+        public ?int $operatorId = null,
+        public ?AppointmentUserKindEnum $kind = AppointmentUserKindEnum::IN_PERSION,
+        public ?bool $smsToDoctor = false,
+        public ?string $description = '',
+        public ?AppointmentUserTypeEnum $type = AppointmentUserTypeEnum::MAIN__APPOINTMENT,
+    ) {
     }
 
 

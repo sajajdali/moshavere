@@ -60,21 +60,37 @@
                                         @endif
                                         @if ($eachTime['status'] == true)
                                             <tr>
-                                                <td class="alert text-center bg-info ">{{ $key + 1 }}</td>
+                                                <td class="alert text-center bg-info ">
+                                                    {{ $key + 1 }}</td>
                                                 <td>
                                                     {{ substr($eachTime['from'], 0, -3) }} -
                                                     {{ substr($eachTime['until'], 0, -3) }}
                                                 </td>
                                                 <td colspan="4" class="text-center">
                                                     <div class="d-flex align-items-center">
-                                                        <button type="button" style="width: 124px"
-                                                            data-time-start="10:30" data-bs-toggle="modal"
-                                                            data-bs-target="#RegistrAnAppointment" data-time-end="10:45"
-                                                            class="btn btn-sm btn-success btn-block">ثبت
-                                                            نوبت</button>
-                                                        @if ($eachTime['gap'])
-                                                            <span class="text-danger ms-5">زمان نوبت کمتر از زمان ویزیت
-                                                                میباشد!</span>
+                                                        @if ($edited['status'])
+                                                            <button type="button"  style="width: fit-content"
+                                                                wire:click='changeAppointmentDate("{{ $eachTime['from'] }}","{{ $eachTime['until'] }}")'
+                                                                class="btn btn-sm btn-secondary btn-block"> تغییر ساعت
+                                                                نوبت به این ساعت</button>
+                                                            @if ($eachTime['gap'])
+                                                                <span class="text-danger ms-5">زمان نوبت کمتر از زمان
+                                                                    ویزیت
+                                                                    میباشد!</span>
+                                                            @endif
+                                                        @else
+                                                            <button type="button" style="width: 124px"
+                                                                data-time-start="10:30" data-bs-toggle="modal"
+                                                                data-bs-target="#RegistrAnAppointment"
+                                                                data-time-end="10:45"
+                                                                wire:click='passTimeToRegisterAppointmentModal("{{ $eachTime['from'] }}","{{ $eachTime['until'] }}")'
+                                                                class="btn btn-sm btn-success btn-block">ثبت
+                                                                نوبت</button>
+                                                            @if ($eachTime['gap'])
+                                                                <span class="text-danger ms-5">زمان نوبت کمتر از زمان
+                                                                    ویزیت
+                                                                    میباشد!</span>
+                                                            @endif
                                                         @endif
                                                     </div>
                                                 </td>
@@ -88,7 +104,7 @@
                                             @endphp
                                             <tr
                                                 class=" @if ($ap->type == Modules\AppointmentUser\Enum\AppointmentUserTypeEnum::BETWEEN_PATIENTS) table-info @else {{ $ap->status->getColor() }} @endif text-center">
-                                                <td class="alert text-center bg-info ">3</td>
+                                                <td class="alert text-center bg-info ">{{ $key + 1 }}</td>
                                                 <td>
                                                     {{ substr($eachTime['from'], 0, -3) }} -
                                                     {{ substr($eachTime['until'], 0, -3) }}
@@ -118,9 +134,20 @@
                                                             عملیات
                                                         </button>
                                                         <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton1">
-                                                            <li><a class="dropdown-item" 
-                                                                    href="#">ویرایش</a></li>
-                                                            <li><a class="dropdown-item" href="#">حذف</a></li>
+                                                            <li>
+                                                                @can('update', $ap)
+                                                                    <a class="dropdown-item"
+                                                                        wire:click='editAppointment("{{ $ap->id }}")'
+                                                                        href="#">ویرایش</a>
+                                                                @endcan
+                                                            </li>
+                                                            <li>
+                                                                @can('delete', $ap)
+                                                                    <a class=" dropdown-item delete_confirm_alert"
+                                                                        data-label="نوبت" data-id="{{ $ap->id }}"
+                                                                        href="#">حذف</a>
+                                                                </li>
+                                                            @endcan
                                                         </ul>
                                                     </div>
                                                 </td>
@@ -148,15 +175,22 @@
             </div>
         </div>
     </div>
-
     <livewire:appointmentuser::admin.add-appointment.modal.service-and-doctor-modal />
-    <livewire:appointmentuser::admin.add-appointment.modal.specific-day-appointment-registration-modal />
+    <livewire:appointmentuser::admin.add-appointment.modal.specific-day-appointment-registration-modal :appId="$fetchData['appId']"
+        :appTime="$fetchData['time']" :appDate="verta($fetchData['selectedDate'])->format('Y-m-d')" />
 </div>
 @push('scripts')
     <!-- SELECT2 JS -->
     <script src="{{ admin_asset('plugins/select2/select2.full.min.js') }}"></script>
+    <script src="{{ admin_asset('plugins/sweet-alert/sweetalert.min.js') }}"></script>
+    <script src="{{ admin_asset('plugins/sweet-alert/admin.sweetalert.js') }}"></script>
     <script>
         $(document).ready(function() {
+            var setAppModal = document.querySelector('#RegistrAnAppointment');
+            var setAppModalInst = bootstrap.Modal.getOrCreateInstance(setAppModal);
+            var myModalEl = document.querySelector('#changeDocmodal');
+            var modal = bootstrap.Modal.getOrCreateInstance(myModalEl);
+
             function addJs() {
                 $('#currentDate').persianDatepicker({
                     format: 'L',
@@ -172,13 +206,12 @@
                     addJs();
                 }, 500);
             });
-            Livewire.on('closeModal', function() {
-                var myModalEl = document.querySelector('#changeDocmodal')
-                var modal = bootstrap.Modal.getOrCreateInstance(myModalEl)
-                modal.hide();
+            @if ($fetchData['showRegisterModal'])
 
-                var setAppModal = document.querySelector('#RegistrAnAppointment')
-                var setAppModalInst = bootstrap.Modal.getOrCreateInstance(setAppModal)
+                setAppModalInst.show();
+            @endif
+            Livewire.on('closeModal', function() {
+                modal.hide();
                 setAppModalInst.hide();
             });
             Livewire.on('dateHasBeenChange', function(newDate) {

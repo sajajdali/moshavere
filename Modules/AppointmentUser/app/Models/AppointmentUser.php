@@ -22,6 +22,7 @@ class AppointmentUser extends Model
     CONST DETAIL_APPOINTMENT_VIA = 'appointment_via';
     CONST DETAIL_PAYMENT_PRICE= 'price';
     CONST DETAIL_QUESTION= 'question';
+    CONST DETAIL_DESCRIPTION= 'description';
     CONST DETAIL_SOMEONE= 'someone';
     CONST DETAIL_FOR_HIMSELF= 'for_himself';
     CONST DETAIL_PAYMENT= 'payment';

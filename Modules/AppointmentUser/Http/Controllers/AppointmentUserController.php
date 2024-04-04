@@ -27,7 +27,7 @@ class AppointmentUserController extends Controller
 
 
         $appointmentSetting = AppointmentSetting::find(1);
-//        Cache::forget('appointmentList.'.$appointmentSetting->id);
+        Cache::forget('appointmentList.'.$appointmentSetting->id);
         $listUsers = Cache::rememberForever('appointmentList.'.$appointmentSetting->id, function () use ($appointmentSetting) {
             return app('AppointmentUserService')->listAppointments($appointmentSetting);
         });

@@ -46,6 +46,17 @@ enum AppointmentUserStatusEnum: int implements EnumHasApiResultInterface
         };
     }
 
+    public static function confirmed() : array
+    {
+        return [
+            self::STATUS_PENDING->value,
+            self::STATUS_SUCCESSFUL->value,
+            self::STATUS_WAIT_PAYMENT->value,
+            self::STATUS_ATTENDED->value,
+            self::STATUS_NOT_ATTENDED->value,
+        ];
+    }
+
     public function apiResult(): array
     {
         return [

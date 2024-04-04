@@ -44,10 +44,11 @@ class AppointmentUserService
             $existingUntil = strtotime($existingTimeRange['until']);
             $newFrom = strtotime($from);
             $newUntil = strtotime($until);
-            $betweenPatients = $existingTimeRange['type'] ?? 1;
+            $betweenPatients = $existingTimeRange['type'] ?? AppointmentUserTypeEnum::MAIN__APPOINTMENT->value;
+            $appointmentStatus = isset($existingTimeRange['app_status']) && in_array( $existingTimeRange['app_status'] , AppointmentUserStatusEnum::confirmed());
 
             // Check for overlap
-            if ($betweenPatients == 1 &&
+            if ($betweenPatients == AppointmentUserTypeEnum::MAIN__APPOINTMENT->value && $appointmentStatus &&
                 (
                     ($newFrom >= $existingFrom && $newFrom < $existingUntil) ||
                     ($newUntil > $existingFrom && $newUntil <= $existingUntil) ||
@@ -180,6 +181,7 @@ class AppointmentUserService
                             'status' => false,
                             'from' => $appointment->start_time,
                             'type' => $appointment->type->value,
+                            'app_status' => $appointment->status->value,
                             'until' => $appointment->end_time,
                             'appointment_user_id' => $appointment->id,
                         ];

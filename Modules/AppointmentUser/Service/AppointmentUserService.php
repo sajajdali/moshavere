@@ -480,7 +480,7 @@ class AppointmentUserService
             ];
         }
 
-        if ($appointmentData->kind == AppointmentUserKindEnum::IN_PERSION) {
+        if ($appointmentData->kind == AppointmentUserKindEnum::IN_PERSION && $appointmentData->appointmentVia == AppointmentVia::SELF) {
             $checkTimeAvailable = $this->isAppointmentTimeAvailable($dateAppointment->toTimeString(), $dateAppointment->copy()->addMinutes($appointmentSetting->time_for_visit)->toTimeString(), $dateAppointment->toDateString(), $appointmentSetting);
             if (!$checkTimeAvailable) {
                 return [

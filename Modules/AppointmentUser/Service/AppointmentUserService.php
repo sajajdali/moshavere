@@ -494,6 +494,9 @@ class AppointmentUserService
         $paymentstatus = $this->paymentstatus($appointmentSetting);
         // create payment link
 
+        // check if end time has set by admin
+        $endTime = $appointmentData->endTime ?? $visitDateTime->copy()->addMinutes($appointmentSetting->time_for_visit)->toTimeString();
+
         // store appointment
         $appointmentUserModel = [
             'service_id' => $appointmentData->serviceId,
@@ -507,7 +510,7 @@ class AppointmentUserService
             'kind' => $appointmentData->kind,
             'type' => $appointmentData->type,
             'start_time' => $visitDateTime->toTimeString(),
-            'end_time' => $visitDateTime->copy()->addMinutes($appointmentSetting->time_for_visit)->toTimeString(),
+            'end_time' => $endTime,
             'date_visit' => $visitDateTime->toDateTimeString(),
             'user_ip' => ip(),
 

@@ -18,6 +18,7 @@ class AppointmentModel
      * @param int|null $placeId
      * @param string|null $description
      * @param AppointmentUserTypeEnum $type
+     * @param string|null $endTime
      */
     public function __construct(
         public int $timestamp,
@@ -31,8 +32,7 @@ class AppointmentModel
         public ?bool $smsToDoctor = false,
         public ?string $description = '',
         public ?AppointmentUserTypeEnum $type = AppointmentUserTypeEnum::MAIN__APPOINTMENT,
+        public ?string $endTime = null,
     ) {
     }
-
-
 }

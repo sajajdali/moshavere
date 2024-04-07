@@ -37,7 +37,7 @@
                         </button>
                     </div>
                     @if (!$edited['status'])
-                        <button class="btn btn-success" data-bs-toggle="modal"
+                        <button class="btn btn-success" data-bs-toggle="modal" wire:click='dateHasBeenChange'
                             data-bs-target="#RegistrAnAppointment">ثبت
                             نوبت</button>
                     @endif
@@ -66,7 +66,7 @@
                                             <tr>
                                                 <td colspan="6">
                                                     <div class="alert alert-avatar alert-primary alert-dismissible">
-                                                        حضور از ساعت {{ substr($eachTime['from'], 0, -6) }} عصر به بعد
+                                                        حضور از ساعت {{ substr($eachTime['from'], 0, -6) }}
                                                     </div>
                                                 </td>
                                             </tr>
@@ -115,8 +115,7 @@
                                                 );
                                                 $user = $ap->user;
                                             @endphp
-                                            <tr
-                                                class="{{$ap->getColor()}} text-center">
+                                            <tr class="{{ $ap->getColor() }} text-center">
                                                 <td class="alert text-center bg-info ">{{ $key + 1 }}</td>
                                                 <td>
                                                     {{ substr($eachTime['from'], 0, -3) }} -
@@ -153,7 +152,9 @@
                                                                         wire:click='editAppointment("{{ $ap->id }}")'
                                                                         href="#">ویرایش</a>
                                                                 </li>
-                                                                @if ($ap->type == Modules\AppointmentUser\Enum\AppointmentUserTypeEnum::MAIN__APPOINTMENT)
+                                                                @if (
+                                                                    $ap->type == Modules\AppointmentUser\Enum\AppointmentUserTypeEnum::MAIN__APPOINTMENT &&
+                                                                        $ap->status != Modules\AppointmentUser\Enum\AppointmentUserStatusEnum::STATUS_CANCEL)
                                                                     <li>
                                                                         <a class="dropdown-item"
                                                                             wire:click='changeAppointmentType("{{ $ap->id }}")'
@@ -219,7 +220,7 @@
                                             <tr>
                                                 <td colspan="6">
                                                     <div class="alert alert-avatar alert-primary alert-dismissible">
-                                                        حضور تا ساعت {{ substr($eachTime['until'], 0, -6) }} عصر
+                                                        حضور تا ساعت {{ substr($eachTime['until'], 0, -6) }}
                                                     </div>
                                                 </td>
                                             </tr>
@@ -239,7 +240,7 @@
     </div>
     <livewire:appointmentuser::admin.add-appointment.modal.service-and-doctor-modal />
     <livewire:appointmentuser::admin.add-appointment.modal.specific-day-appointment-registration-modal :appId="$fetchData['appId']"
-        :appTime="$fetchData['time']" :appDate="verta($fetchData['selectedDate'])->format('Y-m-d')" />
+        :appTime="$fetchData['time']" />
 </div>
 @push('scripts')
     <!-- SELECT2 JS -->
@@ -269,14 +270,13 @@
                 }, 500);
             });
             @if ($fetchData['showRegisterModal'])
-
                 setAppModalInst.show();
             @endif
             Livewire.on('closeModal', function() {
                 modal.hide();
                 setAppModalInst.hide();
             });
-            Livewire.on('dateHasBeenChange', function(newDate) {
+            Livewire.on('urlDateChange', function(newDate) {
                 var currentUrl = window.location.href;
                 var baseUrl = currentUrl.split('/').slice(0, -1).join('/');
                 var newUrl = baseUrl + '/' + newDate.newDate;

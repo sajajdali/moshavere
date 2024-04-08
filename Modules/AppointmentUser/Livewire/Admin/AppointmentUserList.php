@@ -8,10 +8,12 @@ use Modules\User\Entities\User;
 use Livewire\Attributes\Computed;
 use Spatie\Permission\Models\Role;
 use Modules\User\Enum\UserMetaEnum;
+use Maatwebsite\Excel\Facades\Excel;
 use Hekmatinasser\Verta\Facades\Verta;
 use Modules\Service\app\Models\Service;
 use Modules\AppointmentUser\app\Models\AppointmentUser;
 use Modules\AppointmentUser\Enum\AppointmentUserStatusEnum;
+use Modules\AppointmentUser\app\Exports\AppointmentListExport;
 
 class AppointmentUserList extends Component
 {
@@ -23,6 +25,8 @@ class AppointmentUserList extends Component
         'user_mobile'          => null,
         'appointment_date'     => null,
         'appointment_set_date' => null,
+        'appointment_star_date' => null,
+        'appointment_end_date' => null,
         'AppointmentStatus'    => null,
         'docNumber'            => null,
         'setterAppointment'    => null,
@@ -44,6 +48,8 @@ class AppointmentUserList extends Component
             'user_mobile'          => null,
             'appointment_date'     => null,
             'appointment_set_date' => null,
+            'appointment_star_date' => null,
+            'appointment_end_date' => null,
             'AppointmentStatus'    => null,
             'docNumber'            => null,
             'setterAppointment'    => null,
@@ -105,13 +111,25 @@ class AppointmentUserList extends Component
             'appointment_date' => [
                 'condition' => $this->search['appointment_date'],
                 'callback' => function ($query) {
-                    return $query->where('date_visit', Verta::parse($this->search['user_id'])->toCarbon());
+                    return $query->whereDate('date_visit', Verta::parse($this->search['appointment_date'])->toCarbon());
                 },
             ],
             'appointment_set_date' => [
                 'condition' => $this->search['appointment_set_date'],
                 'callback' => function ($query) {
-                    return $query->where('created_at', Verta::parse($this->search['appointment_set_date'])->toCarbon());
+                    return $query->whereDate('created_at', Verta::parse($this->search['appointment_set_date'])->toCarbon());
+                },
+            ],
+            'appointment_end_date' => [
+                'condition' => $this->search['appointment_end_date'],
+                'callback' => function ($query) {
+                    return $query->whereDate('created_at', '<', Verta::parse($this->search['appointment_end_date'])->toCarbon());
+                },
+            ],
+            'appointment_star_date' => [
+                'condition' => $this->search['appointment_star_date'],
+                'callback' => function ($query) {
+                    return $query->whereDate('created_at', '>', Verta::parse($this->search['appointment_star_date'])->toCarbon());
                 },
             ],
             'AppointmentStatus' => [
@@ -163,9 +181,21 @@ class AppointmentUserList extends Component
         $appointments =  $query->paginate(10);
         return $appointments;
     }
-    public function mount()
+    public function ExportData()
     {
         
+        if ($this->handleSearch()->getCollection()->count() > 2000) {
+            return $this->addError('exelError', 'مقدار اطلاعات بیشتر از حد مجاز است، لطفا با استفاده از جست و جوی تاریخ، تعداد نوبت ها را محدود تر کنید');
+        }
+        return  Excel::download(new AppointmentListExport($this->handleSearch()->getCollection()), 'appointment_lists.xlsx');
+    }
+    public function booted()
+    {
+        $this->dispatch('loadJs', true);
+    }
+    public function mount()
+    {
+
         // TODO::pass roles that can set appointmet in appointmentSetter property ;
         $this->fetchData['appointmentSetter'] = Role::find(1)->users;
         $this->fetchData['Services'] = Service::all();

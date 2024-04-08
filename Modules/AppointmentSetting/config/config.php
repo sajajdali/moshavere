@@ -102,6 +102,16 @@ return [
                 'has_child' => false,
                 'children' => null
             ],
+            [
+                'title' => 'پیام های نوبت آنلاین',
+                'gate' => 'viewAny',
+                'policy_class' => \Modules\User\Entities\User::class,
+                'icon' => 'fe fe-message-square',
+                'route' => 'admin.appointment_user.message.list',
+                'has_badge' => false,
+                'has_child' => false,
+                'children' => null
+            ],
         ],
     ],
 ];

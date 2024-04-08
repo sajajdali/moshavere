@@ -3,21 +3,20 @@
 namespace Modules\AppointmentSetting\app\Models;
 
 use App\Enum\ActiveEnum;
-use Modules\AppointmentUser\app\Models\AppointmentUser;
 use Modules\User\Entities\User;
 use Illuminate\Database\Eloquent\Model;
 use Modules\Service\app\Models\Service;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Modules\AppointmentUser\app\Models\AppointmentUser;
+use Modules\AppointmentSetting\app\trait\AppointmentSettingDetailKeyTrait;
 use Modules\AppointmentSetting\Database\factories\AppointmentSettingFactory;
 
 class AppointmentSetting extends Model
 {
-    use HasFactory, SoftDeletes;
+    use HasFactory, SoftDeletes,AppointmentSettingDetailKeyTrait;
 
-    const DETAIL_PAYMENT_NOT_PAY_STATUS_DONT_SUBMIT = 'dontSubmit';
-    const DETAIL_PAYMENT_NOT_PAY_STATUS_SUBMIT = 'submit';
     protected $casts = [
         'active' => ActiveEnum::class,
         'last_day_active' => 'date',

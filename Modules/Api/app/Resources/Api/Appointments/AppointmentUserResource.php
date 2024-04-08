@@ -43,11 +43,20 @@ class AppointmentUserResource extends JsonResource
 
     private function online()
     {
-        if (!isset($this->details[AppointmentUser::DETAIL_APPOINTMENT_VIA]) || $this->kind != AppointmentUserKindEnum::ONLINE){
+        if ($this->kind != AppointmentUserKindEnum::ONLINE){
             return null;
         }
+        $online = $this->online->first();
         return [
-            'new_message' => 0
+            'new_message' => 0,
+            'online_id' => $online->id,
+            'online_tracking' => $online->tracking_code,
+            'status' => $online->status->apiResult(),
+            'new_messages' => $online->new_messages,
+            'accessibility' => [
+                'can_send_message' => $online->status->canSendMessage(),
+                'can_show_messages' => $online->status->canShowMessages(),
+            ]
         ];
     }
     /**

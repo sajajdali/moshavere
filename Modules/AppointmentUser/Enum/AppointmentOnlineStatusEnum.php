@@ -31,6 +31,21 @@ enum AppointmentOnlineStatusEnum: int implements EnumHasApiResultInterface
             self::REACTIVATED => 'مجدد فعال شده',
         };
     }
+    public function canSendMessage() : bool
+    {
+        return match ($this) {
+            self::ACCEPTED, self::REPLY_BY_USER, self::ANSWER_BY_DOCTOR, self::REACTIVATED => true,
+            default => false
+        };
+    }
+
+    public function canShowMessages() : bool
+    {
+        return match ($this) {
+            self::ACCEPTED, self::REPLY_BY_USER, self::ANSWER_BY_DOCTOR, self::COMPLETED_BY_DOCTOR, self::TIME_IS_OVER , self::REACTIVATED => true,
+            default => false
+        };
+    }
     public function getBadgeColor(): string
     {
         return match ($this) {

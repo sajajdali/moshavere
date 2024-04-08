@@ -2,8 +2,118 @@
 
 namespace Modules\Api\Http\Controllers\Appointment;
 
+use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
+use Modules\Api\app\Http\Requests\Api\Requests\Appointment\StoreAppointmentOnlineRequest;
+use Modules\Api\app\Resources\Api\Appointment\online\AppointmentOnlineMessagesPaginateResource;
+use Modules\Api\app\Resources\Api\Appointment\online\AppointmentOnlineMessagesResource;
+use Modules\Api\app\Resources\Api\Appointment\online\AppointmentOnlinePaginateResource;
+use Modules\Api\Trait\ApiHandlerTrait;
+use Modules\AppointmentUser\app\Models\AppointmentOnline;
+use Modules\AppointmentUser\Enum\AppointmentOnlineMessageTypeEnum;
+use Modules\AppointmentUser\Enum\AppointmentOnlineStatusEnum;
+use Validator;
 
 class AppointmentApiOnlineController extends Controller
 {
+    use ApiHandlerTrait;
+
+    private function uploadFiles($user , $files , $appointmentMessage)
+    {
+        foreach ($files as $file) {
+            $imageName = $user->id.'-'.time().'-'.rand(1,36).'.'.$file->getClientOriginalExtension();
+            $orignName = $file->getClientOriginalName();
+            $extension = $file->getClientMimeType();
+            $size = $file->getSize() ;
+//            $file->move(public_path().'/uploads/tickets/', $imageName);
+            $disk = 'appointment/online/' . $appointmentMessage->id;
+            $file->store($disk , 'public');
+
+            $mime = strtok($extension, '/');
+
+            $appointmentMessage->files()->create([
+                'user_id'   => $user->id,
+                'original_name'   => $orignName,
+                'server_name'   => $imageName,
+                'disk'   => $disk,
+                'path'   => $imageName,
+                'extension'   => $extension,
+                'mime'   => $mime,
+                'size'   => $size,
+            ]);
+        }
+    }
+    public function sendMessage(AppointmentOnline $appointmentOnline , Request $request)
+    {
+        $user = auth()->user();
+        if ($user->id !=  $appointmentOnline->user->id){
+            return $this->requestException([
+                'status' => false,
+                'message' => 'نوبت متعلق به این کاربر نیست'
+            ]);
+        }
+//        if ($request->input('message') == null){
+//            return $this->requestException([
+//                'status' => false,
+//                'message' => 'وارد کردن پیغام الزامی است'
+//            ]);
+//        }
+
+        $type = AppointmentOnlineMessageTypeEnum::QUESTION;
+        if ($request->has('type') && $request->has('type') == 2){
+            $type = AppointmentOnlineMessageTypeEnum::ANSWER;
+        }
+        $message = $appointmentOnline->messages()->create([
+            'user_id' => $user->id,
+            'type' => $type,
+            'body' => $request->input('message')
+        ]);
+        if($request->hasFile('files')) {
+            $validator = Validator::make($request->all(), [
+                'files.*' => 'file|mimes:jpeg,png,jpg,gif,svg,mp4,mov,avi,wmv,pdf',
+            ]);
+
+            if ($validator->fails()) {
+                return $this->requestException([
+                    'status' => false,
+                    'message' => 'فرمت فایل های ارسالی اشتباه است',
+                    'errors' => $validator->errors()->all()
+                ]);
+            }
+
+            $files =  $request->file('files');
+            $this->uploadFiles($user, $files, $message);
+        }
+        $appointmentOnline->increment('new_messages');
+
+        $status = AppointmentOnlineStatusEnum::REPLY_BY_USER;
+        if ($request->has('type') && $request->has('type') == 2){
+            $status = AppointmentOnlineStatusEnum::ANSWER_BY_DOCTOR;
+        }
+
+        $appointmentOnline->update([
+            'status' => $status
+        ]);
+
+        return $this->ok([
+            'status' => true,
+            'message' => 'پیغام با موفقیت ارسال شد',
+            'model' => AppointmentOnlineMessagesResource::make($message)
+        ]);
+    }
+
+    public function messages(AppointmentOnline $appointmentOnline)
+    {
+        $user = auth()->user();
+        if ($user->id !=  $appointmentOnline->user->id){
+            return $this->requestException([
+                'status' => false,
+                'message' => 'نوبت متعلق به این کاربر نیست'
+            ]);
+        }
+        $appointmentOnline->update(['new_messages' => 0]);
+        $messages = $appointmentOnline->messages()->orderByDesc('id')->paginate();
+        return $this->ok(new AppointmentOnlineMessagesPaginateResource($messages));
+
+    }
 }

@@ -462,7 +462,8 @@ class AppointmentUserService
 
     private function insertOnlineAppointment(AppointmentUser $appointmentUser): void
     {
-        $status = $appointmentUser->details[AppointmentUser::DETAIL_APPOINTMENT_VIA] == AppointmentVia::SELF ? AppointmentOnlineStatusEnum::PENDING : AppointmentOnlineStatusEnum::ACCEPTED;
+//        $status = $appointmentUser->details[AppointmentUser::DETAIL_APPOINTMENT_VIA] == AppointmentVia::SELF ? AppointmentOnlineStatusEnum::PENDING : AppointmentOnlineStatusEnum::ACCEPTED;
+        $status = AppointmentOnlineStatusEnum::ACCEPTED; // TODO : Be temporarily active
 
 
         $appointmentUser->online()->create([

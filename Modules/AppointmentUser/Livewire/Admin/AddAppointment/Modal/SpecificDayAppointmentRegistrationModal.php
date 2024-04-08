@@ -55,6 +55,25 @@ class SpecificDayAppointmentRegistrationModal extends Component
 
         $this->step = 1;
     }
+    public function privousStep()
+    {
+        if ($this->step == 2) {
+            $this->form = [
+                "number" => null,
+                "document" => null,
+                "first_name" => null,
+                "last_name" => null,
+                "appType" => 'main_app',
+                "smsType" => 'send',
+            ];
+            if (isset($this->fetchData['user'])) {
+                unset($this->fetchData['user']);
+            }
+            $this->step = 1;
+        } elseif ($this->step == 3) {
+            $this->step = 2;
+        }
+    }
     public function numberSet()
     {
         if ($this->step == 1) {
@@ -70,12 +89,20 @@ class SpecificDayAppointmentRegistrationModal extends Component
                 $this->createUser();
             }
             $this->storeAppointmentByAdmin();
+        } elseif ($this->step == 3) {
+            $this->storeApp();
             $this->step = 1;
             $this->form = [
                 "number" => null,
                 "document" => null,
             ];
         }
+    }
+
+    #[On('dateHasBeenChange')]
+    public function changeAppDate($newDate)
+    {
+        $this->appDate = $newDate;
     }
     private function createUser()
     {
@@ -135,8 +162,34 @@ class SpecificDayAppointmentRegistrationModal extends Component
         $this->form['time']['from'] = $from;
         $this->form['time']['until'] = $until;
     }
+    public function IsthisTimeAvaialable($from, $until)
+    {
+        $appSetting = AppointmentSetting::find($this->appId);
+        return  app('AppointmentUserService')->isAppointmentTimeAvailable(
+            $from,
+            $until,
+            Verta::parse($this->appDate)->toCarbon()->format('Y/m/d'),
+            $appSetting
+        );
+    }
 
     public function storeAppointmentByAdmin()
+    {
+        $from = Carbon::createFromTimeString($this->form['time']['from']);
+        $until =  Carbon::createFromTimeString($this->form['time']['until']);
+        if ($from->greaterThan($until)) {
+            return $this->addError('form.time.from', 'زمان شروع نوبت نباید بزرگ تر از زمان پایان باشد');
+        } else {
+            $is_time_free = $this->IsthisTimeAvaialable($from->toDateString(), $until->toDateString());
+            if ($is_time_free) {
+                $this->storeApp();
+            } else {
+                $this->step = 3;
+            }
+            $this->render();
+        }
+    }
+    private function storeApp()
     {
         $user = $this->fetchData['user'];
         $appointmentSetting = AppointmentSetting::findOrFail($this->appId);
@@ -169,6 +222,7 @@ class SpecificDayAppointmentRegistrationModal extends Component
             placeId: $this->appId->place?->id ?? null,
             description: isset($this->form['description']) ? $this->form['description'] : '',
             type: $appointment_type,
+            endTime: Carbon::createFromTimeString($this->form['time']['until'])->toTimeString(),
         );
 
 
@@ -199,6 +253,7 @@ class SpecificDayAppointmentRegistrationModal extends Component
             'form.document_number.required_if' => 'لطفا یکی از فیلد ها را تکمیل کنید',
             'form.first_name.required' => 'وارد کردن نام الزامی است',
             'form.last_name.required' => 'وارد کردن نام خانوادگی الزامی است',
+            'form.time.from.required' => 'زمان نوبت به درستی انتخاب نشده است!',
         ];
     }
 

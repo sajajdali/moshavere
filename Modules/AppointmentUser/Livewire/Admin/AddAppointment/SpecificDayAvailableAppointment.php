@@ -12,6 +12,7 @@ use Modules\AppointmentUser\app\Models\AppointmentUser;
 use Modules\AppointmentUser\Enum\AppointmentUserTypeEnum;
 use Modules\AppointmentUser\Enum\AppointmentUserStatusEnum;
 use Modules\AppointmentSetting\app\Models\AppointmentSetting;
+use Modules\AppointmentUser\Livewire\Admin\AddAppointment\Modal\SpecificDayAppointmentRegistrationModal;
 
 class SpecificDayAvailableAppointment extends Component
 {
@@ -28,7 +29,8 @@ class SpecificDayAvailableAppointment extends Component
     }
     public function dateHasBeenChange()
     {
-        $this->dispatch('dateHasBeenChange', newDate: verta($this->fetchData['selectedDate'])->format('Y-m-d'));
+        $this->dispatch('dateHasBeenChange', newDate: verta($this->fetchData['selectedDate'])->format('Y-m-d'))->to(SpecificDayAppointmentRegistrationModal::class);
+        $this->dispatch('urlDateChange', newDate: verta($this->fetchData['selectedDate'])->format('Y-m-d'));
     }
     public function loadDifferentDayDetail()
     {
@@ -133,6 +135,7 @@ class SpecificDayAvailableAppointment extends Component
     }
     public function passTimeToRegisterAppointmentModal($from, $until)
     {
+        $this->dateHasBeenChange();
         $this->dispatch('time', from: $from, until: $until);
     }
     public function lunchAppModal()
@@ -195,6 +198,7 @@ class SpecificDayAvailableAppointment extends Component
             'date_visit' => $this->fetchData['selectedDate']->todatetimestring(),
             'start_time' => $from,
             'end_time' => $until,
+            'status' => AppointmentUserStatusEnum::STATUS_SUCCESSFUL, 
         ];
 
         // Check if the type needs to be updated

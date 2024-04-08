@@ -16,7 +16,7 @@
                     @if ($step == 1)
                         <div class="row">
                             <label for="inputPassword" class=" col-form-label">ثبت نوبت با شماره همراه </label>
-                            <input type="text" placeholder="09123456789"
+                            <input type="text" placeholder="09123456789" wire:ignore
                                 class="form-control @error('form.number') is-invalid @enderror" id="inputPassword"
                                 wire:model='form.number'>
                             @error('form.number')
@@ -31,7 +31,7 @@
                             <label for="parvande" class=" col-form-label">ثبت نوبت با شماره پرونده </label>
                             <input type="text"
                                 class="form-control @error('form.document_number') is-invalid @enderror" id="parvande"
-                                wire:model='form.document_number'>
+                                wire:ignore wire:model='form.document_number'>
                             @error('form.document_number')
                                 <span class="text-danger">{{ $message }}</span>
                             @enderror
@@ -98,7 +98,10 @@
                             <div class="col-md-8">
                                 <hr>
                             </div>
-                            <div class="collapse @if (!isset($form['time']['from'])) show @endif  row" id="timingCollaps">
+                            <div class="collapse @if (!isset($form['time']['from'])) show @endif  @error('form.time.from')
+                            show
+                            @enderror row"
+                                id="timingCollaps">
                                 <div class="col-md-6">
                                     <div class="mb-3">
                                         <input type="time" class="form-control" id="firs_name_addApp"
@@ -114,7 +117,7 @@
                             </div>
                             @error('form.time.from')
                                 <div class="col-12 mt-2">
-                                    <span class="text-danger">لطفا زمان ویزیت را انتخاب کنید</span>
+                                    <span class="text-danger">{{ $message }}</span>
                                 </div>
                             @enderror
                         </div>
@@ -202,20 +205,38 @@
                                 </div>
                             </div>
                         </div>
-                    @endif
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-success" wire:click='numberSet'
-                            wire:loading.class='btn-loading bg-gray'>
-                            @if ($step == 1)
-                                ادامه
-                            @else
-                                ثبت
-                            @endif
-                        </button>
-                        <button type="button" class="btn btn-secondary" wire:click='dismisModal'
-                            data-bs-dismiss="modal">بیخیال</button>
-                    </div>
+                    @elseif($step == 3)
+                        <div class="row my-5">
+                            <div class="alert alert-warning alert-dismissible fade show" role="alert">
+                                در ساعت انتخابی شما ، یک
+                                نوبت ثبت شده است ، آیا مایل به ثبت نوبت هستید؟
+                            </div>
 
+                        </div>
+                    @endif
+                    <div class="modal-footer d-flex justify-content-between">
+                        <div>
+                            @if ($step > 1)
+                                <button type="button" class="btn btn-gray" wire:click='privousStep'
+                                    wire:loading.class='btn-loading bg-gray'>
+                                    <i class="fa fa-arrow-right" aria-hidden="true"></i></button>
+                            @endif
+                        </div>
+                        <div>
+                            <button type="button" class="btn btn-success" wire:click='numberSet'
+                                wire:loading.class='btn-loading bg-gray'>
+                                @if ($step == 1)
+                                    ادامه
+                                @elseif($step == 2)
+                                    ثبت
+                                @elseif($step == 3)
+                                    بله ثبت شود
+                                @endif
+                            </button>
+                            <button type="button" class="btn btn-secondary" wire:click='dismisModal'
+                                data-bs-dismiss="modal">بیخیال</button>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>

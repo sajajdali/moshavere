@@ -7,6 +7,7 @@ use Illuminate\Http\Resources\Json\JsonResource;
 use Modules\Api\app\Resources\Transaction\TransactionResource;
 use Modules\Api\Transformers\UserResource;
 use Modules\AppointmentUser\app\Models\AppointmentUser;
+use Modules\AppointmentUser\Enum\AppointmentUserKindEnum;
 
 class AppointmentUserResource extends JsonResource
 {
@@ -39,6 +40,16 @@ class AppointmentUserResource extends JsonResource
     {
         return TransactionResource::make($this->transaction()->orderByDesc('id')->first());
     }
+
+    private function online()
+    {
+        if (!isset($this->details[AppointmentUser::DETAIL_APPOINTMENT_VIA]) || $this->kind != AppointmentUserKindEnum::ONLINE){
+            return null;
+        }
+        return [
+            'new_message' => 0
+        ];
+    }
     /**
      * Transform the resource into an array.
      */
@@ -64,6 +75,7 @@ class AppointmentUserResource extends JsonResource
             'transaction' => $this->lastTransaction(),
             'payment_status' => $this->details[AppointmentUser::DETAIL_PAYMENT] ?? null,
             'payment_link' => route('appointmentUser.payment', $this),
+            'online' => $this->online()
         ];
     }
 }

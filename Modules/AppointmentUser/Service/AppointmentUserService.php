@@ -2,6 +2,8 @@
 
 namespace Modules\AppointmentUser\Service;
 
+use Modules\AppointmentUser\app\Models\AppointmentOnline;
+use Modules\AppointmentUser\Enum\AppointmentOnlineStatusEnum;
 use Verta;
 use App\Event;
 use Carbon\Carbon;
@@ -458,6 +460,20 @@ class AppointmentUserService
         ]);
     }
 
+    private function insertOnlineAppointment(AppointmentUser $appointmentUser): void
+    {
+        $status = $appointmentUser->details[AppointmentUser::DETAIL_APPOINTMENT_VIA] == AppointmentVia::SELF ? AppointmentOnlineStatusEnum::PENDING : AppointmentOnlineStatusEnum::ACCEPTED;
+
+
+        $appointmentUser->online()->create([
+            'appointment_setting_id' => $appointmentUser->setting->id,
+            'user_id' => $appointmentUser->user->id,
+            'doctor_id' => $appointmentUser->doctor->id,
+            'tracking_code' => AppointmentOnline::generateTrackingCode(),
+            'status' => $status,
+            'date_visit' => $appointmentUser->date_visit,
+        ]);
+    }
     public function storeAppointment(AppointmentSetting $appointmentSetting, UserModelAppointment $userModelAppointment, AppointmentModel $appointmentData, $detail = [])
     {
 
@@ -513,7 +529,6 @@ class AppointmentUserService
             'end_time' => $endTime,
             'date_visit' => $visitDateTime->toDateTimeString(),
             'user_ip' => ip(),
-
         ];
         if ($appointmentData->kind == AppointmentUserKindEnum::ONLINE) {
             $appointmentUserModel['start_time'] = null;
@@ -522,6 +537,8 @@ class AppointmentUserService
         $detailDatabaseDB['payment'] = [
             'status' => false,
         ];
+
+
 
         //description for app
         if($appointmentData->description) {
@@ -555,10 +572,16 @@ class AppointmentUserService
             $detailDatabaseDB[AppointmentUser::DETAIL_QUESTION] = $detailAppointment[AppointmentUser::DETAIL_QUESTION];
         }
 
+        $detailDatabaseDB[AppointmentUser::DETAIL_APPOINTMENT_VIA] = $appointmentData->appointmentVia;
         $appointmentUserModel['details'] = $detailDatabaseDB;
 
         // store appointment in DB
         $appointmentUser = $appointmentSetting->appointmentUsers()->create($appointmentUserModel);
+
+        // insert online appointment
+        if ($appointmentData->kind == AppointmentUserKindEnum::ONLINE){
+            $this->insertOnlineAppointment($appointmentUser);
+        }
 
         // send sms
         if(isset($smsTemplate)) {

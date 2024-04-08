@@ -13,10 +13,11 @@ class AppointmentOnlineMessage extends Model
     /**
      * The attributes that are mass assignable.
      */
-    protected $fillable = [];
-    
-    protected static function newFactory(): AppointmentOnlineMessageFactory
+    protected $guarded = ['id'];
+
+    public function files(): \Illuminate\Database\Eloquent\Relations\HasMany
     {
-        //return AppointmentOnlineMessageFactory::new();
+        return $this->hasMany(AppointmentOnlineMessageFile::class );
     }
+
 }

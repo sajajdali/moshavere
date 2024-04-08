@@ -23,7 +23,7 @@ class AppointmentOnline extends Model
      */
     protected $guarded = ['id'];
 
-    public function AppointmentUser(): \Illuminate\Database\Eloquent\Relations\BelongsTo
+    public function appointmentUser(): \Illuminate\Database\Eloquent\Relations\BelongsTo
     {
         return $this->belongsTo(AppointmentUser::class , 'id');
     }

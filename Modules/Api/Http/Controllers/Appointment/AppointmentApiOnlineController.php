@@ -21,13 +21,15 @@ class AppointmentApiOnlineController extends Controller
     private function uploadFiles($user , $files , $appointmentMessage)
     {
         foreach ($files as $file) {
-            $imageName = $user->id.'-'.time().'-'.rand(1,36).'.'.$file->getClientOriginalExtension();
             $orignName = $file->getClientOriginalName();
             $extension = $file->getClientMimeType();
-            $size = $file->getSize() ;
-//            $file->move(public_path().'/uploads/tickets/', $imageName);
-            $disk = 'appointment/online/' . $appointmentMessage->id;
-            $file->store($disk , 'public');
+            $size = $file->getSize();
+
+            $disk = 'appointment/online/' . $appointmentMessage->online->appointmentUser->id .'/' ;
+            $name = $file->store($disk , 'public');
+
+            $imageName = basename($name);
+
 
             $mime = strtok($extension, '/');
 

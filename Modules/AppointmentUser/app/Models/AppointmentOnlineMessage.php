@@ -33,6 +33,11 @@ class AppointmentOnlineMessage extends Model
         return $this->belongsTo(User::class);
     }
 
+    public function online(): \Illuminate\Database\Eloquent\Relations\BelongsTo
+    {
+        return $this->belongsTo(AppointmentOnline::class , 'appointment_online_id');
+    }
+
     public function answerBy()
     {
         return $this->belongsTo(User::class , 'answer_by');

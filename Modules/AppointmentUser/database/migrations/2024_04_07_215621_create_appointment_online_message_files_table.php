@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
             $table->foreignIdFor(\Modules\User\Entities\User::class)->nullable()->constrained()->cascadeOnDelete();
             $table->foreignIdFor(\Modules\User\Entities\User::class,'answer_by')->nullable()->constrained('users')->cascadeOnDelete();
-            $table->foreignIdFor(\Modules\AppointmentUser\app\Models\AppointmentOnlineMessage::class)->nullable()->constrained()->cascadeOnDelete();
+            $table->foreignIdFor(\Modules\AppointmentUser\app\Models\AppointmentOnlineMessage::class ,'fk_id')->comment('appointment_online_message_id')->nullable()->constrained('appointment_online_messages' )->cascadeOnDelete();
             $table->string('original_name')->nullable();
             $table->string('server_name')->nullable();
             $table->string('disk')->nullable();
@@ -25,6 +25,8 @@ return new class extends Migration
             $table->integer('size')->default(0)->nullable();
             $table->softDeletes();
             $table->timestamps();
+
+
         });
     }
 

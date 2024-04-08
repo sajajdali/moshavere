@@ -42,7 +42,7 @@ class AppointmentUser extends Model
 
     public function setting()
     {
-        return $this->belongsTo(AppointmentSetting::class);
+        return $this->belongsTo(AppointmentSetting::class , 'appointment_setting_id');
     }
 
     public static function generateTrackingCode(): string
@@ -100,5 +100,15 @@ class AppointmentUser extends Model
             AppointmentUserStatusEnum::STATUS_ATTENDED => 'table-secondary',
             AppointmentUserStatusEnum::STATUS_NOT_ATTENDED => 'table-primary',
         };
+    }
+
+    public function online(): \Illuminate\Database\Eloquent\Relations\HasMany
+    {
+        return $this->hasMany(AppointmentOnline::class);
+    }
+
+    protected function asJson($value)
+    {
+        return json_encode($value, JSON_UNESCAPED_UNICODE);
     }
 }

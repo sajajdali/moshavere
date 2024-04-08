@@ -209,7 +209,7 @@ class AppointmentApiController extends Controller
         $kind = $request->input('kind') == 2 ? AppointmentUserKindEnum::ONLINE : AppointmentUserKindEnum::IN_PERSION;
         // appointment model
         $appointmentModel = new AppointmentModel(
-            timestamp: $request->input('timestamp'),
+            timestamp: $request->input('timestamp') ?? null,
             appointmentVia: AppointmentVia::SELF,
             sendSmsToUser: true,
             serviceId: $request->input('service_id'),

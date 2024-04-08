@@ -18,11 +18,11 @@ return new class extends Migration
             $table->foreignIdFor(\Modules\User\Entities\User::class)->nullable()->constrained()->cascadeOnDelete();
             $table->foreignIdFor(\Modules\User\Entities\User::class,'doctor_id')->nullable()->constrained('users')->cascadeOnDelete();
             $table->string('tracking_code' , 20)->nullable();
-            $table->tinyInteger('status')->default(1);
-            $table->tinyInteger('message_status')->default(0)->comment("0 = new | 1 = question user | 2 = close | 3 = reject | 9 = answered");
+            $table->tinyInteger('status')->default(0);
             $table->timestamp('date_visit')->nullable();
             $table->json('details')->nullable();
             $table->smallInteger('new_messages')->default(0);
+            $table->timestamp('close_at')->nullable();
             $table->softDeletes();
             $table->timestamps();
         });

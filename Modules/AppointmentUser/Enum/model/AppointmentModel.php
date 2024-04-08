@@ -11,17 +11,21 @@ class AppointmentModel
     // public ?string $description ;
 
     /**
-     * @param int $timestamp
+     * @param int|null $timestamp
      * @param AppointmentVia $appointmentVia
      * @param bool $sendSmsToUser
      * @param int|null $serviceId
      * @param int|null $placeId
+     * @param int|null $agentId
+     * @param int|null $operatorId
+     * @param AppointmentUserKindEnum|null $kind
+     * @param bool|null $smsToDoctor
      * @param string|null $description
-     * @param AppointmentUserTypeEnum $type
+     * @param AppointmentUserTypeEnum|null $type
      * @param string|null $endTime
      */
     public function __construct(
-        public int $timestamp,
+        public ?int $timestamp = null,
         public AppointmentVia $appointmentVia = AppointmentVia::SELF,
         public bool $sendSmsToUser = true,
         public ?int $serviceId = null,

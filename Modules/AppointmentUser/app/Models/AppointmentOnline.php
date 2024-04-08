@@ -3,12 +3,17 @@
 namespace Modules\AppointmentUser\app\Models;
 
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Modules\AppointmentUser\Database\factories\AppointmentOnlineFactory;
+use Illuminate\Database\Eloquent\SoftDeletes;
+use Modules\AppointmentUser\Enum\AppointmentOnlineStatusEnum;
 
 class AppointmentOnline extends Model
 {
-    use HasFactory;
+    use  SoftDeletes;
+
+    protected $casts = [
+        'status' => AppointmentOnlineStatusEnum::class,
+        'json' => 'json',
+    ];
 
     protected $table = 'appointment_online';
 
@@ -17,8 +22,26 @@ class AppointmentOnline extends Model
      */
     protected $guarded = ['id'];
 
-    protected static function newFactory(): AppointmentOnlineFactory
+    public function AppointmentUser(): \Illuminate\Database\Eloquent\Relations\BelongsTo
     {
-        //return AppointmentOnlineFactory::new();
+        return $this->belongsTo(AppointmentUser::class , 'id');
     }
+
+    public static function generateTrackingCode(): string
+    {
+        do {
+            $uniqueCode = generateUniqueCode(8, true);
+        } while (static::where('tracking_code', $uniqueCode)->exists());
+
+        // Insert the unique code into the "transaction" table
+        return $uniqueCode;
+    }
+
+    protected function asJson($value)
+    {
+        return json_encode($value, JSON_UNESCAPED_UNICODE);
+    }
+
+
+
 }

@@ -3,12 +3,17 @@
         <div>
             <h1 class="page-title">لیست نوبت های ثبت شده</h1>
         </div>
-        <a href="{{ route('admin.appointment.add.sectionList') }}" class="btn btn-primary" aria-expanded="false"
+        <a href="{{ route('admin.appointment.doctor.list') }}" class="btn btn-primary" aria-expanded="false"
             aria-controls="customDate">افزودن نوبت</a>
     </div>
     @include('admin::layouts.components.alert')
-
-    <div class="row row-sm" wire:key='{{\uniqid()}}'>
+    @error('exelError')
+        <div class="col-md-12 alert alert-danger fade show" role="alert">
+            <i class="fa fa-remove me-2" aria-hidden="true"></i>
+            {{ $message }}
+        </div>
+    @enderror
+    <div class="row row-sm" wire:key='{{ \uniqid() }}'>
         <div class="col-lg-12">
             <div class="card custom-card">
                 <div class="card-header d-flex justify-content-between border-bottom">
@@ -93,12 +98,17 @@
                             <div class="col-12 col-md-9">
                                 <hr class="my-4">
                             </div>
-                            <div class="collapse row" id="appointmentCollapsSearch">
+                            <div class="collapse row
+                            @if (isset($search['appointment_date']) ||
+                                    isset($search['appointment_set_date']) ||
+                                    isset($search['appointment_star_date']) ||
+                                    isset($search['appointment_end_date'])) show @endif"
+                                id="appointmentCollapsSearch" wire:ignore.self>
                                 <div class="col-md-6">
                                     <label for="search-appointment_date" class="form-label"><strong>زمان
                                             نوبت</strong></label>
                                     <input class="form-control" id="search-appointment_date"
-                                        wire:model="search.appointment_date" wire:ignore
+                                        wire:model="search.appointment_date"
                                         placeholder="زمانی که نوبت دریافت شده" type="text">
 
                                 </div>
@@ -107,8 +117,24 @@
                                             ثبت
                                             نوبت</strong></label>
                                     <input class="form-control" id="search-appointment_set_date"
-                                        wire:model="search.appointment_set_date" wire:ignore
+                                        wire:model="search.appointment_set_date"
                                         placeholder="زمانی که نوبت ثبت شده" type="text">
+
+                                </div>
+                                <div class="col-md-6">
+                                    <label for="search-id-appointment_star_date" class="form-label"><strong>تاریخ
+                                            شروع</strong></label>
+                                    <input class="form-control" id="search-appointment_star_date"
+                                        wire:model="search.appointment_star_date"
+                                        placeholder="نوبت های از این تاریخ به بعد" type="text">
+
+                                </div>
+                                <div class="col-md-6">
+                                    <label for="search-id-appointment_end_date" class="form-label"><strong>تاریخ
+                                            پایان</strong></label>
+                                    <input class="form-control" id="search-appointment_end_date"
+                                        wire:model="search.appointment_end_date"
+                                        placeholder="نوبت هایی ازین تاریخ به قبل" type="text">
 
                                 </div>
                                 <div class="col-md-6">
@@ -245,7 +271,7 @@
                         <thead>
                             <tr>
                                 <th scope="col">#</th>
-                                <th scope="col">انتخاب</th>
+                                {{-- <th scope="col">انتخاب</th> --}}
                                 <th scope="col">نوع نوبت</th>
                                 <th scope="col">ثبت شده توسط</th>
                                 <th scope="col">نام کاربر</th>
@@ -267,13 +293,13 @@
                                     <tr class="text-center {{ $ap->status->getColor() }}"
                                         wire:key='appoimt_{{ $ap->id }}'>
                                         <td>{{ $ap->id }}</td>
-                                        <td class="p-4">
+                                        {{-- <td class="p-4">
                                             <label class="mt-1" for="checkbox-{{ $ap->id }}">
                                                 <input wire:model='form.checkbox.{{ $ap->id }}'
                                                     class="" id="checkbox-{{ $ap->id }}"
                                                     type="checkbox" value="">
                                             </label>
-                                        </td>
+                                        </td> --}}
                                         <td>
                                             {!! $ap->kind->getIcon() !!}
                                         </td>
@@ -288,7 +314,7 @@
                                         <td>{{ $ap->user->mobile }}</td>
                                         <td>{{ $ap->user->document_number ?? '---' }}</td>
                                         <td>{{ $ap->doctor->full_name }}</td>
-                                        <td>{{ $ap->service->title }}</td>
+                                        <td>{{ $ap->service?->title }}</td>
                                         <td>
                                             {{ verta($ap->start_time)->format('H:i') }}
                                             <strong>
@@ -338,7 +364,7 @@
                                         <div class="alert alert-info alert-dismissible fade show" role="alert">
                                             <strong>توجه!</strong> نوبتی یافت نشد
                                             <a type="button" class="btn btn-info"
-                                                href="{{ route('admin.appointment.add.sectionList') }}">
+                                                href="{{ route('admin.appointment.doctor.list') }}">
                                                 ثبت نوبت
                                             </a>
                                         </div>
@@ -353,6 +379,10 @@
                 </div>
             </div>
         </div>
+        <div class="text-end">
+            <button wire:loading.class='btn-loading bg-gray' wire:target='ExportData' wire:click='ExportData'
+                class="btn btn-info">دانلود خروجی اکسل</button>
+        </div>
     </div>
 </div>
 
@@ -364,23 +394,50 @@
 <script src="{{ admin_asset('plugins/select2/select2.full.min.js') }}"></script>
 <script>
     $(document).ready(function() {
-        $('.select2-show-search').select2();
-        $('#search-appointment_date').persianDatepicker({
-            initialValue: false,
-            format: 'L',
-            autoClose: true,
-            onSelect: function(unix) {
-                @this.set('search.appointment_date', $('#search-appointment_date').val());
-            }
-        });
-        $('#search-appointment_set_date').persianDatepicker({
-            initialValue: false,
-            format: 'L',
-            autoClose: true,
-            onSelect: function(unix) {
-                @this.set('search.appointment_set_date', $('#search-appointment_set_date').val());
-            }
-        });
+        function js() {
+            $('.select2-show-search').select2();
+            $('#search-appointment_date').persianDatepicker({
+                initialValue: false,
+                format: 'L',
+                autoClose: true,
+                onSelect: function(unix) {
+                    @this.set('search.appointment_date', $('#search-appointment_date').val());
+                }
+            });
+            $('#search-appointment_set_date').persianDatepicker({
+                initialValue: false,
+                format: 'L',
+                autoClose: true,
+                onSelect: function(unix) {
+                    @this.set('search.appointment_set_date', $('#search-appointment_set_date')
+                        .val());
+                }
+            });
+            $('#search-appointment_end_date').persianDatepicker({
+                initialValue: false,
+                format: 'L',
+                autoClose: true,
+                onSelect: function(unix) {
+                    @this.set('search.appointment_end_date', $('#search-appointment_end_date')
+                        .val());
+                }
+            });
+            $('#search-appointment_star_date').persianDatepicker({
+                initialValue: false,
+                format: 'L',
+                autoClose: true,
+                onSelect: function(unix) {
+                    @this.set('search.appointment_star_date', $('#search-appointment_star_date')
+                        .val());
+                }
+            });
+        }
+        js();
+        Livewire.on('loadJs', function() {
+            setTimeout(() => {
+                js();
+            }, 500);
+        })
     });
 </script>
 @endpush

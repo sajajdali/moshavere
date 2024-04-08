@@ -262,6 +262,14 @@ class SpecificDayAppointmentRegistrationModal extends Component
 
         if (isset($this->appId)) {
             $app =  AppointmentSetting::find($this->appId);
+            $this->fetchData['app_kind'] =
+                [
+                    'online'    => isset($app->detail[AppointmentSetting::VISIT_TYPE_INPERSON]) ? $app->detail[AppointmentSetting::VISIT_TYPE_INPERSON] : false,
+                    'in_person' => isset($app->detail[AppointmentSetting::VISIT_TYPE_ONLINE])   ? $app->detail[AppointmentSetting::VISIT_TYPE_ONLINE]   : false,
+                ];
+            if ($this->fetchData['app_kind']['online'] && $this->fetchData['app_kind']['in_person']) {
+                $this->form['kind'] = 'in_person';
+            }
         }
         if (isset($this->appTime) && !empty($this->appTime)) {
             $this->form['time']['from'] = $this->appTime;

@@ -172,6 +172,41 @@
                                 </div>
                             </div>
                         </div>
+                        @if($fetchData['app_kind']['online'] && $fetchData['app_kind']['in_person']  )
+                        <div class="row my-5">
+                            <div class="col-md-4">
+                                <a class="text-primary" data-bs-toggle="collapse" href="#appKind"
+                                    role="button" aria-expanded="false" aria-controls="appKind">
+                                    <i class="fa fa-comments-o me-1 text-primary" aria-hidden="true"></i>
+                                    <strong>وضعیت نوبت</strong>
+                                </a>
+                            </div>
+                            <div class="col-md-8">
+                                <hr>
+                            </div>
+                            <div class="collapse row show mt-2" id="appKind">
+                                <div class="col-6">
+                                    <div class="form-check">
+                                        <input class="form-check-input" checked type="radio"
+                                            wire:model='form.kind'  value="in_person" name="smsStatusType"
+                                            id="smsStatusType1">
+                                        <label class="form-check-label" for="smsStatusType1">
+                                            نوبت حضوری
+                                        </label>
+                                    </div>
+                                </div>
+                                <div class="col-6">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="radio" name="smsStatusType"
+                                            wire:model='form.kind'  value="online" id="smsStatusType2">
+                                        <label class="form-check-label" for="smsStatusType2">
+                                            نوبت آنلاین
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        @endif
                         <div class="row my-5">
                             <div class="col-md-4">
                                 <a class="text-primary" data-bs-toggle="collapse" href="#smsStatusCollaps"

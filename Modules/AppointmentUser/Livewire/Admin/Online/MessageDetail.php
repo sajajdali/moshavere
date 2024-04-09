@@ -5,7 +5,12 @@ namespace Modules\AppointmentUser\Livewire\Admin\Online;
 use Livewire\Component;
 use Livewire\Attributes\Url;
 use Livewire\Attributes\Computed;
+use Illuminate\Support\Facades\Storage;
 use Modules\AppointmentUser\app\Models\AppointmentOnline;
+use Modules\AppointmentUser\app\Models\AppointmentOnlineMessage;
+use Modules\AppointmentUser\Enum\AppointmentOnlineMessageSeenEnum;
+use Modules\AppointmentUser\Enum\AppointmentOnlineMessageTypeEnum;
+use Modules\AppointmentUser\app\Models\AppointmentOnlineMessageFile;
 
 class MessageDetail extends Component
 {
@@ -17,13 +22,75 @@ class MessageDetail extends Component
     {
         $this->getMessages();
     }
-    public function ignoreSearch() {
+    public function ignoreSearch()
+    {
         unset($this->search);
         $this->fetchData['messages'] = $this->fetchData['appOnline']->messages;
         $this->getMessages();
     }
+
+    public function sendMessage()
+    {
+        $this->validate([
+            'form.typedMessage' => 'required_without:form.file',
+
+        ]);
+        $model = [
+            'appointment_online_id' =>  $this->fetchData['appOnline']->id,
+            'user_id'               =>  $this->fetchData['user']->id,
+            'answer_by'             =>  auth()->user()->id,
+            'type'                  =>  AppointmentOnlineMessageTypeEnum::ANSWER,
+            'seen'                  =>  AppointmentOnlineMessageSeenEnum::UNSEEN,
+            'body'                  =>  isset($this->form['typedMessage']) ? $this->form['typedMessage'] : '',
+        ];
+        $AOM =  AppointmentOnlineMessage::create($model);
+        if (isset($this->form['file'])) {
+            $url = $this->form['file'];
+            // Parse the URL
+            $parsedUrl = parse_url($url);
+
+            // Get the file path
+            $filePath = str_replace('/storage/', '', $parsedUrl['path']);
+            // Get the file name
+            $fileName = basename($filePath);
+
+            // Get the file mime type
+            $fileMime = Storage::mimeType($filePath);
+
+            // Get the file size
+            $fileSize = Storage::size('/public/' . $filePath);
+
+            // Get the disk
+            $fileDisk = 'public';
+            $extension = pathinfo($parsedUrl['path'], PATHINFO_EXTENSION);
+
+            $fileModel = [
+                'user_id' => $this->fetchData['user']->id,
+                'answer_by' => auth()->user()->id,
+                'fk_id' => $AOM->id,
+                'original_name' => $fileName,
+                'server_name' => $fileName,
+                'disk' => $fileDisk,
+                'path' => $filePath,
+                'extension' => $extension,
+                'mime' => $fileMime,
+                'size' => $fileSize,
+            ];
+            AppointmentOnlineMessageFile::create($fileModel);
+            unset($this->form['file']);
+        }
+        unset($this->form['typedMessage']);
+        $this->addError('success', 'پیام با موفقیت ارسال شد');
+        $this->getMessagesBodys();
+    }
+    public function messages()
+    {
+        return [
+            'form.typedMessage.required_without' => 'لطفا پیام را وارد کنید',
+        ];
+    }
     #[Computed]
-    public function getMessages()
+    public function getMessagesBodys()
     {
         if (isset($this->search)) {
             $this->fetchData['messages'] =  $this->fetchData['appOnline']->messages()->where('body', 'LIKE', "%{$this->search}%")->get();

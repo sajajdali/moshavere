@@ -14,9 +14,13 @@ class AppointmentOnlineMessageFile extends Model
      */
     protected $guarded = ['id'];
 
-    public function message(): \Illuminate\Database\Eloquent\Relations\BelongsTo
+    public function appointmentOnline()
     {
-        return $this->belongsTo(AppointmentOnlineMessage::class , 'fk_id');
+        return $this->belongsTo(AppointmentOnline::class, 'fk_id', 'id');
     }
 
+    public function message(): \Illuminate\Database\Eloquent\Relations\BelongsTo
+    {
+        return $this->belongsTo(AppointmentOnlineMessage::class, 'fk_id');
+    }
 }

@@ -7,6 +7,12 @@
     </div>
     <!-- PAGE-HEADER END -->
     @include('admin::layouts.components.alert')
+    @error('success')
+        <div class="col-md-12 alert alert-success fade show" role="alert">
+            <i class="fa fa-check-circle-o me-2" aria-hidden="true"></i>
+            {{ $message }}
+        </div>
+    @enderror
     <div class="row row-deck">
         <div class="col-md-4">
             <div class="card">
@@ -100,17 +106,25 @@
                         <!-- main-chat-header -->
                         <div class="main-chat-body flex-2" id="ChatBody">
                             <div class="content-inner">
-                                @if (!empty($this->getMessages()) && $this->getMessages()->isNotEmpty())
-                                    @foreach ($this->getMessages() as $date => $messages)
+                                @if (!empty($this->getMessagesBodys()) && $this->getMessagesBodys()->isNotEmpty())
+                                    @foreach ($this->getMessagesBodys() as $date => $messages)
                                         <label class="main-chat-time"><span>{{ $date }}</span></label>
                                         @foreach ($messages as $message)
+                                            @continue($message->id != 9)
+
                                             @if ($message->user_id == $fetchData['user']->id)
                                                 <div class="media flex-row-reverse chat-right">
                                                     <div class="main-img-user online"><img alt="avatar"
                                                             src="{{ $message->user->avatar }}"></div>
                                                     <div class="media-body">
                                                         <div class="main-msg-wrapper">
-                                                            {{ $message->body }}
+                                                            @if ($message->body == null)
+                                                            @dd($message->messageFile)
+                                                                <button><i class="fa fa-download"
+                                                                        aria-hidden="true"></i>{{ $message->file->original_name }}</button>
+                                                            @else
+                                                                {{ $message->body }}
+                                                            @endif
                                                         </div>
                                                         <div>
                                                             <span>{{ $message->created_at->format('H:i') }}</span> <a
@@ -125,7 +139,7 @@
                                                             src="{{ $message->user->avatar }}"></div>
                                                     <div class="media-body">
                                                         <div class="main-msg-wrapper">
-                                                            {{ $message->body }}
+                                                            {{ $message->body ?? $message->file->original_name }}
                                                         </div>
                                                         <div>
                                                             <span>{{ $message->created_at->format('H:i') }}</span> <a
@@ -146,10 +160,21 @@
                             </div>
                         </div>
                         <div class="main-chat-footer pt-5">
-                            <input class="form-control" placeholder="متن خود را یادداشت کنید" type="text">
-                            <a class="nav-link" href="javascript:void(0)"><i class="fe fe-paperclip"></i></a>
-                            <button type="button" class="btn btn-icon  btn-primary brround"><i
-                                    class="fa fa-paper-plane-o"></i></button>
+                            <input class="form-control @error('form.typedMessage') is-invalid @enderror"
+                                wire:model='form.typedMessage'
+                                placeholder="@error('form.typedMessage') {{ $message }} @else متن خود را یادداشت کنید @enderror "
+                                type="text">
+                            <button data-bs-target="#file-selector-modal" data-bs-toggle="modal" class="nav-link"
+                                href="javascript:void(0)">
+                                @if (isset($form['file']))
+                                    <i class="fa fa-check" aria-hidden="true"></i>
+                                @else
+                                    <i class="fe fe-paperclip"></i>
+                                @endif
+                            </button>
+                            <button wire:click='sendMessage' wire:target='sendMessage'
+                                wire:loading.class='btn-loading' wire:loading.attr='disabeld' type="button"
+                                class="btn btn-icon  btn-primary brround"><i class="fa fa-paper-plane-o"></i></button>
                             <nav class="nav">
                             </nav>
                         </div>
@@ -158,4 +183,16 @@
             </div>
         </div>
     </div>
+    <livewire:admin::file-manager-modal />
 </div>
+@push('scripts')
+    <script>
+        $(document).ready(function() {
+            Livewire.on('select_file', (param) => {
+                console.log(param.url);
+                @this.set('form.file', param.url);
+                $('#file-selector-modal').modal('hide');
+            });
+        });
+    </script>
+@endpush

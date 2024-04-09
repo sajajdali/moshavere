@@ -25,9 +25,9 @@ class AppointmentOnlineMessage extends Model
         'details' => 'json',
     ];
 
-    public function files(): \Illuminate\Database\Eloquent\Relations\HasMany
+    public function messageFile()
     {
-        return $this->hasMany(AppointmentOnlineMessageFile::class ,'fk_id' );
+        return $this->hasMany(AppointmentOnlineMessageFile::class, 'id', 'fk_id');
     }
 
 

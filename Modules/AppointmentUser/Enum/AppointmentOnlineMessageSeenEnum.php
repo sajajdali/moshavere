@@ -7,13 +7,13 @@ use App\interface\EnumHasApiResultInterface;
 enum AppointmentOnlineMessageSeenEnum: int implements EnumHasApiResultInterface
 {
     case SEEN = 0;
-    case UNSEEM = 1;
+    case UNSEEN = 1;
 
     public function getName(): string
     {
         return match ($this) {
             self::SEEN      => 'دیده شده',
-            self::UNSEEM   => 'دیده نشده',
+            self::UNSEEN   => 'دیده نشده',
         };
     }
 

@@ -43,7 +43,7 @@
                     </div>
                     {{-- search inputs --}}
                     <div class="card-body d-flex py-2">
-                        <div class="collapse  @foreach ($search as $key => $value)
+                        <div class="collapse w-100  @foreach ($search as $key => $value)
                             @if ($value !== null) show @break @endif @endforeach "
                             id="advanceSearch" wire:ignore.self>
                             <form class="form-horizontal example" autocomplete="off">
@@ -198,15 +198,16 @@
                     <div class="tab-content main-chat-list flex-2" wire:loading.class='opacity-50'>
                         <div class="tab-pane active" id="ChatList">
                             <div class="main-chat-list tab-pane">
-                                @foreach ($this->handleSearch() as $messages)
-                                    <a class="media new" href="#">
+                                @foreach ($this->handleSearch() as $OnlineApp)
+                                    <a class="media new"
+                                        href="{{ route('admin.appointment_user.message.detail', ['onlineAppId' => $OnlineApp->id]) }}">
                                         <div class="main-img-user">
-                                            <img alt="" src="{{ asset('assets/images/users/6.jpg') }}">
-                                            <span>3</span>
+                                            <img alt="" src="{{ $OnlineApp->avatar }}">
+                                            <span>5</span>
                                         </div>
                                         <div class="media-body">
                                             <div class="media-contact-name">
-                                                <span>Ariana Monino</span> <span>30 min</span>
+                                                <span>{{ $OnlineApp->user->fullName }}</span> <span>30 min</span>
                                             </div>
                                             <p>Good Morning</p>
                                         </div>
@@ -236,6 +237,7 @@
     </div>
 </div>
 @push('scripts')
+
     <script>
         $(document).ready(function() {
             function js() {

@@ -93,9 +93,7 @@
                                                             @endif
                                                         @else
                                                             <button type="button" style="width: 124px"
-                                                                data-time-start="10:30" data-bs-toggle="modal"
-                                                                data-bs-target="#RegistrAnAppointment"
-                                                                data-time-end="10:45"
+                                                                data-time-start="10:30" data-time-end="10:45"
                                                                 wire:click='passTimeToRegisterAppointmentModal("{{ $eachTime['from'] }}","{{ $eachTime['until'] }}")'
                                                                 class="btn btn-sm btn-success btn-block">ثبت
                                                                 نوبت</button>
@@ -200,9 +198,7 @@
                                                             @endif
                                                         @else
                                                             <button type="button" style="width: 124px"
-                                                                data-time-start="10:30" data-bs-toggle="modal"
-                                                                data-bs-target="#RegistrAnAppointment"
-                                                                data-time-end="10:45"
+                                                                data-time-start="10:30" data-time-end="10:45"
                                                                 wire:click='passTimeToRegisterAppointmentModal("{{ $eachTime['from'] }}","{{ $eachTime['until'] }}")'
                                                                 class="btn btn-sm btn-success btn-block">ثبت
                                                                 نوبت</button>
@@ -264,6 +260,11 @@
                 });
             };
             addJs();
+            Livewire.on('lunchRegisterModal', function() {
+                setTimeout(() => {
+                    setAppModalInst.show();
+                }, 500);
+            });
             Livewire.on('loadJs', function() {
                 setTimeout(() => {
                     addJs();

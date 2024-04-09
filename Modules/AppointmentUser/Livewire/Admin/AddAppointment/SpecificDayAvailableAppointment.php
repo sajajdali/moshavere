@@ -137,6 +137,7 @@ class SpecificDayAvailableAppointment extends Component
     {
         $this->dateHasBeenChange();
         $this->dispatch('time', from: $from, until: $until);
+        $this->dispatch('lunchRegisterModal',true);
     }
     public function lunchAppModal()
     {
@@ -198,7 +199,7 @@ class SpecificDayAvailableAppointment extends Component
             'date_visit' => $this->fetchData['selectedDate']->todatetimestring(),
             'start_time' => $from,
             'end_time' => $until,
-            'status' => AppointmentUserStatusEnum::STATUS_SUCCESSFUL, 
+            'status' => AppointmentUserStatusEnum::STATUS_SUCCESSFUL,
         ];
 
         // Check if the type needs to be updated

@@ -31,7 +31,7 @@
                             <label for="parvande" class=" col-form-label">ثبت نوبت با شماره پرونده </label>
                             <input type="text"
                                 class="form-control @error('form.document_number') is-invalid @enderror" id="parvande"
-                                wire:ignore wire:model='form.document_number'>
+                                wire:loading.attr="disabled" wire:model='form.document_number'>
                             @error('form.document_number')
                                 <span class="text-danger">{{ $message }}</span>
                             @enderror
@@ -177,8 +177,8 @@
                             <div class="col-md-4">
                                 <a class="text-primary" data-bs-toggle="collapse" href="#appKind"
                                     role="button" aria-expanded="false" aria-controls="appKind">
-                                    <i class="fa fa-comments-o me-1 text-primary" aria-hidden="true"></i>
-                                    <strong>وضعیت نوبت</strong>
+                                    <i class="fa fa-comments-o me-1 @error('AppKind') text-danger @else text-primary @enderror" aria-hidden="true"></i>
+                                    <strong class="@error('AppKind') text-danger @else text-primary @enderror">وضعیت نوبت</strong>
                                 </a>
                             </div>
                             <div class="col-md-8">
@@ -188,22 +188,25 @@
                                 <div class="col-6">
                                     <div class="form-check">
                                         <input class="form-check-input" checked type="radio"
-                                            wire:model='form.kind'  value="in_person" name="smsStatusType"
-                                            id="smsStatusType1">
-                                        <label class="form-check-label" for="smsStatusType1">
+                                            wire:model='form.kind'  value="{{Modules\AppointmentUser\Enum\AppointmentUserKindEnum::IN_PERSION}}" name="appointmentKind"
+                                            id="appKind1">
+                                        <label class="form-check-label" for="appKind1">
                                             نوبت حضوری
                                         </label>
                                     </div>
                                 </div>
                                 <div class="col-6">
                                     <div class="form-check">
-                                        <input class="form-check-input" type="radio" name="smsStatusType"
-                                            wire:model='form.kind'  value="online" id="smsStatusType2">
-                                        <label class="form-check-label" for="smsStatusType2">
+                                        <input class="form-check-input" type="radio" name="appointmentKind"
+                                            wire:model='form.kind'  value="{{Modules\AppointmentUser\Enum\AppointmentUserKindEnum::ONLINE}}" id="appKind2">
+                                        <label class="form-check-label" for="appKind2">
                                             نوبت آنلاین
                                         </label>
                                     </div>
                                 </div>
+                                @error('appKind')
+                                    <span class="text-danger">{{$message}}</span>
+                                @enderror
                             </div>
                         </div>
                         @endif

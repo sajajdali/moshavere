@@ -13,6 +13,7 @@ use Modules\AppointmentUser\Enum\AppointmentVia;
 use Modules\AppointmentUser\Enum\model\UserModel;
 use Modules\AppointmentUser\app\Models\AppointmentUser;
 use Modules\AppointmentUser\Enum\model\AppointmentModel;
+use Modules\AppointmentUser\Enum\AppointmentUserKindEnum;
 use Modules\AppointmentUser\Enum\AppointmentUserTypeEnum;
 use Modules\AppointmentUser\Enum\model\UserModelAppointment;
 use Modules\AppointmentSetting\app\Models\AppointmentSetting;
@@ -27,6 +28,7 @@ class SpecificDayAppointmentRegistrationModal extends Component
         "last_name" => null,
         "appType" => 'main_app',
         "smsType" => 'send',
+        "kind" => AppointmentUserKindEnum::IN_PERSION,
     ];
     // "appType" => keys : main , subMainApp ;
     public array $fetchData = [];
@@ -193,6 +195,16 @@ class SpecificDayAppointmentRegistrationModal extends Component
     {
         $user = $this->fetchData['user'];
         $appointmentSetting = AppointmentSetting::findOrFail($this->appId);
+        //check for appointment kind
+
+
+        if ($appointmentSetting->detail[AppointmentSetting::VISIT_TYPE_ONLINE] && $appointmentSetting->detail[AppointmentSetting::VISIT_TYPE_INPERSON]) {
+            if (!isset($this->form['kind']) || empty($this->form['kind'])) {
+                return $this->addError('AppKind', 'لطفا نوع نوبت را انتخاب کنید');
+            }
+        }
+
+
         // If he wants to take the turn for someone else
         $someoneModel = null;
         $foHimself = 1;
@@ -217,6 +229,7 @@ class SpecificDayAppointmentRegistrationModal extends Component
         $appointmentModel = new AppointmentModel(
             timestamp: $appTime->timestamp,
             appointmentVia: AppointmentVia::BY_ADMIN,
+            kind: isset($this->form['kind']) ? $this->form['kind'] : null,
             sendSmsToUser: $sms_status,
             serviceId: $this->appId->service?->id ?? null,
             placeId: $this->appId->place?->id ?? null,
@@ -267,8 +280,12 @@ class SpecificDayAppointmentRegistrationModal extends Component
                     'online'    => isset($app->detail[AppointmentSetting::VISIT_TYPE_INPERSON]) ? $app->detail[AppointmentSetting::VISIT_TYPE_INPERSON] : false,
                     'in_person' => isset($app->detail[AppointmentSetting::VISIT_TYPE_ONLINE])   ? $app->detail[AppointmentSetting::VISIT_TYPE_ONLINE]   : false,
                 ];
-            if ($this->fetchData['app_kind']['online'] && $this->fetchData['app_kind']['in_person']) {
-                $this->form['kind'] = 'in_person';
+            if ($app->detail[AppointmentSetting::VISIT_TYPE_ONLINE] || $app->detail[AppointmentSetting::VISIT_TYPE_INPERSON]) {
+                if ($app->detail[AppointmentSetting::VISIT_TYPE_INPERSON]) {
+                    $this->form['kind'] = AppointmentUserKindEnum::IN_PERSION;
+                } else {
+                    $this->form['kind'] = AppointmentUserKindEnum::ONLINE;
+                }
             }
         }
         if (isset($this->appTime) && !empty($this->appTime)) {

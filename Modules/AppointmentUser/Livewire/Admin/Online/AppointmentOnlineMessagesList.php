@@ -10,7 +10,17 @@ use Modules\AppointmentUser\app\Models\AppointmentOnline;
 #[Title('پیام های پشتیبانی')]
 class AppointmentOnlineMessagesList extends Component
 {
-    public array $search = [];
+    public array $search = [
+        'user_id' => null,
+        'user_first_name' => null,
+        'user_last_name' => null,
+        'user_mobile' => null,
+        'appointment_date' => null,
+        'appointment_set_date' => null,
+        'appointment_end_date' => null,
+        'appointment_star_date' => null,
+        'AppointmentStatus' => null,
+    ];
     public array $fetchData = [];
 
 

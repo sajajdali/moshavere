@@ -2,11 +2,12 @@
 
 namespace Modules\AppointmentUser\app\Models;
 
+use Modules\User\Entities\User;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Modules\AppointmentUser\Database\factories\AppointmentOnlineMessageFactory;
+use Modules\AppointmentUser\Enum\AppointmentOnlineMessageSeenEnum;
 use Modules\AppointmentUser\Enum\AppointmentOnlineMessageTypeEnum;
-use Modules\User\Entities\User;
+use Modules\AppointmentUser\Database\factories\AppointmentOnlineMessageFactory;
 
 class AppointmentOnlineMessage extends Model
 {
@@ -16,9 +17,11 @@ class AppointmentOnlineMessage extends Model
      * The attributes that are mass assignable.
      */
     protected $guarded = ['id'];
+
+    // TODO::'seen' => has been change from boolian to  AppointmentOnlineMessageSeenEnum::class ;
     protected $casts = [
         'type' => AppointmentOnlineMessageTypeEnum::class,
-        'seen' => 'boolean',
+        'seen' => AppointmentOnlineMessageSeenEnum::class,
         'details' => 'json',
     ];
 

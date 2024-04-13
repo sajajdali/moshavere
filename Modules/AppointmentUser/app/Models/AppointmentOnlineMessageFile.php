@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 class AppointmentOnlineMessageFile extends Model
 {
 
-
+    const HAS_FILE = 'has_file';
     /**
      * The attributes that are mass assignable.
      */

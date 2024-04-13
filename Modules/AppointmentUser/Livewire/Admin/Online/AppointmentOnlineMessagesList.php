@@ -6,6 +6,7 @@ use Livewire\Component;
 use Livewire\Attributes\Title;
 use Livewire\Attributes\Computed;
 use Modules\AppointmentUser\app\Models\AppointmentOnline;
+use Modules\AppointmentUser\Enum\AppointmentOnlineStatusEnum;
 
 #[Title('پیام های پشتیبانی')]
 class AppointmentOnlineMessagesList extends Component
@@ -20,10 +21,34 @@ class AppointmentOnlineMessagesList extends Component
         'appointment_end_date' => null,
         'appointment_star_date' => null,
         'AppointmentStatus' => null,
+        'appointment_messages' => null,
     ];
+    public array $form = ['seenStatus' => false];
     public array $fetchData = [];
-
-
+    public function seenStatus($condition)
+    {
+        $this->form['seenStatus'] = $condition;
+        $this->render();
+    }
+    public function startSearch()
+    {
+        $this->render();
+    }
+    public function resetProperties() {
+        $this->search = [
+            'user_id' => null,
+            'user_first_name' => null,
+            'user_last_name' => null,
+            'user_mobile' => null,
+            'appointment_date' => null,
+            'appointment_set_date' => null,
+            'appointment_end_date' => null,
+            'appointment_star_date' => null,
+            'AppointmentStatus' => null,
+            'appointment_messages' => null,
+        ];
+        $this->render();
+    }
     #[Computed]
     public function handleSearch()
     {
@@ -33,6 +58,22 @@ class AppointmentOnlineMessagesList extends Component
                 'condition' => $this->search['user_id'],
                 'callback' => function ($query) {
                     return $query->where('user_id', $this->search['user_id']);
+                },
+            ],
+            'seen_status' => [
+                'condition' => true,
+                'callback' => function ($query) {
+                    return $query->whereHas('messages', function ($q) {
+                        return $q->where('seen', (bool) $this->form['seenStatus']);
+                    });
+                },
+            ],
+            'appointment_messages' => [
+                'condition' => $this->search['appointment_messages'],
+                'callback' => function ($query) {
+                    return $query->whereHas('messages', function ($q) {
+                        return $q->where('body', 'LIKE', "%{$this->search['appointment_messages']}%");
+                    });
                 },
             ],
             'user_first_name' => [

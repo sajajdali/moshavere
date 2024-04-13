@@ -27,7 +27,7 @@ class AppointmentOnlineMessage extends Model
 
     public function messageFile()
     {
-        return $this->hasMany(AppointmentOnlineMessageFile::class, 'id', 'fk_id');
+        return $this->hasMany(AppointmentOnlineMessageFile::class,'fk_id','id');
     }
 
 

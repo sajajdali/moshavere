@@ -33,7 +33,6 @@ class MessageDetail extends Component
     {
         $this->validate([
             'form.typedMessage' => 'required_without:form.file',
-
         ]);
         $model = [
             'appointment_online_id' =>  $this->fetchData['appOnline']->id,
@@ -42,7 +41,11 @@ class MessageDetail extends Component
             'type'                  =>  AppointmentOnlineMessageTypeEnum::ANSWER,
             'seen'                  =>  AppointmentOnlineMessageSeenEnum::UNSEEN,
             'body'                  =>  isset($this->form['typedMessage']) ? $this->form['typedMessage'] : '',
+            'details'                => [AppointmentOnlineMessageFile::HAS_FILE => 'false'],
         ];
+        if (isset($this->form['file'])) {
+            $model['details'] = [AppointmentOnlineMessageFile::HAS_FILE => 'true'];
+        }
         $AOM =  AppointmentOnlineMessage::create($model);
         if (isset($this->form['file'])) {
             $url = $this->form['file'];
@@ -58,8 +61,8 @@ class MessageDetail extends Component
             $fileMime = Storage::mimeType($filePath);
 
             // Get the file size
-            $fileSize = Storage::size('/public/' . $filePath);
-
+            $fileSizebyte = Storage::size('/public/' . $filePath);
+            $fileSize = $fileSizebyte / 1024 ;
             // Get the disk
             $fileDisk = 'public';
             $extension = pathinfo($parsedUrl['path'], PATHINFO_EXTENSION);

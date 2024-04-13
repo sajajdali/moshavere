@@ -110,44 +110,84 @@
                                     @foreach ($this->getMessagesBodys() as $date => $messages)
                                         <label class="main-chat-time"><span>{{ $date }}</span></label>
                                         @foreach ($messages as $message)
-                                            @continue($message->id != 9)
-
                                             @if ($message->user_id == $fetchData['user']->id)
-                                                <div class="media flex-row-reverse chat-right">
-                                                    <div class="main-img-user online"><img alt="avatar"
-                                                            src="{{ $message->user->avatar }}"></div>
-                                                    <div class="media-body">
-                                                        <div class="main-msg-wrapper">
-                                                            @if ($message->body == null)
-                                                            @dd($message->messageFile)
-                                                                <button><i class="fa fa-download"
-                                                                        aria-hidden="true"></i>{{ $message->file->original_name }}</button>
-                                                            @else
+                                                @if ($message->details[Modules\AppointmentUser\app\Models\AppointmentOnlineMessageFile::HAS_FILE] == true)
+                                                    <div class="media flex-row-reverse chat-right">
+                                                        <div class="main-img-user online"><img alt="avatar"
+                                                                src="{{ $message->user->avatar }}"></div>
+                                                        <div class="media-body">
+                                                            <div class="main-msg-wrapper">
+                                                                <a href="{{ url('storage/' . $message->messageFile->first()->server_name) }}"
+                                                                    download>
+                                                                    <i class="fa fa-download"
+                                                                        aria-hidden="true"></i></a>
+                                                                <br>
+                                                                <small
+                                                                    class="text-left">{{ $message->messageFile->first()->size }}kb</small>
+                                                            </div>
+                                                            <div>
+                                                                <span>{{ $message->created_at->format('H:i') }}</span>
+                                                                <a href="javascript:void(0)"><i
+                                                                        class="icon ion-android-more-vertical"></i></a>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                @endif
+                                                @if ($message->body != null)
+                                                    <div class="media flex-row-reverse chat-right">
+                                                        <div class="main-img-user online"><img alt="avatar"
+                                                                src="{{ $message->user->avatar }}"></div>
+                                                        <div class="media-body">
+                                                            <div class="main-msg-wrapper">
                                                                 {{ $message->body }}
-                                                            @endif
-                                                        </div>
-                                                        <div>
-                                                            <span>{{ $message->created_at->format('H:i') }}</span> <a
-                                                                href="javascript:void(0)"><i
-                                                                    class="icon ion-android-more-vertical"></i></a>
+                                                            </div>
+                                                            <div>
+                                                                <span>{{ $message->created_at->format('H:i') }}</span>
+                                                                <a href="javascript:void(0)"><i
+                                                                        class="icon ion-android-more-vertical"></i></a>
+                                                            </div>
                                                         </div>
                                                     </div>
-                                                </div>
+                                                @endif
                                             @else
-                                                <div class="media chat-left">
-                                                    <div class="main-img-user online"><img alt="avatar"
-                                                            src="{{ $message->user->avatar }}"></div>
-                                                    <div class="media-body">
-                                                        <div class="main-msg-wrapper">
-                                                            {{ $message->body ?? $message->file->original_name }}
-                                                        </div>
-                                                        <div>
-                                                            <span>{{ $message->created_at->format('H:i') }}</span> <a
-                                                                href="javascript:void(0)"><i
-                                                                    class="icon ion-android-more-vertical"></i></a>
+                                                @if ($message->details[Modules\AppointmentUser\app\Models\AppointmentOnlineMessageFile::HAS_FILE] == true)
+                                                    <div class="media flex-row-reverse chat-right">
+                                                        <div class="main-img-user online"><img alt="avatar"
+                                                                src="{{ $message->user->avatar }}"></div>
+                                                        <div class="media-body">
+                                                            <div class="main-msg-wrapper">
+                                                                <a href="{{ url('storage/' . $message->messageFile->first()->server_name) }}"
+                                                                    download>
+                                                                    <i class="fa fa-download"
+                                                                        aria-hidden="true"></i></a>
+                                                                <br>
+                                                                <small
+                                                                    class="text-left">{{ $message->messageFile->first()->size }}kb</small>
+                                                            </div>
+                                                            <div>
+                                                                <span>{{ $message->created_at->format('H:i') }}</span>
+                                                                <a href="javascript:void(0)"><i
+                                                                        class="icon ion-android-more-vertical"></i></a>
+                                                            </div>
                                                         </div>
                                                     </div>
-                                                </div>
+                                                @endif
+                                                @if ($message->body != null)
+                                                    <div class="media chat-left">
+                                                        <div class="main-img-user online"><img alt="avatar"
+                                                                src="{{ $message->user->avatar }}"></div>
+                                                        <div class="media-body">
+                                                            <div class="main-msg-wrapper">
+                                                                {{ $message->body ?? $message->file->original_name }}
+                                                            </div>
+                                                            <div>
+                                                                <span>{{ $message->created_at->format('H:i') }}</span>
+                                                                <a href="javascript:void(0)"><i
+                                                                        class="icon ion-android-more-vertical"></i></a>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                @endif
                                             @endif
                                         @endforeach
                                     @endforeach

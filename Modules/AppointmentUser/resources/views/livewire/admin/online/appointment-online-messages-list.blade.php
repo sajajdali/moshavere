@@ -28,168 +28,198 @@
                                     data-bs-target="#advanceSearch" aria-expanded="false" aria-controls="advanceSearch">
                                     جست و جوی پیشرفته
                                 </button>
-                                @foreach ($search as $key => $value)
-                                    @if ($value !== null)
-                                        <button class="btn btn-secondary ms-2" wire:click="resetProperties"
-                                            type="button" data-bs-toggle="collapse" data-bs-target="#advanceSearch"
-                                            aria-expanded="false" aria-controls="advanceSearch"
-                                            wire:loading.class="bg-gray btn-loading disabled">نمایش
-                                            همه
-                                        </button>
-                                    @break
-                                @endif
-                            @endforeach
+
+                            </div>
                         </div>
-                    </div>
-                    {{-- search inputs --}}
-                    <div class="card-body d-flex py-2">
-                        <div class="collapse w-100  @foreach ($search as $key => $value)
+                        {{-- search inputs --}}
+                        <div class="card-body d-flex py-2">
+                            <div class="collapse w-100  @foreach ($search as $key => $value)
                             @if ($value !== null) show @break @endif @endforeach "
-                            id="advanceSearch" wire:ignore.self>
-                            <form class="form-horizontal example" autocomplete="off">
-                                <div class="row mb-5">
-                                    <div class="col-12 col-md-3">
-                                        <h4 class="text-center text-primary text-start ms-1"><a
-                                                data-bs-toggle="collapse" href="#userDataCollaps" role="button"
-                                                aria-expanded="false" aria-controls="userDataCollaps"
-                                                href="">
-                                                <i class="fa fa-user" aria-hidden="true"></i>
-                                                <span>مشخصات کاربر</span>
-                                            </a></h4>
-                                    </div>
-                                    <div class=" col-12 col-md-9">
-                                        <hr class="my-4">
-                                    </div>
-                                    <div class=" col-12 collapse show row" id="userDataCollaps">
-                                        <div class="col-md-6 form-group">
-                                            <label for="search-id" class=" form-label"><strong>ایدی</strong></label>
-                                            <input class="form-control" id="search-id" wire:model="search.user_id"
-                                                placeholder="ایدی کاربر مورد نظر" type="text">
-
+                                id="advanceSearch" wire:ignore.self>
+                                <form class="form-horizontal example" autocomplete="off">
+                                    <div class="row mb-5">
+                                        <div class="col-12 col-md-3">
+                                            <h4 class="text-center text-primary text-start ms-1"><a
+                                                    data-bs-toggle="collapse" href="#userDataCollaps" role="button"
+                                                    aria-expanded="false" aria-controls="userDataCollaps"
+                                                    href="">
+                                                    <i class="fa fa-user" aria-hidden="true"></i>
+                                                    <span>مشخصات کاربر</span>
+                                                </a></h4>
                                         </div>
-                                        <div class="col-md-6">
-                                            <label for="search-Username"
-                                                class="form-label"><strong>نام</strong></label>
-                                            <input class="form-control" id="search-Username"
-                                                wire:model="search.user_first_name" placeholder="نام کاربر مورد نظر"
-                                                type="text">
-
+                                        <div class=" col-12 col-md-9">
+                                            <hr class="my-4">
                                         </div>
-                                        <div class="col-md-6">
-                                            <label for="search-UserLname" class="form-label"><strong>نام
-                                                    خانوادگی</strong></label>
-                                            <input class="form-control" id="search-UserLname"
-                                                wire:model="search.user_last_name"
-                                                placeholder="نام خانوادگی کاربر مورد نظر" type="text">
+                                        <div class=" col-12 collapse show row" id="userDataCollaps">
+                                            <div class="col-md-6 form-group">
+                                                <label for="search-id" class=" form-label"><strong>ایدی</strong></label>
+                                                <input class="form-control" id="search-id" wire:model="search.user_id"
+                                                    placeholder="ایدی کاربر مورد نظر" type="text">
 
-                                        </div>
-                                        <div class="col-md-6">
-                                            <label for="search-UserMobile" class="form-label"><strong>شماره
-                                                    موبایل</strong></label>
-                                            <input class="form-control" id="search-UserMobile"
-                                                wire:model="search.user_mobile" placeholder="شماره تماس"
-                                                type="text">
+                                            </div>
+                                            <div class="col-md-6">
+                                                <label for="search-Username"
+                                                    class="form-label"><strong>نام</strong></label>
+                                                <input class="form-control" id="search-Username"
+                                                    wire:model="search.user_first_name" placeholder="نام کاربر مورد نظر"
+                                                    type="text">
 
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="row my-5">
-                                    <div class="col-12 col-md-3">
-                                        <h4 class="text-center text-primary text-start ms-1"><a
-                                                data-bs-toggle="collapse" href="#appointmentCollapsSearch"
-                                                role="button" aria-expanded="false"
-                                                aria-controls="appointmentCollapsSearch">
-                                                <i class="fa fa-calendar-check-o" aria-hidden="true"></i>
-                                                <span>فیلتر نوبت</span>
-                                            </a></h4>
-                                    </div>
-                                    <div class="col-12 col-md-9">
-                                        <hr class="my-4">
-                                    </div>
-                                    <div class="collapse row
-                            @if (isset($search['appointment_date']) ||
-                                    isset($search['appointment_set_date']) ||
-                                    isset($search['appointment_star_date']) ||
-                                    isset($search['appointment_end_date'])) show @endif"
-                                        id="appointmentCollapsSearch" wire:ignore.self>
-                                        <div class="col-md-6">
-                                            <label for="search-appointment_date" class="form-label"><strong>زمان
-                                                    نوبت</strong></label>
-                                            <input class="form-control" id="search-appointment_date"
-                                                wire:model="search.appointment_date"
-                                                placeholder="زمانی که نوبت دریافت شده" type="text">
+                                            </div>
+                                            <div class="col-md-6">
+                                                <label for="search-UserLname" class="form-label"><strong>نام
+                                                        خانوادگی</strong></label>
+                                                <input class="form-control" id="search-UserLname"
+                                                    wire:model="search.user_last_name"
+                                                    placeholder="نام خانوادگی کاربر مورد نظر" type="text">
 
-                                        </div>
-                                        <div class="col-md-6">
-                                            <label for="search-id-appointment_set_date"
-                                                class="form-label"><strong>زمان
-                                                    ثبت
-                                                    نوبت</strong></label>
-                                            <input class="form-control" id="search-appointment_set_date"
-                                                wire:model="search.appointment_set_date"
-                                                placeholder="زمانی که نوبت ثبت شده" type="text">
+                                            </div>
+                                            <div class="col-md-6">
+                                                <label for="search-UserMobile" class="form-label"><strong>شماره
+                                                        موبایل</strong></label>
+                                                <input class="form-control" id="search-UserMobile"
+                                                    wire:model="search.user_mobile" placeholder="شماره تماس"
+                                                    type="text">
 
-                                        </div>
-                                        <div class="col-md-6">
-                                            <label for="search-id-appointment_star_date"
-                                                class="form-label"><strong>تاریخ
-                                                    شروع</strong></label>
-                                            <input class="form-control" id="search-appointment_star_date"
-                                                wire:model="search.appointment_star_date"
-                                                placeholder="نوبت های از این تاریخ به بعد" type="text">
-
-                                        </div>
-                                        <div class="col-md-6">
-                                            <label for="search-id-appointment_end_date"
-                                                class="form-label"><strong>تاریخ
-                                                    پایان</strong></label>
-                                            <input class="form-control" id="search-appointment_end_date"
-                                                wire:model="search.appointment_end_date"
-                                                placeholder="نوبت هایی ازین تاریخ به قبل" type="text">
-
-                                        </div>
-                                        <div class="col-md-6">
-                                            <label for="search-appStatusId"
-                                                class="form-label datePicker"><strong>وضعیت
-                                                    نوبت</strong></label>
-                                            <select class="form-control" id="search-appStatusId"
-                                                wire:model="search.AppointmentStatus" placeholder="نام ثبت نوبت"
-                                                type="text">
-                                                <option value="">انتخاب کنید...</option>
-                                                @foreach (Modules\AppointmentUser\Enum\AppointmentOnlineStatusEnum::cases() as $enum)
-                                                    <option value="{{ $enum->value }}">
-                                                        {{ $enum->getName() }}
-
-                                                    </option>
-                                                @endforeach
-                                            </select>
-
-                                        </div>
-                                        <div class="col-md-6">
-                                            <label for="search-docNumberId" class="form-label"><strong>شماره
-                                                    پرونده</strong></label>
-                                            <input class="form-control" id="search-docNumberId"
-                                                wire:model="search.docNumber" placeholder="ایدی رژیم مورد نظر"
-                                                type="text">
-
+                                            </div>
                                         </div>
                                     </div>
-                                </div>
-                                <button class="btn btn-primary" type="button" wire:click="startSearch"
-                                    wire:loading.class="bg-gray btn-loading disabled">جست و
-                                    جو
-                                </button>
+                                    <div class="row my-5">
+                                        <div class="col-12 col-md-3">
+                                            <h4 class="text-center text-primary text-start ms-1"><a
+                                                    data-bs-toggle="collapse" href="#appointmentCollapsSearch"
+                                                    role="button" aria-expanded="false"
+                                                    aria-controls="appointmentCollapsSearch">
+                                                    <i class="fa fa-calendar-check-o" aria-hidden="true"></i>
+                                                    <span>فیلتر نوبت</span>
+                                                </a></h4>
+                                        </div>
+                                        <div class="col-12 col-md-9">
+                                            <hr class="my-4">
+                                        </div>
+                                        <div class="collapse row
+                                        @if (isset($search['appointment_date']) ||
+                                                isset($search['appointment_set_date']) ||
+                                                isset($search['appointment_star_date']) ||
+                                                isset($search['appointment_end_date'])) show @endif"
+                                            id="appointmentCollapsSearch" wire:ignore.self>
+                                            <div class="col-md-6">
+                                                <label for="search-appointment_date" class="form-label"><strong>زمان
+                                                        نوبت</strong></label>
+                                                <input class="form-control" id="search-appointment_date"
+                                                    wire:model="search.appointment_date"
+                                                    placeholder="زمانی که نوبت دریافت شده" type="text">
+
+                                            </div>
+                                            <div class="col-md-6">
+                                                <label for="search-id-appointment_set_date"
+                                                    class="form-label"><strong>زمان
+                                                        ثبت
+                                                        نوبت</strong></label>
+                                                <input class="form-control" id="search-appointment_set_date"
+                                                    wire:model="search.appointment_set_date"
+                                                    placeholder="زمانی که نوبت ثبت شده" type="text">
+
+                                            </div>
+                                            <div class="col-md-6">
+                                                <label for="search-id-appointment_star_date"
+                                                    class="form-label"><strong>تاریخ
+                                                        شروع</strong></label>
+                                                <input class="form-control" id="search-appointment_star_date"
+                                                    wire:model="search.appointment_star_date"
+                                                    placeholder="نوبت های از این تاریخ به بعد" type="text">
+
+                                            </div>
+                                            <div class="col-md-6">
+                                                <label for="search-id-appointment_end_date"
+                                                    class="form-label"><strong>تاریخ
+                                                        پایان</strong></label>
+                                                <input class="form-control" id="search-appointment_end_date"
+                                                    wire:model="search.appointment_end_date"
+                                                    placeholder="نوبت هایی ازین تاریخ به قبل" type="text">
+
+                                            </div>
+                                            <div class="col-md-6">
+                                                <label for="search-appStatusId"
+                                                    class="form-label datePicker"><strong>وضعیت
+                                                        نوبت</strong></label>
+                                                <select class="form-control" id="search-appStatusId"
+                                                    wire:model="search.AppointmentStatus" placeholder="نام ثبت نوبت"
+                                                    type="text">
+                                                    <option value="">انتخاب کنید...</option>
+                                                    @foreach (Modules\AppointmentUser\Enum\AppointmentOnlineStatusEnum::cases() as $enum)
+                                                        <option value="{{ $enum->value }}">
+                                                            {{ $enum->getName() }}
+
+                                                        </option>
+                                                    @endforeach
+                                                </select>
+
+                                            </div>
+                                            <div class="col-md-6">
+                                                <label for="search-docNumberId" class="form-label"><strong>شماره
+                                                        پرونده</strong></label>
+                                                <input class="form-control" id="search-docNumberId"
+                                                    wire:model="search.docNumber" placeholder="ایدی رژیم مورد نظر"
+                                                    type="text">
+
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="row my-5">
+                                        <div class="col-12 col-md-3">
+                                            <h4 class="text-center text-primary text-start ms-1"><a
+                                                    data-bs-toggle="collapse" href="#appointmentMessageSearch"
+                                                    role="button" aria-expanded="false"
+                                                    aria-controls="appointmentMessageSearch">
+                                                    <i class="fa fa-calendar-check-o" aria-hidden="true"></i>
+                                                    <span>پیام ها</span>
+                                                </a></h4>
+                                        </div>
+                                        <div class="col-12 col-md-9">
+                                            <hr class="my-4">
+                                        </div>
+                                        <div class="collapse row
+                                        @if (isset($search['appointment_messages'])) show @endif"
+                                            id="appointmentMessageSearch" wire:ignore.self>
+                                            <div class="col-md-12">
+                                                <label for="search-appointment_messages"
+                                                    class="form-label"><strong>متن پیام</strong></label>
+                                                <input class="form-control" id="search-appointment_messages"
+                                                    wire:model="search.appointment_messages"
+                                                    placeholder="متن پیامی که ارسال شده است" type="text">
+
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <button class="btn btn-primary" type="button" wire:click="startSearch"
+                                        wire:loading.class="bg-gray btn-loading disabled">جست و
+                                        جو
+                                    </button>
+                                    @foreach ($search as $key => $value)
+                                        @if ($value !== null)
+                                            <button class="btn btn-secondary ms-2" wire:click="resetProperties"
+                                                type="button" data-bs-toggle="collapse"
+                                                data-bs-target="#advanceSearch" aria-expanded="false"
+                                                aria-controls="advanceSearch"
+                                                wire:loading.class="bg-gray btn-loading disabled">نمایش
+                                                همه
+                                            </button>
+                                        @break
+                                    @endif
+                                @endforeach
                             </form>
                         </div>
                     </div>
                     {{-- filter tab --}}
                     <div class="tab-menu-heading border-0">
                         <div class="tabs-menu">
-                            <ul class="nav panel-tabs">
-                                <li><a href="#ChatList" class="me-2 active mb-2" data-bs-toggle="tab">پیام های
+                            <ul class="nav panel-tabs" wire:ignore>
+                                <li><a href="#ChatList" class="me-2 active mb-2" wire:click="seenStatus(false)"
+                                        data-bs-toggle="tab">پیام های
                                         پاسخ داده نشده</a>
                                 </li>
-                                <li><a href="#ChatGroups" class="me-2 mb-2" data-bs-toggle="tab">پیام های پاسخ
+                                <li><a href="#ChatList" class="me-2 mb-2" wire:click="seenStatus(true)"
+                                        data-bs-toggle="tab">پیام های پاسخ
                                         داده شده</a></li>
                             </ul>
                         </div>
@@ -202,33 +232,24 @@
                                     <a class="media new"
                                         href="{{ route('admin.appointment_user.message.detail', ['onlineAppId' => $OnlineApp->id]) }}">
                                         <div class="main-img-user">
-                                            <img alt="" src="{{ $OnlineApp->avatar }}">
-                                            <span>5</span>
+                                            <img alt="" src="{{ $OnlineApp->user->avatar }}">
+                                            <span>{{ $OnlineApp->messages->count() }}</span>
                                         </div>
                                         <div class="media-body">
                                             <div class="media-contact-name">
-                                                <span>{{ $OnlineApp->user->fullName }}</span> <span>30 min</span>
+                                                <span>{{ $OnlineApp->user->fullName }}</span>
+                                                <span>{{ verta($OnlineApp->messages->last()->updated_at)->diffDays() }}
+                                                    روز پیش</span>
                                             </div>
-                                            <p>Good Morning</p>
+                                            @if ($OnlineApp->messages?->last()->body != null)
+                                                <p>{{ strip_tags(mb_substr($OnlineApp->messages->last()->body, 0, 50, 'UTF-8'), 'string,br') }}
+                                                </p>
+                                            @endif
                                         </div>
                                     </a>
                                 @endforeach
                             </div>
                             <!-- main-chat-list -->
-                        </div>
-                        <div class="tab-pane" id="ChatGroups">
-                            <a class="media new" href="#">
-                                <div class="main-img-user">
-                                    <img alt="" src="{{ asset('assets/images/users/6.jpg') }}">
-                                    <span>3</span>
-                                </div>
-                                <div class="media-body">
-                                    <div class="media-contact-name">
-                                        <span>Ariana Monino</span> <span>30 min</span>
-                                    </div>
-                                    <p>Good Morning</p>
-                                </div>
-                            </a>
                         </div>
                     </div>
                 </div>
@@ -237,7 +258,6 @@
     </div>
 </div>
 @push('scripts')
-
     <script>
         $(document).ready(function() {
             function js() {

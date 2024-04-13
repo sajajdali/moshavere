@@ -9,7 +9,9 @@ class AppointmentOnlineMessagesPaginateResource extends JsonResource
 {
     private function changeStructure(): array
     {
-        $collect =  $this->groupBy(function ($message) {
+        $messagesCollect = $this['messages'];
+
+        $collect = $messagesCollect->groupBy(function ($message) {
             return verta($message->created_at->toDateString())->format("d F Y");
         });
         $messagesWithDates = [];
@@ -22,19 +24,20 @@ class AppointmentOnlineMessagesPaginateResource extends JsonResource
 
         return $messagesWithDates;
     }
+
     /**
      * Transform the resource into an array.
      */
     public function toArray($request): array
     {
-
         return [
             'messageList' => $this->changeStructure(),
+            'accessibility' => $this['accessibility'],
             'paginate' => [
-                'current_page' => $this->currentPage(),
-                'per_page' => $this->perPage(),
-                'total' => $this->total(),
-                'last_page' => $this->lastPage()
+                'current_page' => $this['messages']->currentPage(),
+                'per_page' => $this['messages']->perPage(),
+                'total' => $this['messages']->total(),
+                'last_page' => $this['messages']->lastPage()
             ],
         ];
     }

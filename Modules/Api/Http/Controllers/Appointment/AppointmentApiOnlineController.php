@@ -22,7 +22,7 @@ class AppointmentApiOnlineController extends Controller
     {
         foreach ($files as $file) {
             $orignName = $file->getClientOriginalName();
-            $extension = $file->getClientMimeType();
+            $extension = $file->guessExtension() ?: $file->getClientMimeType();
             $size = $file->getSize();
 
             $disk = 'appointment/online/' . $appointmentMessage->online->appointmentUser->id .'/' ;
@@ -72,7 +72,7 @@ class AppointmentApiOnlineController extends Controller
         ]);
         if($request->hasFile('files')) {
             $validator = Validator::make($request->all(), [
-                'files.*' => 'file|mimes:jpeg,png,jpg,gif,svg,mp4,mov,avi,wmv,pdf,mp3,wav',
+                'files.*' => 'file|mimes:jpeg,png,jpg,gif,svg,mp4,mov,avi,wmv,pdf,mp3,wav,m4a,m4v,webm',
             ]);
 
             if ($validator->fails()) {
@@ -114,7 +114,15 @@ class AppointmentApiOnlineController extends Controller
             ]);
         }
         $appointmentOnline->update(['new_messages' => 0]);
+        $accessibility = [
+            'can_send_message' => $appointmentOnline->status->canSendMessage(),
+            'can_show_messages' => $appointmentOnline->status->canShowMessages(),
+        ];
         $messages = $appointmentOnline->messages()->orderByDesc('id')->paginate();
-        return $this->ok(new AppointmentOnlineMessagesPaginateResource($messages));
+        $list = [
+            'messages' => $messages,
+            'accessibility' => $accessibility
+        ];
+        return $this->ok(new AppointmentOnlineMessagesPaginateResource($list));
     }
 }

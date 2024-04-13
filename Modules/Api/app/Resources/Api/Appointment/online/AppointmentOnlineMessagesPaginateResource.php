@@ -7,6 +7,21 @@ use Modules\AppointmentUser\app\Models\AppointmentOnlineMessage;
 
 class AppointmentOnlineMessagesPaginateResource extends JsonResource
 {
+    private function changeStructure(): array
+    {
+        $collect =  $this->groupBy(function ($message) {
+            return verta($message->created_at->toDateString())->format("d F Y");
+        });
+        $messagesWithDates = [];
+        foreach ($collect as $date => $messages) {
+            $messagesWithDates[] = [
+                'date' => $date,
+                'messages' => AppointmentOnlineMessagesResource::collection($messages)
+            ];
+        }
+
+        return $messagesWithDates;
+    }
     /**
      * Transform the resource into an array.
      */
@@ -14,7 +29,7 @@ class AppointmentOnlineMessagesPaginateResource extends JsonResource
     {
 
         return [
-            'messages' => AppointmentOnlineMessagesResource::collection($this),
+            'messageList' => $this->changeStructure(),
             'paginate' => [
                 'current_page' => $this->currentPage(),
                 'per_page' => $this->perPage(),

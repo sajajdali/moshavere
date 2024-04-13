@@ -33,7 +33,7 @@ class AppointmentApiOnlineController extends Controller
 
             $mime = strtok($extension, '/');
 
-            $appointmentMessage->files()->create([
+            $appointmentMessage->messageFile()->create([
                 'user_id'   => $user->id,
                 'original_name'   => $orignName,
                 'server_name'   => $imageName,
@@ -72,7 +72,7 @@ class AppointmentApiOnlineController extends Controller
         ]);
         if($request->hasFile('files')) {
             $validator = Validator::make($request->all(), [
-                'files.*' => 'file|mimes:jpeg,png,jpg,gif,svg,mp4,mov,avi,wmv,pdf',
+                'files.*' => 'file|mimes:jpeg,png,jpg,gif,svg,mp4,mov,avi,wmv,pdf,mp3,wav',
             ]);
 
             if ($validator->fails()) {
@@ -116,6 +116,5 @@ class AppointmentApiOnlineController extends Controller
         $appointmentOnline->update(['new_messages' => 0]);
         $messages = $appointmentOnline->messages()->orderByDesc('id')->paginate();
         return $this->ok(new AppointmentOnlineMessagesPaginateResource($messages));
-
     }
 }

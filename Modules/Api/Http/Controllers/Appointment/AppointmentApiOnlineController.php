@@ -22,7 +22,7 @@ class AppointmentApiOnlineController extends Controller
     {
         foreach ($files as $file) {
             $orignName = $file->getClientOriginalName();
-            $extension = $file->guessExtension() ?: $file->getClientMimeType();
+            $extension = $file->getClientMimeType();
             $size = $file->getSize();
 
             $disk = 'appointment/online/' . $appointmentMessage->online->appointmentUser->id .'/' ;

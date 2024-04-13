@@ -14,6 +14,7 @@ use Modules\AppointmentUser\Enum\AppointmentOnlineMessageTypeEnum;
 use Modules\AppointmentUser\Enum\AppointmentOnlineStatusEnum;
 use Validator;
 
+
 class AppointmentApiOnlineController extends Controller
 {
     use ApiHandlerTrait;
@@ -31,9 +32,10 @@ class AppointmentApiOnlineController extends Controller
             $extension = pathinfo($name, PATHINFO_EXTENSION);
 
             $imageName = basename($name);
-
-
             $mime = strtok($extension, '/');
+            if (strpos($orignName, "audio_123337") === 0) {
+                $mime = 'mp3';
+            }
 
             $appointmentMessage->messageFile()->create([
                 'user_id'   => $user->id,

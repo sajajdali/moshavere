@@ -6,7 +6,7 @@ use Livewire\Component;
 use Livewire\Attributes\Title;
 use Livewire\Attributes\Computed;
 use Modules\AppointmentUser\app\Models\AppointmentOnline;
-use Modules\AppointmentUser\Enum\AppointmentOnlineStatusEnum;
+use Modules\AppointmentUser\Enum\AppointmentOnlineMessageSeenEnum;
 
 #[Title('پیام های پشتیبانی')]
 class AppointmentOnlineMessagesList extends Component
@@ -23,11 +23,11 @@ class AppointmentOnlineMessagesList extends Component
         'AppointmentStatus' => null,
         'appointment_messages' => null,
     ];
-    public array $form = ['seenStatus' => false];
+    public array $form = ['seenStatus' => AppointmentOnlineMessageSeenEnum::UNSEEN];
     public array $fetchData = [];
     public function seenStatus($condition)
     {
-        $this->form['seenStatus'] = $condition;
+        $this->form['seenStatus'] = AppointmentOnlineMessageSeenEnum::tryFrom($condition);
         $this->render();
     }
     public function startSearch()
@@ -64,7 +64,7 @@ class AppointmentOnlineMessagesList extends Component
                 'condition' => true,
                 'callback' => function ($query) {
                     return $query->whereHas('messages', function ($q) {
-                        return $q->where('seen', (bool) $this->form['seenStatus']);
+                        return $q->where('seen', $this->form['seenStatus']);
                     });
                 },
             ],

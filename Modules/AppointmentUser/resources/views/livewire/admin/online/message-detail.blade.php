@@ -104,26 +104,40 @@
                             </nav>
                         </div>
                         <!-- main-chat-header -->
-                        <div class="main-chat-body flex-2" id="ChatBody">
+                        <div class="main-chat-body flex-2" id="ChatBody" style="overflow: scroll !important">
                             <div class="content-inner">
                                 @if (!empty($this->getMessagesBodys()) && $this->getMessagesBodys()->isNotEmpty())
                                     @foreach ($this->getMessagesBodys() as $date => $messages)
                                         <label class="main-chat-time"><span>{{ $date }}</span></label>
                                         @foreach ($messages as $message)
-                                            @if ($message->user_id == $fetchData['user']->id)
-                                                @if ($message->details[Modules\AppointmentUser\app\Models\AppointmentOnlineMessageFile::HAS_FILE] == true)
+                                            @if ($message->type == Modules\AppointmentUser\Enum\AppointmentOnlineMessageTypeEnum::ANSWER)
+                                                @if ($message->messageFile->isNotEmpty())
                                                     <div class="media flex-row-reverse chat-right">
                                                         <div class="main-img-user online"><img alt="avatar"
                                                                 src="{{ $message->user->avatar }}"></div>
                                                         <div class="media-body">
                                                             <div class="main-msg-wrapper">
-                                                                <a href="{{ url('storage/' . $message->messageFile->first()->server_name) }}"
-                                                                    download>
-                                                                    <i class="fa fa-download"
-                                                                        aria-hidden="true"></i></a>
-                                                                <br>
-                                                                <small
-                                                                    class="text-left">{{ $message->messageFile->first()->size }}kb</small>
+                                                                @if ($message->messageFile->first()->mime == 'audio/mpeg')
+                                                                    <audio controls>
+                                                                        <source
+                                                                            src="{{ url('storage/' . $message->messageFile->first()->server_name) }}"
+                                                                            type="{{ $message->messageFile->first()->mime }}">
+                                                                    </audio>
+                                                                @elseif($message->messageFile->first()->mime == 'video/mp4')
+                                                                    <video width="320" height="240" controls>
+                                                                        <source
+                                                                            src="{{ url('storage/' . $message->messageFile->first()->server_name) }}"
+                                                                            type="{{ $message->messageFile->first()->mime }}">
+                                                                    </video>
+                                                                @else
+                                                                    <a href="{{ url('storage/' . $message->messageFile->first()->server_name) }}"
+                                                                        download>
+                                                                        <i class="fa fa-download"
+                                                                            aria-hidden="true"></i></a>
+                                                                    <br>
+                                                                    <small
+                                                                        class="text-left">{{ $message->messageFile->first()->size }}kb</small>
+                                                                @endif
                                                             </div>
                                                             <div>
                                                                 <span>{{ $message->created_at->format('H:i') }}</span>
@@ -150,19 +164,35 @@
                                                     </div>
                                                 @endif
                                             @else
-                                                @if ($message->details[Modules\AppointmentUser\app\Models\AppointmentOnlineMessageFile::HAS_FILE] == true)
-                                                    <div class="media flex-row-reverse chat-right">
+                                                @if ($message->messageFile->isNotEmpty())
+                                                    <div class="media chat-left">
                                                         <div class="main-img-user online"><img alt="avatar"
                                                                 src="{{ $message->user->avatar }}"></div>
                                                         <div class="media-body">
                                                             <div class="main-msg-wrapper">
-                                                                <a href="{{ url('storage/' . $message->messageFile->first()->server_name) }}"
-                                                                    download>
-                                                                    <i class="fa fa-download"
-                                                                        aria-hidden="true"></i></a>
-                                                                <br>
-                                                                <small
-                                                                    class="text-left">{{ $message->messageFile->first()->size }}kb</small>
+                                                                @if ($message->messageFile->first()->mime == 'audio/mpeg')
+                                                                    <div class="main-msg-wrapper">
+                                                                        <audio controls>
+                                                                            <source
+                                                                                src="{{ url('storage/' . $message->messageFile->first()->server_name) }}"
+                                                                                type="{{ $message->messageFile->first()->mime }}">
+                                                                        </audio>
+                                                                    </div>
+                                                                @elseif($message->messageFile->first()->mime == 'video/mp4')
+                                                                    <video width="320" height="240" controls>
+                                                                        <source
+                                                                            src="{{ url('storage/' . $message->messageFile->first()->server_name) }}"
+                                                                            type="{{ $message->messageFile->first()->mime }}">
+                                                                    </video>
+                                                                @else
+                                                                    <a href="{{ url('storage/' . $message->messageFile->first()->server_name) }}"
+                                                                        download>
+                                                                        <i class="fa fa-download"
+                                                                            aria-hidden="true"></i></a>
+                                                                    <br>
+                                                                    <small
+                                                                        class="text-left">{{ $message->messageFile->first()->size }}kb</small>
+                                                                @endif
                                                             </div>
                                                             <div>
                                                                 <span>{{ $message->created_at->format('H:i') }}</span>
@@ -200,7 +230,11 @@
                             </div>
                         </div>
                         <div class="main-chat-footer pt-5">
-                            <input class="form-control @error('form.typedMessage') is-invalid @enderror"
+                            <button type="button" class="btn btn-secondary ms-2" data-bs-toggle="modal"
+                                data-bs-target="#soundRecorderModal">
+                                <i class="fa fa-microphone fa-xl" aria-hidden="true"></i>
+                            </button>
+                            <input class="form-control ms-2 @error('form.typedMessage') is-invalid @enderror"
                                 wire:model='form.typedMessage'
                                 placeholder="@error('form.typedMessage') {{ $message }} @else متن خود را یادداشت کنید @enderror "
                                 type="text">
@@ -224,14 +258,63 @@
         </div>
     </div>
     <livewire:admin::file-manager-modal />
+    <livewire:appointmentuser::admin.online.sound-recorder />
 </div>
 @push('scripts')
+    <script src="{{ admin_asset('js/sound/Fr.voice.js') }}"></script>
+    <script src="{{ admin_asset('js/sound/recorder.js') }}"></script>
+    <script src="{{ admin_asset('js/sound/app.js') }}"></script>
     <script>
         $(document).ready(function() {
             Livewire.on('select_file', (param) => {
-                console.log(param.url);
                 @this.set('form.file', param.url);
                 $('#file-selector-modal').modal('hide');
+            });
+            $('#ChatBody').scrollTop($('#ChatBody')[0].scrollHeight);
+
+            Livewire.on('sendMessage', function() {
+                $('#ChatBody').scrollTop($('#ChatBody')[0].scrollHeight);
+            });
+            Livewire.on('ignoreSearch', function() {
+                setTimeout(() => {
+                    $('#ChatBody').scrollTop($('#ChatBody')[0].scrollHeight);
+                }, 500);
+            });
+            Livewire.on('fileHasUpload', function() {
+                var myModalEl = document.getElementById('soundRecorderModal');
+                var modalsound = bootstrap.Modal.getInstance(myModalEl);
+                modalsound.hide();
+            });
+            $(document).on("click", "#save:not(.disabled)", function() {
+                function upload(blob) {
+                    var formData = new FormData();
+                    formData.append('file', blob);
+                    $.ajaxSetup({
+                        headers: {
+                            'X-CSRF-TOKEN': "{{ csrf_token() }}"
+                        }
+                    });
+                    $.ajax({
+                        url: "/admin/appointment_user/storevoice",
+                        type: 'POST',
+                        data: formData,
+                        contentType: false,
+                        processData: false,
+                        success: function(url) {
+                            @this.set('form.voice', url)
+                            @this.dispatch('fileHasUpload');
+                            $("#audio").attr("src", url);
+                            $("#secound_loading").removeClass('d-block').addClass('d-none');
+                        }
+                    });
+                }
+                if ($(this).parent().data("type") === "mp3") {
+                    Fr.voice.exportMP3(upload, "blob");
+                } else {
+                    $("#secound_loading").removeClass('d-none').addClass('d-block');
+                    Fr.voice.export(upload, "blob");
+                }
+                restore();
             });
         });
     </script>

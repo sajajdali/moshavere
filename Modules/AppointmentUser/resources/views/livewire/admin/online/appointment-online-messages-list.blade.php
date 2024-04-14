@@ -214,11 +214,11 @@
                     <div class="tab-menu-heading border-0">
                         <div class="tabs-menu">
                             <ul class="nav panel-tabs" wire:ignore>
-                                <li><a href="#ChatList" class="me-2 active mb-2" wire:click="seenStatus(false)"
+                                <li><a href="#ChatList" class="me-2 active mb-2" wire:click="seenStatus({{Modules\AppointmentUser\Enum\AppointmentOnlineMessageSeenEnum::UNSEEN}})"
                                         data-bs-toggle="tab">پیام های
                                         پاسخ داده نشده</a>
                                 </li>
-                                <li><a href="#ChatList" class="me-2 mb-2" wire:click="seenStatus(true)"
+                                <li><a href="#ChatList" class="me-2 mb-2" wire:click="seenStatus({{Modules\AppointmentUser\Enum\AppointmentOnlineMessageSeenEnum::SEEN}})"
                                         data-bs-toggle="tab">پیام های پاسخ
                                         داده شده</a></li>
                             </ul>
@@ -233,7 +233,12 @@
                                         href="{{ route('admin.appointment_user.message.detail', ['onlineAppId' => $OnlineApp->id]) }}">
                                         <div class="main-img-user">
                                             <img alt="" src="{{ $OnlineApp->user->avatar }}">
-                                            <span>{{ $OnlineApp->messages->count() }}</span>
+                                            @php
+                                                $badge = $OnlineApp->messages()->where('type',1)->where('seen',Modules\AppointmentUser\Enum\AppointmentOnlineMessageSeenEnum::UNSEEN)->count() ;
+                                            @endphp
+                                            @if ($badge > 0)
+                                            <span>{{$badge}}</span>
+                                            @endif
                                         </div>
                                         <div class="media-body">
                                             <div class="media-contact-name">

@@ -3,6 +3,7 @@
 namespace Modules\AppointmentUser\Livewire\Admin\Online;
 
 use Livewire\Component;
+use Livewire\Attributes\On;
 use Livewire\Attributes\Url;
 use Livewire\Attributes\Computed;
 use Illuminate\Support\Facades\Storage;
@@ -22,11 +23,48 @@ class MessageDetail extends Component
     {
         $this->getMessages();
     }
+    #[On('fileHasUpload')]
+    public function storeRecordedVoice()
+    {
+        if (isset($this->form['voice'])) {
+            $fileUrl = Storage::disk('public')->url($this->form['voice']);
+        }
+        $p = explode('/',$this->form['voice']);
+        $mimeType = Storage::mimeType($this->form['voice']);
+        $size  =  ceil((Storage::size($this->form['voice'])) / 1024);
+        $extension = pathinfo($fileUrl, PATHINFO_EXTENSION);
+        $model = [
+            'appointment_online_id' =>  $this->fetchData['appOnline']->id,
+            'user_id'               =>  $this->fetchData['user']->id,
+            'answer_by'             =>  auth()->user()->id,
+            'type'                  =>  AppointmentOnlineMessageTypeEnum::ANSWER,
+            'seen'                  =>  AppointmentOnlineMessageSeenEnum::UNSEEN,
+            'body'                  =>  isset($this->form['typedMessage']) ? $this->form['typedMessage'] : '',
+        ];
+        $AOM =  AppointmentOnlineMessage::create($model);
+        $fileModel = [
+            'user_id' => $this->fetchData['user']->id,
+            'answer_by' => auth()->user()->id,
+            'fk_id' => $AOM->id,
+            'original_name' => $p[3],
+            'server_name' => $p[3],
+            'disk' => $p[0],
+            'path' => $this->form['voice'] ,
+            'extension' => $extension,
+            'mime' => $mimeType,
+            'size' => $size,
+        ];
+        AppointmentOnlineMessageFile::create($fileModel);
+        $this->addError('success', 'ویس با موفقیت ارسال شد');
+        $this->fetchData['messages'] = $this->fetchData['appOnline']->messages;
+        $this->dispatch('sendMessage', true);
+    }
+
     public function ignoreSearch()
     {
         unset($this->search);
         $this->fetchData['messages'] = $this->fetchData['appOnline']->messages;
-        $this->getMessages();
+        $this->dispatch('ignoreSearch', true);
     }
 
     public function sendMessage()
@@ -41,11 +79,7 @@ class MessageDetail extends Component
             'type'                  =>  AppointmentOnlineMessageTypeEnum::ANSWER,
             'seen'                  =>  AppointmentOnlineMessageSeenEnum::UNSEEN,
             'body'                  =>  isset($this->form['typedMessage']) ? $this->form['typedMessage'] : '',
-            'details'                => [AppointmentOnlineMessageFile::HAS_FILE => 'false'],
         ];
-        if (isset($this->form['file'])) {
-            $model['details'] = [AppointmentOnlineMessageFile::HAS_FILE => 'true'];
-        }
         $AOM =  AppointmentOnlineMessage::create($model);
         if (isset($this->form['file'])) {
             $url = $this->form['file'];
@@ -58,11 +92,10 @@ class MessageDetail extends Component
             $fileName = basename($filePath);
 
             // Get the file mime type
-            $fileMime = Storage::mimeType($filePath);
-
+            $fileMime = Storage::mimeType('/public/' . $filePath);
             // Get the file size
             $fileSizebyte = Storage::size('/public/' . $filePath);
-            $fileSize = $fileSizebyte / 1024 ;
+            $fileSize = $fileSizebyte / 1024;
             // Get the disk
             $fileDisk = 'public';
             $extension = pathinfo($parsedUrl['path'], PATHINFO_EXTENSION);
@@ -84,7 +117,8 @@ class MessageDetail extends Component
         }
         unset($this->form['typedMessage']);
         $this->addError('success', 'پیام با موفقیت ارسال شد');
-        $this->getMessagesBodys();
+        $this->fetchData['messages'] = $this->fetchData['appOnline']->messages;
+        $this->dispatch('sendMessage', true);
     }
     public function messages()
     {
@@ -108,8 +142,8 @@ class MessageDetail extends Component
     public function mount()
     {
         $this->fetchData['appOnline'] = AppointmentOnline::find(request()->route('onlineAppId'));
-        $this->fetchData['messages'] = $this->fetchData['appOnline']->messages;
-        $this->fetchData['user'] =  $this->fetchData['appOnline']->user;
+        $this->fetchData['messages']  = $this->fetchData['appOnline']->messages;
+        $this->fetchData['user']      =  $this->fetchData['appOnline']->user;
     }
     public function render()
     {

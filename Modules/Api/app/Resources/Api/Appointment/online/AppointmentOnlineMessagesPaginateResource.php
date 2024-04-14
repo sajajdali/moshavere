@@ -31,7 +31,7 @@ class AppointmentOnlineMessagesPaginateResource extends JsonResource
     public function toArray($request): array
     {
         return [
-            'messageList' => $this->changeStructure(),
+            'message_list' => $this->changeStructure(),
             'accessibility' => $this['accessibility'],
             'paginate' => [
                 'current_page' => $this['messages']->currentPage(),

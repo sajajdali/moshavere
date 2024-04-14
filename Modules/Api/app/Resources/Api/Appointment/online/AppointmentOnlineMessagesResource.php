@@ -18,7 +18,7 @@ class AppointmentOnlineMessagesResource extends JsonResource
             'type' => $this->type->apiResult(),
             'seen' => $this->seen == 1,
             'answer_by' => $this->answer_by ? UserResource::make($this->answerBy) : null,
-            'created_at' => verta($this->created_at)->format('H:i:s'),
+            'created_at' => verta($this->created_at)->format('H:i'),
             'files' => AppointmentOnlineMessagesFilesResource::collection($this->messageFile),
 
         ];

@@ -19,6 +19,24 @@
                 <div class="card-header d-flex justify-content-between border-bottom">
                     <h3 class="card-title">لیست نوبت های ثبت شده</h3>
                     <div class="card-options">
+                        @can('[update,delete]', $this->handleSearch()->first())
+                            <div class="btn-group me-2 d-none " id="exutebtn">
+                                <button type="button" class="btn btn-success dropdown-toggle "
+                                    data-bs-toggle="dropdown">
+                                    عملیات گروهی <span class="caret"></span>
+                                </button>
+                                <ul class="dropdown-menu pe-4" role="menu">
+                                    <li><a href="#"
+                                        class="confirm_swal_alert w-100"
+                                        data-description="از کنسل کردن نوبت های انتخابی مطمعن هستید؟"
+                                         data-title="کنسل کردن"
+                                         data-confirmbtn="بله کنسل شوند"
+                                         data-action="GroupCancel"
+                                         >کنسل کردن</a>
+                                    </li>
+                                </ul>
+                            </div>
+                        @endcan
                         <button class="btn btn-primary" type="button" data-bs-toggle="collapse"
                             data-bs-target="#advanceSearch" aria-expanded="false" aria-controls="advanceSearch">
                             جست و جوی پیشرفته
@@ -271,7 +289,7 @@
                         <thead>
                             <tr>
                                 <th scope="col">#</th>
-                                {{-- <th scope="col">انتخاب</th> --}}
+                                <th scope="col">انتخاب</th>
                                 <th scope="col">نوع نوبت</th>
                                 <th scope="col">ثبت شده توسط</th>
                                 <th scope="col">نام کاربر</th>
@@ -293,13 +311,13 @@
                                     <tr class="text-center {{ $ap->status->getColor() }}"
                                         wire:key='appoimt_{{ $ap->id }}'>
                                         <td>{{ $ap->id }}</td>
-                                        {{-- <td class="p-4">
+                                        <td class="p-4">
                                             <label class="mt-1" for="checkbox-{{ $ap->id }}">
                                                 <input wire:model='form.checkbox.{{ $ap->id }}'
-                                                    class="" id="checkbox-{{ $ap->id }}"
+                                                    class="checkbox" id="checkbox-{{ $ap->id }}"
                                                     type="checkbox" value="">
                                             </label>
-                                        </td> --}}
+                                        </td>
                                         <td>
                                             {!! $ap->kind->getIcon() !!}
                                         </td>
@@ -334,20 +352,26 @@
                                                     <ul class="dropdown-menu" role="menu">
                                                         <li><a href="#" data-label="ویرایش">ویرایش زمان نوبت</a>
                                                         </li>
-                                                        <li><a class="delete_confirm_alert" data-label="نوبت"
-                                                                data-id="{{ $ap->id }}" href=""> تبدیل
+                                                        <li><a
+                                                            data-description="میخواهید نوبت به بین مریض تبدیل شود؟"
+                                                            data-title="تغییر وضعیت "
+                                                            data-confirmbtn="بله تغییر کند"
+                                                            data-action="changeType"
+                                                            data-id="{{ $ap->id }}"
+                                                            class="confirm_swal_alert" data-label="نوبت"
+                                                                 href=""> تبدیل
                                                                 به نوبت بین مریض</a>
                                                         </li>
-                                                        <li><a class="delete_confirm_alert" data-label="نوبت"
+                                                        <li><a class="confirm_swal_alert" data-label="نوبت"
                                                                 data-id="{{ $ap->id }}" href="">کنسل
                                                                 کردن <small>(با ارسال پیامک)</small></a>
                                                         </li>
-                                                        <li><a class="delete_confirm_alert" data-label="نوبت"
+                                                        <li><a class="confirm_swal_alert" data-label="نوبت"
                                                                 data-id="{{ $ap->id }}" href="">کنسل
                                                                 کردن <small>(بدون ارسال پیامک)</small></a>
                                                         </li>
                                                         @can('delete', $ap)
-                                                            <li><a class="delete_confirm_alert" data-label="نوبت"
+                                                            <li><a class="confirm_swal_alert" data-label="نوبت"
                                                                     data-id="{{ $ap->id }}" href="">کنسل و
                                                                     حذف نوبت</a>
                                                             </li>
@@ -394,6 +418,16 @@
 <script src="{{ admin_asset('plugins/select2/select2.full.min.js') }}"></script>
 <script>
     $(document).ready(function() {
+        $('.checkbox').change(function() {
+            if ($('.checkbox:checked').length > 0) {
+                $('#exutebtn').removeClass('d-none');
+                $('#exutebtn').fadeIn();
+            } else {
+                $('#exutebtn').fadeOut();
+                $('#exutebtn').addClass('d-none');
+            }
+        });
+
         function js() {
             $('.select2-show-search').select2();
             $('#search-appointment_date').persianDatepicker({

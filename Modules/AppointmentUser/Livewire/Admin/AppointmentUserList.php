@@ -3,6 +3,7 @@
 namespace Modules\AppointmentUser\Livewire\Admin;
 
 use Livewire\Component;
+use Livewire\Attributes\On;
 use Livewire\WithPagination;
 use Modules\User\Entities\User;
 use Livewire\Attributes\Computed;
@@ -14,6 +15,7 @@ use Modules\Service\app\Models\Service;
 use Modules\AppointmentUser\app\Models\AppointmentUser;
 use Modules\AppointmentUser\Enum\AppointmentUserStatusEnum;
 use Modules\AppointmentUser\app\Exports\AppointmentListExport;
+use Modules\AppointmentUser\Enum\AppointmentUserTypeEnum;
 
 class AppointmentUserList extends Component
 {
@@ -34,6 +36,7 @@ class AppointmentUserList extends Component
         'Doc_id'               => null,
     ];
     public array $fetchData = [];
+    public array $form = [];
 
     public function startSearch()
     {
@@ -183,11 +186,39 @@ class AppointmentUserList extends Component
     }
     public function ExportData()
     {
-        
+
         if ($this->handleSearch()->getCollection()->count() > 2000) {
             return $this->addError('exelError', 'مقدار اطلاعات بیشتر از حد مجاز است، لطفا با استفاده از جست و جوی تاریخ، تعداد نوبت ها را محدود تر کنید');
         }
         return  Excel::download(new AppointmentListExport($this->handleSearch()->getCollection()), 'appointment_lists.xlsx');
+    }
+
+    #[On('confirm_swal')]
+    public function swal_confirm($action, $model)
+    {
+        return match ($action) {
+            'GroupCancel' => $this->cancelSelectedApp(),
+            'changeType' => $this->changeType($model),
+            default => '',
+        };
+    }
+    public function cancelSelectedApp()
+    {
+        foreach ($this->form['checkbox'] as $AppID => $checked) {
+            if ($checked) {
+                $app = AppointmentUser::find($AppID);
+                $app->update(['status' => AppointmentUserStatusEnum::STATUS_CANCEL]);
+            }
+        }
+        return redirect()->route('admin.appointment_user.list')->with('success', 'نوبت های انتخابی با موفقیت کنسل شدند');
+    }
+    public function changeType($id)
+    {
+
+        $app = AppointmentUser::find($id);
+        $app->update(['type' =>  AppointmentUserTypeEnum::BETWEEN_PATIENTS]);
+        return redirect()->route('admin.appointment_user.list')->with('success', 'نوبت های به بین مریض تغییر پیدا کرد');
+
     }
     public function booted()
     {

@@ -92,7 +92,9 @@ class AppointmentUser extends Model
 
     public function getColor()
     {
-
+        if($this->type == AppointmentUserTypeEnum::BETWEEN_PATIENTS) {
+            return 'table-info' ;
+        }
         return match ($this->status) {
             AppointmentUserStatusEnum::STATUS_SUCCESSFUL =>   $this->type == AppointmentUserTypeEnum::MAIN__APPOINTMENT ? 'table-success' : "table-info",
             AppointmentUserStatusEnum::STATUS_CANCEL => 'table-danger',

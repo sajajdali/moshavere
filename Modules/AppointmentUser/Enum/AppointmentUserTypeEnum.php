@@ -17,6 +17,18 @@ enum AppointmentUserTypeEnum: int implements EnumHasNameInterface , EnumHasApiRe
         };
     }
 
+    public function getbage() {
+        return match($this) {
+            self::MAIN__APPOINTMENT => '',
+            self::BETWEEN_PATIENTS => ' <span class="badge bg-primary rounded-pill">بین مریض</span>',
+        };
+    }
+    public function getclass() {
+        return match($this) {
+            self::MAIN__APPOINTMENT => '',
+            self::BETWEEN_PATIENTS => 'd-flex flex-column',
+        };
+    }
     public function apiResult(): array
     {
         return [

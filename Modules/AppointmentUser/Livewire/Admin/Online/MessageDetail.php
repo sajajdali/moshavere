@@ -30,7 +30,7 @@ class MessageDetail extends Component
             $fileUrl = Storage::disk('public')->url($this->form['voice']);
         }
         $p = explode('/',$this->form['voice']);
-        $mimeType = Storage::mimeType($this->form['voice']);
+        // $mimeType = Storage::mimeType($this->form['voice']);
         $size  =  ceil((Storage::size($this->form['voice'])) / 1024);
         $extension = pathinfo($fileUrl, PATHINFO_EXTENSION);
         $model = [
@@ -51,7 +51,7 @@ class MessageDetail extends Component
             'disk' => $p[0],
             'path' => $this->form['voice'] ,
             'extension' => $extension,
-            'mime' => $mimeType,
+            'mime' => 'mp3',
             'size' => $size,
         ];
         AppointmentOnlineMessageFile::create($fileModel);

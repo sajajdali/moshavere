@@ -26,6 +26,7 @@ Modules/*/package-lock.json
 Modules/*/mix-manifest.json
 Modules/*/yarn.lock
 /public/assets
+/public/assets\admin\js
 /public/product_image
 /public/public
 /storage/app

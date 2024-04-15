@@ -51,6 +51,14 @@ class AppointmentUserController extends Controller
     /**
      * Display a listing of the resource.
      */
+
+     public function upload(Request $request) {
+        $fileName = time().'.'.$request->file->extension();
+        $filePath = 'public/online-message/voice';
+        $file_location = Storage::put($filePath,$request->file);
+        // $request->file->move(public_path('uploads/voice/'), $fileName);
+        return ($file_location);
+     }
     public function index()
     {
         return view('appointmentuser::index');

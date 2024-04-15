@@ -308,7 +308,7 @@
                         <tbody>
                             @if ($this->handleSearch()->isNotEmpty())
                                 @foreach ($this->handleSearch() as $key => $ap)
-                                    <tr class="text-center {{ $ap->status->getColor() }}"
+                                    <tr class="text-center {{ $ap->getColor() }}"
                                         wire:key='appoimt_{{ $ap->id }}'>
                                         <td>{{ $ap->id }}</td>
                                         <td class="p-4">
@@ -318,8 +318,9 @@
                                                     type="checkbox" value="">
                                             </label>
                                         </td>
-                                        <td>
+                                        <td class="{{ $ap->type->getclass()}}">
                                             {!! $ap->kind->getIcon() !!}
+                                            {!! $ap->type->getbage() !!}
                                         </td>
                                         <td>
                                             @if (isset($ap->details[Modules\AppointmentUser\app\Models\AppointmentUser::DETAIL_APPOINTMENT_VIA]))
@@ -362,16 +363,31 @@
                                                                  href=""> تبدیل
                                                                 به نوبت بین مریض</a>
                                                         </li>
-                                                        <li><a class="confirm_swal_alert" data-label="نوبت"
+                                                        <li>
+                                                            <a class="confirm_swal_alert" data-label="نوبت"
+                                                            data-description="از کنسل کردن نوبت مطمعن هستید؟"
+                                                            data-title="کنسل کردن "
+                                                            data-confirmbtn="بله کنسل شود"
+                                                            data-action="cancelWithSms"
+                                                            data-id="{{ $ap->id }}"
                                                                 data-id="{{ $ap->id }}" href="">کنسل
-                                                                کردن <small>(با ارسال پیامک)</small></a>
+                                                                کردن <small>(با ارسال پیامک)</small>
+                                                            </a>
                                                         </li>
                                                         <li><a class="confirm_swal_alert" data-label="نوبت"
+                                                            data-description="از کنسل کردن نوبت مطمعن هستید؟"
+                                                            data-title="کنسل کردن "
+                                                            data-confirmbtn="بله کنسل شود"
+                                                            data-action="cancelWithOutSms
                                                                 data-id="{{ $ap->id }}" href="">کنسل
                                                                 کردن <small>(بدون ارسال پیامک)</small></a>
                                                         </li>
                                                         @can('delete', $ap)
                                                             <li><a class="confirm_swal_alert" data-label="نوبت"
+                                                                data-description="از کنسل و حذف کردن نوبت مطمعن هستید؟"
+                                                                data-title="کنسل و حذف  کردن "
+                                                                data-confirmbtn="بله کنسل و حذف شود"
+                                                                data-action="delete"
                                                                     data-id="{{ $ap->id }}" href="">کنسل و
                                                                     حذف نوبت</a>
                                                             </li>
@@ -398,7 +414,7 @@
                         </tbody>
                     </table>
                 </div>
-                <div>
+                <div class="d-flex justify-content-center">
                     {{ $this->handleSearch()->links() }}
                 </div>
             </div>
@@ -418,7 +434,8 @@
 <script src="{{ admin_asset('plugins/select2/select2.full.min.js') }}"></script>
 <script>
     $(document).ready(function() {
-        $('.checkbox').change(function() {
+        function js() {
+            $('.checkbox').change(function() {
             if ($('.checkbox:checked').length > 0) {
                 $('#exutebtn').removeClass('d-none');
                 $('#exutebtn').fadeIn();
@@ -427,8 +444,6 @@
                 $('#exutebtn').addClass('d-none');
             }
         });
-
-        function js() {
             $('.select2-show-search').select2();
             $('#search-appointment_date').persianDatepicker({
                 initialValue: false,

@@ -12,10 +12,12 @@ use Modules\User\Enum\UserMetaEnum;
 use Maatwebsite\Excel\Facades\Excel;
 use Hekmatinasser\Verta\Facades\Verta;
 use Modules\Service\app\Models\Service;
+use Modules\Setting\Enum\SettingKeyEnum;
 use Modules\AppointmentUser\app\Models\AppointmentUser;
+use Modules\AppointmentUser\Enum\AppointmentUserTypeEnum;
 use Modules\AppointmentUser\Enum\AppointmentUserStatusEnum;
 use Modules\AppointmentUser\app\Exports\AppointmentListExport;
-use Modules\AppointmentUser\Enum\AppointmentUserTypeEnum;
+use Modules\AppointmentUser\app\Notifications\AppointmentSmsNotification;
 
 class AppointmentUserList extends Component
 {
@@ -192,13 +194,15 @@ class AppointmentUserList extends Component
         }
         return  Excel::download(new AppointmentListExport($this->handleSearch()->getCollection()), 'appointment_lists.xlsx');
     }
-
     #[On('confirm_swal')]
     public function swal_confirm($action, $model)
     {
         return match ($action) {
             'GroupCancel' => $this->cancelSelectedApp(),
             'changeType' => $this->changeType($model),
+            'cancelWithSms' => $this->cancelAppointment($model, true),
+            'cancelWithOutSms' => $this->cancelAppointment($model, false),
+            'delete' => $this->cancelAndDeleteApp($model),
             default => '',
         };
     }
@@ -210,15 +214,37 @@ class AppointmentUserList extends Component
                 $app->update(['status' => AppointmentUserStatusEnum::STATUS_CANCEL]);
             }
         }
-        return redirect()->route('admin.appointment_user.list')->with('success', 'نوبت های انتخابی با موفقیت کنسل شدند');
+        return  $this->redirectToPage('نوبت های انتخابی با موفقیت کنسل شدند');
     }
     public function changeType($id)
     {
-
         $app = AppointmentUser::find($id);
         $app->update(['type' =>  AppointmentUserTypeEnum::BETWEEN_PATIENTS]);
-        return redirect()->route('admin.appointment_user.list')->with('success', 'نوبت های به بین مریض تغییر پیدا کرد');
+        return  $this->redirectToPage('نوبت به بین مریض تغییر پیدا کرد');
+    }
+    public function cancelAppointment($id, $sendSmsStatus)
+    {
+        $app = AppointmentUser::find($id);
+        $app->update(['status' =>  AppointmentUserStatusEnum::STATUS_CANCEL]);
+        if ($sendSmsStatus) {
+            $smsTemplate = setting(SettingKeyEnum::SMS_APPOINTMENT_CANCEL);
+            if (isset($smsTemplate)) {
+                $app->notify(new AppointmentSmsNotification($smsTemplate));
+            }
+        }
+        return  $this->redirectToPage('نوبت با موفقیت کنسل شد');
+    }
+    public function cancelAndDeleteApp($id)
+    {
 
+        $this->cancelAppointment($id, true);
+        $app = AppointmentUser::find($id);
+        $app->delete();
+        $this->redirectToPage('نوبت با موفقیت حذف شد');
+    }
+    private function redirectToPage($msg)
+    {
+        return redirect()->route('admin.appointment_user.list')->with('success', $msg);
     }
     public function booted()
     {

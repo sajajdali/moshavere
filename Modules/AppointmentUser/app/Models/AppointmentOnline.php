@@ -25,14 +25,14 @@ class AppointmentOnline extends Model
 
     public function appointmentUser(): \Illuminate\Database\Eloquent\Relations\BelongsTo
     {
-        return $this->belongsTo(AppointmentUser::class, 'id');
+        return $this->belongsTo(AppointmentUser::class);
     }
 
     public function messages(): \Illuminate\Database\Eloquent\Relations\HasMany
     {
         return $this->hasMany(AppointmentOnlineMessage::class);
     }
-  
+
 
     public static function generateTrackingCode(): string
     {

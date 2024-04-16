@@ -26,6 +26,7 @@ class AppointmentUser extends Model
     const DETAIL_SOMEONE = 'someone';
     const DETAIL_FOR_HIMSELF = 'for_himself';
     const DETAIL_PAYMENT = 'payment';
+    const DISAPPROVED_DESCRIPTION = 'disapproved_description';
 
     /**
      * The attributes that are mass assignable.
@@ -42,7 +43,7 @@ class AppointmentUser extends Model
 
     public function setting()
     {
-        return $this->belongsTo(AppointmentSetting::class , 'appointment_setting_id');
+        return $this->belongsTo(AppointmentSetting::class, 'appointment_setting_id');
     }
 
     public static function generateTrackingCode(): string
@@ -92,15 +93,27 @@ class AppointmentUser extends Model
 
     public function getColor()
     {
-        if($this->type == AppointmentUserTypeEnum::BETWEEN_PATIENTS) {
-            return 'table-info' ;
-        }
-        return match ($this->status) {
+
+        $color =  match ($this->status) {
             AppointmentUserStatusEnum::STATUS_SUCCESSFUL =>   $this->type == AppointmentUserTypeEnum::MAIN__APPOINTMENT ? 'table-success' : "table-info",
             AppointmentUserStatusEnum::STATUS_CANCEL => 'table-danger',
-            AppointmentUserStatusEnum::STATUS_WAIT_PAYMENT => 'table-info',
+            AppointmentUserStatusEnum::STATUS_WAIT_PAYMENT => 'table-warning',
             AppointmentUserStatusEnum::STATUS_ATTENDED => 'table-secondary',
             AppointmentUserStatusEnum::STATUS_NOT_ATTENDED => 'table-primary',
+            AppointmentUserStatusEnum::STATUS_PENDING => 'table-warning',
+            AppointmentUserStatusEnum::STATUS_DISAPPROVED => 'table-danger',
+            default => '',
+        };
+        if ($this->type == AppointmentUserTypeEnum::BETWEEN_PATIENTS) {
+            $color = 'table-info';
+        }
+        return $color;
+    }
+    public function getbage()
+    {
+        return match ($this->type) {
+            AppointmentUserTypeEnum::MAIN__APPOINTMENT => '',
+            AppointmentUserTypeEnum::BETWEEN_PATIENTS => ' <span class="badge bg-primary rounded-pill">بین مریض</span>',
         };
     }
 

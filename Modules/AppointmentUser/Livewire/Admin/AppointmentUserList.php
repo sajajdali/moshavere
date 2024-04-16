@@ -5,6 +5,7 @@ namespace Modules\AppointmentUser\Livewire\Admin;
 use Livewire\Component;
 use Livewire\Attributes\On;
 use Livewire\WithPagination;
+use Modules\AppointmentUser\Enum\AppointmentOnlineStatusEnum;
 use Modules\User\Entities\User;
 use Livewire\Attributes\Computed;
 use Spatie\Permission\Models\Role;
@@ -14,6 +15,7 @@ use Hekmatinasser\Verta\Facades\Verta;
 use Modules\Service\app\Models\Service;
 use Modules\Setting\Enum\SettingKeyEnum;
 use Modules\AppointmentUser\app\Models\AppointmentUser;
+use Modules\AppointmentUser\app\Models\AppointmentOnline;
 use Modules\AppointmentUser\Enum\AppointmentUserTypeEnum;
 use Modules\AppointmentUser\Enum\AppointmentUserStatusEnum;
 use Modules\AppointmentUser\app\Exports\AppointmentListExport;
@@ -241,6 +243,46 @@ class AppointmentUserList extends Component
         $app = AppointmentUser::find($id);
         $app->delete();
         $this->redirectToPage('نوبت با موفقیت حذف شد');
+    }
+    public function ApproveOnlineAppointment($id)
+    {
+        $app = AppointmentUser::find($id);
+        $onlineApp = AppointmentOnline::firstWhere('appointment_user_id',$app->id);
+        $onlineApp->update(['status' => AppointmentOnlineStatusEnum::ACCEPTED]);
+        $app->update(['status' => AppointmentUserStatusEnum::STATUS_SUCCESSFUL]);
+        $this->redirectToPage('نوبت با موفقیت تایید شد');
+    }
+    public function disApproveOnlineAppointment($id)
+    {
+        $this->fetchData['disapproveId'] = $id;
+        $this->dispatch('lunchModal', true);
+        $app = AppointmentUser::find($id);
+        $app->update(['status'=>AppointmentUserStatusEnum::STATUS_DISAPPROVED]) ;
+        $this->redirectToPage('ضعیت نوبت به عدم تایید ، تغییر پیدا کرد');
+    }
+    public function disaprovedModal()
+    {
+        $app = AppointmentUser::find($this->fetchData['disapproveId']);
+        $detail = $app->details;
+        if (isset($this->form['reason'])) {
+            if (isset($detail)) {
+                $detail = array_merge($detail, [AppointmentUser::DISAPPROVED_DESCRIPTION => $this->form['reason']]);
+            } else {
+                $detail = [AppointmentUser::DISAPPROVED_DESCRIPTION => $this->form['reason'] ];
+            }
+        }
+        try {
+            $onlineApp = AppointmentOnline::firstWhere('appointment_user_id',$app->id);
+            $onlineApp->update(['status' => AppointmentOnlineStatusEnum::REJECT]);
+            $app->update(['status' => AppointmentUserStatusEnum::STATUS_DISAPPROVED, 'details' =>  $detail]);
+        } catch (\Exception $th) {
+            return redirect()->route('admin.appointment_user.list')->with('error', 'خطا در به روز رسانی');
+        }
+        $this->redirectToPage('وضعیت نوبت به عدم تایید ، تغییر پیدا کرد');
+    }
+    public function ignoreDisaproveModal()
+    {
+        unset($this->fetchData['disapproveId']);
     }
     private function redirectToPage($msg)
     {

@@ -13,6 +13,7 @@ enum AppointmentUserStatusEnum: int implements EnumHasApiResultInterface
     case STATUS_CANCEL = 3;
     case STATUS_ATTENDED = 4;
     case STATUS_NOT_ATTENDED = 5;
+    case STATUS_DISAPPROVED = 6;
 
     public function getName(): string
     {
@@ -23,6 +24,7 @@ enum AppointmentUserStatusEnum: int implements EnumHasApiResultInterface
             self::STATUS_CANCEL       => 'کنسل شده',
             self::STATUS_ATTENDED     => 'حضور پیدا کرده',
             self::STATUS_NOT_ATTENDED => 'عدم حضور',
+            self::STATUS_DISAPPROVED =>  'رد شده',
         };
     }
     public function getBadgeColor(): string
@@ -34,11 +36,13 @@ enum AppointmentUserStatusEnum: int implements EnumHasApiResultInterface
             self::STATUS_CANCEL       => 'bg-danger',
             self::STATUS_ATTENDED     => 'bg-secondary',
             self::STATUS_NOT_ATTENDED => 'bg-primary',
+            self::STATUS_DISAPPROVED =>  'bg-danger',
         };
     }
     public function getColor(): string
     {
         return match ($this) {
+            self::STATUS_DISAPPROVED         => 'table-danger',
             self::STATUS_CANCEL         => 'table-danger',
             self::STATUS_PENDING        => 'table-warning',
             self::STATUS_SUCCESSFUL     => 'table-success',
@@ -54,6 +58,7 @@ enum AppointmentUserStatusEnum: int implements EnumHasApiResultInterface
             self::STATUS_WAIT_PAYMENT->value,
             self::STATUS_ATTENDED->value,
             self::STATUS_NOT_ATTENDED->value,
+            self::STATUS_DISAPPROVED->value,
         ];
     }
 

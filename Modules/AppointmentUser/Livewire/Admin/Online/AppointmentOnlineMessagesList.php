@@ -161,9 +161,6 @@ class AppointmentOnlineMessagesList extends Component
     {
         $this->dispatch('loadJs', true);
     }
-    public function mount()
-    {
-    }
     public function render()
     {
         return view('appointmentuser::livewire.admin.online.appointment-online-messages-list');

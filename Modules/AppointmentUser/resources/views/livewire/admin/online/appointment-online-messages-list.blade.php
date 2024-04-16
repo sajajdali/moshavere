@@ -241,8 +241,11 @@
                                             @endif
                                         </div>
                                         <div class="media-body">
-                                            <div class="media-contact-name">
-                                                <span>{{ $OnlineApp->user->fullName }}</span>
+                                            <div class="media-contact-name ">
+                                                <div class="d-flex align-items-center">
+                                                    <span>{{ $OnlineApp->user->fullName }} </span>
+                                                    {!!  $OnlineApp->status->getMessageDetailBadge() !!}
+                                                </div>
                                                 <span>{{ verta($OnlineApp->messages->last()->updated_at)->diffDays() }}
                                                     روز پیش</span>
                                             </div>

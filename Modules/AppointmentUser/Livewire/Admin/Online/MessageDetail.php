@@ -7,11 +7,14 @@ use Livewire\Attributes\On;
 use Livewire\Attributes\Url;
 use Livewire\Attributes\Computed;
 use Illuminate\Support\Facades\Storage;
+use Modules\AppointmentUser\app\Models\AppointmentUser;
 use Modules\AppointmentUser\app\Models\AppointmentOnline;
+use Modules\AppointmentUser\Enum\AppointmentOnlineStatusEnum;
 use Modules\AppointmentUser\app\Models\AppointmentOnlineMessage;
 use Modules\AppointmentUser\Enum\AppointmentOnlineMessageSeenEnum;
 use Modules\AppointmentUser\Enum\AppointmentOnlineMessageTypeEnum;
 use Modules\AppointmentUser\app\Models\AppointmentOnlineMessageFile;
+use Modules\AppointmentUser\Enum\AppointmentUserStatusEnum;
 
 class MessageDetail extends Component
 {
@@ -29,7 +32,7 @@ class MessageDetail extends Component
         if (isset($this->form['voice'])) {
             $fileUrl = Storage::disk('public')->url($this->form['voice']);
         }
-        $p = explode('/',$this->form['voice']);
+        $p = explode('/', $this->form['voice']);
         // $mimeType = Storage::mimeType($this->form['voice']);
         $size  =  ceil((Storage::size($this->form['voice'])) / 1024);
         $extension = pathinfo($fileUrl, PATHINFO_EXTENSION);
@@ -49,7 +52,7 @@ class MessageDetail extends Component
             'original_name' => $p[3],
             'server_name' => $p[3],
             'disk' => $p[0],
-            'path' => $this->form['voice'] ,
+            'path' => $this->form['voice'],
             'extension' => $extension,
             'mime' => 'mp3',
             'size' => $size,
@@ -138,6 +141,32 @@ class MessageDetail extends Component
             });
         }
         return $temp;
+    }
+    public function ignoreDisaproveModal()
+    {
+        if (isset($this->form['reason'])) {
+            unset($this->form['reason']);
+        }
+    }
+    public function approvedAppointment(){
+        $this->fetchData['appOnline']->appointmentUser()->update(['status' => AppointmentOnlineStatusEnum::ACCEPTED]) ;
+        $this->fetchData['appOnline']->update(['status' => AppointmentOnlineStatusEnum::ACCEPTED]) ;
+        return redirect()->route('admin.appointment_user.message.detail',$this->fetchData['appOnline']->id);
+    }
+    public function disaprovedModal() {
+
+        if (isset($this->form['reason'])) {
+           $detail =  $this->fetchData['appOnline']->appointmentUser->details ;
+            if (isset($detail)) {
+                $detail = array_merge($detail, [AppointmentUser::DISAPPROVED_DESCRIPTION => $this->form['reason']]);
+            } else {
+                $detail = [AppointmentUser::DISAPPROVED_DESCRIPTION => $this->form['reason']];
+            }
+        }
+        $this->fetchData['appOnline']->appointmentUser()->update(['status' => AppointmentUserStatusEnum::STATUS_CANCEL]) ;
+        $this->fetchData['appOnline']->update(['status' => AppointmentOnlineStatusEnum::REJECT]);
+
+        return redirect()->route('admin.appointment_user.message.detail',$this->fetchData['appOnline']->id);
     }
     public function mount()
     {

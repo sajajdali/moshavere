@@ -68,7 +68,20 @@ enum AppointmentOnlineStatusEnum: int implements EnumHasApiResultInterface
             self::ANSWER_BY_DOCTOR => 'table-primary',
         };
     }
+    public function getMessageDetailBadge() {
 
+        return match($this) {
+          self::PENDING => '<span class="badge bg-info  rounded-pill text-white ms-1">در انتظار</span>' ,
+          self::ACCEPTED => '<span class="badge bg-success rounded-pill ms-1">تایید شده</span>' ,
+          self::REJECT => '<span class="badge bg-danger rounded-pill ms-1">رد شده</span>' ,
+          self::CANCEL => '<span class="badge bg-danger rounded-pill ms-1">کنسل شده</span>' ,
+          self::REPLY_BY_USER => '<span class="badge bg-danger rounded-pill ms-1">پاسخ کاربر</span>' ,
+          self::ANSWER_BY_DOCTOR => '<span class="badge bg-danger rounded-pill ms-1">پاسخ داده شده</span>' ,
+          self::COMPLETED_BY_DOCTOR => '<span class="badge bg-danger rounded-pill ms-1">اتمام رسیده</span>' ,
+          self::TIME_IS_OVER => '<span class="badge bg-danger rounded-pill ms-1">زمان ویزیت تمام شده</span>' ,
+          self::REACTIVATED => '<span class="badge bg-danger rounded-pill ms-1" >مجدد فعال شده</span>' ,
+        };
+    }
 
     public function apiResult(): array
     {

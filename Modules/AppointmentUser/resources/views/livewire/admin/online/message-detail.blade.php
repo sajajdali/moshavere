@@ -229,7 +229,8 @@
 
                             </div>
                         </div>
-                        <div class="main-chat-footer pt-5">
+                        <div class="main-chat-footer d-flex justify-content-center pt-5">
+                            @if ($this->fetchData['appOnline']->status == Modules\AppointmentUser\Enum\AppointmentOnlineStatusEnum::ACCEPTED)
                             <button type="button" class="btn btn-secondary ms-2" data-bs-toggle="modal"
                                 data-bs-target="#soundRecorderModal">
                                 <i class="fa fa-microphone fa-xl" aria-hidden="true"></i>
@@ -249,6 +250,15 @@
                             <button wire:click='sendMessage' wire:target='sendMessage'
                                 wire:loading.class='btn-loading' wire:loading.attr='disabeld' type="button"
                                 class="btn btn-icon  btn-primary brround"><i class="fa fa-paper-plane-o"></i></button>
+                            @elseif($this->fetchData['appOnline']->status == Modules\AppointmentUser\Enum\AppointmentOnlineStatusEnum::PENDING)
+                            <button type="button" class="btn btn-success ms-2" wire:click='approvedAppointment' wire:loading.class='btn-loading btn-gray' wire:target='approvedAppointment'> تایید این نوبت</button>
+                            <button type="button" class="btn btn-danger ms-2" data-bs-toggle="modal"
+                            data-bs-target="#resoanForDisapproveModal"> عدم تایید این نوبت</button>
+                            @elseif($this->fetchData['appOnline']->status == Modules\AppointmentUser\Enum\AppointmentOnlineStatusEnum::REJECT)
+                            <div class="col-md-12 alert alert-danger fade show mt-4 ms-3" role="alert">
+                                نوبت رد شده است!
+                            </div>
+                            @endif
                             <nav class="nav">
                             </nav>
                         </div>
@@ -257,6 +267,7 @@
             </div>
         </div>
     </div>
+    @include('appointmentuser::components.appointmentlist.disapprovemodal')
     <livewire:admin::file-manager-modal />
     <livewire:appointmentuser::admin.online.sound-recorder />
 </div>

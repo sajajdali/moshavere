@@ -32,18 +32,19 @@ class DashboardController extends Controller
             'courses' => [] ,
             'news' => [
                 [
-                    'link' => '',
+                    'link' => 'https://drmehrnushamiri.com/%d8%b9%d9%88%d8%a7%d8%b1%d8%b6-ivf-%d8%a8%d8%b1%d8%a7%db%8c-%d8%aa%d8%b9%db%8c%db%8c%d9%86-%d8%ac%d9%86%d8%b3%db%8c%d8%aa/',
                     'date' => '1402/12/11',
-                    'title' => "رژیم غذایی تخمدان پلی کیستیک",
-                    'body'  => "PCOS و رژیم غذایی: 7 نکته کلیدی در رژیم غذایی تخمدان پلی کیستیک سندروم تخمدان پلی کیستیک (PCOS) یک اختلال",
-                    'image' => "https://jesmino.com/wp-content/uploads/2024/02/سندرم-پلی-کیستیک-300x191.jpg"
+                    'title' => "عوارض ivf برای تعیین جنسیت",
+                    'body'  => "عوارض ivf برای تعیین جنسیت چیست؟ خطرات ای وی اف تعیین جنسیت برای مادر و جنین چه خطراتی هستند؟ چطور می‌توان عوارض آن را کاهش داد؟ لقاح آزمایشگاهی",
+                    'image' => url('storage/news/ivf.jpg'),
+
                 ],
                 [
-                    'link' => '',
+                    'link' => 'https://drmehrnushamiri.com/%d8%af%d8%b1%d9%85%d8%a7%d9%86-%d9%86%d8%a7%d8%b2%d8%a7%db%8c%db%8c-%d8%a8%d8%a7-%d9%87%db%8c%d8%b3%d8%aa%d8%b1%d9%88%d8%b3%da%a9%d9%88%d9%be%db%8c/',
                     'date' => '1402/12/11',
-                    'title' => "رژیم غذایی تخمدان پلی کیستیک",
-                    'body'  => "PCOS و رژیم غذایی: 7 نکته کلیدی در رژیم غذایی تخمدان پلی کیستیک سندروم تخمدان پلی کیستیک (PCOS) یک اختلال",
-                    'image' => "https://jesmino.com/wp-content/uploads/2024/02/سندرم-پلی-کیستیک-300x191.jpg"
+                    'title' => "درمان نازایی با هیستروسکوپی",
+                    'body'  => "روش های تشخیصی بسیاری به منظور تشخیص بیماری ها وجود دارد اما پس از بررسی و مشاهده علائم بالینی، سونوگرافی، سونوهیسترو و سونوگرافی",
+                    'image' => url('storage/news/ivf2.jpg'),
                 ]
             ]
         ]);

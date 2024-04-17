@@ -31,6 +31,16 @@ enum AppointmentOnlineStatusEnum: int implements EnumHasApiResultInterface
             self::REACTIVATED => 'مجدد فعال شده',
         };
     }
+
+    public static function showInDashboardApi(): array
+    {
+        return [
+            self::ACCEPTED->value ,
+            self::REPLY_BY_USER->value,
+            self::ANSWER_BY_DOCTOR->value,
+            self::REACTIVATED->value
+        ];
+    }
     public function canSendMessage() : bool
     {
         return match ($this) {

@@ -4,12 +4,14 @@ namespace Modules\Api\Http\Controllers\Profile;
 
 use App\Http\Controllers\Controller;
 use Carbon\Carbon;
+use Illuminate\Contracts\Database\Query\Builder;
 use Modules\Api\app\Resources\Api\Appointments\AppointmentUserPaginateResource;
 use Modules\Api\app\Resources\Api\Appointments\AppointmentUserResource;
 use Modules\Api\Trait\ApiHandlerTrait;
 use Modules\Api\Transformers\Exercise\ExerciseRequestWithOutDetailResource;
 use Modules\Api\Transformers\Notification\NotificationResource;
 use Modules\Api\Transformers\Package\PackageUserResource;
+use Modules\AppointmentUser\Enum\AppointmentOnlineStatusEnum;
 use Modules\AppointmentUser\Enum\AppointmentUserKindEnum;
 use Modules\AppointmentUser\Enum\AppointmentUserStatusEnum;
 use Modules\Diet\Enum\DietRequestStatusEnum;
@@ -21,15 +23,54 @@ class DashboardController extends Controller
 {
     use ApiHandlerTrait;
 
+    private function stories(): array
+    {
+        return [
+            [
+                'image' => url('storage/videos/image1.png'),
+                'video' => url('storage/videos/video1.mp4'),
+            ],
+            [
+                'image' => url('storage/videos/image2.png'),
+                'video' => url('storage/videos/video2.mp4'),
+            ]
+            ,[
+                'image' => url('storage/videos/image3.png'),
+                'video' => url('storage/videos/video3.mp4'),
+            ]
+        ];
+    }
     public function index()
     {
         $user = auth()->user();
-        $appointments = $user->appointments()->whereDate('date_visit' , '>=', Carbon::today())->get();
+        $appointmentInPerson = $user->appointments()
+            ->whereDate('date_visit' , '>=', Carbon::today())
+            ->whereIn('status' ,[ AppointmentUserStatusEnum::STATUS_SUCCESSFUL ,AppointmentUserStatusEnum::STATUS_ATTENDED , AppointmentUserStatusEnum::STATUS_WAIT_PAYMENT , AppointmentUserStatusEnum::STATUS_NOT_ATTENDED])
+            ->where('kind' , AppointmentUserKindEnum::IN_PERSION)
+            ->orderBy('created_at')
+            ->first();
+
+        $appointmentOnline = $user->appointments()
+            ->whereIn('status' ,[ AppointmentUserStatusEnum::STATUS_SUCCESSFUL , AppointmentUserStatusEnum::STATUS_WAIT_PAYMENT])
+            ->where('kind' , AppointmentUserKindEnum::ONLINE)
+            ->whereHas('online' , function (Builder $online) {
+                return $online->whereIn('status' , AppointmentOnlineStatusEnum::showInDashboardApi());
+            })
+            ->orderBy('created_at')
+            ->first();
+//        dd($appointmentOnline);
+
+
+        $stories = $this->stories();
         return $this->ok([
             'status' => true,
-            'appointments' => AppointmentUserResource::collection($appointments),
+            'appointments' => [
+                'online' =>  AppointmentUserResource::make($appointmentOnline),
+                'in_person' => AppointmentUserResource::make($appointmentInPerson),
+            ],
             'purchased_courses' => [],
             'courses' => [] ,
+            'stories' => $stories ,
             'news' => [
                 [
                     'link' => 'https://drmehrnushamiri.com/%d8%b9%d9%88%d8%a7%d8%b1%d8%b6-ivf-%d8%a8%d8%b1%d8%a7%db%8c-%d8%aa%d8%b9%db%8c%db%8c%d9%86-%d8%ac%d9%86%d8%b3%db%8c%d8%aa/',

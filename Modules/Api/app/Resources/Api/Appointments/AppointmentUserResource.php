@@ -81,6 +81,7 @@ class AppointmentUserResource extends JsonResource
             'date_visit_format' => verta($this->date_visit)->format('l j F Y'),
             'doctor'    => DoctorResource::make($this->doctor),
             'deadline_payment' => $this->deadline_at ? Carbon::parse($this->deadline_at)->diffForHumans(): null,
+            'timestamp' => Carbon::parse($this->date_visit)->timestamp,
             'transaction' => $this->lastTransaction(),
             'payment_status' => $this->details[AppointmentUser::DETAIL_PAYMENT] ?? null,
             'payment_link' => route('appointmentUser.payment', $this),

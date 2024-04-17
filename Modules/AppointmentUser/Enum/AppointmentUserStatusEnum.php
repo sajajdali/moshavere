@@ -33,17 +33,15 @@ enum AppointmentUserStatusEnum: int implements EnumHasApiResultInterface
             self::STATUS_PENDING      => 'bg-warning',
             self::STATUS_SUCCESSFUL   => 'bg-success',
             self::STATUS_WAIT_PAYMENT => 'bg-info',
-            self::STATUS_CANCEL       => 'bg-danger',
+            self::STATUS_CANCEL, self::STATUS_DISAPPROVED => 'bg-danger',
             self::STATUS_ATTENDED     => 'bg-secondary',
             self::STATUS_NOT_ATTENDED => 'bg-primary',
-            self::STATUS_DISAPPROVED =>  'bg-danger',
         };
     }
     public function getColor(): string
     {
         return match ($this) {
-            self::STATUS_DISAPPROVED         => 'table-danger',
-            self::STATUS_CANCEL         => 'table-danger',
+            self::STATUS_DISAPPROVED, self::STATUS_CANCEL => 'table-danger',
             self::STATUS_PENDING        => 'table-warning',
             self::STATUS_SUCCESSFUL     => 'table-success',
             self::STATUS_WAIT_PAYMENT   => 'table-primary',

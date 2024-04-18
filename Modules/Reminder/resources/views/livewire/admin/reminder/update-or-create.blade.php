@@ -7,33 +7,38 @@
         </div>
     </div>
     @include('admin::layouts.components.alert')
-    @error('*')
-    <span class="invalid_message">{{$message}}</span>
-    @enderror
-    <div class="card   @if ($errors->has('form.visitType.inPerson') || $errors->has('form.visitType.online')) border border-danger @endif">
+    <div class="card">
         <div class="card-body">
             <div class="row">
                 <div class="col-md-12">
                     <div class="form-group">
-                        <label class="form-label"><strong>انتخاب بخش</strong></label>
-                        <select  class="form-control select2-show-search form-select" id="serviceSelet" wire:ignore.self
-                            data-placeholder="انتخاب کنید..">
+                        <label class="form-label">
+                            <strong>انتخاب بخش</strong>
+                        </label>
+                        <select class="form-control select2-show-search form-select" id="serviceSelet" wire:ignore.self
+                            wire:key='{{ time() }}' data-placeholder="انتخاب کنید..">
                             <option value="null">همه بخش ها</option>
                             @foreach ($fetchData['services'] as $key => $service)
-                                    <option value="{{ $service->id }}">{{ $service->title }}</option>
-                             @endforeach
+                                <option value="{{ $service->id }}">{{ $service->title }}</option>
+                            @endforeach
                         </select>
+                        @error('form.service')
+                            <div class="text-danger">
+                                <i class="fa fa-exclamation-triangle ms-1 mt-1" aria-hidden="true"></i> {{ $message }}
+                            </div>
+                        @enderror
                     </div>
                 </div>
                 {{-- line seperator --}}
                 <div class="col-12 col-md-3 mt-md-5 mb-md-3">
-                    <div class="d-flex align-items-center text-primary">
+                    <div
+                        class="d-flex align-items-center @error('form.specificDoctors') text-danger @else text-primary @enderror">
                         <i class="fa fa-user-md fa-2x mb-1 me-2" aria-hidden="true"></i>
                         <h4 class="mt-1">انتخاب پزشک</h4>
                     </div>
                 </div>
                 <div class="col-12 col-md-9 mt-md-5 mb-md-3">
-                    <hr>
+                    <hr class="@error('form.specificDoctors') bg-danger @enderror">
                 </div>
                 {{-- line seperator --}}
 
@@ -59,69 +64,76 @@
                 <div class="col-md-12 d-none" id="selectDoctorSelectBox" wire:ignore.self>
                     <div class="form-group">
                         <label class="form-label">انتخاب پزشک</label>
-                        <select multiple class="form-control select2-show-search form-select" id="speciificDocSelect2" wire:ignore.self
-                            data-placeholder="انتخاب کنید...">
+                        <select multiple class="form-control select2-show-search form-select" id="speciificDocSelect2"
+                            wire:ignore.self data-placeholder="انتخاب کنید...">
                             <option label="انتخاب کنید..."></option>
                             @foreach ($fetchData['doctors'] as $doctor)
                                 <option value="{{ $doctor->id }}">{{ $doctor->fullname }}</option>
                             @endforeach
                         </select>
+                        @error('form.specificDoctors')
+                            <div class="text-danger">
+                                <i class="fa fa-exclamation-triangle ms-1 mt-1" aria-hidden="true"></i> {{ $message }}
+                            </div>
+                        @enderror
                     </div>
                 </div>
                 {{-- line seperator --}}
                 <div class="col-12 col-md-3 mt-5  mt-md-5 mb-md-3">
-                    <div class="d-flex align-items-center text-primary">
+                    <div
+                        class="d-flex align-items-center @if ($errors->hasAny('form.callAnnouncment', 'form.smsTemplateName', 'form.notificationText')) text-danger @else text-primary @endif">
                         <i class="fa fa-flag  fa-2x mb-1 me-2" aria-hidden="true"></i>
                         <h4 class="mt-1">انتخاب نوع ارسال</h4>
                     </div>
                 </div>
                 <div class="col-12 col-md-9 mt-md-5  mt-md-5 mb-md-3">
-                    <hr>
+                    <hr class="@if ($errors->hasAny('form.callAnnouncment', 'form.smsTemplateName', 'form.notificationText')) bg-danger @endif">
                 </div>
                 {{-- send Type --}}
                 <div class="col-12 mt-4">
                     <div class="row">
-                        <div class="col-md-4">
-                            <label class="rdiobox" for="sendTypeSms">
-                                <input name="sendNotifType" type="radio" class="radio-secondary sendType"
-                                    wire:model='form.sendType' value="sms" value="all" id="sendTypeSms">
-                                <span>پیامک</span>
-                            </label>
-                        </div>
-                        <div class="col-md-4">
-                            <label class="rdiobox" for="sendTypeNotification">
-                                <input name="sendNotifType" type="radio" class="radio-secondary sendType"
-                                    wire:model='form.sendType' value="notification" id="sendTypeNotification">
-                                <span>اعلان موبایل</span>
-                            </label>
-                        </div>
-                        <div class="col-md-4">
-                            <label class="rdiobox" for="sendTypecall">
-                                <input name="sendNotifType" type="radio" class="radio-secondary sendType"
-                                    wire:model='form.sendType' value="call" id="sendTypecall">
-                                <span>تماس</span>
-                            </label>
-                        </div>
+                        @foreach(Modules\Reminder\Enum\ReminderStatusEnum::cases() as $key => $value)
+                            <div class="col-md-4">
+                                <label class="rdiobox" for="sendType{{$value->getWireModelName()}}">
+                                    <input name="sendNotifType" type="radio" class="radio-secondary sendType"
+                                        wire:model='form.sendType' value="{{$value}}" value="{{$value->getWireModelName()}}" id="sendType{{$value->getWireModelName()}}">
+                                    <span>{{$value->getName()}}</span>
+                                </label>
+                            </div>
+                        @endforeach
                     </div>
                 </div>
-                <div class="col-12 mt-4" id="smsTemplateDiv">
+                <div class="col-12 mt-4" id="smsTemplateDiv" wire:ignore.self>
                     <label for="smsTemplate" class="form-label">نام قالب پیامکی</label>
-                    <input wire:model='form.smsTemplateName' class="form-control" id="smsTemplate"
+                    <input wire:model='form.smsTemplateName'
+                        class="form-control @error('form.smsTemplateName') is-invalid @enderror" id="smsTemplate"
                         placeholder="نام قالب پیامکی که در پنل پیامکی ثبت کردید" type="text">
+                    @error('form.smsTemplateName')
+                        <div class="text-danger">
+                            <i class="fa fa-exclamation-triangle ms-1 mt-1" aria-hidden="true"></i> {{ $message }}
+                        </div>
+                    @enderror
                 </div>
-                <div class="col-md-12 d-none" id="notificationTemplateDiv">
+                <div class="col-md-12 d-none" id="notificationTemplateDiv" wire:ignore.self>
                     <label for="validationTextarea" class="form-label">متن اعلان</label>
                     <textarea wire:model='form.notificationText' class="form-control" id="validationTextarea"
                         placeholder="متن اعلان را وارد کنید"></textarea>
                     <small class="text-gray">برای استفاده از متن متغیر، از %param1% استفاده کنید!</small>
-                    <div class="invalid-feedback">
-                        Please enter a message in the textarea.
-                    </div>
+                    @error('form.notificationText')
+                        <div class="text-danger">
+                            <i class="fa fa-exclamation-triangle ms-1 mt-1" aria-hidden="true"></i> {{ $message }}
+                        </div>
+                    @enderror
                 </div>
-                <div class="col-12 mt-4 d-none" id="callAnnouncmentDiv">
+                <div class="col-12 mt-4 d-none" id="callAnnouncmentDiv" wire:ignore.self>
                     <label for="callTemp" class="form-label">نام قالب </label>
                     <input wire:model='form.callAnnouncment' class="form-control" id="callTemp"
                         placeholder="عنوان پیام تلفنی " type="text">
+                    @error('form.callAnnouncment')
+                        <div class="text-danger">
+                            <i class="fa fa-exclamation-triangle ms-1 mt-1" aria-hidden="true"></i> {{ $message }}
+                        </div>
+                    @enderror
                 </div>
                 <div id="paramDiv" class="col-12 row">
                     <div class="col-12 col-md-3 mt-5  mt-md-5 mb-md-3">
@@ -141,13 +153,14 @@
                                     <span class="badge bg-secondary rounded-phill mt-md-1">1</span>
                                 </div>
                                 <div class="col-11">
-                                    <select class="form-control select2-show-search form-select parametrSelecter" data-id="1" wire:ignore.self
-                                    data-placeholder="انتخاب کنید...">
-                                    <option label="انتخاب کنید..."></option>
-                                    @foreach (Modules\Reminder\Enum\ReminderParametersEnum::cases() as $parameter)
-                                        <option value="{{ $parameter->value }}">{{ $parameter->getName() }}</option>
-                                    @endforeach
-                                </select>
+                                    <select class="form-control select2-show-search form-select parametrSelecter"
+                                        data-id="1" wire:ignore.self data-placeholder="انتخاب کنید...">
+                                        <option label="انتخاب کنید..."></option>
+                                        @foreach (Modules\Reminder\Enum\ReminderParametersEnum::cases() as $parameter)
+                                            <option value="{{ $parameter->value }}">{{ $parameter->getName() }}
+                                            </option>
+                                        @endforeach
+                                    </select>
                                 </div>
                             </div>
                         </div>
@@ -159,8 +172,9 @@
                             </div>
                             <div class="col-md-9">
                                 <div class="form-group">
-                                    <select class="form-control select2-show-search form-select parametrSelecter" data-id="{{$i + 2}}" wire:ignore.self
-                                         data-placeholder="انتخاب کنید...">
+                                    <select class="form-control select2-show-search form-select parametrSelecter"
+                                        data-id="{{ $i + 2 }}" wire:ignore.self
+                                        data-placeholder="انتخاب کنید...">
                                         <option label="انتخاب کنید..."></option>
                                         @foreach (Modules\Reminder\Enum\ReminderParametersEnum::cases() as $parameter)
                                             <option value="{{ $parameter->value }}">{{ $parameter->getName() }}
@@ -184,13 +198,14 @@
                 </div>
                 {{-- line seperator --}}
                 <div class="col-12 col-md-3 mt-5  mt-md-5 mb-md-3">
-                    <div class="d-flex align-items-center text-primary">
+                    <div
+                        class="d-flex align-items-center   @error('form.timeSend') text-danger @else text-primary @enderror">
                         <i class="fa fa-clock-o fa-2x mb-1 me-2" aria-hidden="true"></i>
                         <h4 class="mt-1">زمان ارسال</h4>
                     </div>
                 </div>
                 <div class="col-12 col-md-9 mt-md-5  mt-md-5 mb-md-3">
-                    <hr>
+                    <hr class="@error('form.timeSend') bg-danger @enderror">
                 </div>
                 {{-- line seperator --}}
 
@@ -210,9 +225,13 @@
                                             value="selectedDate"
                                             type="radio"id="numberOfBeforeVisitDate_radio"><span></span></label>
                                 </div>
-                                <input class="form-control dayInput" id="numberOfBeforeVisitDate_input" disabled
-                                    wire:model='form.specificDay' placeholder="چند روز قبل از فرا رسیدن روز نوبت"
-                                    type="text">
+                                <input class="form-control dayInput" id="numberOfBeforeVisitDate_input" wire:ignore disabled
+                                    placeholder="چند روز قبل از فرا رسیدن روز نوبت" type="text">
+                                    @error('form.specificDay')
+                                    <div class="text-danger">
+                                        <i class="fa fa-exclamation-triangle ms-1 mt-1" aria-hidden="true"></i> {{ $message }}
+                                    </div>
+                                    @enderror
                             </div>
                         </div>
                     </div>
@@ -220,14 +239,20 @@
                 <div class="col-md-12 mb-3 mt-4">
                     <label for="datetimepicker2">چند ساعت قبل از نوبت ارسال شود</label>
                     <div class="input-group col-md-6 ps-0">
-                        <input class="form-control" id="datetimepicker2" type="time">
+                        <input class="form-control   @error('form.timeSend') is-invalid @enderror"
+                            id="datetimepicker2" wire:model='form.timeSend' type="time">
                     </div>
                     <small class="text-gray">برای انتخاب روی ساعت کلیک کنید</small>
+                    @error('form.timeSend')
+                        <div class="text-danger">
+                            <i class="fa fa-exclamation-triangle ms-1 mt-1" aria-hidden="true"></i> {{ $message }}
+                        </div>
+                    @enderror
                 </div>
                 <div class="col-md-12 mt-3">
                     <div class="main-toggle-group d-flex align-items-center ms-0">
-                        <div class="toggle toggle-lg toggle-primary my-1 customCheckbox on"
-                            wire:ignore.self data-id="visitType.inPerson">
+                        <div class="toggle toggle-lg toggle-primary my-1 customCheckbox on" wire:ignore.self
+                            data-id="visitType.inPerson">
                             <span></span>
                         </div>
                         <div class="ms-2">
@@ -239,7 +264,8 @@
                     <hr>
                 </div>
                 <div class="col-md-12 text-end">
-                    <button wire:click='storeReminder' class="btn btn-success"><strong>ذخیره ی یادآور</strong></button>
+                    <button wire:click='storeReminder' wire:loading.class='btn-loading bg-gray'
+                        wire:target='storeReminder' class="btn btn-success"><strong>ذخیره ی یادآور</strong></button>
                 </div>
             </div>
         </div>
@@ -256,6 +282,9 @@
                     $('.select2-show-search').select2();
                 }, 200);
             });
+            $('#numberOfBeforeVisitDate_input').change(function() {
+                @this.set('form.specific', $(this).val());
+            });
             $('.docradio').on('click', function(e) {
                 if ($('#rdio-secondary-unchecked').is(':checked')) {
                     $('#selectDoctorSelectBox').fadeIn('d-none');
@@ -267,12 +296,12 @@
             });
             $('.sendType').on('change', function(e) {
                 var val = $(this).val();
-                if (val == 'sms') {
+                if (val == '1') {
                     $('#smsTemplateDiv').fadeIn().removeClass('d-none');
                     $('#notificationTemplateDiv').fadeOut().addClass('d-none');
                     $('#callAnnouncmentDiv').fadeOut().addClass('d-none');
                     $('#paramDiv').fadeIn().removeClass('d-none');
-                } else if (val == 'notification') {
+                } else if (val == '2') {
                     $('#notificationTemplateDiv').fadeIn().removeClass('d-none');
                     $('#smsTemplateDiv').fadeOut().addClass('d-none');
                     $('#callAnnouncmentDiv').fadeOut().addClass('d-none');
@@ -290,17 +319,16 @@
                     $('#numberOfBeforeVisitDate_input').prop('disabled', true);
                 }
             });
-            $('#serviceSelet').on('change',function(){
-                @this.set('form.service',$(this).val());
+            $('#serviceSelet').on('change', function() {
+                @this.set('form.service', $(this).val());
             });
-            $('#speciificDocSelect2').on('change',function(){
-                @this.set('form.specificDoctors',$(this).val());
+            $('#speciificDocSelect2').on('change', function() {
+                @this.set('form.specificDoctors', $(this).val());
             });
-            $('body').on('change','.parametrSelecter',function(){
+            $('body').on('change', '.parametrSelecter', function() {
                 var id = $(this).data('id');
-                @this.set('form.parametr.' + id,$(this).val());
+                @this.set('form.parametr.' + id, $(this).val());
             });
         });
-
     </script>
 @endpush

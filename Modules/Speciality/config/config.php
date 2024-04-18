@@ -25,6 +25,35 @@ return [
         'priority' => 90,
         'children' => [ //it is required
             [
+                'title' => 'پیام های یادآوری',
+                'gate' => 'viewAny',
+                'policy_class' => \Modules\User\Entities\User::class,
+                'icon' => 'fe fe-bell',
+                'route' => null,
+                'has_badge' => false,
+                'has_child' => true,
+                'children' => [
+                    [
+                        'title' => 'لیست',
+                        'gate' => 'viewAny',
+                        'policy_class' => \Modules\User\Entities\User::class,
+                        'icon' => 'fa fa-list',
+                        'route' => 'admin.speciality.index',
+                        'has_child' => false,
+                        'children' => null,
+                    ],
+                    [
+                        'title' => 'افزودن',
+                        'gate' => 'create',
+                        'policy_class' => \Modules\User\Entities\User::class,
+                        'icon' => 'fa fa-plus-circle',
+                        'route' => 'admin.reminder.create',
+                        'has_child' => false,
+                        'children' => null,
+                    ],
+                ],
+            ],
+            [
                 'title' => 'تخصص ها',
                 'gate' => 'viewAny',
                 'policy_class' => \Modules\User\Entities\User::class,

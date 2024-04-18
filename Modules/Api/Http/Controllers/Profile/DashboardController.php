@@ -65,8 +65,8 @@ class DashboardController extends Controller
         return $this->ok([
             'status' => true,
             'appointments' => [
-                'online' =>  AppointmentUserResource::make($appointmentOnline),
-                'in_person' => AppointmentUserResource::make($appointmentInPerson),
+                'online' => isset($appointmentOnline) ?  AppointmentUserResource::make($appointmentOnline) : null,
+                'in_person' => isset($appointmentInPerson) ? AppointmentUserResource::make($appointmentInPerson) : null,
             ],
             'purchased_courses' => [],
             'courses' => [] ,

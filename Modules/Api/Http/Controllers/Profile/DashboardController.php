@@ -7,6 +7,7 @@ use Carbon\Carbon;
 use Illuminate\Contracts\Database\Query\Builder;
 use Modules\Api\app\Resources\Api\Appointments\AppointmentUserPaginateResource;
 use Modules\Api\app\Resources\Api\Appointments\AppointmentUserResource;
+use Modules\Api\app\Resources\Api\DoctorResource;
 use Modules\Api\Trait\ApiHandlerTrait;
 use Modules\Api\Transformers\Exercise\ExerciseRequestWithOutDetailResource;
 use Modules\Api\Transformers\Notification\NotificationResource;
@@ -35,10 +36,17 @@ class DashboardController extends Controller
                 'video' => url('storage/videos/video2.mp4'),
             ]
             ,[
-                'image' => url('storage/videos/image3.png'),
+                'image' => url('storage/videos/image3.jpg'),
                 'video' => url('storage/videos/video3.mp4'),
             ]
         ];
+    }
+
+    private function doctors()
+    {
+        $doctors = User::doctors_query()->whereHas('appointmentSettings')->get();
+        return \Modules\Api\app\Resources\Api\Appointments\DoctorResource::collection($doctors);
+
     }
     public function index()
     {
@@ -71,6 +79,7 @@ class DashboardController extends Controller
             'purchased_courses' => [],
             'courses' => [] ,
             'stories' => $stories ,
+            'doctors' => $this->doctors(),
             'news' => [
                 [
                     'link' => 'https://drmehrnushamiri.com/%d8%b9%d9%88%d8%a7%d8%b1%d8%b6-ivf-%d8%a8%d8%b1%d8%a7%db%8c-%d8%aa%d8%b9%db%8c%db%8c%d9%86-%d8%ac%d9%86%d8%b3%db%8c%d8%aa/',
@@ -85,7 +94,7 @@ class DashboardController extends Controller
                     'date' => '1402/12/11',
                     'title' => "درمان نازایی با هیستروسکوپی",
                     'body'  => "روش های تشخیصی بسیاری به منظور تشخیص بیماری ها وجود دارد اما پس از بررسی و مشاهده علائم بالینی، سونوگرافی، سونوهیسترو و سونوگرافی",
-                    'image' => url('storage/news/ivf2.jpg'),
+                    'image' => url('storage/news/ivf1.jpg'),
                 ]
             ]
         ]);

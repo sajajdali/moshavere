@@ -19,7 +19,8 @@
                             wire:key='{{ time() }}' data-placeholder="انتخاب کنید..">
                             <option value="null">همه بخش ها</option>
                             @foreach ($fetchData['services'] as $key => $service)
-                                <option value="{{ $service->id }}">{{ $service->title }}</option>
+                                <option @if (isset($this->form['service']) && $this->form['service'] == $service->id) selected @endif value="{{ $service->id }}">
+                                    {{ $service->title }}</option>
                             @endforeach
                         </select>
                         @error('form.service')
@@ -44,7 +45,7 @@
 
                 {{-- doctor --}}
                 <div class="col-12 mt-4">
-                    <div class="row">
+                    <div class="row" wire:click='updateSpecificPRoperties'>
                         <div class="col-md-6">
                             <label class="rdiobox docradio" for="rdio-primary-unchecked">
                                 <input name="rdio-secondary" type="radio" class="radio-primary"
@@ -68,7 +69,8 @@
                             wire:ignore.self data-placeholder="انتخاب کنید...">
                             <option label="انتخاب کنید..."></option>
                             @foreach ($fetchData['doctors'] as $doctor)
-                                <option value="{{ $doctor->id }}">{{ $doctor->fullname }}</option>
+                                <option @if (isset($form['specificDoctors']) && in_array($doctor->id, $form['specificDoctors'])) selected @endif value="{{ $doctor->id }}">
+                                    {{ $doctor->fullname }}</option>
                             @endforeach
                         </select>
                         @error('form.specificDoctors')
@@ -92,12 +94,14 @@
                 {{-- send Type --}}
                 <div class="col-12 mt-4">
                     <div class="row">
-                        @foreach(Modules\Reminder\Enum\ReminderStatusEnum::cases() as $key => $value)
+                        @foreach (Modules\Reminder\Enum\ReminderStatusEnum::cases() as $key => $value)
                             <div class="col-md-4">
-                                <label class="rdiobox" for="sendType{{$value->getWireModelName()}}">
+                                <label class="rdiobox" for="sendType{{ $value->getWireModelName() }}">
                                     <input name="sendNotifType" type="radio" class="radio-secondary sendType"
-                                        wire:model='form.sendType' value="{{$value}}" value="{{$value->getWireModelName()}}" id="sendType{{$value->getWireModelName()}}">
-                                    <span>{{$value->getName()}}</span>
+                                        wire:model='form.sendType' value="{{ $value }}"
+                                        value="{{ $value->getWireModelName() }}"
+                                        id="sendType{{ $value->getWireModelName() }}">
+                                    <span>{{ $value->getName() }}</span>
                                 </label>
                             </div>
                         @endforeach
@@ -153,11 +157,11 @@
                                     <span class="badge bg-secondary rounded-phill mt-md-1">1</span>
                                 </div>
                                 <div class="col-11">
-                                    <select class="form-control select2-show-search form-select parametrSelecter"
+                                    <select class="form-control  form-select" wire:model='form.parametr.0'
                                         data-id="1" wire:ignore.self data-placeholder="انتخاب کنید...">
                                         <option label="انتخاب کنید..."></option>
                                         @foreach (Modules\Reminder\Enum\ReminderParametersEnum::cases() as $parameter)
-                                            <option value="{{ $parameter->value }}">{{ $parameter->getName() }}
+                                            <option value="{{ $parameter }}">{{ $parameter->getName() }}
                                             </option>
                                         @endforeach
                                     </select>
@@ -172,12 +176,13 @@
                             </div>
                             <div class="col-md-9">
                                 <div class="form-group">
-                                    <select class="form-control select2-show-search form-select parametrSelecter"
-                                        data-id="{{ $i + 2 }}" wire:ignore.self
+                                    <select class="form-control form-select " wire:model='form.parametr.{{$i +1}}'
+                                        data-id="{{ $i }}" wire:ignore.self
                                         data-placeholder="انتخاب کنید...">
                                         <option label="انتخاب کنید..."></option>
                                         @foreach (Modules\Reminder\Enum\ReminderParametersEnum::cases() as $parameter)
-                                            <option value="{{ $parameter->value }}">{{ $parameter->getName() }}
+                                            <option @if (isset($this->form['parametr']) && in_array($parameter->value, $this->form['parametr'])) selected @endif
+                                                value="{{ $parameter->value }}">{{ $parameter->getName() }}
                                             </option>
                                         @endforeach
                                     </select>
@@ -225,13 +230,14 @@
                                             value="selectedDate"
                                             type="radio"id="numberOfBeforeVisitDate_radio"><span></span></label>
                                 </div>
-                                <input class="form-control dayInput" id="numberOfBeforeVisitDate_input" wire:ignore disabled
-                                    placeholder="چند روز قبل از فرا رسیدن روز نوبت" type="text">
-                                    @error('form.specificDay')
+                                <input class="form-control dayInput" id="numberOfBeforeVisitDate_input" wire:ignore
+                                   @if (! isset($form['send_at_specific_date']) && $form['sendDate'] == 'sameDay'  ) disabled @else value="@if (isset($form['send_at_specific_date'])) {{$form['send_at_specific_date']}}@endif" @endif  placeholder="چند روز قبل از فرا رسیدن روز نوبت" type="text">
+                                @error('form.specificDay')
                                     <div class="text-danger">
-                                        <i class="fa fa-exclamation-triangle ms-1 mt-1" aria-hidden="true"></i> {{ $message }}
+                                        <i class="fa fa-exclamation-triangle ms-1 mt-1" aria-hidden="true"></i>
+                                        {{ $message }}
                                     </div>
-                                    @enderror
+                                @enderror
                             </div>
                         </div>
                     </div>
@@ -239,7 +245,8 @@
                 <div class="col-md-12 mb-3 mt-4">
                     <label for="datetimepicker2">چند ساعت قبل از نوبت ارسال شود</label>
                     <div class="input-group col-md-6 ps-0">
-                        <input class="form-control   @error('form.timeSend') is-invalid @enderror"
+                        <input class="form-control @error('form.timeSend') is-invalid @enderror"
+                        @if (isset($form['timeSend']) && !empty($form['timeSend']) ) value="{{$form['timeSend']}}" @endif
                             id="datetimepicker2" wire:model='form.timeSend' type="time">
                     </div>
                     <small class="text-gray">برای انتخاب روی ساعت کلیک کنید</small>
@@ -277,13 +284,24 @@
     <script>
         $(document).ready(function() {
             $('.select2-show-search').select2();
+            var doctors = "{{ $form['doctors'] }}";
+            if (doctors == 'specificDoctor') {
+                $('#selectDoctorSelectBox').removeClass('d-none');
+            }
             Livewire.on('loadjs', function() {
                 setTimeout(() => {
                     $('.select2-show-search').select2();
                 }, 200);
             });
             $('#numberOfBeforeVisitDate_input').change(function() {
-                @this.set('form.specific', $(this).val());
+                @this.set('form.send_at_specific_date', $(this).val());
+            });
+            $('.customCheckbox').on('click', function() {
+                if ($(this).hasClass('on')) {
+                    @this.set('form.active', 1);
+                } else {
+                    @this.set('form.active', 0);
+                }
             });
             $('.docradio').on('click', function(e) {
                 if ($('#rdio-secondary-unchecked').is(':checked')) {
@@ -296,6 +314,14 @@
             });
             $('.sendType').on('change', function(e) {
                 var val = $(this).val();
+                changeSendTypeStatus(val);
+            });
+            if ({{ isset($form['sendType']) }}) {
+                val = "{{ $form['sendType'] }}";
+                changeSendTypeStatus(val);
+            };
+
+            function changeSendTypeStatus(val) {
                 if (val == '1') {
                     $('#smsTemplateDiv').fadeIn().removeClass('d-none');
                     $('#notificationTemplateDiv').fadeOut().addClass('d-none');
@@ -311,7 +337,7 @@
                     $('#callAnnouncmentDiv').fadeIn().removeClass('d-none');
                     $('#paramDiv').fadeOut().addClass('d-none');
                 }
-            });
+            }
             $('.dayInput').on('click', function() {
                 if ($('#numberOfBeforeVisitDate_radio').prop('checked')) {
                     $('#numberOfBeforeVisitDate_input').prop('disabled', false);
@@ -324,10 +350,6 @@
             });
             $('#speciificDocSelect2').on('change', function() {
                 @this.set('form.specificDoctors', $(this).val());
-            });
-            $('body').on('change', '.parametrSelecter', function() {
-                var id = $(this).data('id');
-                @this.set('form.parametr.' + id, $(this).val());
             });
         });
     </script>

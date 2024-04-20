@@ -2,6 +2,8 @@
 
 namespace Modules\Reminder\app\Models;
 
+use App\Enum\ActiveEnum;
+use Modules\User\Entities\User;
 use Illuminate\Database\Eloquent\Model;
 use Modules\Service\app\Models\Service;
 use Modules\Reminder\Enum\ReminderStatusEnum;
@@ -11,23 +13,51 @@ class Reminder extends Model
     /**
      * The attributes that are mass assignable.
      */
-    protected $table = ['id'];
+    protected $guarded = ['id'];
     protected $casts = [
-        'status'      => ReminderStatusEnum::class ,
-        'detail'      => 'json' ,
-        'parameters'  => 'json' ,
-        'doctors'     => 'json' ,
-    ] ;
+        'status'      => ReminderStatusEnum::class,
+        'detail'      => 'json',
+        'parameters'  => 'json',
+        'doctors'     => 'json',
+        'active'      => ActiveEnum::class,
+    ];
     protected function reminderable()
     {
         return $this->morphTo();
     }
-    public function service() {
-        $this->morphTo(Service::class);
-    }
+
     protected function asJson($value)
     {
         return json_encode($value, JSON_UNESCAPED_UNICODE);
     }
-
+    public function getSendDateString(): string
+    {
+        $date =  ' در روز نوبت  و '  . substr($this->send_time, 0, -3) . 'ساعت قبل ';
+        if (!empty($this->send_day)) {
+            $date = $this->send_day . ' روز و ' . substr($this->send_time, 0, -3) . ' ساعت قبل ';
+        }
+        return $date;
+    }
+    public function getDoctorsName()
+    {
+        $docName = 'تمامی پزشکان';
+        if (!empty($this->doctors)) {
+            $docName = '';
+            foreach ($this->doctors as  $key => $doctorId) {
+                if($key == 0 ) {
+                    $docName .= User::find($doctorId)->fullName;
+                }else{
+                    $docName .= ',' . User::find($doctorId)->fullName;
+                }
+            }
+        }
+        return $docName;
+    }
+    public function getDoctorsNameBadge() :string{
+        $className = '';
+        if (empty($this->doctors)) {
+            $className =  'badge bg-info rounded-pill' ;
+        }
+        return $className ;
+    }
 }

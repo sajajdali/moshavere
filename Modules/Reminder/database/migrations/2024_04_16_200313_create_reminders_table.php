@@ -18,8 +18,10 @@ return new class extends Migration
             $table->string('body');
             $table->json('parameters')->nullable();
             $table->json('doctors')->nullable();
-            $table->timestamp('send_at')->nullable();
-            $table->json('detail');
+            $table->integer('send_day')->nullable();
+            $table->time('send_time')->nullable();
+            $table->tinyInteger('active');
+            $table->json('detail')->nullable();
             $table->timestamps();
         });
     }

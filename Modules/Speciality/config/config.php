@@ -38,7 +38,7 @@ return [
                         'gate' => 'viewAny',
                         'policy_class' => \Modules\User\Entities\User::class,
                         'icon' => 'fa fa-list',
-                        'route' => 'admin.speciality.index',
+                        'route' => 'admin.reminder.list',
                         'has_child' => false,
                         'children' => null,
                     ],

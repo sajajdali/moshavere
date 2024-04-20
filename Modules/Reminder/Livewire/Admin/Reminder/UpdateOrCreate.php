@@ -3,19 +3,29 @@
 namespace Modules\Reminder\Livewire\Admin\Reminder;
 
 use Livewire\Component;
-use Modules\Reminder\app\Models\Reminder;
-use Modules\Reminder\Enum\ReminderStatusEnum;
+use App\Enum\ActiveEnum;
+use Illuminate\Support\Arr;
 use Modules\User\Entities\User;
 use Modules\Service\app\Models\Service;
+use Modules\Reminder\app\Models\Reminder;
+use Modules\Reminder\Enum\ReminderStatusEnum;
 
 class UpdateOrCreate extends Component
 {
+
     public array $fetchData = ['parametrCounter' => 0];
     public array $form = [
         'doctors' => 'all',
         'sendType' => ReminderStatusEnum::SMS,
         'sendDate' => 'sameDay',
+        'active' => 1,
     ];
+    public function updateSpecificPRoperties()
+    {
+        if (isset($this->form['specificDoctors'])) {
+            unset($this->form['specificDoctors']);
+        }
+    }
     public function addMoreParam()
     {
         $this->fetchData['parametrCounter'] = $this->fetchData['parametrCounter'] + 1;
@@ -42,18 +52,18 @@ class UpdateOrCreate extends Component
     public function rules()
     {
         return [
-            'form.service'          => 'required',
             'form.doctors'          => 'required',
             'form.specificDoctors'  => 'required_if:form.doctors,specificDoctor',
             'form.smsTemplateName'  => 'required_if:form.sendType,sms',
             'form.callAnnouncment'  => 'required_if:form.sendType,call',
             'form.notificationText' => 'required_if:form.sendType,notification',
-            'form.sendDay'          => 'required',
+            'form.sendDate'         => 'required',
             'form.specificDay'      => 'required_if:form.sendDay,selectedDate',
             'form.timeSend'         => 'required',
         ];
     }
-    public function messages(){
+    public function messages()
+    {
         return [
             'form.specificDoctors.required_if' => 'لطفا پزشک مورد نظر را انتخاب کنید',
             'form.smsTemplateName.required_if' => 'لطفا نام قالب پیامکی را وارد کنید ',
@@ -64,25 +74,104 @@ class UpdateOrCreate extends Component
     }
     public function storeReminder()
     {
+
         $this->validate();
         $this->StoreDBReminder();
     }
-    private function StoreDBReminder() {
-        if($this->form['service'] != null) {
-                $service = Service::find($this->form['service']);
+    private function StoreDBReminder()
+    {
+
+        if (isset($this->form['service']) && $this->form['service'] != null) {
+            $service = Service::find($this->form['service']);
+        }
+        $status = $this->form['sendType'];
+        $body = match ($status) {
+            ReminderStatusEnum::SMS          => $this->form['smsTemplateName'],
+            ReminderStatusEnum::NOTIFICATION => $this->form['notificationText'],
+            ReminderStatusEnum::CALL         => $this->form['callAnnouncment'],
+        };
+        $parameter = isset($this->form['parametr']) ? $this->form['parametr'] : null;
+        if (isset($this->form['service']) &&  $this->form['service'] != null) {
+            $service = Service::find($this->form['service']);
         }
         $model = [
-            'status' => ReminderStatusEnum::tryFrom($this->form['sendType'])
+            'status'       => $status,
+            'body'         => $body,
+            'parameters'   => $parameter,
+            'doctors'      => isset($this->form['specificDoctors']) ? $this->form['specificDoctors'] : null,
+            'send_day'     => $this->form['sendDate'] == 'sameDay' ? null : $this->form['send_at_specific_date'],
+            'send_time'    => $this->form['timeSend'],
+            'active'       => ActiveEnum::tryFrom($this->form['active']),
         ];
-        Reminder::UpdateOrCreate($model);
+        if (isset($this->fetchData['reminder'])) {
+            if ($status == ReminderStatusEnum::CALL && isset($parameter)) {
+                $model['parameters'] = null ;
+            }
+            if (isset($service)) {
+                if (
+                    is_null($this->fetchData['reminder']->reminderable_id) &&
+                    is_null($this->fetchData['reminder']->reminderable_type)
+                ) {
+                    $service->reminder()->save($this->fetchData['reminder']);
+                } else {
+                    // Update the Reminder through the relationship
+                    $this->fetchData['reminder']->update($model);
+                }
+            } else {
+                if (
+                    is_null($this->fetchData['reminder']->reminderable_id) &&
+                    is_null($this->fetchData['reminder']->reminderable_type)
+                ) {
+                    $this->fetchData['reminder']->update($model);
+                } else {
+                    $this->fetchData['reminder']->update(array_merge($model, ['reminderable_type' => null, 'reminderable_id' => null]));
+                }
+            }
+        } else {
+            if (isset($service)) {
+                $service->reminder()->create($model);
+            } else {
+                Reminder::create($model);
+            }
+        }
+        return redirect()->route('admin.reminder.list')->with('success', 'یادآور با موفقیت اضافه شد');
     }
-
+    private function fillTheInputs()
+    {
+        if (!empty($this->fetchData['reminder']->reminderable)) {
+            $this->form['service'] = $this->fetchData['reminder']->reminderable->id;
+        }
+        $this->form['sendType'] = $this->fetchData['reminder']->status;
+        $body = match ($this->form['sendType']) {
+            ReminderStatusEnum::SMS          => $this->form['smsTemplateName']  = $this->fetchData['reminder']->body,
+            ReminderStatusEnum::NOTIFICATION => $this->form['notificationText'] = $this->fetchData['reminder']->body,
+            ReminderStatusEnum::CALL         => $this->form['callAnnouncment']  = $this->fetchData['reminder']->body,
+        };
+        if (!empty($this->fetchData['reminder']->parameters)) {
+            $this->fetchData['parametrCounter'] = count($this->fetchData['reminder']->parameters) - 1;
+            $this->form['parametr'] = $this->fetchData['reminder']->parameters;
+        }
+        if (!empty($this->fetchData['reminder']->doctors)) {
+            $this->form['doctors'] = 'specificDoctor';
+            $this->form['specificDoctors'] = $this->fetchData['reminder']->doctors;
+        }
+        $this->form['sendDate'] =  $this->fetchData['reminder']->send_day == null ? 'sameDay' : 'selectedDate';
+        $this->form['sendDate'] == 'sameDay' ?  $this->form['send_at_specific_date'] =  $this->fetchData['reminder']->send_day : '';
+        $this->form['send_at_specific_date'] = $this->fetchData['reminder']->send_day;
+        $this->form['timeSend'] = $this->fetchData['reminder']->send_time;
+    }
     public function booted()
     {
         $this->dispatch('loadjs', true);
     }
     public function mount()
     {
+        if (request()->has('reminder')) {
+            $this->fetchData['reminder'] = Reminder::find(request()->get('reminder'));
+            if (!empty($this->fetchData['reminder'])) {
+                $this->fillTheInputs();
+            }
+        }
         $this->fetchData['doctors'] = User::doctors();
         $this->fetchData['services'] = Service::all();
     }

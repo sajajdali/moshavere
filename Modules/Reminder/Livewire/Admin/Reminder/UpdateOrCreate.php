@@ -19,6 +19,7 @@ class UpdateOrCreate extends Component
         'sendType' => ReminderStatusEnum::SMS,
         'sendDate' => 'sameDay',
         'active' => 1,
+        'timeSend' => 2,
     ];
     public function updateSpecificPRoperties()
     {
@@ -51,24 +52,30 @@ class UpdateOrCreate extends Component
     }
     public function rules()
     {
-        return [
+        $custumrules = [];
+        if (isset($this->form['sendType'])) {
+            match ($this->form['sendType']) {
+                ReminderStatusEnum::SMS => $custumrules['form.smsTemplateName'] = 'required',
+                ReminderStatusEnum::CALL => $custumrules['form.callAnnouncment'] = 'required',
+                ReminderStatusEnum::NOTIFICATION => $custumrules['form.notificationText'] = 'required',
+            };
+        }
+        $generalRuls = [
             'form.doctors'          => 'required',
             'form.specificDoctors'  => 'required_if:form.doctors,specificDoctor',
-            'form.smsTemplateName'  => 'required_if:form.sendType,sms',
-            'form.callAnnouncment'  => 'required_if:form.sendType,call',
-            'form.notificationText' => 'required_if:form.sendType,notification',
             'form.sendDate'         => 'required',
             'form.specificDay'      => 'required_if:form.sendDay,selectedDate',
             'form.timeSend'         => 'required',
         ];
+        return array_merge($custumrules , $generalRuls) ;
     }
     public function messages()
     {
         return [
             'form.specificDoctors.required_if' => 'لطفا پزشک مورد نظر را انتخاب کنید',
-            'form.smsTemplateName.required_if' => 'لطفا نام قالب پیامکی را وارد کنید ',
-            'form.notificationText.required_if' => 'لطفا متن نوتیفیکشن را وارد کنید ',
-            'form.callAnnouncment.required_if' => 'لطفا عنوان قالب پیام تلفنی را وارد کنید ',
+            'form.smsTemplateName.required' => 'لطفا نام قالب پیامکی را وارد کنید ',
+            'form.notificationText.required' => 'لطفا متن نوتیفیکشن را وارد کنید ',
+            'form.callAnnouncment.required' => 'لطفا عنوان قالب پیام تلفنی را وارد کنید ',
             'form.timeSend.required'        => 'لطفا ساعت ارسال را وارد کنید',
         ];
     }

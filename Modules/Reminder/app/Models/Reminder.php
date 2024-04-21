@@ -32,9 +32,9 @@ class Reminder extends Model
     }
     public function getSendDateString(): string
     {
-        $date =  ' در روز نوبت  و '  . substr($this->send_time, 0, -3) . 'ساعت قبل ';
+        $date =  ' در روز نوبت  و '  . $this->send_time . ' ساعت قبل ';
         if (!empty($this->send_day)) {
-            $date = $this->send_day . ' روز و ' . substr($this->send_time, 0, -3) . ' ساعت قبل ';
+            $date = $this->send_day . ' روز و ' . $this->send_time . ' ساعت قبل ';
         }
         return $date;
     }

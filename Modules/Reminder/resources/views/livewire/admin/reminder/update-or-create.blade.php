@@ -247,7 +247,7 @@
                     <div class="input-group col-md-6 ps-0">
                         <input class="form-control @error('form.timeSend') is-invalid @enderror"
                         @if (isset($form['timeSend']) && !empty($form['timeSend']) ) value="{{$form['timeSend']}}" @endif
-                            id="datetimepicker2" wire:model='form.timeSend' type="time">
+                            id="datetimepicker2" wire:model='form.timeSend' type="number">
                     </div>
                     <small class="text-gray">برای انتخاب روی ساعت کلیک کنید</small>
                     @error('form.timeSend')

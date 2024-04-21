@@ -13,12 +13,15 @@ return new class extends Migration
     {
         Schema::create('reminders', function (Blueprint $table) {
             $table->id();
-            $table->morphs('reminderable');
+            $table->nullableMorphs('reminderable');
             $table->tinyInteger('status')->default(1)->comment("1 = sms | 2 = notification | 3 = call ");
             $table->string('body');
             $table->json('parameters')->nullable();
-            $table->timestamp('send_at')->nullable();
-            $table->json('detail');
+            $table->json('doctors')->nullable();
+            $table->integer('send_day')->nullable();
+            $table->integer('send_time')->nullable();
+            $table->tinyInteger('active');
+            $table->json('detail')->nullable();
             $table->timestamps();
         });
     }

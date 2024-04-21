@@ -3,11 +3,13 @@
 namespace Modules\Service\app\Models;
 
 use App\Enum\ActiveEnum;
+use Modules\User\Entities\User;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
-use Modules\User\Entities\User;
+use Illuminate\Database\Eloquent\Relations\MorphMany;
+use Modules\Reminder\app\Models\Reminder;
 
 class Service extends Model
 {
@@ -44,6 +46,10 @@ class Service extends Model
     public function subSection(): Collection
     {
         return Service::where('parent_id', $this->id)?->get();
+    }
+    public function reminder(): MorphMany
+    {
+        return $this->morphMany(Reminder::class, 'reminderable');
     }
 
     public function apiResult()

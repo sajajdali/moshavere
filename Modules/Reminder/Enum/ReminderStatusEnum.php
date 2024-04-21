@@ -19,8 +19,18 @@ enum ReminderStatusEnum : int implements EnumHasNameInterface
         return match($this)
         {
             self::SMS => 'پیامک' ,
-            self::NOTIFICATION => 'ناتیفیکیشن موبایل' ,
+            self::NOTIFICATION => 'نوتیفیکشن موبایل' ,
             self::CALL => 'تماس' ,
+            default => "",
+        } ;
+    }
+    public function getWireModelName(): string
+    {
+        return match($this)
+        {
+            self::SMS => 'sms' ,
+            self::NOTIFICATION => 'notification' ,
+            self::CALL => 'call' ,
             default => "",
         } ;
     }

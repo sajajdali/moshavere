@@ -9,7 +9,9 @@ use Livewire\Attributes\Computed;
 use Modules\Chat\app\Models\Chat;
 use Illuminate\Support\Collection;
 use Modules\Chat\Enum\ChatStatusEnum;
+use Illuminate\Support\Facades\Storage;
 use Modules\Chat\Enum\ChatDetailTypeEnum;
+use Modules\Chat\app\Models\ChatDetailsFile;
 use Modules\Chat\app\Events\AdminAnswerChatEvent;
 
 class ChatView extends Component
@@ -43,11 +45,12 @@ class ChatView extends Component
             $this->dispatch('error', message: 'لطفا فایل را دوباره انتخاب کنید.');
             return;
         }
-        $this->chat?->chatDetails()->create([
+       $chatDetailId =  $this->chat?->chatDetails()->create([
             'content' => $this->ImgMessg,
             'type' => ChatDetailTypeEnum::ATTACH,
             'user_id' => auth()->id(),
         ]);
+            $this->InsertFileUpload($chatDetailId);
         $this->chat?->update([
             'status' => ChatStatusEnum::ANSWERED,
             'new_message_by_user' => 0,
@@ -56,7 +59,29 @@ class ChatView extends Component
         $this->chatMessage = '';
         AdminAnswerChatEvent::dispatch($this->chat);
     }
-
+    private function insertFileUpload( $chatDetailId){
+        if (isset($this->ImgMessg)) {
+            $fileUrl = Storage::disk('public')->url($this->ImgMessg);
+        }
+        $p = explode('/', $this->ImgMessg);
+        // $mimeType = Storage::mimeType($this->ImgMessg);
+        $size  =  ceil((Storage::size('public/'. end($p))) / 1024);
+        $mime  =  Storage::mimeType('public/'. end($p));
+        $extension = pathinfo($fileUrl, PATHINFO_EXTENSION);
+        $fileModel = [
+            'user_id' => $this->chat?->user->id,
+            'answer_by' => auth()->user()->id,
+            'chat_detail_id' =>  $chatDetailId->id,
+            'original_name' => end($p),
+            'server_name' => end($p),
+            'disk' => 'public',
+            'path' => $this->ImgMessg,
+            'extension' => $extension,
+            'mime' => $mime,
+            'size' => $size,
+        ];
+        ChatDetailsFile::create($fileModel);
+    }
 
     public function sendMessage()
     {

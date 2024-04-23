@@ -14,6 +14,7 @@ enum AppointmentUserStatusEnum: int implements EnumHasApiResultInterface
     case STATUS_ATTENDED = 4;
     case STATUS_NOT_ATTENDED = 5;
     case STATUS_DISAPPROVED = 6;
+    case STATUS_MONITORING = 7;
 
     public function getName(): string
     {
@@ -25,6 +26,7 @@ enum AppointmentUserStatusEnum: int implements EnumHasApiResultInterface
             self::STATUS_ATTENDED     => 'حضور پیدا کرده',
             self::STATUS_NOT_ATTENDED => 'عدم حضور',
             self::STATUS_DISAPPROVED =>  'رد شده',
+            self::STATUS_MONITORING =>  'در انتظار تایید',
         };
     }
     public function getBadgeColor(): string
@@ -36,6 +38,21 @@ enum AppointmentUserStatusEnum: int implements EnumHasApiResultInterface
             self::STATUS_CANCEL, self::STATUS_DISAPPROVED => 'bg-danger',
             self::STATUS_ATTENDED     => 'bg-secondary',
             self::STATUS_NOT_ATTENDED => 'bg-primary',
+            self::STATUS_MONITORING   => 'bg-warning',
+            default => '',
+        };
+    }
+    public function getButtonColor(): string
+    {
+        return match ($this) {
+            self::STATUS_PENDING      => 'btn-warning',
+            self::STATUS_SUCCESSFUL   => 'btn-success',
+            self::STATUS_WAIT_PAYMENT => 'btn-info',
+            self::STATUS_CANCEL, self::STATUS_DISAPPROVED => 'btn-danger',
+            self::STATUS_ATTENDED     => 'btn-secondary',
+            self::STATUS_NOT_ATTENDED => 'btn-primary',
+            self::STATUS_MONITORING   => 'btn-warning',
+            default => '',
         };
     }
     public function getColor(): string
@@ -45,6 +62,8 @@ enum AppointmentUserStatusEnum: int implements EnumHasApiResultInterface
             self::STATUS_PENDING        => 'table-warning',
             self::STATUS_SUCCESSFUL     => 'table-success',
             self::STATUS_WAIT_PAYMENT   => 'table-primary',
+            self::STATUS_MONITORING     => 'table-warning',
+            default => '',
         };
     }
 

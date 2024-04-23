@@ -2,24 +2,27 @@
 
 namespace Modules\AppointmentUser\Service;
 
-use Modules\AppointmentUser\app\Models\AppointmentOnline;
-use Modules\AppointmentUser\Enum\AppointmentOnlineStatusEnum;
 use Verta;
 use App\Event;
 use Carbon\Carbon;
 use Modules\Absence\app\Models\Absence;
+use Modules\Service\app\Models\Service;
 use Modules\Setting\Enum\SettingKeyEnum;
+use Modules\Reminder\app\Models\Reminder;
 use Modules\Api\app\Resources\PriceResource;
 use Modules\AppointmentUser\Enum\AppointmentVia;
 use Modules\Api\app\Resources\Api\SomeoneResource;
+use Modules\Reminder\app\Models\AppointmentReminder;
 use Modules\AppointmentUser\Enum\model\MainUserModel;
 use Modules\AppointmentUser\app\Models\AppointmentUser;
 use Modules\AppointmentUser\Enum\model\AppointmentModel;
+use Modules\AppointmentUser\app\Models\AppointmentOnline;
 use Modules\AppointmentUser\Enum\AppointmentUserKindEnum;
 use Modules\AppointmentUser\Enum\AppointmentUserTypeEnum;
 use Modules\AppointmentUser\Enum\AppointmentUserStatusEnum;
 use Modules\AppointmentUser\Enum\model\UserModelAppointment;
 use Modules\AppointmentSetting\app\Models\AppointmentSetting;
+use Modules\AppointmentUser\Enum\AppointmentOnlineStatusEnum;
 use Modules\AppointmentSetting\app\Models\AppointmentSettingTime;
 use Modules\AppointmentUser\app\Notifications\AppointmentSmsNotification;
 
@@ -47,10 +50,11 @@ class AppointmentUserService
             $newFrom = strtotime($from);
             $newUntil = strtotime($until);
             $betweenPatients = $existingTimeRange['type'] ?? AppointmentUserTypeEnum::MAIN__APPOINTMENT->value;
-            $appointmentStatus = isset($existingTimeRange['app_status']) && in_array( $existingTimeRange['app_status'] , AppointmentUserStatusEnum::confirmed());
+            $appointmentStatus = isset($existingTimeRange['app_status']) && in_array($existingTimeRange['app_status'], AppointmentUserStatusEnum::confirmed());
 
             // Check for overlap
-            if ($betweenPatients == AppointmentUserTypeEnum::MAIN__APPOINTMENT->value && $appointmentStatus &&
+            if (
+                $betweenPatients == AppointmentUserTypeEnum::MAIN__APPOINTMENT->value && $appointmentStatus &&
                 (
                     ($newFrom >= $existingFrom && $newFrom < $existingUntil) ||
                     ($newUntil > $existingFrom && $newUntil <= $existingUntil) ||
@@ -91,7 +95,6 @@ class AppointmentUserService
                 $startDate = Carbon::parse($details['specialDay']);
                 $endDate = $startDate->copy()->addDays($details['numberDays']);
             }
-
         }
 
         if (!$specialDaySelected) {
@@ -284,7 +287,6 @@ class AppointmentUserService
                                     ];
                                 }
                             }
-
                         } else {
                             if ($overlaps['overLapTime'] != 0 && $overlaps['overLapTime'] < $timeForVisit) {
 
@@ -322,7 +324,6 @@ class AppointmentUserService
                                             ];
                                         }
                                     }
-
                                 } else {
                                     $startTime->subMinutes($overlaps['overLapTime']);
 
@@ -336,7 +337,6 @@ class AppointmentUserService
                                         'gap' => true
                                     ];
                                 }
-
                             }
                         }
                         $startTime->addMinutes($timeForVisit);
@@ -403,7 +403,7 @@ class AppointmentUserService
     public function isAppointmentTimeAvailable($startDateTime, $endDateTime, $dateVisit, AppointmentSetting $appointmentSetting)
     {
         // Check if there are any overlapping appointments
-        $existingAppointments = AppointmentUser::where('doctor_id', $appointmentSetting->user_id)->where('type',AppointmentUserTypeEnum::MAIN__APPOINTMENT)->whereIn('status',AppointmentUserStatusEnum::confirmed());
+        $existingAppointments = AppointmentUser::where('doctor_id', $appointmentSetting->user_id)->where('type', AppointmentUserTypeEnum::MAIN__APPOINTMENT)->whereIn('status', AppointmentUserStatusEnum::confirmed());
         if (!$appointmentSetting->interference) {
             $existingAppointments->where('appointment_setting_id', $appointmentSetting->id);
         }
@@ -462,7 +462,7 @@ class AppointmentUserService
 
     private function insertOnlineAppointment(AppointmentUser $appointmentUser): void
     {
-//        $status = $appointmentUser->details[AppointmentUser::DETAIL_APPOINTMENT_VIA] == AppointmentVia::SELF ? AppointmentOnlineStatusEnum::PENDING : AppointmentOnlineStatusEnum::ACCEPTED;
+        //        $status = $appointmentUser->details[AppointmentUser::DETAIL_APPOINTMENT_VIA] == AppointmentVia::SELF ? AppointmentOnlineStatusEnum::PENDING : AppointmentOnlineStatusEnum::ACCEPTED;
         $status = AppointmentOnlineStatusEnum::ACCEPTED; // TODO : Be temporarily active
 
 
@@ -514,6 +514,12 @@ class AppointmentUserService
         // check if end time has set by admin
         $endTime = $appointmentData->endTime ?? $visitDateTime->copy()->addMinutes($appointmentSetting->time_for_visit)->toTimeString();
 
+        //check for monitoring appointment
+        if(isset($appointmentSetting->detail[AppointmentSetting::MONITORTING_APPOINTMENT]) && $appointmentSetting->detail[AppointmentSetting::MONITORTING_APPOINTMENT] != null ) {
+            $status = AppointmentUserStatusEnum::STATUS_MONITORING ;
+        }else {
+            $status = AppointmentUserStatusEnum::STATUS_SUCCESSFUL ;
+        }
         // store appointment
         $appointmentUserModel = [
             'service_id' => $appointmentData->serviceId,
@@ -523,7 +529,7 @@ class AppointmentUserService
             'agent_id' => $appointmentData->agentId,
             'operator_id' => $appointmentData->operatorId,
             'tracking_code' => AppointmentUser::generateTrackingCode(),
-            'status' => AppointmentUserStatusEnum::STATUS_SUCCESSFUL,
+            'status' => $status,
             'kind' => $appointmentData->kind,
             'type' => $appointmentData->type,
             'start_time' => $visitDateTime->toTimeString(),
@@ -542,13 +548,13 @@ class AppointmentUserService
 
 
         //description for app
-        if($appointmentData->description) {
+        if ($appointmentData->description) {
             $detailDatabaseDB[AppointmentUser::DETAIL_DESCRIPTION] =  $appointmentData->description;
         }
 
         // handel payment
         $paymentLink = null;
-        $smsTemplate = setting(SettingKeyEnum::SMS_APPOINTMENT_RECEIVING_SUCCESSFUL) ;
+        $smsTemplate = setting(SettingKeyEnum::SMS_APPOINTMENT_RECEIVING_SUCCESSFUL);
         if ($appointmentData->appointmentVia == AppointmentVia::SELF && $paymentstatus['status']) {
             $smsTemplate = setting(SettingKeyEnum::SMS_APPOINTMENT_WAITING_PAYMENT);
             $appointmentUserModel['deadline_at'] = $paymentstatus['deadline'];
@@ -580,12 +586,12 @@ class AppointmentUserService
         $appointmentUser = $appointmentSetting->appointmentUsers()->create($appointmentUserModel);
 
         // insert online appointment
-        if ($appointmentData->kind == AppointmentUserKindEnum::ONLINE){
+        if ($appointmentData->kind == AppointmentUserKindEnum::ONLINE) {
             $this->insertOnlineAppointment($appointmentUser);
         }
 
         // send sms
-        if(isset($smsTemplate)) {
+        if (isset($smsTemplate)) {
             $appointmentUser->notify(new AppointmentSmsNotification($smsTemplate));
         }
 
@@ -595,8 +601,8 @@ class AppointmentUserService
         }
         // handel sms
 
-//        $this->makeShortLink($appointmentUser);
-
+        //        $this->makeShortLink($appointmentUser);
+        $this->Addreminder($appointmentUser);
         return [
             'status' => true,
             'message' => 'نوبت با موفقیت برای کاربر ثبت شد',
@@ -610,6 +616,48 @@ class AppointmentUserService
 
         //        $appointmentLists->where('start_time', '>', $dateAppointment)->where('end_time',);
     }
+    public function Addreminder($appointmentUser)
+    {
+        $reminders = collect();
+        //get the reminder that set for all the sections
+        $reminders = $reminders->merge(Reminder::whereNull('reminderable_id')->whereNull('doctors')->get());
 
+        //check if for  doctor reminder
+        $specific_doctor = Reminder::whereNull('reminderable_id')->whereJsonContains('doctors', (string)$appointmentUser->doctor_id)->get();
+        if ($specific_doctor->isNotEmpty()) {
+            $reminders = $reminders->merge($specific_doctor);
+        }
 
+        //check if for  service reminder
+        if ($appointmentUser->service && $appointmentUser->service->reminder) {
+            $specific_service = $appointmentUser->service->reminder()->whereJsonContains('doctors', (string)$appointmentUser->doctor_id)->get();
+            if ($specific_service->isNotEmpty()) {
+                $reminders = $reminders->merge($specific_service);
+            }
+        }
+        if ($reminders->isNotEmpty()) {
+            $reminders->each(function ($reminder) use ($appointmentUser) {
+                $detail = [
+                    'mobile' => $appointmentUser->user->mobile,
+                    'parameter' => $reminder->parameters,
+                ];
+                AppointmentReminder::create([
+                    'appointment_user_id' => $appointmentUser->id,
+                    'type' => $reminder->status,
+                    'send_at' => $appointmentUser->date_visit->addDays($reminder->send_day)->addHours($reminder->send_time),
+                    'details' => $detail,
+                ]);
+            });
+        }
+    }
+
+    public function deleteAppointmentReminder($appointmentUser)
+    {
+        $reminders =  AppointmentReminder::where('appointment_user_id', $appointmentUser->id)->get();
+        if ($reminders->isNotEmpty()) {
+            $reminders->each(function ($reminder) {
+                $reminder->delete();
+            });
+        }
+    }
 }

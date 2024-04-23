@@ -5,8 +5,8 @@
             <a aria-label="مخفی کردن منو" class="app-sidebar__toggle" data-bs-toggle="sidebar" href="#"></a>
             <!-- sidebar-toggle-->
             <a class="logo-horizontal " href="{{ url('admin/dashboard') }}">
-                <img src="{{ admin_default_asset('logo.png') }}" class="header-brand-img desktop-logo" alt="جسمی‌نو">
-                <img src="{{ admin_default_asset('logo.png') }}" class="header-brand-img light-logo1" alt="جسمی‌نو">
+                <img src="{{ setting(Modules\Setting\Enum\SettingKeyEnum::SITE_LOGO_URL) }}" class="header-brand-img desktop-logo" alt="{{ setting(Modules\Setting\Enum\SettingKeyEnum::SITE_TITLE) }}">
+                <img src="{{ setting(Modules\Setting\Enum\SettingKeyEnum::SITE_LOGO_URL) }}" class="header-brand-img light-logo1" alt="{{ setting(Modules\Setting\Enum\SettingKeyEnum::SITE_TITLE) }}">
             </a>
             <!-- LOGO -->
             <div class="d-flex order-lg-2 ms-auto header-right-icons">

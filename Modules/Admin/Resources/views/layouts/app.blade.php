@@ -9,7 +9,7 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="description" content="سیستم مدیریت">
     <meta name="author" content="شمیران وب">
-    <meta name="keywords" content="مدیریت جسمی نو">
+    <meta name="keywords" content="مدیریت {{setting(Modules\Setting\Enum\SettingKeyEnum::SITE_TITLE)}}">
     <!-- Favicon -->
     <link rel="apple-touch-icon" sizes="76x76" href="{{ admin_default_asset('favicon/apple-touch-icon.png') }}">
     <link rel="icon" type="image/png" sizes="32x32" href="{{ admin_default_asset('favicon/favicon-32x32.png') }}">

@@ -21,6 +21,7 @@ return new class extends Migration
             $table->integer('max_day_active')->nullable();
             $table->integer('cancellation_by_user')->nullable()->default(0)->comment('null = for deactive | 0-1000 = number of the before canceled');
             $table->date('last_day_active')->nullable();
+            $table->date('first_day_active')->nullable();
             $table->tinyInteger('active_payment')->default(0)->comment('1 = active | 0 = deactivate');
             $table->tinyInteger('interference')->default(0);
             $table->tinyInteger('active')->default(1);

@@ -13,14 +13,11 @@ class AppointmentSmsNotification extends Notification implements ShouldQueue
 {
     use Queueable;
 
-    public string $template;
-
     /**
-     * @param string $template
+     * @param string|null $template
      */
-    public function __construct(string $template)
+    public function __construct(public ?string $template)
     {
-        $this->template = $template;
     }
     /**
      * Create a new notification instance.
@@ -54,7 +51,6 @@ class AppointmentSmsNotification extends Notification implements ShouldQueue
         $serviceName = $notifiable->service?->title;
         $dateAppointment = dateFormatSimlpe($notifiable->date_visit);
         $hour = substr($notifiable->start_time, 0, -3);
-
         return [
             'template' => $this->template,
             'receptor' => $notifiable->user->mobile,

@@ -15,6 +15,17 @@ return [
             \Modules\Setting\Enum\SettingKeyEnum::SMS_APPOINTMENT_CANCEL,
             \Modules\Setting\Enum\SettingKeyEnum::SMS_APPOINTMENT_TO_DOCTOR,
             \Modules\Setting\Enum\SettingKeyEnum::SMS_APPOINTMENT_TO_OPERATOR,
+            \Modules\Setting\Enum\SettingKeyEnum::SMS_APPROVED_MONITORING_APPOINTMENT,
+            \Modules\Setting\Enum\SettingKeyEnum::SMS_DIS_APPROVED_MONITORING_APPOINTMENT,
+
+        ],
+    ],
+    'website' => [
+        'title' => 'تنظمات وبسایت',
+        'icon' => 'fa fa-globe',
+        'settings' => [
+            \Modules\Setting\Enum\SettingKeyEnum::SITE_LOGO_URL,
+            \Modules\Setting\Enum\SettingKeyEnum::SITE_TITLE,
 
         ],
     ],

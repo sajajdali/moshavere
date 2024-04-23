@@ -158,30 +158,11 @@
                                         wire:model="search.AppointmentStatus" placeholder="نام ثبت نوبت"
                                         type="text">
                                         <option value="">انتخاب کنید...</option>
-                                        <option
-                                            value="{{ Modules\AppointmentUser\Enum\AppointmentUserStatusEnum::STATUS_PENDING }}">
-                                            {{ Modules\AppointmentUser\Enum\AppointmentUserStatusEnum::STATUS_PENDING->getName() }}
-                                        </option>
-                                        <option
-                                            value="{{ Modules\AppointmentUser\Enum\AppointmentUserStatusEnum::STATUS_SUCCESSFUL }}">
-                                            {{ Modules\AppointmentUser\Enum\AppointmentUserStatusEnum::STATUS_SUCCESSFUL->getName() }}
-                                        </option>
-                                        <option
-                                            value="{{ Modules\AppointmentUser\Enum\AppointmentUserStatusEnum::STATUS_WAIT_PAYMENT }}">
-                                            {{ Modules\AppointmentUser\Enum\AppointmentUserStatusEnum::STATUS_WAIT_PAYMENT->getName() }}
-                                        </option>
-                                        <option
-                                            value="{{ Modules\AppointmentUser\Enum\AppointmentUserStatusEnum::STATUS_CANCEL }}">
-                                            {{ Modules\AppointmentUser\Enum\AppointmentUserStatusEnum::STATUS_CANCEL->getName() }}
-                                        </option>
-                                        <option
-                                            value="{{ Modules\AppointmentUser\Enum\AppointmentUserStatusEnum::STATUS_ATTENDED }}">
-                                            {{ Modules\AppointmentUser\Enum\AppointmentUserStatusEnum::STATUS_ATTENDED->getName() }}
-                                        </option>
-                                        <option
-                                            value="{{ Modules\AppointmentUser\Enum\AppointmentUserStatusEnum::STATUS_NOT_ATTENDED }}">
-                                            {{ Modules\AppointmentUser\Enum\AppointmentUserStatusEnum::STATUS_NOT_ATTENDED->getName() }}
-                                        </option>
+                                        @foreach (Modules\AppointmentUser\Enum\AppointmentUserStatusEnum::cases() as $enumCase)
+                                            <option value="{{ $enumCase }}">
+                                                {{ $enumCase->getName() }}
+                                            </option>
+                                        @endforeach
                                     </select>
 
                                 </div>
@@ -342,9 +323,10 @@
                                         @can('update', $ap)
                                             <td>
                                                 <div class="btn-group mt-2 mb-2">
-                                                    <button type="button" class="btn btn-primary dropdown-toggle"
+                                                    <button type="button" class="btn {{$ap->status->getButtonColor()}} dropdown-toggle"
                                                         data-bs-toggle="dropdown">
-                                                        عملیات <span class="caret"></span>
+                                                        {{$ap->status->getName()}}
+                                                         <span class="caret"></span>
                                                     </button>
                                                     <ul class="dropdown-menu" role="menu">
 
@@ -365,6 +347,24 @@
                                                                     عدم تایید نوبت
                                                                 </a>
                                                             </li>
+                                                        @elseif($ap->status == Modules\AppointmentUser\Enum\AppointmentUserStatusEnum::STATUS_MONITORING)
+                                                            <li>
+                                                                <a wire:click='ApprovemonitoringAppointment({{ $ap->id }})'
+                                                                    href="#" data-label="ویرایش">
+                                                                    <i class="fa fa-check text-success"
+                                                                        aria-hidden="true"></i>
+                                                                    تایید نوبت
+                                                                </a>
+                                                            </li>
+                                                            <li>
+                                                                <a wire:click='disApprovemonitoringAppointment({{ $ap->id }})'
+                                                                    href="#" data-label="ویرایش">
+                                                                    <i class="fa fa-ban text-danger"
+                                                                        aria-hidden="true"></i>
+                                                                    عدم تایید نوبت
+                                                                </a>
+                                                            </li>
+                                                        @elseif($ap->status == Modules\AppointmentUser\Enum\AppointmentUserStatusEnum::STATUS_DISAPPROVED || $ap->status == Modules\AppointmentUser\Enum\AppointmentUserStatusEnum::STATUS_CANCEL)
                                                         @else
                                                             <li><a href="#" data-label="ویرایش">
                                                                     <i class="fa fa-pencil-square-o"

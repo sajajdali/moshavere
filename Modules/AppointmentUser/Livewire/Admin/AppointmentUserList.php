@@ -214,6 +214,7 @@ class AppointmentUserList extends Component
             if ($checked) {
                 $app = AppointmentUser::find($AppID);
                 $app->update(['status' => AppointmentUserStatusEnum::STATUS_CANCEL]);
+                app('AppointmentUserService')->deleteAppointmentReminder($app);
             }
         }
         return  $this->redirectToPage('نوبت های انتخابی با موفقیت کنسل شدند');
@@ -228,6 +229,7 @@ class AppointmentUserList extends Component
     {
         $app = AppointmentUser::find($id);
         $app->update(['status' =>  AppointmentUserStatusEnum::STATUS_CANCEL]);
+        app('AppointmentUserService')->deleteAppointmentReminder($app);
         if ($sendSmsStatus) {
             $smsTemplate = setting(SettingKeyEnum::SMS_APPOINTMENT_CANCEL);
             if (isset($smsTemplate)) {
@@ -244,10 +246,26 @@ class AppointmentUserList extends Component
         $app->delete();
         $this->redirectToPage('نوبت با موفقیت حذف شد');
     }
+    public function ApprovemonitoringAppointment($id)
+    {
+
+        $app = AppointmentUser::find($id);
+        $app->update(['status' => AppointmentUserStatusEnum::STATUS_WAIT_PAYMENT]);
+        $app->notify(new AppointmentSmsNotification(setting(SettingKeyEnum::SMS_APPROVED_MONITORING_APPOINTMENT)));
+        $this->redirectToPage('نوبت با موفقیت تایید شد');
+    }
+    public function disApprovemonitoringAppointment($id)
+    {
+
+        $app = AppointmentUser::find($id);
+        $app->update(['status' => AppointmentUserStatusEnum::STATUS_DISAPPROVED]);
+        $app->notify(new AppointmentSmsNotification(setting(SettingKeyEnum::SMS_DIS_APPROVED_MONITORING_APPOINTMENT)));
+        $this->redirectToPage('نوبت با موفقیت لغو شد');
+    }
     public function ApproveOnlineAppointment($id)
     {
         $app = AppointmentUser::find($id);
-        $onlineApp = AppointmentOnline::firstWhere('appointment_user_id',$app->id);
+        $onlineApp = AppointmentOnline::firstWhere('appointment_user_id', $app->id);
         $onlineApp->update(['status' => AppointmentOnlineStatusEnum::ACCEPTED]);
         $app->update(['status' => AppointmentUserStatusEnum::STATUS_SUCCESSFUL]);
         $this->redirectToPage('نوبت با موفقیت تایید شد');
@@ -257,7 +275,7 @@ class AppointmentUserList extends Component
         $this->fetchData['disapproveId'] = $id;
         $this->dispatch('lunchModal', true);
         $app = AppointmentUser::find($id);
-        $app->update(['status'=>AppointmentUserStatusEnum::STATUS_DISAPPROVED]) ;
+        $app->update(['status' => AppointmentUserStatusEnum::STATUS_DISAPPROVED]);
         $this->redirectToPage('ضعیت نوبت به عدم تایید ، تغییر پیدا کرد');
     }
     public function disaprovedModal()
@@ -268,11 +286,11 @@ class AppointmentUserList extends Component
             if (isset($detail)) {
                 $detail = array_merge($detail, [AppointmentUser::DISAPPROVED_DESCRIPTION => $this->form['reason']]);
             } else {
-                $detail = [AppointmentUser::DISAPPROVED_DESCRIPTION => $this->form['reason'] ];
+                $detail = [AppointmentUser::DISAPPROVED_DESCRIPTION => $this->form['reason']];
             }
         }
         try {
-            $onlineApp = AppointmentOnline::firstWhere('appointment_user_id',$app->id);
+            $onlineApp = AppointmentOnline::firstWhere('appointment_user_id', $app->id);
             $onlineApp->update(['status' => AppointmentOnlineStatusEnum::REJECT]);
             $app->update(['status' => AppointmentUserStatusEnum::STATUS_DISAPPROVED, 'details' =>  $detail]);
         } catch (\Exception $th) {

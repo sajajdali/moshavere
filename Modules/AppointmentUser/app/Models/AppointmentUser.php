@@ -102,6 +102,7 @@ class AppointmentUser extends Model
             AppointmentUserStatusEnum::STATUS_NOT_ATTENDED => 'table-primary',
             AppointmentUserStatusEnum::STATUS_PENDING => 'table-warning',
             AppointmentUserStatusEnum::STATUS_DISAPPROVED => 'table-danger',
+            AppointmentUserStatusEnum::STATUS_MONITORING => 'table-warning',
             default => '',
         };
         if ($this->type == AppointmentUserTypeEnum::BETWEEN_PATIENTS) {

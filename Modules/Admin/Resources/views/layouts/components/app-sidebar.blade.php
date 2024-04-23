@@ -4,10 +4,10 @@
     <div class="app-sidebar">
         <div class="side-header">
             <a class="header-brand1" href="{{url('index')}}">
-                <img src="{{admin_default_asset('logo.png')}}" class="header-brand-img desktop-logo" alt="جسمی نو">
-                <img src="{{admin_default_asset('logo.png')}}" class="header-brand-img toggle-logo" alt="جسمی نو">
-                <img src="{{admin_default_asset('logo.png')}}" class="header-brand-img light-logo" alt="جسمی نو">
-                <img src="{{admin_default_asset('logo.png')}}" class="header-brand-img light-logo1" alt="جسمی نو">
+                <img src="{{ setting(Modules\Setting\Enum\SettingKeyEnum::SITE_LOGO_URL) }}" class="header-brand-img desktop-logo" alt="{{setting(Modules\Setting\Enum\SettingKeyEnum::SITE_TITLE)}}">
+                <img src="{{ setting(Modules\Setting\Enum\SettingKeyEnum::SITE_LOGO_URL) }}" class="header-brand-img toggle-logo" alt="{{setting(Modules\Setting\Enum\SettingKeyEnum::SITE_TITLE)}}">
+                <img src="{{ setting(Modules\Setting\Enum\SettingKeyEnum::SITE_LOGO_URL) }}" class="header-brand-img light-logo" alt="{{setting(Modules\Setting\Enum\SettingKeyEnum::SITE_TITLE)}}">
+                <img src="{{ setting(Modules\Setting\Enum\SettingKeyEnum::SITE_LOGO_URL) }}" class="header-brand-img light-logo1" alt="{{setting(Modules\Setting\Enum\SettingKeyEnum::SITE_TITLE)}}">
             </a><!-- LOGO -->
         </div>
         <div class="main-sidemenu">

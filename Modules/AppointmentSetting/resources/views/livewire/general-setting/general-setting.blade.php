@@ -209,30 +209,6 @@
                             هر روز بتواند چند نوبت دریافت بکند</span>
                     </div>
                     <div class="col-md-3 pt-2">
-                        <label class="text-primary" for="basic-url">تعداد نوبت فعال در کل</label>
-                    </div>
-                    <div class="col-md-9 mb-3">
-                        <div class="input-group ">
-                            <input type="number" class="form-control" id="basic-url"
-                                aria-describedby="basic-addon3" wire:model='form.maxAvailabeAppointment.totall'>
-                            <div class="input-group-prepend">
-                                <span class="input-group-text" id="basic-addon3">عدد</span>
-                            </div>
-                        </div>
-                        <span class="text-muted d-flex align-items-center ms-1 mt-1 mb-2"><i
-                                class="fa fa-exclamation-circle fa-lg text-light me-1 " aria-hidden="true"></i>هر کاربر
-                            بتواند در کل چند نوبت فعال داشته
-                            باشد</span>
-                    </div>
-                    <div class="d-flex  mt-2 ms-2">
-                        <p class="text-muted"><strong class="me-1"> نکته!! </strong> دقت کنید که حداکثر نوبت
-                            دریافتی در
-                            یک روز از تعداد کل نوبت ها (فیلد اول نسبت به دوم) بزرگ تر نباشد!</p>
-                    </div>
-                    <div class="col-12 my-2">
-                        <hr class="opacity-75">
-                    </div>
-                     <div class="col-md-3 pt-2">
                         <label class="text-primary" for="basic-url">تعداد نوبت فعال برای منشی</label>
                     </div>
                     <div class="col-md-9 mb-1 mb-3">
@@ -244,7 +220,8 @@
                             </div>
                         </div>
                         <span class="text-muted d-flex align-items-center ms-1 mt-1 mb-2"><i
-                                class="fa fa-exclamation-circle fa-lg text-light me-1" aria-hidden="true"></i>منشی بتواند حداکثر در هر روز چند نوبت ثبت بکند</span>
+                                class="fa fa-exclamation-circle fa-lg text-light me-1" aria-hidden="true"></i>منشی
+                            بتواند حداکثر در هر روز چند نوبت ثبت بکند</span>
                     </div>
                 </div>
             </div>
@@ -300,6 +277,41 @@
     {{-- segments  --}}
     <div class="card @error('form.segments.value') border border-danger @enderror">
         @include('appointmentsetting::components.generalsetting.segments')
+    </div>
+    {{-- start Date time  --}}
+    <div class="card  @error('form.startAppointment.date') border border-danger @enderror">
+        <div class="card-header border-bottom d-flex justify-content-between">
+            <h3> تعیین تاریخ شروع نوبت دهی </h3>
+            <div class="main-toggle-group d-sm-flex align-items-center ms-0">
+                <div class="toggle toggle-lg toggle-primary my-1 customCheckbox @if (isset($form['startAppointment']['date'])) on @else off @endif"
+                    data-id="startAppointment.status" wire:ignore.self data-bs-toggle="collapse"
+                    href="#startTimecollaps" role="button" aria-expanded="false" aria-controls="startTimecollaps">
+                    <span></span>
+                </div>
+            </div>
+        </div>
+        <div class="card-body collapse @if (isset($form['startAppointment']['date'])) show @endif " id="startTimecollaps"
+            wire:ignore.self>
+            {{-- section --}}
+            @error('form.startAppointment.date')
+                <div class="alert alert-danger" role="alert">
+                    <p class="text-danger"> لطفا تاریخ را انتخاب کنید!!
+                    </p>
+                </div>
+            @enderror
+            <div class="row">
+                <div class="col-md-3 pt-2">
+                    <label class="text-primary" for="basic-url">انتخاب تاریخ:</label>
+                </div>
+                <div class="col-md-9">
+                    <div class="input-group mb-3">
+                        <input type="text" wire:model='form.startAppointment.date'
+                            class="form-control @error('form.startAppointment.date') is-invalid @enderror"
+                           id="startDatePicker" >
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
     {{-- end Date time  --}}
     <div class="card  @error('form.endAppointment.date') border border-danger @enderror">
@@ -458,6 +470,63 @@
             </div>
         </div>
     </div>
+    {{-- MONITORING  --}}
+    <div class="card @error('form.monitoring.hour') border border-danger @enderror">
+        <div class="card-header border-bottom d-flex justify-content-between">
+            <h3><span class="text-primary">پایش</span> نوبت </h3>
+            <div class="main-toggle-group d-sm-flex align-items-center ms-0">
+                <div class="toggle toggle-lg toggle-primary my-1  customCheckbox @if (isset($form['monitoring']['hour'])) on  @else off @endif"
+                    data-id="monitoring.status" wire:ignore.self data-bs-toggle="collapse"
+                    href="#monitoringStatusDiv" role="button" aria-expanded="false"
+                    aria-controls="monitoringStatusDiv">
+                    <span></span>
+                </div>
+            </div>
+        </div>
+        <div class="collapse @if (isset($form['monitoring']['hour'])) show @endif " id="monitoringStatusDiv"
+            wire:ignore.self>
+            <div class="card-body">
+                @error('form.monitoring.hour')
+                    <div class="alert alert-danger" role="alert">
+                        <p class="text-danger"> لطفا مشخص کنید در صورت عدم پرداخت نوبت چند ساعت رزرو بماند!!
+                        </p>
+                    </div>
+                @enderror
+                {{-- section --}}
+                <div class="row">
+                    <div class="col-md-4 pt-2">
+                        <label class="text-primary" for="basic-url">مدت زمان انتظار برای پرداخت آنلاین: </label>
+                    </div>
+                    <div class="col-md-8">
+                        <div class="input-group mb-3">
+                            <input type="number"
+                                class="form-control  @error('form.monitoring.hour') is-invalid @enderror"
+                                id="basic-url" placeholder="ساعت پیشنهادی: 24" aria-describedby="basic-addon3"
+                                wire:model='form.monitoring.hour'>
+                            <div class="input-group-prepend">
+                                <span class="input-group-text" id="basic-addon3">ساعت</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="d-flex  mt-2">
+                        <p class="text-muted" style="font-size: unset !important">
+                            <strong class="me-1"> نکته!! </strong>
+                            با فعال کردن این گزینه نوبت ها به صورت اتوماتیک پس از ثبت یا پرداخت آنلاین فعال نمیشوند و پس
+                            از دریافت نوبت توسط کاربران، حتما میبایست از طریق مدیریت اقدام به فعال کردن این نوبت ها
+                            انجام داد .
+                            کاربران پس از ثبت نوبت و دریافت نوبت از طریق سایت، نوبت انها به حالت در انتظار تایید تغییر
+                            میکند و پس از تایید مدیریت فعال میشود. در صورتی که پرداخت آنلاین نیز برای این قسمت فعال شده
+                            باشد، پس از تایید نوبت توسط مدیریت، کاربران میبایست مبلغ را به صورت انلاین پرداخت کنند تا
+                            نوبت انها فعال شود.
+                            مدت زمانی که کاربران پس از تایید نوبتشان مهلت دارند تا پرداخت آنلاین را انجام دهند به صورت
+                            پیش فرض ۲۴ ساعت میباشد که شما میتوانید این مدت زمان را نیز در قسمت بالا تغییر دهید (فقط در
+                            صورت فعال بودن پرداخت آنلاین این زمان را وارد کنید)
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
     {{-- active status  --}}
     <div class="card">
         <div class="card-header border-bottom d-flex justify-content-between">
@@ -572,8 +641,7 @@
                         fadeOutPeymentStatusDiv();
                     }
                 }
-            });
-
+            })
 
             $('#paymentOnInVoip').click(function(e) {
                 if ($('#paymentOnInVoip').hasClass('on')) {
@@ -592,6 +660,14 @@
                 autoClose: true,
                 onSelect: function(unix) {
                     @this.set('form.endAppointment.date', $('#endDatePicker').val());
+                }
+            });
+            $('#startDatePicker').persianDatepicker({
+                initialValue: false,
+                format: 'L',
+                autoClose: true,
+                onSelect: function(unix) {
+                    @this.set('form.startAppointment.date', $('#startDatePicker').val());
                 }
             });
         });

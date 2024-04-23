@@ -13,6 +13,8 @@ use Modules\User\Entities\User;
 enum SettingKeyEnum: int implements EnumHasNameInterface, SettingTypeInterface, SettingHasCacheInterface, SettingRenderAbleInterface, SettingHasOptionInterface
 {
     case DEFAULT_EXERCISE_STATUS = 1;
+    case SITE_LOGO_URL = 2;
+    case SITE_TITLE= 3;
     case SMS_API_TOKEN = 20;
     case SMS_API_LOGIN_TEMPLATE = 30;
     case SMS_APPOINTMENT_RECEIVING_SUCCESSFUL = 31;
@@ -23,6 +25,8 @@ enum SettingKeyEnum: int implements EnumHasNameInterface, SettingTypeInterface, 
     case SMS_APPOINTMENT_CANCEL = 36;
     case SMS_APPOINTMENT_TO_DOCTOR = 37;
     case SMS_APPOINTMENT_TO_OPERATOR = 38;
+    case SMS_APPROVED_MONITORING_APPOINTMENT = 39;
+    case SMS_DIS_APPROVED_MONITORING_APPOINTMENT = 40;
     case SUPPORT_USER_ROLE = 100;
     case PAYMENT_PAYSTAR_TOKEN = 150;
     case PAYMENT_PAYSTAR_SIGN = 151;
@@ -36,6 +40,8 @@ enum SettingKeyEnum: int implements EnumHasNameInterface, SettingTypeInterface, 
     {
         return match ($this) {
             self::SMS_API_TOKEN => false,
+            self::SITE_TITLE => false,
+            self::SITE_LOGO_URL => false,
             self::SUPPORT_USER_ROLE => false,
             self::SMS_API_LOGIN_TEMPLATE => false,
             self::SMS_APPOINTMENT_RECEIVING_SUCCESSFUL => false,
@@ -46,6 +52,8 @@ enum SettingKeyEnum: int implements EnumHasNameInterface, SettingTypeInterface, 
             self::SMS_APPOINTMENT_CANCEL => false,
             self::SMS_APPOINTMENT_TO_DOCTOR => false,
             self::SMS_APPOINTMENT_TO_OPERATOR => false,
+            self::SMS_APPROVED_MONITORING_APPOINTMENT => false,
+            self::SMS_DIS_APPROVED_MONITORING_APPOINTMENT => false,
             self::PAYMENT_PAYSTAR_TOKEN => false,
             self::PAYMENT_PAYSTAR_SIGN => false,
             self::WEIGHT_CHART_DESCRIPTION_APP => false,
@@ -58,6 +66,10 @@ enum SettingKeyEnum: int implements EnumHasNameInterface, SettingTypeInterface, 
     public function getName(): string
     {
         return match ($this) {
+            //Website setting
+            self::SITE_LOGO_URL => 'آدرس لوگو',
+            self::SITE_TITLE    => 'عنوان سایت',
+
             self::SMS_API_TOKEN => 'توکن API پیامک',
             self::DEFAULT_EXERCISE_STATUS => 'وضعیت برنامه بعد از تجویز',
             self::SUPPORT_USER_ROLE => 'گروه کاربری پشتیبانان',
@@ -74,6 +86,8 @@ enum SettingKeyEnum: int implements EnumHasNameInterface, SettingTypeInterface, 
             self::SMS_APPOINTMENT_CANCEL => 'پیامک به کاربر پس از کنسل شدن نوبت',
             self::SMS_APPOINTMENT_TO_DOCTOR => 'پیامک به پزشک پز از دریافت نوبت توسط هر کاربر',
             self::SMS_APPOINTMENT_TO_OPERATOR => 'پیامک به اپراتور پس از دریافت هر نوبت',
+            self::SMS_APPROVED_MONITORING_APPOINTMENT => 'پیامک به کاربر بعد از تایید نوبت در  پایش نوبت',
+            self::SMS_DIS_APPROVED_MONITORING_APPOINTMENT => 'پیامک به کاربر بعد از عدم تایید نوبت در  پایش نوبت',
 
             // voip
             self::VOIP_USERNAME => 'نام کاربری برای API ',
@@ -95,6 +109,7 @@ enum SettingKeyEnum: int implements EnumHasNameInterface, SettingTypeInterface, 
              <br/> ۷ = لینک جزئیات
              <br/> ۸ = شماره پیگیری
              ',
+             self::SMS_APPROVED_MONITORING_APPOINTMENT => 'در صورت فعال بودن پایش نوبت ، و تغییر وضعیت نوبت به در انتظار پرداخت(تایید نوبت) این پیامک برای کاربر ارسال میشود',
             default => ''
         };
     }
@@ -108,6 +123,10 @@ enum SettingKeyEnum: int implements EnumHasNameInterface, SettingTypeInterface, 
     {
         return match ($this) {
             self::SMS_API_TOKEN => SettingTypeEnum::TEXT,
+            self::SMS_APPROVED_MONITORING_APPOINTMENT => SettingTypeEnum::TEXT,
+            self::SMS_DIS_APPROVED_MONITORING_APPOINTMENT => SettingTypeEnum::TEXT,
+            self::SITE_TITLE => SettingTypeEnum::TEXT,
+            self::SITE_LOGO_URL => SettingTypeEnum::TEXT,
             self::DEFAULT_EXERCISE_STATUS => SettingTypeEnum::SELECT,
             self::SUPPORT_USER_ROLE => SettingTypeEnum::SELECT,
             self::PAYMENT_PAYSTAR_TOKEN => SettingTypeEnum::TEXT,

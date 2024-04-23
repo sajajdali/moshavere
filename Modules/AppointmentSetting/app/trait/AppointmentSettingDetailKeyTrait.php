@@ -18,4 +18,5 @@ trait AppointmentSettingDetailKeyTrait
     const VOIP = 'voip';
     const PRICE = 'price';
     const NOT_PAYING_STATUS = 'notPayinStatus';
+    const MONITORTING_APPOINTMENT = 'monitoring_appointment';
 }

@@ -153,6 +153,7 @@ class SpecificDayAvailableAppointment extends Component
             'status' => AppointmentUserStatusEnum::STATUS_CANCEL,
         ]);
         Cache::forget('appointmentList.' .   $this->fetchData['appId']);
+        app('AppointmentUserService')->deleteAppointmentReminder($app);
         return redirect()->route(
             'admin.appointment.add.specificday',
             [

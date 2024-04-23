@@ -195,39 +195,56 @@
                     <div class="col-md-3 pt-2">
                         <label class="text-primary" for="basic-url">تعداد نوبت فعال در هر روز</label>
                     </div>
-                    <div class="col-md-9 mb-1">
-                        <div class="input-group mb-3">
+                    <div class="col-md-9 mb-1 mb-3">
+                        <div class="input-group ">
                             <input type="number" class="form-control" id="basic-url"
                                 aria-describedby="basic-addon3" wire:model='form.maxAvailabeAppointment.eachDay'>
                             <div class="input-group-prepend">
                                 <span class="input-group-text" id="basic-addon3">عدد</span>
                             </div>
                         </div>
-                        <span class="text-muted d-flex align-items-center"><i
-                                class="fa fa-exclamation-circle fa-lg text-light me-1" aria-hidden="true"></i>هر کاربر
+                        <span class="text-muted d-flex align-items-center ms-1 mt-1 mb-2"><i
+                                class="fa fa-exclamation-circle fa-lg text-light me-1" aria-hidden="true"></i>کاربران
                             در
-                            هر روز بتواند چند نوتب دریافت بکند</span>
+                            هر روز بتواند چند نوبت دریافت بکند</span>
                     </div>
                     <div class="col-md-3 pt-2">
                         <label class="text-primary" for="basic-url">تعداد نوبت فعال در کل</label>
                     </div>
-                    <div class="col-md-9">
-                        <div class="input-group mb-3">
+                    <div class="col-md-9 mb-3">
+                        <div class="input-group ">
                             <input type="number" class="form-control" id="basic-url"
                                 aria-describedby="basic-addon3" wire:model='form.maxAvailabeAppointment.totall'>
                             <div class="input-group-prepend">
                                 <span class="input-group-text" id="basic-addon3">عدد</span>
                             </div>
                         </div>
-                        <span class="text-muted d-flex align-items-center"><i
-                                class="fa fa-exclamation-circle fa-lg text-light me-1" aria-hidden="true"></i>هر کاربر
+                        <span class="text-muted d-flex align-items-center ms-1 mt-1 mb-2"><i
+                                class="fa fa-exclamation-circle fa-lg text-light me-1 " aria-hidden="true"></i>هر کاربر
                             بتواند در کل چند نوبت فعال داشته
                             باشد</span>
                     </div>
-                    <div class="d-flex  mt-2">
+                    <div class="d-flex  mt-2 ms-2">
                         <p class="text-muted"><strong class="me-1"> نکته!! </strong> دقت کنید که حداکثر نوبت
                             دریافتی در
                             یک روز از تعداد کل نوبت ها (فیلد اول نسبت به دوم) بزرگ تر نباشد!</p>
+                    </div>
+                    <div class="col-12 my-2">
+                        <hr class="opacity-75">
+                    </div>
+                     <div class="col-md-3 pt-2">
+                        <label class="text-primary" for="basic-url">تعداد نوبت فعال برای منشی</label>
+                    </div>
+                    <div class="col-md-9 mb-1 mb-3">
+                        <div class="input-group ">
+                            <input type="number" class="form-control" id="basic-url"
+                                aria-describedby="basic-addon3" wire:model='form.maxAvailabeAppointment.ForSecretery'>
+                            <div class="input-group-prepend">
+                                <span class="input-group-text" id="basic-addon3">عدد</span>
+                            </div>
+                        </div>
+                        <span class="text-muted d-flex align-items-center ms-1 mt-1 mb-2"><i
+                                class="fa fa-exclamation-circle fa-lg text-light me-1" aria-hidden="true"></i>منشی بتواند حداکثر در هر روز چند نوبت ثبت بکند</span>
                     </div>
                 </div>
             </div>

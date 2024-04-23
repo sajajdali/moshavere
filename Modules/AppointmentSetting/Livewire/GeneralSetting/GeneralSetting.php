@@ -179,6 +179,7 @@ class GeneralSetting extends Component
             'form.maxDayAvaialbe'                 => 'required|integer',
             'form.maxAvailabeAppointment.eachDay' => 'required_if:form.maxAvailabeAppointment.status,true',
             'form.maxAvailabeAppointment.totall'  => 'required_if:form.maxAvailabeAppointment.status,true',
+            'form.maxAvailabeAppointment.ForSecretery'  => 'required_if:form.maxAvailabeAppointment.status,true',
             'form.cancel.day'                     => 'required_if:form.cancel.status,true',
             'form.endAppointment.date'            => 'required_if:form.endAppointment.status,true',
             'form.segments.value'                 => 'required_if:form.segments.status,true',
@@ -220,6 +221,9 @@ class GeneralSetting extends Component
             }
             if (isset($this->form['maxAvailabeAppointment']['totall'])) {
                 unset($this->form['maxAvailabeAppointment']['totall']);
+            }
+            if (isset($this->form['maxAvailabeAppointment']['ForSecretery'])) {
+                unset($this->form['maxAvailabeAppointment']['ForSecretery']);
             }
         }
         if (isset($this->form['cancel']['status'])  && $this->form['cancel']['status'] == false) {
@@ -267,6 +271,7 @@ class GeneralSetting extends Component
             AppointmentSetting::VISIT_TYPE_ONLINE                    => isset($this->form['visitType']['online']) ? $this->form['visitType']['online'] : null,
             AppointmentSetting::MAX_AVAILABLE_APPOINTMENT_EACH_DAY   => isset($this->form['maxAvailabeAppointment']['eachDay']) ? $this->form['maxAvailabeAppointment']['eachDay'] : null,
             AppointmentSetting::MAX_AVAILABLE_APPOINTMENT_TOTALL     => isset($this->form['maxAvailabeAppointment']['totall']) ? $this->form['maxAvailabeAppointment']['totall'] : null,
+            AppointmentSetting::MAX_AVAILABLE_APPOINTMENT_FOR_SECRETERY     => isset($this->form['maxAvailabeAppointment']['ForSecretery']) ? $this->form['maxAvailabeAppointment']['ForSecretery'] : null,
             AppointmentSetting::PAYMENT                              =>
             [
                 AppointmentSetting::STATUS                           => isset($this->form['onlinePayment']['status']) ? $this->form['onlinePayment']['status']  : false,
@@ -398,14 +403,15 @@ class GeneralSetting extends Component
         $this->appointment_setting = $apSet;
 
         $this->fillTheTime($apSet);
-        $this->form['visitType']['inPerson']              = $apSet->detail['visit_type_inPerson'] ?? false;
-        $this->form['visitType']['voip']              = $apSet->detail['visit_type_voip'] ?? false;
+        $this->form['visitType']['inPerson']             = $apSet->detail['visit_type_inPerson'] ?? false;
+        $this->form['visitType']['voip']                 = $apSet->detail['visit_type_voip'] ?? false;
         $this->form['visitType']['online']               = $apSet->detail['visit_type_online'] ?? false;
         $this->form['visitTime']                         = $apSet->time_for_visit;
         $this->form['minDayAvaialbe']                    = $apSet->min_day_active;
         $this->form['maxDayAvaialbe']                    = $apSet->max_day_active;
-        $this->form['maxAvailabeAppointment']['eachDay'] = $apSet->detail['maxAvailabeAppointment-eachDay'];
-        $this->form['maxAvailabeAppointment']['totall']  = $apSet->detail['maxAvailabeAppointment-totall'];
+        $this->form['maxAvailabeAppointment']['eachDay'] = $apSet->detail[AppointmentSetting::MAX_AVAILABLE_APPOINTMENT_EACH_DAY];
+        $this->form['maxAvailabeAppointment']['totall']  = $apSet->detail[AppointmentSetting::MAX_AVAILABLE_APPOINTMENT_TOTALL];
+        $this->form['maxAvailabeAppointment']['ForSecretery']= $apSet->detail[AppointmentSetting::MAX_AVAILABLE_APPOINTMENT_FOR_SECRETERY];
         $this->form['cancel']['day']                     = $apSet->cancellation_by_user ?? null;
         $this->form['avtive']                            = $apSet->active->value;
 

@@ -95,9 +95,9 @@ function chatQuestions(){
                             'answer' => 'مراجعه کننده گرامی به علت محدودیت در نوبت ها لطفا در روز دیگری تلاش به دریافت نوبت کنید و یا برای تسریع در روند شروع درمان ، نوبت ویزیت آنلاین دریافت کنید',
                             'answer_detail' => [
                                 'title_link' => 'دریافت نوبت آنلاین',
-                                'link' => 'online_appointment',
-                                'image' => null,
-                                'video' => null,
+                                'link' => 'appointment',
+                                'image' => url('storage/help/chat/help.png'),
+                                'video' => url('storage/help/chat/sample.mp4'),
                                 'show_chat_button' => true,
                             ]
                         ]

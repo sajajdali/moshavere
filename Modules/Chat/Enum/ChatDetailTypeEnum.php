@@ -16,7 +16,7 @@ enum ChatDetailTypeEnum : int
     {
         return match ($this) {
             self::MESSAGE => 'سوال کاربر',
-            self::ADMIN_MESSAGE => 'پاسخر مدیر',
+            self::ADMIN_MESSAGE => 'پاسخ مدیر',
         };
     }
 

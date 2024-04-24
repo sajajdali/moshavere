@@ -18,10 +18,12 @@ class Chat extends Model
      */
     protected $guarded = ['id'];
     protected $table = 'chats';
+    const DETAIL_QUESTION = 'question';
 
     protected $casts = [
         'status' => ChatStatusEnum::class,
         'ban' => 'boolean',
+        'detail' => 'json'
     ];
 
     protected $with = ['user', 'chatDetails'];
@@ -41,6 +43,11 @@ class Chat extends Model
             $chat->save();
         }
         return $chat;
+    }
+
+    public static function badgeCount()
+    {
+        return 5;
     }
 
     protected static function newFactory(): ChatFactory

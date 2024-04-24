@@ -5,6 +5,7 @@ namespace Modules\User\Entities;
 use Laravel\Sanctum\HasApiTokens;
 use Modules\AppointmentSetting\app\Models\AppointmentSetting;
 use Modules\AppointmentUser\app\Models\AppointmentUser;
+use Modules\Chat\app\Models\Chat;
 use Spatie\Permission\Models\Role;
 use Modules\User\Enum\UserMetaEnum;
 use Spatie\Permission\Traits\HasRoles;
@@ -208,6 +209,11 @@ class User extends Authenticatable
         $birthDay = json_decode($birthDayData);
         $shamsiDate = Verta::parse("{$birthDay->year}/{$birthDay->month}/{$birthDay->day}");
         return $shamsiDate->diff(now())->y;
+    }
+
+    public function chats(): HasMany
+    {
+        return $this->hasMany(Chat::class);
     }
 
 }

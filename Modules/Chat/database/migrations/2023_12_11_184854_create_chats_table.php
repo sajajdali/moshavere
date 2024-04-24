@@ -19,6 +19,7 @@ return new class extends Migration
             $table->integer('new_message_by_user')->default(0);
             $table->integer('new_message_by_support')->default(0);
             $table->boolean('ban')->default(false);
+            $table->json('detail')->nullable();
             $table->timestamps();
         });
     }

@@ -21,6 +21,13 @@ Route::post('edit', 'UserController@edit');
 Route::prefix('profile')->group(function () {
     Route::get('dashboard', [\Modules\Api\Http\Controllers\Profile\DashboardController::class, 'index'])->name('dashboard');
     Route::get('appointments', [\Modules\Api\Http\Controllers\Profile\DashboardController::class, 'appointmentList'])->name('appointment_list');
+
+    Route::prefix('chat')->group(function () {
+        Route::get('index' , [\Modules\Api\Http\Controllers\ChatController::class , 'index']);
+        Route::get('list' , [\Modules\Api\Http\Controllers\ChatController::class , 'list']);
+        Route::get('show/{chat}' , [\Modules\Api\Http\Controllers\ChatController::class , 'show']);
+        Route::post('send_message' , [\Modules\Api\Http\Controllers\ChatController::class , 'sendMessage']);
+    });
 });
 Route::get('test', function () {
     $user = auth()->user();

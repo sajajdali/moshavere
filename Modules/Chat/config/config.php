@@ -28,7 +28,11 @@ return [
                 'policy_class' => \Modules\User\Entities\User::class,
                 'icon' => 'fe fe-message-circle',
                 'route' => 'admin.chat',
-                'has_badge' => false,
+                'has_badge' => true,
+                'badge' => [
+                    'class' => \Modules\Chat\app\Models\Chat::class,
+                    'type' => 'badge badge-sm bg-secondary badge-hide'
+                ],
                 'has_child' => false,
                 'children' => null
             ],

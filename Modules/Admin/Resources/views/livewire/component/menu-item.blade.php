@@ -16,7 +16,7 @@
                 @endif
                 @if($depth ===0 && isset($innerItem['has_badge']) && $innerItem['has_badge'] && $this->badgeCount($innerItem['badge']['class']) > 0)
                     <span
-                        class="{{ $innerItem['badge']['type']->value ?? '' }}">{{ $this->badgeCount($innerItem['badge']['class']) }}
+                        class="{{ $innerItem['badge']['type'] ?? '' }}">{{ $this->badgeCount($innerItem['badge']['class']) }}
                     </span>
                 @endif
                 @if($innerItem['has_child'])

@@ -53,4 +53,9 @@ class ChatDetail extends Model
         return $this->type === ChatDetailTypeEnum::ATTACH;
     }
 
+    public function files(): \Illuminate\Database\Eloquent\Relations\HasMany
+    {
+        return $this->hasMany(ChatDetailsFile::class , 'chat_detail_id');
+    }
+
 }

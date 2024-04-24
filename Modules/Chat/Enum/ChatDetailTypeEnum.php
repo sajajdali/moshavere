@@ -9,16 +9,14 @@ enum ChatDetailTypeEnum : int
 {
     use EnumFunctionTrait;
     case MESSAGE = 0;
-    case ADMIN_MESSAGE = 2;
-    case ATTACH = 10;
+    case ADMIN_MESSAGE = 1;
 
 
     public function getName(): string
     {
         return match ($this) {
-            self::MESSAGE => 'text',
-            self::ADMIN_MESSAGE => 'text',
-            self::ATTACH => 'file',
+            self::MESSAGE => 'سوال کاربر',
+            self::ADMIN_MESSAGE => 'پاسخر مدیر',
         };
     }
 

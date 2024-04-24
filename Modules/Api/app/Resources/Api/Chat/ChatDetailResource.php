@@ -15,7 +15,6 @@ class ChatDetailResource extends JsonResource
             'id' => $this->id,
             'body'=> $this->content,
             'type' => $this->type->apiResult(),
-            'chat_id'=> $this->chat_id,
             'seen'=> true,
             'answer_by' => null,
             'created_at' => dateFormat($this->created_at),

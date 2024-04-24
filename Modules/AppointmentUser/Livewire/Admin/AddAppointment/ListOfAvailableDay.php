@@ -119,7 +119,6 @@ class ListOfAvailableDay extends Component
         $this->fethData['firstTreeAvailableAppointment'] =  $this->findFirstTreeAppointment($listOfAppointment);
         $this->fethData['appointmentSetting'] = $appointmentSetting->id;
     }
-
     public function render()
     {
         return view('appointmentuser::livewire.admin.add-appointment.list-of-available-day');

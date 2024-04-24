@@ -2,6 +2,7 @@
 
 namespace Modules\AppointmentUser\Service;
 
+use Modules\AppointmentUser\app\Events\CancelAppointment;
 use Verta;
 use App\Event;
 use Carbon\Carbon;
@@ -15,6 +16,7 @@ use Modules\Api\app\Resources\Api\SomeoneResource;
 use Modules\Reminder\app\Models\AppointmentReminder;
 use Modules\AppointmentUser\Enum\model\MainUserModel;
 use Modules\AppointmentUser\app\Models\AppointmentUser;
+use Modules\AppointmentUser\app\Events\StoreAppointment;
 use Modules\AppointmentUser\Enum\model\AppointmentModel;
 use Modules\AppointmentUser\app\Models\AppointmentOnline;
 use Modules\AppointmentUser\Enum\AppointmentUserKindEnum;
@@ -22,6 +24,7 @@ use Modules\AppointmentUser\Enum\AppointmentUserTypeEnum;
 use Modules\AppointmentUser\Enum\AppointmentUserStatusEnum;
 use Modules\AppointmentUser\Enum\model\UserModelAppointment;
 use Modules\AppointmentSetting\app\Models\AppointmentSetting;
+use Modules\AppointmentUser\app\Events\StoreAppointmentEvent;
 use Modules\AppointmentUser\Enum\AppointmentOnlineStatusEnum;
 use Modules\AppointmentSetting\app\Models\AppointmentSettingTime;
 use Modules\AppointmentUser\app\Notifications\AppointmentSmsNotification;
@@ -515,10 +518,14 @@ class AppointmentUserService
         $endTime = $appointmentData->endTime ?? $visitDateTime->copy()->addMinutes($appointmentSetting->time_for_visit)->toTimeString();
 
         //check for monitoring appointment
-        if(isset($appointmentSetting->detail[AppointmentSetting::MONITORTING_APPOINTMENT]) && $appointmentSetting->detail[AppointmentSetting::MONITORTING_APPOINTMENT] != null ) {
-            $status = AppointmentUserStatusEnum::STATUS_MONITORING ;
-        }else {
-            $status = AppointmentUserStatusEnum::STATUS_SUCCESSFUL ;
+        if (
+            isset($appointmentSetting->detail[AppointmentSetting::MONITORTING_APPOINTMENT])
+            && $appointmentSetting->detail[AppointmentSetting::MONITORTING_APPOINTMENT] != null &&
+            $appointmentData->appointmentVia == AppointmentVia::SELF
+        ) {
+            $status = AppointmentUserStatusEnum::STATUS_MONITORING;
+        } else {
+            $status = AppointmentUserStatusEnum::STATUS_SUCCESSFUL;
         }
         // store appointment
         $appointmentUserModel = [
@@ -602,7 +609,8 @@ class AppointmentUserService
         // handel sms
 
         //        $this->makeShortLink($appointmentUser);
-        $this->Addreminder($appointmentUser);
+        event(new StoreAppointmentEvent($appointmentUser));
+
         return [
             'status' => true,
             'message' => 'نوبت با موفقیت برای کاربر ثبت شد',
@@ -613,51 +621,6 @@ class AppointmentUserService
             ]
         ];
 
-
         //        $appointmentLists->where('start_time', '>', $dateAppointment)->where('end_time',);
-    }
-    public function Addreminder($appointmentUser)
-    {
-        $reminders = collect();
-        //get the reminder that set for all the sections
-        $reminders = $reminders->merge(Reminder::whereNull('reminderable_id')->whereNull('doctors')->get());
-
-        //check if for  doctor reminder
-        $specific_doctor = Reminder::whereNull('reminderable_id')->whereJsonContains('doctors', (string)$appointmentUser->doctor_id)->get();
-        if ($specific_doctor->isNotEmpty()) {
-            $reminders = $reminders->merge($specific_doctor);
-        }
-
-        //check if for  service reminder
-        if ($appointmentUser->service && $appointmentUser->service->reminder) {
-            $specific_service = $appointmentUser->service->reminder()->whereJsonContains('doctors', (string)$appointmentUser->doctor_id)->get();
-            if ($specific_service->isNotEmpty()) {
-                $reminders = $reminders->merge($specific_service);
-            }
-        }
-        if ($reminders->isNotEmpty()) {
-            $reminders->each(function ($reminder) use ($appointmentUser) {
-                $detail = [
-                    'mobile' => $appointmentUser->user->mobile,
-                    'parameter' => $reminder->parameters,
-                ];
-                AppointmentReminder::create([
-                    'appointment_user_id' => $appointmentUser->id,
-                    'type' => $reminder->status,
-                    'send_at' => $appointmentUser->date_visit->addDays($reminder->send_day)->addHours($reminder->send_time),
-                    'details' => $detail,
-                ]);
-            });
-        }
-    }
-
-    public function deleteAppointmentReminder($appointmentUser)
-    {
-        $reminders =  AppointmentReminder::where('appointment_user_id', $appointmentUser->id)->get();
-        if ($reminders->isNotEmpty()) {
-            $reminders->each(function ($reminder) {
-                $reminder->delete();
-            });
-        }
     }
 }

@@ -127,4 +127,5 @@ class AppointmentUser extends Model
     {
         return json_encode($value, JSON_UNESCAPED_UNICODE);
     }
+
 }

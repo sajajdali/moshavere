@@ -2,10 +2,17 @@
 
 namespace App\Providers;
 
+use Illuminate\Support\Facades\Event;
 use Illuminate\Auth\Events\Registered;
+use Modules\appointmentUser\app\Events\StoreAppointment;
+use Modules\AppointmentUser\app\Events\CancelAppointment;
+use Modules\AppointmentUser\app\Listeners\DeleteReminders;
+use Modules\AppointmentUser\app\Events\StoreAppointmentEvent;
+use Modules\AppointmentUser\app\Events\CancelAppointmentEvent;
+use Modules\AppointmentUser\app\Events\DeleteAppointmentEvent;
+use Modules\AppointmentUser\app\Listeners\AddReminderListener;
 use Illuminate\Auth\Listeners\SendEmailVerificationNotification;
 use Illuminate\Foundation\Support\Providers\EventServiceProvider as ServiceProvider;
-use Illuminate\Support\Facades\Event;
 
 class EventServiceProvider extends ServiceProvider
 {
@@ -17,6 +24,15 @@ class EventServiceProvider extends ServiceProvider
     protected $listen = [
         Registered::class => [
             SendEmailVerificationNotification::class,
+        ],
+        StoreAppointmentEvent::class => [
+            AddReminderListener::class ,
+        ],
+        DeleteAppointmentEvent::class => [
+            DeleteReminders::class ,
+        ],
+        CancelAppointmentEvent::class => [
+            DeleteReminders::class ,
         ],
     ];
 

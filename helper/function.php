@@ -82,7 +82,7 @@ function chatQuestions(){
             'id' => 1,
             'title' => 'مشکل در نوبتدهی حضوری ',
             'answer' => null,
-            'answer_detail' => [],
+            'answer_detail' => null,
             'children' => [
                 [
                     'id' => 11,
@@ -95,14 +95,15 @@ function chatQuestions(){
                             'answer' => 'مراجعه کننده گرامی به علت محدودیت در نوبت ها لطفا در روز دیگری تلاش به دریافت نوبت کنید و یا برای تسریع در روند شروع درمان ، نوبت ویزیت آنلاین دریافت کنید',
                             'answer_detail' => [
                                 'title_link' => 'دریافت نوبت آنلاین',
-                                'link' => 'on;ine_appointment',
+                                'link' => 'online_appointment',
                                 'image' => null,
-                                'video' => null
+                                'video' => null,
+                                'show_chat_button' => true,
                             ]
                         ]
                     ],
                     'answer' => null,
-                    'answer_detail' => []
+                    'answer_detail' => null
                 ],
                 [
                     'id' => 13,
@@ -123,7 +124,7 @@ function chatQuestions(){
                         ]
                     ],
                     'answer' => null,
-                    'answer_detail' => []
+                    'answer_detail' => null
                 ],
                 [
                     'id' => 15,
@@ -144,7 +145,7 @@ function chatQuestions(){
                         ]
                     ],
                     'answer' => null,
-                    'answer_detail' => []
+                    'answer_detail' => null
                 ],
                 [
                     'id' => 17,
@@ -165,7 +166,7 @@ function chatQuestions(){
                         ]
                     ],
                     'answer' => null,
-                    'answer_detail' => []
+                    'answer_detail' => null
                 ],
             ],
         ],
@@ -192,7 +193,7 @@ function chatQuestions(){
                         ]
                     ],
                     'answer' => null,
-                    'answer_detail' => []
+                    'answer_detail' => null
                 ],
                 [
                     'id' => 21,
@@ -213,7 +214,7 @@ function chatQuestions(){
                         ]
                     ],
                     'answer' => null,
-                    'answer_detail' => []
+                    'answer_detail' => null
                 ],
 
                 [
@@ -235,7 +236,7 @@ function chatQuestions(){
                         ]
                     ],
                     'answer' => null,
-                    'answer_detail' => []
+                    'answer_detail' => null
                 ],
                 [
                     'id' => 25,
@@ -256,7 +257,7 @@ function chatQuestions(){
                         ]
                     ],
                     'answer' => null,
-                    'answer_detail' => []
+                    'answer_detail' => null
                 ],
                 [
                     'id' => 27,
@@ -277,7 +278,7 @@ function chatQuestions(){
                         ]
                     ],
                     'answer' => null,
-                    'answer_detail' => []
+                    'answer_detail' => null
                 ],
                 [
                     'id' => 29,
@@ -298,7 +299,7 @@ function chatQuestions(){
                         ]
                     ],
                     'answer' => null,
-                    'answer_detail' => []
+                    'answer_detail' => null
                 ],
                 [
                     'id' => 31,
@@ -322,12 +323,12 @@ function chatQuestions(){
                         ]
                     ],
                     'answer' => null,
-                    'answer_detail' => []
+                    'answer_detail' => null
                 ],
 
             ],
             'answer' => null,
-            'answer_detail' => []
+            'answer_detail' => null
         ],
         [
             'id' => 3,
@@ -352,11 +353,11 @@ function chatQuestions(){
                         ]
                     ],
                     'answer' => null,
-                    'answer_detail' => []
+                    'answer_detail' => null
                 ],
             ],
             'answer' => null,
-            'answer_detail' => []
+            'answer_detail' => null
         ]
 
     ];

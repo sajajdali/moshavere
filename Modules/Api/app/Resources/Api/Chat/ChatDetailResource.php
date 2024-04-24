@@ -13,9 +13,11 @@ class ChatDetailResource extends JsonResource
     {
         return [
             'id' => $this->id,
-            'chat_id'=> $this->chat_id,
+            'body'=> $this->content,
             'type' => $this->type->apiResult(),
-            'content'=> $this->content,
+            'chat_id'=> $this->chat_id,
+            'seen'=> true,
+            'answer_by' => null,
             'created_at' => dateFormat($this->created_at),
             'files' => ChatDetailFilesResource::collection( $this->files)
         ];

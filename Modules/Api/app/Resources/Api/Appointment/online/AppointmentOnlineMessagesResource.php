@@ -14,13 +14,14 @@ class AppointmentOnlineMessagesResource extends JsonResource
     public function toArray($request): array
     {
         return [
+            'id' => $this->id,
             'body' => $this->body,
             'type' => $this->type->apiResult(),
+            'chat_id' => null,
             'seen' => $this->seen == 1,
             'answer_by' => $this->answer_by ? UserResource::make($this->answerBy) : null,
             'created_at' => verta($this->created_at)->format('H:i'),
             'files' => AppointmentOnlineMessagesFilesResource::collection($this->messageFile),
-
         ];
     }
 }

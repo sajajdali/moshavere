@@ -28,9 +28,7 @@ class ChatController extends Controller
         }
 
         $chatDetail = $chat->chatDetails()->paginate();
-        return $this->ok([
-            'data' => new ChatDetailPaginateResource($chatDetail)
-        ]);
+        return $this->ok( new ChatDetailPaginateResource($chatDetail));
 
     }
 
@@ -48,24 +46,9 @@ class ChatController extends Controller
                 ]);
             }
 
-        } else {
-//            $status = ChatStatusEnum::JUST_CREATED;
-
-            // insert chat
-//            $chat = $user->chats()->create([
-//                'status' => $status,
-//                'new_message_by_support' => 0,
-//                'new_message_by_user' => 1
-//            ]);
         }
-
-
-
         $content = $request->input('content');
-
-
         DB::beginTransaction();
-
         try {
 
             if ($request->has('chat_id')) {
@@ -125,30 +108,7 @@ class ChatController extends Controller
             'active_chat' =>  ChatDetailResource::collection($chat->chatDetails)
         ]);
 
-        /*
-        $chatDetail = $chat->chatDetails()->create([
-           'content' => $content,
-            'user_id' => $user->id,
-            'type' => ChatDetailTypeEnum::MESSAGE
-        ]);
 
-        if($request->hasFile('files')) {
-            $validator = Validator::make($request->all(), [
-                'files.*' => 'file|mimes:jpeg,png,jpg,gif,svg,mp4,mov,avi,wmv,pdf,mp3,wav,m4a,m4v,webm',
-            ]);
-
-            if ($validator->fails()) {
-                return $this->requestException([
-                    'status' => false,
-                    'message' => 'فرمت فایل های ارسالی اشتباه است',
-                    'errors' => $validator->errors()->all()
-                ]);
-            }
-
-            $files =  $request->file('files');
-            $this->uploadFiles($user, $files, $chatDetail);
-        }
-        */
 
     }
 
@@ -207,9 +167,7 @@ class ChatController extends Controller
     {
         $user = auth()->user();
         $chats = $user->chats()->orderByDesc('id')->paginate();
-        return $this->ok([
-            'data' => new ChatPaginateResource($chats)
-        ]);
+        return $this->ok( new ChatPaginateResource($chats));
     }
 
     private function checkActiveChat()

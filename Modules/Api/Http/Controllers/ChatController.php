@@ -5,6 +5,7 @@ namespace Modules\Api\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
 use Modules\Api\app\Resources\Api\Chat\ChatDetailPaginateResource;
+use Modules\Api\app\Resources\Api\Chat\ChatDetailResource;
 use Modules\Api\app\Resources\Api\Chat\ChatPaginateResource;
 use Modules\Api\app\Resources\Api\Chat\ChatResource;
 use Modules\Api\Trait\ApiHandlerTrait;
@@ -121,7 +122,7 @@ class ChatController extends Controller
         }
 
         return $this->created([
-            'active_chat' => ChatResource::make($chat)
+            'active_chat' =>  ChatDetailResource::collection($chat->chatDetails)
         ]);
 
         /*

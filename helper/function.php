@@ -99,6 +99,8 @@ function chatQuestions(){
                                 'image' => url('storage/help/chat/help.png'),
                                 'video' => url('storage/help/chat/sample.mp4'),
                                 'show_chat_button' => true,
+                                'show_call_button' => true,
+                                'call_number' => '0909122978167'
                             ]
                         ]
                     ],
@@ -119,6 +121,9 @@ function chatQuestions(){
                                 'image' => url('storage/help/chat/help.png'),
                                 'video' => null,
                                 'show_chat_button' => true,
+                                'show_call_button' => true,
+                                'call_number' => '0909122978167'
+
                             ],
                             'children' => [],
                         ]
@@ -140,6 +145,9 @@ function chatQuestions(){
                                 'image' => url('storage/help/chat/help.png'),
                                 'video' => null,
                                 'show_chat_button' => true,
+                                'show_call_button' => true,
+                                'call_number' => '0909122978167'
+
                             ],
                             'children' => [],
                         ]
@@ -161,6 +169,9 @@ function chatQuestions(){
                                 'image' => null,
                                 'video' => null,
                                 'show_chat_button' => true,
+                                'show_call_button' => true,
+                                'call_number' => '0909122978167'
+
                             ],
                             'children' => [],
                         ]
@@ -188,6 +199,9 @@ function chatQuestions(){
                                 'image' => null,
                                 'video' => null,
                                 'show_chat_button' => true,
+                                'show_call_button' => true,
+                                'call_number' => '0909122978167'
+
                             ],
                             'children' => []
                         ]
@@ -209,6 +223,8 @@ function chatQuestions(){
                                 'image' => null,
                                 'video' => null,
                                 'show_chat_button' => true,
+                                'show_call_button' => true,
+                                'call_number' => '0909122978167'
                             ],
                             'children' => []
                         ]
@@ -231,6 +247,8 @@ function chatQuestions(){
                                 'image' => null,
                                 'video' => url('storage/help/chat/sample.mp4'),
                                 'show_chat_button' => true,
+                                'show_call_button' => true,
+                                'call_number' => '0909122978167'
                             ],
                             'children' => []
                         ]
@@ -252,6 +270,8 @@ function chatQuestions(){
                                 'image' => null,
                                 'video' => null,
                                 'show_chat_button' => true,
+                                'show_call_button' => true,
+                                'call_number' => '0909122978167'
                             ],
                             'children' => []
                         ]
@@ -273,6 +293,8 @@ function chatQuestions(){
                                 'image' => url('storage/help/chat/help.png'),
                                 'video' => null,
                                 'show_chat_button' => true,
+                                'show_call_button' => true,
+                                'call_number' => '0909122978167'
                             ],
                             'children' => []
                         ]
@@ -294,6 +316,8 @@ function chatQuestions(){
                                 'image' => null,
                                 'video' => null,
                                 'show_chat_button' => true,
+                                'show_call_button' => true,
+                                'call_number' => '0909122978167'
                             ],
                             'children' => []
                         ]
@@ -318,6 +342,8 @@ function chatQuestions(){
                                 'image' => null,
                                 'video' => null,
                                 'show_chat_button' => true,
+                                'show_call_button' => true,
+                                'call_number' => '0909122978167'
                             ],
                             'children' => []
                         ]
@@ -348,6 +374,8 @@ function chatQuestions(){
                                 'image' => url('storage/help/chat/help.png'),
                                 'video' => null,
                                 'show_chat_button' => true,
+                                'show_call_button' => true,
+                                'call_number' => '0909122978167'
                             ],
                             'children' => []
                         ]

@@ -3,18 +3,19 @@
 namespace Modules\AppointmentUser\app\Models;
 
 use App\ShortLink;
-use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\SoftDeletes;
-use Illuminate\Notifications\Notifiable;
-use Modules\AppointmentSetting\app\Models\AppointmentSetting;
-use Modules\AppointmentUser\Enum\AppointmentUserKindEnum;
-use Modules\AppointmentUser\Enum\AppointmentUserStatusEnum;
-use Modules\AppointmentUser\Enum\AppointmentUserTypeEnum;
-use Modules\Place\app\Models\Place;
-use Modules\Service\app\Models\Service;
-use Modules\Transaction\app\Models\Transaction;
+use Carbon\Carbon;
 use Modules\User\Entities\User;
+use Modules\Place\app\Models\Place;
+use Illuminate\Database\Eloquent\Model;
+use Modules\Service\app\Models\Service;
+use Illuminate\Notifications\Notifiable;
+use Illuminate\Database\Eloquent\SoftDeletes;
+use Modules\Transaction\app\Models\Transaction;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Modules\AppointmentUser\Enum\AppointmentUserKindEnum;
+use Modules\AppointmentUser\Enum\AppointmentUserTypeEnum;
+use Modules\AppointmentUser\Enum\AppointmentUserStatusEnum;
+use Modules\AppointmentSetting\app\Models\AppointmentSetting;
 
 class AppointmentUser extends Model
 {
@@ -126,6 +127,29 @@ class AppointmentUser extends Model
     protected function asJson($value)
     {
         return json_encode($value, JSON_UNESCAPED_UNICODE);
+    }
+
+    public function scopeToday($query)
+    {
+        return $query->whereDate('date_visit', Carbon::today());
+    }
+    public function scopeState($query,AppointmentUserStatusEnum $appointmentUserStatusEnum)  {
+        return $query->where('status' , $appointmentUserStatusEnum);
+    }
+    public function scopeSuccessful($query)  {
+        return $query->state(AppointmentUserStatusEnum::STATUS_SUCCESSFUL);
+    }
+    public function scopeWaitpayment($query)  {
+        return $query->state(AppointmentUserStatusEnum::STATUS_WAIT_PAYMENT);
+    }
+    public function scopeCanceled($query)  {
+        return $query->state(AppointmentUserStatusEnum::STATUS_CANCEL);
+    }
+    public function scopeDisApproved($query)  {
+        return $query->state(AppointmentUserStatusEnum::STATUS_DISAPPROVED);
+    }
+    public function scopeDisabled($query)  {
+        return $query->where('status',AppointmentUserStatusEnum::STATUS_CANCEL)->orWhere('status',AppointmentUserStatusEnum::STATUS_CANCEL);
     }
 
 }

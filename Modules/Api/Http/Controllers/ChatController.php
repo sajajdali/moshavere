@@ -28,7 +28,7 @@ class ChatController extends Controller
         if ($chat->user->id <> $user->id) {
             return $this->badRequest('شما درسترسی به این چت را ندارید');
         }
-        $chatDetail = $chat->chatDetails()->paginate();
+        $chatDetail = $chat->chatDetails()->orderByDesc('id')->paginate();
         if ($chatDetail->first()){
             $access = !($chatDetail->first()->chat->ban == true || $chatDetail->first()->chat->status == ChatStatusEnum::CLOSED);
         } else {

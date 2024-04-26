@@ -104,9 +104,8 @@ class ChatController extends Controller
             ]);
         }
 
-        return $this->created([
-            'active_chat' =>  ChatDetailResource::collection($chat->chatDetails)
-        ]);
+        $chatDetail = $chat->chatDetails()->paginate();
+        return $this->ok( new ChatDetailPaginateResource($chatDetail));
 
 
 

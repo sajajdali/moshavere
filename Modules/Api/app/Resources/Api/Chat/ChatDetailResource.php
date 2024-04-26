@@ -13,6 +13,7 @@ class ChatDetailResource extends JsonResource
     {
         return [
             'id' => $this->id,
+            'chat_id' => $this->chat->id,
             'body'=> $this->content,
             'type' => $this->type->apiResult(),
             'seen'=> true,

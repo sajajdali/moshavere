@@ -30,7 +30,7 @@ class ChatController extends Controller
         }
         $chatDetail = $chat->chatDetails()->paginate();
         if ($chatDetail->first()){
-            $access = $chatDetail->first()->chat->ban == false || $chatDetail->first()->chat->status != ChatStatusEnum::CLOSED;
+            $access = !($chatDetail->first()->chat->ban == true || $chatDetail->first()->chat->status == ChatStatusEnum::CLOSED);
         } else {
             $access = false;
         }

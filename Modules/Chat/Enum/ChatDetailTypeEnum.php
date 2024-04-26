@@ -8,8 +8,8 @@ use App\trait\EnumFunctionTrait;
 enum ChatDetailTypeEnum : int
 {
     use EnumFunctionTrait;
-    case MESSAGE = 0;
-    case ADMIN_MESSAGE = 1;
+    case MESSAGE = 1;
+    case ADMIN_MESSAGE = 2;
 
 
     public function getName(): string

@@ -18,7 +18,7 @@ class ChatDetailResource extends JsonResource
             'type' => $this->type->apiResult(),
             'seen'=> true,
             'answer_by' => null,
-            'created_at' => dateFormat($this->created_at),
+            'created_at' => verta($this->created_at)->format('H:i'),
             'files' => ChatDetailFilesResource::collection( $this->files)
         ];
     }

@@ -2,6 +2,7 @@
 
 namespace Modules\Api\Http\Controllers;
 
+use http\Client\Curl\User;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
 use Modules\Api\app\Resources\Api\Chat\ChatDetailPaginateResource;
@@ -23,12 +24,25 @@ class ChatController extends Controller
     public function show(Chat $chat)
     {
         $user = auth()->user();
+
         if ($chat->user->id <> $user->id) {
             return $this->badRequest('شما درسترسی به این چت را ندارید');
         }
-
         $chatDetail = $chat->chatDetails()->paginate();
-        return $this->ok( new ChatDetailPaginateResource($chatDetail));
+        if ($chatDetail->first()){
+            $access = $chatDetail->first()->chat->ban == false || $chatDetail->first()->chat->status != ChatStatusEnum::CLOSED;
+        } else {
+            $access = false;
+        }
+        $accessibility = [
+            'can_send_message' =>  $access,
+            'can_show_messages' => $access,
+        ];
+        $list = [
+            'messages' => $chatDetail,
+            'accessibility' => $accessibility
+        ];
+        return $this->ok( new ChatDetailPaginateResource($list));
 
     }
 
@@ -104,8 +118,13 @@ class ChatController extends Controller
             ]);
         }
 
-        $chatDetail = $chat->chatDetails()->paginate();
-        return $this->ok( new ChatDetailPaginateResource($chatDetail));
+        return $this->ok([
+            'status' => true,
+            'message' => 'پیغام با موفقیت ارسال شد',
+            'model' => ChatDetailResource::make($chat->chatDetails()->orderByDesc('id')->first())
+        ]);
+//        $chatDetail = $chat->chatDetails()->paginate();
+//        return $this->ok( new ChatDetailPaginateResource($chatDetail));
 
 
 

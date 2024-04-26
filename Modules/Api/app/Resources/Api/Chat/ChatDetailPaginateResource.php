@@ -8,7 +8,7 @@ class ChatDetailPaginateResource extends JsonResource
 {
     private function changeStructure(): array
     {
-        $messagesCollect = $this;
+        $messagesCollect = $this['messages'];
 
         $collect = $messagesCollect->groupBy(function ($message) {
             return verta($message->created_at->toDateString())->format("d F Y");
@@ -17,7 +17,7 @@ class ChatDetailPaginateResource extends JsonResource
         foreach ($collect as $date => $messages) {
             $messagesWithDates[] = [
                 'date' => $date,
-                'messages' => ChatDetailResource::collection($this)
+                'messages' => ChatDetailResource::collection($messages)
             ];
         }
 
@@ -30,11 +30,12 @@ class ChatDetailPaginateResource extends JsonResource
     {
         return [
             'message_list' => $this->changeStructure(),
+            'accessibility' => $this['accessibility'],
             'paginate' => [
-                'current_page' => $this->currentPage(),
-                'per_page' => $this->perPage(),
-                'total' => $this->total(),
-                'last_page' => $this->lastPage()
+                'current_page' => $this['messages']->currentPage(),
+                'per_page' => $this['messages']->perPage(),
+                'total' => $this['messages']->total(),
+                'last_page' => $this['messages']->lastPage()
             ],
         ];
     }

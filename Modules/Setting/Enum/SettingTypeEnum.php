@@ -11,6 +11,7 @@ enum SettingTypeEnum : string
     case EDITOR = 'editor';
 
     case RADIO = 'radio';
+    case CHECK = 'check';
 
     case SELECT = 'select';
 
@@ -22,6 +23,7 @@ enum SettingTypeEnum : string
             self::EDITOR => 'setting::admin.setting.component.editor',
             self::RADIO => 'setting::admin.setting.component.radio',
             self::SELECT => 'setting::admin.setting.component.select',
+            self::CHECK => 'setting::admin.setting.component.check',
         };
     }
 }

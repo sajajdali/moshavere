@@ -15,6 +15,9 @@ enum SettingKeyEnum: int implements EnumHasNameInterface, SettingTypeInterface, 
     case DEFAULT_EXERCISE_STATUS = 1;
     case SITE_LOGO_URL = 2;
     case SITE_TITLE= 3;
+    case APPOINTMENT_STATUS = 4;
+
+    //sms
     case SMS_API_TOKEN = 20;
     case SMS_API_LOGIN_TEMPLATE = 30;
     case SMS_APPOINTMENT_RECEIVING_SUCCESSFUL = 31;
@@ -27,9 +30,17 @@ enum SettingKeyEnum: int implements EnumHasNameInterface, SettingTypeInterface, 
     case SMS_APPOINTMENT_TO_OPERATOR = 38;
     case SMS_APPROVED_MONITORING_APPOINTMENT = 39;
     case SMS_DIS_APPROVED_MONITORING_APPOINTMENT = 40;
+
     case SUPPORT_USER_ROLE = 100;
+
+    //payment
+    case PAYMENT_PAYSTAR_STATUS = 152;
     case PAYMENT_PAYSTAR_TOKEN = 150;
     case PAYMENT_PAYSTAR_SIGN = 151;
+    case PAYMENT_ZARINPAL_STATUS = 153;
+    case PAYMENT_ZARINPAL_MERCHENID = 154;
+
+
     case WEIGHT_CHART_DESCRIPTION_APP = 120;
     case VOIP_USERNAME = 160;
     case VOIP_PASSWORD = 170;
@@ -39,27 +50,7 @@ enum SettingKeyEnum: int implements EnumHasNameInterface, SettingTypeInterface, 
     public function isSupportCache(): bool
     {
         return match ($this) {
-            self::SMS_API_TOKEN => false,
-            self::SITE_TITLE => false,
-            self::SITE_LOGO_URL => false,
-            self::SUPPORT_USER_ROLE => false,
-            self::SMS_API_LOGIN_TEMPLATE => false,
-            self::SMS_APPOINTMENT_RECEIVING_SUCCESSFUL => false,
-            self::SMS_APPOINTMENT_WAITING_PAYMENT => false,
-            self::SMS_APPOINTMENT_AFTER_PAYMENT => false,
-            self::SMS_APPOINTMENT_REMOVAL_WHEN_NON_PAYMENT => false,
-            self::SMS_APPOINTMENT_TIME_UPDATE => false,
-            self::SMS_APPOINTMENT_CANCEL => false,
-            self::SMS_APPOINTMENT_TO_DOCTOR => false,
-            self::SMS_APPOINTMENT_TO_OPERATOR => false,
-            self::SMS_APPROVED_MONITORING_APPOINTMENT => false,
-            self::SMS_DIS_APPROVED_MONITORING_APPOINTMENT => false,
-            self::PAYMENT_PAYSTAR_TOKEN => false,
-            self::PAYMENT_PAYSTAR_SIGN => false,
-            self::WEIGHT_CHART_DESCRIPTION_APP => false,
-            self::VOIP_USERNAME => false,
-            self::VOIP_PASSWORD => false,
-            default => true
+            default => false
         };
     }
 
@@ -69,14 +60,21 @@ enum SettingKeyEnum: int implements EnumHasNameInterface, SettingTypeInterface, 
             //Website setting
             self::SITE_LOGO_URL => 'آدرس لوگو',
             self::SITE_TITLE    => 'عنوان سایت',
+            self::APPOINTMENT_STATUS    => 'فعال بودن نوبت دهی',
 
             self::SMS_API_TOKEN => 'توکن API پیامک',
             self::DEFAULT_EXERCISE_STATUS => 'وضعیت برنامه بعد از تجویز',
             self::SUPPORT_USER_ROLE => 'گروه کاربری پشتیبانان',
             self::SMS_API_LOGIN_TEMPLATE => 'الگو پیامک ورود',
+            self::WEIGHT_CHART_DESCRIPTION_APP => 'متن توضیح در صفحه ی مشاهده مودار وزنی ',
+
+            //payment
+            self::PAYMENT_PAYSTAR_STATUS => 'فعال بودن درگاه پی استار',
             self::PAYMENT_PAYSTAR_TOKEN => 'کد درگاه پرداخت پی استار',
             self::PAYMENT_PAYSTAR_SIGN => 'امضا درگاه پی استار',
-            self::WEIGHT_CHART_DESCRIPTION_APP => 'متن توضیح در صفحه ی مشاهده مودار وزنی ',
+            self::PAYMENT_ZARINPAL_STATUS => 'فعال بودن درگاه زرین پال',
+            self::PAYMENT_ZARINPAL_MERCHENID => 'مرچند ایدی درگاه زرین پال',
+
             // sms
             self::SMS_APPOINTMENT_RECEIVING_SUCCESSFUL => 'پیامک به کاربر پس از دریافت نوبت موفق',
             self::SMS_APPOINTMENT_WAITING_PAYMENT => 'پیامک به کاربر در صورتی که پرداخت فعال باشد و نوبت برای کاربر ثبت شود (نوبتی که نیاز به پرداخت دارد)',
@@ -122,15 +120,11 @@ enum SettingKeyEnum: int implements EnumHasNameInterface, SettingTypeInterface, 
     public function getType(): SettingTypeEnum
     {
         return match ($this) {
-            self::SMS_API_TOKEN => SettingTypeEnum::TEXT,
-            self::SMS_APPROVED_MONITORING_APPOINTMENT => SettingTypeEnum::TEXT,
-            self::SMS_DIS_APPROVED_MONITORING_APPOINTMENT => SettingTypeEnum::TEXT,
-            self::SITE_TITLE => SettingTypeEnum::TEXT,
-            self::SITE_LOGO_URL => SettingTypeEnum::TEXT,
             self::DEFAULT_EXERCISE_STATUS => SettingTypeEnum::SELECT,
+            self::PAYMENT_PAYSTAR_STATUS => SettingTypeEnum::CHECK,
+            self::PAYMENT_ZARINPAL_STATUS => SettingTypeEnum::CHECK,
+            self::APPOINTMENT_STATUS => SettingTypeEnum::CHECK,
             self::SUPPORT_USER_ROLE => SettingTypeEnum::SELECT,
-            self::PAYMENT_PAYSTAR_TOKEN => SettingTypeEnum::TEXT,
-            self::PAYMENT_PAYSTAR_SIGN => SettingTypeEnum::TEXT,
             self::WEIGHT_CHART_DESCRIPTION_APP => SettingTypeEnum::TEXTAREA,
             default => SettingTypeEnum::TEXT
         };

@@ -421,7 +421,7 @@ class GeneralSetting extends Component
         $this->form['minDayAvaialbe']                    = $apSet->min_day_active;
         $this->form['maxDayAvaialbe']                    = $apSet->max_day_active;
         $this->form['maxAvailabeAppointment']['eachDay'] = $apSet->detail[AppointmentSetting::MAX_AVAILABLE_APPOINTMENT_EACH_DAY];
-        $this->form['maxAvailabeAppointment']['ForSecretery'] = $apSet->detail[AppointmentSetting::MAX_AVAILABLE_APPOINTMENT_FOR_SECRETERY];
+        $this->form['maxAvailabeAppointment']['ForSecretery'] = $apSet->detail[AppointmentSetting::MAX_AVAILABLE_APPOINTMENT_FOR_SECRETERY] ?? null;
         $this->form['cancel']['day']                     = $apSet->cancellation_by_user ?? null;
         $this->form['avtive']                            = $apSet->active->value;
 

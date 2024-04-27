@@ -234,10 +234,14 @@ class AppointmentApiController extends Controller
 
     public function listDays(Request $request)
     {
-        $doctorId = $request->get('doctor_id');
-        $placesId = $request->get('places_id');
+        $doctorId   = $request->get('doctor_id');
+        $placesId   = $request->get('places_id');
         $servicesId = $request->get('services_id');
-        $kind = $request->get('kind') ?? 1; // in person or online
+        $kind       = $request->get('kind') ?? 1; // in person or online
+        $question  = $request->input('question');
+        $hasVisited = $request->input('has_visited');
+
+        $conditions = $alert = null;
 
         $appointmentSetting = AppointmentSetting::where('user_id', $doctorId);
 
@@ -250,15 +254,22 @@ class AppointmentApiController extends Controller
         }
 
         if ($placesId) {
-            $appointmentSetting->where('place_id', $placesId);
-        } else {
-            $appointmentSetting->whereNull('place_id');
+            if(AppointmentSetting::where('user_id', $doctorId)->where('place_id', $servicesId)->count()) {
+                $appointmentSetting->where('place_id', $placesId);
+            }
+            else {
+                $appointmentSetting->whereNull('place_id');
+            }
         }
+
         if ($servicesId) {
-            $appointmentSetting->where('service_id', $servicesId);
-        } else {
-            $appointmentSetting->whereNull('service_id');
+            if(AppointmentSetting::where('user_id', $doctorId)->where('service_id', $servicesId)->count()){
+                $appointmentSetting->where('service_id', $servicesId);
+            } else {
+                $appointmentSetting->whereNull('service_id');
+            }
         }
+
         $appointmentSetting = $appointmentSetting->first();
 
         if (!$appointmentSetting) {
@@ -267,6 +278,8 @@ class AppointmentApiController extends Controller
                 'message' => 'هیچ اطلاعاتی یاف تشد'
             ]);
         }
+
+
 
         if ($kind == AppointmentUserKindEnum::ONLINE->value) {
             return $this->ok([
@@ -293,12 +306,56 @@ class AppointmentApiController extends Controller
 //        $firstTwoEmpty = $this->getFirstTwoEmpty($listDays);
         $resultList = $this->getListEmptyAppointment($listDays);
 
+        // handle condition dr amiri
+        if ($doctorId == 2){
+            // bardari
+            if ($servicesId == 1){
+                if ($hasVisited == 2){
+                    $alert['title'] = 'بسیار مهم';
+                    $alert['message'] = 'اولین ویزیت شما در هر هفته از بارداری، توسط دکتر امیری انجام میگردد';
+                    $alert['alternative_doctor'] = null;
+                    $alert['button_text'] = 'تایید میکنم';
+                } else {
+                    if ($question == 2 || $question == 3){
+                        $conditions['title'] = 'امکان دریافت نوبت با دکتر امیری فراهم نیست';
+                        $conditions['message'] = 'مراجعه کنندگان گرامی ویزیت بارداران فقط تا ۱۲ هفته توسط دکتر امیری انجام میشود . و بعد از آن توسط تیم فوق تخصصی دکتر امیری (دکتر سهامیررضا) انجام میشود.
+ویزیت آخر قبل از سزارین  با دکتر امیری انجام میشود.
+';
+                        $conditions['alternative_doctor'] = DoctorResource::make(User::find(3));
+                        $conditions['button_text'] = 'انتخاب پزشک دیگر';
+                    }
+                }
+
+            }
+
+            elseif ($servicesId == 2 || $servicesId == 4){
+                if ($hasVisited == 2){
+                    $conditions['title'] = 'امکان دریافت نوبت با دکتر امیری فراهم نیست';
+                    $conditions['message'] = 'مراجعه کننده گرامی شما ویزیت اولیه شما توسط تیم فوق تخصصی دکتر امیری انجام میشود .
+دکتر امیری ویزیت اولیه انجام نمیدهند .
+بررسی های اولیه و آزمایشات لازم زیر نظر دکتر امیری نوشته میشود و شما برای ویزیت های بعدی میتوانید با دکتر امیری نوبت دریافت کنید.
+';
+                    $conditions['alternative_doctor'] = DoctorResource::make(User::find(3));
+                    $conditions['button_text'] = 'انتخاب پزشک دیگر';
+                } else {
+                    $alert['title'] = 'شما تایید میکنید که قبلا از دکتر امیری نوبت دریافت کرده اید';
+                    $alert['message'] = 'در صورتی که سابقه ویزیت با دکتر امیری نداشته باشید، نوبت شما حذف میشود .';
+                    $alert['alternative_doctor'] = null;
+                    $alert['button_text'] = 'تایید میکنم';
+                }
+
+            }
+        }
+        // handle condition dr amiri
+
         return $this->ok([
             'status' => true,
             'payment' => app('AppointmentUserService')->paymentstatus($appointmentSetting),
             'appointment_setting_id' => $appointmentSetting->id,
             'first_two_empty' => $resultList['firstTwoEmpty'],
             'get_list_empty_appointment' => $resultList['listAppointments'],
+            'conditions' => $conditions,
+            'alert' => $alert,
             'messages' => null
         ]);
     }

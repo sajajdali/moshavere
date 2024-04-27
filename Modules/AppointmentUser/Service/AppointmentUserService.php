@@ -123,7 +123,8 @@ class AppointmentUserService
         });
 
         // Fetch appointment settings for the doctor
-        $appointmentSettings = AppointmentSetting::where('user_id', $doctorId)->first();
+//        $appointmentSettings = AppointmentSetting::where('user_id', $doctorId)->first();
+        $appointmentSettings = $appointmentSetting;
 
         // List of attendance times
         $appointmentSettingTimes = $appointmentSettings->times()->get();

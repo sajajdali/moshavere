@@ -6,12 +6,21 @@ use Carbon\Carbon;
 use Livewire\Component;
 use Livewire\Attributes\On;
 use Livewire\Attributes\Computed;
+use Modules\Place\app\Models\Place;
 use Illuminate\Support\Facades\Cache;
 use Hekmatinasser\Verta\Facades\Verta;
+use Modules\Service\app\Models\Service;
+use Modules\Setting\Enum\SettingKeyEnum;
 use Modules\AppointmentUser\app\Models\AppointmentUser;
+use Modules\AppointmentUser\app\Events\CancelAppointment;
+use Modules\AppointmentUser\app\Models\AppointmentOnline;
 use Modules\AppointmentUser\Enum\AppointmentUserTypeEnum;
 use Modules\AppointmentUser\Enum\AppointmentUserStatusEnum;
 use Modules\AppointmentSetting\app\Models\AppointmentSetting;
+use Modules\AppointmentUser\Enum\AppointmentOnlineStatusEnum;
+use Modules\AppointmentUser\app\Events\CancelAppointmentEvent;
+use Modules\AppointmentUser\app\Events\DeleteAppointmentEvent;
+use Modules\AppointmentUser\app\Notifications\AppointmentSmsNotification;
 use Modules\AppointmentUser\Livewire\Admin\AddAppointment\Modal\SpecificDayAppointmentRegistrationModal;
 
 class SpecificDayAvailableAppointment extends Component
@@ -137,32 +146,11 @@ class SpecificDayAvailableAppointment extends Component
     {
         $this->dateHasBeenChange();
         $this->dispatch('time', from: $from, until: $until);
-        $this->dispatch('lunchRegisterModal',true);
+        $this->dispatch('lunchRegisterModal', true);
     }
     public function lunchAppModal()
     {
         $this->fetchData['showRegisterModal'] = true;
-    }
-
-    #[On('delete')]
-    public function cancelAppointment($model)
-    {
-        // TODO:: change this to cancel from delete
-        $app = AppointmentUser::find($model);
-        $app->update([
-            'status' => AppointmentUserStatusEnum::STATUS_CANCEL,
-        ]);
-        Cache::forget('appointmentList.' .   $this->fetchData['appId']);
-        app('AppointmentUserService')->deleteAppointmentReminder($app);
-        return redirect()->route(
-            'admin.appointment.add.specificday',
-            [
-                'appId' =>   $this->fetchData['appId'],
-                'date' => verta($this->fetchData['selectedDate'])->format('Y-m-d')
-            ]
-        )->with('success', 'نوبت با موفقیت کنسل شد');
-
-        // AppointmentUser::$
     }
 
     public function changeAppointmentType($appId)
@@ -175,6 +163,8 @@ class SpecificDayAvailableAppointment extends Component
         return redirect()->route(
             'admin.appointment.add.specificday',
             [
+                'serviceId' => $this->fetchData['service']->id,
+                'placeId' => $this->fetchData['place'],
                 'appId'         =>   $this->fetchData['appId'],
                 'date'          => verta($this->fetchData['selectedDate'])->format('Y-m-d'),
             ]
@@ -186,12 +176,126 @@ class SpecificDayAvailableAppointment extends Component
         return redirect()->route(
             'admin.appointment.add.specificday',
             [
+                'serviceId' => $this->fetchData['service']->id,
+                'placeId' => $this->fetchData['place'],
                 'appId'         =>   $this->fetchData['appId'],
                 'date'          => verta($this->fetchData['selectedDate'])->format('Y-m-d'),
                 'tracking_code' => $app->tracking_code
             ]
         );
     }
+    // opration button functions
+    #[On('confirm_swal')]
+    public function swal_confirm($action, $model)
+    {
+        return match ($action) {
+            'GroupCancel'      => $this->cancelSelectedApp(),
+            'changeType'       => $this->changeType($model),
+            'cancelWithSms'    => $this->cancelAppointment($model, true),
+            'cancelWithOutSms' => $this->cancelAppointment($model, false),
+            'delete'           => $this->cancelAndDeleteApp($model),
+            default => '',
+        };
+    }
+    public function cancelSelectedApp()
+    {
+        foreach ($this->form['checkbox'] as $AppID => $checked) {
+            if ($checked) {
+                $app = AppointmentUser::find($AppID);
+                $app->update(['status' => AppointmentUserStatusEnum::STATUS_CANCEL]);
+            }
+        }
+        event(new CancelAppointmentEvent($app));
+        return  $this->redirectToPage('نوبت های انتخابی با موفقیت کنسل شدند');
+    }
+    public function changeType($id)
+    {
+        $app = AppointmentUser::find($id);
+        $app->update(['type' =>  AppointmentUserTypeEnum::BETWEEN_PATIENTS]);
+        return  $this->redirectToPage('نوبت به بین مریض تغییر پیدا کرد');
+    }
+    public function cancelAppointment($id, $sendSmsStatus)
+    {
+        $app = AppointmentUser::find($id);
+        $app->update(['status' =>  AppointmentUserStatusEnum::STATUS_CANCEL]);
+        if ($sendSmsStatus) {
+            $smsTemplate = setting(SettingKeyEnum::SMS_APPOINTMENT_CANCEL);
+            if (isset($smsTemplate)) {
+                $app->notify(new AppointmentSmsNotification($smsTemplate));
+            }
+        }
+        event(new CancelAppointmentEvent($app));
+        return  $this->redirectToPage('نوبت با موفقیت کنسل شد');
+    }
+    public function cancelAndDeleteApp($id)
+    {
+
+        $this->cancelAppointment($id, true);
+        $app = AppointmentUser::find($id);
+        $app->delete();
+        event(new CancelAppointmentEvent($app));
+        event(new DeleteAppointmentEvent($app));
+        $this->redirectToPage('نوبت با موفقیت حذف شد');
+    }
+
+    public function ApproveOnlineAppointment($id)
+    {
+        $app = AppointmentUser::find($id);
+        $onlineApp = AppointmentOnline::firstWhere('appointment_user_id', $app->id);
+        $onlineApp?->update(['status' => AppointmentOnlineStatusEnum::ACCEPTED]);
+        $app->update(['status' => AppointmentUserStatusEnum::STATUS_SUCCESSFUL]);
+        $this->redirectToPage('نوبت با موفقیت تایید شد');
+    }
+    public function disApproveOnlineAppointment($id)
+    {
+        $this->fetchData['disapproveId'] = $id;
+        $this->dispatch('lunchModal', true);
+    }
+    public function disaprovedModal()
+    {
+        $app = AppointmentUser::find($this->fetchData['disapproveId']);
+        $app->update(['status' => AppointmentUserStatusEnum::STATUS_DISAPPROVED]);
+        $detail = $app->details;
+        if (isset($this->form['reason'])) {
+            if (isset($detail)) {
+                $detail = array_merge($detail, [AppointmentUser::DISAPPROVED_DESCRIPTION => $this->form['reason']]);
+            } else {
+                $detail = [AppointmentUser::DISAPPROVED_DESCRIPTION => $this->form['reason']];
+            }
+        }
+        try {
+            $onlineApp = AppointmentOnline::firstWhere('appointment_user_id', $app->id);
+            $onlineApp->update(['status' => AppointmentOnlineStatusEnum::REJECT]);
+            $app->update(['status' => AppointmentUserStatusEnum::STATUS_DISAPPROVED, 'details' =>  $detail]);
+        } catch (\Exception $th) {
+            return redirect()->route('admin.appointment_user.list')->with('error', 'خطا در به روز رسانی');
+        }
+        $this->redirectToPage('وضعیت نوبت به عدم تایید ، تغییر پیدا کرد');
+    }
+    public function ApprovemonitoringAppointment($id)
+    {
+
+        $app = AppointmentUser::find($id);
+        $deadLine_Time = $app->setting->detial[AppointmentSetting::MONITORTING_APPOINTMENT];
+        $Appoointment_dedLine = now()->addHours($deadLine_Time);
+        $app->update(['status' => AppointmentUserStatusEnum::STATUS_WAIT_PAYMENT, 'deadline_at' => $Appoointment_dedLine]);
+        $app->notify(new AppointmentSmsNotification(setting(SettingKeyEnum::SMS_APPROVED_MONITORING_APPOINTMENT)));
+        $this->redirectToPage('نوبت با موفقیت تایید شد');
+    }
+    public function disApprovemonitoringAppointment($id)
+    {
+
+        $app = AppointmentUser::find($id);
+        $app->update(['status' => AppointmentUserStatusEnum::STATUS_DISAPPROVED]);
+        $app->notify(new AppointmentSmsNotification(setting(SettingKeyEnum::SMS_DIS_APPROVED_MONITORING_APPOINTMENT)));
+        $this->redirectToPage('نوبت با موفقیت لغو شد');
+    }
+    private function redirectToPage($msg)
+    {
+        return redirect()->route('admin.appointment.add.specificday', ['serviceId' => $this->fetchData['service']->id, 'placeId' => $this->fetchData['place'], 'appId' => $this->fetchData['appId'],  'date' => verta($this->fetchData['selectedDate'])->format('Y-m-d')])->with('success', $msg);
+    }
+    // opration button functions
+
     // when tracking_code is exist in url
     public function changeAppointmentDate($from, $until)
     {
@@ -212,6 +316,8 @@ class SpecificDayAvailableAppointment extends Component
         $this->edited['old_app']->update($updateData);
 
         return redirect()->route('admin.appointment.add.specificday', [
+            'serviceId' => $this->fetchData['service']->id,
+            'placeId' => $this->fetchData['place'],
             'appId' =>  $this->fetchData['appId'],
             'date' => verta($this->fetchData['selectedDate'])->format('Y-m-d')
         ])->with('success', 'نوبت با موفقیت تغییر کرد');
@@ -219,6 +325,8 @@ class SpecificDayAvailableAppointment extends Component
     public function mount()
     {
         $app = AppointmentSetting::find(request()->route('appId'));
+        $this->fetchData['service'] = Service::find(request()->route('serviceId'));
+        $this->fetchData['place'] = request()->route('placeId');
         $this->fetchData['doc'] = $app->user;
         $this->fetchData['appId'] = $app->id;
         $this->fetchData['appointmentSetting'] = $app;
@@ -242,6 +350,9 @@ class SpecificDayAvailableAppointment extends Component
         if (request()->has('tracking_code')) {
             $this->edited['status'] = true;
             $this->edited['old_app'] = AppointmentUser::firstWhere('tracking_code', request()->get('tracking_code'));
+        }
+        if (request()->has('serviceId')) {
+            $this->fetchData['service'] = Service::find(request()->get('serviceId'));
         }
     }
     public function render()

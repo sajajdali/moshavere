@@ -5,6 +5,7 @@ namespace Modules\AppointmentUser\Livewire\Admin\AddAppointment;
 use Carbon\Carbon;
 use Livewire\Component;
 use Modules\User\Entities\User;
+use Modules\Place\app\Models\Place;
 use Illuminate\Support\Facades\Cache;
 use Hekmatinasser\Verta\Facades\Verta;
 use Modules\Service\app\Models\Service;
@@ -19,7 +20,15 @@ class ListOfAvailableDay extends Component
     public function GotoSpecificDay()
     {
         $date = Verta::parse($this->specificDayDate)->format('Y-m-d');
-        return redirect()->route('admin.appointment.add.specificday', ['appId' => $this->fethData['appointmentSetting'], 'date' => $date]);
+        return redirect()->route(
+            'admin.appointment.add.specificday',
+            [
+                'serviceId' => $this->fethData['service']->id,
+                'placeId'    => $this->fethData['place']->id,
+                'appId' => $this->fethData['appointmentSetting'],
+                'date' => $date
+            ]
+        );
     }
     public function GotoAppointmentList($time, $day = null)
     {
@@ -29,9 +38,9 @@ class ListOfAvailableDay extends Component
         }
         $passedDate =  verta(Carbon::parse($time))->format('Y-m-d');
         if (!empty($day)) {
-            return redirect()->route('admin.appointment.add.specificday', ['appId' => $this->fethData['appointmentSetting'], 'date' => $passedDate, 'time' => $passedHour]);
+            return redirect()->route('admin.appointment.add.specificday', ['serviceId' => $this->fethData['service']->id, 'placeId'    => $this->fethData['place']->id, 'appId' => $this->fethData['appointmentSetting'], 'date' => $passedDate, 'time' => $passedHour]);
         }
-        return redirect()->route('admin.appointment.add.specificday', ['appId' => $this->fethData['appointmentSetting'], 'date' => $passedDate]);
+        return redirect()->route('admin.appointment.add.specificday', ['serviceId' => $this->fethData['service']->id, 'placeId'    => $this->fethData['place']->id, 'appId' => $this->fethData['appointmentSetting'], 'date' => $passedDate]);
     }
     private function findFirstTreeAppointment($listOfAppointment)
     {
@@ -99,6 +108,7 @@ class ListOfAvailableDay extends Component
 
         $this->fethData['service'] = Service::find($serviceId);
         $this->fethData['doctor']  = User::find($doctorId);
+        $this->fethData['place']  = Place::find($placeId);
         //check for special setting for special section
         $appointmentSetting = AppointmentSetting::where('service_id', $serviceId)
             ->where('place_id', $placeId)
@@ -119,7 +129,6 @@ class ListOfAvailableDay extends Component
         $this->fethData['firstTreeAvailableAppointment'] =  $this->findFirstTreeAppointment($listOfAppointment);
         $this->fethData['appointmentSetting'] = $appointmentSetting->id;
     }
-
     public function render()
     {
         return view('appointmentuser::livewire.admin.add-appointment.list-of-available-day');

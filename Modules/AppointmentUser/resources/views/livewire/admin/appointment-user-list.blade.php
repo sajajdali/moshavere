@@ -3,7 +3,7 @@
         <div>
             <h1 class="page-title">لیست نوبت های ثبت شده</h1>
         </div>
-        <a href="{{ route('admin.appointment.doctor.list') }}" class="btn btn-primary" aria-expanded="false"
+        <a href="{{ route('admin.appointment_user.addApp') }}" class="btn btn-primary" aria-expanded="false"
             aria-controls="customDate">افزودن نوبت</a>
     </div>
     @include('admin::layouts.components.alert')
@@ -329,103 +329,7 @@
                                                          <span class="caret"></span>
                                                     </button>
                                                     <ul class="dropdown-menu" role="menu">
-
-                                                        @if ($ap->status == Modules\AppointmentUser\Enum\AppointmentUserStatusEnum::STATUS_PENDING)
-                                                            <li>
-                                                                <a wire:click='ApproveOnlineAppointment({{ $ap->id }})'
-                                                                    href="#" data-label="ویرایش">
-                                                                    <i class="fa fa-check text-success"
-                                                                        aria-hidden="true"></i>
-                                                                    تایید نوبت
-                                                                </a>
-                                                            </li>
-                                                            <li>
-                                                                <a wire:click='disApproveOnlineAppointment({{ $ap->id }})'
-                                                                    href="#" data-label="ویرایش">
-                                                                    <i class="fa fa-ban text-danger"
-                                                                        aria-hidden="true"></i>
-                                                                    عدم تایید نوبت
-                                                                </a>
-                                                            </li>
-                                                        @elseif($ap->status == Modules\AppointmentUser\Enum\AppointmentUserStatusEnum::STATUS_MONITORING)
-                                                            <li>
-                                                                <a wire:click='ApprovemonitoringAppointment({{ $ap->id }})'
-                                                                    href="#" data-label="ویرایش">
-                                                                    <i class="fa fa-check text-success"
-                                                                        aria-hidden="true"></i>
-                                                                    تایید نوبت
-                                                                </a>
-                                                            </li>
-                                                            <li>
-                                                                <a wire:click='disApprovemonitoringAppointment({{ $ap->id }})'
-                                                                    href="#" data-label="ویرایش">
-                                                                    <i class="fa fa-ban text-danger"
-                                                                        aria-hidden="true"></i>
-                                                                    عدم تایید نوبت
-                                                                </a>
-                                                            </li>
-                                                        @elseif($ap->status == Modules\AppointmentUser\Enum\AppointmentUserStatusEnum::STATUS_DISAPPROVED || $ap->status == Modules\AppointmentUser\Enum\AppointmentUserStatusEnum::STATUS_CANCEL)
-                                                        @else
-                                                            <li><a href="#" data-label="ویرایش">
-                                                                    <i class="fa fa-pencil-square-o"
-                                                                        aria-hidden="true"></i>
-                                                                    ویرایش زمان نوبت
-                                                                </a>
-                                                            </li>
-                                                            @if ($ap->type !== Modules\AppointmentUser\Enum\AppointmentUserTypeEnum::BETWEEN_PATIENTS)
-                                                                <li><a data-description="میخواهید نوبت به بین مریض تبدیل شود؟"
-                                                                        data-title="تغییر وضعیت "
-                                                                        data-confirmbtn="بله تغییر کند"
-                                                                        data-action="changeType"
-                                                                        data-id="{{ $ap->id }}"
-                                                                        class="confirm_swal_alert" data-label="نوبت"
-                                                                        href="">
-                                                                        <i class="fa fa-retweet"
-                                                                            aria-hidden="true"></i>
-                                                                        تبدیل
-                                                                        به نوبت بین مریض</a>
-                                                                </li>
-                                                            @endif
-                                                            <li>
-                                                                <a class="confirm_swal_alert" data-label="نوبت"
-                                                                    data-description="از کنسل کردن نوبت مطمعن هستید؟"
-                                                                    data-title="کنسل کردن "
-                                                                    data-confirmbtn="بله کنسل شود"
-                                                                    data-action="cancelWithSms"
-                                                                    data-id="{{ $ap->id }}"
-                                                                    data-id="{{ $ap->id }}" href="">
-                                                                    <i class="fa fa-envelope-o"
-                                                                        aria-hidden="true"></i>
-                                                                    کنسل
-                                                                    کردن <small>(با ارسال پیامک)</small>
-                                                                </a>
-                                                            </li>
-                                                            <li><a class="confirm_swal_alert" data-label="نوبت"
-                                                                    data-description="از کنسل کردن نوبت مطمعن هستید؟"
-                                                                    data-title="کنسل کردن "
-                                                                    data-confirmbtn="بله کنسل شود"
-                                                                    data-action="cancelWithOutSms
-                                                                data-id="{{ $ap->id }}"
-                                                                    href="">
-                                                                    <i class="fa fa-times" aria-hidden="true"></i>
-                                                                    کنسل
-                                                                    کردن <small>(بدون ارسال پیامک)</small></a>
-                                                            </li>
-                                                        @endif
-                                                        @can('delete', $ap)
-                                                            <li><a class="confirm_swal_alert" data-label="نوبت"
-                                                                    data-description="از کنسل و حذف کردن نوبت مطمعن هستید؟"
-                                                                    data-title="کنسل و حذف  کردن "
-                                                                    data-confirmbtn="بله کنسل و حذف شود"
-                                                                    data-action="delete" data-id="{{ $ap->id }}"
-                                                                    href="">
-                                                                    <i class="fa fa-trash text-danger"
-                                                                        aria-hidden="true"></i>
-                                                                    کنسل و
-                                                                    حذف نوبت
-                                                                </a>
-                                                            </li>
-                                                        @endcan
+                                                        @include('appointmentuser::components.appointmentlist.operationbutton')
                                                     </ul>
                                                 </div>
                                             </td>

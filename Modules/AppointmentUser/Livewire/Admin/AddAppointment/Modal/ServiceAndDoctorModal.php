@@ -75,7 +75,7 @@ class ServiceAndDoctorModal extends Component
             $this->dispatch('closeModal', true);
             $this->dispatch('docHasChange', appId: $this->form['app_id']);
         } else {
-            return redirect()->route('admin.appointment_user.create')->with('error', 'تنظیمات حضور یافت نشد');
+            return redirect()->route('admin.appointment_user.addApp')->with('error', 'تنظیمات حضور یافت نشد');
         }
     }
     public function searchDocAndSection()

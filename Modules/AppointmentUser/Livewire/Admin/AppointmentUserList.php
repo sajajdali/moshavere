@@ -5,7 +5,6 @@ namespace Modules\AppointmentUser\Livewire\Admin;
 use Livewire\Component;
 use Livewire\Attributes\On;
 use Livewire\WithPagination;
-use Modules\AppointmentUser\Enum\AppointmentOnlineStatusEnum;
 use Modules\User\Entities\User;
 use Livewire\Attributes\Computed;
 use Spatie\Permission\Models\Role;
@@ -18,6 +17,9 @@ use Modules\AppointmentUser\app\Models\AppointmentUser;
 use Modules\AppointmentUser\app\Models\AppointmentOnline;
 use Modules\AppointmentUser\Enum\AppointmentUserTypeEnum;
 use Modules\AppointmentUser\Enum\AppointmentUserStatusEnum;
+use Modules\AppointmentSetting\app\Models\AppointmentSetting;
+use Modules\AppointmentUser\Enum\AppointmentOnlineStatusEnum;
+use Modules\AppointmentUser\app\Events\CancelAppointmentEvent;
 use Modules\AppointmentUser\app\Exports\AppointmentListExport;
 use Modules\AppointmentUser\app\Notifications\AppointmentSmsNotification;
 
@@ -190,7 +192,6 @@ class AppointmentUserList extends Component
     }
     public function ExportData()
     {
-
         if ($this->handleSearch()->getCollection()->count() > 2000) {
             return $this->addError('exelError', 'مقدار اطلاعات بیشتر از حد مجاز است، لطفا با استفاده از جست و جوی تاریخ، تعداد نوبت ها را محدود تر کنید');
         }
@@ -214,7 +215,7 @@ class AppointmentUserList extends Component
             if ($checked) {
                 $app = AppointmentUser::find($AppID);
                 $app->update(['status' => AppointmentUserStatusEnum::STATUS_CANCEL]);
-                app('AppointmentUserService')->deleteAppointmentReminder($app);
+                event(new CancelAppointmentEvent($app));
             }
         }
         return  $this->redirectToPage('نوبت های انتخابی با موفقیت کنسل شدند');
@@ -229,18 +230,17 @@ class AppointmentUserList extends Component
     {
         $app = AppointmentUser::find($id);
         $app->update(['status' =>  AppointmentUserStatusEnum::STATUS_CANCEL]);
-        app('AppointmentUserService')->deleteAppointmentReminder($app);
         if ($sendSmsStatus) {
             $smsTemplate = setting(SettingKeyEnum::SMS_APPOINTMENT_CANCEL);
             if (isset($smsTemplate)) {
                 $app->notify(new AppointmentSmsNotification($smsTemplate));
             }
         }
+        event(new CancelAppointmentEvent($app));
         return  $this->redirectToPage('نوبت با موفقیت کنسل شد');
     }
     public function cancelAndDeleteApp($id)
     {
-
         $this->cancelAppointment($id, true);
         $app = AppointmentUser::find($id);
         $app->delete();
@@ -248,15 +248,15 @@ class AppointmentUserList extends Component
     }
     public function ApprovemonitoringAppointment($id)
     {
-
         $app = AppointmentUser::find($id);
-        $app->update(['status' => AppointmentUserStatusEnum::STATUS_WAIT_PAYMENT]);
+        $deadLine_Time = $app->setting->detail[AppointmentSetting::MONITORTING_APPOINTMENT] ;
+        $Appoointment_dedLine = now()->addHours($deadLine_Time) ;
+        $app->update(['status' => AppointmentUserStatusEnum::STATUS_WAIT_PAYMENT , 'deadline_at' => $Appoointment_dedLine ]);
         $app->notify(new AppointmentSmsNotification(setting(SettingKeyEnum::SMS_APPROVED_MONITORING_APPOINTMENT)));
         $this->redirectToPage('نوبت با موفقیت تایید شد');
     }
     public function disApprovemonitoringAppointment($id)
     {
-
         $app = AppointmentUser::find($id);
         $app->update(['status' => AppointmentUserStatusEnum::STATUS_DISAPPROVED]);
         $app->notify(new AppointmentSmsNotification(setting(SettingKeyEnum::SMS_DIS_APPROVED_MONITORING_APPOINTMENT)));
@@ -266,7 +266,7 @@ class AppointmentUserList extends Component
     {
         $app = AppointmentUser::find($id);
         $onlineApp = AppointmentOnline::firstWhere('appointment_user_id', $app->id);
-        $onlineApp->update(['status' => AppointmentOnlineStatusEnum::ACCEPTED]);
+        $onlineApp?->update(['status' => AppointmentOnlineStatusEnum::ACCEPTED]);
         $app->update(['status' => AppointmentUserStatusEnum::STATUS_SUCCESSFUL]);
         $this->redirectToPage('نوبت با موفقیت تایید شد');
     }
@@ -274,13 +274,11 @@ class AppointmentUserList extends Component
     {
         $this->fetchData['disapproveId'] = $id;
         $this->dispatch('lunchModal', true);
-        $app = AppointmentUser::find($id);
-        $app->update(['status' => AppointmentUserStatusEnum::STATUS_DISAPPROVED]);
-        $this->redirectToPage('ضعیت نوبت به عدم تایید ، تغییر پیدا کرد');
     }
     public function disaprovedModal()
     {
         $app = AppointmentUser::find($this->fetchData['disapproveId']);
+        $app->update(['status' => AppointmentUserStatusEnum::STATUS_DISAPPROVED]);
         $detail = $app->details;
         if (isset($this->form['reason'])) {
             if (isset($detail)) {
@@ -305,6 +303,21 @@ class AppointmentUserList extends Component
     private function redirectToPage($msg)
     {
         return redirect()->route('admin.appointment_user.list')->with('success', $msg);
+    }
+    public function editAppointment($id)
+    {
+        $app = AppointmentUser::find($id);
+        $date = verta($app->date_visit)->format('Y-m-d') ;
+        return redirect()->route(
+            'admin.appointment.add.specificday',
+            [
+                'serviceId'     => $app->service_id ,
+                'placeId'       => $app->place_id ,
+                'appId'         => $app->setting->id,
+                'date'          => $date,
+                'tracking_code' => $app->tracking_code
+            ]
+        );
     }
     public function booted()
     {

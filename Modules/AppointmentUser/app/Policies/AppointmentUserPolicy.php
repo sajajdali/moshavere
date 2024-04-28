@@ -26,7 +26,7 @@ class AppointmentUserPolicy
 
     public function create(User $user): bool
     {
-        return $user->hasPermissionTo('appointment_user.create');
+        return $user->hasPermissionTo('appointment_user.addApp');
     }
 
     public function delete(User $user, AppointmentUser $appointmentUser): bool

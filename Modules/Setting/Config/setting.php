@@ -24,6 +24,7 @@ return [
         'title' => 'تنظمات وبسایت',
         'icon' => 'fa fa-globe',
         'settings' => [
+            \Modules\Setting\Enum\SettingKeyEnum::APPOINTMENT_STATUS,
             \Modules\Setting\Enum\SettingKeyEnum::SITE_LOGO_URL,
             \Modules\Setting\Enum\SettingKeyEnum::SITE_TITLE,
 
@@ -40,8 +41,11 @@ return [
         'title' => 'تنظیمات پرداخت',
         'icon' => 'fa fa-credit-card',
         'settings' => [
+            \Modules\Setting\Enum\SettingKeyEnum::PAYMENT_PAYSTAR_STATUS,
             \Modules\Setting\Enum\SettingKeyEnum::PAYMENT_PAYSTAR_TOKEN,
             \Modules\Setting\Enum\SettingKeyEnum::PAYMENT_PAYSTAR_SIGN,
+            \Modules\Setting\Enum\SettingKeyEnum::PAYMENT_ZARINPAL_STATUS,
+            \Modules\Setting\Enum\SettingKeyEnum::PAYMENT_ZARINPAL_MERCHENID,
         ],
     ],
     'voip' => [

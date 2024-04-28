@@ -138,39 +138,14 @@
                                                 </td>
                                                 <td>
                                                     <div class="dropdown">
-                                                        <button class="btn btn-danger dropdown-toggle" type="button"
+                                                        <button class="btn  {{$ap->status->getButtonColor()}} dropdown-toggle" type="button"
                                                             id="dropdownMenuButton1" data-bs-toggle="dropdown"
                                                             aria-expanded="false">
-                                                            عملیات
+                                                            {{$ap->status->getName()}}
                                                         </button>
                                                         <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton1">
                                                             @can('update', $ap)
-                                                                <li>
-                                                                    <a class="dropdown-item"
-                                                                        wire:click='editAppointment("{{ $ap->id }}")'
-                                                                        href="#">ویرایش</a>
-                                                                </li>
-                                                                @if (
-                                                                    $ap->type == Modules\AppointmentUser\Enum\AppointmentUserTypeEnum::MAIN__APPOINTMENT &&
-                                                                        $ap->status != Modules\AppointmentUser\Enum\AppointmentUserStatusEnum::STATUS_CANCEL)
-                                                                    <li>
-                                                                        <a class="dropdown-item"
-                                                                            wire:click='changeAppointmentType("{{ $ap->id }}")'
-                                                                            href="#">
-                                                                            تبدیل به نوبت بین مریض
-                                                                        </a>
-                                                                    </li>
-                                                                @endif
-                                                            @endcan
-                                                            <li>
-                                                                @can('delete', $ap)
-                                                                    <a class=" dropdown-item delete_confirm_alert"
-                                                                        data-title="کنسل کردن نوبت"
-                                                                        data-description="آیا از کنسل کردن این نوبت مطمعن هستید؟"
-                                                                        data-confirmbtn="بله کنسل شود" data-label="نوبت"
-                                                                        data-id="{{ $ap->id }}" href="#">کنسل
-                                                                        کردن</a>
-                                                                </li>
+                                                               @include('appointmentuser::components.appointmentlist.operationbutton')
                                                             @endcan
                                                         </ul>
                                                     </div>
@@ -234,9 +209,17 @@
             </div>
         </div>
     </div>
-    <livewire:appointmentuser::admin.add-appointment.modal.service-and-doctor-modal />
+    <livewire:appointmentuser::admin.add-appointment.modal.service-and-doctor-modal
+    :appId="$fetchData['appId']"
+    :appTime="$fetchData['time']"
+    :serviceId="$fetchData['service']->id"
+    :placeId="$fetchData['place']"
+     />
     <livewire:appointmentuser::admin.add-appointment.modal.specific-day-appointment-registration-modal :appId="$fetchData['appId']"
-        :appTime="$fetchData['time']" />
+        :appTime="$fetchData['time']" :serviceId="$fetchData['service']->id"  :placeId="$fetchData['place']"/>
+        <div>
+            @include('appointmentuser::components.appointmentlist.disapprovemodal')
+        </div>
 </div>
 @push('scripts')
     <!-- SELECT2 JS -->
@@ -265,6 +248,15 @@
                     setAppModalInst.show();
                 }, 500);
             });
+            Livewire.on('lunchModal', function() {
+            setTimeout(() => {
+                var myModal = new bootstrap.Modal(document.getElementById(
+                    'resoanForDisapproveModal'), {
+                    keyboard: false
+                });
+                myModal.show();
+            }, 1000);
+        });
             Livewire.on('loadJs', function() {
                 setTimeout(() => {
                     addJs();

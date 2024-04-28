@@ -130,6 +130,9 @@ class GeneralSetting extends Component
     public function removeCounter($day)
     {
         $this->counter[$day] = $this->counter[$day] - 1;
+        if (isset($this->form['timeFrame'][$day]) && ($this->counter[$day] +1 ) == count($this->form['timeFrame'][$day]) ) {
+            array_pop($this->form['timeFrame'][$day]);
+        }
         $this->render();
     }
 

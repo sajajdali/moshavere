@@ -85,6 +85,12 @@
                     </div>
                 @endfor
                 <div class="col-12">
+                    <hr class="opacity-50 w-50">
+                    <div class="row">
+                            <label for="PlaceAddress" class="form-label">آدرس  مطب</label>
+                            <textarea wire:model='form.address' class="form-control" rows="5" id="PlaceAddress" placeholder="آدرس نوشتاری به مطب شما به همراه جزئیات دسترسی"></textarea>
+                </div>
+                <div class="col-12">
                     @if (!empty($fetchData['doctors']))
                         <div class="row mt-5">
                             <h4>لیست پزشکان</h4>
@@ -115,7 +121,7 @@
                     <h4>ترتیب نمایش این مطب در لیست مطب ها</h4>
                     <hr style="opacity: 0.9">
                     <div class="form-group">
-                        <label for="order">ترتیب نمایش :</label>
+                        <label class="form-label" for="order">ترتیب نمایش :</label>
                         <input wire:key="prioruty" type="text" class="form-control" id="placeorder"
                             wire:model='form.priority'
                             placeholder="اواویت نمایش مربوط به این مطب در صورتی که چند مطب داشته باشید را به عدد وارد کنید.">

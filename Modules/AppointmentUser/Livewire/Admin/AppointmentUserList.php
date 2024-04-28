@@ -311,7 +311,9 @@ class AppointmentUserList extends Component
         return redirect()->route(
             'admin.appointment.add.specificday',
             [
-                'appId'         =>  $app->setting->id,
+                'serviceId'     => $app->service_id ,
+                'placeId'       => $app->place_id ,
+                'appId'         => $app->setting->id,
                 'date'          => $date,
                 'tracking_code' => $app->tracking_code
             ]

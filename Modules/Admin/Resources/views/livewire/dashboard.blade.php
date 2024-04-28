@@ -23,7 +23,7 @@
                             <p class="text-muted fs-13 mb-0">تعداد نوبت های امروز</p>
                             <p class="text-muted mb-0 mt-2 fs-12">
                                 <span class="icn-box text-success fw-semibold fs-13 me-1">
-                                  
+
                             </p>
                         </div>
                         <div class="col col-auto top-icn dash">
@@ -147,7 +147,7 @@
                                             <div class="alert alert-info">
                                                 نوبتی برای امروز یافت نشد
                                                 <a class="btn btn-success ms-2"
-                                                    href="{{ route('admin.appointment.doctor.list') }}">ثبت نوبت</a>
+                                                    href="{{ route('admin.appointment_user.addApp') }}">ثبت نوبت</a>
                                             </div>
                                         </td>
                                     </tr>
@@ -188,10 +188,10 @@
             var myChart = new Chart(ctx, {
                 type: 'line',
                 data: {
-                    labels: ["فروردین", "اردیبهشت", "خرداد", "تیر", "مرداد"],
+                    labels: {!!json_encode($fetchData['chart']['month'],256)!!},
                     datasets: [{
                         label: 'موفق',
-                        data: [10, 110, 50, 60, 70, 10, 100],
+                        data: {!!json_encode($fetchData['chart']['data']['successful'])!!},
                         backgroundColor: 'transparent',
                         borderColor: '#77bc21',
                         borderWidth: 1,
@@ -199,7 +199,7 @@
                         pointRadius: 3
                     }, {
                         label: 'کنسل شده',
-                        data: [20, 40, 2, 50, 10, 30, 0],
+                        data: {!!json_encode($fetchData['chart']['data']['canceld'])!!},
                         backgroundColor: 'transparent',
                         borderColor: '#e984b1',
                         borderWidth: 1,

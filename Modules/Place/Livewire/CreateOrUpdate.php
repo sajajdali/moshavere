@@ -75,16 +75,19 @@ class CreateOrUpdate extends Component
                 Place::DETAIL_KEY_LOCATION_LNG => $this->form['place']['loc']['lng'],
             ];
         }
+        if (isset($this->form['address'])) {
+            $detail[Place::DETAIL_ADDRESS] = $this->form['address'];
+        }
         $modelCreateOrUpdate['detail'] = $detail;
 
         if ($this->isEdited) {
             $this->place->update($modelCreateOrUpdate);
-            $message = 'لوکیشن با موفقیت ویرایش شد';
+            $message = 'مطب با موفقیت ویرایش شد';
         } else {
 
             $this->place = Place::create($modelCreateOrUpdate);
 
-            $message = 'لوکیشن با موفقیت اضافه شد';
+            $message = 'مطب با موفقیت اضافه شد';
         }
         if (isset($this->form['doctors'])) {
             $syncArr = [];
@@ -98,25 +101,34 @@ class CreateOrUpdate extends Component
         }
         return redirect()->route('admin.place.list')->with('success', $message);
     }
+    private function fillTheForm($place)
+    {
+        $this->place = $place;
+        $this->form['name'] = $place['title'];
+        $this->form['numbers'] = $place['detail']['numbers'] ?? '';
+        $this->counter = count($this->form['numbers']);
+        $this->form['priority'] = $place['priority'];
+        $this->form['active'] = $place['active'] == ActiveEnum::ACTIVE;
+        $doctores = $this->place->user->pluck('id')->toArray();
+        foreach ($doctores as $value) {
+            $this->form['doctors'][$value] = true;
+        }
+        if (isset($place->detail['location']) && isset($place->detail['location']['location_lat'])) {
+            $this->form['loc']['lat'] = $place->detail['location']['location_lat'];
+            $this->form['loc']['lng'] =  $place->detail['location']['location_lng'];
+        }
+        if (isset($place->detail[Place::DETAIL_ADDRESS])) {
+            $this->form['address'] = $place->detail[Place::DETAIL_ADDRESS];
+        }
+    }
     public function mount()
     {
         $this->fetchData['doctors'] = Role::find(3)->users;
         $place = request()->route('place');
         if ($place instanceof Place) {
+            $this->fillTheForm($place);
             $this->authorize('update', $place);
             $this->isEdited = true;
-            $this->place = $place;
-            $this->form['name'] = $place['title'];
-            $this->form['numbers'] = $place['detail']['numbers'] ?? '';
-            $this->counter = count($this->form['numbers']);
-            $this->form['priority'] = $place['priority'];
-            $this->form['active'] = $place['active'] == ActiveEnum::ACTIVE;
-            $doctores = $this->place->user->pluck('id')->toArray();
-            foreach ($doctores as $value) {
-                $this->form['doctors'][$value] = true;
-            }
-            $this->form['loc']['lat'] = $place->detail['location']['location_lat'];
-            $this->form['loc']['lng'] =  $place->detail['location']['location_lng'];
         } else {
             $this->form['priority'] = Place::maxPriority();
         }

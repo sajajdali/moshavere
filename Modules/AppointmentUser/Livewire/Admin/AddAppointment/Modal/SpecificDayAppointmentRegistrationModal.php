@@ -9,6 +9,7 @@ use Modules\User\Entities\User;
 use Modules\User\Enum\UserMetaEnum;
 use Illuminate\Support\Facades\Cache;
 use Hekmatinasser\Verta\Facades\Verta;
+use Modules\Service\app\Models\Service;
 use Modules\AppointmentUser\Enum\AppointmentVia;
 use Modules\AppointmentUser\Enum\model\UserModel;
 use Modules\AppointmentUser\app\Models\AppointmentUser;
@@ -35,6 +36,8 @@ class SpecificDayAppointmentRegistrationModal extends Component
     public $step = 1;
     public $appId;
     public $appTime;
+    public $serviceId;
+    public $placeId;
     public $appDate;
 
     public function dismisModal()
@@ -197,7 +200,6 @@ class SpecificDayAppointmentRegistrationModal extends Component
         $appointmentSetting = AppointmentSetting::findOrFail($this->appId);
         //check for appointment kind
 
-
         if ($appointmentSetting->detail[AppointmentSetting::VISIT_TYPE_ONLINE] && $appointmentSetting->detail[AppointmentSetting::VISIT_TYPE_INPERSON]) {
             if (!isset($this->form['kind']) || empty($this->form['kind'])) {
                 return $this->addError('AppKind', 'لطفا نوع نوبت را انتخاب کنید');
@@ -231,8 +233,8 @@ class SpecificDayAppointmentRegistrationModal extends Component
             appointmentVia: AppointmentVia::BY_ADMIN,
             kind: isset($this->form['kind']) ? $this->form['kind'] : null,
             sendSmsToUser: $sms_status,
-            serviceId: $this->appId->service?->id ?? null,
-            placeId: $this->appId->place?->id ?? null,
+            serviceId: $this->appId->service?->id ?? $this->fetchData['service']?->id,
+            placeId: $this->appId->place?->id ?? $this->placeId,
             description: isset($this->form['description']) ? $this->form['description'] : '',
             type: $appointment_type,
             endTime: Carbon::createFromTimeString($this->form['time']['until'])->toTimeString(),
@@ -242,7 +244,7 @@ class SpecificDayAppointmentRegistrationModal extends Component
         $detail = [];
         $storeAppointment = app('AppointmentUserService')->storeAppointment($appointmentSetting, $userModelAppointment, $appointmentModel, $detail);
         Cache::forget('appointmentList.' . $this->appId);
-        return redirect()->route('admin.appointment.add.specificday', ['appId' => $this->appId, 'date' => $this->appDate])->with('success', $storeAppointment['message']);
+        return redirect()->route('admin.appointment.add.specificday', ['serviceId' => $this->fetchData['service']->id ,'placeId' => $this->placeId,  'appId' => $this->appId, 'date' => $this->appDate])->with('success', $storeAppointment['message']);
     }
 
     public function closeModal()
@@ -291,6 +293,9 @@ class SpecificDayAppointmentRegistrationModal extends Component
         if (isset($this->appTime) && !empty($this->appTime)) {
             $this->form['time']['from'] = $this->appTime;
             $this->form['time']['until'] = Carbon::createFromTimeString($this->appTime)->copy()->addMinutes($app->time_for_visit)->toTimeString();
+        }
+        if(isset($this->serviceId)) {
+            $this->fetchData['service'] = Service::find($this->serviceId);
         }
     }
     public function render()

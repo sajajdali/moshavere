@@ -6,8 +6,10 @@ use Carbon\Carbon;
 use Livewire\Component;
 use Livewire\Attributes\On;
 use Livewire\Attributes\Computed;
+use Modules\Place\app\Models\Place;
 use Illuminate\Support\Facades\Cache;
 use Hekmatinasser\Verta\Facades\Verta;
+use Modules\Service\app\Models\Service;
 use Modules\Setting\Enum\SettingKeyEnum;
 use Modules\AppointmentUser\app\Models\AppointmentUser;
 use Modules\AppointmentUser\app\Events\CancelAppointment;
@@ -144,7 +146,7 @@ class SpecificDayAvailableAppointment extends Component
     {
         $this->dateHasBeenChange();
         $this->dispatch('time', from: $from, until: $until);
-        $this->dispatch('lunchRegisterModal',true);
+        $this->dispatch('lunchRegisterModal', true);
     }
     public function lunchAppModal()
     {
@@ -161,6 +163,8 @@ class SpecificDayAvailableAppointment extends Component
         return redirect()->route(
             'admin.appointment.add.specificday',
             [
+                'serviceId' => $this->fetchData['service']->id,
+                'placeId' => $this->fetchData['place'],
                 'appId'         =>   $this->fetchData['appId'],
                 'date'          => verta($this->fetchData['selectedDate'])->format('Y-m-d'),
             ]
@@ -172,6 +176,8 @@ class SpecificDayAvailableAppointment extends Component
         return redirect()->route(
             'admin.appointment.add.specificday',
             [
+                'serviceId' => $this->fetchData['service']->id,
+                'placeId' => $this->fetchData['place'],
                 'appId'         =>   $this->fetchData['appId'],
                 'date'          => verta($this->fetchData['selectedDate'])->format('Y-m-d'),
                 'tracking_code' => $app->tracking_code
@@ -270,9 +276,10 @@ class SpecificDayAvailableAppointment extends Component
     {
 
         $app = AppointmentUser::find($id);
-        $deadLine_Time = $app->setting->detial[AppointmentSetting::MONITORTING_APPOINTMENT] ;
-        $Appoointment_dedLine = now()->addHours($deadLine_Time) ;
-        $app->update(['status' => AppointmentUserStatusEnum::STATUS_WAIT_PAYMENT , 'deadline_at' => $Appoointment_dedLine ]);        $app->notify(new AppointmentSmsNotification(setting(SettingKeyEnum::SMS_APPROVED_MONITORING_APPOINTMENT)));
+        $deadLine_Time = $app->setting->detial[AppointmentSetting::MONITORTING_APPOINTMENT];
+        $Appoointment_dedLine = now()->addHours($deadLine_Time);
+        $app->update(['status' => AppointmentUserStatusEnum::STATUS_WAIT_PAYMENT, 'deadline_at' => $Appoointment_dedLine]);
+        $app->notify(new AppointmentSmsNotification(setting(SettingKeyEnum::SMS_APPROVED_MONITORING_APPOINTMENT)));
         $this->redirectToPage('نوبت با موفقیت تایید شد');
     }
     public function disApprovemonitoringAppointment($id)
@@ -285,7 +292,7 @@ class SpecificDayAvailableAppointment extends Component
     }
     private function redirectToPage($msg)
     {
-        return redirect()->route('admin.appointment.add.specificday',['appId' => $this->fetchData['appId'] ,  'date' => verta($this->fetchData['selectedDate'])->format('Y-m-d')])->with('success', $msg);
+        return redirect()->route('admin.appointment.add.specificday', ['serviceId' => $this->fetchData['service']->id, 'placeId' => $this->fetchData['place'], 'appId' => $this->fetchData['appId'],  'date' => verta($this->fetchData['selectedDate'])->format('Y-m-d')])->with('success', $msg);
     }
     // opration button functions
 
@@ -309,6 +316,8 @@ class SpecificDayAvailableAppointment extends Component
         $this->edited['old_app']->update($updateData);
 
         return redirect()->route('admin.appointment.add.specificday', [
+            'serviceId' => $this->fetchData['service']->id,
+            'placeId' => $this->fetchData['place'],
             'appId' =>  $this->fetchData['appId'],
             'date' => verta($this->fetchData['selectedDate'])->format('Y-m-d')
         ])->with('success', 'نوبت با موفقیت تغییر کرد');
@@ -316,6 +325,8 @@ class SpecificDayAvailableAppointment extends Component
     public function mount()
     {
         $app = AppointmentSetting::find(request()->route('appId'));
+        $this->fetchData['service'] = Service::find(request()->route('serviceId'));
+        $this->fetchData['place'] = request()->route('placeId');
         $this->fetchData['doc'] = $app->user;
         $this->fetchData['appId'] = $app->id;
         $this->fetchData['appointmentSetting'] = $app;
@@ -339,6 +350,9 @@ class SpecificDayAvailableAppointment extends Component
         if (request()->has('tracking_code')) {
             $this->edited['status'] = true;
             $this->edited['old_app'] = AppointmentUser::firstWhere('tracking_code', request()->get('tracking_code'));
+        }
+        if (request()->has('serviceId')) {
+            $this->fetchData['service'] = Service::find(request()->get('serviceId'));
         }
     }
     public function render()

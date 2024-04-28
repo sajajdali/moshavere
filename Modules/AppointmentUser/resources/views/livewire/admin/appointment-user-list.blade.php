@@ -3,7 +3,7 @@
         <div>
             <h1 class="page-title">لیست نوبت های ثبت شده</h1>
         </div>
-        <a href="{{ route('admin.appointment.doctor.list') }}" class="btn btn-primary" aria-expanded="false"
+        <a href="{{ route('admin.appointment_user.addApp') }}" class="btn btn-primary" aria-expanded="false"
             aria-controls="customDate">افزودن نوبت</a>
     </div>
     @include('admin::layouts.components.alert')

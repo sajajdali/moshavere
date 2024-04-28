@@ -97,7 +97,7 @@ return [
                 'gate' => 'viewAny',
                 'policy_class' => \Modules\User\Entities\User::class,
                 'icon' => 'fe fe-plus-circle',
-                'route' => 'admin.appointment_user.create',
+                'route' => 'admin.appointment_user.addApp',
                 'has_badge' => false,
                 'has_child' => false,
                 'children' => null

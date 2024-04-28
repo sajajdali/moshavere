@@ -10,7 +10,7 @@ return [
             'type' => 'success',
             'display_name' => 'بخش ثبت نوبت',
             'permissions' => [
-                'appointment_user.create' => 'ثبت نوبت',
+                'appointment_user.addApp' => 'ثبت نوبت',
                 'appointment_user.edit'   => 'ویرایش نوبت',
                 'appointment_user.delete' => 'حذف نوبت',
             ],

@@ -15,6 +15,7 @@ class Place extends Model
     const DETAIL_KEY_NUMBERS = 'numbers';
     const DETAIL_KEY_LOCATION_LAT = 'location_lat';
     const DETAIL_KEY_LOCATION_LNG = 'location_lng';
+    const DETAIL_ADDRESS = 'address';
     use SoftDeletes;
     /**
      * The attributes that are mass assignable.

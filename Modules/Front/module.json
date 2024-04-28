@@ -1,0 +1,13 @@
+{
+    "name": "Front",
+    "alias": "front",
+    "description": "",
+    "keywords": [],
+    "priority": 0,
+    "providers": [
+        "Modules\\Front\\app\\Providers\\FrontServiceProvider"
+    ],
+    "files": [
+        "Helper/front_helper.php"
+    ]
+}

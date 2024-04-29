@@ -15,5 +15,5 @@ use Modules\Front\Livewire\Appointment\AppointmentDetail;
 */
 
 Route::group([], function () {
-    Route::get('appointment/detail', AppointmentDetail::class);
+    Route::get('appointment/detail/{tracking_code}', AppointmentDetail::class)->name('front.appointment.detail');
 });

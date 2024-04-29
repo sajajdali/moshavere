@@ -117,14 +117,50 @@
                         </div>
                     @endif
                 </div>
-                <div class="col-12 mt-4">
+                <div class="col-12 mt-4 mb-5">
                     <h4>ترتیب نمایش این مطب در لیست مطب ها</h4>
                     <hr style="opacity: 0.9">
                     <div class="form-group">
-                        <label class="form-label" for="order">ترتیب نمایش :</label>
+                        <label class="form-label" for="placeorder">ترتیب نمایش :</label>
                         <input wire:key="prioruty" type="text" class="form-control" id="placeorder"
                             wire:model='form.priority'
                             placeholder="اواویت نمایش مربوط به این مطب در صورتی که چند مطب داشته باشید را به عدد وارد کنید.">
+                    </div>
+                </div>
+                <div class="col-12 mt-5">
+                    <h4>شبکه های اجتماعی</h4>
+                    <hr style="opacity: 0.9">
+                    <div class="row">
+                        <div class="col-md-4 form-group">
+                            <label class="form-label" for="instagramAddtess">
+                                <i class="fa fa-instagram me-1 text-warning" aria-hidden="true"></i>
+                                <span>آدرس اینستاگرام:</span>
+                            </label>
+                            <input type="text" class="form-control" id="instagramAddtess"
+                                wire:model='form.instagram'
+                                placeholder="آدرس اینترنتی اینستاگرام">
+                                <small>به صورت : https://www.instagram.com/your_id/</small>
+                        </div>
+                        <div class=" col-md-4 form-group">
+                            <label class="form-label" for="telegramAddtess">
+                                <i class="fa fa-telegram me-1 text-primary" aria-hidden="true"></i>
+                                 <span>آدرس تلگرام:</span>
+                                </label>
+                            <input type="text" class="form-control" id="telegramAddtess"
+                                wire:model='form.telegram'
+                                placeholder="آدرس اینترنتی تلگرام">
+                                <small>به صورت : https://web.telegram.org/your_id</small>
+                        </div>
+                        <div class=" col-md-4 form-group">
+                            <label class="form-label" for="whatsappAddtess">
+                                <i class="fa fa-whatsapp me-1 text-success " aria-hidden="true"></i>
+                                <span>آدرس واتساپ:</span>
+                            </label>
+                            <input type="text" class="form-control" id="whatsappAddtess"
+                                wire:model='form.whatsapp'
+                                placeholder="آدرس اینترنتی واتساپ">
+                                <small>به صورت : https://web.whatsapp.com/your_id</small>
+                        </div>
                     </div>
                 </div>
                 <div class="col-12 mt-5">

@@ -2,8 +2,8 @@
 
 namespace Modules\AppointmentUser\app\Models;
 
-use App\ShortLink;
 use Carbon\Carbon;
+use App\Models\ShortLink;
 use Modules\User\Entities\User;
 use Modules\Place\app\Models\Place;
 use Illuminate\Database\Eloquent\Model;

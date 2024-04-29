@@ -27,7 +27,9 @@ return [
             \Modules\Setting\Enum\SettingKeyEnum::APPOINTMENT_STATUS,
             \Modules\Setting\Enum\SettingKeyEnum::SITE_LOGO_URL,
             \Modules\Setting\Enum\SettingKeyEnum::SITE_TITLE,
-
+            \Modules\Setting\Enum\SettingKeyEnum::APPOINTMENT_DESCRIPTION_STATUS,
+            \Modules\Setting\Enum\SettingKeyEnum::APPOINTMENT_DESCRIPTION,
+            \Modules\Setting\Enum\SettingKeyEnum::APPOINTMENT_CANCEL_DESCRIPTION,
         ],
     ],
     'support' => [

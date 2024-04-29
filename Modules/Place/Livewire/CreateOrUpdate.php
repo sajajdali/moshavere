@@ -78,13 +78,20 @@ class CreateOrUpdate extends Component
         if (isset($this->form['address'])) {
             $detail[Place::DETAIL_ADDRESS] = $this->form['address'];
         }
+        if (isset($this->form['instagram'])) {
+            $detail[Place::DETAIL_INSTAGRAM_ADDRESS] = $this->form['instagram'];
+        }
+        if (isset($this->form['telegram'])) {
+            $detail[Place::DETAIL_TELEGRAM_ADDRESS] = $this->form['telegram'];
+        }
+        if (isset($this->form['whatsapp'])) {
+            $detail[Place::DETAIL_WHATSAPP_ADDRESS] = $this->form['whatsapp'];
+        }
         $modelCreateOrUpdate['detail'] = $detail;
-
         if ($this->isEdited) {
             $this->place->update($modelCreateOrUpdate);
             $message = 'مطب با موفقیت ویرایش شد';
         } else {
-
             $this->place = Place::create($modelCreateOrUpdate);
 
             $message = 'مطب با موفقیت اضافه شد';
@@ -119,6 +126,15 @@ class CreateOrUpdate extends Component
         }
         if (isset($place->detail[Place::DETAIL_ADDRESS])) {
             $this->form['address'] = $place->detail[Place::DETAIL_ADDRESS];
+        }
+        if (isset($place->detail[Place::DETAIL_INSTAGRAM_ADDRESS])) {
+            $this->form['instagram'] =  $place->detail[Place::DETAIL_INSTAGRAM_ADDRESS];
+        }
+        if (isset($place->detail[Place::DETAIL_TELEGRAM_ADDRESS])) {
+            $this->form['telegram'] =  $place->detail[Place::DETAIL_TELEGRAM_ADDRESS];
+        }
+        if (isset($place->detail[Place::DETAIL_WHATSAPP_ADDRESS])) {
+            $this->form['whatsapp'] =  $place->detail[Place::DETAIL_WHATSAPP_ADDRESS];
         }
     }
     public function mount()

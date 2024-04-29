@@ -16,6 +16,9 @@ class Place extends Model
     const DETAIL_KEY_LOCATION_LAT = 'location_lat';
     const DETAIL_KEY_LOCATION_LNG = 'location_lng';
     const DETAIL_ADDRESS = 'address';
+    const DETAIL_TELEGRAM_ADDRESS   = 'telegram_address';
+    const DETAIL_INSTAGRAM_ADDRESS  = 'instagram_address';
+    const DETAIL_WHATSAPP_ADDRESS   = 'whatsapp_address';
     use SoftDeletes;
     /**
      * The attributes that are mass assignable.
@@ -27,13 +30,14 @@ class Place extends Model
         'detail' => 'json',
     ];
 
-    public function user() {
+    public function user()
+    {
         return $this->belongsToMany(User::class);
     }
 
     public function checkActive()
     {
-        return $this->active == ActiveEnum::ACTIVE->value ;
+        return $this->active == ActiveEnum::ACTIVE->value;
     }
     public function scopeActive(Builder $query): Builder
     {

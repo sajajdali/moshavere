@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\ShortLinkController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -18,6 +19,9 @@ Route::get('/', function () {
     $template = setting(\Modules\Setting\Enum\SettingKeyEnum::SMS_APPOINTMENT_RECEIVING_SUCCESSFUL);
     $appointmentUser = \Modules\AppointmentUser\app\Models\AppointmentUser::find(14);
     $notify = $appointmentUser->notify(new \Modules\AppointmentUser\app\Notifications\AppointmentSmsNotification($template));
-    dd($notify , "sa");
+    dd($notify, "sa");
     return view('welcome');
+});
+Route::group(['middleware' => 'throttle:10,1'], function () {
+    Route::get('/s/{param}', [ShortLinkController::class, 'index']);
 });

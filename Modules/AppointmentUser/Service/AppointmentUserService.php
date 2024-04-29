@@ -2,10 +2,10 @@
 
 namespace Modules\AppointmentUser\Service;
 
-use Modules\AppointmentUser\app\Events\CancelAppointment;
 use Verta;
 use App\Event;
 use Carbon\Carbon;
+use App\Models\ShortLink;
 use Modules\Absence\app\Models\Absence;
 use Modules\Service\app\Models\Service;
 use Modules\Setting\Enum\SettingKeyEnum;
@@ -18,6 +18,7 @@ use Modules\AppointmentUser\Enum\model\MainUserModel;
 use Modules\AppointmentUser\app\Models\AppointmentUser;
 use Modules\AppointmentUser\app\Events\StoreAppointment;
 use Modules\AppointmentUser\Enum\model\AppointmentModel;
+use Modules\AppointmentUser\app\Events\CancelAppointment;
 use Modules\AppointmentUser\app\Models\AppointmentOnline;
 use Modules\AppointmentUser\Enum\AppointmentUserKindEnum;
 use Modules\AppointmentUser\Enum\AppointmentUserTypeEnum;
@@ -456,11 +457,8 @@ class AppointmentUserService
     private function makeShortLink($appointmentUser)
     {
         $appointmentUser->shortLink()->create([
-            'transaction_code' => '323',
-            'paid_by' => TransactionPaidEnum::ONLINE,
-            'status' => TransactionStatusEnum::PENDING,
-            'cost' => $this->appointmentUser->details['payment'][AppointmentUser::DETAIL_PAYMENT_PRICE],
-            'total_cost' => $this->appointmentUser->details['payment'][AppointmentUser::DETAIL_PAYMENT_PRICE]
+            'link_code' => ShortLink::generateShortLinkCode(),
+            'link_url'  => route('front.appointment.detail', ['tracking_code' => $appointmentUser->tracking_code]),
         ]);
     }
 
@@ -598,18 +596,18 @@ class AppointmentUserService
             $this->insertOnlineAppointment($appointmentUser);
         }
 
-        // send sms
-        if (isset($smsTemplate)) {
-            $appointmentUser->notify(new AppointmentSmsNotification($smsTemplate));
-        }
-
         // create payment link
         if ($appointmentData->appointmentVia == AppointmentVia::SELF && $paymentstatus['status']) {
             $paymentLink = route('appointmentUser.payment', $appointmentUser);
         }
-        // handel sms
 
-        //        $this->makeShortLink($appointmentUser);
+        // handel sms
+        $this->makeShortLink($appointmentUser);
+
+        // send sms
+        if (isset($smsTemplate)) {
+            $appointmentUser->notify(new AppointmentSmsNotification($smsTemplate));
+        }
         event(new StoreAppointmentEvent($appointmentUser));
 
         return [

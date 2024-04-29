@@ -3,17 +3,12 @@
 namespace Modules\AppointmentUser\Http\Controllers;
 
 use App\Http\Controllers\Controller;
-use App\ShortLink;
 use Carbon\Carbon;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
-use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Cache;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Modules\AppointmentSetting\app\Models\AppointmentSetting;
-use Modules\AppointmentUser\app\Jobs\CacheJob;
-use Modules\AppointmentUser\app\Models\AppointmentUser;
 
 class AppointmentUserController extends Controller
 {

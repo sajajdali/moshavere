@@ -1,5 +1,5 @@
 <div>
-    <div class="page-header">
+    <div class="page-header align-items-center">
         <div>
             @if (!$edited['status'])
                 <h1 class="page-title"> افزودن نوبت برای دکتر <span
@@ -7,7 +7,10 @@
             @else
                 <h1 class="page-title">تغییر زمان نوبت</h1>
             @endif
-
+        </div>
+        <div class="mt-2">
+            <h5><mark class="p-2">
+                ثبت نوبت در روز {{verta($fetchData['selectedDate'])->format('d F Y')}}</mark></h5>
         </div>
         <button id="changeDocButton" class="btn btn-primary mt-3 mt-sm-0" type="button" class="btn btn-primary"
             data-bs-toggle="modal" data-bs-target="#changeDocmodal">
@@ -138,14 +141,15 @@
                                                 </td>
                                                 <td>
                                                     <div class="dropdown">
-                                                        <button class="btn  {{$ap->status->getButtonColor()}} dropdown-toggle" type="button"
-                                                            id="dropdownMenuButton1" data-bs-toggle="dropdown"
-                                                            aria-expanded="false">
-                                                            {{$ap->status->getName()}}
+                                                        <button
+                                                            class="btn  {{ $ap->status->getButtonColor() }} dropdown-toggle"
+                                                            type="button" id="dropdownMenuButton1"
+                                                            data-bs-toggle="dropdown" aria-expanded="false">
+                                                            {{ $ap->status->getName() }}
                                                         </button>
                                                         <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton1">
                                                             @can('update', $ap)
-                                                               @include('appointmentuser::components.appointmentlist.operationbutton')
+                                                                @include('appointmentuser::components.appointmentlist.operationbutton')
                                                             @endcan
                                                         </ul>
                                                     </div>
@@ -209,17 +213,13 @@
             </div>
         </div>
     </div>
-    <livewire:appointmentuser::admin.add-appointment.modal.service-and-doctor-modal
-    :appId="$fetchData['appId']"
-    :appTime="$fetchData['time']"
-    :serviceId="$fetchData['service']->id"
-    :placeId="$fetchData['place']"
-     />
+    <livewire:appointmentuser::admin.add-appointment.modal.service-and-doctor-modal :appId="$fetchData['appId']" :appTime="$fetchData['time']"
+        :serviceId="$fetchData['service']->id" :placeId="$fetchData['place']" />
     <livewire:appointmentuser::admin.add-appointment.modal.specific-day-appointment-registration-modal :appId="$fetchData['appId']"
-        :appTime="$fetchData['time']" :serviceId="$fetchData['service']->id"  :placeId="$fetchData['place']"/>
-        <div>
-            @include('appointmentuser::components.appointmentlist.disapprovemodal')
-        </div>
+        :appTime="$fetchData['time']" :serviceId="$fetchData['service']->id" :placeId="$fetchData['place']" />
+    <div>
+        @include('appointmentuser::components.appointmentlist.disapprovemodal')
+    </div>
 </div>
 @push('scripts')
     <!-- SELECT2 JS -->
@@ -249,21 +249,23 @@
                 }, 500);
             });
             Livewire.on('lunchModal', function() {
-            setTimeout(() => {
-                var myModal = new bootstrap.Modal(document.getElementById(
-                    'resoanForDisapproveModal'), {
-                    keyboard: false
-                });
-                myModal.show();
-            }, 1000);
-        });
+                setTimeout(() => {
+                    var myModal = new bootstrap.Modal(document.getElementById(
+                        'resoanForDisapproveModal'), {
+                        keyboard: false
+                    });
+                    myModal.show();
+                }, 1000);
+            });
             Livewire.on('loadJs', function() {
                 setTimeout(() => {
                     addJs();
                 }, 500);
             });
             @if ($fetchData['showRegisterModal'])
-                setAppModalInst.show();
+                setTimeout(() => {
+                    setAppModalInst.show();
+                }, 1000);
             @endif
             Livewire.on('closeModal', function() {
                 modal.hide();

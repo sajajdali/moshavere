@@ -29,16 +29,36 @@ class AppointmentApiController extends Controller
 {
     use ApiHandlerTrait;
 
-    public function doctorsList()
+    public function doctorsList(Request $request)
     {
-        $user = auth()->user();
-        $doctors = User::doctors_query()->whereHas('appointmentSettings')->get();
+        $query = User::doctors_query();
+
+        if ($request->has('type') && in_array($request->get('type'), [1, 2])) {
+
+            $query->whereHas('appointmentSettings', function ($query) use ($request) {
+                if ($request->get('type') == 1) {
+                    $query->where('detail->visit_type_inPerson', true);
+                } elseif ($request->get('type') == 2) {
+                    $query->where('detail->visit_type_online', true);
+                }
+            });
+        }
+
+        $doctors = $query->get();
 
         return $this->ok([
-                'status' => true,
-                'doctors' => DoctorResource::collection($doctors)
-            ]
-        );
+            'status' => true,
+            'doctors' => DoctorResource::collection($doctors)
+        ]);
+
+    }
+
+    public function doctorProfile(User $doctor)
+    {
+        return $this->ok([
+            'status' => true,
+            'profile' => DoctorResource::make($doctor)
+        ]);
     }
 
     public function places(User $doctor)

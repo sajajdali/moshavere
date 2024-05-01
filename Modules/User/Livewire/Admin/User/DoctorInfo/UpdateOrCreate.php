@@ -19,19 +19,22 @@ class UpdateOrCreate extends Component
 
     public function storeDocInfo()
     {
-        if (isset($form['specility'])) {
-            $this->user->specialities()->sync(array_values($this->form['specility']));
+        if (isset($this->form['specility'])) {
+            $r =  $this->user->specialities()->sync(array_values($this->form['specility']));
         }
-        if (isset($form['specialitiesType'])) {
+        if (isset($this->form['specialitiesType'])) {
             $this->user->speciality_type = UserSpecialityType::tryFrom($this->form['specialitiesType'])->value;
         } else {
             $this->user->speciality_type = UserSpecialityType::DOCTOR->value;
         }
         if (isset($this->form['biography'])) {
-            $this->user->biography = $this->form['biography'];
+            $this->user->doc_biography = $this->form['biography'];
         }
         if (isset($this->form['licenceNumber'])) {
             $this->user->licence_number = $this->form['licenceNumber'];
+        }
+        if (isset($this->form['places'])) {
+            $this->user->places()->sync(array_values($this->form['places']));
         }
         if (isset($this->form['services'])) {
             $this->user->services()->sync(array_values($this->form['services']));
@@ -55,16 +58,16 @@ class UpdateOrCreate extends Component
         $this->fetchData['specialitiesType'] = UserSpecialityType::cases();
         $this->fetchData['services']         = Service::all();
         $this->fetchData['places']           = Place::all();
-        if (isset($form['specility'])) {
-            $this->user->specialities()->sync([$this->form['specility']]);
+        if ($this->user->specialities->isNotEmpty()) {
+            $this->form['specility'] = $this->user->specialities->pluck('id')->toArray();
         }
         if (isset($this->user->speciality_type)) {
             $this->form['specialitiesType'] =  UserSpecialityType::tryFrom($this->user->speciality_type)->value;
         } else {
             $this->form['specialitiesType'] = UserSpecialityType::DOCTOR->value;
         }
-        if (isset($this->user->biography)) {
-            $this->form['biography'] =   $this->user->biography;
+        if (isset($this->user->doc_biography)) {
+            $this->form['biography'] =   $this->user->doc_biography;
         }
         if (isset($this->user->licence_number)) {
             $this->form['licenceNumber'] = $this->user->licence_number;
@@ -95,9 +98,6 @@ class UpdateOrCreate extends Component
             $this->user = $user;
         }
         $this->fillTheInputs();
-        if ($this->user->specialities->isNotEmpty()) {
-            $this->form['specility'] = $this->user->specialities->pluck('id')->toArray();
-        }
         if ($this->user->services->isNotEmpty()) {
             $this->form['services'] = $this->user->services->pluck('id')->toArray();
         }

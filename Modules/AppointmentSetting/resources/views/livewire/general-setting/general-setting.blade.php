@@ -307,7 +307,7 @@
                     <div class="input-group mb-3">
                         <input type="text" wire:model='form.startAppointment.date'
                             class="form-control @error('form.startAppointment.date') is-invalid @enderror"
-                           id="startDatePicker" >
+                            id="startDatePicker">
                     </div>
                 </div>
             </div>
@@ -422,14 +422,15 @@
                                     id="default-dropdown" wire:model='form.onlinePayment.notPayingStatus'
                                     data-bs-placeholder="انتخاب کنید...">
                                     <option label="انتخاب کنید..."></option>
-                                    <option value="submit">نوبت ثبت شود</option>
-                                    <option value="dontSubmit">نوبت ثبت نشود</option>
+                                    <option @if (isset($form['onlinePayment']['notPayingStatus']) && $form['onlinePayment']['notPayingStatus'] == 'submit') selected @endif value="submit">نوبت ثبت
+                                        شود</option>
+                                    <option  @if (isset($form['onlinePayment']['notPayingStatus']) && $form['onlinePayment']['notPayingStatus'] == 'dontSubmit') selected @endif  value="dontSubmit">نوبت ثبت نشود</option>
                                 </select>
                             </div>
                         </div>
                     </div>
                 </div>
-                <div style="display:  @if (isset($form['onlinePayment']['online']['status']) && isset($form['onlinePayment']['voip']['status'])) block  @else none @endif"
+                <div style="display:  @if (isset($form['onlinePayment']['online']['status']) || isset($form['onlinePayment']['voip']['status'])) block  @else none @endif"
                     id="paymentPriceInput">
                     <div class="row">
                         <div class="col-md-5 pt-2">

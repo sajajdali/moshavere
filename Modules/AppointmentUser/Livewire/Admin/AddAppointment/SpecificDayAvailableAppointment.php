@@ -83,49 +83,48 @@ class SpecificDayAvailableAppointment extends Component
     }
     private function listOfAppointment($listOfAppointment)
     {
-
         $firstTwoEmpty = [];
         $report = $listOfAppointment['report'];
         $mainDaActive = $report['min_day_active'];
-
         $isDay   = Carbon::now()->format('Y-m-d');
-
         $result = [];
         $temPResult = [];
-        foreach ($listOfAppointment['data'] as $yeay => $day) {
-            foreach ($day as $month => $appointments) {
-                foreach ($appointments as $day => $appointment) {
-                    $dayNumber = $appointment['day_number_gmt'];
-                    foreach ($appointment['times'] as $time) {
-                        if ($time['status']) {
-                            // Increment the counter
-                            $temPResult[] = [
-                                'status' => true,
-                                'time_stamp' => $time['timestamp'],
-                                'from' => $time['from'],
-                                'until' => $time['until'],
-                                'gap' => isset($time['gap']) ? true : false,
-                            ];
-                            // If two matches are found, break out of the loop
-                        } else {
-                            $temPResult[] = [
-                                'status' => false,
-                                'from' => $time['from'],
-                                'until' => $time['until'],
-                                'appointment_user_id' => isset($time['appointment_user_id']) ? $time['appointment_user_id'] : null,
-                                'gap' => isset($time['gap']) ? true : false,
+        if(isset($listOfAppointment['data'])) {
+            foreach ($listOfAppointment['data'] as $yeay => $day) {
+                foreach ($day as $month => $appointments) {
+                    foreach ($appointments as $day => $appointment) {
+                        $dayNumber = $appointment['day_number_gmt'];
+                        foreach ($appointment['times'] as $time) {
+                            if ($time['status']) {
+                                // Increment the counter
+                                $temPResult[] = [
+                                    'status' => true,
+                                    'time_stamp' => $time['timestamp'],
+                                    'from' => $time['from'],
+                                    'until' => $time['until'],
+                                    'gap' => isset($time['gap']) ? true : false,
+                                ];
+                                // If two matches are found, break out of the loop
+                            } else {
+                                $temPResult[] = [
+                                    'status' => false,
+                                    'from' => $time['from'],
+                                    'until' => $time['until'],
+                                    'appointment_user_id' => isset($time['appointment_user_id']) ? $time['appointment_user_id'] : null,
+                                    'gap' => isset($time['gap']) ? true : false,
+                                ];
+                            }
+                        }
+
+                        if (isset($temPResult)) {
+                            $result[] = [
+                                'date' => $dayNumber,
+                                'times' => $temPResult,
+                                'is_active' => $isDay == $dayNumber,
                             ];
                         }
+                        unset($temPResult);
                     }
-
-                    if (isset($temPResult)) {
-                        $result[] = [
-                            'date' => $dayNumber,
-                            'times' => $temPResult,
-                            'is_active' => $isDay == $dayNumber,
-                        ];
-                    }
-                    unset($temPResult);
                 }
             }
         }
@@ -150,6 +149,7 @@ class SpecificDayAvailableAppointment extends Component
     }
     public function lunchAppModal()
     {
+
         $this->fetchData['showRegisterModal'] = true;
     }
 

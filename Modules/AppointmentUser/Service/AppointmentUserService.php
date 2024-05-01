@@ -93,8 +93,8 @@ class AppointmentUserService
         if (isset($details['specialDay'])) {
             if (array_key_exists('specialDay', $details)) {
                 $specialDaySelected = true;
-                $startDate = Carbon::parse($details['specialDay']);
-                $endDate = $startDate->copy()->addDay(); // Adjust the number of days as needed
+                $startDate = Carbon::parse($details['specialDay'])->subDays(20);
+                $endDate = $startDate->copy()->addDays($details['specialDay_endDate'] ?? 60); // Adjust the number of days as needed
             } elseif (array_key_exists('completeDays', $details)) {
                 $startDate = Carbon::parse($details['specialDay']);
                 $endDate = $startDate->copy()->addDays($details['numberDays']);
@@ -138,7 +138,6 @@ class AppointmentUserService
 
         // Iterate over the week starting from today
         $firstDayInLog = $firstEmptyDay = $lastDayInLog = null;
-
         for ($currentDate = $startDate; $currentDate->lte($endDate); $currentDate->addDay()) {
             $year = verta($currentDate)->year;
             $month = verta($currentDate)->month;
@@ -159,7 +158,6 @@ class AppointmentUserService
                 'empty_appoints' => 0,
                 'times' => [],
             ];
-
             if ($appointmentSettings->count()) {
                 // Get the time for each visit in minutes
                 $timeForVisit = $appointmentSettings->time_for_visit;
@@ -362,7 +360,6 @@ class AppointmentUserService
             });
 
             // Sorting the array
-
             $output['data'][$year][$month][$day] = $dayOutput;
             $lastDayInLog = $currentDate->toDateString();
 

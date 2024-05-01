@@ -442,7 +442,7 @@ class GeneralSetting extends Component
         }
         if (isset($apSet->detail[AppointmentSetting::PAYMENT][AppointmentSetting::ONLINE])) {
             $this->form['onlinePayment'][AppointmentSetting::ONLINE][AppointmentSetting::STATUS] = $apSet->detail[AppointmentSetting::PAYMENT][AppointmentSetting::ONLINE][AppointmentSetting::STATUS];
-            $this->form['onlinePayment'][AppointmentSetting::NOT_PAYING_STATUS]  = $apSet->detail[AppointmentSetting::PAYMENT][AppointmentSetting::ONLINE][AppointmentSetting::NOT_PAYING_STATUS];
+            $this->form['onlinePayment']['notPayingStatus']  = $apSet->detail[AppointmentSetting::PAYMENT][AppointmentSetting::ONLINE][AppointmentSetting::NOT_PAYING_STATUS];
         }
         if (isset($apSet->detail[AppointmentSetting::PAYMENT][AppointmentSetting::VOIP])) {
             $this->form['onlinePayment']['voip'][AppointmentSetting::STATUS] = $apSet->detail[AppointmentSetting::PAYMENT][AppointmentSetting::VOIP][AppointmentSetting::STATUS];

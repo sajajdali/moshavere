@@ -121,10 +121,14 @@
                                                 </td>
                                                 <td> {{ $user->mobile }}</td>
                                                 <td>
-                                                    @foreach ($user->roles as $index => $role)
-                                                        <span
-                                                            class="badge bg-{{ $index === 0 ? 'info' : ($index === 1 ? 'success' : 'danger') }} my-1 text-bold">{{ $role->name }}</span>
-                                                    @endforeach
+                                                    @if ($user->roles->isNotEmpty())
+                                                        @foreach ($user->roles as $index => $role)
+                                                            <span
+                                                                class="badge bg-{{ $index === 0 ? 'info' : ($index === 1 ? 'success' : 'danger') }} my-1 text-bold">{{ $role->name ?? 'کاربر' }}</span>
+                                                        @endforeach
+                                                    @else
+                                                        <span class="badge bg-secondary">کاربر</span>
+                                                    @endif
                                                 </td>
                                                 <td>
                                                     @canany(['update', 'delete'], $user)

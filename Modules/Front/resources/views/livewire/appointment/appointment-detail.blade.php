@@ -77,6 +77,10 @@
                                     <th><strong>{{ $fetchData['app']->doctor->fullName }}</strong></th>
                                 </tr>
                                 <tr>
+                                    <th>نوع نوبت</th>
+                                    <th><strong>{{ $fetchData['app']->kind->getName() }}</strong></th>
+                                </tr>
+                                <tr>
                                     <th>تاریخ نوبت</th>
                                     <th><strong>{{ verta($fetchData['app']->visited_date)->format('d F') }}</strong>
                                     </th>
@@ -85,7 +89,11 @@
                                     <th>ساعت نوبت</th>
                                     <th>
                                         @if ($this->fetchData['stauts']['enum'] != Modules\AppointmentUser\Enum\AppointmentUserStatusEnum::STATUS_CANCEL)
-                                            <strong>{{ verta($fetchData['app']->visited_date)->format('H:i') }}</strong>
+                                            <strong> @if (isset($fetchData['app']->visited_date ))
+                                                {{ verta($fetchData['app']->visited_date )->format('H:i') }}
+                                                @else
+                                                ---
+                                            @endif</strong>
                                         @else
                                             <span class="badge bg-danger rounded-pill">کنسل شده</span>
                                         @endif

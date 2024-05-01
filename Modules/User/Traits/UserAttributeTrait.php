@@ -142,4 +142,12 @@ trait UserAttributeTrait
             set: fn ($value) => $this->metas()->create(['meta_key' => $operator, 'meta_value' => $value])
         );
     }
+    public function drGallery(): Attribute
+    {
+        $operator = UserMetaEnum::DR_GALLERY;
+        return Attribute::make(
+            get: fn() => $this->getMeta( $operator)?->meta_value,
+            set: fn ($value) => $this->metas()->create(['meta_key' => $operator, 'meta_value' => $value])
+        );
+    }
 }

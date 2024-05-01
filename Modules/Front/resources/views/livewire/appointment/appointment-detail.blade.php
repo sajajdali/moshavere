@@ -26,9 +26,10 @@
                     <div class="card-header border-bottom d-flex justify-content-between">
                         <h3 class="card-title">مدیریت نوبت</h3>
                         <a class=" btn btn-danger text-bold confirm_swal_alert " data-label="نوبت"
-                            data-description= "{{ setting(Modules\Setting\Enum\SettingKeyEnum::APPOINTMENT_CANCEL_DESCRIPTION) ?? 'از کنسل کردن نوبت مطمعن هستید؟ '}}"  data-title="توجه!"
-                            data-confirmbtn="بله کنسل شود" data-action="cancelWithSms" data-id="{{ $this->fetchData['app']->id}}"
-                            data-id="{{ $this->fetchData['app']->id }}" href="">
+                            data-description= "{{ setting(Modules\Setting\Enum\SettingKeyEnum::APPOINTMENT_CANCEL_DESCRIPTION) ?? 'از کنسل کردن نوبت مطمعن هستید؟ ' }}"
+                            data-title="توجه!" data-confirmbtn="بله کنسل شود" data-action="cancelWithSms"
+                            data-id="{{ $this->fetchData['app']->id }}" data-id="{{ $this->fetchData['app']->id }}"
+                            href="">
                             <i class="fa fa-times" aria-hidden="true"></i>
                             کنسل
                             کردن
@@ -69,7 +70,7 @@
                                 </tr>
                                 <tr>
                                     <th>نام بخش</th>
-                                    <th><strong>{{ $fetchData['app']->service->title }}</strong></th>
+                                    <th><strong>{{ $fetchData['app']->service?->title ?? '---' }}</strong></th>
                                 </tr>
                                 <tr>
                                     <th>پزشک شما</th>
@@ -83,11 +84,11 @@
                                 <tr>
                                     <th>ساعت نوبت</th>
                                     <th>
-                                        @if ($this->fetchData['stauts']['enum'] != Modules\AppointmentUser\Enum\AppointmentUserStatusEnum::STATUS_CANCEL )
-                                        <strong>{{ verta($fetchData['app']->visited_date)->format('H:i') }}</strong>
+                                        @if ($this->fetchData['stauts']['enum'] != Modules\AppointmentUser\Enum\AppointmentUserStatusEnum::STATUS_CANCEL)
+                                            <strong>{{ verta($fetchData['app']->visited_date)->format('H:i') }}</strong>
                                         @else
-                                        <span class="badge bg-danger rounded-pill">کنسل شده</span>
-                                    @endif
+                                            <span class="badge bg-danger rounded-pill">کنسل شده</span>
+                                        @endif
                                     </th>
                                 </tr>
                                 <tr>
@@ -100,83 +101,86 @@
                 </div>
             </div>
         </div>
-        <div class="col-lg-12">
-            <div class="card custom-card">
-                <div class="card-header border-bottom d-flex justify-content-between">
-                    <h3 class="card-title">آدرس</h3>
-                    <div>
-                        @if ($fetchData['socailmedia']['status'])
-                            @if ($fetchData['socailmedia']['telegram'])
-                                <a href="{{ $fetchData['socailmedia']['telegram'] }}">
-                                    <i class="fa fa-telegram fa-2x me-2 text-primary" aria-hidden="true"></i>
-                                </a>
-                            @endif
-                            @if ($fetchData['socailmedia']['whatsapp'])
-                                <a href="{{ $fetchData['socailmedia']['whatsapp'] }}">
-                                    <i class="fa fa-whatsapp fa-2x me-2 text-success " aria-hidden="true"></i>
+        @if (isset($fetchData['place']))
+            <div class="col-lg-12">
+                <div class="card custom-card">
+                    <div class="card-header border-bottom d-flex justify-content-between">
+                        <h3 class="card-title">آدرس</h3>
+                        <div>
+                            @if ($fetchData['socailmedia']['status'])
+                                @if ($fetchData['socailmedia']['telegram'])
+                                    <a href="{{ $fetchData['socailmedia']['telegram'] }}">
+                                        <i class="fa fa-telegram fa-2x me-2 text-primary" aria-hidden="true"></i>
+                                    </a>
+                                @endif
+                                @if ($fetchData['socailmedia']['whatsapp'])
+                                    <a href="{{ $fetchData['socailmedia']['whatsapp'] }}">
+                                        <i class="fa fa-whatsapp fa-2x me-2 text-success " aria-hidden="true"></i>
 
-                                </a>
+                                    </a>
+                                @endif
+                                @if ($fetchData['socailmedia']['instagram'])
+                                    <a href="{{ $fetchData['socailmedia']['instagram'] }}">
+                                        <i class="fa fa-instagram fa-2x  text-warning" aria-hidden="true"></i>
+                                    </a>
+                                @endif
                             @endif
-                            @if ($fetchData['socailmedia']['instagram'])
-                                <a href="{{ $fetchData['socailmedia']['instagram'] }}">
-                                    <i class="fa fa-instagram fa-2x  text-warning" aria-hidden="true"></i>
-                                </a>
-                            @endif
-                        @endif
+                        </div>
                     </div>
-                </div>
-                <div class="card-body">
-                    @if (isset($fetchData['place']->detail[Modules\Place\app\Models\Place::DETAIL_KEY_LOCATION]))
-                        <div class="row mb-4">
-                            <div class="col-lg-12">
-                                <div id="testmap"></div>
-                                <div class="h-500" id="mapdiv"></div>
-                            </div>
-                            <div class="col-12 mt-5">
-                                <h5>
-                                    <i class="fa fa-location-arrow me-1" aria-hidden="true"></i>
-                                    مسیر یابی
+                    <div class="card-body">
+                        @if (isset($fetchData['place']->detail[Modules\Place\app\Models\Place::DETAIL_KEY_LOCATION]))
+                            <div class="row mb-4">
+                                <div class="col-lg-12">
+                                    <div id="testmap"></div>
+                                    <div class="h-500" id="mapdiv"></div>
+                                </div>
+                                <div class="col-12 mt-5">
+                                    <h5>
+                                        <i class="fa fa-location-arrow me-1" aria-hidden="true"></i>
+                                        مسیر یابی
+                                    </h5>
+                                    <hr class="text-light opacity-50">
+                                </div>
+                                <div class="col-md-12 d-flex justify-content-around">
+                                    <a href="https://maps.google.com/maps?daddr={{ $fetchData['place']->detail[Modules\Place\app\Models\Place::DETAIL_KEY_LOCATION][Modules\Place\app\Models\Place::DETAIL_KEY_LOCATION_LAT] }},{{ $fetchData['place']->detail[Modules\Place\app\Models\Place::DETAIL_KEY_LOCATION][Modules\Place\app\Models\Place::DETAIL_KEY_LOCATION_LNG] }}&amp;ll="
+                                        class="navigation-button google-map-button">مسیریابی با گوگل مپ</a>
+                                    <a href="https://www.waze.com/ul?ll={{ $fetchData['place']->detail[Modules\Place\app\Models\Place::DETAIL_KEY_LOCATION][Modules\Place\app\Models\Place::DETAIL_KEY_LOCATION_LAT] }},{{ $fetchData['place']->detail[Modules\Place\app\Models\Place::DETAIL_KEY_LOCATION][Modules\Place\app\Models\Place::DETAIL_KEY_LOCATION_LNG] }}&navigate=yes"
+                                        class="navigation-button waze-button">مسیریابی با اپلیکیشن ویز</a>
+
+                                    <a href=" https://neshan.org/maps/routing/car/destination/{{ $fetchData['place']->detail[Modules\Place\app\Models\Place::DETAIL_KEY_LOCATION][Modules\Place\app\Models\Place::DETAIL_KEY_LOCATION_LAT] }},{{ $fetchData['place']->detail[Modules\Place\app\Models\Place::DETAIL_KEY_LOCATION][Modules\Place\app\Models\Place::DETAIL_KEY_LOCATION_LNG] }}"
+                                        class="navigation-button neshan-button">مسیریابی با اپلیکیشن نشان</a>
+                                </div>
+                        @endif
+                        <div class="col-12">
+                            @if (isset($fetchData['place']->detail[Modules\Place\app\Models\Place::DETAIL_ADDRESS]))
+                                <h5 class="mt-4">
+                                    <i class="fa fa-address-card-o me-1" aria-hidden="true"></i>
+                                    آدرس نوشتاری:
                                 </h5>
                                 <hr class="text-light opacity-50">
-                            </div>
-                            <div class="col-md-12 d-flex justify-content-around">
-                                <a href="https://maps.google.com/maps?daddr={{ $fetchData['place']->detail[Modules\Place\app\Models\Place::DETAIL_KEY_LOCATION][Modules\Place\app\Models\Place::DETAIL_KEY_LOCATION_LAT] }},{{ $fetchData['place']->detail[Modules\Place\app\Models\Place::DETAIL_KEY_LOCATION][Modules\Place\app\Models\Place::DETAIL_KEY_LOCATION_LNG] }}&amp;ll="
-                                    class="navigation-button google-map-button">مسیریابی با گوگل مپ</a>
-                                <a href="https://www.waze.com/ul?ll={{ $fetchData['place']->detail[Modules\Place\app\Models\Place::DETAIL_KEY_LOCATION][Modules\Place\app\Models\Place::DETAIL_KEY_LOCATION_LAT] }},{{ $fetchData['place']->detail[Modules\Place\app\Models\Place::DETAIL_KEY_LOCATION][Modules\Place\app\Models\Place::DETAIL_KEY_LOCATION_LNG] }}&navigate=yes"
-                                    class="navigation-button waze-button">مسیریابی با اپلیکیشن ویز</a>
 
-                                <a href=" https://neshan.org/maps/routing/car/destination/{{ $fetchData['place']->detail[Modules\Place\app\Models\Place::DETAIL_KEY_LOCATION][Modules\Place\app\Models\Place::DETAIL_KEY_LOCATION_LAT] }},{{ $fetchData['place']->detail[Modules\Place\app\Models\Place::DETAIL_KEY_LOCATION][Modules\Place\app\Models\Place::DETAIL_KEY_LOCATION_LNG] }}"
-                                    class="navigation-button neshan-button">مسیریابی با اپلیکیشن نشان</a>
-                            </div>
-                    @endif
-                    <div class="col-12">
-                        @if (isset($fetchData['place']->detail[Modules\Place\app\Models\Place::DETAIL_ADDRESS]))
-                            <h5 class="mt-4">
-                                <i class="fa fa-address-card-o me-1" aria-hidden="true"></i>
-                                آدرس نوشتاری:
-                            </h5>
-                            <hr class="text-light opacity-50">
+                                <p class="ms-2 mt-1">
+                                    {{ $fetchData['place']->detail[Modules\Place\app\Models\Place::DETAIL_ADDRESS] }}
+                                </p>
+                            @endif
+                        </div>
+                        <div class="col-12">
+                            @if (isset($fetchData['place']->detail[Modules\Place\app\Models\Place::DETAIL_ADDRESS]))
+                                <h5 class="mt-4">
+                                    <i class="fa fa-phone me-1" aria-hidden="true"></i>
+                                    شماره تماس:
+                                </h5>
+                                <hr class="text-light opacity-50">
 
-                            <p class="ms-2 mt-1">
-                                {{ $fetchData['place']->detail[Modules\Place\app\Models\Place::DETAIL_ADDRESS] }}</p>
-                        @endif
-                    </div>
-                    <div class="col-12">
-                        @if (isset($fetchData['place']->detail[Modules\Place\app\Models\Place::DETAIL_ADDRESS]))
-                            <h5 class="mt-4">
-                                <i class="fa fa-phone me-1" aria-hidden="true"></i>
-                                شماره تماس:
-                            </h5>
-                            <hr class="text-light opacity-50">
-
-                            <p class="ms-2 mt-1">
-                                {{ implode(',',$fetchData['place']->detail[Modules\Place\app\Models\Place::DETAIL_KEY_NUMBERS]) }}</p>
-                        @endif
+                                <p class="ms-2 mt-1">
+                                    {{ implode(',', $fetchData['place']->detail[Modules\Place\app\Models\Place::DETAIL_KEY_NUMBERS]) }}
+                                </p>
+                            @endif
+                        </div>
                     </div>
                 </div>
             </div>
-        </div>
-
+        @endif
     </div>
 </div>
 </div>
@@ -191,42 +195,45 @@
     <script src="{{ admin_asset('js/mapp.min.js') }}"></script>
     <script src="{{ admin_asset('js/mapp.env.js') }}"></script>
     <script>
-        $(document).ready(function() {
-            if ({{ isset($fetchData['place']->detail[Modules\Place\app\Models\Place::DETAIL_KEY_LOCATION]) }}) {
-                var crosshairIcon = {
-                    iconUrl: "{{ front_asset('image/marker-icon.png') }}",
-                    iconSize: [25, 41], // size of the icon
-                    iconAnchor: [12, 55], // point of the icon which will correspond to marker's location
-                };
-                var placeLat =
-                    {{ (float) $fetchData['place']->detail[Modules\Place\app\Models\Place::DETAIL_KEY_LOCATION][Modules\Place\app\Models\Place::DETAIL_KEY_LOCATION_LAT] }};
-                var placeLng =
-                    {{ (float) $fetchData['place']->detail[Modules\Place\app\Models\Place::DETAIL_KEY_LOCATION][Modules\Place\app\Models\Place::DETAIL_KEY_LOCATION_LNG] }};
-                var app = new Mapp({
-                    element: '#mapdiv',
-                    presets: {
+        @if (isset($fetchData['place']))
+            $(document).ready(function() {
+                if (
+                    {{ isset($fetchData['place']->detail[Modules\Place\app\Models\Place::DETAIL_KEY_LOCATION]) }}) {
+                    var crosshairIcon = {
+                        iconUrl: "{{ front_asset('image/marker-icon.png') }}",
+                        iconSize: [25, 41], // size of the icon
+                        iconAnchor: [12, 55], // point of the icon which will correspond to marker's location
+                    };
+                    var placeLat =
+                        {{ (float) $fetchData['place']->detail[Modules\Place\app\Models\Place::DETAIL_KEY_LOCATION][Modules\Place\app\Models\Place::DETAIL_KEY_LOCATION_LAT] }};
+                    var placeLng =
+                        {{ (float) $fetchData['place']->detail[Modules\Place\app\Models\Place::DETAIL_KEY_LOCATION][Modules\Place\app\Models\Place::DETAIL_KEY_LOCATION_LNG] }};
+                    var app = new Mapp({
+                        element: '#mapdiv',
+                        presets: {
+                            latlng: {
+                                lat: placeLat,
+                                lng: placeLng,
+                            },
+                            zoom: 14
+                        },
+                        apiKey: 'eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiIsImp0aSI6IjAwYjU3ZjUzYjk4OThlOGZlYmZlMjJhODc3NjM3ZGJlYzE5OGZmYzAzMmQ1MDdmODcxY2M5ZThlODM4N2ZkNjRiNzM3MWVlOWFmYjk1MWJlIn0.eyJhdWQiOiIyNjA5NSIsImp0aSI6IjAwYjU3ZjUzYjk4OThlOGZlYmZlMjJhODc3NjM3ZGJlYzE5OGZmYzAzMmQ1MDdmODcxY2M5ZThlODM4N2ZkNjRiNzM3MWVlOWFmYjk1MWJlIiwiaWF0IjoxNzA3NTQ3MzUyLCJuYmYiOjE3MDc1NDczNTIsImV4cCI6MTcxMDA1Mjk1Miwic3ViIjoiIiwic2NvcGVzIjpbImJhc2ljIl19.G_8eZJV03f9krGyP_nvkNXn9nODDK8VAf-lI9ESuZBPobkrPCceG02Y-nzosNEilZzZSGqW2yBjZE6PMZVcf81T53bMAlo6DmPaDGoqjAO88ZrL1tvhQ7KPBDBSkA4oODvSVGtA071CWpvUd7xdzoy0h-mEGmIdkY3Cs3MkPbCltrYXaK1LuDSE-4fz2HHeyswUAc8IHkoxKcze-FACfT_uifSijX6rfYfG4k9uXTNap41rKvmqZ1c4DSXkkHTc_2Pit1WUAX-y-ALxKtt22h8GQPv4FV-Bd_PJHp9g6U93QmKaeJdC0PCcnVOJHhHfGtme7I0zYAfmtgqDC5j2CAw'
+                    });
+                    app.addVectorLayers();
+                    app.addZoomControls();
+                    app.addMarker({
                         latlng: {
                             lat: placeLat,
                             lng: placeLng,
                         },
-                        zoom: 14
-                    },
-                    apiKey: 'eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiIsImp0aSI6IjAwYjU3ZjUzYjk4OThlOGZlYmZlMjJhODc3NjM3ZGJlYzE5OGZmYzAzMmQ1MDdmODcxY2M5ZThlODM4N2ZkNjRiNzM3MWVlOWFmYjk1MWJlIn0.eyJhdWQiOiIyNjA5NSIsImp0aSI6IjAwYjU3ZjUzYjk4OThlOGZlYmZlMjJhODc3NjM3ZGJlYzE5OGZmYzAzMmQ1MDdmODcxY2M5ZThlODM4N2ZkNjRiNzM3MWVlOWFmYjk1MWJlIiwiaWF0IjoxNzA3NTQ3MzUyLCJuYmYiOjE3MDc1NDczNTIsImV4cCI6MTcxMDA1Mjk1Miwic3ViIjoiIiwic2NvcGVzIjpbImJhc2ljIl19.G_8eZJV03f9krGyP_nvkNXn9nODDK8VAf-lI9ESuZBPobkrPCceG02Y-nzosNEilZzZSGqW2yBjZE6PMZVcf81T53bMAlo6DmPaDGoqjAO88ZrL1tvhQ7KPBDBSkA4oODvSVGtA071CWpvUd7xdzoy0h-mEGmIdkY3Cs3MkPbCltrYXaK1LuDSE-4fz2HHeyswUAc8IHkoxKcze-FACfT_uifSijX6rfYfG4k9uXTNap41rKvmqZ1c4DSXkkHTc_2Pit1WUAX-y-ALxKtt22h8GQPv4FV-Bd_PJHp9g6U93QmKaeJdC0PCcnVOJHhHfGtme7I0zYAfmtgqDC5j2CAw'
-                });
-                app.addVectorLayers();
-                app.addZoomControls();
-                app.addMarker({
-                    latlng: {
-                        lat: placeLat,
-                        lng: placeLng,
-                    },
-                    icon: crosshairIcon,
-                    popup: false,
-                    pan: false,
-                    draggable: true,
-                    history: false
-                });
-            }
-        });
+                        icon: crosshairIcon,
+                        popup: false,
+                        pan: false,
+                        draggable: true,
+                        history: false
+                    });
+                }
+            });
+        @endif
     </script>
 @endpush

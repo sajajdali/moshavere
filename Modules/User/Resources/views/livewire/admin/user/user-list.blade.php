@@ -143,6 +143,10 @@
                                                                             <a href="{{ route('admin.doctor.info', $user) }}">ویرایش
                                                                                 اطلاعات پزشک</a>
                                                                         </li>
+                                                                        <li>
+                                                                            <a href="{{ route('admin.doctor.gallery', $user) }}">
+                                                                                گالری پزشک</a>
+                                                                        </li>
                                                                     @endif
                                                                 @endcan
                                                                 @can('documentte', $user)

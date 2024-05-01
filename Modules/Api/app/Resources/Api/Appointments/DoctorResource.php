@@ -20,10 +20,10 @@ class DoctorResource extends JsonResource
             'avatar' => $this->avatar,
             'services' => ServiceResource::collection($this->service),
             'check_has_visited_or_not'   => true,
-            'biography' => $this->biography,
-            'licenceNumber' => $this->licenceNumber,
+            'biography' => $this->drBiography,
+            'licenceNumber' => $this->drLicenceNumber,
             'gallery' => null,
-            'address' => $this->address,
+            'address' => $this->drAddress,
         ];
     }
     public function getSpeciality()

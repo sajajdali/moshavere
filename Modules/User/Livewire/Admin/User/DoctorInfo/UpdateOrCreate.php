@@ -45,7 +45,6 @@ class UpdateOrCreate extends Component
         if (isset($this->form['order'])) {
             $this->user->dr_order = $this->form['order'];
         }
-
         $this->user->active_appointment = $this->form['active'];
         $this->user->ban_user = $this->form['banUser'];
 
@@ -78,7 +77,7 @@ class UpdateOrCreate extends Component
         if (isset($this->user->dr_order)) {
             $this->form['order'] = $this->user->dr_order;
         }
-        if (isset($this->user->active_appointment) &&  $this->user->ban_user != 1) {
+        if (isset($this->user->active_appointment) &&  $this->user->active_appointment != 1) {
             $this->form['active'] =  false;
         } else {
             $this->form['active'] = true;

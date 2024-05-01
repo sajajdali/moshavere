@@ -152,7 +152,6 @@ class SpecificDayAvailableAppointment extends Component
 
         $this->fetchData['showRegisterModal'] = true;
     }
-
     public function changeAppointmentType($appId)
     {
         $appUser = AppointmentUser::find($appId);

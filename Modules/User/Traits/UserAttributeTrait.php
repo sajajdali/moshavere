@@ -91,28 +91,28 @@ trait UserAttributeTrait
             set: fn ($value) => $this->metas()->updateOrCreate(['meta_key' => UserMetaEnum::SPECIALITY_TYPE, 'meta_value' => $value])
         );
     }
-    public function docBiography(): Attribute
+    public function drBiography(): Attribute
     {
         return Attribute::make(
             get: fn () => $this->getMeta(UserMetaEnum::DOC_BIOGRAPHY)?->meta_value,
             set: fn ($value) => $this->metas()->updateOrCreate(['meta_key' => UserMetaEnum::DOC_BIOGRAPHY, 'meta_value' => $value])
         );
     }
-    public function licenceNumber(): Attribute
+    public function drLicenceNumber(): Attribute
     {
         return Attribute::make(
             get: fn () => $this->getMeta(UserMetaEnum::LICENCE_NUMBER)?->meta_value,
             set: fn ($value) => $this->metas()->updateOrCreate(['meta_key' => UserMetaEnum::LICENCE_NUMBER, 'meta_value' => $value])
         );
     }
-    public function docAddress(): Attribute
+    public function drAddress(): Attribute
     {
         return Attribute::make(
             get: fn () => $this->getMeta(UserMetaEnum::DOC_ADDRESS)?->meta_value,
             set: fn ($value) => $this->metas()->updateOrCreate(['meta_key' => UserMetaEnum::DOC_ADDRESS, 'meta_value' => $value])
         );
     }
-    public function docOrder(): Attribute
+    public function drOrder(): Attribute
     {
         return Attribute::make(
             get: fn () => $this->getMeta(UserMetaEnum::DOCTOR_ORDER)?->meta_value,

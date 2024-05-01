@@ -28,10 +28,10 @@ class UpdateOrCreate extends Component
             $this->user->speciality_type = UserSpecialityType::DOCTOR->value;
         }
         if (isset($this->form['biography'])) {
-            $this->user->doc_biography = $this->form['biography'];
+            $this->user->dr_biography = $this->form['biography'];
         }
         if (isset($this->form['licenceNumber'])) {
-            $this->user->licence_number = $this->form['licenceNumber'];
+            $this->user->dr_licence_number = $this->form['licenceNumber'];
         }
         if (isset($this->form['places'])) {
             $this->user->places()->sync(array_values($this->form['places']));
@@ -40,10 +40,10 @@ class UpdateOrCreate extends Component
             $this->user->services()->sync(array_values($this->form['services']));
         }
         if (isset($this->form['address'])) {
-            $this->user->doc_address = $this->form['address'];
+            $this->user->dr_address = $this->form['address'];
         }
         if (isset($this->form['order'])) {
-            $this->user->doc_order = $this->form['order'];
+            $this->user->dr_order = $this->form['order'];
         }
 
         $this->user->active_appointment = $this->form['active'];
@@ -66,17 +66,17 @@ class UpdateOrCreate extends Component
         } else {
             $this->form['specialitiesType'] = UserSpecialityType::DOCTOR->value;
         }
-        if (isset($this->user->doc_biography)) {
-            $this->form['biography'] =   $this->user->doc_biography;
+        if (isset($this->user->dr_biography)) {
+            $this->form['biography'] =   $this->user->dr_biography;
         }
-        if (isset($this->user->licence_number)) {
-            $this->form['licenceNumber'] = $this->user->licence_number;
+        if (isset($this->user->dr_licence_number)) {
+            $this->form['licenceNumber'] = $this->user->dr_licence_number;
         }
-        if (isset($this->user->doc_address)) {
-            $this->form['address'] = $this->user->doc_address;
+        if (isset($this->user->dr_address)) {
+            $this->form['address'] = $this->user->dr_address;
         }
-        if (isset($this->user->doc_order)) {
-            $this->form['order'] = $this->user->doc_order;
+        if (isset($this->user->dr_order)) {
+            $this->form['order'] = $this->user->dr_order;
         }
         if (isset($this->user->active_appointment) &&  $this->user->ban_user != 1) {
             $this->form['active'] =  false;

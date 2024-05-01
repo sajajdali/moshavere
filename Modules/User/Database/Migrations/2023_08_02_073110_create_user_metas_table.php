@@ -17,7 +17,7 @@ return new class extends Migration
                 ->onUpdate('no action')
                 ->onDelete('cascade');
             $table->integer('meta_key');
-            $table->string('meta_value');
+            $table->mediumText('meta_value');
             $table->timestamps();
         });
     }

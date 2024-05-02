@@ -2,12 +2,14 @@
 
 namespace Modules\User\Traits;
 
-use Illuminate\Database\Eloquent\Casts\Attribute;
-use Modules\AppointmentSetting\app\Models\AppointmentSetting;
+use App\Models\Comment;
 use Modules\Place\app\Models\Place;
+use Modules\User\Enum\UserMetaEnum;
 use Modules\Service\app\Models\Service;
 use Modules\Speciality\app\Models\Speciality;
-use Modules\User\Enum\UserMetaEnum;
+use Illuminate\Database\Eloquent\Casts\Attribute;
+use Illuminate\Database\Eloquent\Relations\MorphMany;
+use Modules\AppointmentSetting\app\Models\AppointmentSetting;
 
 //this Trait is return value as a UerMetaEnum not string
 trait UserRelationTrait
@@ -30,5 +32,9 @@ trait UserRelationTrait
     public function services()
     {
         return $this->belongsToMany(Service::class);
+    }
+    public function comments(): MorphMany
+    {
+        return $this->morphMany(Comment::class, 'commentable');
     }
 }

@@ -124,7 +124,7 @@
                                         <tbody>
                                             @foreach ($fetchData['comments'] as $comment)
                                                 <tr>
-                                                    <td><textarea disabled cols="70" rows="2" >{!! nl2br($comment->body) !!}</textarea></td>
+                                                    <td><textarea disabled cols="70" rows="2" > {{$comment->body}}</textarea></td>
                                                     <td>{{ verta($comment->created_at)->format('Y-m-d ساعت H:i') }}</td>
                                                     <td><button class="btn btn-danger delete_confirm_alert"
                                                         data-id="{{ $comment->id }}"

@@ -14,12 +14,13 @@ class TransactionResource extends JsonResource
      */
     public function toArray($request): array
     {
+        $transaction = $this->transaction()->orderByDesc('id')->first();
         return [
-            'id' => $this->transaction()->first()->id,
+            'id' => $transaction->id,
             'user' => UserResource::make($this->user),
-            'status' =>$this->transaction()->first()->status->apiResult(),
-            'payment_for' => $this->transaction()->first()->payment_for ? $this->transaction()->first()->payment_for->apiResult() : null,
-            'paid_by' => $this->transaction()->first()->paid_by ? $this->transaction()->first()->paid_by->apiResult() : null,
+            'status' =>$transaction->status->apiResult(),
+            'payment_for' =>$transaction->payment_for ? $transaction->payment_for->apiResult() : null,
+            'paid_by' => $transaction->paid_by ? $transaction->paid_by->apiResult() : null,
             'appointment' => [
                 'start_time' => substr($this->start_time , 0 , -3),
                 'end_time' => substr($this->end_time, 0 , -3),

@@ -55,5 +55,9 @@ Route::prefix('appointment')->group(function () {
         Route::post('send_message/{appointmentOnline}', [\Modules\Api\Http\Controllers\Appointment\AppointmentApiOnlineController::class, 'sendMessage'])->name('api.send_message');
     });
 });
-// appointment
+
+// transactions
+Route::prefix('transaction')->group(function () {
+    Route::get('list', [\Modules\Api\Http\Controllers\TransactionController::class, 'index']);
+});
 

@@ -6,6 +6,7 @@ use Laravel\Sanctum\HasApiTokens;
 use Modules\AppointmentSetting\app\Models\AppointmentSetting;
 use Modules\AppointmentUser\app\Models\AppointmentUser;
 use Modules\Chat\app\Models\Chat;
+use Modules\Transaction\app\Models\Transaction;
 use Spatie\Permission\Models\Role;
 use Modules\User\Enum\UserMetaEnum;
 use Spatie\Permission\Traits\HasRoles;
@@ -215,6 +216,11 @@ class User extends Authenticatable
     public function chats(): HasMany
     {
         return $this->hasMany(Chat::class);
+    }
+
+    public function transactions(): HasMany
+    {
+        return $this->hasMany(Transaction::class);
     }
 
 }

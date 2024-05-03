@@ -32,6 +32,7 @@ class AppointmentUserPayment extends Component
             $this->message = 'پرداخت شما انجام شده و نوبت شما فعال شد';
             $this->transaction = $this->appointmentUser->transaction()->create([
                 'transaction_code' => Transaction::generateTransactionCode(),
+                'user_id' => $this->appointmentUser->user->id,
                 'paid_by' => TransactionPaidEnum::ONLINE,
                 'status' => TransactionStatusEnum::SUCCESSFUL,
                 'cost' => $this->appointmentUser->details['payment'][AppointmentUser::DETAIL_PAYMENT_PRICE]['int'],

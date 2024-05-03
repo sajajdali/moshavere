@@ -22,4 +22,12 @@ enum TransactionPaymentForEnum : int implements EnumHasNameInterface
             self::BOTH => 'هردو',
         };
     }
+
+    public function apiResult(): array
+    {
+        return [
+            'name' => $this->value,
+            'body' => $this->getName()
+        ];
+    }
 }

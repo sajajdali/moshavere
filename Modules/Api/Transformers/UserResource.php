@@ -17,6 +17,7 @@ class UserResource extends JsonResource
             'avatar' => $this->avatar ?? '',
             'age'=> $this->age() ?? '',
             'national_code' => $this->national_code ?? '',
+            'city' => $this->city ?? '',
             'birth_day' => $this->birthday ? json_decode($this->birthday) : null,
         ];
     }

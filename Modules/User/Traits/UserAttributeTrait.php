@@ -111,6 +111,14 @@ trait UserAttributeTrait
             set: fn ($value) => $this->metas()->updateOrCreate(['meta_key' => UserMetaEnum::SPECIALITY_TYPE, 'meta_value' => $value])
         );
     }
+    public function drBanner(): Attribute
+    {
+        return Attribute::make(
+            get: fn () => $this->getMeta(UserMetaEnum::DR_BANNER)?->meta_value,
+            set: fn ($value) => $this->metas()->updateOrCreate(['meta_key' => UserMetaEnum::DR_BANNER, 'meta_value' => $value])
+        );
+    }
+
     public function drBiography(): Attribute
     {
         return Attribute::make(

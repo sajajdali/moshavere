@@ -28,6 +28,7 @@ enum UserMetaEnum: int implements EnumHasNameInterface
     case ACTIVE_APPOINTMENT = 15;
     case BAN_USER = 16;
     case DR_GALLERY = 17;
+    case DR_BANNER = 21;
 
 
 

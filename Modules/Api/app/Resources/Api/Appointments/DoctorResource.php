@@ -24,6 +24,7 @@ class DoctorResource extends JsonResource
             'licenceNumber' => $this->drLicenceNumber,
             'gallery' => $this->gallery(),
             'address' => $this->drAddress,
+            'banner' => $this->drBanner ?? url('storage/amniri_banner.jpeg'),
         ];
     }
 

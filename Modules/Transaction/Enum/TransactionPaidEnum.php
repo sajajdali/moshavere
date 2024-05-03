@@ -24,4 +24,12 @@ enum TransactionPaidEnum : int  implements EnumHasNameInterface
             default => "",
         } ;
     }
+
+    public function apiResult(): array
+    {
+        return [
+            'name' => $this->value,
+            'body' => $this->getName()
+        ];
+    }
 }

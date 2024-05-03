@@ -85,6 +85,7 @@ class AppointmentUserResource extends JsonResource
             'transaction' => $this->lastTransaction(),
             'payment_status' => $this->details[AppointmentUser::DETAIL_PAYMENT] ?? null,
             'payment_link' => route('appointmentUser.payment', $this),
+            'tracking_url' => $this->shortLink ? $this->shortLink->first()->link_url : null,
             'location_link' => 'https://www.google.com/maps/place/Dr+Mehrnoush+Amiri+Siyavashani/@35.7989335,51.4732843,15z/data=!4m2!3m1!1s0x0:0xd520695f679116d1?sa=X&ved=1t:2428&ictx=111',
             'online' => $this->online()
         ];

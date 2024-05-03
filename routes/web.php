@@ -25,3 +25,7 @@ Route::get('/', function () {
 Route::group(['middleware' => 'throttle:10,1'], function () {
     Route::get('/s/{param}', [ShortLinkController::class, 'index']);
 });
+
+Route::get('/pusher', [\App\Http\Controllers\PusherController::class, 'index']);
+Route::post('/broadcast', [\App\Http\Controllers\PusherController::class , 'broadcast']);
+Route::post('/receive', [\App\Http\Controllers\PusherController::class , 'receive']);

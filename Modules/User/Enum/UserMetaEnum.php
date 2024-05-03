@@ -16,6 +16,8 @@ enum UserMetaEnum: int implements EnumHasNameInterface
     case DISEASES = 7;
     case DOCUMENT_NUMBER = 8;
     case MOBILE = 9;
+    case NATIONAL_CODE = 18;
+    case CITY = 19;
 
      // doctor Enum
     case SPECIALITY_TYPE = 10;
@@ -45,6 +47,8 @@ enum UserMetaEnum: int implements EnumHasNameInterface
             self::BIRTHDAY => 'تاریخ تولد',
             self::DISEASES => 'بیماری ها',
             self::DOCUMENT_NUMBER => 'شماره پرونده',
+            self::NATIONAL_CODE => 'کد ملی',
+            self::CITY => 'شهر',
         };
     }
 }

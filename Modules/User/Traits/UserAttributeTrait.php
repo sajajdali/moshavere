@@ -27,6 +27,26 @@ trait UserAttributeTrait
         );
     }
 
+    public function city(): Attribute
+    {
+        return Attribute::make(
+            get: fn () => $this->getMeta(UserMetaEnum::CITY)?->meta_value,
+            set: fn ($value) => $this->metas()->updateOrCreate(
+                ['meta_key' => UserMetaEnum::CITY, 'meta_value' => $value]
+            )
+        );
+    }
+
+    public function nationalCode(): Attribute
+    {
+        return Attribute::make(
+            get: fn () => $this->getMeta(UserMetaEnum::NATIONAL_CODE)?->meta_value,
+            set: fn ($value) => $this->metas()->updateOrCreate(
+                ['meta_key' => UserMetaEnum::NATIONAL_CODE, 'meta_value' => $value]
+            )
+        );
+    }
+
     public function documentNumber(): Attribute
     {
         return Attribute::make(
@@ -79,7 +99,7 @@ trait UserAttributeTrait
     {
         return Attribute::make(
             get: fn () => $this->getMeta(UserMetaEnum::GENDER)?->meta_value,
-            set: fn ($value) => $this->metas()->create(['meta_key' => UserMetaEnum::GENDER, 'meta_value' => $value])
+            set: fn ($value) => $this->metas()->updateOrCreate(['meta_key' => UserMetaEnum::GENDER, 'meta_value' => $value])
         );
     }
 
@@ -139,7 +159,7 @@ trait UserAttributeTrait
         $operator = UserMetaEnum::BIRTHDAY;
         return Attribute::make(
             get: fn() => $this->getMeta( $operator)?->meta_value,
-            set: fn ($value) => $this->metas()->create(['meta_key' => $operator, 'meta_value' => $value])
+            set: fn ($value) => $this->metas()->updateOrCreate(['meta_key' => $operator, 'meta_value' => $value])
         );
     }
     public function drGallery(): Attribute

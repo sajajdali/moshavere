@@ -2,6 +2,8 @@
 
 namespace Modules\AppointmentUser\Service;
 
+use Modules\Api\Transformers\UserResource;
+use Modules\User\Entities\User;
 use Verta;
 use App\Event;
 use Carbon\Carbon;
@@ -496,14 +498,38 @@ class AppointmentUserService
             ];
         }
 
+        // update user meta
+        if ($userModelAppointment->needToUpdate){
+            if ( $userModelAppointment->userModel->firstName){
+                $userModelAppointment->userModel->user->first_name = $userModelAppointment->userModel->firstName;
+            }
+            if ($userModelAppointment->userModel->lastName){
+                $userModelAppointment->userModel->user->last_name = $userModelAppointment->userModel->lastName;
+            }
+            if ($userModelAppointment->userModel->gender){
+                $userModelAppointment->userModel->user->gender = $userModelAppointment->userModel->gender;
+            }
+            if ($userModelAppointment->userModel->nationalCode){
+                $userModelAppointment->userModel->user->national_code = $userModelAppointment->userModel->nationalCode;
+            }
+            if ($userModelAppointment->userModel->birthday){
+                $userModelAppointment->userModel->user->birthday = json_encode($userModelAppointment->userModel->birthday);
+            }
+            if ($userModelAppointment->userModel->city){
+                $userModelAppointment->userModel->user->city = $userModelAppointment->userModel->city;
+            }
+        }
+
+        $detailDatabaseDB[AppointmentUser::USER_MODEL] = UserResource::make($userModelAppointment->userModel->user);
+
         if ($appointmentData->kind == AppointmentUserKindEnum::IN_PERSION && $appointmentData->appointmentVia == AppointmentVia::SELF) {
             $checkTimeAvailable = $this->isAppointmentTimeAvailable($dateAppointment->toTimeString(), $dateAppointment->copy()->addMinutes($appointmentSetting->time_for_visit)->toTimeString(), $dateAppointment->toDateString(), $appointmentSetting);
             if (!$checkTimeAvailable) {
-                return [
-                    'status' => false,
-                    'message' => 'زمان انتخابی شما توسط شخصی دیگر پر شده است . لطفا یک زمان دیگر انتخاب کنید',
-                    'route' => 'time'
-                ];
+//                return [
+//                    'status' => false,
+//                    'message' => 'زمان انتخابی شما توسط شخصی دیگر پر شده است . لطفا یک زمان دیگر انتخاب کنید',
+//                    'route' => 'time'
+//                ];
             }
         }
 
@@ -613,6 +639,7 @@ class AppointmentUserService
             'detail' => [
                 'tracking_code' => $appointmentUserModel['tracking_code'],
                 'appointment_user_id' => $appointmentUser->id,
+                'tracking_url' => $appointmentUser->shortLink()->first()->link_url,
                 'payment_link' => $paymentLink
             ]
         ];

@@ -48,6 +48,7 @@ Route::prefix('appointment')->group(function () {
     Route::post('store', [\Modules\Api\Http\Controllers\Appointment\AppointmentApiController::class, 'store'])->name('api.appointment.store');
     Route::get('tracking/{appointmentUser}', [\Modules\Api\Http\Controllers\Appointment\AppointmentApiController::class, 'tracking'])->name('api.appointment.tracking');
 
+    Route::get('user_info', [\Modules\Api\Http\Controllers\Appointment\AppointmentApiController::class, 'userInfo'])->name('api.user_info');
     //
     Route::prefix('online')->group(function () {
         Route::get('messages/{appointmentOnline}', [\Modules\Api\Http\Controllers\Appointment\AppointmentApiOnlineController::class, 'messages'])->name('api.messages');

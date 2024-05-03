@@ -14,6 +14,7 @@ use Modules\Api\app\Resources\Api\Appointments\DoctorResource;
 use Modules\Api\app\Resources\Api\PlaceResource;
 use Modules\Api\app\Resources\Api\ServiceResource;
 use Modules\Api\Trait\ApiHandlerTrait;
+use Modules\Api\Transformers\UserResource;
 use Modules\AppointmentSetting\app\Models\AppointmentSetting;
 use Modules\AppointmentUser\app\Models\AppointmentUser;
 use Modules\AppointmentUser\Enum\AppointmentUserKindEnum;
@@ -29,6 +30,15 @@ class AppointmentApiController extends Controller
 {
     use ApiHandlerTrait;
 
+    public function userInfo( ): \Illuminate\Http\JsonResponse
+    {
+
+        $user = auth()->user();
+        return $this->ok([
+            'status' => true,
+            'user' => UserResource::make($user),
+        ]);
+    }
     public function doctorsList(Request $request)
     {
         $query = User::doctors_query();
@@ -224,7 +234,7 @@ class AppointmentApiController extends Controller
         );
 
         // full user model
-        $userModelAppointment = new UserModelAppointment(userModel: $mainUser, forHimself: $foHimself, userSomeoneModel: $someoneModel);
+        $userModelAppointment = new UserModelAppointment(userModel: $mainUser, forHimself: $foHimself, userSomeoneModel: $someoneModel , needToUpdate: true);
 
         $kind = $request->input('kind') == 2 ? AppointmentUserKindEnum::ONLINE : AppointmentUserKindEnum::IN_PERSION;
         // appointment model

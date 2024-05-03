@@ -22,10 +22,12 @@ class TransactionController extends Controller
         //filter
         if (request()->has('filter')) {
             $filter = request()->get('filter');
-            $validStatuses = collect(TransactionStatusEnum::all())->pluck('id')->toArray();
-            $validStatuses = array_filter($validStatuses, function($value) {
-                return $value !== TransactionStatusEnum::ALL->value;
-            });
+            $validStatuses = collect(TransactionStatusEnum::all())
+                ->pluck('id')
+                ->reject(function ($status) {
+                    return $status === TransactionStatusEnum::ALL->value;
+                })
+                ->toArray();
 
             if (in_array($filter, $validStatuses)) {
                 $transactions->whereHas('transaction', function ($query) use ($filter) {
@@ -33,6 +35,8 @@ class TransactionController extends Controller
                 });
             }
         }
+
+
         $transactions = $transactions->paginate();
         return $this->ok(new TransactionPaginateResource($transactions));
     }

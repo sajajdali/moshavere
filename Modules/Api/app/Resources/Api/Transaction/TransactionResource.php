@@ -21,6 +21,7 @@ class TransactionResource extends JsonResource
             'status' =>$transaction->status->apiResult(),
             'payment_for' =>$transaction->payment_for ? $transaction->payment_for->apiResult() : null,
             'paid_by' => $transaction->paid_by ? $transaction->paid_by->apiResult() : null,
+            'transaction_date' => verta($transaction->created_at)->format('l j F Y ساعت H:i دقیه'),
             'appointment' => [
                 'start_time' => substr($this->start_time , 0 , -3),
                 'end_time' => substr($this->end_time, 0 , -3),

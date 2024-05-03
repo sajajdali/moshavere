@@ -15,7 +15,7 @@ class TransactionResource extends JsonResource
     public function toArray($request): array
     {
         return [
-            'id' => $this->id,
+            'id' => $this->transaction()->first()->id,
             'user' => UserResource::make($this->user),
             'status' =>$this->transaction()->first()->status->apiResult(),
             'payment_for' => $this->transaction()->first()->payment_for ? $this->transaction()->first()->payment_for->apiResult() : null,

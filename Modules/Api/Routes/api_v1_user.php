@@ -59,5 +59,6 @@ Route::prefix('appointment')->group(function () {
 // transactions
 Route::prefix('transaction')->group(function () {
     Route::get('list', [\Modules\Api\Http\Controllers\TransactionController::class, 'index']);
+    Route::get('show/{id}', [\Modules\Api\Http\Controllers\TransactionController::class, 'show']);
 });
 

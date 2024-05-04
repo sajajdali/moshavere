@@ -27,5 +27,14 @@ Route::group(['middleware' => 'throttle:10,1'], function () {
 });
 
 Route::get('/pusher', [\App\Http\Controllers\PusherController::class, 'index']);
+Route::get('/pusher-r', [\App\Http\Controllers\PusherController::class, 'indexr']);
 Route::post('/broadcast', [\App\Http\Controllers\PusherController::class , 'broadcast']);
 Route::post('/receive', [\App\Http\Controllers\PusherController::class , 'receive']);
+
+Route::get('pusher-test/{chat}', function ($chat) {
+
+    $chatDetail = \Modules\Chat\app\Models\ChatDetail::find($chat);
+    $message = \Modules\Api\app\Resources\Api\Chat\ChatDetailResource::make($chatDetail);
+    event(new App\Events\PusherBroadcast($message , $chat));
+    return "Event has been sent!";
+});

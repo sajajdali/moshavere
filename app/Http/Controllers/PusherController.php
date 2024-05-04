@@ -11,6 +11,10 @@ class PusherController extends Controller
     {
         return view('pusher.index');
     }
+    public function indexr()
+    {
+        return view('pusher.index_r');
+    }
 
     public function broadcast(Request $request)
     {

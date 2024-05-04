@@ -2,10 +2,12 @@
 
 namespace Modules\Chat\Livewire;
 
+use App\Events\PusherBroadcast;
 use Livewire\Component;
 use Livewire\Attributes\On;
 use Livewire\Attributes\Url;
 use Livewire\Attributes\Computed;
+use Modules\Api\app\Resources\Api\Chat\ChatDetailResource;
 use Modules\Chat\app\Models\Chat;
 use Illuminate\Support\Collection;
 use Modules\Chat\Enum\ChatStatusEnum;
@@ -93,7 +95,7 @@ class ChatView extends Component
             $this->dispatch('error', message: 'لطفا گفت و گوی مد نظر خود را انتخاب کنید');
             return;
         }
-        $this->chat?->chatDetails()->create([
+        $chatDetail = $this->chat?->chatDetails()->create([
             'content' => $this->chatMessage,
             'type' => ChatDetailTypeEnum::MESSAGE,
             'user_id' => auth()->id(),
@@ -104,6 +106,11 @@ class ChatView extends Component
         ]);
         //clear input
         $this->chatMessage = '';
+
+        // send pusher event
+        $message = ChatDetailResource::make($chatDetail);
+        event(new PusherBroadcast($message , $this->chat->id));
+
         AdminAnswerChatEvent::dispatch($this->chat);
     }
 

@@ -14,16 +14,18 @@ class PusherBroadcast implements ShouldBroadcast
 {
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
-    public string $message;
+    public $message;
+    public $chatId;
 
-    public function __construct(string $message)
+    public function __construct($message, $chatId)
     {
         $this->message = $message;
+        $this->chatId = $chatId;
     }
 
-    public function broadcastOn(): array
+    public function broadcastOn()
     {
-        return ['public'];
+        return new PrivateChannel('chat.' . $this->chatId);
     }
 
     public function broadcastAs(): string

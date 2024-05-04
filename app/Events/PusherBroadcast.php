@@ -25,7 +25,7 @@ class PusherBroadcast implements ShouldBroadcast
 
     public function broadcastOn()
     {
-        return new PrivateChannel('chat.' . $this->chatId);
+        return new Channel('chat.' . $this->chatId);
     }
 
     public function broadcastAs(): string

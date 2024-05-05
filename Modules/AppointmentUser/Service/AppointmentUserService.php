@@ -118,6 +118,9 @@ class AppointmentUserService
             ->orderBy('start_time')
             ->get();
 
+        // Has set a limit on the number that can be received for 1 day
+        $maxAppointmentEachDay = (isset($appointmentSetting->detail[AppointmentSetting::MAX_AVAILABLE_APPOINTMENT_EACH_DAY]) && (int) $appointmentSetting->detail[AppointmentSetting::MAX_AVAILABLE_APPOINTMENT_EACH_DAY] > 0) ? $appointmentSetting->detail[AppointmentSetting::MAX_AVAILABLE_APPOINTMENT_EACH_DAY] : null;
+
         $appointments = $appointments->sortByDesc(function ($appointment) {
             // If there's no appointment with the same start_time, it should have the highest priority
             $maxEndTime = AppointmentUser::where('start_time', $appointment->start_time)
@@ -141,6 +144,7 @@ class AppointmentUserService
         // Iterate over the week starting from today
         $firstDayInLog = $firstEmptyDay = $lastDayInLog = null;
         for ($currentDate = $startDate; $currentDate->lte($endDate); $currentDate->addDay()) {
+            $numberAppointmentsPerDay = 0;
             $year = verta($currentDate)->year;
             $month = verta($currentDate)->month;
             $day = verta($currentDate)->day;
@@ -181,11 +185,11 @@ class AppointmentUserService
                 //list appointments
                 foreach ($appointments as $appointment) {
                     if (Carbon::parse($appointment->date_visit)->isSameDay($currentDate)) {
-
                         // remove item in collection
                         $appointments = $appointments->filter(function ($app) use ($appointment) {
                             return $appointment->id != $app->id; // adjust condition accordingly
                         });
+                        $numberAppointmentsPerDay++;
 
                         $dayOutput['times'][] = [
                             'status' => false,
@@ -273,13 +277,24 @@ class AppointmentUserService
 
                             else {
 
+                                $thisStatus = !$currentDate->isPast();
+
+                                // check max appointment per day
+                                if ($maxAppointmentEachDay !== null && (int) $maxAppointmentEachDay > 0){
+                                    if ($numberAppointmentsPerDay  == (int) $maxAppointmentEachDay){
+                                        $thisStatus = false;
+                                    }
+                                }
+
                                 $dayOutput['times'][] = [
-                                    'status' => !$currentDate->isPast(),
+                                    'status' => $thisStatus,
                                     'timestamp' => $currentDate->copy()->setTime($startTime->hour, $startTime->minute)->timestamp,
                                     'from' => $startTime->toTimeString(),
                                     'until' => $until->toTimeString(),
                                 ];
-                                $dayOutput['empty_appoints']++;
+                                if ($thisStatus){
+                                    $dayOutput['empty_appoints']++;
+                                }
                                 $startTime = $until->subMinutes($timeForVisit);
 
                                 // set first empty day in log
@@ -311,6 +326,7 @@ class AppointmentUserService
                                         ];
                                     } else {
 
+                                        // available appointment
                                         $dayOutput['times'][] = [
                                             'status' => !$currentDate->isPast(),
                                             'timestamp' => $startDate->copy()->timestamp,

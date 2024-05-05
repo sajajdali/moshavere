@@ -187,7 +187,7 @@ class AppointmentUserList extends Component
                 $query->when($condition, $callback);
             }
         }
-        $appointments =  $query->paginate(10);
+        $appointments =  $query->orderByDesc('id')->paginate(10);
         return $appointments;
     }
     public function ExportData()

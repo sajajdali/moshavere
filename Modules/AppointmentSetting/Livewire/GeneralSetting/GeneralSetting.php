@@ -130,7 +130,7 @@ class GeneralSetting extends Component
     public function removeCounter($day)
     {
         $this->counter[$day] = $this->counter[$day] - 1;
-        if (isset($this->form['timeFrame'][$day]) && ($this->counter[$day] +1 ) == count($this->form['timeFrame'][$day]) ) {
+        if (isset($this->form['timeFrame'][$day]) && ($this->counter[$day] + 1) == count($this->form['timeFrame'][$day])) {
             array_pop($this->form['timeFrame'][$day]);
         }
         $this->render();
@@ -181,8 +181,6 @@ class GeneralSetting extends Component
             'form.visitTime'                      => 'required',
             'form.minDayAvaialbe'                 => 'required|integer',
             'form.maxDayAvaialbe'                 => 'required|integer',
-            'form.maxAvailabeAppointment.eachDay' => 'required_if:form.maxAvailabeAppointment.status,true',
-            'form.maxAvailabeAppointment.ForSecretery'  => 'required_if:form.maxAvailabeAppointment.status,true',
             'form.cancel.day'                     => 'required_if:form.cancel.status,true',
             'form.endAppointment.date'            => 'required_if:form.endAppointment.status,true',
             'form.segments.value'                 => 'required_if:form.segments.status,true',
@@ -449,6 +447,9 @@ class GeneralSetting extends Component
         }
         if (isset($apSet->detail[AppointmentSetting::PAYMENT][AppointmentSetting::PRICE])) {
             $this->form['onlinePayment']['Price'] = $apSet->detail[AppointmentSetting::PAYMENT][AppointmentSetting::PRICE];
+        }
+        if (isset($apSet->detail[AppointmentSetting::MAX_AVAILABLE_APPOINTMENT_FOR_SECRETERY])) {
+            $this->form['maxAvailabeAppointment']['ForSecretery'] = $apSet->detail[AppointmentSetting::MAX_AVAILABLE_APPOINTMENT_FOR_SECRETERY];
         }
         if (!$apSet->segments->isEmpty()) {
             $this->form['segments'][AppointmentSetting::STATUS] = true;

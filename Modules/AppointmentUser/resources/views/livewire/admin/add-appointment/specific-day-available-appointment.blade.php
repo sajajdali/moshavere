@@ -10,7 +10,7 @@
         </div>
         <div class="mt-2">
             <h5><mark class="p-2">
-                ثبت نوبت در روز {{verta($fetchData['selectedDate'])->format('d F Y')}}</mark></h5>
+                    ثبت نوبت در روز {{ verta($fetchData['selectedDate'])->format('d F Y') }}</mark></h5>
         </div>
         <button id="changeDocButton" class="btn btn-primary mt-3 mt-sm-0" type="button" class="btn btn-primary"
             data-bs-toggle="modal" data-bs-target="#changeDocmodal">
@@ -262,11 +262,11 @@
                     addJs();
                 }, 500);
             });
-            @if ($fetchData['showRegisterModal'])
+            if({{$fetchData['showRegisterModal'] }}){
                 setTimeout(() => {
                     setAppModalInst.show();
                 }, 1000);
-            @endif
+            };
             Livewire.on('closeModal', function() {
                 modal.hide();
                 setAppModalInst.hide();

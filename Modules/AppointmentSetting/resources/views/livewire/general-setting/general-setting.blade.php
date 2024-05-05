@@ -173,7 +173,7 @@
         <div class="card-header border-bottom d-flex justify-content-between">
             <h3>امکان دریافت حداکثر <span class="text-primary">دریافت نوبت</span></h3>
             <div class="main-toggle-group d-sm-flex align-items-center ms-0">
-                <div class="toggle toggle-lg toggle-primary my-1 @if (isset($form['maxAvailabeAppointment']['eachDay']) && isset($form['maxAvailabeAppointment']['totall'])) on @else off @endif customCheckbox"
+                <div class="toggle toggle-lg toggle-primary my-1 @if (isset($form['maxAvailabeAppointment']['eachDay']) || isset($form['maxAvailabeAppointment']['ForSecretery'])) on @else off @endif customCheckbox"
                     data-id="maxAvailabeAppointment.status" wire:ignore.self data-bs-toggle="collapse"
                     href="#maximumAppointmentCanBePerchased" role="button" aria-expanded="false"
                     aria-controls="maximumAppointmentCanBePerchased">
@@ -181,7 +181,7 @@
                 </div>
             </div>
         </div>
-        <div class="collapse @if (isset($form['maxAvailabeAppointment']['eachDay']) && isset($form['maxAvailabeAppointment']['totall'])) show @endif " id="maximumAppointmentCanBePerchased"
+        <div class="collapse @if (isset($form['maxAvailabeAppointment']['eachDay']) || isset($form['maxAvailabeAppointment']['ForSecretery'])) show @endif " id="maximumAppointmentCanBePerchased"
             wire:ignore.self>
             <div class="card-body">
                 @error('form.maxAvailabeAppointment.*')

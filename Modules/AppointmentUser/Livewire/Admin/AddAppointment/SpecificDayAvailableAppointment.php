@@ -27,7 +27,7 @@ class SpecificDayAvailableAppointment extends Component
 {
     //this propery shouldNOT exist in the final product
     public $tempMessage = null;
-    public array $fetchData = ['showRegisterModal' => false];
+    public array $fetchData = ['showRegisterModal' => 'false'];
     public array $form = [];
     public array $edited = ['status' => false];
     public function updated($property)
@@ -60,12 +60,24 @@ class SpecificDayAvailableAppointment extends Component
     }
     public function nextDay()
     {
-        $privous_array = $this->fetchData['listOfAppointment'][($this->fetchData['showingAppointmentIndex'] + 1)];
-        $privous_array_date = Carbon::parse($privous_array['date']);
-        $this->fetchData['selectedDate'] = $privous_array_date;
+        if(array_key_exists(($this->fetchData['showingAppointmentIndex'] + 1),$this->fetchData['listOfAppointment'])){
+            //check if selected date exist in list of appointment
+            $next_array = $this->fetchData['listOfAppointment'][($this->fetchData['showingAppointmentIndex'] + 1)];
+        }else {
+            // create new list of appointment based of selected date
+             $this->RecreatelistOfAppointment();
+        }
+        $next_array_array_date = Carbon::parse($next_array['date']);
+        $this->fetchData['selectedDate'] = $next_array_array_date;
         $this->dispatch('loadJs', true);
         $this->dateHasBeenChange();
         $this->render();
+    }
+    public function RecreatelistOfAppointment() {
+        $app = $this->fetchData['appointmentSetting'];
+        $newListTimes = app('AppointmentUserService')
+        ->listAppointments($app, ['specialDays' => $this->fetchData['selectedDate']->toDateString()]);
+        dd($this->listOfAppointment($newListTimes)[0]);
     }
     #[Computed]
     public function ShowListOfAppointmentForSpecificDay()
@@ -150,7 +162,7 @@ class SpecificDayAvailableAppointment extends Component
     public function lunchAppModal()
     {
 
-        $this->fetchData['showRegisterModal'] = true;
+        $this->fetchData['showRegisterModal'] = 'true';
     }
     public function changeAppointmentType($appId)
     {

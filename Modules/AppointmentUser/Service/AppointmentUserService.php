@@ -97,13 +97,16 @@ class AppointmentUserService
                 $specialDaySelected = true;
                 $startDate = Carbon::parse($details['specialDay'])->subDays(20);
                 $endDate = $startDate->copy()->addDays($details['specialDay_endDate'] ?? 60); // Adjust the number of days as needed
+            } elseif (array_key_exists('specialDays', $details)) {
+                $startDate = Carbon::parse($details['specialDays'])->subDays(20);
+                $endDate = $startDate->copy()->addDays($appointmentSetting->max_day_active ?? 90); // Adjust the number of days as needed
             } elseif (array_key_exists('completeDays', $details)) {
                 $startDate = Carbon::parse($details['specialDay']);
                 $endDate = $startDate->copy()->addDays($details['numberDays']);
             }
         }
 
-        if (!$specialDaySelected) {
+        if (!$specialDaySelected && !isset($startDate)) {
             $startDate = Carbon::today()->subDays(20);
             $endDate = Carbon::today()->addDays($appointmentSetting->max_day_active ?? 90); // Adjust the number of days as needed
         }
@@ -132,7 +135,7 @@ class AppointmentUserService
         });
 
         // Fetch appointment settings for the doctor
-//        $appointmentSettings = AppointmentSetting::where('user_id', $doctorId)->first();
+        //        $appointmentSettings = AppointmentSetting::where('user_id', $doctorId)->first();
         $appointmentSettings = $appointmentSetting;
 
         // List of attendance times
@@ -280,8 +283,8 @@ class AppointmentUserService
                                 $thisStatus = !$currentDate->isPast();
 
                                 // check max appointment per day
-                                if ($maxAppointmentEachDay !== null && (int) $maxAppointmentEachDay > 0){
-                                    if ($numberAppointmentsPerDay  == (int) $maxAppointmentEachDay){
+                                if ($maxAppointmentEachDay !== null && (int) $maxAppointmentEachDay > 0) {
+                                    if ($numberAppointmentsPerDay  == (int) $maxAppointmentEachDay) {
                                         $thisStatus = false;
                                     }
                                 }
@@ -292,7 +295,7 @@ class AppointmentUserService
                                     'from' => $startTime->toTimeString(),
                                     'until' => $until->toTimeString(),
                                 ];
-                                if ($thisStatus){
+                                if ($thisStatus) {
                                     $dayOutput['empty_appoints']++;
                                 }
                                 $startTime = $until->subMinutes($timeForVisit);
@@ -515,23 +518,23 @@ class AppointmentUserService
         }
 
         // update user meta
-        if ($userModelAppointment->needToUpdate){
-            if ( $userModelAppointment->userModel->firstName){
+        if ($userModelAppointment->needToUpdate) {
+            if ($userModelAppointment->userModel->firstName) {
                 $userModelAppointment->userModel->user->first_name = $userModelAppointment->userModel->firstName;
             }
-            if ($userModelAppointment->userModel->lastName){
+            if ($userModelAppointment->userModel->lastName) {
                 $userModelAppointment->userModel->user->last_name = $userModelAppointment->userModel->lastName;
             }
-            if ($userModelAppointment->userModel->gender){
+            if ($userModelAppointment->userModel->gender) {
                 $userModelAppointment->userModel->user->gender = $userModelAppointment->userModel->gender;
             }
-            if ($userModelAppointment->userModel->nationalCode){
+            if ($userModelAppointment->userModel->nationalCode) {
                 $userModelAppointment->userModel->user->national_code = $userModelAppointment->userModel->nationalCode;
             }
-            if ($userModelAppointment->userModel->birthday){
+            if ($userModelAppointment->userModel->birthday) {
                 $userModelAppointment->userModel->user->birthday = json_encode($userModelAppointment->userModel->birthday);
             }
-            if ($userModelAppointment->userModel->city){
+            if ($userModelAppointment->userModel->city) {
                 $userModelAppointment->userModel->user->city = $userModelAppointment->userModel->city;
             }
         }
@@ -541,11 +544,11 @@ class AppointmentUserService
         if ($appointmentData->kind == AppointmentUserKindEnum::IN_PERSION && $appointmentData->appointmentVia == AppointmentVia::SELF) {
             $checkTimeAvailable = $this->isAppointmentTimeAvailable($dateAppointment->toTimeString(), $dateAppointment->copy()->addMinutes($appointmentSetting->time_for_visit)->toTimeString(), $dateAppointment->toDateString(), $appointmentSetting);
             if (!$checkTimeAvailable) {
-//                return [
-//                    'status' => false,
-//                    'message' => 'زمان انتخابی شما توسط شخصی دیگر پر شده است . لطفا یک زمان دیگر انتخاب کنید',
-//                    'route' => 'time'
-//                ];
+                //                return [
+                //                    'status' => false,
+                //                    'message' => 'زمان انتخابی شما توسط شخصی دیگر پر شده است . لطفا یک زمان دیگر انتخاب کنید',
+                //                    'route' => 'time'
+                //                ];
             }
         }
 

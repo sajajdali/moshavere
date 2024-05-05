@@ -96,7 +96,7 @@
     <!-- End PAGE -->
 </div>
 @push('scripts')
-    <script src="https://www.google.com/recaptcha/api.js?render={{ config('app.recaptcha.site_key') }}"></script>
+    {{-- <script src="https://www.google.com/recaptcha/api.js?render={{ config('app.recaptcha.site_key') }}"></script>
 
     <script>
         function resetCaptcha() {
@@ -115,5 +115,5 @@
         $(document).ready(function () {
             resetCaptcha();
         });
-    </script>
+    </script> --}}
 @endpush

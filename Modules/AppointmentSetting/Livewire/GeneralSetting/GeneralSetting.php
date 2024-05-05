@@ -201,6 +201,7 @@ class GeneralSetting extends Component
             ],
             'form.monitoring.hour' => 'required_if:form.monitoring.status,true',
             'form.startAppointment.date' => 'required_if:form.startAppointment.status,true',
+            'form.startAppointment.time' => 'required_if:form.startAppointment.status,true',
         ];
         $validateSpecialDate = $this->validateSpecialdate();
         return array_merge($dayRules,  $rules, $validateSpecialDate);
@@ -267,6 +268,7 @@ class GeneralSetting extends Component
         if (isset($this->form['startAppointment']['status'])  && $this->form['startAppointment']['status'] == false) {
             unset($this->form['startAppointment']['status']);
             unset($this->form['startAppointment']['date']);
+            unset($this->form['startAppointment']['time']);
         }
     }
     public function saveSetting()
@@ -274,8 +276,8 @@ class GeneralSetting extends Component
         //if check box for each section is turned off , delete the inside the boxes
         $this->checkForUnsetTheCheckBoxes();
         $this->validate();
-        $endAppointmentTime =  isset($this->form['endAppointment']['date']) ? Verta::parse($this->form['endAppointment']['date'])->toCarbon() : null;
-        $startAppointmentTime =  isset($this->form['startAppointment']['date']) ? Verta::parse($this->form['startAppointment']['date'])->toCarbon() : null;
+        $endAppointmentTime   =  isset($this->form['endAppointment']['date']) ? Verta::parse($this->form['endAppointment']['date'])->toCarbon() : null;
+        $startAppointmentTime =  isset($this->form['startAppointment']['date']) ? Verta::parse($this->form['startAppointment']['date'])->toCarbon()->setTime(substr($this->form['startAppointment']['time'],0,2,) ,substr($this->form['startAppointment']['time'],3,2)) : null;
         $detail = [
             AppointmentSetting::VISIT_TYPE_INPERSON                  => isset($this->form['visitType']['inPerson']) ? $this->form['visitType']['inPerson'] : null,
             AppointmentSetting::VISIT_TYPE_VOIP                      => isset($this->form['visitType']['voip']) ? $this->form['visitType']['voip'] : null,
@@ -431,6 +433,8 @@ class GeneralSetting extends Component
         }
         if (isset($apSet->first_day_active)) {
             $this->form['startAppointment']['date'] = verta($apSet->first_day_active)->format('Y/m/d');
+            $this->form['startAppointment']['time'] = verta($apSet->first_day_active)->format('H:i');
+            $this->form['startAppointment']['status'] = true;
         }
         if (isset($apSet->active_payment)) {
             $this->form['onlinePayment']['status'] = $apSet->active_payment;

@@ -45,39 +45,54 @@ class SpecificDayAvailableAppointment extends Component
     {
         // if date has been change , this functio would be call
         $this->fetchData['selectedDate']      =  Verta::parse($this->form['changeDate'])->tocarbon();
+        $start_date_in_list = carbon::parse($this->fetchData['listOfAppointment'][0]['date']);
+        $end_date_in_list = carbon::parse($this->fetchData['listOfAppointment'][count($this->fetchData['listOfAppointment']) - 1]['date']);
+        if ($this->fetchData['selectedDate']->gt($start_date_in_list) && $this->fetchData['selectedDate']->lte($end_date_in_list)) {
+        } else {
+            $this->RecreatelistOfAppointment();
+        }
+        // array_column($this->fetchData['listOfAppointment'] , 'date')
         $this->dispatch('loadJs', true);
         $this->dateHasBeenChange();
         $this->render();
     }
     public function previousDay()
     {
-        $privous_array = $this->fetchData['listOfAppointment'][($this->fetchData['showingAppointmentIndex'] - 1)];
-        $privous_array_date = Carbon::parse($privous_array['date']);
-        $this->fetchData['selectedDate'] = $privous_array_date;
+        if (isset($this->fetchData['showingAppointmentIndex']) && !array_key_exists(($this->fetchData['showingAppointmentIndex'] - 1), $this->fetchData['listOfAppointment'])) {
+            $this->RecreatelistOfAppointment();
+        } else {
+            $privous_array = $this->fetchData['listOfAppointment'][($this->fetchData['showingAppointmentIndex'] - 1)];
+            $privous_array_date = Carbon::parse($privous_array['date']);
+            $this->fetchData['selectedDate'] = $privous_array_date;
+        }
         $this->dispatch('loadJs', true);
         $this->dateHasBeenChange();
         $this->render();
     }
     public function nextDay()
     {
-        if(array_key_exists(($this->fetchData['showingAppointmentIndex'] + 1),$this->fetchData['listOfAppointment'])){
-            //check if selected date exist in list of appointment
+        if (isset($this->fetchData['showingAppointmentIndex']) && !array_key_exists(($this->fetchData['showingAppointmentIndex'] + 1), $this->fetchData['listOfAppointment'])) {
+            $this->RecreatelistOfAppointment();
+        } else {
             $next_array = $this->fetchData['listOfAppointment'][($this->fetchData['showingAppointmentIndex'] + 1)];
-        }else {
-            // create new list of appointment based of selected date
-             $this->RecreatelistOfAppointment();
+            $next_array_array_date = Carbon::parse($next_array['date']);
+            $this->fetchData['selectedDate'] = $next_array_array_date;
         }
-        $next_array_array_date = Carbon::parse($next_array['date']);
-        $this->fetchData['selectedDate'] = $next_array_array_date;
         $this->dispatch('loadJs', true);
         $this->dateHasBeenChange();
         $this->render();
     }
-    public function RecreatelistOfAppointment() {
+    public function RecreatelistOfAppointment()
+    {
         $app = $this->fetchData['appointmentSetting'];
         $newListTimes = app('AppointmentUserService')
-        ->listAppointments($app, ['specialDays' => $this->fetchData['selectedDate']->toDateString()]);
-        dd($this->listOfAppointment($newListTimes)[0]);
+            ->listAppointments($app, ['specialDays' => $this->fetchData['selectedDate']->toDateString()]);
+        $this->fetchData['listOfAppointment'] =  $this->listOfAppointment($newListTimes);
+        foreach ($this->fetchData['listOfAppointment'] as $index => $avaiableTimes) {
+            if ($avaiableTimes['date'] == $this->fetchData['selectedDate']->format('Y-m-d')) {
+                $this->fetchData['showingAppointmentIndex'] = $index;
+            }
+        }
     }
     #[Computed]
     public function ShowListOfAppointmentForSpecificDay()
@@ -88,10 +103,13 @@ class SpecificDayAvailableAppointment extends Component
                 return $avaiableTimes['times'];
             }
         }
+        if (!isset($this->fetchData['showingAppointmentIndex'])) {
+            $this->fetchData['showingAppointmentIndex'] = 5;
+        }
         // when selected date is not exist in log date range
-        $app = $this->fetchData['appointmentSetting'];
-        $newListTimes = app('AppointmentUserService')->listAppointments($app, ['specialDay' => $this->fetchData['selectedDate']->toDateString()]);
-        return $this->listOfAppointment($newListTimes)[0]['times'];
+        // $app = $this->fetchData['appointmentSetting'];
+        // $newListTimes = app('AppointmentUserService')->listAppointments($app, ['specialDay' => $this->fetchData['selectedDate']->toDateString()]);
+        // return $this->listOfAppointment($newListTimes)[0]['times'];
     }
     private function listOfAppointment($listOfAppointment)
     {
@@ -101,7 +119,7 @@ class SpecificDayAvailableAppointment extends Component
         $isDay   = Carbon::now()->format('Y-m-d');
         $result = [];
         $temPResult = [];
-        if(isset($listOfAppointment['data'])) {
+        if (isset($listOfAppointment['data'])) {
             foreach ($listOfAppointment['data'] as $yeay => $day) {
                 foreach ($day as $month => $appointments) {
                     foreach ($appointments as $day => $appointment) {
@@ -127,13 +145,16 @@ class SpecificDayAvailableAppointment extends Component
                                 ];
                             }
                         }
-
-                        if (isset($temPResult)) {
-                            $result[] = [
-                                'date' => $dayNumber,
-                                'times' => $temPResult,
-                                'is_active' => $isDay == $dayNumber,
-                            ];
+                        if (empty($temPResult)) {
+                            continue;
+                        } else {
+                            if (isset($temPResult)) {
+                                $result[] = [
+                                    'date' => $dayNumber,
+                                    'times' => $temPResult,
+                                    'is_active' => $isDay == $dayNumber,
+                                ];
+                            }
                         }
                         unset($temPResult);
                     }
@@ -151,7 +172,7 @@ class SpecificDayAvailableAppointment extends Component
             return app('AppointmentUserService')->listAppointments($app);
         });
         // dd($this->fetchData['RawlistOfAppointment']);
-        $this->fetchData['listOfAppointment'] = $this->listOfAppointment($this->fetchData['RawlistOfAppointment']);;
+        $this->fetchData['listOfAppointment'] = $this->listOfAppointment($this->fetchData['RawlistOfAppointment']);
     }
     public function passTimeToRegisterAppointmentModal($from, $until)
     {

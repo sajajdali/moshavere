@@ -210,56 +210,45 @@
                             </form>
                         </div>
                     </div>
-                    {{-- filter tab --}}
-                    <div class="tab-menu-heading border-0">
-                        <div class="tabs-menu">
-                            <ul class="nav panel-tabs" wire:ignore>
-                                <li><a href="#ChatList" class="me-2 active mb-2" wire:click="seenStatus({{Modules\AppointmentUser\Enum\AppointmentOnlineMessageSeenEnum::UNSEEN}})"
-                                        data-bs-toggle="tab">پیام های
-                                        پاسخ داده نشده</a>
-                                </li>
-                                <li><a href="#ChatList" class="me-2 mb-2" wire:click="seenStatus({{Modules\AppointmentUser\Enum\AppointmentOnlineMessageSeenEnum::SEEN}})"
-                                        data-bs-toggle="tab">پیام های پاسخ
-                                        داده شده</a></li>
-                            </ul>
-                        </div>
-                    </div>
                     {{-- chats --}}
-                    <div class="tab-content main-chat-list flex-2" wire:loading.class='opacity-50'>
-                        <div class="tab-pane active" id="ChatList">
-                            <div class="main-chat-list tab-pane">
-                                @foreach ($this->handleSearch() as $OnlineApp)
-                                    <a class="media new"
-                                        href="{{ route('admin.appointment_user.message.detail', ['onlineAppId' => $OnlineApp->id]) }}">
-                                        <div class="main-img-user">
-                                            <img alt="" src="{{ $OnlineApp->user->avatar }}">
-                                            @php
-                                                $badge = $OnlineApp->messages()->where('type',1)->where('seen',Modules\AppointmentUser\Enum\AppointmentOnlineMessageSeenEnum::UNSEEN)->count() ;
-                                            @endphp
-                                            @if ($badge > 0)
-                                            <span>{{$badge}}</span>
-                                            @endif
+                    <div class="main-chat-list tab-pane mt-5">
+                        @foreach ($this->handleSearch() as $OnlineApp)
+                            <a class="media new"
+                                href="{{ route('admin.appointment_user.message.detail', ['onlineAppId' => $OnlineApp->id]) }}">
+                                <div class="main-img-user">
+                                    <img alt="" src="{{ $OnlineApp->user->avatar }}">
+                                    @php
+                                        $badge = $OnlineApp
+                                            ->messages()
+                                            ->where('type', 1)
+                                            ->where(
+                                                'seen',
+                                                Modules\AppointmentUser\Enum\AppointmentOnlineMessageSeenEnum::UNSEEN,
+                                            )
+                                            ->count();
+                                    @endphp
+                                    @if ($badge > 0)
+                                        <span>{{ $badge }}</span>
+                                    @endif
+                                </div>
+                                <div class="media-body">
+                                    <div class="media-contact-name ">
+                                        <div class="d-flex align-items-center">
+                                            <span>{{ $OnlineApp->user->fullName }} </span>
+                                            {!! $OnlineApp->status->getMessageDetailBadge() !!}
                                         </div>
-                                        <div class="media-body">
-                                            <div class="media-contact-name ">
-                                                <div class="d-flex align-items-center">
-                                                    <span>{{ $OnlineApp->user->fullName }} </span>
-                                                    {!!  $OnlineApp->status->getMessageDetailBadge() !!}
-                                                </div>
-                                                <span>{{ verta($OnlineApp->messages->last()->updated_at)->diffDays() }}
-                                                    روز پیش</span>
-                                            </div>
-                                            @if ($OnlineApp->messages?->last()->body != null)
-                                                <p>{{ strip_tags(mb_substr($OnlineApp->messages->last()->body, 0, 50, 'UTF-8'), 'string,br') }}
-                                                </p>
-                                            @endif
-                                        </div>
-                                    </a>
-                                @endforeach
-                            </div>
-                            <!-- main-chat-list -->
-                        </div>
+                                        <span>{{ verta($OnlineApp->messages->last()->updated_at)->diffDays() }}
+                                            روز پیش</span>
+                                    </div>
+                                    @if ($OnlineApp->messages?->last()->body != null)
+                                        <p>{{ strip_tags(mb_substr($OnlineApp->messages->last()->body, 0, 50, 'UTF-8'), 'string,br') }}
+                                        </p>
+                                    @endif
+                                </div>
+                            </a>
+                        @endforeach
                     </div>
+                    <!-- main-chat-list -->
                 </div>
             </div>
         </div>

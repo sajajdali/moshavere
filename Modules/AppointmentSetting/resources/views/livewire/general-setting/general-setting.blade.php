@@ -278,41 +278,6 @@
     <div class="card @error('form.segments.value') border border-danger @enderror">
         @include('appointmentsetting::components.generalsetting.segments')
     </div>
-    {{-- start Date time  --}}
-    <div class="card  @error('form.startAppointment.date') border border-danger @enderror">
-        <div class="card-header border-bottom d-flex justify-content-between">
-            <h3> تعیین تاریخ شروع نوبت دهی </h3>
-            <div class="main-toggle-group d-sm-flex align-items-center ms-0">
-                <div class="toggle toggle-lg toggle-primary my-1 customCheckbox @if (isset($form['startAppointment']['date'])) on @else off @endif"
-                    data-id="startAppointment.status" wire:ignore.self data-bs-toggle="collapse"
-                    href="#startTimecollaps" role="button" aria-expanded="false" aria-controls="startTimecollaps">
-                    <span></span>
-                </div>
-            </div>
-        </div>
-        <div class="card-body collapse @if (isset($form['startAppointment']['date'])) show @endif " id="startTimecollaps"
-            wire:ignore.self>
-            {{-- section --}}
-            @error('form.startAppointment.date')
-                <div class="alert alert-danger" role="alert">
-                    <p class="text-danger"> لطفا تاریخ را انتخاب کنید!!
-                    </p>
-                </div>
-            @enderror
-            <div class="row">
-                <div class="col-md-3 pt-2">
-                    <label class="text-primary" for="basic-url">انتخاب تاریخ:</label>
-                </div>
-                <div class="col-md-9">
-                    <div class="input-group mb-3">
-                        <input type="text" wire:model='form.startAppointment.date'
-                            class="form-control @error('form.startAppointment.date') is-invalid @enderror"
-                            id="startDatePicker">
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
     {{-- end Date time  --}}
     <div class="card  @error('form.endAppointment.date') border border-danger @enderror">
         <div class="card-header border-bottom d-flex justify-content-between">
@@ -424,7 +389,8 @@
                                     <option label="انتخاب کنید..."></option>
                                     <option @if (isset($form['onlinePayment']['notPayingStatus']) && $form['onlinePayment']['notPayingStatus'] == 'submit') selected @endif value="submit">نوبت ثبت
                                         شود</option>
-                                    <option  @if (isset($form['onlinePayment']['notPayingStatus']) && $form['onlinePayment']['notPayingStatus'] == 'dontSubmit') selected @endif  value="dontSubmit">نوبت ثبت نشود</option>
+                                    <option @if (isset($form['onlinePayment']['notPayingStatus']) && $form['onlinePayment']['notPayingStatus'] == 'dontSubmit') selected @endif value="dontSubmit">نوبت
+                                        ثبت نشود</option>
                                 </select>
                             </div>
                         </div>
@@ -524,6 +490,58 @@
                             صورت فعال بودن پرداخت آنلاین این زمان را وارد کنید)
                         </p>
                     </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {{-- start Date time  --}}
+    <div class="card @if($errors->has('form.startAppointment.date') || $errors->has('form.startAppointment.time')) border border-danger @endif">
+        <div class="card-header border-bottom d-flex justify-content-between">
+            <h3> تعیین تاریخ شروع نوبت دهی </h3>
+            <div class="main-toggle-group d-sm-flex align-items-center ms-0">
+                <div class="toggle toggle-lg toggle-primary my-1 customCheckbox @if (isset($form['startAppointment']['date'])) on @else off @endif"
+                    data-id="startAppointment.status" wire:ignore.self data-bs-toggle="collapse"
+                    href="#startTimecollaps" role="button" aria-expanded="false" aria-controls="startTimecollaps">
+                    <span></span>
+                </div>
+            </div>
+        </div>
+        <div class="card-body collapse @if (isset($form['startAppointment']['date'])) show @endif " id="startTimecollaps"
+            wire:ignore.self>
+            {{-- section --}}
+            @if($errors->has('form.startAppointment.date','form.startAppointment.time'))
+                <div class="alert alert-danger" role="alert">
+                    <p class="text-danger"> لطفا تاریخ و ساعت  را انتخاب کنید!!
+                    </p>
+                </div>
+            @endif
+            <div class="row">
+                <div class="col-md-3 pt-2">
+                    <label class="text-primary" for="basic-url">انتخاب تاریخ:</label>
+                </div>
+                <div class="col-md-9">
+                    <div class="input-group mb-3">
+                        <input type="text" wire:model='form.startAppointment.date'
+                            class="form-control @error('form.startAppointment.date') is-invalid @enderror"
+                            id="startDatePicker">
+                    </div>
+                </div>
+                <div class="col-md-3 pt-2">
+                    <label class="text-primary" for="basic-url">انتخاب ساعت:</label>
+                </div>
+                <div class="col-md-9 mb-3">
+                    <div class="input-group ">
+                        <input type="time" wire:model='form.startAppointment.time'
+                            class="form-control @error('form.startAppointment.time') is-invalid @enderror"
+                            id="startDatePicker">
+                        </div>
+                        <small class="text-gray ms-2">برای انتخاب روی آیکون ساعت کلیک کنید ویا مقدار را وارد کنید</small>
+                </div>
+                <div class="col-12 mt-3 d-flex">
+                    <p><strong>نکته:</strong></p> &nbsp;
+                    <p>
+                        با تعیین این تاریخ ، نوبت دهی قبل از این تاریخ برای کاربران غیر فعال میشود و امکان ثبت نوبت از طریق پنل مدیریت برای منشی وجود دارد.
+                    </p>
                 </div>
             </div>
         </div>

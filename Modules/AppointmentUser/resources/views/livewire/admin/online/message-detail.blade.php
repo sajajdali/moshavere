@@ -230,34 +230,37 @@
                             </div>
                         </div>
                         <div class="main-chat-footer d-flex justify-content-center pt-5">
-                            @if ($this->fetchData['appOnline']->status == Modules\AppointmentUser\Enum\AppointmentOnlineStatusEnum::ACCEPTED)
-                            <button type="button" class="btn btn-secondary ms-2" data-bs-toggle="modal"
-                                data-bs-target="#soundRecorderModal">
-                                <i class="fa fa-microphone fa-xl" aria-hidden="true"></i>
-                            </button>
-                            <input class="form-control ms-2 @error('form.typedMessage') is-invalid @enderror"
-                                wire:model='form.typedMessage'
-                                placeholder="@error('form.typedMessage') {{ $message }} @else متن خود را یادداشت کنید @enderror "
-                                type="text">
-                            <button data-bs-target="#file-selector-modal" data-bs-toggle="modal" class="nav-link"
-                                href="javascript:void(0)">
-                                @if (isset($form['file']))
-                                    <i class="fa fa-check" aria-hidden="true"></i>
-                                @else
-                                    <i class="fe fe-paperclip"></i>
-                                @endif
-                            </button>
-                            <button wire:click='sendMessage' wire:target='sendMessage'
-                                wire:loading.class='btn-loading' wire:loading.attr='disabeld' type="button"
-                                class="btn btn-icon  btn-primary brround"><i class="fa fa-paper-plane-o"></i></button>
+                            @if ($this->fetchData['appOnline']->status != Modules\AppointmentUser\Enum\AppointmentOnlineStatusEnum::REJECT)
+                                <button type="button" class="btn btn-secondary ms-2" data-bs-toggle="modal"
+                                    data-bs-target="#soundRecorderModal">
+                                    <i class="fa fa-microphone fa-xl" aria-hidden="true"></i>
+                                </button>
+                                <input class="form-control ms-2 @error('form.typedMessage') is-invalid @enderror"
+                                    wire:model='form.typedMessage'
+                                    placeholder="@error('form.typedMessage') {{ $message }} @else متن خود را یادداشت کنید @enderror "
+                                    type="text">
+                                <button data-bs-target="#file-selector-modal" data-bs-toggle="modal" class="nav-link"
+                                    href="javascript:void(0)">
+                                    @if (isset($form['file']))
+                                        <i class="fa fa-check" aria-hidden="true"></i>
+                                    @else
+                                        <i class="fe fe-paperclip"></i>
+                                    @endif
+                                </button>
+                                <button wire:click='sendMessage' wire:target='sendMessage'
+                                    wire:loading.class='btn-loading' wire:loading.attr='disabeld' type="button"
+                                    class="btn btn-icon  btn-primary brround"><i
+                                        class="fa fa-paper-plane-o"></i></button>
                             @elseif($this->fetchData['appOnline']->status == Modules\AppointmentUser\Enum\AppointmentOnlineStatusEnum::PENDING)
-                            <button type="button" class="btn btn-success ms-2" wire:click='approvedAppointment' wire:loading.class='btn-loading btn-gray' wire:target='approvedAppointment'> تایید این نوبت</button>
-                            <button type="button" class="btn btn-danger ms-2" data-bs-toggle="modal"
-                            data-bs-target="#resoanForDisapproveModal"> عدم تایید این نوبت</button>
+                                <button type="button" class="btn btn-success ms-2" wire:click='approvedAppointment'
+                                    wire:loading.class='btn-loading btn-gray' wire:target='approvedAppointment'> تایید
+                                    این نوبت</button>
+                                <button type="button" class="btn btn-danger ms-2" data-bs-toggle="modal"
+                                    data-bs-target="#resoanForDisapproveModal"> عدم تایید این نوبت</button>
                             @elseif($this->fetchData['appOnline']->status == Modules\AppointmentUser\Enum\AppointmentOnlineStatusEnum::REJECT)
-                            <div class="col-md-12 alert alert-danger fade show mt-4 ms-3" role="alert">
-                                نوبت رد شده است!
-                            </div>
+                                <div class="col-md-12 alert alert-danger fade show mt-4 ms-3" role="alert">
+                                    نوبت رد شده است!
+                                </div>
                             @endif
                             <nav class="nav">
                             </nav>

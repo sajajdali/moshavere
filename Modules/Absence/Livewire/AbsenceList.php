@@ -25,6 +25,7 @@ class AbsenceList extends Component
     {
         $absence  = Absence::find($model);
         $absence->delete();
+        return redirect()->route('admin.absence.list')->with('success','عدم حضور با موفقیت حذف شد');
     }
 
     public function startSearch()

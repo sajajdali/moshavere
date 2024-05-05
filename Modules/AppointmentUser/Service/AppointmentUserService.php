@@ -92,7 +92,7 @@ class AppointmentUserService
     {
         // Get the date range for which you want to fetch appointments and available slots
         $specialDaySelected = false;
-        if (isset($details['specialDay'])) {
+        // if (isset($details['specialDay'])) {
             if (array_key_exists('specialDay', $details)) {
                 $specialDaySelected = true;
                 $startDate = Carbon::parse($details['specialDay'])->subDays(20);
@@ -104,7 +104,7 @@ class AppointmentUserService
                 $startDate = Carbon::parse($details['specialDay']);
                 $endDate = $startDate->copy()->addDays($details['numberDays']);
             }
-        }
+        // }
 
         if (!$specialDaySelected && !isset($startDate)) {
             $startDate = Carbon::today()->subDays(20);

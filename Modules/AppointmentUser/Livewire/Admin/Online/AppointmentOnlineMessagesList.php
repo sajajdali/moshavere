@@ -5,8 +5,11 @@ namespace Modules\AppointmentUser\Livewire\Admin\Online;
 use Livewire\Component;
 use Livewire\Attributes\Title;
 use Livewire\Attributes\Computed;
+use Modules\User\Enum\UserMetaEnum;
+use Hekmatinasser\Verta\Facades\Verta;
 use Modules\AppointmentUser\app\Models\AppointmentOnline;
 use Modules\AppointmentUser\Enum\AppointmentOnlineMessageSeenEnum;
+use Modules\AppointmentUser\Enum\AppointmentUserStatusEnum;
 
 #[Title('پیام های پشتیبانی')]
 class AppointmentOnlineMessagesList extends Component
@@ -23,13 +26,8 @@ class AppointmentOnlineMessagesList extends Component
         'AppointmentStatus' => null,
         'appointment_messages' => null,
     ];
-    public array $form = ['seenStatus' => AppointmentOnlineMessageSeenEnum::UNSEEN];
+    public array $form = [];
     public array $fetchData = [];
-    public function seenStatus($condition)
-    {
-        $this->form['seenStatus'] = AppointmentOnlineMessageSeenEnum::tryFrom($condition);
-        $this->render();
-    }
     public function startSearch()
     {
         $this->render();
@@ -58,14 +56,6 @@ class AppointmentOnlineMessagesList extends Component
                 'condition' => $this->search['user_id'],
                 'callback' => function ($query) {
                     return $query->where('user_id', $this->search['user_id']);
-                },
-            ],
-            'seen_status' => [
-                'condition' => true,
-                'callback' => function ($query) {
-                    return $query->whereHas('messages', function ($q) {
-                        return $q->where('seen', $this->form['seenStatus']);
-                    });
                 },
             ],
             'appointment_messages' => [

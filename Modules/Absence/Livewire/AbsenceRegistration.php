@@ -4,17 +4,13 @@ namespace Modules\Absence\Livewire;
 
 use Livewire\Component;
 use Illuminate\Support\Arr;
-use Livewire\Attributes\On;
 use Livewire\Attributes\Url;
-use Illuminate\Validation\Rule;
-use Modules\AppointmentSetting\app\Jobs\CacheJob;
-use Modules\AppointmentSetting\app\Jobs\createCacheJob;
 use Modules\User\Entities\User;
 use Spatie\Permission\Models\Role;
 use Modules\User\Enum\UserMetaEnum;
 use Hekmatinasser\Verta\Facades\Verta;
 use Modules\Absence\app\Models\Absence;
-use Modules\Service\app\Models\Service;
+use Modules\AppointmentUser\app\Jobs\CacheJob;
 
 class AbsenceRegistration extends Component
 {
@@ -171,24 +167,28 @@ class AbsenceRegistration extends Component
     }
     public function storeForSelectedsections()
     {
-        $services = [];
-        foreach ($this->form['selectedSection'] as $serviceId => $status) {
-            if ($status) {
-                foreach ($this->form['absence'] as $key => $date) {
+        if(isset($this->form['selectedSection'])){
+            $services = [];
+            foreach ($this->form['selectedSection'] as $serviceId => $status) {
+                if ($status) {
+                    foreach ($this->form['absence'] as $key => $date) {
 
-                    $services = [
-                        'user_id' => (Arr::flatten($this->form['doctor'])[0])->id,
-                        'service_id' => $serviceId,
-                        'start_at' => Verta::parse($date['start'])->toCarbon(),
-                        'end_at'   =>  Verta::parse($date['end'])->toCarbon(),
-                    ];
-                    $this->createAbsence($services);
+                        $services = [
+                            'user_id' => (Arr::flatten($this->form['doctor'])[0])->id,
+                            'service_id' => $serviceId,
+                            'start_at' => Verta::parse($date['start'])->toCarbon(),
+                            'end_at'   =>  Verta::parse($date['end'])->toCarbon(),
+                        ];
+                        $this->createAbsence($services);
+                    }
                 }
             }
+            session()->flash('success', 'تنظیمات با موفقیت ذخیره شد');
+            return redirect()->route('admin.absence.list');
+        }else{
+          return  $this->addError('selectSection','لطفا یکی از گزینه های زیر را انتخاب کنید!');
         }
-
-        session()->flash('success', 'تنظیمات با موفقیت ذخیره شد');
-        return redirect()->route('admin.absence.list');
+;
     }
 
     public function searchDoctor()

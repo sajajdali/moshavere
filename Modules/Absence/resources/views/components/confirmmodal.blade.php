@@ -9,6 +9,12 @@
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
+                    @error('selectSection')
+                        <div class="col-md-12 alert alert-danger fade show" role="alert">
+                            <i class="fa fa-check-circle-o me-2" aria-hidden="true"></i>
+                            {{ $message }}
+                        </div>
+                    @enderror
                     <div class="flex mt-5">
                         <button class="btn btn-info" wire:click='storeForAllSection'>
                             <span wire:loading.remove wire:target='storeForAllSection'>ذخیره تنظیمات برای تمامی بخش
@@ -49,7 +55,11 @@
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">بیخیال</button>
-                    <button type="button" class="btn btn-success" wire:click='storeForSelectedsections'>ذخیره</button>
+                    <button type="button" class="btn btn-success"
+                     wire:click='storeForSelectedsections'
+                      wire:target='storeForSelectedsections'
+                      wire:loading.class='btn-loading btn-gray'
+                      >ذخیره</button>
                 </div>
             </div>
         </div>

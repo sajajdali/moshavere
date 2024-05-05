@@ -4,6 +4,7 @@ namespace Modules\AppointmentUser\Livewire\Admin;
 
 use Livewire\Component;
 use Livewire\Attributes\On;
+use Livewire\Attributes\Url;
 use Livewire\WithPagination;
 use Modules\User\Entities\User;
 use Livewire\Attributes\Computed;
@@ -26,6 +27,7 @@ use Modules\AppointmentUser\app\Notifications\AppointmentSmsNotification;
 class AppointmentUserList extends Component
 {
     use WithPagination;
+    #[Url]
     public array $search = [
         'user_id'              => null,
         'user_first_name'      => null,

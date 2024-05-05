@@ -235,6 +235,7 @@ class SpecificDayAppointmentRegistrationModal extends Component
             sendSmsToUser: $sms_status,
             serviceId: $this->appId->service?->id ?? $this->fetchData['service']?->id,
             placeId: $this->appId->place?->id ?? $this->placeId,
+            agentId: auth()->user()->id,
             description: isset($this->form['description']) ? $this->form['description'] : '',
             type: $appointment_type,
             endTime: Carbon::createFromTimeString($this->form['time']['until'])->toTimeString(),

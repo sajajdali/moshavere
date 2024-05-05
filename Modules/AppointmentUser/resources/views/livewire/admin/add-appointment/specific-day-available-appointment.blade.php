@@ -216,7 +216,7 @@
     <livewire:appointmentuser::admin.add-appointment.modal.service-and-doctor-modal :appId="$fetchData['appId']" :appTime="$fetchData['time']"
         :serviceId="$fetchData['service']->id" :placeId="$fetchData['place']" />
     <livewire:appointmentuser::admin.add-appointment.modal.specific-day-appointment-registration-modal :appId="$fetchData['appId']"
-        :appTime="$fetchData['time']" :serviceId="$fetchData['service']->id" :placeId="$fetchData['place']" />
+        :appTime="$fetchData['time']" :serviceId="$fetchData['service']->id" :placeId="$fetchData['place']"  />
     <div>
         @include('appointmentuser::components.appointmentlist.disapprovemodal')
     </div>
@@ -263,6 +263,7 @@
                 }, 500);
             });
             if({{$fetchData['showRegisterModal'] }}){
+                @this.dateHasBeenChange();
                 setTimeout(() => {
                     setAppModalInst.show();
                 }, 1000);

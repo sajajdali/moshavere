@@ -300,10 +300,10 @@
                                             {!! $ap->getbage() !!}
                                         </td>
                                         <td>
-                                            @if (isset($ap->details[Modules\AppointmentUser\app\Models\AppointmentUser::DETAIL_APPOINTMENT_VIA]))
-                                                {{ Modules\User\Entities\User::find($ap->details[Modules\AppointmentUser\app\Models\AppointmentUser::DETAIL_APPOINTMENT_VIA])->full_name }}
+                                            @if ($ap->agent)
+                                             {{$ap->agent->fullName}}
                                             @else
-                                                'بیمار'
+                                                'خود کاربر'
                                             @endif
                                         </td>
                                         <td>{{ $ap->user->full_name }}</td>

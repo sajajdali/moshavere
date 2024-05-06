@@ -5,7 +5,7 @@
                 class="{{ $aClassByDepth[$innerItem['has_child']][$depth] }} {{ (!$innerItem['has_child'] && $depth===0) ? 'hsa-link' : '' }}"
                 @if($depth===0 || $innerItem['has_child'])
                     data-bs-toggle="{{ $aToggleByDepth[$depth] }}" @endif
-                href="{{ (!$innerItem['has_child'] && $innerItem['route'] != null) ? (\Route::has($innerItem['route']) ? route($innerItem['route']) : $innerItem['route']) : '#' }}">
+                href="{{ (!$innerItem['has_child'] && $innerItem['route'] != null) ? (\Route::has($innerItem['route']) ? route($innerItem['route']) : $innerItem['route']) : '#'  }}{{isset($innerItem['param']) ? $innerItem['param'] : '' }}">
                 @if($depth === 0)
                     <i class="side-menu__icon {{ $innerItem['icon'] ?? '' }}"></i>
                 @endif

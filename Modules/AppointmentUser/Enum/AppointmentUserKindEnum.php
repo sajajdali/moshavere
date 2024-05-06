@@ -22,9 +22,9 @@ enum AppointmentUserKindEnum: int implements EnumHasNameInterface , EnumHasAdmin
 
     public function getBadge() {
         return match($this) {
-            self::IN_PERSION => '<span class="badge bg-success rounded-pill">حضوری</span>',
-            self::ONLINE => '<span class="badge bg-danger rounded-pill">آنلاین</span>',
-            self::VOIP => '<span class="badge bg-info rounded-pill">تلفنی</span>',
+            self::IN_PERSION => '<span class="badge badge-sm bg-success rounded-pill">حضوری</span>',
+            self::ONLINE => '<span class="badge badge-sm bg-danger rounded-pill">آنلاین</span>',
+            self::VOIP => '<span class="badge badge-sm bg-info rounded-pill">تلفنی</span>',
         };
     }
     public function getIcon() {

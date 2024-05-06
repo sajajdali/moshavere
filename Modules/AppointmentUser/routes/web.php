@@ -15,7 +15,7 @@ use Modules\AppointmentUser\Http\Controllers\AppointmentUserController;
 |
 */
 Route::group([], function () {
-    Route::resource('appointmentuser', AppointmentUserController::class)->names('appointmentuser');
+    // Route::resource('appointmentuser', AppointmentUserController::class)->names('appointmentuser');
 
     Route::post('admin/appointment_user/storevoice', [\Modules\AppointmentUser\Http\Controllers\AppointmentUserController::class, 'upload'])->name('storevoice')->can('viewAny', AppointmentUser::class) ;
     Route::get('test' , [AppointmentUserController::class, 'test'])->name('appointmentuser.test');

@@ -33,6 +33,17 @@ return [
                 'children' => null
             ],
             [
+                'title' => 'نوبت های آنلاین',
+                'gate' => 'viewAny',
+                'policy_class' => \Modules\User\Entities\User::class,
+                'icon' => 'fe fe-wifi',
+                'route' => 'admin.appointment_user.list',
+                'param' => '?search[kind]=2&search[AppointmentStatus]=0',
+                'has_badge' => false,
+                'has_child' => false,
+                'children' => null
+            ],
+            [
                 'title' => 'تنظیمات نوبت دهی',
                 'gate' => 'viewAny',
                 'policy_class' => \Modules\User\Entities\User::class,

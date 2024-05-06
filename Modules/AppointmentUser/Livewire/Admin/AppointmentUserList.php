@@ -35,13 +35,14 @@ class AppointmentUserList extends Component
         'user_mobile'          => null,
         'appointment_date'     => null,
         'appointment_set_date' => null,
-        'appointment_star_date' => null,
+        'appointment_star_date'=> null,
         'appointment_end_date' => null,
         'AppointmentStatus'    => null,
         'docNumber'            => null,
         'setterAppointment'    => null,
         'section_status'       => null,
         'Doc_id'               => null,
+        'kind'                 => null,
     ];
     public array $fetchData = [];
     public array $form = [];
@@ -61,11 +62,12 @@ class AppointmentUserList extends Component
             'appointment_set_date' => null,
             'appointment_star_date' => null,
             'appointment_end_date' => null,
-            'AppointmentStatus'    => null,
             'docNumber'            => null,
             'setterAppointment'    => null,
             'section_status'       => null,
             'Doc_id'               => null,
+            'AppointmentStatus'    => null,
+            'kind'                 => null,
         ];
         $this->resetPage();
     }
@@ -119,6 +121,12 @@ class AppointmentUserList extends Component
                     });
                 },
             ],
+            'kind' => [
+                'condition' => $this->search['kind'],
+                'callback' => function ($query) {
+                    return $query->where('kind', $this->search['kind']);
+                },
+            ],
             'appointment_date' => [
                 'condition' => $this->search['appointment_date'],
                 'callback' => function ($query) {
@@ -144,11 +152,12 @@ class AppointmentUserList extends Component
                 },
             ],
             'AppointmentStatus' => [
-                'condition' => $this->search['AppointmentStatus'],
+                'condition' => isset($this->search['AppointmentStatus']),
                 'callback' => function ($query) {
                     return $query->where('status', AppointmentUserStatusEnum::tryFrom($this->search['AppointmentStatus']));
                 },
             ],
+
             'docNumber' => [
                 'condition' => $this->search['docNumber'],
                 'callback' => function ($query) {
@@ -251,9 +260,9 @@ class AppointmentUserList extends Component
     public function ApprovemonitoringAppointment($id)
     {
         $app = AppointmentUser::find($id);
-        $deadLine_Time = $app->setting->detail[AppointmentSetting::MONITORTING_APPOINTMENT] ;
-        $Appoointment_dedLine = now()->addHours($deadLine_Time) ;
-        $app->update(['status' => AppointmentUserStatusEnum::STATUS_WAIT_PAYMENT , 'deadline_at' => $Appoointment_dedLine ]);
+        $deadLine_Time = $app->setting->detail[AppointmentSetting::MONITORTING_APPOINTMENT];
+        $Appoointment_dedLine = now()->addHours($deadLine_Time);
+        $app->update(['status' => AppointmentUserStatusEnum::STATUS_WAIT_PAYMENT, 'deadline_at' => $Appoointment_dedLine]);
         $app->notify(new AppointmentSmsNotification(setting(SettingKeyEnum::SMS_APPROVED_MONITORING_APPOINTMENT)));
         $this->redirectToPage('نوبت با موفقیت تایید شد');
     }
@@ -309,12 +318,12 @@ class AppointmentUserList extends Component
     public function editAppointment($id)
     {
         $app = AppointmentUser::find($id);
-        $date = verta($app->date_visit)->format('Y-m-d') ;
+        $date = verta($app->date_visit)->format('Y-m-d');
         return redirect()->route(
             'admin.appointment.add.specificday',
             [
-                'serviceId'     => $app->service_id ,
-                'placeId'       => $app->place_id ,
+                'serviceId'     => $app->service_id,
+                'placeId'       => $app->place_id,
                 'appId'         => $app->setting->id,
                 'date'          => $date,
                 'tracking_code' => $app->tracking_code
@@ -332,15 +341,13 @@ class AppointmentUserList extends Component
         $this->fetchData['appointmentSetter'] = Role::find(1)->users;
         $this->fetchData['Services'] = Service::all();
         $this->fetchData['doctors'] = User::doctors();
+
     }
 
     public function render()
     {
         // handle search pannel with defining new search Critera ;
         $query = $this->handleSearch();
-        return view(
-            'appointmentuser::livewire.admin.appointment-user-list'
-
-        );
+        return view('appointmentuser::livewire.admin.appointment-user-list');
     }
 }

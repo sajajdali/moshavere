@@ -16,7 +16,7 @@
                                 <div class="alert alert-info" role="alert">
                                     <span class="alert-inner--text"> {{$message}}</span>
                                 </div>
-                                <a href="https://amiri.selakteb.com/appointment/{{$appointmentUser->id}}"
+                                <a href="https://webapp.drmehrnushamiri.com/transaction/show/{{$transaction->id}}"
                                    class="login100-form-btn btn-primary">
                                     بازگشت به اپلیکیشن
                                 </a>
@@ -26,7 +26,7 @@
                                 <div class="alert alert-success" role="alert">
                                     <span class="alert-inner--text"> پرداخت شا با موفقیت انجام شد</span>
                                 </div>
-                                <a href="https://amiri.selakteb.com/appointment/{{$appointmentUser->id}}"
+                                <a href="https://webapp.drmehrnushamiri.com/transaction/show/{{$transaction->id}}"
                                    class="login100-form-btn btn-primary">
                                     بازگشت به اپلیکیشن
                                 </a>
@@ -36,7 +36,7 @@
                                 <div class="alert alert-danger" role="alert">
                                     <span class="alert-inner--text"> پرداخت شا با موفقیت انجام نشد</span>
                                 </div>
-                                <a href="https://amiri.selakteb.com/appointment/{{$appointmentUser->id}}"
+                                <a href="https://webapp.drmehrnushamiri.com/transaction/show/{{$transaction->id}}"
                                    class="login100-form-btn btn-primary">
                                     بازگشت به اپلیکیشن
                                 </a>
@@ -55,7 +55,7 @@
                                         <div class="alert alert-success" role="alert">
                                             <span class="alert-inner--text"> پرداخت قبلا انجام شده است</span>
                                         </div>
-                                        <a href="https://amiri.selakteb.com/appointment/{{$appointmentUser->id}}"
+                                        <a href="https://webapp.drmehrnushamiri.com/transaction/show/{{$transaction->id}}"
                                            class="login100-form-btn btn-primary">
                                             بازگشت به اپلیکیشن
                                         </a>

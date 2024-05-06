@@ -232,16 +232,29 @@
                                     @endif
                                 </div>
                                 <div class="media-body">
-                                    <div class="media-contact-name ">
-                                        <div class="d-flex align-items-center">
-                                            <span>{{ $OnlineApp->user->fullName }} </span>
-                                            {!! $OnlineApp->status->getMessageDetailBadge() !!}
+                                    @if ($OnlineApp->messages->last() !== null)
+                                        <div class="media-contact-name ">
+                                            <div class="d-flex align-items-center">
+                                                <span>{{ $OnlineApp->user->fullName }} </span>
+                                                {!! $OnlineApp->status->getMessageDetailBadge() !!}
+                                            </div>
+                                            <span>{{ verta($OnlineApp->messages->last()?->updated_at)->diffDays() }}
+                                                روز پیش</span>
                                         </div>
-                                        <span>{{ verta($OnlineApp->messages->last()->updated_at)->diffDays() }}
-                                            روز پیش</span>
-                                    </div>
-                                    @if ($OnlineApp->messages?->last()->body != null)
-                                        <p>{{ strip_tags(mb_substr($OnlineApp->messages->last()->body, 0, 50, 'UTF-8'), 'string,br') }}
+                                        @if ($OnlineApp->messages?->last()->body != null)
+                                            <p>{{ strip_tags(mb_substr($OnlineApp->messages->last()->body, 0, 50, 'UTF-8'), 'string,br') }}
+                                            </p>
+                                        @endif
+                                    @else
+                                        <div class="media-contact-name ">
+                                            <div class="d-flex align-items-center">
+                                                <span>{{ $OnlineApp->user->fullName }} </span>
+                                                {!! $OnlineApp->status->getMessageDetailBadge() !!}
+                                            </div>
+                                            <span>{{ verta($OnlineApp->messages->last()?->updated_at)->diffDays() }}
+                                                روز پیش</span>
+                                        </div>
+                                        <p>پیامی ارسال نشده است!!
                                         </p>
                                     @endif
                                 </div>

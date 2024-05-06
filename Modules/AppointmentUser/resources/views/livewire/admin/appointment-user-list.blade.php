@@ -42,8 +42,7 @@
                                 <button class="btn btn-secondary ms-2" wire:click="resetProperties" type="button"
                                     data-bs-toggle="collapse" data-bs-target="#advanceSearch" aria-expanded="false"
                                     aria-controls="advanceSearch"
-                                    wire:loading.class="bg-gray btn-loading disabled">نمایش
-                                    همه
+                                    wire:loading.class="bg-gray btn-loading disabled">نمایش همه نوبت ها
                                 </button>
                             @break
                         @endif
@@ -53,8 +52,13 @@
             </div>
             {{-- search cards --}}
             <div class="card-body">
-                <div class="mb-5 collapse  @foreach ($search as $key => $value)
-                            @if ($value !== null) show @break @endif @endforeach "
+                <div class="mb-5 collapse
+                @foreach ($search as $key => $value)
+                @if ($key == 'kind')
+                    @continue
+                @endif
+                    @if ($value !== null) show @break @endif
+                @endforeach "
                     id="advanceSearch" wire:ignore.self>
                     <form class="form-horizontal example" autocomplete="off">
                         <div class="row mb-5">
@@ -115,9 +119,24 @@
                             <div class="collapse row
                             @if (isset($search['appointment_date']) ||
                                     isset($search['appointment_set_date']) ||
+                                    isset($search['kind']) ||
                                     isset($search['appointment_star_date']) ||
                                     isset($search['appointment_end_date'])) show @endif"
                                 id="appointmentCollapsSearch" wire:ignore.self>
+                                <div class="col-md-6">
+                                    <label for="search-kind" class="form-label datePicker"><strong>نوع
+                                            نوبت</strong></label>
+                                    <select class="form-control" id="search-kind" wire:model="search.kind"
+                                        type="text">
+                                        <option value="">انتخاب کنید...</option>
+                                        @foreach (Modules\AppointmentUser\Enum\AppointmentUserKindEnum::cases() as $kindCase)
+                                            <option value="{{ $kindCase }}">
+                                                {{ $kindCase->getName() }}
+                                            </option>
+                                        @endforeach
+                                    </select>
+
+                                </div>
                                 <div class="col-md-6">
                                     <label for="search-appointment_date" class="form-label"><strong>زمان
                                             نوبت</strong></label>
@@ -170,7 +189,7 @@
                                     <label for="search-docNumberId" class="form-label"><strong>شماره
                                             پرونده</strong></label>
                                     <input class="form-control" id="search-docNumberId"
-                                        wire:model="search.docNumber" placeholder="ایدی رژیم مورد نظر"
+                                        wire:model="search.docNumber" placeholder="شماره پرونده کاربر"
                                         type="text">
 
                                 </div>
@@ -295,13 +314,13 @@
                                                     type="checkbox" value="">
                                             </label>
                                         </td>
-                                        <td class="{{ $ap->type->getclass() }}">
+                                        <td class="{{ $ap->type->getclass() }} d-flex flex-column">
                                             {!! $ap->kind->getIcon() !!}
-                                            {!! $ap->getbage() !!}
+                                            {!! $ap->kind->getBadge() !!}
                                         </td>
                                         <td>
                                             @if ($ap->agent)
-                                             {{$ap->agent->fullName}}
+                                                {{ $ap->agent->fullName }}
                                             @else
                                                 'خود کاربر'
                                             @endif
@@ -323,10 +342,11 @@
                                         @can('update', $ap)
                                             <td>
                                                 <div class="btn-group mt-2 mb-2">
-                                                    <button type="button" class="btn {{$ap->status->getButtonColor()}} dropdown-toggle"
+                                                    <button type="button"
+                                                        class="btn {{ $ap->status->getButtonColor() }} dropdown-toggle"
                                                         data-bs-toggle="dropdown">
-                                                        {{$ap->status->getName()}}
-                                                         <span class="caret"></span>
+                                                        {{ $ap->status->getName() }}
+                                                        <span class="caret"></span>
                                                     </button>
                                                     <ul class="dropdown-menu" role="menu">
                                                         @include('appointmentuser::components.appointmentlist.operationbutton')

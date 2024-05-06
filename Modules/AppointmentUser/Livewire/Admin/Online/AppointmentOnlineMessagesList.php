@@ -32,7 +32,8 @@ class AppointmentOnlineMessagesList extends Component
     {
         $this->render();
     }
-    public function resetProperties() {
+    public function resetProperties()
+    {
         $this->search = [
             'user_id' => null,
             'user_first_name' => null,
@@ -50,7 +51,7 @@ class AppointmentOnlineMessagesList extends Component
     #[Computed]
     public function handleSearch()
     {
-        $query = AppointmentOnline::query();
+        $query = AppointmentOnline::with('messages');
         $searchCriteria = [
             'user_id_search' => [
                 'condition' => $this->search['user_id'],
@@ -144,8 +145,19 @@ class AppointmentOnlineMessagesList extends Component
                 $query->when($condition, $callback);
             }
         }
-        $appointments =  $query->paginate(10);
-        return $appointments;
+        // TODO::sort the chat
+        $query->get()->transform(function ($appointment) {
+            $appointment->messages = $appointment->messages->filter(function ($message) {
+                return $message->seen === AppointmentOnlineMessageSeenEnum::UNSEEN;
+            });
+            return $appointment;
+        });
+        // Sort appointments based on the latest unseen message
+        $query->get()->sortByDesc(function ($appointment) {
+            return $appointment->messages->max('updated_at');
+        });
+        return  $query->paginate(10);
+
     }
     public function booted()
     {

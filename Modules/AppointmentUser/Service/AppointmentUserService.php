@@ -588,6 +588,7 @@ class AppointmentUserService
         if ($appointmentData->kind == AppointmentUserKindEnum::ONLINE) {
             $appointmentUserModel['start_time'] = null;
             $appointmentUserModel['end_time'] = null;
+            $appointmentUserModel['status'] =  AppointmentUserStatusEnum::STATUS_PENDING ;
         }
         $detailDatabaseDB['payment'] = [
             'status' => false,

@@ -28,10 +28,10 @@ class SmsChannel
      */
     public function send($notifiable, Notification $notification): void
     {
+        $data = $notification->toArray($notifiable);
         if (isset($data['template']) && !empty($data['template'])) {
             $smsSandbox = env('SMS_SEND_SANDBOX');
             $apiToken = setting(SettingKeyEnum::SMS_API_TOKEN);
-            $data = $notification->toArray($notifiable);
             //data should have receptor and template and at least one params
             if ($smsSandbox !== true && $apiToken != '' && isset($data['receptor']) && isset($data['template']) && isset($data['params']) && count($data['params']) > 0) {
                 $condition = [

@@ -15,23 +15,43 @@ return [
             ],
         ],
     ],
-
     'menu' => [
         'title' => 'امور مالی',
         'gate' => ['discount'],
         'policy_class' => null,
         'has_divider' => true,
         'priority' => 70,
-        'children' => [//it is required
+        'children' => [ //it is required
             [
                 'title' => 'کد تخفیف',
                 'gate' => 'viewAny',
                 'policy_class' => \Modules\User\Entities\User::class,
                 'icon' => 'fe fe-percent',
-                'route' => 'admin.discount.create',
-                'has_child' => false,
-                'children' => null
+                'route' => null,
+                'has_badge' => false,
+                'has_child' => true,
+                'children' => [
+                    [
+                        'title' => 'افزودن',
+                        'gate' => 'viewAny',
+                        'policy_class' => \Modules\User\Entities\User::class,
+                        'icon' => 'fe fe-percent',
+                        'route' => 'admin.discount.create',
+                        'has_child' => false,
+                        'children' => null
+                    ],
+                    [
+                        'title' => 'لیست',
+                        'gate' => 'create',
+                        'policy_class' => \Modules\User\Entities\User::class,
+                        'icon' => 'fa fa-plus-circle',
+                        'route' => 'admin.discount.list',
+                        'has_child' => false,
+                        'children' => null,
+                    ],
+                ],
             ],
         ],
     ],
+
 ];

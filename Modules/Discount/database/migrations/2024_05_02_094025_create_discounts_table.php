@@ -14,13 +14,13 @@ return new class extends Migration
     {
         Schema::create('discounts', function (Blueprint $table) {
             $table->id();
-            $table->nullableMorphs('discountable');
-            $table->foreignId('doctor_id')->nullable()->constrained('users');
+            $table->json('service_id')->nullable();
+            $table->json('doctor_id')->nullable();
+            $table->text('code');
+            $table->integer('usage_counter')->default(0);
+            $table->tinyInteger('active')->default(1);
             $table->dateTime('start_at')->nullable();
             $table->dateTime('end_at')->nullable();
-            $table->integer('maximum_usage_totall')->nullable();
-            $table->integer('maximum_usage_each_user')->nullable();
-            $table->integer('minimum_price')->default(1);
             $table->json('detail')->nullable();
             $table->timestamps();
         });

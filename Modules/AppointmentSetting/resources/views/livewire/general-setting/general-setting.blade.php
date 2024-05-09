@@ -321,92 +321,132 @@
         </div>
     </div>
     {{-- payment  --}}
-    <div class="card @error('form.onlinePayment.*') border border-danger @enderror">
+    <div class="card @error('form.payment.*') border border-danger @enderror">
         <div class="card-header border-bottom d-flex justify-content-between">
             <h3>پرداخت آنلاین</h3>
             <div class="main-toggle-group d-sm-flex align-items-center ms-0">
                 <div class="toggle toggle-lg toggle-primary my-1  customCheckbox
-                @if (isset($this->form['onlinePayment']['online']['status']) || isset($this->form['onlinePayment']['voip']['status'])) on  @else off @endif"
-                    data-id="onlinePayment.status" wire:ignore.self data-bs-toggle="collapse" href="#paymentCollaps"
+                @if (isset($form['payment']['status']) && $form['payment']['status'] != false  ) on  @else off @endif"
+                    data-id="payment.status" wire:ignore.self data-bs-toggle="collapse" href="#paymentCollaps"
                     role="button" aria-expanded="false" aria-controls="paymentCollaps">
                     <span></span>
                 </div>
             </div>
         </div>
-        <div class="card-body collapse @if (isset($this->form['onlinePayment']['online']['status']) || isset($this->form['onlinePayment']['voip']['status'])) show @endif" id="paymentCollaps"
+        <div class="card-body collapse @if (isset($form['payment']['status']) && $form['payment']['status'] != false  ) show @endif" id="paymentCollaps"
             wire:ignore.self>
-            @error('form.onlinePayment.*')
+            @error('form.payment.*')
                 <div class="alert alert-danger" role="alert">
                     <p class="text-danger"> لطفا مقدار را وارد کنید!!
                     </p>
                 </div>
             @enderror
             <div class="row">
-                <div class="col-md-6">
+                <div class="col-md-4">
                     <div class="d-flex align-items-center">
                         <div class="main-toggle-group d-sm-flex align-items-center ms-0">
                             <div class="toggle toggle-lg toggle-primary my-1  customCheckbox
-                            @if (isset($this->form['onlinePayment']['online']['status']) && $this->form['onlinePayment']['online']['status'] == true) on
+                            @if (isset($form['payment']['inPerson']['status']) && $form['payment']['inPerson']['status'] == true) on
                                 @else
                                 off @endif"
-                                data-id="onlinePayment.online.status" id="sitePaymentStatus" wire:ignore.self>
+                                data-id="payment.inPerson.status" id="sitePaymentStatus" wire:ignore.self>
                                 <span></span>
                             </div>
                         </div>
-                        <span class="ms-2">فعال بودن پرداخت آنلاین در سایت</span>
+                        <span class="ms-2">فعال بودن پرداخت برای نوبت حضوری</span>
                     </div>
                 </div>
-
-                <div class="col-md-6">
+                <div class="col-md-4">
+                    <div class="d-flex align-items-center">
+                        <div class="main-toggle-group d-sm-flex align-items-center ms-0">
+                            <div class="toggle toggle-lg toggle-primary my-1  customCheckbox
+                            @if (isset($form['payment']['online']['status']) && $form['payment']['online']['status'] == true) on
+                                @else
+                                off @endif"
+                                data-id="payment.online.status" id="sitePaymentStatus" wire:ignore.self>
+                                <span></span>
+                            </div>
+                        </div>
+                        <span class="ms-2">فعال بودن پرداخت برای نوبت آنلاین</span>
+                    </div>
+                </div>
+                <div class="col-md-4">
                     <div class="d-flex align-items-center">
                         <div class="main-toggle-group d-sm-flex align-items-center ms-0">
                             <div class="toggle toggle-lg toggle-primary my-1 customCheckbox
-                            @if (isset($this->form['onlinePayment']['voip']['status']) && $this->form['onlinePayment']['voip']['status'] == true) on
+                            @if (isset($form['payment']['voip']['status']) && $form['payment']['voip']['status'] == true) on
                                 @else
                                 off @endif"
-                                data-id="onlinePayment.voip.status" wire:ignore.self id="paymentOnInVoip">
+                                data-id="payment.voip.status" wire:ignore.self id="paymentOnInVoip">
                                 <span></span>
                             </div>
                         </div>
-                        <span class="ms-2">فعال بودن پرداخت آنلاین در ویپ</span>
+                        <span class="ms-2">فعال بودن پرداخت در ویپ</span>
                     </div>
                 </div>
-
             </div>
             <div class="row mt-5" wire:ignore>
-                <div style="display:@if (isset($form['onlinePayment']['online']['status']) && $form['onlinePayment']['online']['status'] == 'true') block @else none @endif"
-                    id="paymentstatusSelect">
+                <div id="notPaidStatus">
                     <div class="row">
                         <div class="col-md-5 pt-2">
-                            <label class="text-primary" for="default-dropdown"> وضعیت در صورت عدم پرداخت</label>
+                            <label class="text-primary" for="paymentStatusSelect"> وضعیت در صورت عدم پرداخت</label>
                         </div>
                         <div class="col-md-7">
                             <div class="form-group">
                                 <select name="country"
-                                    class="form-control form-select  @error('form.onlinePayment.notPayingStatus') is-invalid @enderror"
-                                    id="default-dropdown" wire:model='form.onlinePayment.notPayingStatus'
+                                    class="form-control form-select  @error('form.payment.notPayingStatus') is-invalid @enderror"
+                                    id="paymentStatusSelect" wire:model='form.payment.notPayingStatus'
                                     data-bs-placeholder="انتخاب کنید...">
                                     <option label="انتخاب کنید..."></option>
-                                    <option @if (isset($form['onlinePayment']['notPayingStatus']) && $form['onlinePayment']['notPayingStatus'] == 'submit') selected @endif value="submit">نوبت ثبت
+                                    <option @if (isset($form['payment']['notPayingStatus']) && $form['payment']['notPayingStatus'] == 'submit') selected @endif value="submit">نوبت ثبت
                                         شود</option>
-                                    <option @if (isset($form['onlinePayment']['notPayingStatus']) && $form['onlinePayment']['notPayingStatus'] == 'dontSubmit') selected @endif value="dontSubmit">نوبت
+                                    <option @if (isset($form['payment']['notPayingStatus']) && $form['payment']['notPayingStatus'] == 'dontSubmit') selected @endif value="dontSubmit">نوبت
                                         ثبت نشود</option>
                                 </select>
                             </div>
                         </div>
                     </div>
                 </div>
-                <div style="display:  @if (isset($form['onlinePayment']['online']['status']) || isset($form['onlinePayment']['voip']['status'])) block  @else none @endif"
-                    id="paymentPriceInput">
+                <div id="inPersonPrice" style="display:@if (isset($form['payment']['inPerson']['status']) && $form['payment']['inPerson']['status'] == true) block @else none @endif ">
                     <div class="row">
                         <div class="col-md-5 pt-2">
-                            <label class="text-primary" for="basic-url"> مبلغ قابل پرداخت</label>
+                            <label class="text-primary" for="inPersonPriceInpout"> هزینه نوبت حضوری</label>
                         </div>
                         <div class="col-md-7">
                             <div class="form-group">
                                 <input type="text"
-                                    class="form-control  @error('form.onlinePayment.Price') is-invalid @enderror"
-                                    id="inputName" wire:model='form.onlinePayment.Price' placeholder="مبلغ به تومان">
+                                    class="form-control @error('form.payment.inPerson.price') is-invalid @enderror"
+                                    id="inPersonPriceInpout" wire:model='form.payment.inPerson.price'
+                                    placeholder="مبلغ به تومان">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div id="onlinePrice" style="display: @if (isset($form['payment']['online']['status']) && $form['payment']['online']['status'] == true) block @else none @endif">
+                    <div class="row">
+                        <div class="col-md-5 pt-2">
+                            <label class="text-primary" for="onlineProceInpit"> هزینه نوبت آنلاین</label>
+                        </div>
+                        <div class="col-md-7">
+                            <div class="form-group">
+                                <input type="text"
+                                    class="form-control  @error('form.payment.online.price') is-invalid @enderror"
+                                    id="onlineProceInpit" wire:model='form.payment.online.price'
+                                    placeholder="مبلغ به تومان">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div id="VoipPrice" style="display: @if (isset($form['payment']['voip']['status']) && $form['payment']['voip']['status'] == true) block  @else none @endif">
+                    <div class="row">
+                        <div class="col-md-5 pt-2">
+                            <label class="text-primary" for="voipPrice"> هزینه نوبت ویپ</label>
+                        </div>
+                        <div class="col-md-7">
+                            <div class="form-group">
+                                <input type="text"
+                                    class="form-control  @error('form.payment.voip.price') is-invalid @enderror"
+                                    id="voipPrice" wire:model='form.payment.voip.price' placeholder="مبلغ به تومان">
                             </div>
                         </div>
                     </div>
@@ -495,7 +535,7 @@
         </div>
     </div>
     {{-- start Date time  --}}
-    <div class="card @if($errors->has('form.startAppointment.date') || $errors->has('form.startAppointment.time')) border border-danger @endif">
+    <div class="card @if ($errors->has('form.startAppointment.date') || $errors->has('form.startAppointment.time')) border border-danger @endif">
         <div class="card-header border-bottom d-flex justify-content-between">
             <h3> تعیین تاریخ شروع نوبت دهی </h3>
             <div class="main-toggle-group d-sm-flex align-items-center ms-0">
@@ -509,9 +549,9 @@
         <div class="card-body collapse @if (isset($form['startAppointment']['date'])) show @endif " id="startTimecollaps"
             wire:ignore.self>
             {{-- section --}}
-            @if($errors->has('form.startAppointment.date','form.startAppointment.time'))
+            @if ($errors->has('form.startAppointment.date', 'form.startAppointment.time'))
                 <div class="alert alert-danger" role="alert">
-                    <p class="text-danger"> لطفا تاریخ و ساعت  را انتخاب کنید!!
+                    <p class="text-danger"> لطفا تاریخ و ساعت را انتخاب کنید!!
                     </p>
                 </div>
             @endif
@@ -534,13 +574,14 @@
                         <input type="time" wire:model='form.startAppointment.time'
                             class="form-control @error('form.startAppointment.time') is-invalid @enderror"
                             id="startDatePicker">
-                        </div>
-                        <small class="text-gray ms-2">برای انتخاب روی آیکون ساعت کلیک کنید ویا مقدار را وارد کنید</small>
+                    </div>
+                    <small class="text-gray ms-2">برای انتخاب روی آیکون ساعت کلیک کنید ویا مقدار را وارد کنید</small>
                 </div>
                 <div class="col-12 mt-3 d-flex">
                     <p><strong>نکته:</strong></p> &nbsp;
                     <p>
-                        با تعیین این تاریخ ، نوبت دهی قبل از این تاریخ برای کاربران غیر فعال میشود و امکان ثبت نوبت از طریق پنل مدیریت برای منشی وجود دارد.
+                        با تعیین این تاریخ ، نوبت دهی قبل از این تاریخ برای کاربران غیر فعال میشود و امکان ثبت نوبت از
+                        طریق پنل مدیریت برای منشی وجود دارد.
                     </p>
                 </div>
             </div>
@@ -578,7 +619,6 @@
             class="btn btn-success mt-5"><strong>ذخیره</strong></button>
 
     </div>
-
 </div>
 </div>
 
@@ -606,8 +646,28 @@
             //pass the custom checkboxes values
             $('.customCheckbox').on('click', function() {
                 var id = $(this).data('id');
+                var inp =  $(this) ;
                 @this.set('form.' + id, $(this).hasClass('on'));
+                ChangePricesDisplay(id,inp);
             });
+
+            function ChangePricesDisplay(id,inp) {
+                if (id == 'payment.inPerson.status' && inp.hasClass('on')) {
+                    $('#inPersonPrice').fadeIn();
+                } else if (id == 'payment.inPerson.status') {
+                    $('#inPersonPrice').fadeOut();
+                }
+                if (id == 'payment.online.status' && inp.hasClass('on')) {
+                    $('#onlinePrice').fadeIn();
+                } else if (id == 'payment.online.status') {
+                    $('#onlinePrice').fadeOut();
+                }
+                if (id == 'payment.voip.status' && inp.hasClass('on')) {
+                    $('#VoipPrice').fadeIn();
+                } else if (id == 'payment.voip.status') {
+                    $('#VoipPrice').fadeOut();
+                }
+            }
 
             function addPersianDateClassForSpecialDate() {
                 $('.specialDate').persianDatepicker({
@@ -632,47 +692,7 @@
                 }, 1000);
             });
 
-            function appearPeymentStatusDiv() {
-                $('#paymentstatusSelect').fadeIn();
-            }
 
-            function appearPeymentPriceDiv() {
-                $('#paymentPriceInput').fadeIn();
-            }
-
-            function fadeOutPeymentStatusDiv() {
-                $('#paymentstatusSelect').fadeOut();
-            }
-
-            function fadeOutPeymentPriceDiv() {
-                $('#paymentPriceInput').fadeOut();
-            }
-
-            $('#sitePaymentStatus').click(function(e) {
-                if ($('#sitePaymentStatus').hasClass('on')) {
-                    appearPeymentStatusDiv();
-                    appearPeymentPriceDiv();
-                } else {
-                    if ($('#paymentOnInVoip').hasClass('on')) {
-                        fadeOutPeymentStatusDiv();
-                    } else {
-                        fadeOutPeymentPriceDiv();
-                        fadeOutPeymentStatusDiv();
-                    }
-                }
-            })
-
-            $('#paymentOnInVoip').click(function(e) {
-                if ($('#paymentOnInVoip').hasClass('on')) {
-                    if ($('#paymentPriceInput').css('display') === 'none') {
-                        appearPeymentPriceDiv();
-                    }
-                } else {
-                    if (!$('#sitePaymentStatus').hasClass('on')) {
-                        fadeOutPeymentPriceDiv();
-                    }
-                }
-            });
             $('#endDatePicker').persianDatepicker({
                 initialValue: false,
                 format: 'L',

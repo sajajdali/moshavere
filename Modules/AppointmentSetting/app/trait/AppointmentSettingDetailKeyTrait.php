@@ -19,4 +19,5 @@ trait AppointmentSettingDetailKeyTrait
     const PRICE = 'price';
     const NOT_PAYING_STATUS = 'notPayinStatus';
     const MONITORTING_APPOINTMENT = 'monitoring_appointment';
+    const IN_PERSON = 'inPerson';
 }

@@ -176,7 +176,7 @@ class GeneralSetting extends Component
         }
         $rules  = [
             'form.timeFrame'                      => 'required',
-            'form.visitType.inPerson'              => 'required_without_all:form.visitType.online',
+            'form.visitType.inPerson'             => 'required_without_all:form.visitType.online',
             'form.visitType.online'               => 'required_without_all:form.visitType.inPerson',
             'form.visitTime'                      => 'required',
             'form.minDayAvaialbe'                 => 'required|integer',
@@ -184,24 +184,13 @@ class GeneralSetting extends Component
             'form.cancel.day'                     => 'required_if:form.cancel.status,true',
             'form.endAppointment.date'            => 'required_if:form.endAppointment.status,true',
             'form.segments.value'                 => 'required_if:form.segments.status,true',
-            'form.onlinePayment.Price'            => [
-                Rule::requiredIf(function () {
-                    return isset($this->form['onlinePayment']['status']) && $this->form['onlinePayment']['status'] == true &&
-                        ((isset($this->form['onlinePayment']['online']['status']) && $this->form['onlinePayment']['online']['status'] == true) ||
-                            (isset($this->form['onlinePayment']['voip']['status']) && $this->form['onlinePayment']['voip']['status'] == true)
-                        );
-                }),
-            ],
-            'form.onlinePayment.notPayingStatus'  => [
-                Rule::requiredIf(function () {
-                    return isset($this->form['onlinePayment']['status']) && $this->form['onlinePayment']['status'] == true &&
-                        ((isset($this->form['onlinePayment']['online']['status']) && $this->form['onlinePayment']['online']['status'] == true)
-                        );
-                }),
-            ],
-            'form.monitoring.hour' => 'required_if:form.monitoring.status,true',
-            'form.startAppointment.date' => 'required_if:form.startAppointment.status,true',
-            'form.startAppointment.time' => 'required_if:form.startAppointment.status,true',
+            'form.monitoring.hour'                => 'required_if:form.monitoring.status,true',
+            'form.startAppointment.date'          => 'required_if:form.startAppointment.status,true',
+            'form.startAppointment.time'          => 'required_if:form.startAppointment.status,true',
+            'form.payment.notPayingStatus'        => 'required_if:form.payment.status,true',
+            'form.payment.inPerson.price'         => 'required_if:form.payment.inPerson.status,true',
+            'form.payment.online.price'           => 'required_if:form.payment.online.status,true',
+            'form.payment.voip.price'             => 'required_if:form.payment.voip.status,true',
         ];
         $validateSpecialDate = $this->validateSpecialdate();
         return array_merge($dayRules,  $rules, $validateSpecialDate);
@@ -245,16 +234,24 @@ class GeneralSetting extends Component
                 unset($this->form['endAppointment']['date']);
             }
         }
-        if (isset($this->form['onlinePayment']['status'])  && $this->form['onlinePayment']['status'] == false) {
-            if (isset($this->form['onlinePayment']['online']['status'])) {
-                unset($this->form['onlinePayment']['online']['status']);
-                unset($this->form['onlinePayment']['notPayingStatus']);
+        if (isset($this->form['payment']['status'])  && $this->form['payment']['status'] == false) {
+            if (isset($this->form['payment'])) {
+                unset($this->form['payment']);
             }
-            if (isset($this->form['onlinePayment']['online']['Price'])) {
-                unset($this->form['onlinePayment']['online']['Price']);
+        }
+        if (isset($this->form['payment']['online']['status'])  && $this->form['payment']['online']['status'] == false) {
+            if (isset($this->form['payment']['online'])) {
+                unset($this->form['payment']['online']);
             }
-            if (isset($this->form['onlinePayment']['voip']['status'])) {
-                unset($this->form['onlinePayment']['voip']['status']);
+        }
+        if (isset($this->form['payment']['voip']['status'])  && $this->form['payment']['voip']['status'] == false) {
+            if (isset($this->form['payment']['voip'])) {
+                unset($this->form['payment']['voip']);
+            }
+        }
+        if (isset($this->form['payment']['inPerson']['status'])  && $this->form['payment']['inPerson']['status'] == false) {
+            if (isset($this->form['payment']['inPerson'])) {
+                unset($this->form['payment']['inPerson']);
             }
         }
         if (isset($this->form['interference']['status'])  && $this->form['interference']['status'] == false) {
@@ -277,7 +274,7 @@ class GeneralSetting extends Component
         $this->checkForUnsetTheCheckBoxes();
         $this->validate();
         $endAppointmentTime   =  isset($this->form['endAppointment']['date']) ? Verta::parse($this->form['endAppointment']['date'])->toCarbon() : null;
-        $startAppointmentTime =  isset($this->form['startAppointment']['date']) ? Verta::parse($this->form['startAppointment']['date'])->toCarbon()->setTime(substr($this->form['startAppointment']['time'],0,2,) ,substr($this->form['startAppointment']['time'],3,2)) : null;
+        $startAppointmentTime =  isset($this->form['startAppointment']['date']) ? Verta::parse($this->form['startAppointment']['date'])->toCarbon()->setTime(substr($this->form['startAppointment']['time'], 0, 2,), substr($this->form['startAppointment']['time'], 3, 2)) : null;
         $detail = [
             AppointmentSetting::VISIT_TYPE_INPERSON                  => isset($this->form['visitType']['inPerson']) ? $this->form['visitType']['inPerson'] : null,
             AppointmentSetting::VISIT_TYPE_VOIP                      => isset($this->form['visitType']['voip']) ? $this->form['visitType']['voip'] : null,
@@ -287,17 +284,23 @@ class GeneralSetting extends Component
             AppointmentSetting::MONITORTING_APPOINTMENT              => isset($this->form['monitoring']['hour']) ? $this->form['monitoring']['hour'] : null,
             AppointmentSetting::PAYMENT                              =>
             [
-                AppointmentSetting::STATUS                           => isset($this->form['onlinePayment']['status']) ? $this->form['onlinePayment']['status']  : false,
+                AppointmentSetting::STATUS                           => isset($this->form['payment']['status']) ? $this->form['payment']['status']  : false,
+                AppointmentSetting::NOT_PAYING_STATUS                => isset($this->form['payment']['notPayingStatus']) ?  $this->form['payment']['notPayingStatus']  : null,
                 AppointmentSetting::ONLINE =>
                 [
-                    AppointmentSetting::STATUS                     => isset($this->form['onlinePayment']['online']['status']) ? $this->form['onlinePayment']['online']['status'] : null,
-                    AppointmentSetting::NOT_PAYING_STATUS          => isset($this->form['onlinePayment']['notPayingStatus']) ?  $this->form['onlinePayment']['notPayingStatus']  : null,
+                    AppointmentSetting::STATUS                     => isset($this->form['payment']['online']['status']) ? $this->form['payment']['online']['status'] : null,
+                    AppointmentSetting::PRICE                      => isset($this->form['payment']['online']['price'])  ? $this->form['payment']['online']['price']  : null,
                 ],
                 AppointmentSetting::VOIP  =>
                 [
-                    AppointmentSetting::STATUS                     => isset($this->form['onlinePayment']['voip']['status'])   ? $this->form['onlinePayment']['voip']['status']   : null
+                    AppointmentSetting::STATUS                     => isset($this->form['payment']['voip']['status'])   ? $this->form['payment']['voip']['status']   : null,
+                    AppointmentSetting::PRICE                      => isset($this->form['payment']['voip']['price'])    ? $this->form['payment']['voip']['price']    : null,
                 ],
-                AppointmentSetting::PRICE                          => isset($this->form['onlinePayment']['Price']) ? $this->form['onlinePayment']['Price'] : null,
+                AppointmentSetting::IN_PERSON  =>
+                [
+                    AppointmentSetting::STATUS                     => isset($this->form['payment']['inPerson']['status'])   ? $this->form['payment']['inPerson']['status']   : null,
+                    AppointmentSetting::PRICE                      => isset($this->form['payment']['inPerson']['price'])    ? $this->form['payment']['inPerson']['price']    : null,
+                ],
             ]
         ];
 
@@ -311,7 +314,7 @@ class GeneralSetting extends Component
             'cancellation_by_user'  =>  $this->form['cancel']['day'] ?? null,
             'last_day_active'       =>  $endAppointmentTime,
             'first_day_active'      =>  $startAppointmentTime,
-            'active_payment'        =>  isset($this->form['onlinePayment']['online']) ? AppintmentSettingPaymentStatus::tryFrom($this->form['onlinePayment']['status']) : 0,
+            'active_payment'        =>  isset($this->form['payment']['online']) ? AppintmentSettingPaymentStatus::tryFrom($this->form['payment']['status']) : 0,
             'interference'          =>  isset($this->form['interference']['status'])  ? AppintmentSettingInterface::tryFrom($this->form['interference']['status']) : AppintmentSettingInterface::getDefault(),
             'avtive'                =>  ActiveEnum::tryFrom($this->form['avtive']),
             'detail'                =>  $detail,
@@ -437,21 +440,32 @@ class GeneralSetting extends Component
             $this->form['startAppointment']['status'] = true;
         }
         if (isset($apSet->active_payment)) {
-            $this->form['onlinePayment']['status'] = $apSet->active_payment;
+            $this->form['payment']['status'] = $apSet->active_payment;
         }
         if (isset($apSet->interference)) {
             $this->form['interference']['status'] = $apSet->interference;
         }
-        if (isset($apSet->detail[AppointmentSetting::PAYMENT][AppointmentSetting::ONLINE])) {
-            $this->form['onlinePayment'][AppointmentSetting::ONLINE][AppointmentSetting::STATUS] = $apSet->detail[AppointmentSetting::PAYMENT][AppointmentSetting::ONLINE][AppointmentSetting::STATUS];
-            $this->form['onlinePayment']['notPayingStatus']  = $apSet->detail[AppointmentSetting::PAYMENT][AppointmentSetting::ONLINE][AppointmentSetting::NOT_PAYING_STATUS];
+        if (isset($apSet->detail[AppointmentSetting::PAYMENT])) {
+            if (isset($apSet->detail[AppointmentSetting::PAYMENT][AppointmentSetting::STATUS])) {
+                $this->form['payment']['status']  = $apSet->detail[AppointmentSetting::PAYMENT][AppointmentSetting::STATUS];
+            }
+            if (isset($apSet->detail[AppointmentSetting::PAYMENT][AppointmentSetting::NOT_PAYING_STATUS])) {
+                $this->form['payment']['notPayingStatus']  = $apSet->detail[AppointmentSetting::PAYMENT][AppointmentSetting::NOT_PAYING_STATUS];
+            }
+            if (isset($apSet->detail[AppointmentSetting::PAYMENT][AppointmentSetting::ONLINE])) {
+                $this->form['payment'][AppointmentSetting::ONLINE][AppointmentSetting::STATUS] = $apSet->detail[AppointmentSetting::PAYMENT][AppointmentSetting::ONLINE][AppointmentSetting::STATUS];
+                $this->form['payment'][AppointmentSetting::ONLINE][AppointmentSetting::PRICE] = $apSet->detail[AppointmentSetting::PAYMENT][AppointmentSetting::ONLINE][AppointmentSetting::PRICE];
+            }
+            if (isset($apSet->detail[AppointmentSetting::PAYMENT][AppointmentSetting::VOIP])) {
+                $this->form['payment'][AppointmentSetting::VOIP][AppointmentSetting::STATUS] = $apSet->detail[AppointmentSetting::PAYMENT][AppointmentSetting::VOIP][AppointmentSetting::STATUS];
+                $this->form['payment'][AppointmentSetting::VOIP][AppointmentSetting::PRICE] = $apSet->detail[AppointmentSetting::PAYMENT][AppointmentSetting::VOIP][AppointmentSetting::PRICE];
+            }
+            if (isset($apSet->detail[AppointmentSetting::PAYMENT][AppointmentSetting::IN_PERSON])) {
+                $this->form['payment'][AppointmentSetting::IN_PERSON][AppointmentSetting::STATUS] = $apSet->detail[AppointmentSetting::PAYMENT][AppointmentSetting::IN_PERSON][AppointmentSetting::STATUS];
+                $this->form['payment'][AppointmentSetting::IN_PERSON][AppointmentSetting::PRICE] = $apSet->detail[AppointmentSetting::PAYMENT][AppointmentSetting::IN_PERSON][AppointmentSetting::PRICE];
+            }
         }
-        if (isset($apSet->detail[AppointmentSetting::PAYMENT][AppointmentSetting::VOIP])) {
-            $this->form['onlinePayment']['voip'][AppointmentSetting::STATUS] = $apSet->detail[AppointmentSetting::PAYMENT][AppointmentSetting::VOIP][AppointmentSetting::STATUS];
-        }
-        if (isset($apSet->detail[AppointmentSetting::PAYMENT][AppointmentSetting::PRICE])) {
-            $this->form['onlinePayment']['Price'] = $apSet->detail[AppointmentSetting::PAYMENT][AppointmentSetting::PRICE];
-        }
+
         if (isset($apSet->detail[AppointmentSetting::MAX_AVAILABLE_APPOINTMENT_FOR_SECRETERY])) {
             $this->form['maxAvailabeAppointment']['ForSecretery'] = $apSet->detail[AppointmentSetting::MAX_AVAILABLE_APPOINTMENT_FOR_SECRETERY];
         }

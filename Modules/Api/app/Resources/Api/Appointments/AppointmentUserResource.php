@@ -62,11 +62,20 @@ class AppointmentUserResource extends JsonResource
     /**
      * Transform the resource into an array.
      */
+
+    private function getBadge()
+    {
+        if ($this->kind == AppointmentUserKindEnum::IN_PERSION){
+            return null;
+        }
+        return '۲ پیغام جدید';
+    }
     public function toArray($request): array
     {
         return [
             'id' => $this->id,
             'service' => $this->getServiceName(),
+            'badge' => $this->getBadge(),
             'main_user' => UserResource::make($this->user),
             'for_himself' => !isset($this->details[AppointmentUser::DETAIL_FOR_HIMSELF]) || $this->details[AppointmentUser::DETAIL_FOR_HIMSELF] == 1,
             'someone' => $this->details[AppointmentUser::DETAIL_SOMEONE] ?? null,

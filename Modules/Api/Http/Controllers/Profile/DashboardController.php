@@ -79,6 +79,7 @@ class DashboardController extends Controller
             'purchased_courses' => [],
             'courses' => [] ,
             'stories' => $stories ,
+            'chat_badge' => (int) $user->chats()->sum('new_message_by_support'),
             'doctors' => $this->doctors(),
             'news' => [
                 [

@@ -7,6 +7,7 @@ use Illuminate\Http\Resources\Json\JsonResource;
 use Modules\Api\app\Resources\Transaction\TransactionResource;
 use Modules\Api\Transformers\UserResource;
 use Modules\AppointmentUser\app\Models\AppointmentUser;
+use Modules\AppointmentUser\Enum\AppointmentOnlineMessageTypeEnum;
 use Modules\AppointmentUser\Enum\AppointmentUserKindEnum;
 
 class AppointmentUserResource extends JsonResource
@@ -68,7 +69,7 @@ class AppointmentUserResource extends JsonResource
         if ($this->kind == AppointmentUserKindEnum::IN_PERSION){
             return null;
         }
-        return '۲ پیغام جدید';
+        return $this->online->first()->messages()->where('type' , AppointmentOnlineMessageTypeEnum::ANSWER)->where('seen' , '0')->count();
     }
     public function toArray($request): array
     {

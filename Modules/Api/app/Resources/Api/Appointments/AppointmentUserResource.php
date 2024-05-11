@@ -70,7 +70,7 @@ class AppointmentUserResource extends JsonResource
             return null;
         }
         $badge = $this->online->first()->messages()->where('type', AppointmentOnlineMessageTypeEnum::ANSWER)->where('seen', '0')->count();
-        return $badge > 0 ? $badge : null;
+        return $badge > 0 ? $badge ."  پیغام جدید" : null;
     }
     public function toArray($request): array
     {

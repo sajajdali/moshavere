@@ -69,7 +69,8 @@ class AppointmentUserResource extends JsonResource
         if ($this->kind == AppointmentUserKindEnum::IN_PERSION){
             return null;
         }
-        return $this->online->first()->messages()->where('type' , AppointmentOnlineMessageTypeEnum::ANSWER)->where('seen' , '0')->count();
+        $badge = $this->online->first()->messages()->where('type', AppointmentOnlineMessageTypeEnum::ANSWER)->where('seen', '0')->count();
+        return $badge > 0 ? $badge : null;
     }
     public function toArray($request): array
     {

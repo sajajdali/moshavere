@@ -66,7 +66,7 @@ class AppointmentApiOnlineController extends Controller
 //        }
 
         $type = AppointmentOnlineMessageTypeEnum::QUESTION;
-        if ($request->has('type') && $request->has('type') == 2){
+        if ($request->has('type') && $request->get('type') == 2){
             $type = AppointmentOnlineMessageTypeEnum::ANSWER;
         }
         $message = $appointmentOnline->messages()->create([

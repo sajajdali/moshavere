@@ -446,6 +446,7 @@ class AppointmentUserService
 
     public function paymentstatus(AppointmentSetting $appointmentSetting)
     {
+        //TODO::change this function for VOIP and inPerson Payment
         $deadLineDelete = null;
         $statusPayment = false;
         $forcePayment = false;
@@ -458,7 +459,7 @@ class AppointmentUserService
                 $deadLineDelete = Carbon::now()->addHours(4)->toDateTimeString();
                 $forcePayment = true;
             }
-            $price = $detail['payment']['price'];
+            $price = $detail['payment']['online']['price'];
         }
         return [
             'status' => $statusPayment,

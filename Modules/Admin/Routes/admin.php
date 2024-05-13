@@ -19,5 +19,5 @@ Route::get('/shemiranWebLogin', function () {
 
 Route::middleware(['web'])->group(function () {
     Route::get('/secure_login', \Modules\Admin\Livewire\Login::class)->name('login');
-    Route::get('/payment/{transaction}', \Modules\Admin\Livewire\Payment::class)->name('payment');
+    Route::get('/payment/info/{transaction}', \Modules\Admin\Livewire\Payment::class)->name('payment');
 });

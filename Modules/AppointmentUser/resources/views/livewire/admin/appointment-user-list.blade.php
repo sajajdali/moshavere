@@ -362,7 +362,7 @@
                                         <div class="alert alert-info alert-dismissible fade show" role="alert">
                                             <strong>توجه!</strong> نوبتی یافت نشد
                                             <a type="button" class="btn btn-info"
-                                                href="{{ route('admin.appointment.doctor.list') }}">
+                                                href="{{ route('admin.appointment_user.addApp') }}">
                                                 ثبت نوبت
                                             </a>
                                         </div>

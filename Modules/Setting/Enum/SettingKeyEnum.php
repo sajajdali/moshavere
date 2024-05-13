@@ -14,13 +14,13 @@ enum SettingKeyEnum: int implements EnumHasNameInterface, SettingTypeInterface, 
 {
     case DEFAULT_EXERCISE_STATUS = 1;
     case SITE_LOGO_URL = 2;
-    case SITE_TITLE= 3;
+    case SITE_TITLE = 3;
     case APPOINTMENT_STATUS = 4;
     case APPOINTMENT_DESCRIPTION_STATUS = 5;
     case APPOINTMENT_DESCRIPTION = 6;
     case APPOINTMENT_CANCEL_DESCRIPTION = 7;
 
-    //sms
+        //sms
     case SMS_API_TOKEN = 20;
     case SMS_API_LOGIN_TEMPLATE = 30;
     case SMS_APPOINTMENT_RECEIVING_SUCCESSFUL = 31;
@@ -36,12 +36,14 @@ enum SettingKeyEnum: int implements EnumHasNameInterface, SettingTypeInterface, 
 
     case SUPPORT_USER_ROLE = 100;
 
-    //payment
+        //payment
     case PAYMENT_PAYSTAR_STATUS = 152;
     case PAYMENT_PAYSTAR_TOKEN = 150;
     case PAYMENT_PAYSTAR_SIGN = 151;
     case PAYMENT_ZARINPAL_STATUS = 153;
     case PAYMENT_ZARINPAL_MERCHENID = 154;
+    case PAYMENT_RULES_AND_CONDITION_STATUS = 155;
+    case PAYMENT_RULES_AND_CONDITION_DESCRIPTION = 156;
 
 
     case WEIGHT_CHART_DESCRIPTION_APP = 120;
@@ -80,6 +82,8 @@ enum SettingKeyEnum: int implements EnumHasNameInterface, SettingTypeInterface, 
             self::PAYMENT_PAYSTAR_SIGN => 'امضا درگاه پی استار',
             self::PAYMENT_ZARINPAL_STATUS => 'فعال بودن درگاه زرین پال',
             self::PAYMENT_ZARINPAL_MERCHENID => 'مرچند ایدی درگاه زرین پال',
+            self::PAYMENT_RULES_AND_CONDITION_STATUS => 'فعال سازی شرایط و قوانین پرداخت',
+            self::PAYMENT_RULES_AND_CONDITION_DESCRIPTION => 'شرایط و قوانین مربوط به پرداخت',
 
             // sms
             self::SMS_APPOINTMENT_RECEIVING_SUCCESSFUL => 'پیامک به کاربر پس از دریافت نوبت موفق',
@@ -113,7 +117,7 @@ enum SettingKeyEnum: int implements EnumHasNameInterface, SettingTypeInterface, 
              <br/> ۷ = لینک جزئیات
              <br/> ۸ = شماره پیگیری
              ',
-             self::SMS_APPROVED_MONITORING_APPOINTMENT => 'در صورت فعال بودن پایش نوبت ، و تغییر وضعیت نوبت به در انتظار پرداخت(تایید نوبت) این پیامک برای کاربر ارسال میشود',
+            self::SMS_APPROVED_MONITORING_APPOINTMENT => 'در صورت فعال بودن پایش نوبت ، و تغییر وضعیت نوبت به در انتظار پرداخت(تایید نوبت) این پیامک برای کاربر ارسال میشود',
             default => ''
         };
     }
@@ -131,10 +135,12 @@ enum SettingKeyEnum: int implements EnumHasNameInterface, SettingTypeInterface, 
             self::PAYMENT_ZARINPAL_STATUS => SettingTypeEnum::CHECK,
             self::APPOINTMENT_DESCRIPTION_STATUS => SettingTypeEnum::CHECK,
             self::APPOINTMENT_STATUS => SettingTypeEnum::CHECK,
+            self::PAYMENT_RULES_AND_CONDITION_STATUS => SettingTypeEnum::CHECK,
             self::SUPPORT_USER_ROLE => SettingTypeEnum::SELECT,
             self::WEIGHT_CHART_DESCRIPTION_APP => SettingTypeEnum::TEXTAREA,
             self::APPOINTMENT_DESCRIPTION => SettingTypeEnum::TEXTAREA,
             self::APPOINTMENT_CANCEL_DESCRIPTION => SettingTypeEnum::TEXTAREA,
+            self::PAYMENT_RULES_AND_CONDITION_DESCRIPTION => SettingTypeEnum::TEXTAREA,
             default => SettingTypeEnum::TEXT
         };
     }

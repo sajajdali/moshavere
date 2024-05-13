@@ -2,9 +2,9 @@
 
 namespace Modules\Admin\Providers;
 
-use Illuminate\Foundation\Support\Providers\RouteServiceProvider as ServiceProvider;
 use Illuminate\Support\Facades\Route;
-use Modules\Transaction\Entities\Transaction;
+use Modules\Transaction\app\Models\Transaction;
+use Illuminate\Foundation\Support\Providers\RouteServiceProvider as ServiceProvider;
 
 class RouteServiceProvider extends ServiceProvider
 {

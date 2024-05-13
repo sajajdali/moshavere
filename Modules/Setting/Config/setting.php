@@ -48,6 +48,8 @@ return [
             \Modules\Setting\Enum\SettingKeyEnum::PAYMENT_PAYSTAR_SIGN,
             \Modules\Setting\Enum\SettingKeyEnum::PAYMENT_ZARINPAL_STATUS,
             \Modules\Setting\Enum\SettingKeyEnum::PAYMENT_ZARINPAL_MERCHENID,
+            \Modules\Setting\Enum\SettingKeyEnum::PAYMENT_RULES_AND_CONDITION_STATUS,
+            \Modules\Setting\Enum\SettingKeyEnum::PAYMENT_RULES_AND_CONDITION_DESCRIPTION,
         ],
     ],
     'voip' => [

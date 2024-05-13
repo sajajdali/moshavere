@@ -65,4 +65,15 @@ class Discount extends Model
         }
         return '';
     }
+    public function discountCanBeUsed($user)
+    {
+        if (
+            $this->start_at > \now() &&
+            $this->end_at < \now() &&
+            $this->detail[Discount::DETAIL_TOTAL_USAGE] < $this->usage_counter
+        ) {
+            return true;
+        }
+        return false;
+    }
 }

@@ -288,18 +288,18 @@ class GeneralSetting extends Component
                 AppointmentSetting::NOT_PAYING_STATUS                => isset($this->form['payment']['notPayingStatus']) ?  $this->form['payment']['notPayingStatus']  : null,
                 AppointmentSetting::ONLINE =>
                 [
-                    AppointmentSetting::STATUS                     => isset($this->form['payment']['online']['status']) ? $this->form['payment']['online']['status'] : null,
-                    AppointmentSetting::PRICE                      => isset($this->form['payment']['online']['price'])  ? $this->form['payment']['online']['price']  : null,
+                    AppointmentSetting::STATUS                       => isset($this->form['payment']['online']['status']) ? $this->form['payment']['online']['status'] : null,
+                    AppointmentSetting::PRICE                        => isset($this->form['payment']['online']['price'])  ? $this->form['payment']['online']['price']  : null,
                 ],
                 AppointmentSetting::VOIP  =>
                 [
-                    AppointmentSetting::STATUS                     => isset($this->form['payment']['voip']['status'])   ? $this->form['payment']['voip']['status']   : null,
-                    AppointmentSetting::PRICE                      => isset($this->form['payment']['voip']['price'])    ? $this->form['payment']['voip']['price']    : null,
+                    AppointmentSetting::STATUS                       => isset($this->form['payment']['voip']['status'])   ? $this->form['payment']['voip']['status']   : null,
+                    AppointmentSetting::PRICE                        => isset($this->form['payment']['voip']['price'])    ? $this->form['payment']['voip']['price']    : null,
                 ],
                 AppointmentSetting::IN_PERSON  =>
                 [
-                    AppointmentSetting::STATUS                     => isset($this->form['payment']['inPerson']['status'])   ? $this->form['payment']['inPerson']['status']   : null,
-                    AppointmentSetting::PRICE                      => isset($this->form['payment']['inPerson']['price'])    ? $this->form['payment']['inPerson']['price']    : null,
+                    AppointmentSetting::STATUS                       => isset($this->form['payment']['inPerson']['status'])   ? $this->form['payment']['inPerson']['status']   : null,
+                    AppointmentSetting::PRICE                        => isset($this->form['payment']['inPerson']['price'])    ? $this->form['payment']['inPerson']['price']    : null,
                 ],
             ]
         ];

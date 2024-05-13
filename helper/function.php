@@ -25,9 +25,9 @@ function getCurrentSeason()
     }
 }
 
-function generateUniqueCode($length = 4 ,$onlyNumber = false)
+function generateUniqueCode($length = 4, $onlyNumber = false)
 {
-    if ($onlyNumber){
+    if ($onlyNumber) {
         $characters = '0123456789';
     } else {
         $characters = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
@@ -59,7 +59,8 @@ function appointmentUser()
 {
     return app('appointmentUser');
 }
-function formatBytes($bytes, $precision = 2) {
+function formatBytes($bytes, $precision = 2)
+{
     $kilobyte = 1024;
     $megabyte = $kilobyte * 1024;
     $gigabyte = $megabyte * 1024;
@@ -76,7 +77,8 @@ function formatBytes($bytes, $precision = 2) {
 }
 
 
-function chatQuestions(){
+function chatQuestions()
+{
     return [
         [
             'id' => 1,
@@ -376,5 +378,38 @@ function chatQuestions(){
             'answer_detail' => null
         ]
 
+    ];
+}
+
+function feedbackQuestions()
+{
+    return [
+        [
+            'question' => 'از مراحل دریافت نوبت چقدر رضایت دارید؟',
+            'choises' => [
+                'لورم اپسیوملورم اپسیوملورم اپسیوملورم اپسیوملورم اپسیوملورم لورم اپسیوملورم اپسیوملورم اپسیوملورم اپسیوم',
+                ' زیار',
+                'متوسط',
+                'کم',
+            ],
+        ],
+        [
+            'question' => 'چقدر احتمال دارد سیستم نوبت دهی را به ساییر دوستان خود معرفی کنید؟',
+            'choises' => [
+                'اپسیوملورم اپسیوملورم',
+                ' زیار',
+                'متوسط',
+                'کم',
+            ],
+        ],
+        [
+            'question' => 'چقد احتمال دارد که در زمان دریافت نوبت ، نوبت خود را کنسل کنید؟',
+            'choises' => [
+                'بسیار زیار',
+                ' زیار',
+                'اپسیوملورم اپسیوملورم',
+                'کم',
+            ],
+        ],
     ];
 }

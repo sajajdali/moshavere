@@ -2,38 +2,31 @@
 
 namespace App\Providers;
 
-use Illuminate\Foundation\Support\Providers\AuthServiceProvider as ServiceProvider;
-use Illuminate\Support\Facades\Gate;
-use Modules\Chat\app\Models\Chat;
-use Modules\Chat\app\Policies\ChatPolicy;
-use Modules\Core\Entities\Faq;
-use Modules\Core\Policies\FaqPolicy;
-use Modules\Diet\Entities\Condition;
-use Modules\Diet\Entities\DietPlan;
-use Modules\Diet\Entities\Food;
-use Modules\Diet\Entities\FoodUnit;
-use Modules\Diet\Entities\Meal;
-use Modules\Diet\Policies\ConditionPolicy;
-use Modules\Diet\Policies\DietPlanPolicy;
-use Modules\Diet\Policies\FoodPolicy;
-use Modules\Diet\Policies\FoodUnitPolicy;
-use Modules\Diet\Policies\MealPolicy;
-use Modules\Exercise\Entities\Exercise;
-use Modules\Exercise\Entities\ExerciseBodyCategory;
-use Modules\Exercise\Entities\ExercisePlanRequest;
-use Modules\Exercise\Entities\ExercisePlanStrategy;
-use Modules\Exercise\Policies\ExerciseBodyCategoryPolicy;
-use Modules\Exercise\Policies\ExercisePlanRequestPolicy;
-use Modules\Exercise\Policies\ExercisePlanStrategyPolicy;
-use Modules\Exercise\Policies\ExercisePolicy;
-use Modules\Package\Entities\Package;
-use Modules\Package\Policies\PackagePolicy;
-use Modules\Setting\Entities\Setting;
-use Modules\Setting\Policies\SettingPolicy;
 use Modules\User\Entities\User;
+use Spatie\Permission\Models\Role;
+use Modules\Place\app\Models\Place;
+use Illuminate\Support\Facades\Gate;
+use Modules\Setting\Entities\Setting;
 use Modules\User\Policies\RolePolicy;
 use Modules\User\Policies\UserPolicy;
-use Spatie\Permission\Models\Role;
+use Modules\Service\app\Models\Service;
+use Modules\Reminder\app\Models\Reminder;
+use Modules\Place\app\Policies\PlacePolicy;
+use Modules\Setting\Policies\SettingPolicy;
+use Modules\Speciality\app\Models\Speciality;
+use Modules\Service\app\Policies\ServicePolicy;
+use Modules\Reminder\app\Policies\ReminderPolicy;
+use Modules\Speciality\app\Policies\SpecialityPolicy;
+use Modules\AppointmentSetting\app\Policies\AppointmentSettingPolicy;
+use Illuminate\Foundation\Support\Providers\AuthServiceProvider as ServiceProvider;
+use Modules\Absence\app\Models\Absence;
+use Modules\Absence\app\Policies\AbsencePolicy;
+use Modules\AppointmentSetting\app\Models\AppointmentSetting;
+use Modules\AppointmentUser\app\Models\AppointmentUser;
+use Modules\Chat\app\Models\Chat;
+use Modules\Chat\app\Policies\ChatPolicy;
+use Modules\Discount\app\Models\Discount;
+use Modules\Discount\app\Policies\DiscountPolicy;
 
 class AuthServiceProvider extends ServiceProvider
 {
@@ -45,19 +38,16 @@ class AuthServiceProvider extends ServiceProvider
     protected $policies = [
         Role::class => RolePolicy::class,
         User::class => UserPolicy::class,
-        Exercise::class => ExercisePolicy::class,
-        ExerciseBodyCategory::class => ExerciseBodyCategoryPolicy::class,
-        ExercisePlanStrategy::class => ExercisePlanStrategyPolicy::class,
-        ExercisePlanRequest::class => ExercisePlanRequestPolicy::class,
         Setting::class => SettingPolicy::class,
-        Faq::class => FaqPolicy::class,
-        Package::class => PackagePolicy::class,
-        Food::class => FoodPolicy::class,
-        FoodUnit::class => FoodUnitPolicy::class,
-        Condition::class => ConditionPolicy::class,
-        DietPlan::class => DietPlanPolicy::class,
-        Meal::class => MealPolicy::class,
-        Chat::class => ChatPolicy::class
+        Reminder::class => ReminderPolicy::class,
+        Place::class => PlacePolicy::class,
+        Service::class => ServicePolicy::class,
+        Speciality::class => SpecialityPolicy::class ,
+        AppointmentUser::class => AppointmentSettingPolicy::class ,
+        AppointmentSetting::class => AppointmentSettingPolicy::class ,
+        Absence::class => AbsencePolicy::class ,
+        Chat::class => ChatPolicy::class ,
+        Discount::class => DiscountPolicy::class ,
     ];
 
     /**

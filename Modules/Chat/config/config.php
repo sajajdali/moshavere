@@ -17,7 +17,7 @@ return [
 
     'menu' => [
         'title' => 'چت ها',
-        'gate' => ['chat'],
+        'gate' => 'chat',
         'policy_class' => null,
         'has_divider' => true,
         'priority' => 80,
@@ -25,7 +25,7 @@ return [
             [
                 'title' => 'پیام های پشتیبانی',
                 'gate' => 'viewAny',
-                'policy_class' => \Modules\User\Entities\User::class,
+                'policy_class' => \Modules\Chat\app\Models\Chat::class,
                 'icon' => 'fe fe-message-circle',
                 'route' => 'admin.chat',
                 'has_badge' => true,

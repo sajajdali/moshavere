@@ -5,7 +5,7 @@ return [
     'permission' => [
         [
             'gate' => [
-                'appointment_user' => 'دسترسی به وعده ها',
+                'appointment_user' => 'دسترسی به نوبت ها',
             ],
             'type' => 'success',
             'display_name' => 'بخش ثبت نوبت',
@@ -13,6 +13,10 @@ return [
                 'appointment_user.addApp' => 'ثبت نوبت',
                 'appointment_user.edit'   => 'ویرایش نوبت',
                 'appointment_user.delete' => 'حذف نوبت',
+                'appointment_user.list'   => 'مشاهده نوبت ها',
+                'appointment_user.online' => 'لیست نوبت های آنلاین',
+                'appointment_user.inPerson' => 'لیست نوبت های حضوری',
+                'appointment_user.message'  => 'پیام های نوبت آنلاین',
             ],
         ],
     ],

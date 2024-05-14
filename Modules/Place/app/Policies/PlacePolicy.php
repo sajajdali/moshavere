@@ -15,7 +15,7 @@ class PlacePolicy
      */
     public function viewAny(User $user): bool
     {
-        return $user->hasPermissionTo('place.index');
+        return $user->hasPermissionTo('place');
     }
 
     public function create(User $user): bool

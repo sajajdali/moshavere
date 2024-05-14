@@ -10,7 +10,9 @@ return [
             'type' => 'warning',
             'display_name' => 'پیشخوان مدیریت',
             'permissions' => [
-                'admin.dashboard.analytic' => 'مشاهده آمار',
+                'admin.dashboard.appointments' => 'مشاهده نوبت ها',
+                'admin.dashboard.payment'      => 'مشاهده پرداختی ها',
+                'admin.dashboard.analytic'     => 'مشاهده امار نوبت ها',
             ],
         ],
     ],

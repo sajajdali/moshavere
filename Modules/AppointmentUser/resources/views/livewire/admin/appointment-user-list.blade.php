@@ -53,12 +53,14 @@
             {{-- search cards --}}
             <div class="card-body">
                 <div class="mb-5 collapse
-                @foreach ($search as $key => $value)
-                @if ($key == 'kind')
-                    @continue
+                @if ($showcollaps)
+                    @foreach ($search as $key => $value)
+                    @if ($key == 'kind')
+                        @continue
+                    @endif
+                        @if ($value !== null) show @break @endif
+                    @endforeach "
                 @endif
-                    @if ($value !== null) show @break @endif
-                @endforeach "
                     id="advanceSearch" wire:ignore.self>
                     <form class="form-horizontal example" autocomplete="off">
                         <div class="row mb-5">
@@ -121,7 +123,7 @@
                                     isset($search['appointment_set_date']) ||
                                     isset($search['kind']) ||
                                     isset($search['appointment_star_date']) ||
-                                    isset($search['appointment_end_date'])) show @endif"
+                                    isset($search['appointment_end_date']))) show @endif"
                                 id="appointmentCollapsSearch" wire:ignore.self>
                                 <div class="col-md-6">
                                     <label for="search-kind" class="form-label datePicker"><strong>نوع
@@ -325,11 +327,11 @@
                                                 'خود کاربر'
                                             @endif
                                         </td>
-                                        <td>{{ $ap->user->full_name }}</td>
-                                        <td>{{ $ap->user->mobile }}</td>
-                                        <td>{{ $ap->user->document_number ?? '---' }}</td>
-                                        <td>{{ $ap->doctor->full_name }}</td>
-                                        <td>{{ $ap->service?->title }}</td>
+                                        <td>{{ $ap->user?->full_name ?? 'کاربر حذف شده' }}</td>
+                                        <td>{{ $ap->user?->mobile ?? '-----'  }}</td>
+                                        <td>{{ $ap->user?->document_number ?? '---' }}</td>
+                                        <td>{{ $ap->doctor?->full_name ?? 'پزشک حذف شده' }}</td>
+                                        <td>{{ $ap->service?->title ?? 'سرویس حذف شده ' }}</td>
                                         <td>
                                             {{ verta($ap->start_time)->format('H:i') }}
                                             <strong>

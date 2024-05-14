@@ -10,7 +10,9 @@ return [
             'type' => 'success',
             'display_name' => 'مدیریت بخش ها',
             'permissions' => [
-                'Service.update' => 'مدیریت بخش ها',
+                'Service.update' => 'ویرایش بخش',
+                'Service.create' => 'اضافه کردن بخش',
+                'Service.delete' => 'حذف بخش',
             ],
         ],
     ],

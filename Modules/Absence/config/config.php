@@ -5,13 +5,13 @@ return [
     'permission' => [
         [
             'gate' => [
-                'Absence' => 'تنظیمات عدم حضور',
+                'absence' => 'تنظیمات عدم حضور',
             ],
             'type' => 'success',
             'display_name' => 'تنظیمات عدم حضور',
             'permissions' => [
-                'Absence.create' => 'ایجاد عدم حضور',
-                'Absence.delete' => 'حذف عدم حضور ',
+                'absence.create' => 'ایجاد عدم حضور',
+                'absence.delete' => 'حذف عدم حضور ',
             ],
         ],
     ],

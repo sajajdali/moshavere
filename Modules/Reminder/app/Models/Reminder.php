@@ -5,7 +5,6 @@ namespace Modules\Reminder\app\Models;
 use App\Enum\ActiveEnum;
 use Modules\User\Entities\User;
 use Illuminate\Database\Eloquent\Model;
-use Modules\Service\app\Models\Service;
 use Modules\Reminder\Enum\ReminderStatusEnum;
 
 class Reminder extends Model

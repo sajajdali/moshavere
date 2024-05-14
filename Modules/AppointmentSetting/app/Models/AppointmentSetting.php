@@ -11,7 +11,6 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Modules\AppointmentUser\app\Models\AppointmentUser;
 use Modules\AppointmentSetting\app\trait\AppointmentSettingDetailKeyTrait;
-use Modules\AppointmentSetting\Database\factories\AppointmentSettingFactory;
 
 class AppointmentSetting extends Model
 {

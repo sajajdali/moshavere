@@ -3,7 +3,6 @@
 namespace Modules\AppointmentUser\app\Policies;
 
 use Illuminate\Auth\Access\HandlesAuthorization;
-use Modules\AppointmentSetting\app\Models\AppointmentSegment;
 use Modules\AppointmentUser\app\Models\AppointmentUser;
 use Modules\User\Entities\User;
 
@@ -21,6 +20,7 @@ class AppointmentUserPolicy
 
     public function viewAny(User $user): bool
     {
+
         return $user->hasPermissionTo('appointment_user');
     }
 
@@ -31,6 +31,7 @@ class AppointmentUserPolicy
 
     public function delete(User $user, AppointmentUser $appointmentUser): bool
     {
+
         return $user->hasPermissionTo('appointment_user.delete');
     }
 
@@ -38,4 +39,5 @@ class AppointmentUserPolicy
     {
         return $user->hasPermissionTo('appointment_user.edit');
     }
+
 }

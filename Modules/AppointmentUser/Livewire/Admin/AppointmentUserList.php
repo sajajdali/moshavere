@@ -12,6 +12,7 @@ use Spatie\Permission\Models\Role;
 use Modules\User\Enum\UserMetaEnum;
 use Maatwebsite\Excel\Facades\Excel;
 use Hekmatinasser\Verta\Facades\Verta;
+use Illuminate\Support\Facades\Request;
 use Modules\Service\app\Models\Service;
 use Modules\Setting\Enum\SettingKeyEnum;
 use Modules\AppointmentUser\app\Models\AppointmentUser;
@@ -35,7 +36,7 @@ class AppointmentUserList extends Component
         'user_mobile'          => null,
         'appointment_date'     => null,
         'appointment_set_date' => null,
-        'appointment_star_date'=> null,
+        'appointment_star_date' => null,
         'appointment_end_date' => null,
         'AppointmentStatus'    => null,
         'docNumber'            => null,
@@ -46,9 +47,11 @@ class AppointmentUserList extends Component
     ];
     public array $fetchData = [];
     public array $form = [];
+    public bool $showcollaps = true;
 
     public function startSearch()
     {
+        $this->showcollaps = true;
         $this->render();
     }
     public function resetProperties()
@@ -342,6 +345,12 @@ class AppointmentUserList extends Component
         $this->fetchData['Services'] = Service::all();
         $this->fetchData['doctors'] = User::doctors();
 
+        if (request()->has('search')) {
+            $seaechInputs =  request()->input('search');
+            if (isset($seaechInputs['kind']) && $seaechInputs['kind'] === "2" && isset($seaechInputs['AppointmentStatus']) && $seaechInputs['AppointmentStatus'] === "0") {
+                $this->showcollaps = false;
+            }
+        }
     }
 
     public function render()

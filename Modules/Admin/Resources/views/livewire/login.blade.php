@@ -78,7 +78,7 @@
 @push('scripts')
     <script src="https://www.google.com/recaptcha/api.js?render={{ config('app.recaptcha.site_key') }}"></script>
 
-    <script>
+    {{-- <script>
         function resetCaptcha() {
             grecaptcha.ready(function() {
                 grecaptcha.execute('{{ config('app.recaptcha.site_key') }}', {action: 'login'}).then(function(token) {
@@ -94,5 +94,5 @@
         $(document).ready(function () {
             resetCaptcha();
         });
-    </script>
+    </script> --}}
 @endpush

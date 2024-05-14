@@ -35,18 +35,19 @@ class Login extends Component
     {
         $this->message = '';
         $this->validate();
-        $recaptcha = new \ReCaptcha\ReCaptcha(config('app.recaptcha.secret_key'));
-        $resp = $recaptcha
-            ->setExpectedAction('login')
-            ->verify($this->recaptcha, request()->ip());
-        if ($resp->isSuccess()) {
+        // TODO::add recapcha
+        // $recaptcha = new \ReCaptcha\ReCaptcha(config('app.recaptcha.secret_key'));
+        // $resp = $recaptcha
+        //     ->setExpectedAction('login')
+        //     ->verify($this->recaptcha, request()->ip());
+        // if ($resp->isSuccess()) {
             if (auth()->attempt(['email' => $this->email, 'password' => $this->password], true)) {
                 return redirect()->route('admin.dashboard');
             }
             $this->message = 'ایمیل یا رمز عبور اشتباه است';
-        } else {
-            $this->message = 'خطا در سرور! مجدد تلاش کنید.';
-        }
+        // } else {
+        //     $this->message = 'خطا در سرور! مجدد تلاش کنید.';
+        // }
         $this->dispatch('resetReCaptcha');
     }
 

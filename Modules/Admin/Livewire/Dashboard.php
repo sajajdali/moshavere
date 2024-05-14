@@ -4,18 +4,26 @@ namespace Modules\Admin\Livewire;
 
 use Carbon\Carbon;
 use Livewire\Component;
-use Livewire\Attributes\Title;
 use Livewire\WithPagination;
+use Livewire\Attributes\Title;
+use Modules\User\Entities\User;
+use Modules\Setting\Entities\Setting;
+use Modules\Absence\app\Models\Absence;
+use Modules\Setting\Policies\SettingPolicy;
 use Modules\AppointmentUser\app\Models\AppointmentUser;
 use Modules\AppointmentUser\Enum\AppointmentUserStatusEnum;
+use Modules\AppointmentSetting\app\Models\AppointmentSegment;
 
 #[Title('پیشخوان مدیریت')]
 class Dashboard extends Component
 {
     use WithPagination;
+
     public array $fetchData = [];
     public function mount()
     {
+        // dd(auth()->user()->hasPermissionTo('absence'));
+        // dd(auth()->user()->can('viewAny',AppointmentSegment::class));
         //scope functions can be found  in the models
         $this->fetchData['today_appointment']    = AppointmentUser::today()->successful()->get()?->count();
         $this->fetchData['pendding_appointment'] = AppointmentUser::waitpayment()->get()?->count();

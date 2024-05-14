@@ -16,6 +16,6 @@ use Modules\Reminder\Livewire\Admin\Reminder\UpdateOrCreate;
 */
 
 Route::group([], function () {
-    Route::get('reminder/updateOrCreate',UpdateOrCreate::class)->name('reminder.create');
-    Route::get('reminder/list',ReminderList::class)->name('reminder.list');
+    Route::get('reminder/updateOrCreate',UpdateOrCreate::class)->name('reminder.create')->can('viewAny');
+    Route::get('reminder/list',ReminderList::class)->name('reminder.list')->can('viewAny');
 });

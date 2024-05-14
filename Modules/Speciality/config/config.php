@@ -19,7 +19,7 @@ return [
 
     'menu' => [
         'title' => 'تعاریف پایه',
-        'gate' => ['speciality'],
+        'gate' => 'speciality',
         'policy_class' => null,
         'has_divider' => true,
         'priority' => 90,
@@ -27,7 +27,7 @@ return [
             [
                 'title' => 'پیام های یادآوری',
                 'gate' => 'viewAny',
-                'policy_class' => \Modules\User\Entities\User::class,
+                'policy_class' =>  \Modules\Reminder\app\Models\Reminder::class,
                 'icon' => 'fe fe-bell',
                 'route' => null,
                 'has_badge' => false,
@@ -36,7 +36,7 @@ return [
                     [
                         'title' => 'لیست',
                         'gate' => 'viewAny',
-                        'policy_class' => \Modules\User\Entities\User::class,
+                        'policy_class' => \Modules\Reminder\app\Models\Reminder::class,
                         'icon' => 'fa fa-list',
                         'route' => 'admin.reminder.list',
                         'has_child' => false,
@@ -44,8 +44,8 @@ return [
                     ],
                     [
                         'title' => 'افزودن',
-                        'gate' => 'create',
-                        'policy_class' => \Modules\User\Entities\User::class,
+                        'gate' => 'update',
+                        'policy_class' => \Modules\Reminder\app\Models\Reminder::class,
                         'icon' => 'fa fa-plus-circle',
                         'route' => 'admin.reminder.create',
                         'has_child' => false,
@@ -56,7 +56,7 @@ return [
             [
                 'title' => 'تخصص ها',
                 'gate' => 'viewAny',
-                'policy_class' => \Modules\User\Entities\User::class,
+                'policy_class' => \Modules\Speciality\app\Models\Speciality::class,
                 'icon' => 'fe fe-paperclip',
                 'route' => null,
                 'has_badge' => false,
@@ -65,7 +65,7 @@ return [
                     [
                         'title' => 'لیست',
                         'gate' => 'viewAny',
-                        'policy_class' => \Modules\User\Entities\User::class,
+                        'policy_class' =>  \Modules\Speciality\app\Models\Speciality::class,
                         'icon' => 'fa fa-list',
                         'route' => 'admin.speciality.index',
                         'has_child' => false,
@@ -74,7 +74,7 @@ return [
                     [
                         'title' => 'افزودن',
                         'gate' => 'create',
-                        'policy_class' => \Modules\User\Entities\User::class,
+                        'policy_class' => \Modules\Speciality\app\Models\Speciality::class,
                         'icon' => 'fa fa-plus-circle',
                         'route' => 'admin.speciality.manage',
                         'has_child' => false,
@@ -85,7 +85,7 @@ return [
             [
                 'title' => 'مدیریت مطب',
                 'gate' => 'viewAny',
-                'policy_class' => \Modules\User\Entities\User::class,
+                'policy_class' => \Modules\Place\app\Models\Place::class,
                 'icon' => 'fe fe-map-pin',
                 'route' => null,
                 'has_badge' => false,
@@ -94,7 +94,7 @@ return [
                     [
                         'title' => 'لیست',
                         'gate' => 'viewAny',
-                        'policy_class' => \Modules\User\Entities\User::class,
+                        'policy_class' => \Modules\Place\app\Models\Place::class,
                         'icon' => 'fa fa-list',
                         'route' => 'admin.place.list',
                         'has_child' => false,
@@ -102,8 +102,8 @@ return [
                     ],
                     [
                         'title' => 'اضافه کردن',
-                        'gate' => 'viewAny',
-                        'policy_class' => \Modules\User\Entities\User::class,
+                        'gate' => 'create',
+                        'policy_class' => \Modules\Place\app\Models\Place::class,
                         'icon' => 'fa fa-list',
                         'route' => 'admin.place.create',
                         'has_child' => false,
@@ -114,7 +114,7 @@ return [
             [
                 'title' => 'بخش ها',
                 'gate' => 'viewAny',
-                'policy_class' => \Modules\User\Entities\User::class,
+                'policy_class' => \Modules\Service\app\Models\Service::class,
                 'icon' => 'fe fe-anchor',
                 'route' => null,
                 'has_badge' => false,
@@ -123,7 +123,7 @@ return [
                     [
                         'title' => 'لیست',
                         'gate' => 'viewAny',
-                        'policy_class' => \Modules\User\Entities\User::class,
+                        'policy_class' => \Modules\Service\app\Models\Service::class,
                         'icon' => 'fa fa-list',
                         'route' => 'admin.service.list',
                         'has_child' => false,
@@ -131,8 +131,8 @@ return [
                     ],
                     [
                         'title' => 'افزودن',
-                        'gate' => 'viewAny',
-                        'policy_class' => \Modules\User\Entities\User::class,
+                        'gate' => 'create',
+                        'policy_class' => \Modules\Service\app\Models\Service::class,
                         'icon' => 'fa fa-plus-circle',
                         'route' => 'admin.service.create',
                         'has_child' => false,

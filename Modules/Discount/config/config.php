@@ -8,7 +8,7 @@ return [
                 'discount' => 'کد تخفیف',
             ],
             'type' => 'success',
-            'display_name' => 'کد تخفیف',
+            'display_name' => 'دسترسی به کد تخفیف',
             'permissions' => [
                 'discount.update' => 'مدیریت کد تخفیف',
                 'discount.delete' => 'حذف کد تخفیف',
@@ -17,15 +17,15 @@ return [
     ],
     'menu' => [
         'title' => 'امور مالی',
-        'gate' => ['discount'],
-        'policy_class' => null,
+        'gate' => 'viewAny',
+        'policy_class' => \Modules\Discount\app\Models\Discount::class,
         'has_divider' => true,
         'priority' => 70,
         'children' => [ //it is required
             [
                 'title' => 'کد تخفیف',
                 'gate' => 'viewAny',
-                'policy_class' => \Modules\User\Entities\User::class,
+                'policy_class' => \Modules\Discount\app\Models\Discount::class,
                 'icon' => 'fe fe-percent',
                 'route' => null,
                 'has_badge' => false,
@@ -33,8 +33,8 @@ return [
                 'children' => [
                     [
                         'title' => 'افزودن',
-                        'gate' => 'viewAny',
-                        'policy_class' => \Modules\User\Entities\User::class,
+                        'gate' => 'update',
+                        'policy_class' => \Modules\Discount\app\Models\Discount::class,
                         'icon' => 'fe fe-percent',
                         'route' => 'admin.discount.create',
                         'has_child' => false,
@@ -42,8 +42,8 @@ return [
                     ],
                     [
                         'title' => 'لیست',
-                        'gate' => 'create',
-                        'policy_class' => \Modules\User\Entities\User::class,
+                        'gate' => 'viewAny',
+                        'policy_class' => \Modules\Discount\app\Models\Discount::class,
                         'icon' => 'fa fa-plus-circle',
                         'route' => 'admin.discount.list',
                         'has_child' => false,

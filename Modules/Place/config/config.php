@@ -5,16 +5,19 @@ return [
     'permission' => [
         [
             'gate' => [
-                'Place' => 'مدیریت مطب ها',
+                'place' => 'مدیریت مطب ها',
             ],
             'type' => 'success',
             'display_name' => 'مدیریت مطب و کلینیک',
             'permissions' => [
-                'Place.update' => 'مدیریت تنظیمات',
+                'place.update' => 'مدیریت تنظیمات',
+                'place.create' => 'ایجاد مطب',
+                'place.edit' => 'ویرایش مطب',
+                'place.delete' => 'حذف مطب',
             ],
         ],
     ],
 
-    //menu can be find on the Speciality Module 
+    //menu can be find on the Speciality Module
 
 ];

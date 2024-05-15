@@ -5,13 +5,13 @@ return [
     'permission' => [
         [
             'gate' => [
-                'speciality' => 'مدیریت تخصص ها',
+                'speciality' => 'تخصص ها',
             ],
             'type' => 'success',
-            'display_name' => 'تخصص ها',
+            'display_name' => 'دسترسی به تخصص ها',
             'permissions' => [
                 'speciality.create' => 'ایجاد تخصص',
-                'speciality.edit' => 'ویرایش تخصص',
+                'speciality.update' => 'ویرایش تخصص',
                 'speciality.delete' => 'حذف تخصص',
             ],
         ],
@@ -19,7 +19,7 @@ return [
 
     'menu' => [
         'title' => 'تعاریف پایه',
-        'gate' => 'speciality',
+        'gate' => ['speciality','reminder','place','service'],
         'policy_class' => null,
         'has_divider' => true,
         'priority' => 90,
@@ -44,7 +44,7 @@ return [
                     ],
                     [
                         'title' => 'افزودن',
-                        'gate' => 'update',
+                        'gate' => 'create',
                         'policy_class' => \Modules\Reminder\app\Models\Reminder::class,
                         'icon' => 'fa fa-plus-circle',
                         'route' => 'admin.reminder.create',

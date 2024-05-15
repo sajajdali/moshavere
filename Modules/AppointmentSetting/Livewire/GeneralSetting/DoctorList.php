@@ -5,6 +5,7 @@ namespace Modules\AppointmentSetting\Livewire\GeneralSetting;
 use Livewire\Component;
 use Livewire\Attributes\Url;
 use Livewire\WithPagination;
+use Modules\User\Entities\User;
 use Spatie\Permission\Models\Role;
 use Modules\Place\app\Models\Place;
 use Modules\User\Enum\UserMetaEnum;
@@ -50,8 +51,9 @@ class DoctorList extends Component
 
     public function render()
     {
-        $doctors = Role::find(3)->users()
-            ->when(isset($this->search['id']) && (int) $this->search['id'] !== 0, function ($query) {
+        $doctorsQuery = User::doctors_query();
+        if(isset($doctorsQuery)) {
+            $doctorsQuery->when(isset($this->search['id']) && (int) $this->search['id'] !== 0, function ($query) {
                 return $query->where('id', $this->search['id']);
             })
             ->when(isset($this->search['mobile']) && !empty($this->search['mobile']), function ($query) {
@@ -74,8 +76,10 @@ class DoctorList extends Component
                 });
             })
             ->orderByDesc('id')->paginate(10);
+        }
+
         return view('appointmentsetting::livewire.general-setting.doctor-list', [
-            'doctors' => $doctors
+            'doctors' => $doctorsQuery
         ]);
     }
 }

@@ -5,7 +5,9 @@
                 <h1 class="page-title">لیست مطب ها</h1>
             </div>
             <div class="ms-auto pageheader-btn">
-                <a href="{{ route('admin.place.create') }}" class="btn btn-info">افزودن مطب جدید</a>
+                @can('create', Modules\Place\app\Models\Place::class)
+                    <a href="{{ route('admin.place.create') }}" class="btn btn-success">افزودن مطب جدید</a>
+                @endcan
             </div>
         </div>
         @include('admin::layouts.components.alert')
@@ -93,25 +95,33 @@
                                                 </td>
                                                 <td>{{ $place->user()->count() }}</td>
                                                 <td>
-
-                                                    <div class="btn-group mt-2 mb-2">
-                                                        <button type="button" class="btn btn-primary dropdown-toggle"
-                                                            data-bs-toggle="dropdown">
-                                                            عملیات <span class="caret"></span>
-                                                        </button>
-                                                        <ul class="dropdown-menu" role="menu">
-                                                            @can('delete', $place)
-                                                                <li><a class="delete_confirm_alert" data-label="حذف "
-                                                                        data-id="{{ $place->id }}" href="#">حذف</a>
-                                                                </li>
-                                                            @endcan
-                                                            @can('update', $place)
-                                                                <li><a href="{{ route('admin.place.edit', ['place' => $place->id]) }}"
-                                                                        data-label="ویرایش">ویرایش</a>
-                                                                </li>
-                                                            @endcan
-                                                        </ul>
-                                                    </div>
+                                                    @canany(['update', 'delete'], $place)
+                                                        <div class="btn-group mt-2 mb-2">
+                                                            <button type="button" class="btn btn-primary dropdown-toggle"
+                                                                data-bs-toggle="dropdown">
+                                                                عملیات <span class="caret"></span>
+                                                            </button>
+                                                            <ul class="dropdown-menu" role="menu">
+                                                                @can('delete', $place)
+                                                                    <li><a class="delete_confirm_alert" data-label="حذف "
+                                                                            data-id="{{ $place->id }}" href="#">حذف</a>
+                                                                    </li>
+                                                                @endcan
+                                                                @can('edit', $place)
+                                                                    <li><a href="{{ route('admin.place.edit', ['place' => $place->id]) }}"
+                                                                            data-label="ویرایش">ویرایش</a>
+                                                                    </li>
+                                                                @endcan
+                                                            </ul>
+                                                        </div>
+                                                    @else
+                                                        <div class="btn-group mt-2 mb-2">
+                                                            <button type="button" class="btn btn-default dropdown-toggle"
+                                                                data-bs-toggle="dropdown">
+                                                                عملیات <span class="caret"></span>
+                                                            </button>
+                                                        </div>
+                                                    @endcanany
                                                 </td>
                                             </tr>
                                         @endforeach

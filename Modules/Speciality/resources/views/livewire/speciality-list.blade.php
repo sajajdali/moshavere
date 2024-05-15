@@ -4,7 +4,9 @@
             <h1 class="page-title">تمامی تخصص ها</h1>
         </div>
         <div class="ms-auto pageheader-btn">
-            <a class="btn btn-success" href="{{ route('admin.speciality.manage') }}">اضافه کردن تخصص</a>
+            @can('create', \Modules\Speciality\app\Models\Speciality::class)
+                <a class="btn btn-success" href="{{ route('admin.speciality.manage') }}">اضافه کردن تخصص</a>
+            @endcan
         </div>
     </div>
     <!-- PAGE-HEADER END -->
@@ -76,8 +78,9 @@
                                 </tr>
                             </thead>
                             <tbody>
+
                                 @if ($specialities->isNotEmpty())
-                                    @foreach ($specialities as $speciality)
+                                @foreach ($specialities as $speciality)
                                         <tr class="text-center">
                                             <td>{{ $speciality->id }}</td>
                                             <td>{{ $speciality->title }}</td>

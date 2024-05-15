@@ -11,15 +11,15 @@ class SpecialityPolicy
     use HandlesAuthorization;
     public function viewAny(User $user): bool
     {
-        return $user->hasPermissionTo('speciality.update');
+        return $user->hasPermissionTo('speciality');
     }
     public function create(User $user): bool
     {
         return $user->hasPermissionTo('speciality.create');
     }
-    public function edit(User $user): bool
+    public function update(User $user): bool
     {
-        return $user->hasPermissionTo('speciality.edit');
+        return $user->hasPermissionTo('speciality.update');
     }
     public function delete(User $user, Speciality $Speciality): bool
     {

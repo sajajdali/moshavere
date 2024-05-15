@@ -122,8 +122,9 @@ class AppointmentUserCreateOrUpdate extends Component
     }
     public function render()
     {
-        $doctors = User::doctors_query()
-            ->when(isset($this->search['doctors']) && !empty($this->search['doctors']), function ($query) {
+        $docQuery = User::doctors_query();
+        if (isset($docQuery)) {
+           $docQuery =  $docQuery->when(isset($this->search['doctors']) && !empty($this->search['doctors']), function ($query) {
                 return $query->where(function ($q) {
                     $q->whereHas('metas', function ($q) {
                         $q->where([
@@ -138,13 +139,13 @@ class AppointmentUserCreateOrUpdate extends Component
                     });
                 });
             })->orderByDesc('id')->get();
-
+        }
         $Services = Service::query()
             ->when(isset($this->search['searchService']) && !empty($this->search['searchService']), function ($query) {
                 return $query->where('title', 'LIKE', "%{$this->search['searchService']}%");
             })->orderByDesc('id')->get();;
         return view('appointmentuser::livewire.admin.appointment-user-create-or-update', [
-            'doctors' => $doctors,
+            'doctors' => $docQuery,
             'Services' => $Services,
         ]);
     }

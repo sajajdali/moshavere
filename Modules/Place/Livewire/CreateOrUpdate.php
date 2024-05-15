@@ -2,12 +2,13 @@
 
 namespace Modules\Place\Livewire;
 
-use App\Enum\ActiveEnum;
-use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
-use Illuminate\Validation\Validator;
 use Livewire\Component;
-use Modules\Place\app\Models\Place;
+use App\Enum\ActiveEnum;
+use Modules\User\Entities\User;
 use Spatie\Permission\Models\Role;
+use Modules\Place\app\Models\Place;
+use Illuminate\Validation\Validator;
+use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 
 class CreateOrUpdate extends Component
 {
@@ -139,7 +140,7 @@ class CreateOrUpdate extends Component
     }
     public function mount()
     {
-        $this->fetchData['doctors'] = Role::find(3)->users;
+        $this->fetchData['doctors'] = User::doctors();
         $place = request()->route('place');
         if ($place instanceof Place) {
             $this->fillTheForm($place);

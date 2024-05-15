@@ -5,7 +5,9 @@
                 <h1 class="page-title">لیست کد های تخفیف</h1>
             </div>
             <div class="ms-auto pageheader-btn">
-                <a href="{{ route('admin.discount.create') }}" class="btn btn-success">افزودن کد تخفیف جدید</a>
+                @can('create', \Modules\Discount\app\Models\Discount::class)
+                    <a href="{{ route('admin.discount.create') }}" class="btn btn-success">افزودن کد تخفیف جدید</a>
+                @endcan
             </div>
         </div>
         @include('admin::layouts.components.alert')
@@ -19,7 +21,7 @@
                                 data-bs-target="#advanceSearch" aria-expanded="false" aria-controls="advanceSearch">
                                 جست و جوی پیشرفته
                             </button>
-                            @if (isset($search['id']) || isset($search[ 'code']) || isset($search['active']))
+                            @if (isset($search['id']) || isset($search['code']) || isset($search['active']))
                                 <button class="btn btn-secondary ms-2" type="button" wire:click="resetProperties"
                                     data-bs-toggle="collapse" data-bs-target="#advanceSearch" aria-expanded="false"
                                     aria-controls="advanceSearch"
@@ -31,10 +33,8 @@
                     </div>
                     <div class="card-body">
                         <div class="mb-5 collapse
-                        @if (!empty($search['id']) ||
-                         !empty($search['code']) ||
-                         !empty($search['active'])) show @endif" id="advanceSearch"
-                            wire:ignore>
+                        @if (!empty($search['id']) || !empty($search['code']) || !empty($search['active'])) show @endif"
+                            id="advanceSearch" wire:ignore>
                             <form class="form-horizontal example" autocomplete="off">
                                 <div class="row mb-4">
                                     <label for="search-id" class="col-md-2 form-label">ایدی</label>
@@ -118,7 +118,7 @@
                                                     {!! $discount->active->getBadge() !!}
                                                 </td>
                                                 <td>
-
+                                                    @canany(['update','delete'], $discount)
                                                     <div class="btn-group mt-2 mb-2">
                                                         <button type="button" class="btn btn-primary dropdown-toggle"
                                                             data-bs-toggle="dropdown">
@@ -127,7 +127,8 @@
                                                         <ul class="dropdown-menu" role="menu">
                                                             @can('delete', $discount)
                                                                 <li><a class="delete_confirm_alert" data-label="حذف "
-                                                                        data-id="{{ $discount->id }}" href="#">حذف</a>
+                                                                        data-id="{{ $discount->id }}"
+                                                                        href="#">حذف</a>
                                                                 </li>
                                                             @endcan
                                                             @can('update', $discount)
@@ -137,6 +138,14 @@
                                                             @endcan
                                                         </ul>
                                                     </div>
+                                                    @else
+                                                    <div class="btn-group mt-2 mb-2">
+                                                        <button type="button" class="btn btn-default dropdown-toggle"
+                                                            data-bs-toggle="dropdown">
+                                                            عملیات <span class="caret"></span>
+                                                        </button>
+                                                    </div>
+                                                    @endcanany
                                                 </td>
                                             </tr>
                                         @endforeach

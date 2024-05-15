@@ -23,6 +23,7 @@ use Modules\Absence\app\Models\Absence;
 use Modules\Absence\app\Policies\AbsencePolicy;
 use Modules\AppointmentSetting\app\Models\AppointmentSetting;
 use Modules\AppointmentUser\app\Models\AppointmentUser;
+use Modules\AppointmentUser\app\Policies\AppointmentUserPolicy;
 use Modules\Chat\app\Models\Chat;
 use Modules\Chat\app\Policies\ChatPolicy;
 use Modules\Discount\app\Models\Discount;
@@ -43,7 +44,7 @@ class AuthServiceProvider extends ServiceProvider
         Place::class => PlacePolicy::class,
         Service::class => ServicePolicy::class,
         Speciality::class => SpecialityPolicy::class ,
-        AppointmentUser::class => AppointmentSettingPolicy::class ,
+        AppointmentUser::class => AppointmentUserPolicy::class ,
         AppointmentSetting::class => AppointmentSettingPolicy::class ,
         Absence::class => AbsencePolicy::class ,
         Chat::class => ChatPolicy::class ,

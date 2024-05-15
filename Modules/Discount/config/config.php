@@ -10,7 +10,8 @@ return [
             'type' => 'success',
             'display_name' => 'دسترسی به کد تخفیف',
             'permissions' => [
-                'discount.update' => 'مدیریت کد تخفیف',
+                'discount.update' => 'ویرایش کد تخفیف',
+                'discount.create' => 'ایجاد کد تخفیف',
                 'discount.delete' => 'حذف کد تخفیف',
             ],
         ],
@@ -33,7 +34,7 @@ return [
                 'children' => [
                     [
                         'title' => 'افزودن',
-                        'gate' => 'update',
+                        'gate' => 'create',
                         'policy_class' => \Modules\Discount\app\Models\Discount::class,
                         'icon' => 'fe fe-percent',
                         'route' => 'admin.discount.create',

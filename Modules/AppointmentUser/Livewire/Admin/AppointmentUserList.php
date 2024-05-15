@@ -17,6 +17,7 @@ use Modules\Service\app\Models\Service;
 use Modules\Setting\Enum\SettingKeyEnum;
 use Modules\AppointmentUser\app\Models\AppointmentUser;
 use Modules\AppointmentUser\app\Models\AppointmentOnline;
+use Modules\AppointmentUser\Enum\AppointmentUserKindEnum;
 use Modules\AppointmentUser\Enum\AppointmentUserTypeEnum;
 use Modules\AppointmentUser\Enum\AppointmentUserStatusEnum;
 use Modules\AppointmentSetting\app\Models\AppointmentSetting;
@@ -201,6 +202,11 @@ class AppointmentUserList extends Component
                 $query->when($condition, $callback);
             }
         }
+        if (auth()->user()->can('appointment_user.online') && auth()->user()->cannot('appointment_user.list')) {
+            $query->where(function ($q) {
+                $q->where('kind',AppointmentUserKindEnum::ONLINE);
+            });
+        }
         $appointments =  $query->orderByDesc('id')->paginate(10);
         return $appointments;
     }
@@ -341,7 +347,7 @@ class AppointmentUserList extends Component
     {
 
         // TODO::pass roles that can set appointmet in appointmentSetter property ;
-        $this->fetchData['appointmentSetter'] = Role::find(1)->users;
+        $this->fetchData['appointmentSetter'] = null;
         $this->fetchData['Services'] = Service::all();
         $this->fetchData['doctors'] = User::doctors();
 

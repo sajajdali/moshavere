@@ -193,7 +193,7 @@ class AbsenceRegistration extends Component
 
     public function searchDoctor()
     {
-        $query = Role::find(3)->users();
+        $query = User::doctors_query();
         $this->fetchData['doctors'] = $query->when(isset($this->search['id']) && !empty($this->search['id']), function ($query) {
             return $query->where('id', 'LIKE', "%{$this->search['id']}%");
         })->when(isset($this->search['mobile']) && !empty($this->search['mobile']), function ($query) {
@@ -216,12 +216,12 @@ class AbsenceRegistration extends Component
     }
     public function resetProperties()
     {
-        $this->fetchData['doctors'] = Role::find(3)->users;
+        $this->fetchData['doctors'] = User::doctors();
         $this->search = [];
     }
     public function mount()
     {
-        $this->fetchData['doctors'] = Role::find(3)->users;
+        $this->fetchData['doctors'] = User::doctors();
     }
 
 

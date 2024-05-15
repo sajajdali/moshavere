@@ -14,6 +14,10 @@ class DiscountPolicy
     {
         return $user->hasPermissionTo('discount');
     }
+    public function create(User $user): bool
+    {
+        return $user->hasPermissionTo('discount.create');
+    }
     public function update(User $user): bool
     {
         return $user->hasPermissionTo('discount.update');

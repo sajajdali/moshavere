@@ -10,9 +10,8 @@ return [
             'type' => 'success',
             'display_name' => 'مدیریت مطب و کلینیک',
             'permissions' => [
-                'place.update' => 'مدیریت تنظیمات',
                 'place.create' => 'ایجاد مطب',
-                'place.edit' => 'ویرایش مطب',
+                'place.edit'   => 'ویرایش مطب',
                 'place.delete' => 'حذف مطب',
             ],
         ],

@@ -21,6 +21,12 @@
             </div>
         </div>
         <div class="card-body">
+            @if (! isset($doctors))
+            <div class="col-md-12 alert alert-primary fade show" role="alert">
+                <i class="fa fa-bell-o me-2 ms-1" aria-hidden="true"></i>
+                پزشکی یافت نشد ! لطفا ابتدا پزشک به سیستم اضافه کنید .
+            </div>
+            @endif
             <div class="mb-5 collapse {{ $searchPanel }}" id="advanceSearch" wire:ignore>
                 <form class="form-horizontal example" autocomplete="off">
                     <div class="row mb-4">
@@ -58,7 +64,10 @@
                     </button>
                 </form>
             </div>
-            @if ($doctors->count() && $form['services'] != 'true' && $form['place'] != 'true')
+            @if (isset($doctors) && $doctors->isNotEmpty())
+
+            @endif
+            @if (isset($doctors) && $form['services'] != 'true' && $form['place'] != 'true')
                 <div class="row mt-5">
                     <div class="row">
                         <h5 class="text-muted mt-1 mb-5">برای تنظیم زمان حضور، پزشک مورد نظر را انتخاب کنید</h5>
@@ -136,7 +145,7 @@
                 </div>
                 <a href="{{ route('admin.place.create') }}" class="btn btn-success">افزودن مطب جدید
                 </a>
-            @elseif($doctors->count() < 1)
+            @elseif(isset($doctors) &&  $doctors->count() < 1)
                 <div class="alert alert-primary alert-dismissible fade show" role="alert">
                     <span class="alert-inner--text"><strong>پزشکی یافت نشد!!</strong>
                         <br>
@@ -149,10 +158,10 @@
                 </div>
                 <a href="{{ route('admin.user.create') }}" class="btn btn-success">افزودن پزشک جدید
                 </a>
-            @endif
             <div class="d-flex justify-content-center">
-                {{ $doctors->links() }}
+                  {{ $doctors->links() }}
             </div>
+            @endif
         </div>
     </div>
 

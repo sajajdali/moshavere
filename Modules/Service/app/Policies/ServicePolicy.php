@@ -1,32 +1,32 @@
 <?php
 
-namespace Modules\Service\app\Policies;
+namespace Modules\service\app\Policies;
 
 use Modules\User\Entities\User;
 use Illuminate\Auth\Access\HandlesAuthorization;
-use Modules\Service\app\Models\Service;
+use Modules\service\app\Models\service;
 
-class ServicePolicy
+class servicePolicy
 {
     use HandlesAuthorization;
 
     public function viewAny(User $user): bool
     {
-        return $user->hasPermissionTo('Service.index');
+        return $user->hasPermissionTo('service');
     }
 
     public function create(User $user): bool
     {
-        return $user->hasPermissionTo('Service.create');
+        return $user->hasPermissionTo('service.create');
     }
 
     public function delete(User $user, Service $service): bool
     {
-        return $user->hasPermissionTo('Service.delete');
+        return $user->hasPermissionTo('service.delete');
     }
 
     public function update(User $user, Service $service): bool
     {
-        return $user->hasPermissionTo('Service.update');
+        return $user->hasPermissionTo('service.update');
     }
 }

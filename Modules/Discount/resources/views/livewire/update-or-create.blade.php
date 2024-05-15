@@ -72,6 +72,7 @@
                         </div>
                     </div>
                     <div class="col-md-12" id="selectDoctorSelectBox" wire:ignore>
+                        @if (isset($fetchData['doctors']))
                         <div class="form-group">
                             <label class="form-label">انتخاب پزشک</label>
                             <select multiple class="form-control select2-show-search form-select"
@@ -96,6 +97,11 @@
                                 </div>
                             @enderror
                         </div>
+                        @else
+                        <div class="col-md-12 alert alert-info fade show" role="alert">
+                            پزشکی وارد نشده است
+                        </div>
+                        @endif
                     </div>
                 </div>
                 {{-- seperator --}}

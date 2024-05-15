@@ -4,7 +4,9 @@
             <h1 class="page-title">تمامی یادآور ها</h1>
         </div>
         <div class="ms-auto pageheader-btn">
+            @can('create', \Modules\Reminder\app\Models\Reminder::class)
             <a class="btn btn-success" href="{{ route('admin.reminder.create') }}">اضافه کردن یادآور</a>
+            @endcan
         </div>
     </div>
     <!-- PAGE-HEADER END -->

@@ -68,10 +68,15 @@
                         <select multiple class="form-control select2-show-search form-select" id="speciificDocSelect2"
                             wire:ignore.self data-placeholder="انتخاب کنید...">
                             <option label="انتخاب کنید..."></option>
-                            @foreach ($fetchData['doctors'] as $doctor)
-                                <option @if (isset($form['specificDoctors']) && in_array($doctor->id, $form['specificDoctors'])) selected @endif value="{{ $doctor->id }}">
-                                    {{ $doctor->fullname }}</option>
-                            @endforeach
+                            @if (isset($fetchData['doctors']))
+                                @foreach ($fetchData['doctors'] as $doctor)
+                                    <option @if (isset($form['specificDoctors']) && in_array($doctor->id, $form['specificDoctors'])) selected @endif
+                                        value="{{ $doctor->id }}">
+                                        {{ $doctor->fullname }}</option>
+                                @endforeach
+                            @else
+                                <option value="null" disabled>لطفا ابتدا پزشک به سیستم اضافه کنید!!</option>
+                            @endif
                         </select>
                         @error('form.specificDoctors')
                             <div class="text-danger">
@@ -176,9 +181,9 @@
                             </div>
                             <div class="col-md-9">
                                 <div class="form-group">
-                                    <select class="form-control form-select " wire:model='form.parametr.{{$i +1}}'
-                                        data-id="{{ $i }}" wire:ignore.self
-                                        data-placeholder="انتخاب کنید...">
+                                    <select class="form-control form-select "
+                                        wire:model='form.parametr.{{ $i + 1 }}' data-id="{{ $i }}"
+                                        wire:ignore.self data-placeholder="انتخاب کنید...">
                                         <option label="انتخاب کنید..."></option>
                                         @foreach (Modules\Reminder\Enum\ReminderParametersEnum::cases() as $parameter)
                                             <option @if (isset($this->form['parametr']) && in_array($parameter->value, $this->form['parametr'])) selected @endif
@@ -231,7 +236,9 @@
                                             type="radio"id="numberOfBeforeVisitDate_radio"><span></span></label>
                                 </div>
                                 <input class="form-control dayInput" id="numberOfBeforeVisitDate_input" wire:ignore
-                                   @if (! isset($form['send_at_specific_date']) && $form['sendDate'] == 'sameDay'  ) disabled @else value="@if (isset($form['send_at_specific_date'])) {{$form['send_at_specific_date']}}@endif" @endif  placeholder="چند روز قبل از فرا رسیدن روز نوبت" type="text">
+                                    @if (!isset($form['send_at_specific_date']) && $form['sendDate'] == 'sameDay') disabled @else value="@if (isset($form['send_at_specific_date'])) {{ $form['send_at_specific_date'] }} @endif"
+                                    @endif placeholder="چند روز قبل از فرا رسیدن روز نوبت"
+                                type="text">
                                 @error('form.specificDay')
                                     <div class="text-danger">
                                         <i class="fa fa-exclamation-triangle ms-1 mt-1" aria-hidden="true"></i>
@@ -246,7 +253,7 @@
                     <label for="datetimepicker2">چند ساعت قبل از نوبت ارسال شود</label>
                     <div class="input-group col-md-6 ps-0">
                         <input class="form-control @error('form.timeSend') is-invalid @enderror"
-                        @if (isset($form['timeSend']) && !empty($form['timeSend']) ) value="{{$form['timeSend']}}" @endif
+                            @if (isset($form['timeSend']) && !empty($form['timeSend'])) value="{{ $form['timeSend'] }}" @endif
                             id="datetimepicker2" wire:model='form.timeSend' type="number">
                     </div>
                     <small class="text-gray">برای انتخاب روی ساعت کلیک کنید</small>

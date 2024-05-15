@@ -6,7 +6,9 @@
                 <h1 class="page-title">لیست بخش ها</h1>
             </div>
             <div class="ms-auto pageheader-btn">
-                <a href="{{ route('admin.service.create') }}" class="btn btn-info">افزودن بخش جدید</a>
+                @can('create', Modules\Service\app\Models\Service::class)
+                    <a href="{{ route('admin.service.create') }}" class="btn btn-info">افزودن بخش جدید</a>
+                @endcan
             </div>
         </div>
         @include('admin::layouts.components.alert')
@@ -107,24 +109,33 @@
                                                 </td>
                                                 <td>{{ $service->user?->count() ?? 0 }} </td>
                                                 <td>
-                                                    <div class="btn-group mt-2 mb-2">
-                                                        <button type="button" class="btn btn-primary dropdown-toggle"
-                                                            data-bs-toggle="dropdown">
-                                                            عملیات <span class="caret"></span>
-                                                        </button>
-                                                        <ul class="dropdown-menu" role="menu">
-                                                            @can('delete', $service)
-                                                                <li><a class="delete_confirm_alert" data-label="حذف "
-                                                                        data-id="{{ $service->id }}" href="#">حذف</a>
-                                                                </li>
-                                                            @endcan
-                                                            @can('update', $service)
-                                                                <li><a href="{{ route('admin.service.edit', ['service' => $service]) }}"
-                                                                        data-label="ویرایش">ویرایش</a>
-                                                                </li>
-                                                            @endcan
-                                                        </ul>
-                                                    </div>
+                                                    @canany(['update', 'delete'], $service)
+                                                        <div class="btn-group mt-2 mb-2">
+                                                            <button type="button" class="btn btn-primary dropdown-toggle"
+                                                                data-bs-toggle="dropdown">
+                                                                عملیات <span class="caret"></span>
+                                                            </button>
+                                                            <ul class="dropdown-menu" role="menu">
+                                                                @can('delete', $service)
+                                                                    <li><a class="delete_confirm_alert" data-label="حذف "
+                                                                            data-id="{{ $service->id }}" href="#">حذف</a>
+                                                                    </li>
+                                                                @endcan
+                                                                @can('update', $service)
+                                                                    <li><a href="{{ route('admin.service.edit', ['service' => $service]) }}"
+                                                                            data-label="ویرایش">ویرایش</a>
+                                                                    </li>
+                                                                @endcan
+                                                            </ul>
+                                                        </div>
+                                                    @else
+                                                        <div class="btn-group mt-2 mb-2">
+                                                            <button type="button" class="btn btn-default dropdown-toggle"
+                                                                data-bs-toggle="dropdown">
+                                                                عملیات <span class="caret"></span>
+                                                            </button>
+                                                        </div>
+                                                    @endcanany
                                                 </td>
                                             </tr>
                                         @endforeach

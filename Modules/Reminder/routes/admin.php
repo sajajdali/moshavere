@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use Modules\Reminder\app\Models\Reminder;
 use Modules\Reminder\Livewire\Admin\Reminder\ReminderList;
 use Modules\Reminder\Livewire\Admin\Reminder\UpdateOrCreate;
 
@@ -16,6 +17,6 @@ use Modules\Reminder\Livewire\Admin\Reminder\UpdateOrCreate;
 */
 
 Route::group([], function () {
-    Route::get('reminder/updateOrCreate',UpdateOrCreate::class)->name('reminder.create')->can('viewAny');
-    Route::get('reminder/list',ReminderList::class)->name('reminder.list')->can('viewAny');
+    Route::get('reminder/updateOrCreate',UpdateOrCreate::class)->name('reminder.create')->can('create',Reminder::class);
+    Route::get('reminder/list',ReminderList::class)->name('reminder.list')->can('viewAny',Reminder::class);
 });

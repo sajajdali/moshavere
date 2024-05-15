@@ -15,7 +15,6 @@ class ReminderList extends Component
     #[Url]
     public $search = [];
     public $searchPanel = '';
-
     public function startSearch()
     {
         $this->render();

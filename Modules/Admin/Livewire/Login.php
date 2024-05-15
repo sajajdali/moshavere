@@ -27,7 +27,7 @@ class Login extends Component
             return redirect()->route('admin.dashboard');
         }
         if (auth()->check()) {
-            return redirect()->route('profile.dashboard');
+            return redirect()->route('admin.dashboard');
         }
     }
 

@@ -5,12 +5,12 @@ return [
     'permission' => [
         [
             'gate' => [
-                'chat' => 'پیام های کاربران',
+                'chat' => 'دسترسی به پیام های پشتیبانی',
             ],
             'type' => 'success',
-            'display_name' => 'پشتیبانی',
+            'display_name' => 'پیام های پشتیبانی',
             'permissions' => [
-                'chat.update' => 'مدیریت تنظیمات',
+                
             ],
         ],
     ],

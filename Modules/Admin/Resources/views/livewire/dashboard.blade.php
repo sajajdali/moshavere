@@ -14,6 +14,14 @@
     </div>
     @include('admin::layouts.components.alert')
     <div class="row">
+        @if (! Gate::check('admin.dashboard.appointments') &&! Gate::check('admin.dashboard.payment') )
+            <div class="col-12 mb-2">
+                <div class="alert alert-avatar alert-default alert-dismissible">
+                    <i class="fa fa-bell-o me-2" aria-hidden="true"></i>
+                    لطفا از طریق منو ، قسمت مورد نظر خود را انتخاب کنید!
+                </div>
+            </div>
+        @endif
         @can('admin.dashboard.appointments')
             <div class="col-lg-6 col-sm-12 col-md-6 col-xl-3">
                 <div class="card overflow-hidden">

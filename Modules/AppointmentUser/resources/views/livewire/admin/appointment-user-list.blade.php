@@ -3,8 +3,10 @@
         <div>
             <h1 class="page-title">لیست نوبت های ثبت شده</h1>
         </div>
+        @can('appointment_user.addApp')
         <a href="{{ route('admin.appointment_user.addApp') }}" class="btn btn-primary" aria-expanded="false"
             aria-controls="customDate">افزودن نوبت</a>
+        @endcan
     </div>
     @include('admin::layouts.components.alert')
     @error('exelError')
@@ -45,6 +47,7 @@
                                     wire:loading.class="bg-gray btn-loading disabled">نمایش همه نوبت ها
                                 </button>
                             @break
+
                         @endif
                     @endforeach
                 </div>
@@ -53,14 +56,12 @@
             {{-- search cards --}}
             <div class="card-body">
                 <div class="mb-5 collapse
-                @if ($showcollaps)
-                    @foreach ($search as $key => $value)
+                @if ($showcollaps) @foreach ($search as $key => $value)
                     @if ($key == 'kind')
-                        @continue
-                    @endif
+                        @continue @endif
                         @if ($value !== null) show @break @endif
                     @endforeach "
-                @endif
+                    @endif
                     id="advanceSearch" wire:ignore.self>
                     <form class="form-horizontal example" autocomplete="off">
                         <div class="row mb-5">
@@ -123,7 +124,7 @@
                                     isset($search['appointment_set_date']) ||
                                     isset($search['kind']) ||
                                     isset($search['appointment_star_date']) ||
-                                    isset($search['appointment_end_date']))) show @endif"
+                                    isset($search['appointment_end_date'])) ) show @endif"
                                 id="appointmentCollapsSearch" wire:ignore.self>
                                 <div class="col-md-6">
                                     <label for="search-kind" class="form-label datePicker"><strong>نوع
@@ -217,10 +218,12 @@
                                             class="form-control select2-show-search form-select"
                                             data-placeholder="انتخاب کنید..">
                                             <option label="انتخاب کنید.."></option>
-                                            @foreach ($fetchData['appointmentSetter'] as $key => $user)
-                                                <option value="{{ $user->id }}">{{ $user->fullName }}
-                                                </option>
-                                            @endforeach
+                                            @if (isset($fetchData['appointmentSetter']))
+                                                @foreach ($fetchData['appointmentSetter'] as $key => $user)
+                                                    <option value="{{ $user->id }}">{{ $user->fullName }}
+                                                    </option>
+                                                @endforeach
+                                            @endif
                                         </select>
                                     </div>
                                 </div>
@@ -268,9 +271,12 @@
                                     <select class="form-control" id="search-name" wire:model="search.Doc_id"
                                         placeholder="انتخاب کنید" type="text">
                                         <option value="">انتخاب کنید...</option>
-                                        @foreach ($fetchData['doctors'] as $doctor)
-                                            <option value="{{ $doctor->id }}">{{ $doctor->fullName }}</option>
-                                        @endforeach
+                                        @if (isset($fetchData['doctors']))
+                                            @foreach ($fetchData['doctors'] as $doctor)
+                                                <option value="{{ $doctor->id }}">{{ $doctor->fullName }}
+                                                </option>
+                                            @endforeach
+                                        @endif
                                     </select>
                                 </div>
                             </div>
@@ -298,9 +304,7 @@
                                 <th scope="col">ساعت نوبت</th>
                                 <th scope="col">تاریخ نوبت</th>
                                 <th scope="col">تاریخ ثبت نوبت</th>
-                                @can('update', $this->handleSearch()->first())
-                                    <th scope="col">عملیات</th>
-                                @endcan
+                                <th scope="col">عملیات</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -328,7 +332,7 @@
                                             @endif
                                         </td>
                                         <td>{{ $ap->user?->full_name ?? 'کاربر حذف شده' }}</td>
-                                        <td>{{ $ap->user?->mobile ?? '-----'  }}</td>
+                                        <td>{{ $ap->user?->mobile ?? '-----' }}</td>
                                         <td>{{ $ap->user?->document_number ?? '---' }}</td>
                                         <td>{{ $ap->doctor?->full_name ?? 'پزشک حذف شده' }}</td>
                                         <td>{{ $ap->service?->title ?? 'سرویس حذف شده ' }}</td>
@@ -341,8 +345,8 @@
                                         </td>
                                         <td>{{ verta($ap->date_visit)->format('Y/m/d') }}</td>
                                         <td>{{ verta($ap->created_at)->format('Y/m/d') }}</td>
-                                        @can('update', $ap)
-                                            <td>
+                                        <td>
+                                                @canany(['update','delete'], $ap)
                                                 <div class="btn-group mt-2 mb-2">
                                                     <button type="button"
                                                         class="btn {{ $ap->status->getButtonColor() }} dropdown-toggle"
@@ -354,8 +358,15 @@
                                                         @include('appointmentuser::components.appointmentlist.operationbutton')
                                                     </ul>
                                                 </div>
+                                                @else
+                                                <div class="btn-group mt-2 mb-2">
+                                                    <button type="button" class="btn btn-default dropdown-toggle"
+                                                        data-bs-toggle="dropdown">
+                                                        عملیات <span class="caret"></span>
+                                                    </button>
+                                                </div>
+                                                @endcan
                                             </td>
-                                        @endcan
                                     </tr>
                                 @endforeach
                             @else

@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use Modules\Absence\app\Models\Absence;
 use Modules\Absence\Livewire\AbsenceList;
 use Modules\Absence\Livewire\AbsenceRegistration;
 
@@ -16,6 +17,6 @@ use Modules\Absence\Livewire\AbsenceRegistration;
 */
 
 Route::group([], function () {
-    Route::get('appointment/setting/absence', AbsenceRegistration::class)->name('absence.create');
-    Route::get('appointment/setting/absence/list', AbsenceList::class)->name('absence.list');
+    Route::get('appointment/setting/absence', AbsenceRegistration::class)->name('absence.create')->can('create',Absence::class);
+    Route::get('appointment/setting/absence/list', AbsenceList::class)->name('absence.list')->can('viewAny',Absence::class);
 });

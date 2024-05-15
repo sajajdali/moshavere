@@ -25,6 +25,10 @@ class ReminderPolicy
     {
         return $user->hasPermissionTo('reminder.update');
     }
+    public function create(User $user): bool
+    {
+        return $user->hasPermissionTo('reminder.create');
+    }
 
     public function delete(User $user, Reminder $reminder): bool
     {

@@ -82,7 +82,7 @@ class UpdateOrCreateSpeciality extends Component
         } else {
             $this->status  = 'false';
         }
-        $this->doctors = Role::find(3)->users;
+        $this->doctors = User::doctors();
     }
     public function render()
     {

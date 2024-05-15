@@ -7,7 +7,6 @@ use Modules\User\Entities\User;
 use Illuminate\Database\Eloquent\Model;
 use Modules\Service\app\Models\Service;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Modules\Discount\Database\factories\DiscountFactory;
 
 class Discount extends Model
 {
@@ -41,7 +40,7 @@ class Discount extends Model
         $service_titles = [];
         if (!empty($service_id)) {
             foreach ($service_id as $key => $service) {
-                $service_titles[] = Service::find($service)->title;
+                $service_titles[] = Service::find($service)?->title ?? 'سرویس حذف شده است';
             }
             return implode(',', $service_titles);
         }
@@ -59,7 +58,7 @@ class Discount extends Model
         $doctor_names = [];
         if (!empty($doctor_id)) {
             foreach ($doctor_id as $key => $doctor) {
-                $doctor_names[] = User::find($doctor)->fullName;
+                $doctor_names[] = User::find($doctor)?->fullName ?? 'پزشک حذف شده است!';
             }
             return implode(',', $doctor_names);
         }

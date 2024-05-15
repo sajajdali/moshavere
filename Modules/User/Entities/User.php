@@ -195,11 +195,11 @@ class User extends Authenticatable
     }
     public static function doctors()
     {
-        return Role::find(3)->users;
+        return Role::find(3)?->users;
     }
     public static function doctors_query()
     {
-        return Role::find(3)->users();
+        return Role::find(3)?->users();
     }
 
     public function age(): int

@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use Modules\Discount\app\Models\Discount;
 use Modules\Discount\Livewire\DiscountList;
 use Modules\Discount\Livewire\UpdateOrCreate;
 
@@ -16,7 +17,7 @@ use Modules\Discount\Livewire\UpdateOrCreate;
 */
 
 Route::group([], function () {
-    Route::get('discount/create', UpdateOrCreate::class)->name('discount.create');
-    Route::get('discount/edit/{discount}', UpdateOrCreate::class)->name('discount.edit');
-    Route::get('discount/list', DiscountList::class)->name('discount.list');
+    Route::get('discount/create', UpdateOrCreate::class)->name('discount.create')->can('create',Discount::class);
+    Route::get('discount/edit/{discount}', UpdateOrCreate::class)->name('discount.edit')->can('update',Discount::class);
+    Route::get('discount/list', DiscountList::class)->name('discount.list')->can('viewAny',Discount::class);;
 });

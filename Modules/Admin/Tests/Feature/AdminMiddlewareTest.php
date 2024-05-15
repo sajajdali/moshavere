@@ -65,7 +65,7 @@ class AdminMiddlewareTest extends TestCase
 
         // Assert that the middleware redirected to the profile dashboard route (302 status code)
         $this->assertEquals(302, $response->status());
-        $this->assertStringContainsString('profile.dashboard', $response->headers->get('Location'));
+        $this->assertStringContainsString('admin.dashboard', $response->headers->get('Location'));
     }
 
     /**

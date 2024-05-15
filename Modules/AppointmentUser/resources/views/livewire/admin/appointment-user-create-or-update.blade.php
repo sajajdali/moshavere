@@ -5,8 +5,6 @@
         </div>
     </div>
     @include('admin::layouts.components.alert')
-
-
     <!-- ROW-2 OPEN -->
     <div class="row">
         <div class="col-md-12">
@@ -66,6 +64,7 @@
                                             </div>
                                         </div>
                                     </div>
+                                    @if(isset($doctors))
                                     @foreach ($doctors as $key => $doctor)
                                         <div class="col-md-4 col-sm-12">
                                             <div class="card custom-card client-card border">
@@ -75,14 +74,14 @@
                                                             <div class="rounded-circle align-self-start mb-0">
                                                             </div>
                                                             <div class="flex-fill my-1"> <a
-                                                                    href="javascript:void(0);">{{ $doctor->fullName }}</a>
+                                                                    href="javascript:void(0);">{{ $doctor?->fullName ?? '--' }}</a>
                                                                 <p>
-                                                                    @if ($doctor->specialities->isEmpty())
+                                                                    @if ($doctor?->specialities->isEmpty())
                                                                         <span class="badge bg-danger rounded-pill">
                                                                             تخصص ثبت نشده
                                                                         </span>
                                                                     @endif
-                                                                    @foreach ($doctor->specialities as $speciality)
+                                                                    @foreach ($doctor?->specialities as $speciality)
                                                                         <span class="text-gray">
                                                                             {{ $speciality?->title }}</span>
                                                                         @if (!$loop->last)
@@ -110,6 +109,14 @@
                                             </div>
                                         </div>
                                     @endforeach
+                                    @else
+                                    <div class="alert alert-primary alert-dismissible fade show" role="alert">
+                                        <span class="alert-inner--text">پزشکی یافت نشد،لطفا ابتدا پزشکان را به سیستم اضافه کنید!</span>
+                                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close">
+                                            <span aria-hidden="true">×</span>
+                                        </button>
+                                    </div>
+                                    @endif
                                 </div>
                             </div>
                             {{-- section panel  --}}

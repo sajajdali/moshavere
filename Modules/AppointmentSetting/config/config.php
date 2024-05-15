@@ -17,15 +17,15 @@ return [
 
     'menu' => [
         'title' => 'نوبت دهی',
-        'gate' => 'appointment_user',
+        'gate' => ['appointment_user','AppointmentSetting','absence','segment'],
         'policy_class' => null,
         'has_divider' => true,
         'priority' => 80,
         'children' => [ //it is required
             [
                 'title' => 'لیست نوبت های ثبت شده',
-                'gate' => 'viewAny',
-                'policy_class' => \Modules\AppointmentUser\app\Models\AppointmentUser::class,
+                'gate' => 'appointment_user.list',
+                'policy_class' => null,
                 'icon' => 'fe fe-bar-chart-2',
                 'route' => 'admin.appointment_user.list',
                 'has_badge' => false,
@@ -34,8 +34,8 @@ return [
             ],
             [
                 'title' => 'نوبت های آنلاین',
-                'gate' => 'viewAny',
-                'policy_class' => \Modules\AppointmentUser\app\Models\AppointmentUser::class,
+                'gate' => 'appointment_user.online',
+                'policy_class' => null,
                 'icon' => 'fe fe-wifi',
                 'route' => 'admin.appointment_user.list',
                 'param' => '?search[kind]=2&search[AppointmentStatus]=0',
@@ -115,8 +115,8 @@ return [
             ],
             [
                 'title' => 'پیام های نوبت آنلاین',
-                'gate' => 'viewAny',
-                'policy_class' => \Modules\AppointmentUser\app\Models\AppointmentUser::class,
+                'gate' => 'appointment_user.message',
+                'policy_class' => null,
                 'icon' => 'fe fe-message-square',
                 'route' => 'admin.appointment_user.message.list',
                 'has_badge' => false,

@@ -43,20 +43,24 @@ class Reminder extends Model
         if (!empty($this->doctors)) {
             $docName = '';
             foreach ($this->doctors as  $key => $doctorId) {
-                if($key == 0 ) {
-                    $docName .= User::find($doctorId)->fullName;
-                }else{
-                    $docName .= ',' . User::find($doctorId)->fullName;
+                $user = User::find($doctorId);
+                if ($user) {
+                    if ($key == 0) {
+                        $docName .= $user->fullName;
+                    } else {
+                        $docName .= ',' . $user->fullName;
+                    }
                 }
             }
         }
         return $docName;
     }
-    public function getDoctorsNameBadge() :string{
+    public function getDoctorsNameBadge(): string
+    {
         $className = '';
         if (empty($this->doctors)) {
-            $className =  'badge bg-info rounded-pill' ;
+            $className =  'badge bg-info rounded-pill';
         }
-        return $className ;
+        return $className;
     }
 }

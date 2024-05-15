@@ -5,14 +5,14 @@ return [
     'permission' => [
         [
             'gate' => [
-                'Service' => 'تعاریف پایه',
+                'service' => 'بخش ها',
             ],
             'type' => 'success',
-            'display_name' => 'مدیریت بخش ها',
+            'display_name' => 'دسترسی به بخش ها',
             'permissions' => [
-                'Service.update' => 'ویرایش بخش',
-                'Service.create' => 'اضافه کردن بخش',
-                'Service.delete' => 'حذف بخش',
+                'service.update' => 'ویرایش بخش',
+                'service.create' => 'اضافه کردن بخش',
+                'service.delete' => 'حذف بخش',
             ],
         ],
     ],

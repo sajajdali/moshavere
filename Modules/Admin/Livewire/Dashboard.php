@@ -6,10 +6,7 @@ use Carbon\Carbon;
 use Livewire\Component;
 use Livewire\WithPagination;
 use Livewire\Attributes\Title;
-use Modules\User\Entities\User;
-use Modules\Setting\Entities\Setting;
-use Modules\Absence\app\Models\Absence;
-use Modules\Setting\Policies\SettingPolicy;
+use Modules\Service\app\Models\Service;
 use Modules\AppointmentUser\app\Models\AppointmentUser;
 use Modules\AppointmentUser\Enum\AppointmentUserStatusEnum;
 use Modules\AppointmentSetting\app\Models\AppointmentSegment;
@@ -22,9 +19,8 @@ class Dashboard extends Component
     public array $fetchData = [];
     public function mount()
     {
-        // dd(auth()->user()->hasPermissionTo('absence'));
-        // dd(auth()->user()->can('viewAny',AppointmentSegment::class));
         //scope functions can be found  in the models
+        // dd(auth()->user());
         $this->fetchData['today_appointment']    = AppointmentUser::today()->successful()->get()?->count();
         $this->fetchData['pendding_appointment'] = AppointmentUser::waitpayment()->get()?->count();
         $this->fetchData['today_canceld_appointment'] = AppointmentUser::disabled()->today()->get()?->count();

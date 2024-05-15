@@ -2,9 +2,10 @@
 
 namespace App\Http;
 
-use Illuminate\Foundation\Http\Kernel as HttpKernel;
-use Modules\Admin\Http\Middleware\AdminMiddleware;
 use Modules\Api\app\Http\Middleware\BasicAuth;
+use Modules\Admin\Http\Middleware\AdminMiddleware;
+use Illuminate\Foundation\Http\Kernel as HttpKernel;
+use Modules\AppointmentUser\app\Http\Middleware\AppointmentUserListmiddleware;
 
 class Kernel extends HttpKernel
 {
@@ -23,6 +24,7 @@ class Kernel extends HttpKernel
         \Illuminate\Foundation\Http\Middleware\ValidatePostSize::class,
         \App\Http\Middleware\TrimStrings::class,
         \Illuminate\Foundation\Http\Middleware\ConvertEmptyStringsToNull::class,
+       
     ];
 
     /**
@@ -73,5 +75,7 @@ class Kernel extends HttpKernel
         'role' => \Spatie\Permission\Middlewares\RoleMiddleware::class,
         'permission' => \Spatie\Permission\Middlewares\PermissionMiddleware::class,
         'role_or_permission' => \Spatie\Permission\Middlewares\RoleOrPermissionMiddleware::class,
+        'role_or_permission' => \Spatie\Permission\Middlewares\RoleOrPermissionMiddleware::class,
+        'appointment_user_list_middlewere' =>         AppointmentUserListmiddleware::class,
     ];
 }

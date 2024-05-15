@@ -69,7 +69,7 @@ class ServiceAndDoctorModal extends Component
     public function render()
     {
         if ($this->step == 1) {
-            $query = Role::find(3)->users()->when(isset($this->search) && !empty($this->search), function ($query) {
+            $query = User::doctors_query()->when(isset($this->search) && !empty($this->search), function ($query) {
                 return $query->whereHas('metas', function ($q) {
                     $q->where([
                         ['meta_key', UserMetaEnum::LAST_NAME],
@@ -79,7 +79,7 @@ class ServiceAndDoctorModal extends Component
             })->take(10)
                 ->get();
         } else {
-            $query = Role::find(3)->users->take(10);
+            $query = User::doctors()->take(10);
         }
 
         return view(

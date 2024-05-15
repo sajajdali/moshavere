@@ -1,8 +1,9 @@
 <?php
 
+use Modules\Place\app\Models\Place;
 use Illuminate\Support\Facades\Route;
-use Modules\Place\Livewire\CreateOrUpdate;
 use Modules\Place\Livewire\PlaceList;
+use Modules\Place\Livewire\CreateOrUpdate;
 
 /*
 |--------------------------------------------------------------------------
@@ -17,6 +18,6 @@ use Modules\Place\Livewire\PlaceList;
 
 Route::group([], function () {
     Route::get('place/create', CreateOrUpdate::class)->name('place.create')->can('create', \Modules\Place\app\Models\Place::class);
-    Route::get('place/edit/{place}', CreateOrUpdate::class)->name('place.edit')->can('viewAny', \Modules\Place\app\Models\Place::class);
+    Route::get('place/edit/{place}', CreateOrUpdate::class)->name('place.edit')->can('edit', \Modules\Place\app\Models\Place::class);
     Route::get('place/list', PlaceList::class)->name('place.list')->can('viewAny', \Modules\Place\app\Models\Place::class);
 });

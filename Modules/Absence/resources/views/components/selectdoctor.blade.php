@@ -53,6 +53,7 @@
             </div>
             <div class="d-flex justify-content-center">
                 <div class="row">
+                    @if (isset($fetchData['doctors']))
                     <div class="d-flex mt-1 mb-3 align-items-center" wire:ignore>
                         <p style="font-size: medium" class="text-muted">لطفا پزشک و یا پزشکانی که مایل به
                             ویرایش
@@ -88,6 +89,13 @@
                             </div>
                         </div>
                     @endforeach
+                    @else
+                    <div class="col-12 alert alert-primary fade show w-100" role="alert">
+                        <i class="fa fa-bell-o me-2 ms-1" aria-hidden="true"></i>
+                        برای ثبت عدم حضور ، لازم هست که ابتدا پزشک به سیستم اضافه کنید!
+                    </div>
+                    @endif
+
                 </div>
             </div>
             {{-- TODO::alert Message --}}

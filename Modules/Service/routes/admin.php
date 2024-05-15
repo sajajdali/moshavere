@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use Modules\Service\app\Models\Service;
 use Modules\Service\Livewire\ServiceList;
 use Modules\Service\Livewire\CreateOrUpdate;
 
@@ -16,8 +17,8 @@ use Modules\Service\Livewire\CreateOrUpdate;
 */
 
 Route::group([], function () {
-    Route::get('service/craete', CreateOrUpdate::class)->name('service.create')->can('create', \Modules\Place\app\Models\Service::class);
-    Route::get('service/edit/{service}', CreateOrUpdate::class)->name('service.edit')->can('viewAny', \Modules\Place\app\Models\Service::class);
-    Route::get('service/list', ServiceList::class)->name('service.list')->can('viewAny', \Modules\Place\app\Models\Service::class);
+    Route::get('service/craete', CreateOrUpdate::class)->name('service.create')->can('create', Service::class);
+    Route::get('service/edit/{service}', CreateOrUpdate::class)->name('service.edit')->can('update', Service::class);
+    Route::get('service/list', ServiceList::class)->name('service.list')->can('viewAny', Service::class);
 
 });

@@ -4,7 +4,9 @@
             <h1 class="page-title">لیست عدم حضور های ثبت شده</h1>
         </div>
         <div class="ms-auto pageheader-btn">
+            @can('create', Modules\Absence\app\Models\Absence::class)
             <a href="{{ route('admin.absence.create') }}" class="btn btn-info">افزودن</a>
+            @endcan
         </div>
     </div>
     @include('admin::layouts.components.alert')
@@ -95,11 +97,15 @@
                                         <td>
                                             <div class="btn-group mt-2 mb-2">
                                                 @can('delete', $absence)
-                                                @endcan
                                                 <button type="button" class="btn btn-danger delete_confirm_alert"
-                                                    data-label="تنظیمات عدم حضور" data-id="{{ $absence->id }}">
-                                                    حذف
-                                                </button>
+                                                data-label="تنظیمات عدم حضور" data-id="{{ $absence->id }}">
+                                                حذف
+                                                 </button>
+                                                 @else
+                                                 <button type="button" class="btn btn-light" disabled>
+                                                 حذف
+                                                  </button>
+                                            @endcan
                                             </div>
 
                                         </td>

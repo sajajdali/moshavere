@@ -12,10 +12,7 @@ class ChatPolicy
 
     public function viewAny(User $user): bool
     {
-        return $user->hasPermissionTo('appointment_user');
+        return $user->hasPermissionTo('chat');
     }
-    public function update(User $user, Chat $chat): bool
-    {
-        return $user->hasPermissionTo('appointment_user.edit');
-    }
+
 }

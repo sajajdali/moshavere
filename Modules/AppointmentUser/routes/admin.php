@@ -20,10 +20,10 @@ use Modules\AppointmentUser\Livewire\Admin\Online\MessageDetail;
 |
 */
 Route::group([], function () {
-    Route::get('appointment_user/list', AppointmentUserList::class)->name('appointment_user.list')->can('viewAny', AppointmentUser::class);
-    Route::get('appointment_user/create', AppointmentUserCreateOrUpdate::class)->name('appointment_user.addApp')->can('create', AppointmentUser::class) ;
+    Route::get('appointment_user/list', AppointmentUserList::class)->name('appointment_user.list')->middleware('appointment_user_list_middlewere');
+    Route::get('appointment_user/create', AppointmentUserCreateOrUpdate::class)->name('appointment_user.addApp')->middleware('can:appointment_user.addApp') ;
     Route::get('appointment_user/edit/{appointment_user}', AppointmentUserCreateOrUpdate::class)->name('appointment_user.edit')->can('edit', AppointmentUser::class) ;
-    Route::get('appointment_user/Online/message/list', AppointmentOnlineMessagesList::class)->name('appointment_user.message.list')->can('viewAny', AppointmentUser::class) ;
+    Route::get('appointment_user/Online/message/list', AppointmentOnlineMessagesList::class)->name('appointment_user.message.list')->middleware('can:appointment_user.message') ;
     Route::get('appointment_user/Online/message/detail/{onlineAppId}', MessageDetail::class)->name('appointment_user.message.detail')->can('viewAny', AppointmentUser::class) ;
     Route::get('appointment/add/specificday/{serviceId}/{placeId}/{appId}/{date}', SpecificDayAvailableAppointment::class)->name('appointment.add.specificday');
     Route::get('appointment/add/{doctorId}/{sectionId}/{placeId}', ListOfAvailableDay::class)->name('appointment.add.setTime');

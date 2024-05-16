@@ -24,12 +24,19 @@ return [
         'title' => 'تنظمات وبسایت',
         'icon' => 'fa fa-globe',
         'settings' => [
-            \Modules\Setting\Enum\SettingKeyEnum::APPOINTMENT_STATUS,
             \Modules\Setting\Enum\SettingKeyEnum::SITE_LOGO_URL,
             \Modules\Setting\Enum\SettingKeyEnum::SITE_TITLE,
+        ],
+    ],
+    'appointment' => [
+        'title' => 'نوبت دهی',
+        'icon' => 'fa fa-fire',
+        'settings' => [
+            \Modules\Setting\Enum\SettingKeyEnum::APPOINTMENT_STATUS,
             \Modules\Setting\Enum\SettingKeyEnum::APPOINTMENT_DESCRIPTION_STATUS,
             \Modules\Setting\Enum\SettingKeyEnum::APPOINTMENT_DESCRIPTION,
             \Modules\Setting\Enum\SettingKeyEnum::APPOINTMENT_CANCEL_DESCRIPTION,
+            \Modules\Setting\Enum\SettingKeyEnum::APPOINTMENT_USER_PERESENT_STATUS_REGISTRATION,
         ],
     ],
     'support' => [

@@ -52,30 +52,32 @@ class DoctorList extends Component
     public function render()
     {
         $doctorsQuery = User::doctors_query();
-        if(isset($doctorsQuery)) {
-            $doctorsQuery->when(isset($this->search['id']) && (int) $this->search['id'] !== 0, function ($query) {
+        if ($doctorsQuery->get()->isNotEmpty()) {
+            $doctorsQuery =  $doctorsQuery->when(isset($this->search['id']) && (int) $this->search['id'] !== 0, function ($query) {
                 return $query->where('id', $this->search['id']);
             })
-            ->when(isset($this->search['mobile']) && !empty($this->search['mobile']), function ($query) {
-                return $query->where('mobile', 'LIKE', "%{$this->search['mobile']}%");
-            })
-            ->when(isset($this->search['first_name']) && !empty($this->search['first_name']), function ($query) {
-                return $query->whereHas('metas', function ($q) {
-                    $q->where([
-                        ['meta_key', UserMetaEnum::FIRST_NAME],
-                        ['meta_value', 'LIKE', "%{$this->search['first_name']}%"],
-                    ]);
-                });
-            })
-            ->when(isset($this->search['last_name']) && !empty($this->search['last_name']), function ($query) {
-                return $query->whereHas('metas', function ($q) {
-                    $q->where([
-                        ['meta_key', UserMetaEnum::LAST_NAME],
-                        ['meta_value', 'LIKE', "%{$this->search['last_name']}%"],
-                    ]);
-                });
-            })
-            ->orderByDesc('id')->paginate(10);
+                ->when(isset($this->search['mobile']) && !empty($this->search['mobile']), function ($query) {
+                    return $query->where('mobile', 'LIKE', "%{$this->search['mobile']}%");
+                })
+                ->when(isset($this->search['first_name']) && !empty($this->search['first_name']), function ($query) {
+                    return $query->whereHas('metas', function ($q) {
+                        $q->where([
+                            ['meta_key', UserMetaEnum::FIRST_NAME],
+                            ['meta_value', 'LIKE', "%{$this->search['first_name']}%"],
+                        ]);
+                    });
+                })
+                ->when(isset($this->search['last_name']) && !empty($this->search['last_name']), function ($query) {
+                    return $query->whereHas('metas', function ($q) {
+                        $q->where([
+                            ['meta_key', UserMetaEnum::LAST_NAME],
+                            ['meta_value', 'LIKE', "%{$this->search['last_name']}%"],
+                        ]);
+                    });
+                })
+                ->orderByDesc('id')->paginate(10);
+        } else {
+            $doctorsQuery = null;
         }
 
         return view('appointmentsetting::livewire.general-setting.doctor-list', [

@@ -19,6 +19,7 @@ enum SettingKeyEnum: int implements EnumHasNameInterface, SettingTypeInterface, 
     case APPOINTMENT_DESCRIPTION_STATUS = 5;
     case APPOINTMENT_DESCRIPTION = 6;
     case APPOINTMENT_CANCEL_DESCRIPTION = 7;
+    case APPOINTMENT_USER_PERESENT_STATUS_REGISTRATION = 8;
 
         //sms
     case SMS_API_TOKEN = 20;
@@ -69,6 +70,7 @@ enum SettingKeyEnum: int implements EnumHasNameInterface, SettingTypeInterface, 
             self::APPOINTMENT_DESCRIPTION_STATUS    => 'فعال بودن توضیحات در صفحه جزئیات نوبت',
             self::APPOINTMENT_DESCRIPTION    => 'توضیحات مربوط به صفحه جزئیات نوبت',
             self::APPOINTMENT_CANCEL_DESCRIPTION    => 'توضیحات مربوط به کنسلی نوبت',
+            self::APPOINTMENT_USER_PERESENT_STATUS_REGISTRATION    => 'فعال بودن ثبت حضور و یا عدم حضور بیمار',
 
             self::SMS_API_TOKEN => 'توکن API پیامک',
             self::DEFAULT_EXERCISE_STATUS => 'وضعیت برنامه بعد از تجویز',
@@ -136,6 +138,7 @@ enum SettingKeyEnum: int implements EnumHasNameInterface, SettingTypeInterface, 
             self::APPOINTMENT_DESCRIPTION_STATUS => SettingTypeEnum::CHECK,
             self::APPOINTMENT_STATUS => SettingTypeEnum::CHECK,
             self::PAYMENT_RULES_AND_CONDITION_STATUS => SettingTypeEnum::CHECK,
+            self::APPOINTMENT_USER_PERESENT_STATUS_REGISTRATION => SettingTypeEnum::CHECK,
             self::SUPPORT_USER_ROLE => SettingTypeEnum::SELECT,
             self::WEIGHT_CHART_DESCRIPTION_APP => SettingTypeEnum::TEXTAREA,
             self::APPOINTMENT_DESCRIPTION => SettingTypeEnum::TEXTAREA,

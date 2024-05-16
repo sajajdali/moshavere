@@ -30,6 +30,10 @@ class AppointmentUser extends Model
     const USER_MODEL = 'user_model';
     const DISAPPROVED_DESCRIPTION = 'disapproved_description';
 
+    //تنظیمات ثبت حضور بیمار برای نوبت
+    const USRE_ATTENDED_STATUS = 'user_attenede_status';
+
+
     /**
      * The attributes that are mass assignable.
      */
@@ -124,7 +128,14 @@ class AppointmentUser extends Model
     {
         return $this->hasMany(AppointmentOnline::class);
     }
-
+    public function confirm_or_reject_by(): string
+    {
+        $registered_by_user_id =  $this->online()->first()->details;
+        if (isset($registered_by_user_id[AppointmentOnline::COFRIM_OR_REJECT_STATUS]) && isset($registered_by_user_id[AppointmentOnline::COFRIM_OR_REJECT_STATUS][AppointmentOnline::BY])) {
+            return 'تعیین وضعیت: ' . User::find($registered_by_user_id[AppointmentOnline::COFRIM_OR_REJECT_STATUS][AppointmentOnline::BY])->fullName;
+        }
+        return 'تایید شده توسط';
+    }
     protected function asJson($value)
     {
         return json_encode($value, JSON_UNESCAPED_UNICODE);
@@ -134,23 +145,48 @@ class AppointmentUser extends Model
     {
         return $query->whereDate('date_visit', Carbon::today());
     }
-    public function scopeState($query,AppointmentUserStatusEnum $appointmentUserStatusEnum)  {
-        return $query->where('status' , $appointmentUserStatusEnum);
+    public function scopeState($query, AppointmentUserStatusEnum $appointmentUserStatusEnum)
+    {
+        return $query->where('status', $appointmentUserStatusEnum);
     }
-    public function scopeSuccessful($query)  {
+    public function scopeSuccessful($query)
+    {
         return $query->state(AppointmentUserStatusEnum::STATUS_SUCCESSFUL);
     }
-    public function scopeWaitpayment($query)  {
+    public function scopeWaitpayment($query)
+    {
         return $query->state(AppointmentUserStatusEnum::STATUS_WAIT_PAYMENT);
     }
-    public function scopeCanceled($query)  {
+    public function scopeCanceled($query)
+    {
         return $query->state(AppointmentUserStatusEnum::STATUS_CANCEL);
     }
-    public function scopeDisApproved($query)  {
+    public function scopeDisApproved($query)
+    {
         return $query->state(AppointmentUserStatusEnum::STATUS_DISAPPROVED);
     }
-    public function scopeDisabled($query)  {
-        return $query->where('status',AppointmentUserStatusEnum::STATUS_CANCEL)->orWhere('status',AppointmentUserStatusEnum::STATUS_CANCEL);
+    public function scopeDisabled($query)
+    {
+        return $query->where('status', AppointmentUserStatusEnum::STATUS_CANCEL)->orWhere('status', AppointmentUserStatusEnum::STATUS_CANCEL);
     }
 
+    public function attendedStatus()
+    {
+        if (isset($this->details[self::USRE_ATTENDED_STATUS])) {
+            if ($this->details[self::USRE_ATTENDED_STATUS]) {
+                return ' <small class="badge bg-success rounded-pill">
+                حضور
+            </small>';
+            } else {
+                return ' <small class="badge bg-info rounded-pill">
+                عدم حضور
+            </small>';
+            }
+        } else {
+            return ' <small class="badge bg-light rounded-pill">
+            <i class="fa fa-minus-square me-1" aria-hidden="true"></i>
+            نامشخص
+        </small>';
+        }
+    }
 }

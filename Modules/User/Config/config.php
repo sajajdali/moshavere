@@ -8,7 +8,7 @@ return [
             'gate' => [
                 'role' => 'دسترسی به نقش‌ها',
             ],
-            'type' => 'success',
+            'type' => 'light',
             'display_name' => 'نقش‌ها',
             'permissions' => [
                 'role.create' => 'ایجاد نقش',
@@ -21,7 +21,7 @@ return [
                 'user' => 'همه کاربران',
                 'user.own' => 'کاربران خود',
             ],
-            'type' => 'danger',
+            'type' => 'light',
             'display_name' => 'کاربران',
             'permissions' => [
                 'user.create' => 'ایجاد کاربر',

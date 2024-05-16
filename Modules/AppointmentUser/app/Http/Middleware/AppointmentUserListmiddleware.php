@@ -14,7 +14,7 @@ class AppointmentUserListmiddleware
     public function handle(Request $request, Closure $next)
     {
 
-        if (!Gate::any(['appointment_user.list', 'appointment_user.online'])) {
+        if (!Gate::any(['appointment_user.list', 'appointment_user.online','appointment_user.own'])) {
             abort(403, 'Unauthorized action.');
         }
         return $next($request);

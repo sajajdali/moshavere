@@ -20,7 +20,7 @@ use Modules\AppointmentUser\Livewire\Admin\Online\MessageDetail;
 |
 */
 Route::group([], function () {
-    Route::get('appointment_user/list', AppointmentUserList::class)->name('appointment_user.list')->middleware('appointment_user_list_middlewere');
+    Route::get('appointment_user/list', AppointmentUserList::class)->name('appointment_user.list')->middleware(['appointment_user_list_middlewere']);
     Route::get('appointment_user/create', AppointmentUserCreateOrUpdate::class)->name('appointment_user.addApp')->middleware('can:appointment_user.addApp') ;
     Route::get('appointment_user/edit/{appointment_user}', AppointmentUserCreateOrUpdate::class)->name('appointment_user.edit')->can('edit', AppointmentUser::class) ;
     Route::get('appointment_user/Online/message/list', AppointmentOnlineMessagesList::class)->name('appointment_user.message.list')->middleware('can:appointment_user.message') ;

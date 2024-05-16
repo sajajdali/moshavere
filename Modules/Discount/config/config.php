@@ -7,7 +7,7 @@ return [
             'gate' => [
                 'discount' => 'کد تخفیف',
             ],
-            'type' => 'success',
+            'type' => 'light',
             'display_name' => 'دسترسی به کد تخفیف',
             'permissions' => [
                 'discount.update' => 'ویرایش کد تخفیف',

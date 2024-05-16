@@ -7,7 +7,7 @@ return [
             'gate' => [
                 'AppointmentSetting' => 'دسترسی به تنظیمات حضور',
             ],
-            'type' => 'success',
+            'type' => 'light',
             'display_name' => 'تنظیمات زمان های حضور',
             'permissions' => [
                 'AppointmentSetting.update' => 'مدیریت تنظیمات',
@@ -17,14 +17,14 @@ return [
 
     'menu' => [
         'title' => 'نوبت دهی',
-        'gate' => ['appointment_user','AppointmentSetting','absence','segment'],
+        'gate' => ['appointment_user','appointment_user.own','AppointmentSetting','absence','segment'],
         'policy_class' => null,
         'has_divider' => true,
         'priority' => 80,
         'children' => [ //it is required
             [
                 'title' => 'لیست نوبت های ثبت شده',
-                'gate' => 'appointment_user.list',
+                'gate' => ['appointment_user.list','appointment_user.own'],
                 'policy_class' => null,
                 'icon' => 'fe fe-bar-chart-2',
                 'route' => 'admin.appointment_user.list',
@@ -34,7 +34,7 @@ return [
             ],
             [
                 'title' => 'نوبت های آنلاین',
-                'gate' => 'appointment_user.online',
+                'gate' => ['appointment_user.online','appointment_user.own'],
                 'policy_class' => null,
                 'icon' => 'fe fe-wifi',
                 'route' => 'admin.appointment_user.list',
@@ -55,7 +55,7 @@ return [
                     [
                         'title' => 'تنظیمات عمومی',
                         'gate' => 'viewAny',
-                        'policy_class' => \Modules\AppointmentSetting\app\Models\AppointmentSegment::class,
+                        'policy_class' => \Modules\AppointmentSetting\app\Models\AppointmentSetting::class,
                         'icon' => 'fa fa-list',
                         'route' => 'admin.appointment.doctor.list',
                         'has_child' => false,

@@ -7,7 +7,7 @@ return [
             'gate' => [
                 'place' => 'مدیریت مطب ها',
             ],
-            'type' => 'success',
+            'type' => 'light',
             'display_name' => 'مدیریت مطب و کلینیک',
             'permissions' => [
                 'place.create' => 'ایجاد مطب',

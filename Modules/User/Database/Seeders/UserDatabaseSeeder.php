@@ -4,10 +4,11 @@ namespace Modules\User\Database\Seeders;
 
 use Illuminate\Database\Seeder;
 use Modules\User\Entities\User;
+use Spatie\Permission\Models\Role;
 use Modules\User\Entities\UserMeta;
 use Modules\User\Enum\UserMetaEnum;
+use Illuminate\Support\Facades\Artisan;
 use Spatie\Permission\Models\Permission;
-use Spatie\Permission\Models\Role;
 
 class UserDatabaseSeeder extends Seeder
 {
@@ -33,41 +34,64 @@ class UserDatabaseSeeder extends Seeder
                 'meta_value' => 'کل',
             ]),
         ]);
-        //create مدیر Role
-        /** @var Role $role */
+
+        // Create roles
         $role = Role::create(['name' => 'مدیر']);
-        /** @var Role $userDefaultRole */
         $userDefaultRole = Role::create(['name' => 'کاربر']);
-        /** @var Role $doctores */
-        $doctores_roles = Role::create(['name' => 'پزشک']);
-        /** @var Role $secretury */
-        $secretury_roles = Role::create(['name' => 'منشی']);
-        /** @var Role $operator */
-        $operator_roles = Role::create(['name' => 'اپراتور']);
+        $doctorsRoles = Role::create(['name' => 'پزشک']);
+        $secretaryRoles = Role::create(['name' => 'منشی']);
+        $mamaRoles = Role::create(['name' => 'ماما']);
 
-        //create ADMIN and SUPER_ADMIN Permissions
-        $admin                = Permission::create(['name' => 'ADMIN_ACCESS']);
-        $superAdmin           = Permission::create(['name' => 'SUPER_ADMIN']);
-        $doctor_permission    = Permission::create(['name' => 'DOCTOR']);
-        $secretury_permission = Permission::create(['name' => 'SECRETERY']);
-        $operator_permission  = Permission::create(['name' => 'OPERATOR']);
-
-        //create User essential permissions
+        // Create permissions
+        $adminPermission = Permission::create(['name' => 'ADMIN_ACCESS']);
+        $superAdminPermission = Permission::create(['name' => 'SUPER_ADMIN']);
+        $doctorPermission = Permission::create(['name' => 'DOCTOR']);
+        $secretaryPermission = Permission::create(['name' => 'SECRETERY']);
         $userPermission = Permission::create(['name' => 'USER_ACCESS']);
         $userDefaultPermission = Permission::create(['name' => 'USER_DEFAULT']);
-        //assign ADMIN and SUPER_ADMIN Permissions to مدیر Role
-        $role->givePermissionTo($admin);
-        $role->givePermissionTo($superAdmin);
-        $doctores_roles->givePermissionTo($admin);
-        $doctores_roles->givePermissionTo($doctor_permission);
-        $secretury_roles->givePermissionTo($admin);
-        $secretury_roles->givePermissionTo($secretury_permission);
-        $operator_roles->givePermissionTo($admin);
-        $operator_roles->givePermissionTo($operator_permission);
-        //assign User essential permissions to کاربران Role
-        $userDefaultRole->givePermissionTo($userPermission);
-        $userDefaultRole->givePermissionTo($userDefaultPermission);
-        //assign مدیر Role to first user factory
-        $user->syncRoles($role);
+
+        // Assign permissions to roles
+        $role->givePermissionTo([$adminPermission, $superAdminPermission]);
+        $doctorsRoles->givePermissionTo([$adminPermission, $doctorPermission]);
+
+        // Assign User essential permissions to کاربران Role
+        $userDefaultRole->givePermissionTo([$userPermission, $userDefaultPermission]);
+
+        // Assign مدیر Role to first user factory (assuming $user is defined)
+        $user->assignRole($role);
+
+        // Run permission synchronization command
+        Artisan::call('auth:permission-sync');
+
+        // Sync permissions for secretery Role
+        $secretaryPermissions  = [
+            $adminPermission,
+            $secretaryPermission,
+            'appointment_user',
+            'appointment_user.addApp',
+            'appointment_user.edit',
+            'appointment_user.delete',
+            'appointment_user.list',
+            'appointment_user.online',
+            'appointment_user.message',
+            'absence',
+            'absence.create',
+            'absence.delete',
+            'admin.dashboard',
+            'admin.dashboard.appointments',
+            'admin.dashboard.analytic',
+            'AppointmentSetting',
+            'AppointmentSetting.update',
+            'chat',
+            'user',
+            'user.create',
+            'user.edit',
+            'user.delete',
+            'user.documentte',
+        ];
+        $secretaryRoles->syncPermissions($secretaryPermissions);
+        // Sync permissions for mama Role
+        $mamaPermissions = [$adminPermission, 'appointment_user', 'appointment_user.online', 'appointment_user.message'];
+        $mamaRoles->syncPermissions($mamaPermissions);
     }
 }

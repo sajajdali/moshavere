@@ -7,7 +7,7 @@ return [
             'gate' => [
                 'admin.dashboard' => 'پیشخوان مدیریت',
             ],
-            'type' => 'warning',
+            'type' => 'light',
             'display_name' => 'پیشخوان مدیریت',
             'permissions' => [
                 'admin.dashboard.appointments' => 'مشاهده نوبت ها',

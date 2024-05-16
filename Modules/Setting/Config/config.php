@@ -7,7 +7,7 @@ return [
             'gate' => [
                 'setting' => 'دسترسی به بخش تنظیمات',
             ],
-            'type' => 'danger',
+            'type' => 'light',
             'display_name' => 'بخش تنظیمات',
             'permissions' => [
             ]

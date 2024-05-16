@@ -4,8 +4,8 @@
             <h1 class="page-title">لیست نوبت های ثبت شده</h1>
         </div>
         @can('appointment_user.addApp')
-        <a href="{{ route('admin.appointment_user.addApp') }}" class="btn btn-primary" aria-expanded="false"
-            aria-controls="customDate">افزودن نوبت</a>
+            <a href="{{ route('admin.appointment_user.addApp') }}" class="btn btn-primary" aria-expanded="false"
+                aria-controls="customDate">افزودن نوبت</a>
         @endcan
     </div>
     @include('admin::layouts.components.alert')
@@ -325,13 +325,29 @@
                                             {!! $ap->kind->getBadge() !!}
                                         </td>
                                         <td>
-                                            @if ($ap->agent)
-                                                {{ $ap->agent->fullName }}
-                                            @else
-                                                'خود کاربر'
-                                            @endif
+                                            <div class="d-flex flex-column">
+                                                @if ($ap->agent)
+                                                    <span> {{ $ap->agent->fullName }}</span>
+                                                @else
+                                                    <span>خود کاربر</span>
+                                                @endif
+                                                @if ($ap->kind == \Modules\AppointmentUser\Enum\AppointmentUserKindEnum::ONLINE)
+                                                    <small class="badge bg-light rounded-pill">
+                                                        <span> {{ $ap->confirm_or_reject_by() }}</span>
+                                                    </small>
+                                                @endif
+                                            </div>
                                         </td>
-                                        <td>{{ $ap->user?->full_name ?? 'کاربر حذف شده' }}</td>
+                                        <td>
+                                            <div class="d-flex flex-column">
+                                                <span>
+                                                    {{ $ap->user?->full_name ?? 'کاربر حذف شده' }}
+                                                </span>
+                                                @if (setting(\Modules\Setting\Enum\SettingKeyEnum::APPOINTMENT_USER_PERESENT_STATUS_REGISTRATION))
+                                                    {!! $ap->attendedStatus() !!}
+                                                @endif
+                                            </div>
+                                        </td>
                                         <td>{{ $ap->user?->mobile ?? '-----' }}</td>
                                         <td>{{ $ap->user?->document_number ?? '---' }}</td>
                                         <td>{{ $ap->doctor?->full_name ?? 'پزشک حذف شده' }}</td>
@@ -346,7 +362,7 @@
                                         <td>{{ verta($ap->date_visit)->format('Y/m/d') }}</td>
                                         <td>{{ verta($ap->created_at)->format('Y/m/d') }}</td>
                                         <td>
-                                                @canany(['update','delete'], $ap)
+                                            @canany(['update', 'delete'], $ap)
                                                 <div class="btn-group mt-2 mb-2">
                                                     <button type="button"
                                                         class="btn {{ $ap->status->getButtonColor() }} dropdown-toggle"
@@ -358,15 +374,15 @@
                                                         @include('appointmentuser::components.appointmentlist.operationbutton')
                                                     </ul>
                                                 </div>
-                                                @else
+                                            @else
                                                 <div class="btn-group mt-2 mb-2">
                                                     <button type="button" class="btn btn-default dropdown-toggle"
                                                         data-bs-toggle="dropdown">
                                                         عملیات <span class="caret"></span>
                                                     </button>
                                                 </div>
-                                                @endcan
-                                            </td>
+                                            @endcan
+                                        </td>
                                     </tr>
                                 @endforeach
                             @else

@@ -64,9 +64,6 @@
                     </button>
                 </form>
             </div>
-            @if (isset($doctors) && $doctors->isNotEmpty())
-
-            @endif
             @if (isset($doctors) && $form['services'] != 'true' && $form['place'] != 'true')
                 <div class="row mt-5">
                     <div class="row">
@@ -130,8 +127,10 @@
                         <span aria-hidden="true">×</span>
                     </button>
                 </div>
+                @can('create', \Modules\Service\app\Models\Service::class)
                 <a href="{{ route('admin.service.create') }}" class="btn btn-success">افزودن بخش جدید
                 </a>
+                @endcan
             @elseif($form['place'])
                 <div class="alert alert-primary alert-dismissible fade show" role="alert">
                     <span class="alert-inner--text"><strong>مطب یافت نشد!!</strong>

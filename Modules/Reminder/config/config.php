@@ -7,7 +7,7 @@ return [
             'gate' => [
                 'reminder' => 'تنظیمات یادآوری',
             ],
-            'type' => 'success',
+            'type' => 'light',
             'display_name' => 'تنظیمات یادآوری',
             'permissions' => [
                 'reminder.update' => 'ویرایش یادآوری',

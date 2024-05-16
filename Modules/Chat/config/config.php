@@ -7,10 +7,10 @@ return [
             'gate' => [
                 'chat' => 'دسترسی به پیام های پشتیبانی',
             ],
-            'type' => 'success',
+            'type' => 'light',
             'display_name' => 'پیام های پشتیبانی',
             'permissions' => [
-                
+
             ],
         ],
     ],

@@ -7,7 +7,7 @@ return [
             'gate' => [
                 'speciality' => 'تخصص ها',
             ],
-            'type' => 'success',
+            'type' => 'light',
             'display_name' => 'دسترسی به تخصص ها',
             'permissions' => [
                 'speciality.create' => 'ایجاد تخصص',

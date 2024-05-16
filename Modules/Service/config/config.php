@@ -7,7 +7,7 @@ return [
             'gate' => [
                 'service' => 'بخش ها',
             ],
-            'type' => 'success',
+            'type' => 'light',
             'display_name' => 'دسترسی به بخش ها',
             'permissions' => [
                 'service.update' => 'ویرایش بخش',

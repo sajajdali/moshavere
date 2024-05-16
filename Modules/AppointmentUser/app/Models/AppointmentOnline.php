@@ -10,10 +10,13 @@ use Modules\User\Entities\User;
 class AppointmentOnline extends Model
 {
     use  SoftDeletes;
+    const COFRIM_OR_REJECT_STATUS = 'confirm_or_reject_status';
+    const BY = 'by';
+    const DATE = 'date';
 
     protected $casts = [
         'status' => AppointmentOnlineStatusEnum::class,
-        'json' => 'json',
+        'details' => 'json',
     ];
 
     protected $table = 'appointment_online';

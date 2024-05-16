@@ -7,7 +7,7 @@ return [
             'gate' => [
                 'absence' => 'تنظیمات عدم حضور',
             ],
-            'type' => 'success',
+            'type' => 'light',
             'display_name' => 'تنظیمات عدم حضور',
             'permissions' => [
                 'absence.create' => 'ایجاد عدم حضور',

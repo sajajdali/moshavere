@@ -5,9 +5,10 @@ return [
     'permission' => [
         [
             'gate' => [
-                'appointment_user' => 'دسترسی به نوبت ها',
+                'appointment_user.own' => 'تمامی نوبت هایی که خودش ثبت کرده',
+                'appointment_user' => 'تمامی نوبت ها',
             ],
-            'type' => 'success',
+            'type' => 'light',
             'display_name' => 'بخش ثبت نوبت',
             'permissions' => [
                 'appointment_user.addApp' => 'ثبت نوبت',

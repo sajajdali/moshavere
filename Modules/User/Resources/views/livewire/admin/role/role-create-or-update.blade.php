@@ -64,7 +64,7 @@
                                                         <div
                                                             class="expanel expanel-{{ $permission['type'] ?? 'info' }}">
                                                             <div class="expanel-heading">
-                                                                <h3 class="expanel-title">{{ $permission['display_name'] }}
+                                                                <h3 class="expanel-title my-2">{{ $permission['display_name'] }}
                                                                     <div class="pull-left">
                                                                         <label class="rdiobox"
                                                                                for="rdio-disabled-{{ $parentIndex }}-{{ $index }}">

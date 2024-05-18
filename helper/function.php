@@ -1,4 +1,7 @@
 <?php
+
+use Modules\Front\Enum\FeedbackId;
+
 function getCurrentSeason()
 {
     $month = \Carbon\Carbon::now()->format('n');
@@ -383,33 +386,13 @@ function chatQuestions()
 
 function feedbackQuestions()
 {
-    return [
-        [
-            'question' => 'از مراحل دریافت نوبت چقدر رضایت دارید؟',
-            'choises' => [
-                'لورم اپسیوملورم اپسیوملورم اپسیوملورم اپسیوملورم اپسیوملورم لورم اپسیوملورم اپسیوملورم اپسیوملورم اپسیوم',
-                ' زیار',
-                'متوسط',
-                'کم',
-            ],
-        ],
-        [
-            'question' => 'چقدر احتمال دارد سیستم نوبت دهی را به ساییر دوستان خود معرفی کنید؟',
-            'choises' => [
-                'اپسیوملورم اپسیوملورم',
-                ' زیار',
-                'متوسط',
-                'کم',
-            ],
-        ],
-        [
-            'question' => 'چقد احتمال دارد که در زمان دریافت نوبت ، نوبت خود را کنسل کنید؟',
-            'choises' => [
-                'بسیار زیار',
-                ' زیار',
-                'اپسیوملورم اپسیوملورم',
-                'کم',
-            ],
-        ],
-    ];
+    $return_q = [];
+    foreach (FeedbackId::cases() as $question) {
+        $return_q[] = [
+            'id' => $question,
+            'question' => $question->getQuestion(),
+            'choises' => $question->getQuestionChoises(),
+        ];
+    }
+    return $return_q;
 }

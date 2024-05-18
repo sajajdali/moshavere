@@ -8,28 +8,19 @@ use Livewire\Attributes\Url;
 use Livewire\WithPagination;
 use Modules\User\Entities\User;
 use Livewire\Attributes\Computed;
-use Spatie\Permission\Models\Role;
 use Modules\User\Enum\UserMetaEnum;
 use Maatwebsite\Excel\Facades\Excel;
 use Hekmatinasser\Verta\Facades\Verta;
-use Illuminate\Support\Facades\Request;
 use Modules\Service\app\Models\Service;
-use Modules\Setting\Enum\SettingKeyEnum;
 use Modules\AppointmentUser\app\Models\AppointmentUser;
 use Modules\Appointmentuser\Traits\OprationButtonsTrait;
-use Modules\AppointmentUser\app\Models\AppointmentOnline;
 use Modules\AppointmentUser\Enum\AppointmentUserKindEnum;
-use Modules\AppointmentUser\Enum\AppointmentUserTypeEnum;
 use Modules\AppointmentUser\Enum\AppointmentUserStatusEnum;
-use Modules\AppointmentSetting\app\Models\AppointmentSetting;
-use Modules\AppointmentUser\Enum\AppointmentOnlineStatusEnum;
-use Modules\AppointmentUser\app\Events\CancelAppointmentEvent;
 use Modules\AppointmentUser\app\Exports\AppointmentListExport;
-use Modules\AppointmentUser\app\Notifications\AppointmentSmsNotification;
 
 class AppointmentUserList extends Component
 {
-    use WithPagination , OprationButtonsTrait ;
+    use WithPagination, OprationButtonsTrait;
     #[Url]
     public array $search = [
         'user_id'              => null,
@@ -242,6 +233,12 @@ class AppointmentUserList extends Component
         return redirect()->route('admin.appointment_user.list')->with('success', $msg);
     }
     //opdation button functions end
+
+    public function lunchFeedBackModal(AppointmentUser $appointmentUser)
+    {
+        $this->fetchData['feedbacks'] = $appointmentUser->feedbacks ;
+        $this->dispatch('lunchFeedBackModal',true);
+    }
     public function booted()
     {
         $this->dispatch('loadJs', true);

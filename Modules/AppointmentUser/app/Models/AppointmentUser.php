@@ -16,6 +16,7 @@ use Modules\AppointmentUser\Enum\AppointmentUserKindEnum;
 use Modules\AppointmentUser\Enum\AppointmentUserTypeEnum;
 use Modules\AppointmentUser\Enum\AppointmentUserStatusEnum;
 use Modules\AppointmentSetting\app\Models\AppointmentSetting;
+use Modules\Front\app\Models\FeedBack;
 
 class AppointmentUser extends Model
 {
@@ -188,5 +189,9 @@ class AppointmentUser extends Model
             نامشخص
         </small>';
         }
+    }
+    public function feedbacks()
+    {
+        return $this->hasMany(FeedBack::class);
     }
 }

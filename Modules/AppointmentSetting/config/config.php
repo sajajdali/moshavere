@@ -17,7 +17,7 @@ return [
 
     'menu' => [
         'title' => 'نوبت دهی',
-        'gate' => ['appointment_user','appointment_user.own','AppointmentSetting','absence','segment'],
+        'gate' => ['appointment_user','appointment_user.own','AppointmentSetting','absence','segment','appointment_user.feedBack'],
         'policy_class' => null,
         'has_divider' => true,
         'priority' => 80,
@@ -119,6 +119,16 @@ return [
                 'policy_class' => null,
                 'icon' => 'fe fe-message-square',
                 'route' => 'admin.appointment_user.message.list',
+                'has_badge' => false,
+                'has_child' => false,
+                'children' => null
+            ],
+            [
+                'title' => 'نظر سنجی ',
+                'gate' => 'appointment_user.feedback',
+                'policy_class' => null,
+                'icon' => 'fe fe-help-circle',
+                'route' => 'admin.appointment.feedback',
                 'has_badge' => false,
                 'has_child' => false,
                 'children' => null

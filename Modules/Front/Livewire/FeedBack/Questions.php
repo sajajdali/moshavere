@@ -20,12 +20,14 @@ class Questions extends Component
     #[Locked]
     public bool $feedBackCompelete = false;
 
+    public $appintment_user_id ;
+
     public function nxtQuestion($key)
     {
         if ($key === null) {
-            $this->addError('selectAwnser',true);
-        }else{
-            $this->form[$this->step] = $key;
+            $this->addError('selectAwnser', true);
+        } else {
+            $this->form[$this->fetchData['questions'][$this->step]['id']->value] = $key;
             if (count($this->fetchData['questions']) > $this->step + 1) {
                 $this->step++;
             } else {
@@ -46,6 +48,7 @@ class Questions extends Component
     }
     public function mount()
     {
+        $this->appintment_user_id =  request()->route('appointment_user_id') ;
         $this->step = 0;
         $this->fetchData['questions'] = feedbackQuestions();
     }

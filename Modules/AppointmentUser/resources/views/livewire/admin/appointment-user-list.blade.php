@@ -313,12 +313,22 @@
                                     <tr class="text-center {{ $ap->getColor() }}"
                                         wire:key='appoimt_{{ $ap->id }}'>
                                         <td>{{ $ap->id }}</td>
-                                        <td class="p-4">
-                                            <label class="mt-1" for="checkbox-{{ $ap->id }}">
-                                                <input wire:model='form.checkbox.{{ $ap->id }}'
-                                                    class="checkbox" id="checkbox-{{ $ap->id }}"
-                                                    type="checkbox" value="">
-                                            </label>
+                                        <td class="p-4 ">
+                                            <div class="d-flex flex-column">
+                                                <label class="mt-1" for="checkbox-{{ $ap->id }}">
+                                                    <input wire:model='form.checkbox.{{ $ap->id }}'
+                                                        class="checkbox" id="checkbox-{{ $ap->id }}"
+                                                        type="checkbox" value="">
+                                                </label>
+                                                @can('appointment_user.feedBack')
+                                                    @if ($ap->feedbacks->isNotEmpty())
+                                                        <a wire:click='lunchFeedBackModal({{ $ap->id }})'
+                                                            href="#"><small class="badge bg-primary ">
+                                                                نظر سنجی
+                                                            </small></a>
+                                                    @endif
+                                                @endcan
+                                            </div>
                                         </td>
                                         <td class="{{ $ap->type->getclass() }} d-flex flex-column">
                                             {!! $ap->kind->getIcon() !!}
@@ -350,7 +360,9 @@
                                         </td>
                                         <td>{{ $ap->user?->mobile ?? '-----' }}</td>
                                         <td>{{ $ap->user?->document_number ?? '---' }}</td>
-                                        <td>{{ $ap->doctor?->full_name ?? 'پزشک حذف شده' }}</td>
+                                        <td>
+                                            {{ $ap->doctor?->full_name ?? 'پزشک حذف شده' }}
+                                        </td>
                                         <td>{{ $ap->service?->title ?? 'سرویس حذف شده ' }}</td>
                                         <td>
                                             {{ verta($ap->start_time)->format('H:i') }}
@@ -413,6 +425,7 @@
     </div>
     <div>
         @include('appointmentuser::components.appointmentlist.disapprovemodal')
+        @include('appointmentuser::components.appointmentlist.feedbackmodal')
     </div>
 </div>
 </div>
@@ -482,6 +495,15 @@
                     keyboard: false
                 });
                 myModal.show();
+            }, 1000);
+        });
+        Livewire.on('lunchFeedBackModal', function() {
+            setTimeout(() => {
+                var feedBackModal = new bootstrap.Modal(document.getElementById(
+                    'feedBackModal'), {
+                    keyboard: false
+                });
+                feedBackModal.show();
             }, 1000);
         });
     });

@@ -15,6 +15,7 @@ use Modules\Api\Transformers\Package\PackageUserResource;
 use Modules\AppointmentUser\Enum\AppointmentOnlineStatusEnum;
 use Modules\AppointmentUser\Enum\AppointmentUserKindEnum;
 use Modules\AppointmentUser\Enum\AppointmentUserStatusEnum;
+use Modules\Chat\Enum\ChatStatusEnum;
 use Modules\Diet\Enum\DietRequestStatusEnum;
 use Modules\Exercise\Enum\ExercisePlanRequestEnum;
 use Modules\Package\Enum\PackageTypeEnum;
@@ -69,6 +70,7 @@ class DashboardController extends Controller
 //        dd($appointmentOnline);
 
 
+        $activeChat = $user->chats()->where('status', '<>', ChatStatusEnum::CLOSED)->where('ban', false)->orderByDesc('id')->first();
         $stories = $this->stories();
         return $this->ok([
             'status' => true,
@@ -79,6 +81,7 @@ class DashboardController extends Controller
             'purchased_courses' => [],
             'courses' => [] ,
             'stories' => $stories ,
+            'chat_badge' => (isset($activeChat) && (int) $activeChat->sum('new_message_by_support') > 0)  ? (int) $activeChat->sum('new_message_by_support') : null,
             'doctors' => $this->doctors(),
             'news' => [
                 [

@@ -7,6 +7,7 @@ use Illuminate\Http\Resources\Json\JsonResource;
 use Modules\Api\app\Resources\Transaction\TransactionResource;
 use Modules\Api\Transformers\UserResource;
 use Modules\AppointmentUser\app\Models\AppointmentUser;
+use Modules\AppointmentUser\Enum\AppointmentOnlineMessageTypeEnum;
 use Modules\AppointmentUser\Enum\AppointmentUserKindEnum;
 
 class AppointmentUserResource extends JsonResource
@@ -62,11 +63,21 @@ class AppointmentUserResource extends JsonResource
     /**
      * Transform the resource into an array.
      */
+
+    private function getBadge()
+    {
+        if ($this->kind == AppointmentUserKindEnum::IN_PERSION){
+            return null;
+        }
+        $badge = $this->online->first()->messages()->where('type', AppointmentOnlineMessageTypeEnum::ANSWER)->where('seen', '0')->count();
+        return $badge > 0 ? $badge ."  پیغام جدید" : null;
+    }
     public function toArray($request): array
     {
         return [
             'id' => $this->id,
             'service' => $this->getServiceName(),
+            'badge' => $this->getBadge(),
             'main_user' => UserResource::make($this->user),
             'for_himself' => !isset($this->details[AppointmentUser::DETAIL_FOR_HIMSELF]) || $this->details[AppointmentUser::DETAIL_FOR_HIMSELF] == 1,
             'someone' => $this->details[AppointmentUser::DETAIL_SOMEONE] ?? null,

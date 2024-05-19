@@ -34,7 +34,7 @@ enum SettingKeyEnum: int implements EnumHasNameInterface, SettingTypeInterface, 
     case SMS_APPOINTMENT_TO_OPERATOR = 38;
     case SMS_APPROVED_MONITORING_APPOINTMENT = 39;
     case SMS_DIS_APPROVED_MONITORING_APPOINTMENT = 40;
-
+    case SMS_FEEDBACK = 41;
     case SUPPORT_USER_ROLE = 100;
 
         //payment
@@ -45,6 +45,7 @@ enum SettingKeyEnum: int implements EnumHasNameInterface, SettingTypeInterface, 
     case PAYMENT_ZARINPAL_MERCHENID = 154;
     case PAYMENT_RULES_AND_CONDITION_STATUS = 155;
     case PAYMENT_RULES_AND_CONDITION_DESCRIPTION = 156;
+    case SECREYERY_SEND_LINK_FOR_APPOINTMENT = 157;
 
 
     case WEIGHT_CHART_DESCRIPTION_APP = 120;
@@ -86,6 +87,7 @@ enum SettingKeyEnum: int implements EnumHasNameInterface, SettingTypeInterface, 
             self::PAYMENT_ZARINPAL_MERCHENID => 'مرچند ایدی درگاه زرین پال',
             self::PAYMENT_RULES_AND_CONDITION_STATUS => 'فعال سازی شرایط و قوانین پرداخت',
             self::PAYMENT_RULES_AND_CONDITION_DESCRIPTION => 'شرایط و قوانین مربوط به پرداخت',
+            self::SECREYERY_SEND_LINK_FOR_APPOINTMENT => 'امکان ارسال لینک پرداخت نوبت به کاربر توسط منشی',
 
             // sms
             self::SMS_APPOINTMENT_RECEIVING_SUCCESSFUL => 'پیامک به کاربر پس از دریافت نوبت موفق',
@@ -98,6 +100,7 @@ enum SettingKeyEnum: int implements EnumHasNameInterface, SettingTypeInterface, 
             self::SMS_APPOINTMENT_TO_OPERATOR => 'پیامک به اپراتور پس از دریافت هر نوبت',
             self::SMS_APPROVED_MONITORING_APPOINTMENT => 'پیامک به کاربر بعد از تایید نوبت در  پایش نوبت',
             self::SMS_DIS_APPROVED_MONITORING_APPOINTMENT => 'پیامک به کاربر بعد از عدم تایید نوبت در  پایش نوبت',
+            self::SMS_FEEDBACK => 'پیامک ارسال نظر سنجی به کاربر، بعد از ثبت حضور کاربر',
 
             // voip
             self::VOIP_USERNAME => 'نام کاربری برای API ',
@@ -136,6 +139,7 @@ enum SettingKeyEnum: int implements EnumHasNameInterface, SettingTypeInterface, 
             self::PAYMENT_PAYSTAR_STATUS => SettingTypeEnum::CHECK,
             self::PAYMENT_ZARINPAL_STATUS => SettingTypeEnum::CHECK,
             self::APPOINTMENT_DESCRIPTION_STATUS => SettingTypeEnum::CHECK,
+            self::SECREYERY_SEND_LINK_FOR_APPOINTMENT => SettingTypeEnum::CHECK,
             self::APPOINTMENT_STATUS => SettingTypeEnum::CHECK,
             self::PAYMENT_RULES_AND_CONDITION_STATUS => SettingTypeEnum::CHECK,
             self::APPOINTMENT_USER_PERESENT_STATUS_REGISTRATION => SettingTypeEnum::CHECK,

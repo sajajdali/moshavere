@@ -19,5 +19,5 @@ use Modules\Front\Livewire\Payment\Discount;
 Route::group([], function () {
     Route::get('appointment/detail/{tracking_code}', AppointmentDetail::class)->name('front.appointment.detail');
     Route::get('payment/discount', Discount::class)->name('front.payment.discount');
-    Route::get('appintment/feedBack', Questions::class)->name('front.feedBack');
+    Route::get('appintment/feedBack/{appointmentUser_id}', Questions::class)->name('front.feedBack');
 });

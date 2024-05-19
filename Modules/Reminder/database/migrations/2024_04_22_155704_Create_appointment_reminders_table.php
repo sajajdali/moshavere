@@ -14,9 +14,10 @@ return new class extends Migration
         Schema::create('appointment_reminders', function (Blueprint $table) {
             $table->id();
             $table->foreignId('appointment_user_id')->constrained();
-            $table->integer('type');
+            $table->foreignId('reminder_id')->constrained();
+            $table->integer('type')->comment('1=>sms | 2 => notification | 3 => call');
             $table->dateTime('send_at');
-            $table->json('details');
+            $table->json('details')->nullable();
             $table->timestamps();
         });
     }

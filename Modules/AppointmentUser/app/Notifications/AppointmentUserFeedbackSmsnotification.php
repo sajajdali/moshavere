@@ -2,25 +2,20 @@
 
 namespace Modules\AppointmentUser\app\Notifications;
 
-use App\Broadcasting\SmsChannel;
 use Illuminate\Bus\Queueable;
+use App\Broadcasting\SmsChannel;
 use Illuminate\Notifications\Notification;
-use Illuminate\Contracts\Queue\ShouldQueue;
 
-class AppointmentSmsNotification extends Notification implements ShouldQueue
+class AppointmentUserFeedbackSmsnotification extends Notification
 {
     use Queueable;
 
     /**
-     * @param string|null $template
-     */
-    public function __construct(public ?string $template)
-    {
-    }
-    /**
      * Create a new notification instance.
      */
-
+    public function __construct(public ?string $template , public ?string $link_code)
+    {
+    }
 
     /**
      * Get the notification's delivery channels.
@@ -29,14 +24,11 @@ class AppointmentSmsNotification extends Notification implements ShouldQueue
     {
         return [SmsChannel::class];
     }
-
-    /**
-     * Get the mail representation of the notification.
-     */
     public function toSms($notifiable)
     {
         return $notifiable->user->mobile;
     }
+
 
     /**
      * Get the array representation of the notification.
@@ -47,7 +39,7 @@ class AppointmentSmsNotification extends Notification implements ShouldQueue
         $firstName = $notifiable->user?->first_name;
         $lastName = $notifiable->user?->last_name;
         $serviceName = $notifiable->service?->title;
-        $link = url('/s/' . $notifiable->shortLink->link_code);
+        $link = url('/s/' . $this->link_code);
         $dateAppointment = dateFormatSimlpe($notifiable->date_visit);
         $hour = substr($notifiable->start_time, 0, -3);
         return [

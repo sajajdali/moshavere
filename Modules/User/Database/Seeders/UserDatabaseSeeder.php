@@ -88,6 +88,7 @@ class UserDatabaseSeeder extends Seeder
             'user.edit',
             'user.delete',
             'user.documentte',
+            'appointment_user.feedBack',
         ];
         $secretaryRoles->syncPermissions($secretaryPermissions);
         // Sync permissions for mama Role

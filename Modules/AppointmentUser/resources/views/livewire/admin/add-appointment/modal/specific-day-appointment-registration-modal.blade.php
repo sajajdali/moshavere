@@ -172,12 +172,50 @@
                                 </div>
                             </div>
                         </div>
+                        @if (setting(\Modules\Setting\Enum\SettingKeyEnum::SECREYERY_SEND_LINK_FOR_APPOINTMENT))
+                        <div class="row my-5">
+                            <div class="col-md-4">
+                                <a class="text-primary" data-bs-toggle="collapse" href="#pendingStatusPayment"
+                                    role="button" aria-expanded="false" aria-controls="pendingStatusPayment">
+                                    <i class="fa fa-credit-card  text-primary me-1" aria-hidden="true"></i>
+                                    <strong>وضعیت پراداخت</strong>
+                                </a>
+                            </div>
+                            <div class="col-md-8">
+                                <hr>
+                            </div>
+                            <div class="collapse row show mt-2" id="pendingStatusPayment">
+                                <div class="col-6">
+                                    <div class="form-check">
+                                        <input class="form-check-input" checked type="radio"
+                                            wire:model='form.kind'  value="{{Modules\AppointmentUser\Enum\AppointmentUserKindEnum::IN_PERSION}}" name="appointmentKind"
+                                            id="appKind1">
+                                        <label class="form-check-label" for="appKind1">
+                                            لینک پرداخت ارسال شود
+                                        </label>
+                                    </div>
+                                </div>
+                                <div class="col-6">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="radio" name="appointmentKind"
+                                            wire:model='form.kind'  value="{{Modules\AppointmentUser\Enum\AppointmentUserKindEnum::ONLINE}}" id="appKind2">
+                                        <label class="form-check-label" for="appKind2">
+                                            بدون نیاز به پرداخت ثبت شود
+                                        </label>
+                                    </div>
+                                </div>
+                                @error('appKind')
+                                    <span class="text-danger">{{$message}}</span>
+                                @enderror
+                            </div>
+                        </div>
+                        @endif
                         @if($fetchData['app_kind']['online'] && $fetchData['app_kind']['in_person']  )
                         <div class="row my-5">
                             <div class="col-md-4">
                                 <a class="text-primary" data-bs-toggle="collapse" href="#appKind"
                                     role="button" aria-expanded="false" aria-controls="appKind">
-                                    <i class="fa fa-comments-o me-1 @error('AppKind') text-danger @else text-primary @enderror" aria-hidden="true"></i>
+                                    <i class="fa fa-bolt me-1 @error('AppKind') text-danger @else text-primary @enderror" aria-hidden="true"></i>
                                     <strong class="@error('AppKind') text-danger @else text-primary @enderror">وضعیت نوبت</strong>
                                 </a>
                             </div>

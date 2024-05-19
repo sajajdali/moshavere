@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('short_links', function (Blueprint $table) {
             $table->id();
-            $table->morphs('shortlinkable');
+            $table->nullableMorphs('shortlinkable');
             $table->string('link_code');
             $table->string('link_url');
             $table->tinyInteger('number_visited')->default(0);

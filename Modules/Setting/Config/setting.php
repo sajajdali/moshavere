@@ -17,6 +17,7 @@ return [
             \Modules\Setting\Enum\SettingKeyEnum::SMS_APPOINTMENT_TO_OPERATOR,
             \Modules\Setting\Enum\SettingKeyEnum::SMS_APPROVED_MONITORING_APPOINTMENT,
             \Modules\Setting\Enum\SettingKeyEnum::SMS_DIS_APPROVED_MONITORING_APPOINTMENT,
+            \Modules\Setting\Enum\SettingKeyEnum::SMS_FEEDBACK,
 
         ],
     ],
@@ -37,6 +38,8 @@ return [
             \Modules\Setting\Enum\SettingKeyEnum::APPOINTMENT_DESCRIPTION,
             \Modules\Setting\Enum\SettingKeyEnum::APPOINTMENT_CANCEL_DESCRIPTION,
             \Modules\Setting\Enum\SettingKeyEnum::APPOINTMENT_USER_PERESENT_STATUS_REGISTRATION,
+            \Modules\Setting\Enum\SettingKeyEnum::SECREYERY_SEND_LINK_FOR_APPOINTMENT,
+
         ],
     ],
     'support' => [

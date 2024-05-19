@@ -2,10 +2,11 @@
 
 namespace Modules\Front\app\Models;
 
+use App\Models\ShortLink;
 use Illuminate\Database\Eloquent\Model;
+use Modules\Front\Database\factories\FeedBackFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Modules\AppointmentUser\app\Models\AppointmentUser;
-use Modules\Front\Database\factories\FeedBackFactory;
 
 class FeedBack extends Model
 {
@@ -20,5 +21,9 @@ class FeedBack extends Model
     public function appointmentUser()
     {
         return $this->belongsTo(AppointmentUser::class);
+    }
+    public function shortLink(): \Illuminate\Database\Eloquent\Relations\MorphOne
+    {
+        return $this->morphOne(ShortLink::class, 'shortlinkable');
     }
 }

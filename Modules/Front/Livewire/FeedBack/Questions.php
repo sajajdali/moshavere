@@ -6,12 +6,15 @@ use Livewire\Component;
 use Livewire\Attributes\Layout;
 use Livewire\Attributes\Locked;
 use Modules\Front\app\Models\FeedBack;
+use Modules\AppointmentUser\app\Models\AppointmentUser;
 
 #[Layout('front::layouts.app')]
 class Questions extends Component
 {
     #[Locked]
-    public array $fetchData = [];
+    public array $fetchData = [
+        'formAlreadyCopelete' => false
+    ];
     public  $step;
 
     #[Locked]
@@ -20,7 +23,7 @@ class Questions extends Component
     #[Locked]
     public bool $feedBackCompelete = false;
 
-    public $appintment_user_id ;
+    public $appintment_user_id;
 
     public function nxtQuestion($key)
     {
@@ -48,7 +51,15 @@ class Questions extends Component
     }
     public function mount()
     {
-        $this->appintment_user_id =  request()->route('appointment_user_id') ;
+        $app_id = request()->route('appointmentUser_id');
+        $appId =  AppointmentUser::find($app_id);
+        if (!isset($app_id) ||  empty($appId)) {
+            return abort('404');
+        }
+        if ($appId->feedbacks()->exists() ){
+            $this->fetchData['formAlreadyCopelete'] = true ;
+        }
+        $this->appintment_user_id = $app_id;
         $this->step = 0;
         $this->fetchData['questions'] = feedbackQuestions();
     }

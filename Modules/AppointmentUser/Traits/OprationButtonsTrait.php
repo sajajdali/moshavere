@@ -2,7 +2,9 @@
 
 namespace Modules\Appointmentuser\Traits;
 
+use App\Models\ShortLink;
 use Modules\Setting\Enum\SettingKeyEnum;
+use Modules\Reminder\app\Models\AppointmentReminder;
 use Modules\AppointmentUser\app\Models\AppointmentUser;
 use Modules\AppointmentUser\app\Models\AppointmentOnline;
 use Modules\AppointmentUser\Enum\AppointmentUserTypeEnum;
@@ -12,6 +14,7 @@ use Modules\AppointmentUser\Enum\AppointmentOnlineStatusEnum;
 use Modules\AppointmentUser\app\Events\CancelAppointmentEvent;
 use Modules\AppointmentUser\app\Events\DeleteAppointmentEvent;
 use Modules\AppointmentUser\app\Notifications\AppointmentSmsNotification;
+use Modules\AppointmentUser\app\Notifications\AppointmentUserFeedbackSmsnotification;
 
 
 //this Trait is return value as a UerMetaEnum not string
@@ -128,6 +131,7 @@ trait OprationButtonsTrait
     }
     public function userAttenedToAppointment(AppointmentUser $appointmentUser)
     {
+        $this->sendfeedBackLink($appointmentUser);
         $this->changeAttendedStatus($appointmentUser, true);
         $this->redirectToPage('وضعیت نوبت به کاربر حضور پیدا کرده تغییر کرد');
     }
@@ -146,5 +150,18 @@ trait OprationButtonsTrait
             $new_details = $user_attended;
         }
         $appointmentUser->update(['details' => $new_details]);
+    }
+    protected function sendfeedBackLink(AppointmentUser $appointmentUser)
+    {
+        $link_code = ShortLink::generateShortLinkCode();
+        $link_url = route('front.feedBack', ['appointmentUser_id' => $appointmentUser->id]);
+        ShortLink::create([
+            'link_code' => $link_code,
+            'link_url'  => $link_url,
+        ]);
+        $smsTemplate = setting(SettingKeyEnum::SMS_FEEDBACK);
+        if (isset($smsTemplate)) {
+            $appointmentUser->notify(new AppointmentUserFeedbackSmsnotification($smsTemplate,$link_code));
+        }
     }
 }

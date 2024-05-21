@@ -2,12 +2,13 @@
 
 namespace Modules\Transaction\app\Models;
 
+use Modules\User\Entities\User;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Modules\Transaction\Database\factories\TransactionFactory;
 use Modules\Transaction\Enum\TransactionPaidEnum;
-use Modules\Transaction\Enum\TransactionPaymentForEnum;
 use Modules\Transaction\Enum\TransactionStatusEnum;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Modules\Transaction\Enum\TransactionPaymentForEnum;
+use Modules\Transaction\Database\factories\TransactionFactory;
 
 class Transaction extends Model
 {

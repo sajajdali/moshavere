@@ -20,6 +20,8 @@ enum SettingKeyEnum: int implements EnumHasNameInterface, SettingTypeInterface, 
     case APPOINTMENT_DESCRIPTION = 6;
     case APPOINTMENT_CANCEL_DESCRIPTION = 7;
     case APPOINTMENT_USER_PERESENT_STATUS_REGISTRATION = 8;
+    case APPOINTMENT_DEADLINE_VIA_ADMIN = 9;
+    case APPOINTMENT_DEADLINE_VIA_USER = 10;
 
         //sms
     case SMS_API_TOKEN = 20;
@@ -72,6 +74,8 @@ enum SettingKeyEnum: int implements EnumHasNameInterface, SettingTypeInterface, 
             self::APPOINTMENT_DESCRIPTION    => 'توضیحات مربوط به صفحه جزئیات نوبت',
             self::APPOINTMENT_CANCEL_DESCRIPTION    => 'توضیحات مربوط به کنسلی نوبت',
             self::APPOINTMENT_USER_PERESENT_STATUS_REGISTRATION    => 'فعال بودن ثبت حضور و یا عدم حضور بیمار',
+            self::APPOINTMENT_DEADLINE_VIA_ADMIN    => 'مدت زمان رزرو بودن نوبت برای پرداخت در زمانی که وضعیت نوبت در انتظار پرداخت میباشد و نوبت از طریق پنل ادمین ثبت شده باشد (ساعت)',
+            self::APPOINTMENT_DEADLINE_VIA_USER    => 'مدت زمان رزرو بودن نوبت برای پرداخت در زمانی که وضعیت نوبت در انتظار پرداخت میباشد و نوبت را بیمار دریافت کرده باشد(ساعت)',
 
             self::SMS_API_TOKEN => 'توکن API پیامک',
             self::DEFAULT_EXERCISE_STATUS => 'وضعیت برنامه بعد از تجویز',
@@ -96,7 +100,7 @@ enum SettingKeyEnum: int implements EnumHasNameInterface, SettingTypeInterface, 
             self::SMS_APPOINTMENT_REMOVAL_WHEN_NON_PAYMENT => 'پیامک به کاربر در صورتی که پرداخت نکند و نوبت وی حذف شود',
             self::SMS_APPOINTMENT_TIME_UPDATE => 'پیامک به کاربر پس از ویرایش زمان نوبت',
             self::SMS_APPOINTMENT_CANCEL => 'پیامک به کاربر پس از کنسل شدن نوبت',
-            self::SMS_APPOINTMENT_TO_DOCTOR => 'پیامک به پزشک پز از دریافت نوبت توسط هر کاربر',
+            self::SMS_APPOINTMENT_TO_DOCTOR => 'پیامک به پزشک بعد از دریافت نوبت توسط هر کاربر',
             self::SMS_APPOINTMENT_TO_OPERATOR => 'پیامک به اپراتور پس از دریافت هر نوبت',
             self::SMS_APPROVED_MONITORING_APPOINTMENT => 'پیامک به کاربر بعد از تایید نوبت در  پایش نوبت',
             self::SMS_DIS_APPROVED_MONITORING_APPOINTMENT => 'پیامک به کاربر بعد از عدم تایید نوبت در  پایش نوبت',

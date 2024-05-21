@@ -1,9 +1,9 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-use Modules\Front\Livewire\Appointment\AppointmentDetail;
+use Modules\Front\Livewire\Payment\Invoice;
 use Modules\Front\Livewire\FeedBack\Questions;
-use Modules\Front\Livewire\Payment\Discount;
+use Modules\Front\Livewire\Appointment\AppointmentDetail;
 
 /*
 |--------------------------------------------------------------------------
@@ -18,6 +18,7 @@ use Modules\Front\Livewire\Payment\Discount;
 
 Route::group([], function () {
     Route::get('appointment/detail/{tracking_code}', AppointmentDetail::class)->name('front.appointment.detail');
-    Route::get('payment/discount', Discount::class)->name('front.payment.discount');
+    Route::get('payment/invoice/{transaction_id}', Invoice::class)->name('front.payment.invoice');
+    Route::get('payment/invoice/call-back', [\Modules\Front\Livewire\Payment\Invoice::class,'zarinCallback'])->name('front.payment.invoice.callBack');
     Route::get('appintment/feedBack/{appointmentUser_id}', Questions::class)->name('front.feedBack');
 });

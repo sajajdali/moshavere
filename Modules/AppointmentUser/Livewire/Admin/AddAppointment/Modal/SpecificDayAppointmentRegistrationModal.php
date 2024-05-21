@@ -10,6 +10,7 @@ use Modules\User\Enum\UserMetaEnum;
 use Illuminate\Support\Facades\Cache;
 use Hekmatinasser\Verta\Facades\Verta;
 use Modules\Service\app\Models\Service;
+use Modules\Setting\Enum\SettingKeyEnum;
 use Modules\AppointmentUser\Enum\AppointmentVia;
 use Modules\AppointmentUser\Enum\model\UserModel;
 use Modules\AppointmentUser\app\Models\AppointmentUser;
@@ -196,6 +197,13 @@ class SpecificDayAppointmentRegistrationModal extends Component
     }
     private function storeApp()
     {
+        //check if payment is active and sms template exist for it
+        if ((setting(SettingKeyEnum::SECREYERY_SEND_LINK_FOR_APPOINTMENT) != null  &&
+            isset($this->form['registerWithoutPayment']) &&  $this->form['registerWithoutPayment'] != 'false')) {
+            if (setting(SettingKeyEnum::SMS_APPOINTMENT_WAITING_PAYMENT) == null) {
+                $this->addError('form.registerWithoutPayment', true);
+            }
+        }
         $user = $this->fetchData['user'];
         $appointmentSetting = AppointmentSetting::findOrFail($this->appId);
         //check for appointment kind
@@ -206,10 +214,10 @@ class SpecificDayAppointmentRegistrationModal extends Component
             }
         }
 
-
-        // If he wants to take the turn for someone else
+        // If he wants to take the appointmnet for someone else
         $someoneModel = null;
         $foHimself = 1;
+
         // main user data
         $mainUser = new UserModel(
             user: $user,
@@ -227,6 +235,7 @@ class SpecificDayAppointmentRegistrationModal extends Component
 
         $appointment_type = $this->form['appType'] == 'main_app' ? AppointmentUserTypeEnum::MAIN__APPOINTMENT : AppointmentUserTypeEnum::BETWEEN_PATIENTS;
         $sms_status = $this->form['smsType'] == 'send' ? true : false;
+
         // appointment model
         $appointmentModel = new AppointmentModel(
             timestamp: $appTime->timestamp,
@@ -241,11 +250,14 @@ class SpecificDayAppointmentRegistrationModal extends Component
             endTime: Carbon::createFromTimeString($this->form['time']['until'])->toTimeString(),
         );
 
-
         $detail = [];
+        if (setting(SettingKeyEnum::SECREYERY_SEND_LINK_FOR_APPOINTMENT) != null && isset($this->form['registerWithoutPayment']) && $this->form['registerWithoutPayment'] == 'true') {
+            $detail['smsTemplate']      = setting(SettingKeyEnum::SMS_APPOINTMENT_WAITING_PAYMENT);
+            $detail['wait_for_payment'] = true ; 
+        }
         $storeAppointment = app('AppointmentUserService')->storeAppointment($appointmentSetting, $userModelAppointment, $appointmentModel, $detail);
         Cache::forget('appointmentList.' . $this->appId);
-        return redirect()->route('admin.appointment.add.specificday', ['serviceId' => $this->fetchData['service']->id ,'placeId' => $this->placeId,  'appId' => $this->appId, 'date' => $this->appDate])->with('success', $storeAppointment['message']);
+        return redirect()->route('admin.appointment.add.specificday', ['serviceId' => $this->fetchData['service']->id, 'placeId' => $this->placeId,  'appId' => $this->appId, 'date' => $this->appDate])->with('success', $storeAppointment['message']);
     }
 
     public function closeModal()
@@ -295,8 +307,11 @@ class SpecificDayAppointmentRegistrationModal extends Component
             $this->form['time']['from'] = $this->appTime;
             $this->form['time']['until'] = Carbon::createFromTimeString($this->appTime)->copy()->addMinutes($app->time_for_visit)->toTimeString();
         }
-        if(isset($this->serviceId)) {
+        if (isset($this->serviceId)) {
             $this->fetchData['service'] = Service::find($this->serviceId);
+        }
+        if (setting(SettingKeyEnum::SECREYERY_SEND_LINK_FOR_APPOINTMENT)) {
+            $this->form['registerWithoutPayment'] = true;
         }
     }
     public function render()

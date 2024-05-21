@@ -42,7 +42,6 @@ class Payment extends Component
                 } else {
                     $this->status = 'failed';
                 }
-
             }
             elseif ($this->transaction->status == TransactionStatusEnum::REJECTED) {
                 $this->status = 'showMessage';

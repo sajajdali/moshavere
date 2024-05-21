@@ -44,6 +44,7 @@ class AddReminderListener
                 ];
                 AppointmentReminder::create([
                     'appointment_user_id' => $event->appointmentUser->id,
+                    'reminder_id' => $reminder->id,
                     'type' => $reminder->status,
                     'send_at' => $event->appointmentUser->date_visit->addDays($reminder->send_day)->addHours($reminder->send_time),
                     'details' => $detail,

@@ -280,6 +280,15 @@
                     path: newUrl
                 }, '', newUrl);
             })
+            if({{setting(\Modules\Setting\Enum\SettingKeyEnum::SECREYERY_SEND_LINK_FOR_APPOINTMENT)}}){
+                $('body').on('change','.payment_pending_input',function(){
+                    if($(this).val() == 'false') {
+                        $('#sendSubmitPaymentStatus').removeClass('d-none');
+                    }else{
+                        $('#sendSubmitPaymentStatus').addClass('d-none');
+                    }
+                });
+            }
         });
     </script>
 @endpush

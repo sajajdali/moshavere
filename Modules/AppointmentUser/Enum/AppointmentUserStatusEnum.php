@@ -25,8 +25,8 @@ enum AppointmentUserStatusEnum: int implements EnumHasApiResultInterface
             self::STATUS_CANCEL       => 'کنسل شده',
             self::STATUS_ATTENDED     => 'حضور پیدا کرده',
             self::STATUS_NOT_ATTENDED => 'عدم حضور',
-            self::STATUS_DISAPPROVED =>  'رد شده',
-            self::STATUS_MONITORING =>  'در انتظار تایید',
+            self::STATUS_DISAPPROVED  =>  'رد شده',
+            self::STATUS_MONITORING   =>  'در انتظار تایید',
         };
     }
     public function getBadgeColor(): string
@@ -67,7 +67,7 @@ enum AppointmentUserStatusEnum: int implements EnumHasApiResultInterface
         };
     }
 
-    public static function confirmed() : array
+    public static function confirmed(): array
     {
         return [
             self::STATUS_PENDING->value,

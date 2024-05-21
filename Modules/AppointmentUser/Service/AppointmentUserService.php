@@ -2,25 +2,17 @@
 
 namespace Modules\AppointmentUser\Service;
 
-use Modules\Api\Transformers\UserResource;
-use Modules\User\Entities\User;
-use Verta;
 use App\Event;
 use Carbon\Carbon;
 use App\Models\ShortLink;
-use Modules\Absence\app\Models\Absence;
 use Modules\Service\app\Models\Service;
 use Modules\Setting\Enum\SettingKeyEnum;
-use Modules\Reminder\app\Models\Reminder;
+use Modules\Api\Transformers\UserResource;
 use Modules\Api\app\Resources\PriceResource;
 use Modules\AppointmentUser\Enum\AppointmentVia;
 use Modules\Api\app\Resources\Api\SomeoneResource;
-use Modules\Reminder\app\Models\AppointmentReminder;
-use Modules\AppointmentUser\Enum\model\MainUserModel;
 use Modules\AppointmentUser\app\Models\AppointmentUser;
-use Modules\AppointmentUser\app\Events\StoreAppointment;
 use Modules\AppointmentUser\Enum\model\AppointmentModel;
-use Modules\AppointmentUser\app\Events\CancelAppointment;
 use Modules\AppointmentUser\app\Models\AppointmentOnline;
 use Modules\AppointmentUser\Enum\AppointmentUserKindEnum;
 use Modules\AppointmentUser\Enum\AppointmentUserTypeEnum;
@@ -29,7 +21,6 @@ use Modules\AppointmentUser\Enum\model\UserModelAppointment;
 use Modules\AppointmentSetting\app\Models\AppointmentSetting;
 use Modules\AppointmentUser\app\Events\StoreAppointmentEvent;
 use Modules\AppointmentUser\Enum\AppointmentOnlineStatusEnum;
-use Modules\AppointmentSetting\app\Models\AppointmentSettingTime;
 use Modules\AppointmentUser\app\Notifications\AppointmentSmsNotification;
 
 class AppointmentUserService
@@ -93,17 +84,17 @@ class AppointmentUserService
         // Get the date range for which you want to fetch appointments and available slots
         $specialDaySelected = false;
         // if (isset($details['specialDay'])) {
-            if (array_key_exists('specialDay', $details)) {
-                $specialDaySelected = true;
-                $startDate = Carbon::parse($details['specialDay'])->subDays(20);
-                $endDate = $startDate->copy()->addDays($details['specialDay_endDate'] ?? 60); // Adjust the number of days as needed
-            } elseif (array_key_exists('specialDays', $details)) {
-                $startDate = Carbon::parse($details['specialDays'])->subDays(20);
-                $endDate = $startDate->copy()->addDays($appointmentSetting->max_day_active ?? 90); // Adjust the number of days as needed
-            } elseif (array_key_exists('completeDays', $details)) {
-                $startDate = Carbon::parse($details['specialDay']);
-                $endDate = $startDate->copy()->addDays($details['numberDays']);
-            }
+        if (array_key_exists('specialDay', $details)) {
+            $specialDaySelected = true;
+            $startDate = Carbon::parse($details['specialDay'])->subDays(20);
+            $endDate = $startDate->copy()->addDays($details['specialDay_endDate'] ?? 60); // Adjust the number of days as needed
+        } elseif (array_key_exists('specialDays', $details)) {
+            $startDate = Carbon::parse($details['specialDays'])->subDays(20);
+            $endDate = $startDate->copy()->addDays($appointmentSetting->max_day_active ?? 90); // Adjust the number of days as needed
+        } elseif (array_key_exists('completeDays', $details)) {
+            $startDate = Carbon::parse($details['specialDay']);
+            $endDate = $startDate->copy()->addDays($details['numberDays']);
+        }
         // }
 
         if (!$specialDaySelected && !isset($startDate)) {
@@ -589,13 +580,17 @@ class AppointmentUserService
         if ($appointmentData->kind == AppointmentUserKindEnum::ONLINE) {
             $appointmentUserModel['start_time'] = null;
             $appointmentUserModel['end_time'] = null;
-            $appointmentUserModel['status'] =  AppointmentUserStatusEnum::STATUS_PENDING ;
+            $appointmentUserModel['status'] =  AppointmentUserStatusEnum::STATUS_PENDING;
         }
         $detailDatabaseDB['payment'] = [
             'status' => false,
         ];
-
-
+        // if set the appointment to be WAIT_FOR_PAYMENT
+        if (isset($detail['wait_for_payment'])) {
+            $appointmentUserModel['status'] = AppointmentUserStatusEnum::STATUS_WAIT_PAYMENT;
+            $hours =  setting(SettingKeyEnum::APPOINTMENT_DEADLINE_VIA_ADMIN) == null ?   config('app.appointment_dedline') : setting(SettingKeyEnum::APPOINTMENT_DEADLINE_VIA_ADMIN) ;
+            $appointmentUserModel['deadline_at'] =  \now()->addHours($hours);
+        }
 
         //description for app
         if ($appointmentData->description) {
@@ -605,6 +600,7 @@ class AppointmentUserService
         // handel payment
         $paymentLink = null;
         $smsTemplate = setting(SettingKeyEnum::SMS_APPOINTMENT_RECEIVING_SUCCESSFUL);
+
         if ($appointmentData->appointmentVia == AppointmentVia::SELF && $paymentstatus['status']) {
             $smsTemplate = setting(SettingKeyEnum::SMS_APPOINTMENT_WAITING_PAYMENT);
             $appointmentUserModel['deadline_at'] = $paymentstatus['deadline'];
@@ -630,6 +626,9 @@ class AppointmentUserService
         }
 
         $detailDatabaseDB[AppointmentUser::DETAIL_APPOINTMENT_VIA] = $appointmentData->appointmentVia;
+        if (isset($detail['wait_for_payment'])) {
+            $detailDatabaseDB[AppointmentUser::PENDING_APPOINTMENT_BY_SECRETERY] = true ;
+        }
         $appointmentUserModel['details'] = $detailDatabaseDB;
 
         // store appointment in DB
@@ -648,9 +647,12 @@ class AppointmentUserService
         // handel sms
         $this->makeShortLink($appointmentUser);
 
+        if (isset($detail['smsTemplate'])) {
+            $smsTemplate = $detail['smsTemplate'];
+        }
         // send sms
         if (isset($smsTemplate)) {
-            $appointmentUser->notify(new AppointmentSmsNotification($smsTemplate));
+            // $appointmentUser->notify(new AppointmentSmsNotification($smsTemplate));
         }
         event(new StoreAppointmentEvent($appointmentUser));
 

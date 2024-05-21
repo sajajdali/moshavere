@@ -39,6 +39,8 @@ return [
             \Modules\Setting\Enum\SettingKeyEnum::APPOINTMENT_CANCEL_DESCRIPTION,
             \Modules\Setting\Enum\SettingKeyEnum::APPOINTMENT_USER_PERESENT_STATUS_REGISTRATION,
             \Modules\Setting\Enum\SettingKeyEnum::SECREYERY_SEND_LINK_FOR_APPOINTMENT,
+            \Modules\Setting\Enum\SettingKeyEnum::APPOINTMENT_DEADLINE_VIA_ADMIN,
+            \Modules\Setting\Enum\SettingKeyEnum::APPOINTMENT_DEADLINE_VIA_USER,
 
         ],
     ],

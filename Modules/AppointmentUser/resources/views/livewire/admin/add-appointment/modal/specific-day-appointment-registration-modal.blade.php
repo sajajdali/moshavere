@@ -175,7 +175,7 @@
                         @if (setting(\Modules\Setting\Enum\SettingKeyEnum::SECREYERY_SEND_LINK_FOR_APPOINTMENT))
                         <div class="row my-5">
                             <div class="col-md-4">
-                                <a class="text-primary" data-bs-toggle="collapse" href="#pendingStatusPayment"
+                                <a class=" @error('form.registerWithoutPayment') text-danger @else text-primary @endif" data-bs-toggle="collapse" href="#pendingStatusPayment"
                                     role="button" aria-expanded="false" aria-controls="pendingStatusPayment">
                                     <i class="fa fa-credit-card  text-primary me-1" aria-hidden="true"></i>
                                     <strong>وضعیت پراداخت</strong>
@@ -185,10 +185,17 @@
                                 <hr>
                             </div>
                             <div class="collapse row show mt-2" id="pendingStatusPayment">
+                                @error('form.registerWithoutPayment')
+                                <div class="col-12">
+                                    <div class="alert alert-danger fade show" role="alert">
+                                       قالب پیامکی مربوط به ارسال لینک پرداخت تعریف نشده است!
+                                    </div>
+                                </div>
+                                @enderror
                                 <div class="col-6">
                                     <div class="form-check">
-                                        <input class="form-check-input" checked type="radio"
-                                            wire:model='form.kind'  value="{{Modules\AppointmentUser\Enum\AppointmentUserKindEnum::IN_PERSION}}" name="appointmentKind"
+                                        <input class="form-check-input payment_pending_input" checked type="radio"
+                                            wire:model='form.registerWithoutPayment'  value="true" name="appointmentKind"
                                             id="appKind1">
                                         <label class="form-check-label" for="appKind1">
                                             لینک پرداخت ارسال شود
@@ -197,8 +204,8 @@
                                 </div>
                                 <div class="col-6">
                                     <div class="form-check">
-                                        <input class="form-check-input" type="radio" name="appointmentKind"
-                                            wire:model='form.kind'  value="{{Modules\AppointmentUser\Enum\AppointmentUserKindEnum::ONLINE}}" id="appKind2">
+                                        <input class="form-check-input payment_pending_input" type="radio" name="appointmentKind"
+                                            wire:model='form.registerWithoutPayment'  value="false" id="appKind2">
                                         <label class="form-check-label" for="appKind2">
                                             بدون نیاز به پرداخت ثبت شود
                                         </label>
@@ -248,7 +255,7 @@
                             </div>
                         </div>
                         @endif
-                        <div class="row my-5">
+                        <div class="row my-5   @if (setting(\Modules\Setting\Enum\SettingKeyEnum::SECREYERY_SEND_LINK_FOR_APPOINTMENT)) d-none @endif" id="sendSubmitPaymentStatus">
                             <div class="col-md-4">
                                 <a class="text-primary" data-bs-toggle="collapse" href="#smsStatusCollaps"
                                     role="button" aria-expanded="false" aria-controls="smsStatusCollaps">

@@ -4,10 +4,9 @@ namespace Modules\User\Traits;
 
 use App\Models\Comment;
 use Modules\Place\app\Models\Place;
-use Modules\User\Enum\UserMetaEnum;
 use Modules\Service\app\Models\Service;
+use Modules\User\Entities\OperatorTime;
 use Modules\Speciality\app\Models\Speciality;
-use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Modules\AppointmentSetting\app\Models\AppointmentSetting;
 
@@ -36,5 +35,9 @@ trait UserRelationTrait
     public function comments(): MorphMany
     {
         return $this->morphMany(Comment::class, 'commentable');
+    }
+    public function operatorTimes()
+    {
+        return $this->hasMany(OperatorTime::class, 'oprator_id');
     }
 }

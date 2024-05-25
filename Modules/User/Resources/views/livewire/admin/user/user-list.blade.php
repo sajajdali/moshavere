@@ -154,11 +154,19 @@
                                                                     @endif
                                                                 @endcan
                                                                 @can('documentte', $user)
-                                                                    <li>
-                                                                        <a href="{{ route('admin.user.document', $user) }}">مشاهده
-                                                                            پرونده</a>
-                                                                    </li>
+                                                                    @if ($user->hasRole('بیمار'))
+                                                                        <li>
+                                                                            <a href="{{ route('admin.user.document', $user) }}">مشاهده
+                                                                                پرونده</a>
+                                                                        </li>
+                                                                    @endif
                                                                 @endcan
+                                                                @if ($user->hasRole('اپراتور'))
+                                                                    <li>
+                                                                        <a
+                                                                            href="{{ route('admin.oprator.timesetting', $user) }}">تنظیمات زمان حضور اپراتور</a>
+                                                                    </li>
+                                                                @endif
                                                                 @can('delete', $user)
                                                                     @unless ($user->id === 1)
                                                                         <li><a class="delete_confirm_alert" data-label="کاربر"

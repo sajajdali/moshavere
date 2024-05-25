@@ -37,8 +37,9 @@ class UserDatabaseSeeder extends Seeder
 
         // Create roles
         $role = Role::create(['name' => 'مدیر']);
-        $userDefaultRole = Role::create(['name' => 'کاربر']);
+        $userDefaultRole = Role::create(['name' => 'بیمار']);
         $doctorsRoles = Role::create(['name' => 'پزشک']);
+        $opdatorRoles = Role::create(['name' => 'اپراتور']);
         $secretaryRoles = Role::create(['name' => 'منشی']);
         $mamaRoles = Role::create(['name' => 'ماما']);
 
@@ -90,6 +91,7 @@ class UserDatabaseSeeder extends Seeder
             'user.documentte',
             'appointment_user.feedBack',
         ];
+        $opdatorRoles->syncPermissions($secretaryPermissions);
         $secretaryRoles->syncPermissions($secretaryPermissions);
         // Sync permissions for mama Role
         $mamaPermissions = [$adminPermission, 'appointment_user', 'appointment_user.online', 'appointment_user.message'];

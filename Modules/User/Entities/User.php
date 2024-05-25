@@ -197,6 +197,10 @@ class User extends Authenticatable
     {
         return Role::find(3)?->users;
     }
+    public static function operators()
+    {
+        return Role::find(4)?->users;
+    }
     public static function doctors_query()
     {
         return Role::find(3)?->users();
@@ -221,6 +225,9 @@ class User extends Authenticatable
     public function transactions(): HasMany
     {
         return $this->hasMany(Transaction::class);
+    }
+    public function specialServiceseCount() {
+       return  AppointmentSetting::where('user_id',$this->id)->whereNotNull('service_id')->count();
     }
 
 }

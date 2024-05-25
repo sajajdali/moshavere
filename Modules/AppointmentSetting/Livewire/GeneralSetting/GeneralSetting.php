@@ -40,6 +40,7 @@ class GeneralSetting extends Component
         'specialDaydateValues',
         'specialDaytimeValues',
         'monitoring',
+        'operators' => [],
     ];
 
     /*
@@ -162,7 +163,6 @@ class GeneralSetting extends Component
     }
     public function rules()
     {
-
         //validation for each day time frame
         $dayRules = [];
         foreach ($this->counter as $dayName => $counter) {
@@ -191,6 +191,7 @@ class GeneralSetting extends Component
             'form.payment.inPerson.price'         => 'required_if:form.payment.inPerson.status,true',
             'form.payment.online.price'           => 'required_if:form.payment.online.status,true',
             'form.payment.voip.price'             => 'required_if:form.payment.voip.status,true',
+            'form.operators.ids'                  => 'required_if:form.operators.status,true',
         ];
         $validateSpecialDate = $this->validateSpecialdate();
         return array_merge($dayRules,  $rules, $validateSpecialDate);
@@ -267,10 +268,14 @@ class GeneralSetting extends Component
             unset($this->form['startAppointment']['date']);
             unset($this->form['startAppointment']['time']);
         }
+        if (isset($this->form['operators']['status'])  && $this->form['operators']['status'] == false) {
+            unset($this->form['operators']['status']);
+            unset($this->form['operators']['ids']);
+        }
     }
     public function saveSetting()
     {
-        //if check box for each section is turned off , delete the inside the boxes
+        //if check box for each section is turned off , delete the data for it 
         $this->checkForUnsetTheCheckBoxes();
         $this->validate();
         $endAppointmentTime   =  isset($this->form['endAppointment']['date']) ? Verta::parse($this->form['endAppointment']['date'])->toCarbon() : null;
@@ -282,6 +287,10 @@ class GeneralSetting extends Component
             AppointmentSetting::MAX_AVAILABLE_APPOINTMENT_EACH_DAY   => isset($this->form['maxAvailabeAppointment']['eachDay']) ? $this->form['maxAvailabeAppointment']['eachDay'] : null,
             AppointmentSetting::MAX_AVAILABLE_APPOINTMENT_FOR_SECRETERY     => isset($this->form['maxAvailabeAppointment']['ForSecretery']) ? $this->form['maxAvailabeAppointment']['ForSecretery'] : null,
             AppointmentSetting::MONITORTING_APPOINTMENT              => isset($this->form['monitoring']['hour']) ? $this->form['monitoring']['hour'] : null,
+            AppointmentSetting::OPERATORS => [
+                AppointmentSetting::STATUS => isset($this->form['operators']['status']) ? $this->form['operators']['status'] : false,
+                AppointmentSetting::IDS    => isset($this->form['operators']['ids'])    ? $this->form['operators']['ids']    : null,
+            ],
             AppointmentSetting::PAYMENT                              =>
             [
                 AppointmentSetting::STATUS                           => isset($this->form['payment']['status']) ? $this->form['payment']['status']  : false,
@@ -469,6 +478,12 @@ class GeneralSetting extends Component
         if (isset($apSet->detail[AppointmentSetting::MAX_AVAILABLE_APPOINTMENT_FOR_SECRETERY])) {
             $this->form['maxAvailabeAppointment']['ForSecretery'] = $apSet->detail[AppointmentSetting::MAX_AVAILABLE_APPOINTMENT_FOR_SECRETERY];
         }
+        if (isset($apSet->detail[AppointmentSetting::OPERATORS])) {
+            if ($apSet->detail[AppointmentSetting::OPERATORS][AppointmentSetting::STATUS] == true) {
+                $this->form['operators']['status'] = true;
+                $this->form['operators']['ids'] = $apSet->detail[AppointmentSetting::OPERATORS][AppointmentSetting::IDS];
+            }
+        }
         if (!$apSet->segments->isEmpty()) {
             $this->form['segments'][AppointmentSetting::STATUS] = true;
             $this->form['segments']['value'] = $apSet->segments->first()->id;
@@ -509,6 +524,7 @@ class GeneralSetting extends Component
         $this->fetchData['user']            =  request()->route('user');
         $this->fetchData['service_id']      =  request()->route('service');
         $this->fetchData['place']           =  request()->route('place');
+        $this->fetchData['operator']        = User::operators();
         if (isset($this->fetchData['place'])) {
             $this->fetchData['place'] =   $this->fetchData['place']->id;
         }

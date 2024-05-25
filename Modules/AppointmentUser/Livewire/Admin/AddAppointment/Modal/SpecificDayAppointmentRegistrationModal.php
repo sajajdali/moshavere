@@ -236,24 +236,35 @@ class SpecificDayAppointmentRegistrationModal extends Component
         $appointment_type = $this->form['appType'] == 'main_app' ? AppointmentUserTypeEnum::MAIN__APPOINTMENT : AppointmentUserTypeEnum::BETWEEN_PATIENTS;
         $sms_status = $this->form['smsType'] == 'send' ? true : false;
 
+        //check if operator
+        if (isset($this->form['operator'])) {
+            $oprator =  $this->form['operator'];
+        } else {
+            $oprator = null;
+        }
+
         // appointment model
         $appointmentModel = new AppointmentModel(
             timestamp: $appTime->timestamp,
             appointmentVia: AppointmentVia::BY_ADMIN,
-            kind: isset($this->form['kind']) ? $this->form['kind'] : null,
             sendSmsToUser: $sms_status,
             serviceId: $this->appId->service?->id ?? $this->fetchData['service']?->id,
             placeId: $this->appId->place?->id ?? $this->placeId,
             agentId: auth()->user()->id,
+            operatorId: $oprator,
+            kind: isset($this->form['kind']) ? $this->form['kind'] : null,
+            smsToDoctor : false,
             description: isset($this->form['description']) ? $this->form['description'] : '',
             type: $appointment_type,
             endTime: Carbon::createFromTimeString($this->form['time']['until'])->toTimeString(),
         );
 
         $detail = [];
+
+
         if (setting(SettingKeyEnum::SECREYERY_SEND_LINK_FOR_APPOINTMENT) != null && isset($this->form['registerWithoutPayment']) && $this->form['registerWithoutPayment'] == 'true') {
             $detail['smsTemplate']      = setting(SettingKeyEnum::SMS_APPOINTMENT_WAITING_PAYMENT);
-            $detail['wait_for_payment'] = true ; 
+            $detail['wait_for_payment'] = true;
         }
         $storeAppointment = app('AppointmentUserService')->storeAppointment($appointmentSetting, $userModelAppointment, $appointmentModel, $detail);
         Cache::forget('appointmentList.' . $this->appId);
@@ -312,6 +323,11 @@ class SpecificDayAppointmentRegistrationModal extends Component
         }
         if (setting(SettingKeyEnum::SECREYERY_SEND_LINK_FOR_APPOINTMENT)) {
             $this->form['registerWithoutPayment'] = true;
+        }
+        if ($app->detail[AppointmentSetting::OPERATORS][AppointmentSetting::STATUS] == true) {
+            foreach ($app->detail[AppointmentSetting::OPERATORS][AppointmentSetting::IDS] as $key => $user_id) {
+                $this->fetchData['operators'][$user_id] = User::find($user_id)->fullName;
+            }
         }
     }
     public function render()

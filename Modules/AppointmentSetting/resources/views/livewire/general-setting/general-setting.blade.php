@@ -326,14 +326,14 @@
             <h3>پرداخت آنلاین</h3>
             <div class="main-toggle-group d-sm-flex align-items-center ms-0">
                 <div class="toggle toggle-lg toggle-primary my-1  customCheckbox
-                @if (isset($form['payment']['status']) && $form['payment']['status'] != false  ) on  @else off @endif"
+                @if (isset($form['payment']['status']) && $form['payment']['status'] != false) on  @else off @endif"
                     data-id="payment.status" wire:ignore.self data-bs-toggle="collapse" href="#paymentCollaps"
                     role="button" aria-expanded="false" aria-controls="paymentCollaps">
                     <span></span>
                 </div>
             </div>
         </div>
-        <div class="card-body collapse @if (isset($form['payment']['status']) && $form['payment']['status'] != false  ) show @endif" id="paymentCollaps"
+        <div class="card-body collapse @if (isset($form['payment']['status']) && $form['payment']['status'] != false) show @endif" id="paymentCollaps"
             wire:ignore.self>
             @error('form.payment.*')
                 <div class="alert alert-danger" role="alert">
@@ -587,6 +587,10 @@
             </div>
         </div>
     </div>
+    {{-- add operator  --}}
+    <div class="card @error('form.operators.*') border border-danger @enderror">
+        @include('appointmentsetting::components.generalsetting.addoperator')
+    </div>
     {{-- active status  --}}
     <div class="card">
         <div class="card-header border-bottom d-flex justify-content-between">
@@ -641,17 +645,18 @@
     </style>
 @endpush
 @push('scripts')
+    <script src="{{ admin_asset('plugins/select2/select2.full.min.js') }}"></script>
     <script>
         $(document).ready(function() {
             //pass the custom checkboxes values
             $('.customCheckbox').on('click', function() {
                 var id = $(this).data('id');
-                var inp =  $(this) ;
+                var inp = $(this);
                 @this.set('form.' + id, $(this).hasClass('on'));
-                ChangePricesDisplay(id,inp);
+                ChangePricesDisplay(id, inp);
             });
 
-            function ChangePricesDisplay(id,inp) {
+            function ChangePricesDisplay(id, inp) {
                 if (id == 'payment.inPerson.status' && inp.hasClass('on')) {
                     $('#inPersonPrice').fadeIn();
                 } else if (id == 'payment.inPerson.status') {
@@ -709,6 +714,15 @@
                     @this.set('form.startAppointment.date', $('#startDatePicker').val());
                 }
             });
+
+            //operator
+            setTimeout(() => {
+                $('.select2-show-search').select2();
+            }, 1000);
+            $('.select2-show-search').on('change', function() {
+                @this.set('form.operators.ids', $(this).val());
+            });
+
         });
     </script>
 @endpush

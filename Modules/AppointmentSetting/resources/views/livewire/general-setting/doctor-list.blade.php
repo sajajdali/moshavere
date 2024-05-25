@@ -103,11 +103,11 @@
                                             <div
                                                 class="pe-4 border-end d-flex align-items-center justify-content-center">
                                                 <h5 class="mb-0 me-3 text-muted">بخش ها</h5>
-                                                <p class="m-0 text-dark">6</p>
+                                                <p class="m-0 text-dark">{{$doctor->service->count()}}</p>
                                             </div>
                                             <div class="ms-4 d-flex align-items-center justify-content-center">
                                                 <h5 class="mb-0 me-3 text-muted">بخش با زمان اختصاصی</h5>
-                                                <p class="m-0 text-dark">2</p>
+                                                <p class="m-0 text-dark">{{$doctor->specialServiceseCount()}}</p>
                                             </div>
                                         </div>
                                     </div>

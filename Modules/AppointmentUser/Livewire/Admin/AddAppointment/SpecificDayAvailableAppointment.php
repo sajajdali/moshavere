@@ -5,6 +5,7 @@ namespace Modules\AppointmentUser\Livewire\Admin\AddAppointment;
 use Carbon\Carbon;
 use Livewire\Component;
 use Livewire\Attributes\On;
+use Modules\User\Entities\User;
 use Livewire\Attributes\Computed;
 use Illuminate\Support\Facades\Cache;
 use Hekmatinasser\Verta\Facades\Verta;
@@ -18,7 +19,7 @@ use Modules\AppointmentUser\Livewire\Admin\AddAppointment\Modal\SpecificDayAppoi
 
 class SpecificDayAvailableAppointment extends Component
 {
-    use OprationButtonsTrait ;
+    use OprationButtonsTrait;
     //this propery shouldNOT exist in the final product
     public $tempMessage = null;
     public array $fetchData = ['showRegisterModal' => 'false'];
@@ -166,7 +167,7 @@ class SpecificDayAvailableAppointment extends Component
             return app('AppointmentUserService')->listAppointments($app);
         });
         // dd($this->fetchData['RawlistOfAppointment']);
-        $this->fetchData['listOfAppointment'] = $this->listOfAppointment($this->fetchData['RawlistOfAppointment']);
+        $this->fetchData['listOfAppointment'] = $this->listOfAppointmenlunchModalt($this->fetchData['RawlistOfAppointment']);
     }
     public function passTimeToRegisterAppointmentModal($from, $until)
     {
@@ -176,7 +177,6 @@ class SpecificDayAvailableAppointment extends Component
     }
     public function lunchAppModal()
     {
-
         $this->fetchData['showRegisterModal'] = 'true';
     }
     public function changeAppointmentType($appId)
@@ -289,6 +289,7 @@ class SpecificDayAvailableAppointment extends Component
         if (request()->has('serviceId')) {
             $this->fetchData['service'] = Service::find(request()->get('serviceId'));
         }
+        
     }
     public function render()
     {

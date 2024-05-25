@@ -9,6 +9,11 @@ Route::get('user/documents/{user}', \Modules\User\Livewire\Admin\User\UserDocume
 // doctor profile info
 Route::get('user/doctor/info/{user}', \Modules\User\Livewire\Admin\User\DoctorInfo\UpdateOrCreate::class)->name('doctor.info')->can('viewAny', \Modules\User\Entities\User::class);
 Route::get('user/doctor/gallery/{user}', \Modules\User\Livewire\Admin\User\DoctorGallery\UpdateOrCreate::class)->name('doctor.gallery')->can('viewAny', \Modules\User\Entities\User::class);
+
+//oprator routes
+Route::get('user/oprator/timesetting/{user}', Modules\User\Livewire\Admin\User\Oprator\OpratorTimeSetting::class)->name('oprator.timesetting')->can('viewAny', \Modules\User\Entities\User::class);
+
+
 //role routes
 Route::get('role', \Modules\User\Livewire\Admin\Role\RoleList::class)->name('role.index')->can('viewAny', \Spatie\Permission\Models\Role::class);
 Route::get('role/create', \Modules\User\Livewire\Admin\Role\RoleCreateOrUpdate::class)->name('role.create')->can('create', \Spatie\Permission\Models\Role::class);

@@ -20,4 +20,6 @@ trait AppointmentSettingDetailKeyTrait
     const NOT_PAYING_STATUS = 'notPayinStatus';
     const MONITORTING_APPOINTMENT = 'monitoring_appointment';
     const IN_PERSON = 'inPerson';
+    const OPERATORS = 'operators';
+    const IDS = 'ids';
 }

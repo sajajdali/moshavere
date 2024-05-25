@@ -5,6 +5,7 @@ namespace Modules\AppointmentSetting\Livewire\GeneralSetting;
 use Livewire\Component;
 use Livewire\Attributes\Url;
 use Livewire\WithPagination;
+use Modules\AppointmentSetting\app\Models\AppointmentSetting;
 use Modules\User\Entities\User;
 use Spatie\Permission\Models\Role;
 use Modules\Place\app\Models\Place;
@@ -46,6 +47,7 @@ class DoctorList extends Component
         } else {
             $this->form['place'] = true;
         }
+       
     }
 
 

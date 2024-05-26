@@ -1,9 +1,9 @@
-<div>
+<div id="doctorCard">
     <div class="card">
         <div class="card-header border-bottom">
-            <h3 class="card-title"> انتخاب پزشک</h3>
+            <h3 class="card-title"> ثبت عدم حضور برای <strong>پزشک</strong></h3>
             <div class="card-options">
-                <button class="btn btn-primary" type="button" data-bs-toggle="collapse" data-bs-target="#advanceSearch"
+                <button class="btn btn-info" type="button" data-bs-toggle="collapse" data-bs-target="#advanceSearch"
                     aria-expanded="false" aria-controls="advanceSearch">
                     جست و جوی پیشرفته
                 </button>
@@ -69,17 +69,13 @@
                             <span>{{ $message }}</span>
                         </div>
                     @enderror
-                    <div id="checkForSpecialSectoion" class="alert alert-info d-none" role="alert" wire:ignore> در نظر
-                        داشته باشید
-                        که در صورتی که مایل هستید در یک بخش خاص تنظیمات اعمال شوند ، فقط باید یک پزشک را انتخاب کنید!!
-                    </div>
                     @foreach ($fetchData['doctors'] as $key => $doctorList)
                         <div class="col-md-4" wire:ignore>
                             <div class="form-group mt-2">
                                 <div class="checkbox">
                                     <div class="custom-checkbox custom-control">
                                         <input type="checkbox" wire:model='form.doctor.{{ $doctorList->id }}'
-                                            data-id="{{ $doctorList->id }}" {{-- @if (array_key_exists($doctorList->id, $form['doctor']) && $form['doctor'][$doctorList->id] == 'true') checked @endif --}}
+                                            data-id="{{ $doctorList->id }}" data-for="doctor" {{-- @if (array_key_exists($doctorList->id, $form['doctor']) && $form['doctor'][$doctorList->id] == 'true') checked @endif --}}
                                             data-checkboxes="mygroup" class="custom-control-input"
                                             id="checkbox-{{ $key }}">
                                         <label for="checkbox-{{ $key }}"
@@ -105,9 +101,9 @@
             <div class="row">
                 <div class="col-9"></div>
                 <div class="col-3 text-end">
-                    <button class="btn btn-success" type="button" wire:click='AddStep'>
-                        <span wire:loading.remove wire:target='AddStep'>مرحله بعد</span>
-                        <span wire:loading wire:target='AddStep' class="spinner-border spinner-border-sm" role="status"
+                    <button class="btn btn-success" type="button" wire:click="AddStep('doctors')">
+                        <span wire:loading.remove wire:target="AddStep('doctors')">مرحله بعد</span>
+                        <span wire:loading wire:target="AddStep('doctors')" class="spinner-border spinner-border-sm" role="status"
                             aria-hidden="true"></span>
                     </button>
                 </div>

@@ -13,11 +13,9 @@ use Spatie\Permission\Traits\HasRoles;
 use Modules\Service\app\Models\Service;
 use Illuminate\Notifications\Notifiable;
 use Modules\User\Traits\UserRelationTrait;
-use Modules\User\Traits\MetaAttributeTrait;
 use Modules\User\Traits\UserAttributeTrait;
 use Illuminate\Database\Eloquent\Collection;
 use Modules\User\Database\factories\UserFactory;
-use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
@@ -204,6 +202,10 @@ class User extends Authenticatable
     public static function doctors_query()
     {
         return Role::find(3)?->users();
+    }
+    public static function operators_query()
+    {
+        return Role::find(4)?->users();
     }
 
     public function age(): int

@@ -48,7 +48,34 @@ class AppointmentUserCreateOrUpdate extends Component
         $this->form['modalSelectedData']['doctor'] = $user->id;
         if (AppointmentSetting::where('user_id', $user->id)->exists()) {
             $this->fetchData['placeList'] = $user->places;
-            $this->lunchmodal('placeModal');
+            //check if there is more than 1 place exist
+            if (count($this->fetchData['placeList']) == 1) {
+                $this->form['modalSelectedData']['place'] = $this->fetchData['placeList']->first()->id;
+                if (
+                    !empty($this->form['modalSelectedData']['doctor']) &&
+                    !empty($this->form['modalSelectedData']['place'])
+                ) {
+                    $doctor = User::find($this->form['modalSelectedData']['doctor']);
+                    $this->fetchData['ServiceList'] = $doctor->service;
+                    //check if there is more than 1 service exist
+                    if (count($this->fetchData['ServiceList']) == 1) {
+                        return redirect()->route(
+                            'admin.appointment.add.setTime',
+                            [
+                                'doctorId' =>  $this->form['modalSelectedData']['doctor'],
+                                'sectionId' => $this->fetchData['ServiceList']->first()->id,
+                                'placeId' => $this->form['modalSelectedData']['place']
+                            ]
+                        );
+                    } else {
+                        return  $this->lunchmodal('serviceModal');
+                    }
+                }
+                return  $this->lunchmodal('docModal');
+            } else {
+                $this->lunchmodal('placeModal');
+            }
+            // if()
         } else {
             return redirect()->route('admin.appointment.doctor.list')->with('error', " تنظیمات روز های حضور برای {$user->fullName} تعریف نشده است");
         }
@@ -63,7 +90,21 @@ class AppointmentUserCreateOrUpdate extends Component
         ) {
             $doctor = User::find($this->form['modalSelectedData']['doctor']);
             $this->fetchData['ServiceList'] = $doctor->service;
-            return  $this->lunchmodal('serviceModal');
+            if (count($this->fetchData['ServiceList']) == 1) {
+                return redirect()->route(
+                    'admin.appointment.add.setTime',
+                    [
+                        'doctorId' =>  $this->form['modalSelectedData']['doctor'],
+                        'sectionId' => $this->fetchData['ServiceList']->first()->id,
+                        'placeId' => $this->form['modalSelectedData']['place']
+                    ]
+                );
+            } else {
+                return  $this->lunchmodal('serviceModal');
+            }
+        }
+        if (count($this->fetchData['docList']) == 1) {
+            return $this->docSelectedFrommodal($this->fetchData['docList']->first());
         }
         return  $this->lunchmodal('docModal');
     }
@@ -88,7 +129,11 @@ class AppointmentUserCreateOrUpdate extends Component
         $this->fetchData['docList'] = $service->user;
         $associatedService = Service::with('user.places')->find($service->id);
         $this->fetchData['placeList'] = $associatedService->user->flatMap->places;
-        $this->lunchModal('placeModal');
+        if (count($this->fetchData['placeList']) == 1) {
+            $this->placeSelected($this->fetchData['placeList']->first());
+        } else {
+            $this->lunchModal('placeModal');
+        }
     }
     public function docSelectedFrommodal(User $user)
     {
@@ -124,7 +169,7 @@ class AppointmentUserCreateOrUpdate extends Component
     {
         $docQuery = User::doctors_query();
         if (isset($docQuery)) {
-           $docQuery =  $docQuery->when(isset($this->search['doctors']) && !empty($this->search['doctors']), function ($query) {
+            $docQuery =  $docQuery->when(isset($this->search['doctors']) && !empty($this->search['doctors']), function ($query) {
                 return $query->where(function ($q) {
                     $q->whereHas('metas', function ($q) {
                         $q->where([

@@ -293,34 +293,40 @@
                         </div>
                     </div>
                 </div>
+            @elseif($step == 3)
                 @if (isset($fetchData['operators']))
                     <div class="row my-5">
                         <div class="col-md-4">
                             <a
                                 class=" @error('form.operator') text-danger @else text-primary @endif" data-bs-toggle="collapse" href="#operatorCollapsController"
-                                    role="button" aria-expanded="false" aria-controls="operatorCollapsController">
-                                    <i class="fa fa-user-circle-o me-1 " aria-hidden="true"></i>
-                                    <strong>انتخاب اپراتور</strong>
-                                </a>
-                            </div>
-                            <div class="col-md-8">
-                                <hr>
-                            </div>
-                            <div class="collapse row show mt-2" id="operatorCollapsController">
-                                @error('form.operator')
-                                <div class="col-12">
-                                    <div class="alert alert-danger fade show" role="alert">
-                                       قالب پیامکی مربوط به ارسال لینک پرداخت تعریف نشده است!
-                                    </div>
+                            role="button" aria-expanded="false" aria-controls="operatorCollapsController">
+                            <i class="fa fa-user-circle-o me-1 " aria-hidden="true"></i>
+                            <strong>انتخاب اپراتور</strong>
+                        </a>
+                    </div>
+                    <div class="col-md-8">
+                        <hr>
+                    </div>
+                    <div class="col-12 mb-3">
+                        <div class="collapse row show mt-2" id="operatorCollapsController">
+                            @error('form.operator')
+                            <div class="col-12">
+                                <div class="alert alert-danger fade show" role="alert">
+                                   قالب پیامکی مربوط به ارسال لینک پرداخت تعریف نشده است!
                                 </div>
-                                @enderror
-                                <div class="col-12">
-                                    <select class="form-select" id="validationCustom04" wire:model='form.operator'>
-                                        <option value="">انتخاب کنید...</option>
+                            </div>
+                            @enderror
+                            <div class="col-12">
+                                <select class="form-select" id="validationCustom04" wire:model='form.operator'>
+                                    <option value="">انتخاب کنید...</option>
+                                    @if (empty($fetchData['operators']))
+                                        <option value="">بدون اپراتور</option>
+                                    @else
                                         @foreach ($fetchData['operators'] as $user_id => $user_name)
                                             <option value="{{ $user_id }}">{{ $user_name }}</option>
                                         @endforeach
-                                    </select>
+                                    @endif
+                                </select>
                         </div>
                         @error('form.operator')
                             <span class="text-danger">{{ $message }}</span>
@@ -328,18 +334,17 @@
                     </div>
             </div>
             @endif
-        @elseif($step == 3)
+        @elseif($step == 4)
             <div class="row my-5">
                 <div class="alert alert-warning alert-dismissible fade show" role="alert">
                     در ساعت انتخابی شما ، یک
                     نوبت ثبت شده است ، آیا مایل به ثبت نوبت هستید؟
                 </div>
-
             </div>
             @endif
             <div class="modal-footer d-flex justify-content-between">
                 <div>
-                    @if ($step > 1)
+                    @if ($step == 2 )
                         <button type="button" class="btn btn-gray" wire:click='privousStep'
                             wire:loading.class='btn-loading bg-gray'>
                             <i class="fa fa-arrow-right" aria-hidden="true"></i></button>
@@ -350,9 +355,9 @@
                         wire:loading.class='btn-loading bg-gray'>
                         @if ($step == 1)
                             ادامه
-                        @elseif($step == 2)
+                        @elseif($step == 2 || $step == 3)
                             ثبت
-                        @elseif($step == 3)
+                        @elseif($step == 4)
                             بله ثبت شود
                         @endif
                     </button>
@@ -362,6 +367,4 @@
             </div>
         </div>
     </div>
-</div>
-</div>
 </div>

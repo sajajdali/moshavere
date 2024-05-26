@@ -5,10 +5,12 @@ namespace Modules\AppointmentUser\Livewire\Admin\AddAppointment\Modal;
 use Carbon\Carbon;
 use Livewire\Component;
 use Livewire\Attributes\On;
+use Matrix\Operators\Operator;
 use Modules\User\Entities\User;
 use Modules\User\Enum\UserMetaEnum;
 use Illuminate\Support\Facades\Cache;
 use Hekmatinasser\Verta\Facades\Verta;
+use Modules\Absence\app\Models\Absence;
 use Modules\Service\app\Models\Service;
 use Modules\Setting\Enum\SettingKeyEnum;
 use Modules\AppointmentUser\Enum\AppointmentVia;
@@ -63,25 +65,23 @@ class SpecificDayAppointmentRegistrationModal extends Component
     }
     public function privousStep()
     {
-        if ($this->step == 2) {
-            $this->form = [
-                "number" => null,
-                "document" => null,
-                "first_name" => null,
-                "last_name" => null,
-                "appType" => 'main_app',
-                "smsType" => 'send',
-            ];
-            if (isset($this->fetchData['user'])) {
-                unset($this->fetchData['user']);
-            }
-            $this->step = 1;
-        } elseif ($this->step == 3) {
-            $this->step = 2;
+
+        $this->form = [
+            "number" => null,
+            "document" => null,
+            "first_name" => null,
+            "last_name" => null,
+            "appType" => 'main_app',
+            "smsType" => 'send',
+        ];
+        if (isset($this->fetchData['user'])) {
+            unset($this->fetchData['user']);
         }
+        $this->step = 1;
     }
     public function numberSet()
     {
+
         if ($this->step == 1) {
             $this->findeOrCreateUser();
         } elseif ($this->step == 2) {
@@ -94,8 +94,15 @@ class SpecificDayAppointmentRegistrationModal extends Component
             if (!isset($this->fetchData['user'])) {
                 $this->createUser();
             }
-            $this->storeAppointmentByAdmin();
+            if (isset($this->fetchData['operators'])) {
+                $this->checkForAvaiableOperator();
+                $this->step = 3;
+            } else {
+                $this->storeAppointmentByAdmin();
+            }
         } elseif ($this->step == 3) {
+            return $this->storeAppointmentByAdmin();
+        } elseif ($this->step == 4) {
             $this->storeApp();
             $this->step = 1;
             $this->form = [
@@ -190,7 +197,7 @@ class SpecificDayAppointmentRegistrationModal extends Component
             if ($is_time_free) {
                 $this->storeApp();
             } else {
-                $this->step = 3;
+                $this->step = 4;
             }
             $this->render();
         }
@@ -237,12 +244,11 @@ class SpecificDayAppointmentRegistrationModal extends Component
         $sms_status = $this->form['smsType'] == 'send' ? true : false;
 
         //check if operator
-        if (isset($this->form['operator'])) {
+        if (isset($this->form['operator']) && !empty($this->form['operator'])) {
             $oprator =  $this->form['operator'];
         } else {
             $oprator = null;
         }
-
         // appointment model
         $appointmentModel = new AppointmentModel(
             timestamp: $appTime->timestamp,
@@ -253,7 +259,7 @@ class SpecificDayAppointmentRegistrationModal extends Component
             agentId: auth()->user()->id,
             operatorId: $oprator,
             kind: isset($this->form['kind']) ? $this->form['kind'] : null,
-            smsToDoctor : false,
+            smsToDoctor: false,
             description: isset($this->form['description']) ? $this->form['description'] : '',
             type: $appointment_type,
             endTime: Carbon::createFromTimeString($this->form['time']['until'])->toTimeString(),
@@ -295,6 +301,70 @@ class SpecificDayAppointmentRegistrationModal extends Component
             'form.time.from.required' => 'زمان نوبت به درستی انتخاب نشده است!',
         ];
     }
+    private function checkForAvaiableOperator()
+    {
+        $selected_date_visit = (Verta::parse($this->appDate)->toCarbon());
+        if (isset($this->appTime)) {
+            $start_visit_time = explode(':', $this->appTime);
+        }
+        $start_visit_time = explode(':', $this->form['time']['from']);
+        $appTime = Verta::parse($this->appDate)->tocarbon()->setTime($start_visit_time[0], $start_visit_time[1])->toTimeString();
+        $untilTimeString = $this->form['time']['until'];
+        if ($untilTimeString) {
+            $endTime = Carbon::createFromTimeString($untilTimeString)->toTimeString();
+        } else {
+            $endTime = Carbon::parse($appTime)->addMinutes($this->fetchData['app']->time_for_visit)->toTimeString();
+        }
+
+        $this->fetchData['appointmentUser_with_operator'] = AppointmentUser::whereNotNull('operator_id')
+            ->whereDate('date_visit', $selected_date_visit)
+            ->where(function ($query) use ($appTime, $endTime) {
+                // Check if the new appointment starts during an existing appointment
+                $query->where(function ($query) use ($appTime) {
+                    $query->whereTime('start_time', '<=', $appTime)
+                        ->whereTime('end_time', '>', $appTime);
+                })
+                    // Check if the new appointment ends during an existing appointment
+                    ->orWhere(function ($query) use ($endTime) {
+                        $query->whereTime('start_time', '<', $endTime)
+                            ->whereTime('end_time', '>=', $endTime);
+                    })
+                    // Check if the new appointment completely overlaps an existing appointment
+                    ->orWhere(function ($query) use ($appTime, $endTime) {
+                        $query->whereTime('start_time', '>=', $appTime)
+                            ->whereTime('end_time', '<=', $endTime);
+                    });
+            })
+            ->get();
+
+
+        // todo::HERE
+        //check for operator Absence
+        $absence_of_operators = Absence::whereIn('user_id', array_keys($this->fetchData['operators']))
+            ->whereDate('start_at', '<', $selected_date_visit)
+            ->whereDate('end_at', '>', $selected_date_visit)
+            ->pluck('user_id')
+            ->toArray();
+
+        $existing_operators = [];
+        if ($this->fetchData['appointmentUser_with_operator']->isNotEmpty()) {
+            foreach ($this->fetchData['appointmentUser_with_operator'] as $appointmentUser) {
+                $existing_operators[] = $appointmentUser->operator_id;
+            }
+        }
+        // todo::HERE
+
+
+        // Merge existing operators with absent operators
+        $all_existing_or_absent_operators = array_merge($existing_operators, $absence_of_operators);
+
+        if (!empty($all_existing_or_absent_operators)) {
+
+            $operatorsToDeleteFlipped = array_flip($all_existing_or_absent_operators);
+            $filteredOperators = array_diff_key($this->fetchData['operators'], $operatorsToDeleteFlipped);
+            return $this->fetchData['operators'] = $filteredOperators;
+        }
+    }
 
     public function mount()
     {
@@ -313,6 +383,7 @@ class SpecificDayAppointmentRegistrationModal extends Component
                     $this->form['kind'] = AppointmentUserKindEnum::ONLINE;
                 }
             }
+            $this->fetchData['app'] = $app;
         }
         if (isset($this->appTime) && !empty($this->appTime)) {
             $this->form['time']['from'] = $this->appTime;

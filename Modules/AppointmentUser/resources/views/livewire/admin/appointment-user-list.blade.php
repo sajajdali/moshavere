@@ -124,6 +124,7 @@
                                     isset($search['appointment_set_date']) ||
                                     isset($search['kind']) ||
                                     isset($search['appointment_star_date']) ||
+                                    isset($search['appointment_operatorId']) ||
                                     isset($search['appointment_end_date'])) ) show @endif"
                                 id="appointmentCollapsSearch" wire:ignore.self>
                                 <div class="col-md-6">
@@ -195,6 +196,20 @@
                                         wire:model="search.docNumber" placeholder="شماره پرونده کاربر"
                                         type="text">
 
+                                </div>
+                                <div class="col-md-6">
+                                    <label for="search-operator" class="form-label datePicker"><strong>اپراتور نوبت</strong></label>
+                                <select class="form-control" id="search-operator"
+                                    wire:model="search.appointment_operatorId" placeholder="وضعیت اپراتور نوبت"
+                                    type="text">
+                                    <option value="">انتخاب کنید...</option>
+                                    <option value="0">بدون اپراتور</option>
+                                    @foreach (\Modules\User\Entities\User::operators() as $operators)
+                                        <option value="{{ $operators->id }}">
+                                            {{ $operators->fullName }}
+                                        </option>
+                                    @endforeach
+                                </select>
                                 </div>
                             </div>
                         </div>
@@ -361,7 +376,12 @@
                                         <td>{{ $ap->user?->mobile ?? '-----' }}</td>
                                         <td>{{ $ap->user?->document_number ?? '---' }}</td>
                                         <td>
-                                            {{ $ap->doctor?->full_name ?? 'پزشک حذف شده' }}
+                                            <div class="d-flex flex-column">
+                                                <span>{{ $ap->doctor?->full_name ?? 'پزشک حذف شده' }}</span>
+                                                @if ($ap->setting->detail[\Modules\AppointmentSetting\app\Models\AppointmentSetting::OPERATORS][\Modules\AppointmentSetting\app\Models\AppointmentSetting::STATUS])
+                                                <span class="badge badge-sm bg-info" >{{ $ap->operator?->full_name ?? 'بدون اپراتور' }} </span>
+                                                @endif
+                                            </div>
                                         </td>
                                         <td>{{ $ap->service?->title ?? 'سرویس حذف شده ' }}</td>
                                         <td>

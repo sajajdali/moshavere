@@ -11,9 +11,10 @@ use Livewire\Component;
 #[Layout('admin::layouts.login')]
 class Login extends Component
 {
-    #[Rule('required',message: 'آدرس ایمیل را وارد کنید')]
-    #[Rule('email',message: 'ادرس ایمیل به درستی وارد نشده است')]
-    public $email;
+    #[Rule('required',message: 'شماره همراه را وارد کنید')]
+    #[Rule('digits:11',message: 'شماره همراه کمتر از 11 رقم است')]
+    #[Rule('numeric',message: 'شماره همراه به درستی وارد نشده است')]
+    public $mobile;
     #[Rule('required',message: 'رمز عبور را وارد کنید')]
     public $password;
 
@@ -41,7 +42,7 @@ class Login extends Component
         //     ->setExpectedAction('login')
         //     ->verify($this->recaptcha, request()->ip());
         // if ($resp->isSuccess()) {
-            if (auth()->attempt(['email' => $this->email, 'password' => $this->password], true)) {
+            if (auth()->attempt(['mobile' => $this->mobile, 'password' => $this->password], true)) {
                 return redirect()->route('admin.dashboard');
             }
             $this->message = 'ایمیل یا رمز عبور اشتباه است';

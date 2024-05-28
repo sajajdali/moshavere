@@ -12,9 +12,11 @@
             <h5><mark class="p-2">
                     ثبت نوبت در روز {{ verta($fetchData['selectedDate'])->format('d F Y') }}</mark></h5>
         </div>
-        <button id="changeDocButton" class="btn btn-primary mt-3 mt-sm-0" type="button" class="btn btn-primary"
-            data-bs-toggle="modal" data-bs-target="#changeDocmodal">
-            تغییر پزشک و بخش</button>
+        @if ($fetchData['showChangeServiceBtn'])
+            <button id="changeDocButton" class="btn btn-primary mt-3 mt-sm-0" type="button" class="btn btn-primary"
+                data-bs-toggle="modal" data-bs-target="#changeDocmodal">
+                تغییر پزشک و بخش</button>
+        @endif
     </div>
     @include('admin::layouts.components.alert')
 
@@ -216,7 +218,7 @@
     <livewire:appointmentuser::admin.add-appointment.modal.service-and-doctor-modal :appId="$fetchData['appId']" :appTime="$fetchData['time']"
         :serviceId="$fetchData['service']->id" :placeId="$fetchData['place']" />
     <livewire:appointmentuser::admin.add-appointment.modal.specific-day-appointment-registration-modal :appId="$fetchData['appId']"
-        :appTime="$fetchData['time']" :serviceId="$fetchData['service']->id" :placeId="$fetchData['place']"  />
+        :appTime="$fetchData['time']" :serviceId="$fetchData['service']->id" :placeId="$fetchData['place']" />
     <div>
         @include('appointmentuser::components.appointmentlist.disapprovemodal')
     </div>
@@ -226,69 +228,71 @@
     <script src="{{ admin_asset('plugins/select2/select2.full.min.js') }}"></script>
     <script src="{{ admin_asset('plugins/sweet-alert/sweetalert.min.js') }}"></script>
     <script src="{{ admin_asset('plugins/sweet-alert/admin.sweetalert.js') }}"></script>
+    <script src="{{ admin_asset('plugins/treeview/treeview.js') }}"></script>
     <script>
         $(document).ready(function() {
-            var setAppModal = document.querySelector('#RegistrAnAppointment');
-            var setAppModalInst = bootstrap.Modal.getOrCreateInstance(setAppModal);
-            var myModalEl = document.querySelector('#changeDocmodal');
-            var modal = bootstrap.Modal.getOrCreateInstance(myModalEl);
+                    var setAppModal = document.querySelector('#RegistrAnAppointment');
+                    var setAppModalInst = bootstrap.Modal.getOrCreateInstance(setAppModal);
+                    var myModalEl = document.querySelector('#changeDocmodal');
+                    var modal = bootstrap.Modal.getOrCreateInstance(myModalEl);
 
-            function addJs() {
-                $('#currentDate').persianDatepicker({
-                    format: 'L',
-                    autoClose: true,
-                    onSelect: function(unix) {
-                        @this.set('form.changeDate', $('#currentDate').val());
-                    }
-                });
-            };
-            addJs();
-            Livewire.on('lunchRegisterModal', function() {
-                setTimeout(() => {
-                    setAppModalInst.show();
-                }, 500);
-            });
-            Livewire.on('lunchModal', function() {
-                setTimeout(() => {
-                    var myModal = new bootstrap.Modal(document.getElementById(
-                        'resoanForDisapproveModal'), {
-                        keyboard: false
-                    });
-                    myModal.show();
-                }, 1000);
-            });
-            Livewire.on('loadJs', function() {
-                setTimeout(() => {
+                    function addJs() {
+                        $('#currentDate').persianDatepicker({
+                            format: 'L',
+                            autoClose: true,
+                            onSelect: function(unix) {
+                                @this.set('form.changeDate', $('#currentDate').val());
+                            }
+                        });
+                    };
                     addJs();
-                }, 500);
-            });
-            if({{$fetchData['showRegisterModal'] }}){
-                @this.dateHasBeenChange();
-                setTimeout(() => {
-                    setAppModalInst.show();
-                }, 1000);
-            };
-            Livewire.on('closeModal', function() {
-                modal.hide();
-                setAppModalInst.hide();
-            });
-            Livewire.on('urlDateChange', function(newDate) {
-                var currentUrl = window.location.href;
-                var baseUrl = currentUrl.split('/').slice(0, -1).join('/');
-                var newUrl = baseUrl + '/' + newDate.newDate;
-                window.history.pushState({
-                    path: newUrl
-                }, '', newUrl);
-            })
-            @if(setting(\Modules\Setting\Enum\SettingKeyEnum::SECREYERY_SEND_LINK_FOR_APPOINTMENT)){
-                $('body').on('change','.payment_pending_input',function(){
-                    if($(this).val() == 'false') {
-                        $('#sendSubmitPaymentStatus').removeClass('d-none');
-                    }else{
-                        $('#sendSubmitPaymentStatus').addClass('d-none');
-                    }
-                });
-            @endif
-        });
+                    Livewire.on('lunchRegisterModal', function() {
+                        setTimeout(() => {
+                            setAppModalInst.show();
+                        }, 500);
+                    });
+                    Livewire.on('lunchModal', function() {
+                        setTimeout(() => {
+                            var myModal = new bootstrap.Modal(document.getElementById(
+                                'resoanForDisapproveModal'), {
+                                keyboard: false
+                            });
+                            myModal.show();
+                        }, 1000);
+                    });
+                    Livewire.on('loadJs', function() {
+                        setTimeout(() => {
+                            addJs();
+                        }, 500);
+                    });
+                    if ({{ $fetchData['showRegisterModal'] }}) {
+                        @this.dateHasBeenChange();
+                        setTimeout(() => {
+                            setAppModalInst.show();
+                        }, 1000);
+                    };
+                    Livewire.on('closeModal', function() {
+                        modal.hide();
+                        setAppModalInst.hide();
+                    });
+                    Livewire.on('urlDateChange', function(newDate) {
+                        var currentUrl = window.location.href;
+                        var baseUrl = currentUrl.split('/').slice(0, -1).join('/');
+                        var newUrl = baseUrl + '/' + newDate.newDate;
+                        window.history.pushState({
+                            path: newUrl
+                        }, '', newUrl);
+                    })
+                    @if (setting(\Modules\Setting\Enum\SettingKeyEnum::SECREYERY_SEND_LINK_FOR_APPOINTMENT))
+                        {
+                            $('body').on('change', '.payment_pending_input', function() {
+                                if ($(this).val() == 'false') {
+                                    $('#sendSubmitPaymentStatus').removeClass('d-none');
+                                } else {
+                                    $('#sendSubmitPaymentStatus').addClass('d-none');
+                                }
+                            });
+                        @endif
+                    });
     </script>
 @endpush

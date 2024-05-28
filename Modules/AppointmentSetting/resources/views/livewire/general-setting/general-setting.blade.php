@@ -300,13 +300,13 @@
                     </p>
                 </div>
             @enderror
-            <div class="row">
+            <div class="row"  >
                 <div class="col-md-3 pt-2">
                     <label class="text-primary" for="basic-url">انتخاب تاریخ:</label>
                 </div>
                 <div class="col-md-9">
                     <div class="input-group mb-3">
-                        <input type="text" wire:model='form.endAppointment.date'
+                        <input type="text" wire:model='form.endAppointment.date' autocomplete="off"
                             class="form-control @error('form.endAppointment.date') is-invalid @enderror"
                             id="endDatePicker">
                     </div>
@@ -561,7 +561,7 @@
                 </div>
                 <div class="col-md-9">
                     <div class="input-group mb-3">
-                        <input type="text" wire:model='form.startAppointment.date'
+                        <input type="text" wire:model='form.startAppointment.date' autocomplete="off"
                             class="form-control @error('form.startAppointment.date') is-invalid @enderror"
                             id="startDatePicker">
                     </div>

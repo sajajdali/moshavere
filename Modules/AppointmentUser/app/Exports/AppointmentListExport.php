@@ -40,7 +40,7 @@ class AppointmentListExport implements FromCollection, WithMapping, WithHeadings
             $app->user->document_number ?? '---',
             $app->doctor->full_name,
             $app->service?->title,
-            verta($app->start_time)->format('H:i') . 'الی' . verta($app->end_time)->format('H:i'),
+            verta($app->start_time)->format('H:i'),
             verta($app->date_visit)->format('Y/m/d'),
             verta($app->created_at)->format('Y/m/d'),
 

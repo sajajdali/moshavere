@@ -194,4 +194,8 @@ class AppointmentUser extends Model
     {
         return $this->hasMany(FeedBack::class);
     }
+    public function operator()
+    {
+        return $this->belongsTo(User::class, 'operator_id');
+    }
 }

@@ -39,20 +39,27 @@ class ServiceAndDoctorModal extends Component
     }
 
     //after seleced one of the doctors
-    public function showRelatedSection($id)
+    public function doctorSelected($id)
     {
         $this->docSection = User::find($id);
-        $this->fetchData['service'] = $this->docSection->service->take(10);
+        $this->fetchData['service'] = $this->docSection->service()->orderBy('parent_id', 'asc')->get()->take(10);
         $this->step = $this->step + 1;
         $this->render();
     }
     //after seleced one of the services
     //final function
-    public function selectSection($id)
+    public function selectSection()
     {
-        $this->form['service_id'] = $id;
+        if (!isset($this->form['service'])) {
+            return $this->addError('selectService', 'لطفا یک سرویس را انتخاب کنید');
+        }
+        $this->form['service_id'] = $this->form['service'];
         $this->form['doctor_id'] = $this->docSection->id;
-        $this->step = 3;
+        if ($this->fetchData['places']->isNotEmpty() && $this->fetchData['places']->count() == 1) {
+            return  $this->selectplace($this->fetchData['places']->first());
+        } else {
+            $this->step = 3;
+        }
         // $this->dispatch('docAndSection', section: $section_id, doctor: $doctor_id);
         // $this->dispatch('closeModal', true);
     }
@@ -80,7 +87,6 @@ class ServiceAndDoctorModal extends Component
     }
     public function searchDocAndSection()
     {
-        // dd($this->search);
         if ($this->step == 2) {
             $this->fetchData['service'] = $this->docSection->service()->when(!empty($this->search['service']), function ($q) {
                 return $q->where('title', 'LIKE', "%{$this->search['service']}%");
@@ -92,7 +98,7 @@ class ServiceAndDoctorModal extends Component
     public function ignoreSearch()
     {
         $this->search = [
-            'doctor' => null,
+            'doctor'  => null,
             'service' => null,
         ];
         if ($this->step == 2) {
@@ -108,6 +114,9 @@ class ServiceAndDoctorModal extends Component
     public function render()
     {
         if ($this->step == 1) {
+            if (User::doctors()->count() == 1) {
+                $this->doctorSelected(User::doctors()->first()->id);
+            }
             $query = User::doctors_query()->when(!empty($this->search['doctor']), function ($query) {
                 return $query->where(function ($q) {
                     $q->whereHas('metas', function ($q) {

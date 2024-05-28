@@ -21,15 +21,15 @@
                                 </div>
                             @endif
                             <div class="wrap-input100 validate-input"
-                                 data-bs-validate="آدرس ایمیل الزامی است">
-                                <input class="input100" type="text" name="email" placeholder="آدرس ایمیل"
-                                       wire:model="email">
+                                 data-bs-validate="شماره تلفن الزامی است">
+                                <input class="input100" type="text" name="mobile" placeholder="شماره تلفن"
+                                       wire:model="mobile">
                                 <span class="focus-input100"></span>
                                 <span class="symbol-input100">
-											<i class="zmdi zmdi-email" aria-hidden="true"></i>
+                                    <i class="zmdi zmdi-smartphone-android"></i>
 										</span>
                             </div>
-                            @error('email')
+                            @error('mobile')
                             <div class="invalid-feedback" style="display: block;margin-top: 0;margin-bottom: 4px">
                                 {{ $message }}
                             </div>

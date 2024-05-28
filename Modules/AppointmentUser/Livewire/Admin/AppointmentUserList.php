@@ -108,12 +108,7 @@ class AppointmentUserList extends Component
                 'condition' => $this->search['user_mobile'],
                 'callback' => function ($query) {
                     return $query->whereHas('user', function ($q) {
-                        $q->whereHas('metas', function ($qq) {
-                            $qq->where([
-                                ['meta_key', UserMetaEnum::MOBILE],
-                                ['meta_value', 'LIKE', "%{$this->search['user_mobile']}%"],
-                            ]);
-                        });
+                        $q->where('mobile', 'LIKE', "%{$this->search['user_mobile']}%");
                     });
                 },
             ],
@@ -153,7 +148,16 @@ class AppointmentUserList extends Component
                     return $query->where('status', AppointmentUserStatusEnum::tryFrom($this->search['AppointmentStatus']));
                 },
             ],
-
+            'appointment_operatorId' => [
+                'condition' => isset($this->search['appointment_operatorId']),
+                'callback' => function ($query) {
+                    if ($this->search['appointment_operatorId'] == 0) {
+                        return $query->where('operator_id', null);
+                    } else {
+                        return $query->where('operator_id', $this->search['appointment_operatorId']);
+                    }
+                },
+            ],
             'docNumber' => [
                 'condition' => $this->search['docNumber'],
                 'callback' => function ($query) {
@@ -236,8 +240,8 @@ class AppointmentUserList extends Component
 
     public function lunchFeedBackModal(AppointmentUser $appointmentUser)
     {
-        $this->fetchData['feedbacks'] = $appointmentUser->feedbacks ;
-        $this->dispatch('lunchFeedBackModal',true);
+        $this->fetchData['feedbacks'] = $appointmentUser->feedbacks;
+        $this->dispatch('lunchFeedBackModal', true);
     }
     public function booted()
     {

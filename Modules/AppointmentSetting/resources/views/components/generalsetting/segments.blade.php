@@ -27,7 +27,7 @@
         </div>
     @else
         <div class="row">
-            <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            <div class="alert alert-info alert-dismissible fade show" role="alert">
                 <span class="alert-inner--text">لطفا ابتدا از قسمت تنظیمات نوبت دهی و سپس بخش بندی نوبت ، یک بخش بندی به
                     سیستم اضافه بکنید.!</span>
                 @can('crate', \Modules\AppointmentSetting\app\Models\AppointmentSegment::class)

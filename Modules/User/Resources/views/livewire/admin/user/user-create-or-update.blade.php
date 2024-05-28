@@ -41,7 +41,7 @@
                         </div>
                         <div class="form-row">
                             <div class="col-xl-6 col-lg-6 col-md-12 col-sm-12 mb-3">
-                                <label for="userEmail">ایمیل (الزامی)</label>
+                                <label for="userEmail">ایمیل</label>
                                 <input type="text" class="form-control @error('userEmail') is-invalid @enderror"
                                     id="userEmail" wire:model="userEmail" placeholder="آدرس ایمیل">
                                 @error('userEmail')
@@ -50,7 +50,7 @@
                                 @enderror
                             </div>
                             <div class="col-xl-6 col-lg-6 col-md-12 col-sm-12 mb-3">
-                                <label for="userMobile">موبایل</label>
+                                <label for="userMobile">موبایل (الزامی)</label>
                                 <input type="text" class="form-control @error('userMobile') is-invalid @enderror"
                                     id="userMobile" wire:model="userMobile" placeholder="موبایل کاربر">
                                 @error('userMobile')

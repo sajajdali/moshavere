@@ -167,7 +167,7 @@ class SpecificDayAvailableAppointment extends Component
             return app('AppointmentUserService')->listAppointments($app);
         });
         // dd($this->fetchData['RawlistOfAppointment']);
-        $this->fetchData['listOfAppointment'] = $this->listOfAppointmenlunchModalt($this->fetchData['RawlistOfAppointment']);
+        $this->fetchData['listOfAppointment'] = $this->listOfAppointment($this->fetchData['RawlistOfAppointment']);
     }
     public function passTimeToRegisterAppointmentModal($from, $until)
     {
@@ -289,7 +289,11 @@ class SpecificDayAvailableAppointment extends Component
         if (request()->has('serviceId')) {
             $this->fetchData['service'] = Service::find(request()->get('serviceId'));
         }
-        
+        if (User::doctors()->count() >  1 || Service::count() > 1) {
+            $this->fetchData['showChangeServiceBtn'] = true;
+        } else {
+            $this->fetchData['showChangeServiceBtn'] = false;
+        }
     }
     public function render()
     {

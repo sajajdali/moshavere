@@ -107,7 +107,11 @@ class GeneralSetting extends Component
     {
         $this->form[$counter][$itrator] =   $this->form[$counter][$itrator]  + 1;
         if ($counter == 'specialTimeCounter') {
-            $lastArr = array_key_last($this->form['specialDaytimeValues'][$itrator]);
+            if (isset($this->form['specialDaytimeValues']) && isset($this->form['specialDaytimeValues'][$itrator]) ) {
+                $lastArr = array_key_last($this->form['specialDaytimeValues'][$itrator]);
+            } else {
+                $lastArr = 0;
+            }
             $lastArr == 1 ? $lastArr = $lastArr + 1 : '';
             $this->form['specialDaytimeValues'][$itrator][$lastArr + 1]['start'] = '00:00';
             $this->form['specialDaytimeValues'][$itrator][$lastArr + 1]['end']   = '00:00';
@@ -259,7 +263,9 @@ class GeneralSetting extends Component
             unset($this->form['interference']['status']);
         }
         if (isset($this->form['segments']['status'])  && $this->form['segments']['status'] == false) {
-            $this->appointment_setting->segments()->detach();
+            if (isset($this->appointment_setting) && $this->appointment_setting->segments()->exists()) {
+                $this->appointment_setting->segments()->detach();
+            }
             unset($this->form['segments']['status']);
             unset($this->form['segments']['value']);
         }
@@ -275,7 +281,7 @@ class GeneralSetting extends Component
     }
     public function saveSetting()
     {
-        //if check box for each section is turned off , delete the data for it 
+        //if check box for each section is turned off , delete the data for it
         $this->checkForUnsetTheCheckBoxes();
         $this->validate();
         $endAppointmentTime   =  isset($this->form['endAppointment']['date']) ? Verta::parse($this->form['endAppointment']['date'])->toCarbon() : null;

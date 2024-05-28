@@ -83,14 +83,14 @@ class UserCreateOrUpdate extends Component
         $rules = [
             'userName' => 'required',
             'userLastName' => 'required',
-            'userEmail' => 'required|email|unique:users,email',
-            'userMobile' => 'nullable|unique:users,mobile',
-            'password' => 'required|confirmed',
+            'userEmail' => 'email|unique:users,email',
+            'userMobile' => 'required|unique:users,mobile',
+            'password' => 'required|confirmed|min:4',
             'selectedRoles' => 'required',
         ];
         if ($this->user !== null) { //if user is not null, then we are updating
-            $rules['userEmail'] = 'required|email|unique:users,email,' . $this->user?->id;
-            $rules['userMobile'] = 'nullable|unique:users,mobile,' . $this->user?->id;
+            $rules['userEmail'] = 'nullable|email|unique:users,email,' . $this->user?->id;
+            $rules['userMobile'] = 'required|unique:users,mobile,' . $this->user?->id;
             $rules['password'] = 'nullable|confirmed';
         }
 

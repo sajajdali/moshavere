@@ -4,12 +4,13 @@ namespace Modules\Service\app\Models;
 
 use App\Enum\ActiveEnum;
 use Modules\User\Entities\User;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Builder;
+use Modules\Reminder\app\Models\Reminder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
-use Modules\Reminder\app\Models\Reminder;
 
 class Service extends Model
 {
@@ -55,8 +56,19 @@ class Service extends Model
     public function apiResult()
     {
         return [
-            'id' => $this->id ,
+            'id' => $this->id,
             'title' => $this->title
         ];
+    }
+    public function hasChild()
+    {
+        return Service::where('parent_id', $this->id)->exists();
+    }
+
+    public function isParentCategoryExists($collection)
+    {
+        return $collection->contains(function ($item) {
+            return is_null($item->parent_id);
+        });
     }
 }

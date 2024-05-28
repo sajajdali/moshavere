@@ -341,8 +341,8 @@ class SpecificDayAppointmentRegistrationModal extends Component
         // todo::HERE
         //check for operator Absence
         $absence_of_operators = Absence::whereIn('user_id', array_keys($this->fetchData['operators']))
-            ->whereDate('start_at', '<', $selected_date_visit)
-            ->whereDate('end_at', '>', $selected_date_visit)
+            ->whereDate('start_at', '<=', $selected_date_visit)
+            ->whereDate('end_at', '>=', $selected_date_visit)
             ->pluck('user_id')
             ->toArray();
 
@@ -397,7 +397,11 @@ class SpecificDayAppointmentRegistrationModal extends Component
         }
         if ($app->detail[AppointmentSetting::OPERATORS][AppointmentSetting::STATUS] == true) {
             foreach ($app->detail[AppointmentSetting::OPERATORS][AppointmentSetting::IDS] as $key => $user_id) {
-                $this->fetchData['operators'][$user_id] = User::find($user_id)->fullName;
+                $userName  = User::find($user_id)?->fullName ?? null;
+                $userid    =  User::find($user_id)?->id     ?? null;
+                if (!empty($userid)) {
+                    $this->fetchData['operators'][$userid] = $userName;
+                }
             }
         }
     }

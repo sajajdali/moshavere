@@ -87,7 +87,7 @@ class CreateOrUpdate extends Component
             $this->form['active']        = 'true';
         }
         $this->fetchdata['doctors']  = User::doctors();
-        $this->fetchdata['services'] = Service::all();
+        $this->fetchdata['services'] = Service::whereNull('parent_id')->get();
     }
     public function render()
     {

@@ -56,91 +56,95 @@
                     <div class="table-responsive">
                         <table class="table table-bordered text-nowrap border-bottom" id="basic-datatable">
                             <thead>
-                            <tr>
-                                <th class="wd-15p border-bottom-0">شناسه</th>
-                                <th class="wd-15p border-bottom-0">عنوان</th>
-                                <th class="wd-20p border-bottom-0">کاربران نقش</th>
-                                <th class="wd-20p border-bottom-0">نوع</th>
-                                <th class="wd-25p border-bottom-0">عملیات</th>
-                            </tr>
+                                <tr>
+                                    <th class="wd-15p border-bottom-0">شناسه</th>
+                                    <th class="wd-15p border-bottom-0">عنوان</th>
+                                    <th class="wd-20p border-bottom-0">کاربران نقش</th>
+                                    <th class="wd-20p border-bottom-0">نوع</th>
+                                    <th class="wd-25p border-bottom-0">عملیات</th>
+                                </tr>
                             </thead>
                             <tbody>
-                            @foreach($roles as $role)
-                                <tr>
-                                    <td>{{ $role->id }}</td>
-                                    <td>{{ $role->name }}</td>
-                                    <td>{{ number_format($role->users()->count()) }} کاربر</td>
-                                    <td>
-                                        @if($role->hasPermissionTo('ADMIN_ACCESS'))
-                                            <span class="badge bg-primary my-1">نقش مدیریتی</span>
-                                        @endif
-                                        @if($role->hasPermissionTo('USER_ACCESS'))
-                                            <span class="badge bg-danger my-1">نقش کاربری</span>
-                                        @endif
-                                        @if($role->hasPermissionTo('USER_DEFAULT'))
-                                            <span class="badge bg-warning my-1">نقش پیشفرض</span>
-                                        @endif
-                                    </td>
-                                    <td>
-                                        @if($role->id === 1)
-                                            <div class="btn-group mt-2 mb-2">
-                                                <button type="button" class="btn btn-default dropdown-toggle"
-                                                        data-bs-toggle="dropdown">
-                                                    عملیات <span class="caret"></span>
-                                                </button>
-                                            </div>
-
-                                        @else
-                                            @canany(['update','delete'],$role)
-                                                <div class="btn-group mt-2 mb-2">
-                                                    <button type="button" class="btn btn-primary dropdown-toggle"
-                                                            data-bs-toggle="dropdown">
-                                                        عملیات <span class="caret"></span>
-                                                    </button>
-                                                    <ul class="dropdown-menu" role="menu">
-                                                        @can('update',$role)
-                                                            @unless($role->hasPermissionTo('USER_DEFAULT'))
-                                                                <li><a href="{{ route('admin.role.edit',$role) }}">ویرایش</a>
-                                                                </li>
-                                                            @else
-                                                                <li><a class="admin_sweet_alert op-0-4"
-                                                                       data-title="خطا"
-                                                                       data-type="error"
-                                                                       data-description="امکان ویرایش نقش پیشفرض وجود ندارد."
-                                                                       href="#">ویرایش</a>
-                                                                </li>
-                                                            @endunless
-                                                        @endcan
-                                                        @can('delete',$role)
-                                                            @unless($role->hasPermissionTo('USER_DEFAULT'))
-                                                                <li><a class="delete_confirm_alert"
-                                                                       data-label="نقش {{ $role->name }}"
-                                                                       data-id="{{ $role->id }}"
-                                                                       href="">حذف</a>
-                                                                </li>
-                                                            @else
-                                                                <li><a class="admin_sweet_alert op-0-4"
-                                                                       data-title="خطا"
-                                                                       data-type="error"
-                                                                       data-description="امکان حذف نقش پیشفرض وجود ندارد."
-                                                                       href="#">حذف</a>
-                                                                </li>
-                                                            @endunless
-                                                        @endcan
-                                                    </ul>
-                                                </div>
-                                            @else
+                                @foreach ($roles as $role)
+                                    <tr>
+                                        <td>{{ $role->id }}</td>
+                                        <td>{{ $role->name }}</td>
+                                        <td>{{ number_format($role->users()->count()) }} کاربر</td>
+                                        <td>
+                                            @if ($role->hasPermissionTo('ADMIN_ACCESS'))
+                                                <span class="badge bg-primary my-1">نقش مدیریتی</span>
+                                            @endif
+                                            @if ($role->hasPermissionTo('USER_ACCESS'))
+                                                <span class="badge bg-danger my-1">نقش کاربری</span>
+                                            @endif
+                                            @if ($role->hasPermissionTo('USER_DEFAULT'))
+                                                <span class="badge bg-warning my-1">نقش پیشفرض</span>
+                                            @endif
+                                        </td>
+                                        <td>
+                                            @if ($role->id == 1)
                                                 <div class="btn-group mt-2 mb-2">
                                                     <button type="button" class="btn btn-default dropdown-toggle"
-                                                            data-bs-toggle="dropdown">
+                                                        data-bs-toggle="dropdown">
                                                         عملیات <span class="caret"></span>
                                                     </button>
                                                 </div>
-                                            @endcanany
-                                        @endif
-                                    </td>
-                                </tr>
-                            @endforeach
+                                            @else
+                                                @canany(['update', 'delete'], $role)
+                                                    <div class="btn-group mt-2 mb-2">
+                                                        <button type="button" class="btn btn-primary dropdown-toggle"
+                                                            data-bs-toggle="dropdown">
+                                                            عملیات <span class="caret"></span>
+                                                        </button>
+                                                        <ul class="dropdown-menu" role="menu">
+                                                            @can('update', $role)
+                                                                @unless ($role->hasPermissionTo('USER_DEFAULT'))
+                                                                    <li><a href="{{ route('admin.role.edit', $role) }}">ویرایش</a>
+                                                                    </li>
+                                                                @else
+                                                                    <li><a class="admin_sweet_alert op-0-4" data-title="خطا"
+                                                                            data-type="error"
+                                                                            data-description="امکان ویرایش نقش پیشفرض وجود ندارد."
+                                                                            href="#">ویرایش</a>
+                                                                    </li>
+                                                                @endunless
+                                                            @endcan
+                                                            @if ($role->id > 5)
+                                                                @can('delete', $role)
+                                                                    @unless ($role->hasPermissionTo('USER_DEFAULT'))
+                                                                        <li><a class="delete_confirm_alert"
+                                                                                data-label="نقش {{ $role->name }}"
+                                                                                data-id="{{ $role->id }}" href="">حذف</a>
+                                                                        </li>
+                                                                    @else
+                                                                        <li><a class="admin_sweet_alert op-0-4" data-title="خطا"
+                                                                                data-type="error"
+                                                                                data-description="امکان حذف نقش پیشفرض وجود ندارد."
+                                                                                href="#">حذف</a>
+                                                                        </li>
+                                                                    @endunless
+                                                                @endcan
+                                                            @else
+                                                                <li><a class="admin_sweet_alert op-0-4" data-title="خطا"
+                                                                        data-type="error"
+                                                                        data-description="امکان حذف نقش پیشفرض وجود ندارد."
+                                                                        href="#">حذف</a>
+                                                                </li>
+                                                            @endif
+                                                        </ul>
+                                                    </div>
+                                                @else
+                                                    <div class="btn-group mt-2 mb-2">
+                                                        <button type="button" class="btn btn-default dropdown-toggle"
+                                                            data-bs-toggle="dropdown">
+                                                            عملیات <span class="caret"></span>
+                                                        </button>
+                                                    </div>
+                                                @endcanany
+                                            @endif
+                                        </td>
+                                    </tr>
+                                @endforeach
                             </tbody>
                         </table>
                     </div>
@@ -156,14 +160,13 @@
 </div>
 
 @push('scripts')
-
     <!-- INTERNAL SELECT2 JS -->
-    <script src="{{admin_asset('plugins/select2/select2.full.min.js')}}"></script>
+    <script src="{{ admin_asset('plugins/select2/select2.full.min.js') }}"></script>
     <!-- DATA TABLE JS-->
-    <script src="{{admin_asset('plugins/datatable/js/jquery.dataTables.min.js')}}"></script>
-    <script src="{{admin_asset('plugins/datatable/js/dataTables.bootstrap5.js')}}"></script>
-    <script src="{{admin_asset('plugins/datatable/js/dataTables.buttons.min.js')}}"></script>
-    <script src="{{admin_asset('js/table-data.js')}}"></script>
-    <script src="{{admin_asset('plugins/sweet-alert/sweetalert.min.js')}}"></script>
-    <script src="{{admin_asset('plugins/sweet-alert/admin.sweetalert.js')}}"></script>
+    <script src="{{ admin_asset('plugins/datatable/js/jquery.dataTables.min.js') }}"></script>
+    <script src="{{ admin_asset('plugins/datatable/js/dataTables.bootstrap5.js') }}"></script>
+    <script src="{{ admin_asset('plugins/datatable/js/dataTables.buttons.min.js') }}"></script>
+    <script src="{{ admin_asset('js/table-data.js') }}"></script>
+    <script src="{{ admin_asset('plugins/sweet-alert/sweetalert.min.js') }}"></script>
+    <script src="{{ admin_asset('plugins/sweet-alert/admin.sweetalert.js') }}"></script>
 @endpush

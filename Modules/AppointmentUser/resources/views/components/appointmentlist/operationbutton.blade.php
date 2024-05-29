@@ -85,7 +85,7 @@
     </li>
     <li><a class="confirm_swal_alert" data-label="نوبت" data-description="از کنسل کردن نوبت مطمعن هستید؟"
             data-title="کنسل کردن " data-confirmbtn="بله کنسل شود"
-            data-action="cancelWithOutSms
+            data-action="cancelWithOutSms"
         data-id="{{ $ap->id }}" href="">
             <i class="fa fa-times" aria-hidden="true"></i>
             کنسل

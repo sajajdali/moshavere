@@ -7,6 +7,7 @@ use App\Enum\ActiveEnum;
 use Modules\User\Entities\User;
 use Spatie\Permission\Models\Role;
 use Modules\Service\app\Models\Service;
+use Modules\Service\Enum\ServiceShowTypeEnum;
 
 class CreateOrUpdate extends Component
 {
@@ -14,18 +15,20 @@ class CreateOrUpdate extends Component
     public $isEdited = false;
     public array $form = [
         'parent_id' => null,
-        'doctors' => []
+        'doctors' => [],
+        'show_type' => true,
     ];
     public array $fetchdata = [];
 
     public function rules()
     {
         return [
-            'form.title' => 'required|string|max:225',
-            'form.parentId' => 'nullable|integer',
-            'form.priority' => 'required|integer',
-            'form.img' => 'nullable',
-            'form.active' => 'nullable',
+            'form.title'     => 'required|string|max:225',
+            'form.parentId'  => 'nullable|integer',
+            'form.priority'  => 'required|integer',
+            'form.img'       => 'nullable',
+            'form.active'    => 'nullable',
+            'form.show_type' => 'nullable',
         ];
     }
 
@@ -42,6 +45,7 @@ class CreateOrUpdate extends Component
             'icon'          => $this->form['img']            ?? null,
             'priority'      => $this->form['priority']   ?? 1,
             'active'        => ActiveEnum::tryFrom($active),
+            'show_type'     => $this->form['show_type'] ? ServiceShowTypeEnum::SHOW : ServiceShowTypeEnum::DONT_SHOW,
         ];
         if ($this->isEdited) {
             $this->service->update($modelCreateOrUpdate);
@@ -64,16 +68,17 @@ class CreateOrUpdate extends Component
 
     private function addInitialValues()
     {
+        
         $this->form['title']     = $this->service->title;
         $this->form['parent_id'] = $this->service->parent_id;
         $this->form['img']       = $this->service->icon;
         $this->form['priority']  = $this->service->priority;
         $this->form['active']    =  $this->service->active == ActiveEnum::ACTIVE ? 'true' : 'false';
-        $doctors =  $this->service->user->pluck('id')->toArray() ;
+        $this->form['show_type']    =  $this->service->show_type == ServiceShowTypeEnum::SHOW ? 'true' : 'false';
+        $doctors =  $this->service->user->pluck('id')->toArray();
         foreach ($doctors as $doc) {
             $this->form['doctors'][$doc] =  true;
         }
-
     }
     public function mount()
     {

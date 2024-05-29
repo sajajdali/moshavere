@@ -27,4 +27,10 @@ enum ActiveEnum: int implements EnumHasDefaultInterface
             self::DEACTIVE => '<span class="badge bg-danger rounded-pill">غیرفعال</span>',
         };
     }
+    public function getBtnColor() {
+        return match($this) {
+            self::ACTIVE => 'btn-success',
+            self::DEACTIVE => 'btn-danger',
+        };
+    }
 }

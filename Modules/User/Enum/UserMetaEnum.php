@@ -19,7 +19,7 @@ enum UserMetaEnum: int implements EnumHasNameInterface
     case NATIONAL_CODE = 18;
     case CITY = 19;
 
-     // doctor Enum
+        // doctor Enum
     case SPECIALITY_TYPE = 10;
     case DOC_BIOGRAPHY = 11;
     case LICENCE_NUMBER = 12;
@@ -29,6 +29,10 @@ enum UserMetaEnum: int implements EnumHasNameInterface
     case BAN_USER = 16;
     case DR_GALLERY = 17;
     case DR_BANNER = 21;
+    case DR_ENEMRGENCY_STATUS = 22;
+    case DR_ENEMRGENCY_ORDER = 23;
+    case DR_INFO_STATUS = 24;
+    case DR_INFO_ORDER = 25;
 
 
 

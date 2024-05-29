@@ -16,10 +16,10 @@
                         <div class="card-body">
                             <div class="row">
                                 <div class="col-12 col-md-3 mt-3">
-                                    <h4 class="text-center text-primary text-start ms-1"><a data-bs-toggle="collapse"
+                                    <h4 class="text-primary text-start ms-1"><a data-bs-toggle="collapse"
                                             href="#userDataCollaps" role="button" aria-expanded="false"
                                             aria-controls="userDataCollaps" href="">
-                                            <i class="fa fa-user" aria-hidden="true"></i>
+                                            <i class="fa fa-user me-1" aria-hidden="true"></i>
                                             <span>اطلاعات مربوط به پزشک</span>
                                         </a></h4>
                                 </div>
@@ -55,7 +55,8 @@
                                                 @if (isset($fetchData['specialitiesType']) && !empty($fetchData['specialitiesType']))
                                                     <option label="انتخاب کنید..."></option>
                                                     @foreach ($fetchData['specialitiesType'] as $specialityType)
-                                                        <option value="{{ $specialityType->value }}">  {{ $specialityType->getName() }}</option>
+                                                        <option value="{{ $specialityType->value }}">
+                                                            {{ $specialityType->getName() }}</option>
                                                     @endforeach
                                                 @else
                                                     <option label="نوع تخصص وارد نشده است..."></option>
@@ -81,10 +82,10 @@
                                     </div>
                                 </div>
                                 <div class="col-12 col-md-3 mt-5">
-                                    <h4 class="text-center text-primary text-start ms-1"><a data-bs-toggle="collapse"
+                                    <h4 class="text-primary text-start ms-1"><a data-bs-toggle="collapse"
                                             href="#userDataCollaps" role="button" aria-expanded="false"
                                             aria-controls="userDataCollaps" href="">
-                                            <i class="fa fa-hospital-o" aria-hidden="true"></i>
+                                            <i class="fa fa-hospital-o me-1" aria-hidden="true"></i>
                                             <span>بخش و مطب</span>
                                         </a></h4>
                                 </div>
@@ -132,32 +133,87 @@
                                             <textarea wire:model='form.address' class="form-control" maxlength="500" id="address_textarea" rows="2"></textarea>
                                         </div>
                                     </div>
-                                    <div class="col-md-12">
+                                    {{-- seperator --}}
+                                    <div class="col-12 col-md-3 mt-5">
+                                        <h4 class="text-primary text-start ms-1"><a data-bs-toggle="collapse"
+                                                href="#userDataCollaps" role="button" aria-expanded="false"
+                                                aria-controls="userDataCollaps" href="">
+                                                <i class="fa fa-sort me-1" aria-hidden="true"></i>
+                                                <span>ترتیب و وضعیت نمایش </span>
+                                            </a></h4>
+                                    </div>
+                                    <div class="col-12 col-md-9 mt-md-5 ">
+                                        <hr class="my-4">
+                                    </div>
+                                    {{-- seperator --}}
+                                    <div class="col-md-12 mt-3">
                                         <div class="form-group">
                                             <label for="order-id">ترتیب نمایش در لیست پزشکان</label>
                                             <input wire:model='form.order' type="number" class="form-control"
                                                 id="order-id" placeholder="به عدد">
                                         </div>
                                     </div>
-                                </div>
-                                <div class="col-md-12">
-                                    <div class="d-flex flex-wrap align-items-center">
-                                        <div class="material-switch">
-                                            <input wire:model='form.active' id="uncheckedInfoSwitch" name="siwtch04"
-                                                type="checkbox" checked />
-                                            <label for="uncheckedInfoSwitch" class="label-info"></label>
+                                    {{-- emergency status --}}
+                                    <div class="col-md-12 mt-2">
+                                        <div class="d-flex flex-wrap align-items-center">
+                                            <div class="material-switch">
+                                                <input class="listOrderCheckBox" data-id="orderForEmergencyVisitDiv"
+                                                    wire:model='form.showDocInEmergencyVisit.status'
+                                                    id="showDocInEmergencyVisit" type="checkbox" checked />
+                                                <label for="showDocInEmergencyVisit" class="label-info"></label>
+                                            </div>
+                                            <p class="card-sub-title">نمایش در لیست ویزیت فوری پزشک</p>
                                         </div>
-                                        <p class="card-sub-title">فعال بودن نوبت دهی</p>
                                     </div>
-                                </div>
-                                <div class="col-md-12">
-                                    <div class="d-flex flex-wrap align-items-center">
-                                        <div class="material-switch">
-                                            <input wire:model='form.banUser' id="banUser" name="siwtch04" type="checkbox" />
-                                            <label  for="banUser"
-                                                class="label-danger"></label>
+                                    <div class="col-md-12" id="orderForEmergencyVisitDiv" wire:ignore.self>
+                                        <div class="form-group">
+                                            <label for="order-showDocInEmergencyVisit">ترتیب نمایش در در لیست ویزیت
+                                                فوری پزشک</label>
+                                            <input wire:model='form.showDocInEmergencyVisit.order' type="number"
+                                                class="form-control" id="order-showDocInEmergencyVisit"
+                                                placeholder="به عدد">
                                         </div>
-                                        <p class="card-sub-title">مسدود کردن کاربر</p>
+                                    </div>
+                                    {{-- info status --}}
+                                    <div class="col-md-12 mt-2">
+                                        <div class="d-flex flex-wrap align-items-center">
+                                            <div class="material-switch">
+                                                <input class="listOrderCheckBox" data-id="orderInDoctorsInfo"
+                                                    wire:model='form.ShowInIntrodocs.status' id="OrderStatusInDocInfo"
+                                                    type="checkbox" checked />
+                                                <label for="OrderStatusInDocInfo" class="label-info"></label>
+                                            </div>
+                                            <p class="card-sub-title">نمایش در لیست معرفی پزشکان</p>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-12" id="orderInDoctorsInfo" wire:ignore.self>
+                                        <div class="form-group">
+                                            <label for="order-showDocInEmergencyVisit">ترتیب نمایش در لیست معرفی
+                                                پزشکان</label>
+                                            <input wire:model='form.ShowInIntrodocs.order' type="number"
+                                                class="form-control" id="order-showDocInEmergencyVisit"
+                                                placeholder="به عدد">
+                                        </div>
+                                    </div>
+                                    <div class="col-md-12">
+                                        <div class="d-flex flex-wrap align-items-center">
+                                            <div class="material-switch">
+                                                <input wire:model='form.active' id="uncheckedInfoSwitch"
+                                                    name="siwtch04" type="checkbox" checked />
+                                                <label for="uncheckedInfoSwitch" class="label-info"></label>
+                                            </div>
+                                            <p class="card-sub-title">فعال بودن نوبت دهی</p>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-12">
+                                        <div class="d-flex flex-wrap align-items-center">
+                                            <div class="material-switch">
+                                                <input wire:model='form.banUser' id="banUser" name="siwtch04"
+                                                    type="checkbox" />
+                                                <label for="banUser" class="label-danger"></label>
+                                            </div>
+                                            <p class="card-sub-title">مسدود کردن کاربر</p>
+                                        </div>
                                     </div>
                                 </div>
                                 <div class="col-12 text-end">
@@ -182,6 +238,27 @@
                 var value = $(this).val();
                 var id = $(this).data('id');
                 @this.set('form.' + id, value);
+            });
+            $('.listOrderCheckBox').each(function() {
+                var inputOrderId = $(this).data('id');
+                if ($(this).prop('checked') == true) {
+                    $('#' + inputOrderId).css({
+                        display: 'block',
+                    });
+                } else {
+                    $('#' + inputOrderId).css({
+                        display: 'none',
+                    });
+                }
+            });
+            $('body').on('change', '.listOrderCheckBox', function() {
+                var checked = $(this).prop('checked');
+                var inputOrderId = $(this).data('id');
+                if (checked) {
+                    $('#' + inputOrderId).fadeIn();
+                } else {
+                    $('#' + inputOrderId).fadeOut();
+                }
             });
         });
     </script>

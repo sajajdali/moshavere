@@ -81,7 +81,21 @@
                                 </p>
                             </div>
                         </div>
-                        <div class="row mb-5">
+                        <div class="row mt-4 mb-3">
+                            <label for="form_priority" class="col-md-3 form-label">نمایش در صفحه اصلی:</label>
+                            <div class="col-md-9">
+                                <div class="custom-checkbox custom-control">
+                                    <input type="checkbox" wire:model='form.show_type' data-checkboxes="mygroup"
+                                        class="custom-control-input" checked id="check_showType">
+                                    <label for="check_showType" class="custom-control-label">با فعال سازی ، این بخش در صفحه اصلی وبسایت نمایش داده میشود
+                                    </label>
+                                </div>
+                                @error('form.priority')
+                                    <span class="text-danger">{{ $message }}</span>
+                                @enderror
+                            </div>
+                        </div>
+                        <div class="row mb-5 mt-3">
                             <div class="form-row">
                                 <label for="password">تصویر بخش</label>
                                 <div class="input-group">

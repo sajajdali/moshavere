@@ -10,6 +10,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Modules\Reminder\app\Models\Reminder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Modules\Service\Enum\ServiceShowTypeEnum;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
 
 class Service extends Model
@@ -23,6 +24,7 @@ class Service extends Model
 
     protected $casts = [
         'active' => ActiveEnum::class,
+        'show_type' => ServiceShowTypeEnum::class,
         'detail' => 'json',
     ];
 

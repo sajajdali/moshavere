@@ -18,6 +18,7 @@ return new class extends Migration
             $table->string('icon')->nullable();
             $table->integer('priority')->default(1);
             $table->tinyInteger('active')->default(1);
+            $table->tinyInteger('show_type')->default(1)->comment('1=> show in the main page | 2 => not show in the main page');
             $table->softDeletes();
             $table->timestamps();
         });

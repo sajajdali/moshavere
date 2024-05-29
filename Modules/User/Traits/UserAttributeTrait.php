@@ -178,4 +178,36 @@ trait UserAttributeTrait
             set: fn ($value) => $this->metas()->create(['meta_key' => $operator, 'meta_value' => $value])
         );
     }
+    public function drEmergencyvisitStatus(): Attribute
+    {
+        $operator = UserMetaEnum::DR_ENEMRGENCY_STATUS;
+        return Attribute::make(
+            get: fn() => $this->getMeta( $operator)?->meta_value,
+            set: fn ($value) => $this->metas()->create(['meta_key' => $operator, 'meta_value' => $value])
+        );
+    }
+    public function drEmergencyvisitOrder(): Attribute
+    {
+        $operator = UserMetaEnum::DR_ENEMRGENCY_ORDER;
+        return Attribute::make(
+            get: fn() => $this->getMeta( $operator)?->meta_value,
+            set: fn ($value) => $this->metas()->create(['meta_key' => $operator, 'meta_value' => $value])
+        );
+    }
+    public function drInfoStatus(): Attribute
+    {
+        $operator = UserMetaEnum::DR_INFO_STATUS;
+        return Attribute::make(
+            get: fn() => $this->getMeta( $operator)?->meta_value,
+            set: fn ($value) => $this->metas()->create(['meta_key' => $operator, 'meta_value' => $value])
+        );
+    }
+    public function drInfoOrder(): Attribute
+    {
+        $operator = UserMetaEnum::DR_INFO_ORDER;
+        return Attribute::make(
+            get: fn() => $this->getMeta( $operator)?->meta_value,
+            set: fn ($value) => $this->metas()->create(['meta_key' => $operator, 'meta_value' => $value])
+        );
+    }
 }

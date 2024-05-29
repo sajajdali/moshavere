@@ -77,6 +77,7 @@
                                         <th scope="col">وضعیت</th>
                                         <th scope="col">زیربخش</th>
                                         <th scope="col">تعداد پزشکان</th>
+                                        <th scope="col">نمایش در صفحه اصلی</th>
                                         <th scope="col">عملیات</th>
                                     </tr>
                                 </thead>
@@ -108,6 +109,7 @@
                                                         class="badge bg-secondary p-3">{{ $service->subSection()?->count() ?? 0 }}</span>
                                                 </td>
                                                 <td>{{ $service->user?->count() ?? 0 }} </td>
+                                                <td>{!! $service->show_type->getBadge()!!} </td>
                                                 <td>
                                                     @canany(['update', 'delete'], $service)
                                                         <div class="btn-group mt-2 mb-2">

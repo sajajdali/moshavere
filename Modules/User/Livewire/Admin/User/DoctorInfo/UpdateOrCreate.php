@@ -42,10 +42,26 @@ class UpdateOrCreate extends Component
         if (isset($this->form['address'])) {
             $this->user->dr_address = $this->form['address'];
         }
+        $this->user->dr_order = $this->form['order'];
         if (isset($this->form['order'])) {
             $this->user->dr_order = $this->form['order'];
         }
-        $this->user->active_appointment = $this->form['active'];
+        if ($this->form['showDocInEmergencyVisit']['status']) {
+            $this->user->dr_emergencyvisit_order    = $this->form['showDocInEmergencyVisit']['status'];
+            $this->user->dr_emergencyvisit_status   = $this->form['showDocInEmergencyVisit']['order'];
+        } else {
+            $this->user->dr_emergencyvisit_order    = false;
+            $this->user->dr_emergencyvisit_status   = false;
+        }
+        if ($this->form['ShowInIntrodocs']['status']) {
+
+            $this->user->dr_info_status = $this->form['ShowInIntrodocs']['status'];
+            $this->user->dr_info_order  = $this->form['ShowInIntrodocs']['order'];
+        } else {
+            $this->user->dr_info_status = false;
+            $this->user->dr_info_order  = false;
+        }
+
         $this->user->ban_user = $this->form['banUser'];
 
         return redirect()->route('admin.user.index')->with('success', 'اطلاعات پزشک با موفقیت ثبت شد');
@@ -86,6 +102,26 @@ class UpdateOrCreate extends Component
             $this->form['banUser'] =   true;
         } else {
             $this->form['banUser'] =   false;
+        }
+        if (isset($this->user->dr_emergencyvisit_status)) {
+            if ($this->user->dr_emergencyvisit_status == 0) {
+                $this->form['showDocInEmergencyVisit']['status'] =  false;
+            } else {
+                $this->form['showDocInEmergencyVisit']['status'] =  true;
+            }
+            if (isset($this->user->dr_emergencyvisit_order)) {
+                $this->form['showDocInEmergencyVisit']['order'] =   $this->user->dr_emergencyvisit_order;
+            }
+        }
+        if (isset($this->user->dr_info_status)) {
+            if ($this->user->dr_info_status == 0) {
+                $this->form['ShowInIntrodocs']['status'] =  false;
+            } else {
+                $this->form['ShowInIntrodocs']['status'] =  true;
+            }
+            if (isset($this->user->dr_info_order)) {
+                $this->form['ShowInIntrodocs']['order'] =  $this->user->dr_info_order;
+            }
         }
     }
     public function mount()

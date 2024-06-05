@@ -1,0 +1,29 @@
+.swiper-wrapper {
+  padding-bottom: 2.5rem !important
+}
+.swiper-button-prev,
+.swiper-button-next {
+  width: 40px !important;
+  height: 40px !important;
+  top: 40% !important;
+  --swiper-navigation-size: 16px;
+  @apply bg-white rounded-full font-bold border-2 border-primary-main text-[1.1rem];
+}
+.swiper-button-disabled {
+  display: none !important;
+}
+.swiper-pagination-bullet {
+  border-radius: 3px !important;
+  --swiper-pagination-bullet-width: 15px;
+  --swiper-pagination-color: #1766FF;
+  --swiper-pagination-bullet-inactive-color: #1766FF;
+}
+.swiper-pagination-bullet-active {
+  --swiper-pagination-bullet-width: 25px;
+}
+.swiper_homepage {
+  padding-bottom: 40px !important;
+  & .swiper-pagination {
+     bottom: 0 !important;
+  }
+}

@@ -27,6 +27,7 @@ return [
         'settings' => [
             \Modules\Setting\Enum\SettingKeyEnum::SITE_LOGO_URL,
             \Modules\Setting\Enum\SettingKeyEnum::SITE_TITLE,
+            \Modules\Setting\Enum\SettingKeyEnum::SITE_SLIDER_TITLE,
         ],
     ],
     'appointment' => [

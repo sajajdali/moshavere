@@ -1,15 +1,40 @@
 {
-  "private": true,
-  "type": "module",
+  "name": "version-4-jangi",
+  "version": "1.0.0",
+  "description": "- HTML\r - CSS\r - TailwindCSS framework\r - Vanilla JS\r - Laravel mix\r - webpack",
+  "main": "index.js",
   "scripts": {
-    "dev": "vite",
-    "build": "vite build"
+    "dev": "npm run development",
+    "development": "mix",
+    "watch": "mix watch",
+    "watch-poll": "mix watch -- --watch-options-poll=1000",
+    "hot": "mix watch --hot",
+    "prod": "npm run production",
+    "production": "mix --production",
+    "test": "echo \"Error: no test specified\" && exit 1"
   },
+  "repository": {
+    "type": "git",
+    "url": "http://wgit.ir/enabz/ui.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
   "devDependencies": {
-    "axios": "^1.1.2",
-    "laravel-vite-plugin": "^0.7.5",
-    "sass": "^1.69.5",
-    "postcss": "^8.3.7",
-    "vite": "^4.0.0"
+    "autoprefixer": "^10.4.13",
+    "browser-sync": "^2.27.10",
+    "browser-sync-webpack-plugin": "2.3.0",
+    "laravel-mix": "^6.0.49",
+    "postcss": "^8.4.19",
+    "sass": "^1.56.1",
+    "sass-loader": "12.1.0",
+    "svg-spritemap-webpack-plugin": "^4.5.0",
+    "tailwindcss": "^3.2.4",
+    "webpack": "^5.23.0"
+  },
+  "dependencies": {
+    "@fancyapps/ui": "^4.0.31",
+    "chart.js": "^4.3.3",
+    "swiper": "^8.4.4"
   }
 }

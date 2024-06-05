@@ -1,0 +1,121 @@
+@import "components";
+@import "layout";
+@import "slider";
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@font-face {
+   font-family: 'iranSans';
+   font-weight: 500;
+   src: url('../assets/fonts/IRANSansXFaNum-Regular.ttf') format('truetype'),
+      url('../assets/fonts/IRANSansXFaNum-Regular.woff') format('woff'),
+      url('../assets/fonts/IRANSansXFaNum-Regular.woff2') format('woff2'),
+      url('../assets/fonts/IRANSansXFaNum-Regular.otf') format('otf');
+}
+
+@font-face {
+   font-family: 'iranSans';
+   font-weight: 700;
+   src: url('../assets/fonts/IRANSansXFaNum-Bold.ttf') format('truetype'),
+      url('../assets/fonts/IRANSansXFaNum-Bold.woff') format('woff'),
+      url('../assets/fonts/IRANSansXFaNum-Bold.woff2') format('woff2'),
+      url('../assets/fonts/IRANSansXFaNum-Bold.otf') format('otf');
+}
+
+$font: 'iranSans', sans-serif;
+
+@layer utilities {
+   .container {
+      @apply px-5 lg:px-8;
+   }
+}
+
+*,
+*::before,
+*::after {
+   background-repeat: no-repeat;
+   font-family: $font;
+}
+
+@layer base {
+   body {
+      position: relative;
+      overflow-x: hidden;
+      min-height: 100vh;
+   }
+
+   img {
+      user-drag: none;
+      -o-user-drag: none;
+      -moz-user-drag: none;
+      -webkit-user-drag: none;
+      user-select: none;
+      -o-user-select: none;
+      -moz-user-select: none;
+      -webkit-user-select: none;
+   }
+
+   textarea {
+      font-family: $font;
+   }
+
+
+   select {
+      appearance: none;
+      -webkit-appearance: none;
+      -moz-appearance: none;
+      -o-appearance: none;
+      background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3E%3Cpath stroke='%236B7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='m6 8 4 4 4-4'/%3E%3C/svg%3E");
+      background-position: left 0.5rem center;
+      background-repeat: no-repeat;
+      background-size: 1.5em 1.5em;
+      padding-right: 1rem;
+      cursor: pointer;
+      -webkit-print-color-adjust: exact;
+   }
+
+   // adding pointer cursor to every buttons
+   button,
+   input[type="submit"],
+   input[type="reset"],
+   input[type="button"] {
+      @apply cursor-pointer;
+   }
+
+   /* Hide default button of input num type in Chrome, Safari, Edge, Opera */
+   input::-webkit-outer-spin-button,
+   input::-webkit-inner-spin-button {
+      -webkit-appearance: none;
+      margin: 0;
+   }
+
+   /* and Firefox */
+   input[type="number"] {
+      -moz-appearance: textfield;
+   }
+
+   // Remove highlight blue color when click on link or botton in the mobile version
+   button,
+   input[type="submit"],
+   input[type="reset"],
+   input[type="button"],
+   a {
+      -webkit-tap-highlight-color: transparent;
+      -webkit-touch-callout: none;
+   }
+
+   // Remove hover effects when button is disabled
+   button:disabled,
+   input[type="submit"]:disabled,
+   input[type="reset"]:disabled,
+   input[type="button"]:disabled {
+      @apply pointer-events-none;
+   }
+}
+
+/* change style of scrollbar */
+.no_scrollbar::-webkit-scrollbar {
+   @apply hidden;
+}

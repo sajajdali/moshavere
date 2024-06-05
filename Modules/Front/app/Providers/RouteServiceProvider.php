@@ -28,9 +28,9 @@ class RouteServiceProvider extends ServiceProvider
     public function map(): void
     {
         $this->mapApiRoutes();
-
         $this->mapWebRoutes();
         $this->maplivewireRoutes();
+        $this->mapAdminRoutes();
     }
 
     /**
@@ -48,6 +48,13 @@ class RouteServiceProvider extends ServiceProvider
     {
         Route::middleware('web')
             ->group(module_path('Front', '/routes/livewire.php'));
+    }
+    protected function mapAdminRoutes(): void
+    {
+        Route::middleware(['web', 'auth', 'admin'])
+            ->prefix('admin')
+            ->as('admin.')
+            ->group(module_path('Front', '/routes/admin.php'));
     }
 
     /**

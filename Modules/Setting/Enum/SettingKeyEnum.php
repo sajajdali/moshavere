@@ -15,6 +15,7 @@ enum SettingKeyEnum: int implements EnumHasNameInterface, SettingTypeInterface, 
     case DEFAULT_EXERCISE_STATUS = 1;
     case SITE_LOGO_URL = 2;
     case SITE_TITLE = 3;
+    case SITE_SLIDER_TITLE = 11;
     case APPOINTMENT_STATUS = 4;
     case APPOINTMENT_DESCRIPTION_STATUS = 5;
     case APPOINTMENT_DESCRIPTION = 6;
@@ -76,6 +77,7 @@ enum SettingKeyEnum: int implements EnumHasNameInterface, SettingTypeInterface, 
             self::APPOINTMENT_USER_PERESENT_STATUS_REGISTRATION    => 'فعال بودن ثبت حضور و یا عدم حضور بیمار',
             self::APPOINTMENT_DEADLINE_VIA_ADMIN    => 'مدت زمان رزرو بودن نوبت برای پرداخت در زمانی که وضعیت نوبت در انتظار پرداخت میباشد و نوبت از طریق پنل ادمین ثبت شده باشد (ساعت)',
             self::APPOINTMENT_DEADLINE_VIA_USER    => 'مدت زمان رزرو بودن نوبت برای پرداخت در زمانی که وضعیت نوبت در انتظار پرداخت میباشد و نوبت را بیمار دریافت کرده باشد(ساعت)',
+            self::SITE_SLIDER_TITLE    => 'عنوان در ابتتدای صفحه ای اصلی و بالای قسمت جست و جو',
 
             self::SMS_API_TOKEN => 'توکن API پیامک',
             self::DEFAULT_EXERCISE_STATUS => 'وضعیت برنامه بعد از تجویز',

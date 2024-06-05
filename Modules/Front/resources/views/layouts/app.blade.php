@@ -11,18 +11,17 @@
     <meta name="author" content="شمیران وب">
     <meta name="keywords" content="{{setting(Modules\Setting\Enum\SettingKeyEnum::SITE_TITLE)}}">
     <!-- Favicon -->
-    {{-- <link rel="apple-touch-icon" sizes="76x76" href="{{ admin_default_asset('favicon/apple-touch-icon.png') }}"> --}}
-    {{-- <link rel="icon" type="image/png" sizes="32x32" href="{{ admin_default_asset('favicon/favicon-32x32.png') }}">
-    <link rel="icon" type="image/png" sizes="16x16" href="{{ admin_default_asset('favicon/favicon-16x16.png') }}"> --}}
-    {{-- <link rel="manifest" href="{{ admin_default_asset('favicon/site.webmanifest') }}"> --}}
-    {{-- <link rel="mask-icon" href="{{ admin_default_asset('favicon/safari-pinned-tab.svg') }}" color="#5bbad5">
-    <link rel="mask-icon" href="{{ admin_default_asset('favicon/safari-pinned-tab.svg') }}" color="#5bbad5"> --}}
+    {{-- <link rel="apple-touch-icon" sizes="76x76" href="{{ front_default_asset('favicon/apple-touch-icon.png') }}"> --}}
+    {{-- <link rel="icon" type="image/png" sizes="32x32" href="{{ front_default_asset('favicon/favicon-32x32.png') }}">
+    <link rel="icon" type="image/png" sizes="16x16" href="{{ front_default_asset('favicon/favicon-16x16.png') }}"> --}}
+    {{-- <link rel="manifest" href="{{ front_default_asset('favicon/site.webmanifest') }}"> --}}
+    {{-- <link rel="mask-icon" href="{{ front_default_asset('favicon/safari-pinned-tab.svg') }}" color="#5bbad5">
+    <link rel="mask-icon" href="{{ front_default_asset('favicon/safari-pinned-tab.svg') }}" color="#5bbad5"> --}}
     <meta name="msapplication-TileColor" content="#ffffff">
     <meta name="theme-color" content="#ffffff">
     <!-- TITLE -->
     <title>{{setting(Modules\Setting\Enum\SettingKeyEnum::SITE_TITLE)}}</title>
-    @include('admin::layouts.components.styles')
-    <link href="{{ front_asset('css/main.css') }}" rel="stylesheet" />
+    @include('front::layouts.components.styles')
     @stack('styles')
     @livewireStyles
 </head>
@@ -36,14 +35,15 @@
             {{ $slot ?? '' }}
         </div>
     </div>
-    @include('admin::layouts.components.modal')
 
     @yield('modal')
 
 </div>
 <!-- page -->
-@include('admin::layouts.components.scripts')
+@include('front::layouts.components.scripts')
+
 @livewireScripts
 @stack('scripts')
+
 </body>
 </html>

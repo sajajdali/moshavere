@@ -9,7 +9,6 @@ enum ActiveEnum: int implements EnumHasDefaultInterface
     case ACTIVE = 1;
     case DEACTIVE = 0;
 
-
     public static function getDefault(): EnumHasDefaultInterface
     {
         return self::ACTIVE;
@@ -31,6 +30,18 @@ enum ActiveEnum: int implements EnumHasDefaultInterface
         return match($this) {
             self::ACTIVE => 'btn-success',
             self::DEACTIVE => 'btn-danger',
+        };
+    }
+    public function getInverse() {
+        return match($this) {
+            self::ACTIVE =>    self::DEACTIVE,
+            self::DEACTIVE =>  self::ACTIVE,
+        };
+    }
+    public function getAccordionColor() {
+        return match($this) {
+            self::ACTIVE =>    'accordion-success',
+            self::DEACTIVE =>  'accordion-danger',
         };
     }
 }

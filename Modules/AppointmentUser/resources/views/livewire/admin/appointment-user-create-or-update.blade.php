@@ -81,13 +81,7 @@
                                                                             تخصص ثبت نشده
                                                                         </span>
                                                                     @endif
-                                                                    @foreach ($doctor?->specialities as $speciality)
-                                                                        <span class="text-gray">
-                                                                            {{ $speciality?->title }}</span>
-                                                                        @if (!$loop->last)
-                                                                            ,
-                                                                        @endif
-                                                                    @endforeach
+                                                                    {{$doctor->DocSpecialities()}}
                                                                 </p>
                                                             </div>
                                                         </div>

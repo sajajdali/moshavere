@@ -210,4 +210,12 @@ trait UserAttributeTrait
             set: fn ($value) => $this->metas()->create(['meta_key' => $operator, 'meta_value' => $value])
         );
     }
+    public function drWaitingTime(): Attribute
+    {
+        $operator = UserMetaEnum::DR_WAITING_TIME;
+        return Attribute::make(
+            get: fn() => $this->getMeta( $operator)?->meta_value,
+            set: fn ($value) => $this->metas()->create(['meta_key' => $operator, 'meta_value' => $value])
+        );
+    }
 }

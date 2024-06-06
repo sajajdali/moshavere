@@ -2,25 +2,26 @@
 
 namespace Modules\User\Entities;
 
+use Verta;
 use Laravel\Sanctum\HasApiTokens;
-use Modules\AppointmentSetting\app\Models\AppointmentSetting;
-use Modules\AppointmentUser\app\Models\AppointmentUser;
 use Modules\Chat\app\Models\Chat;
-use Modules\Transaction\app\Models\Transaction;
 use Spatie\Permission\Models\Role;
 use Modules\User\Enum\UserMetaEnum;
+use Illuminate\Support\Facades\Cache;
 use Spatie\Permission\Traits\HasRoles;
+use Modules\Absence\app\Models\Absence;
 use Modules\Service\app\Models\Service;
 use Illuminate\Notifications\Notifiable;
 use Modules\User\Traits\UserRelationTrait;
 use Modules\User\Traits\UserAttributeTrait;
 use Illuminate\Database\Eloquent\Collection;
+use Modules\Transaction\app\Models\Transaction;
 use Modules\User\Database\factories\UserFactory;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
-use Modules\Absence\app\Models\Absence;
-use Verta;
+use Modules\AppointmentUser\app\Models\AppointmentUser;
+use Modules\AppointmentSetting\app\Models\AppointmentSetting;
 
 /**
  * Modules\User\Entities\User
@@ -118,7 +119,7 @@ class User extends Authenticatable
 
     public function getMeta(UserMetaEnum $metaKey): ?UserMeta
     {
-        return $this->metas->where('meta_key', $metaKey)->last() ?? null;
+        return $this->metas()->where('meta_key', $metaKey)->get()->last() ?? null;
     }
     public function getMetas(UserMetaEnum $metaKey): ?Collection
     {
@@ -228,8 +229,39 @@ class User extends Authenticatable
     {
         return $this->hasMany(Transaction::class);
     }
-    public function specialServiceseCount() {
-       return  AppointmentSetting::where('user_id',$this->id)->whereNotNull('service_id')->count();
+    public function specialServiceseCount()
+    {
+        return  AppointmentSetting::where('user_id', $this->id)->whereNotNull('service_id')->count();
     }
+    public function scopeEmergencyDoctors($query)
+    {
+        // Define a unique cache key
+        $cacheKey = 'emergency_doctors';
 
+        // Attempt to get the data from the cache
+        return Cache::remember($cacheKey, 60 * 60, function () use ($query) {
+            return $query->whereHas('metas', function ($q) {
+                $q->where('meta_key', UserMetaEnum::DR_INFO_STATUS)
+                    ->where('meta_value', true);
+            })
+                ->with(['metas' => function ($q) {
+                    $q->where('meta_key', UserMetaEnum::DR_INFO_ORDER);
+                }])
+                ->get()
+                ->sortBy(function ($user) {
+                    return $user->metas->where('meta_key', UserMetaEnum::DR_INFO_ORDER)->first()->meta_value ?? 0;
+                });
+        });
+    }
+    public function DocSpecialities(): string
+    {
+        $specialities = $this->specialities;
+
+        if ($specialities->isNotEmpty()) {
+            // Join the speciality titles with a comma and a space
+            return $specialities->pluck('title')->implode(' , ');
+        }
+
+        return '';
+    }
 }

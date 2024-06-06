@@ -61,7 +61,9 @@ class UpdateOrCreate extends Component
             $this->user->dr_info_status = false;
             $this->user->dr_info_order  = false;
         }
-
+        if (isset($this->form['drWaitingTime'])) {
+            $this->user->dr_waiting_time = $this->form['drWaitingTime'];
+        }
         $this->user->ban_user = $this->form['banUser'];
 
         return redirect()->route('admin.user.index')->with('success', 'اطلاعات پزشک با موفقیت ثبت شد');
@@ -122,6 +124,9 @@ class UpdateOrCreate extends Component
             if (isset($this->user->dr_info_order)) {
                 $this->form['ShowInIntrodocs']['order'] =  $this->user->dr_info_order;
             }
+        }
+        if (isset($this->user->dr_waiting_time)) {
+            $this->form['drWaitingTime'] = $this->user->dr_waiting_time;
         }
     }
     public function mount()

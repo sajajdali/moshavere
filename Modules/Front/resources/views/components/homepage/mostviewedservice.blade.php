@@ -14,54 +14,16 @@
        </div>
        <div class="swiper swiper-cards-6">
           <div class="swiper-wrapper">
+            @foreach ($fetchData['service'] as $service)
              <div class="swiper-slide">
                 <a href="#"
                    class="flex flex-col items-center gap-4 p-5 border border-secondary-200 bg-white rounded-lg">
-                   <img src="../assets/svg/heart-blood-circulation.svg" class="h-[66px]" />
-                   <p class="font-semibold">قلب</p>
-                   <p class="text-sm text-secondary-400">+500 پزشک</p>
+                   <img src="{{$service->icon}}" class="h-[66px]" />
+                   <p class="font-semibold">{{$service->title}}</p>
+                   <p class="text-sm text-secondary-400">+{{$service->user->count()}} پزشک</p>
                 </a>
              </div>
-             <div class="swiper-slide">
-                <a href="#"
-                   class="flex flex-col items-center gap-4 p-5 border border-secondary-200 bg-white rounded-lg">
-                   <img src="../assets/svg/teeth.svg" class="h-[66px]" />
-                   <p class="font-semibold">دندان پزشکی</p>
-                   <p class="text-sm text-secondary-400">+500 پزشک</p>
-                </a>
-             </div>
-             <div class="swiper-slide">
-                <a href="#"
-                   class="flex flex-col items-center gap-4 p-5 border border-secondary-200 bg-white rounded-lg">
-                   <img src="../assets/svg/dna.svg" class="h-[66px]" />
-                   <p class="font-semibold">ژنتیک</p>
-                   <p class="text-sm text-secondary-400">+500 پزشک</p>
-                </a>
-             </div>
-             <div class="swiper-slide">
-                <a href="#"
-                   class="flex flex-col items-center gap-4 p-5 border border-secondary-200 bg-white rounded-lg">
-                   <img src="../assets/svg/stomach.svg" class="h-[66px]" />
-                   <p class="font-semibold">گوارشی</p>
-                   <p class="text-sm text-secondary-400">+500 پزشک</p>
-                </a>
-             </div>
-             <div class="swiper-slide">
-                <a href="#"
-                   class="flex flex-col items-center gap-4 p-5 border border-secondary-200 bg-white rounded-lg">
-                   <img src="../assets/svg/eye.svg" class="h-[66px]" />
-                   <p class="font-semibold">چشم</p>
-                   <p class="text-sm text-secondary-400">+500 پزشک</p>
-                </a>
-             </div>
-             <div class="swiper-slide">
-                <a href="#"
-                   class="flex flex-col items-center gap-4 p-5 border border-secondary-200 bg-white rounded-lg">
-                   <img src="../assets/svg/tonsil.svg" class="h-[66px]" />
-                   <p class="font-semibold">دهان و دندان</p>
-                   <p class="text-sm text-secondary-400">+500 پزشک</p>
-                </a>
-             </div>
+             @endforeach
           </div>
           <div class="swiper-pagination"></div>
           <div class="swiper-button-prev"></div>

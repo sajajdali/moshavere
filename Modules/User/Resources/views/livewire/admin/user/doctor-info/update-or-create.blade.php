@@ -133,6 +133,15 @@
                                             <textarea wire:model='form.address' class="form-control" maxlength="500" id="address_textarea" rows="2"></textarea>
                                         </div>
                                     </div>
+                                    <div class="col-md-12">
+                                        <div class="form-group">
+                                            <label for="doc_status" class="form-label">مدت زمان انتظار برای پزشک</label>
+                                            <input wire:model='form.drWaitingTime' class="form-control"  id="doc_status">
+                                            <small class="text-gray ms-2">
+                                                <i class="fa fa-info-circle" aria-hidden="true"></i>
+                                                در صفحه اصلی ، نمایش مدت زمان انتظار برای این پزشک</small>
+                                        </div>
+                                    </div>
                                     {{-- seperator --}}
                                     <div class="col-12 col-md-3 mt-5">
                                         <h4 class="text-primary text-start ms-1"><a data-bs-toggle="collapse"

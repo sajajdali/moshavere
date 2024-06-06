@@ -73,4 +73,14 @@ class Service extends Model
             return is_null($item->parent_id);
         });
     }
+    public function scopeMostViewedService($query)
+    {
+        // Define a unique cache key
+        $cacheKey = 'most_viewed_service';
+
+        // Attempt to get the data from the cache
+        return Cache::remember($cacheKey, 60 * 60, function () use ($query) {
+            return $query->whereNull('parent_id')->get();
+        });
+    }
 }

@@ -4,6 +4,7 @@ use Illuminate\Support\Facades\Route;
 use Modules\Front\Livewire\Payment\Invoice;
 use Modules\Front\Livewire\FeedBack\Questions;
 use Modules\Front\Livewire\Appointment\AppointmentDetail;
+use Modules\Front\Livewire\DoctorProfile\DoctorProfileLivewire;
 use Modules\Front\Livewire\HomePage\HomePageLivewire;
 
 /*
@@ -23,4 +24,5 @@ Route::group([], function () {
     Route::get('payment/invoice/call-back', [\Modules\Front\Livewire\Payment\Invoice::class,'zarinCallback'])->name('front.payment.invoice.callBack');
     Route::get('appintment/feedBack/{appointmentUser_id}', Questions::class)->name('front.feedBack');
     Route::get('/', HomePageLivewire::class)->name('front.homePage');
+    Route::get('/doctor/profile/{doctor_id}', DoctorProfileLivewire::class)->name('front.doctor.profile');
 });

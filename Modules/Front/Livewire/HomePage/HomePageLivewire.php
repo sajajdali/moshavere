@@ -5,6 +5,7 @@ namespace Modules\Front\Livewire\HomePage;
 use Livewire\Component;
 use Livewire\Attributes\Layout;
 use Livewire\Attributes\Locked;
+use Modules\Front\app\Models\Faq;
 use Modules\User\Entities\User;
 use Modules\Service\app\Models\Service;
 
@@ -20,7 +21,10 @@ class HomePageLivewire extends Component
         $this->fetchData['service'] = Service::mostViewedService();
 
         // Fetch doctors with dr_info_status set to true and order them by dr_info_order
-        $this->fetchData['EmergencyDoctors'] = User::emergencyDoctors();
+        $this->fetchData['EmergencyDoctors']    = User::emergencyDoctors();
+        $this->fetchData['introductionDoctors'] = User::introductionDoctors();
+        $this->fetchData['introductionDoctors'] = User::NewestDocs();
+        $this->fetchData['faqs'] = Faq::all();
     }
     public function render()
     {

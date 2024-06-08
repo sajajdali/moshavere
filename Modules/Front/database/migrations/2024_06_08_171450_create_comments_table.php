@@ -13,9 +13,14 @@ return new class extends Migration
     {
         Schema::create('comments', function (Blueprint $table) {
             $table->id();
-            $table->morphs('commentable');
-            $table->longText('body');
-            $table->json('detial')->nullable();
+            $table->foreignIdFor(\Modules\User\Entities\User::class)->nullable()->constrained()->cascadeOnDelete();
+            $table->foreignId('doctor_id')->references('id')->on('users');
+            $table->text('body');
+            $table->foreignId('parent_id')->nullable()->references('id')->on('comments');
+            $table->integer('star')->nullable();
+            $table->integer('like')->default(0);
+            $table->integer('status')->default(0);
+            $table->text('reply')->nullable();
             $table->timestamps();
         });
     }

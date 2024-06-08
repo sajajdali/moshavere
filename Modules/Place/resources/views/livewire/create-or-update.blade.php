@@ -87,8 +87,30 @@
                 <div class="col-12">
                     <hr class="opacity-50 w-50">
                     <div class="row">
+                        <div class="col-12">
                             <label for="PlaceAddress" class="form-label">آدرس  مطب</label>
                             <textarea wire:model='form.address' class="form-control" rows="5" id="PlaceAddress" placeholder="آدرس نوشتاری به مطب شما به همراه جزئیات دسترسی"></textarea>
+                        </div>
+                        <div class="col-md-12">
+                            <div class="form-group" wire:ignore>
+                                <label class="form-label">
+                                    <strong>انتخاب استان</strong>
+                                </label>
+                                <select class="form-control select2-show-search form-select" id="serviceSelet"
+                                    data-placeholder="انتخاب کنید..">
+                                    <option value="">انتخاب کنید...</option>
+                                    @foreach ($fetchData['privoinces'] as $key => $province)
+                                        <option @if (isset($this->form['province']) && $this->form['province'] == $province->id) selected @endif value="{{ $province->id }}">
+                                            {{ $province->title }}</option>
+                                    @endforeach
+                                </select>
+                                @error('form.service')
+                                    <div class="text-danger">
+                                        <i class="fa fa-exclamation-triangle ms-1 mt-1" aria-hidden="true"></i> {{ $message }}
+                                    </div>
+                                @enderror
+                            </div>
+                        </div>
                 </div>
                 <div class="col-12">
                     @if (!empty($fetchData['doctors']))
@@ -207,10 +229,16 @@
 @endpush
 @push('scripts')
     <script type="text/javascript" src="https://cdn.map.ir/web-sdk/1.4.2/js/mapp.min.js"></script>
+    <script src="{{ admin_asset('plugins/select2/select2.full.min.js') }}"></script>
     <script src="{{ admin_asset('js/mapp.min.js') }}"></script>
     <script src="{{ admin_asset('js/mapp.env.js') }}"></script>
     <script>
         $(document).ready(function() {
+            $('.select2-show-search').select2();
+            $('#serviceSelet').on('change', function() {
+                @this.set('form.province', $(this).val());
+                $('.select2-show-search').select2();
+            });
             var crosshairIcon = {
                 iconUrl: 'https://nobat.selakteb.com/images/marker-icon.png',
                 iconSize: [25, 41], // size of the icon

@@ -2,12 +2,11 @@
 
 namespace Modules\User\Traits;
 
-use App\Models\Comment;
 use Modules\Place\app\Models\Place;
+use Modules\Front\app\Models\Comment;
 use Modules\Service\app\Models\Service;
 use Modules\User\Entities\OperatorTime;
 use Modules\Speciality\app\Models\Speciality;
-use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Modules\AppointmentSetting\app\Models\AppointmentSetting;
 
 //this Trait is return value as a UerMetaEnum not string
@@ -32,9 +31,9 @@ trait UserRelationTrait
     {
         return $this->belongsToMany(Service::class);
     }
-    public function comments(): MorphMany
+    public function comments()
     {
-        return $this->morphMany(Comment::class, 'commentable');
+        return $this->hasMany(Comment::class);
     }
     public function operatorTimes()
     {

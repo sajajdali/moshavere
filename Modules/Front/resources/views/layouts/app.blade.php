@@ -26,6 +26,7 @@
     @livewireStyles
 </head>
 <body class="rtl app sidebar-mini">
+    @include('front::layouts.components.app-header')
 <!-- PAGE -->
 <div class="page">
     <div class="page-main">
@@ -40,6 +41,7 @@
 
 </div>
 <!-- page -->
+@include('front::layouts.components.footer')
 @include('front::layouts.components.scripts')
 
 @livewireScripts

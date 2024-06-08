@@ -129,17 +129,72 @@
                                     </div>
                                     <div class="col-md-12">
                                         <div class="form-group">
-                                            <label for="address_textarea" class="form-label">آدرس نمایشی در سایت</label>
-                                            <textarea wire:model='form.address' class="form-control" maxlength="500" id="address_textarea" rows="2"></textarea>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-12">
-                                        <div class="form-group">
                                             <label for="doc_status" class="form-label">مدت زمان انتظار برای پزشک</label>
                                             <input wire:model='form.drWaitingTime' class="form-control"  id="doc_status">
                                             <small class="text-gray ms-2">
                                                 <i class="fa fa-info-circle" aria-hidden="true"></i>
                                                 در صفحه اصلی ، نمایش مدت زمان انتظار برای این پزشک</small>
+                                        </div>
+                                    </div>
+
+                                    {{-- seperator --}}
+                                    <div class="col-12 col-md-3 mt-5">
+                                        <h4 class="text-primary text-start ms-1"><a data-bs-toggle="collapse"
+                                                href="#userDataCollaps" role="button" aria-expanded="false"
+                                                aria-controls="userDataCollaps" href="">
+                                                <i class="fa fa-user-md me-1" aria-hidden="true"></i>
+                                                <span>اطلاعات پروفایل پزشک</span>
+                                            </a></h4>
+                                    </div>
+                                    <div class="col-12 col-md-9 mt-md-5 ">
+                                        <hr class="my-4">
+                                    </div>
+                                    <p class="ms-2">
+                                      <strong>نکته:</strong>
+                                        اطلاعات مربوط به این قسمت ، در صفحه ی پروفایل پزشک ، در سایت به بیماران نمایش داده می شود.
+                                    </p>
+                                    <div class="row">
+                                        <div class="col-md-12">
+                                            <div class="form-group">
+                                                <label for="address_textarea" class="form-label">آدرس</label>
+                                                <input wire:model='form.dr_display_address' class="form-control" id="address_textarea">
+                                                <small class="text-gray ms-2">
+                                                    <i class="fa fa-info-circle" aria-hidden="true"></i>
+                                                فقط تقاطع آخر(برای مثال: چهاراه جهان کودک)</small>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-12">
+                                            <div class="form-group">
+                                                <label for="dr_display_mobile" class="form-label">شماره تماس</label>
+                                                <input wire:model='form.dr_display_mobile' class="form-control" id="dr_display_mobile">
+                                            </div>
+                                        </div>
+                                        <div class="col-md-12">
+                                            <div class="form-group">
+                                                <label for="drDisplayNavigation" class="form-label">لینک مکان یابی</label>
+                                                <input wire:model='form.drDisplayNavigation' class="form-control" id="drDisplayNavigation">
+                                                <small class="text-gray ms-2">
+                                                    <i class="fa fa-info-circle" aria-hidden="true"></i>
+                                                    لینک مسیریابی به لوکیشن، گرفته شده از یکی از مسیریاب ها</small>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-12">
+                                            <div class="form-group">
+                                                <label for="drDisplayExperince" class="form-label">سابقه پزشک</label>
+                                                <input wire:model='form.drDisplayExperince' class="form-control" id="drDisplayExperince">
+                                                <small class="text-gray ms-2">
+                                                    <i class="fa fa-info-circle" aria-hidden="true"></i>
+                                                    برای مثال: 26سال تجربه</small>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-12">
+                                            <div class="form-group">
+                                                <label for="drDisplayDiscription" class="form-label">توضیحات مربوط به پزشک</label>
+                                                <textarea wire:model='form.drDisplayDiscription' rows="3" maxlength="500" class="form-control" id="drDisplayDiscription"></textarea>
+                                                <small class="text-gray ms-2">
+                                                    <i class="fa fa-info-circle" aria-hidden="true"></i>
+                                                    توضیحاتی که مختص به دریافت نوبت از این پزشک می باشد و در صفحه ی پروفایل پزشک نمایش داده می شود</small>
+                                            </div>
                                         </div>
                                     </div>
                                     {{-- seperator --}}

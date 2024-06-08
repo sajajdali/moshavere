@@ -6,8 +6,10 @@ use Verta;
 use Laravel\Sanctum\HasApiTokens;
 use Modules\Chat\app\Models\Chat;
 use Spatie\Permission\Models\Role;
+use Modules\Place\app\Models\Place;
 use Modules\User\Enum\UserMetaEnum;
 use Illuminate\Support\Facades\Cache;
+use Modules\Front\app\Models\Province;
 use Spatie\Permission\Traits\HasRoles;
 use Modules\Absence\app\Models\Absence;
 use Modules\Service\app\Models\Service;
@@ -241,15 +243,15 @@ class User extends Authenticatable
         // Attempt to get the data from the cache
         return Cache::remember($cacheKey, 60 * 60, function () use ($query) {
             return $query->whereHas('metas', function ($q) {
-                $q->where('meta_key', UserMetaEnum::DR_INFO_STATUS)
+                $q->where('meta_key', UserMetaEnum::DR_ENEMRGENCY_STATUS)
                     ->where('meta_value', true);
             })
                 ->with(['metas' => function ($q) {
-                    $q->where('meta_key', UserMetaEnum::DR_INFO_ORDER);
+                    $q->where('meta_key', UserMetaEnum::DR_ENEMRGENCY_ORDER);
                 }])
                 ->get()
                 ->sortBy(function ($user) {
-                    return $user->metas->where('meta_key', UserMetaEnum::DR_INFO_ORDER)->first()->meta_value ?? 0;
+                    return $user->metas->where('meta_key', UserMetaEnum::DR_ENEMRGENCY_ORDER)->first()->meta_value ?? 0;
                 });
         });
     }
@@ -263,5 +265,47 @@ class User extends Authenticatable
         }
 
         return '';
+    }
+    public function DocProvinces()
+    {
+        $provinceIds = $this->places
+            ->filter(function ($place) {
+                return isset($place->detail[Place::DETAIL_PROVINCE]);
+            })
+            ->pluck('detail.' . Place::DETAIL_PROVINCE)
+            ->toArray();
+        $provinces = Province::whereIn('id', $provinceIds)->pluck('title')->toArray();
+        return implode(',', $provinces);
+    }
+    public function scopeIntroductionDoctors($query)
+    {
+        // Define a unique cache key
+        $cacheKey = 'Introduction_doctors';
+
+        // Attempt to get the data from the cache
+        return Cache::remember($cacheKey, 60 * 60, function () use ($query) {
+            return $query->whereHas('metas', function ($q) {
+                $q->where('meta_key', UserMetaEnum::DR_INFO_STATUS)
+                    ->where('meta_value', true);
+            })
+                ->with(['metas' => function ($q) {
+                    $q->where('meta_key', UserMetaEnum::DR_INFO_ORDER);
+                }])
+                ->get()
+                ->sortBy(function ($user) {
+                    return $user->metas->where('meta_key', UserMetaEnum::DR_INFO_ORDER)->first()->meta_value ?? 0;
+                });
+        });
+    }
+
+    public function scopeNewestDocs() {
+
+         // Define a unique cache key
+         $cacheKey = 'newest_docs';
+         // Attempt to get the data from the cache
+         return Cache::remember($cacheKey, 60 * 60, function ()  {
+             return $this->doctors_query()->orderByDesc('created_at')->get()->take(4);
+         });
+
     }
 }

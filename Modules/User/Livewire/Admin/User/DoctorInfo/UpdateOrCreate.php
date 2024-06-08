@@ -42,6 +42,21 @@ class UpdateOrCreate extends Component
         if (isset($this->form['address'])) {
             $this->user->dr_address = $this->form['address'];
         }
+        if ($this->form['dr_display_address']) {
+            $this->user->dr_display_address = $this->form['dr_display_address'];
+        }
+        if (isset($this->form['dr_display_mobile'])) {
+            $this->user->dr_display_mobile =  $this->form['dr_display_mobile'];
+        }
+        if (isset($this->form['drDisplayNavigation'])) {
+            $this->user->dr_display_navigation =     $this->form['drDisplayNavigation'];
+        }
+        if (isset($this->form['drDisplayExperince'])) {
+            $this->user->dr_display_experince =     $this->form['drDisplayExperince'];
+        }
+        if (isset($this->form['drDisplayDiscription'])) {
+            $this->user->dr_display_discription =     $this->form['drDisplayDiscription'];
+        }
         $this->user->dr_order = $this->form['order'];
         if (isset($this->form['order'])) {
             $this->user->dr_order = $this->form['order'];
@@ -89,8 +104,20 @@ class UpdateOrCreate extends Component
         if (isset($this->user->dr_licence_number)) {
             $this->form['licenceNumber'] = $this->user->dr_licence_number;
         }
-        if (isset($this->user->dr_address)) {
-            $this->form['address'] = $this->user->dr_address;
+        if (isset($this->user->dr_display_address)) {
+            $this->form['dr_display_address'] = $this->user->dr_display_address;
+        }
+        if (isset($this->user->dr_display_mobile)) {
+            $this->form['dr_display_mobile'] = $this->user->dr_display_mobile;
+        }
+        if (isset($this->user->dr_display_navigation)) {
+            $this->form['drDisplayNavigation'] = $this->user->dr_display_navigation;
+        }
+        if (isset($this->user->dr_display_experince)) {
+            $this->form['drDisplayExperince'] = $this->user->dr_display_experince;
+        }
+        if (isset($this->user->dr_display_discription)) {
+            $this->form['drDisplayDiscription'] = $this->user->dr_display_discription;
         }
         if (isset($this->user->dr_order)) {
             $this->form['order'] = $this->user->dr_order;

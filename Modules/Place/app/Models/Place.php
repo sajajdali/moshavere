@@ -19,6 +19,7 @@ class Place extends Model
     const DETAIL_TELEGRAM_ADDRESS   = 'telegram_address';
     const DETAIL_INSTAGRAM_ADDRESS  = 'instagram_address';
     const DETAIL_WHATSAPP_ADDRESS   = 'whatsapp_address';
+    const DETAIL_PROVINCE   = 'province';
     use SoftDeletes;
     /**
      * The attributes that are mass assignable.

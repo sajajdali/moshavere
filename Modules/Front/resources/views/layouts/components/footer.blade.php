@@ -1,0 +1,82 @@
+   <!-- footer -->
+   <footer>
+    <section class="bg-secondary-200 py-8">
+       <div class="container grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          <div class="space-y-4">
+             <img src="{{setting(Modules\Setting\Enum\SettingKeyEnum::SITE_LOGO_URL)}}" class="w-[100px]" />
+             <p>
+                لورم ایپسوم متن ساختگی با تولید سادگی نامفهوم از صنعت چاپ و با استفاده از طراحان گرافیک است چاپگرها و
+                متون بلکه روزنامه و مجله در ستون و سطرآنچنان که لازم است
+             </p>
+             <ul class="flex items-center gap-3">
+                <li>
+                   <a href="#"
+                      class="bg-white rounded-full w-[35px] h-[35px] flex items-center justify-center text-black">
+                      <svg class="w-6 h-6" xmlns="http://www.w3.org/2000/svg">
+                         <use xlink:href="#sprite-instagram" />
+                      </svg>
+                   </a>
+                </li>
+                <li>
+                   <a href="#"
+                      class="bg-white rounded-full w-[35px] h-[35px] flex items-center justify-center text-black">
+                      <svg class="w-6 h-6" xmlns="http://www.w3.org/2000/svg">
+                         <use xlink:href="#sprite-telegram" />
+                      </svg>
+                   </a>
+                </li>
+             </ul>
+          </div>
+          <div class="space-y-4">
+             <p class="font-semibold">صفحات اصلی</p>
+             <ul class="text-sm space-y-4">
+                <li>
+                   <a href="#">صفحه اصلی</a>
+                </li>
+                <li>
+                   <a href="#">تماس با ما</a>
+                </li>
+                <li>
+                   <a href="#">آخرین مطالب وبلاگ</a>
+                </li>
+                <li>
+                   <a href="#">آخرین مطالب وبلاگ</a>
+                </li>
+             </ul>
+          </div>
+          <div class="space-y-4">
+             <p class="font-semibold">صفحات اصلی</p>
+             <ul class="text-sm space-y-4">
+                <li>
+                   <a href="#">صفحه اصلی</a>
+                </li>
+                <li>
+                   <a href="#">تماس با ما</a>
+                </li>
+                <li>
+                   <a href="#">آخرین مطالب وبلاگ</a>
+                </li>
+                <li>
+                   <a href="#">آخرین مطالب وبلاگ</a>
+                </li>
+             </ul>
+          </div>
+          <div class="space-y-6">
+             <p class="font-semibold">نماد ها</p>
+             <div class="grid grid-cols-2 gap-8">
+                <a href="#" class="flex justify-center">
+                   <img src="../assets/images/enamad.png" class="h-[114px]" />
+                </a>
+                <a href="#" class="flex justify-center">
+                   <img src="{{front_asset('assets/images/samandehi.png')}}" class="h-[114px]" />
+                </a>
+             </div>
+          </div>
+       </div>
+    </section>
+    <section class="bg-secondary-300 py-3 px-4">
+       <p class="text-sm text-center">
+          تمامی حقوق مادی و معنوی این وب‌سایت، خدمات و محتوای مربوط به آن متعلق به شرکت سلامت شرق است.
+       </p>
+    </section>
+ </footer>

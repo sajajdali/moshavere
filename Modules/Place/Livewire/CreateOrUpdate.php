@@ -9,6 +9,7 @@ use Spatie\Permission\Models\Role;
 use Modules\Place\app\Models\Place;
 use Illuminate\Validation\Validator;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
+use Modules\Front\app\Models\Province;
 
 class CreateOrUpdate extends Component
 {
@@ -53,7 +54,6 @@ class CreateOrUpdate extends Component
     }
     public function updateOrCreate()
     {
-
         $this->validate();
 
         $modelCreateOrUpdate = [
@@ -88,6 +88,9 @@ class CreateOrUpdate extends Component
         if (isset($this->form['whatsapp'])) {
             $detail[Place::DETAIL_WHATSAPP_ADDRESS] = $this->form['whatsapp'];
         }
+        if (isset($this->form['province'])) {
+            $detail[Place::DETAIL_PROVINCE] = $this->form['province'];
+        }
         $modelCreateOrUpdate['detail'] = $detail;
         if ($this->isEdited) {
             $this->place->update($modelCreateOrUpdate);
@@ -113,7 +116,7 @@ class CreateOrUpdate extends Component
     {
         $this->place = $place;
         $this->form['name'] = $place['title'];
-        $this->form['numbers'] = $place['detail']['numbers'] ?? '';
+        $this->form['numbers'] = $place['detail']['numbers'] ?? [] ;
         $this->counter = count($this->form['numbers']);
         $this->form['priority'] = $place['priority'];
         $this->form['active'] = $place['active'] == ActiveEnum::ACTIVE;
@@ -137,6 +140,9 @@ class CreateOrUpdate extends Component
         if (isset($place->detail[Place::DETAIL_WHATSAPP_ADDRESS])) {
             $this->form['whatsapp'] =  $place->detail[Place::DETAIL_WHATSAPP_ADDRESS];
         }
+        if (isset($place->detail[Place::DETAIL_PROVINCE])) {
+            $this->form['province'] = $place->detail[Place::DETAIL_PROVINCE];
+        }
     }
     public function mount()
     {
@@ -149,6 +155,7 @@ class CreateOrUpdate extends Component
         } else {
             $this->form['priority'] = Place::maxPriority();
         }
+        $this->fetchData['privoinces'] = Province::whereNull('parent_id')->get();
     }
     public function render()
     {

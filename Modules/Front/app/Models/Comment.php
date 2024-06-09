@@ -20,6 +20,15 @@ class Comment extends Model
 
     public function user()
     {
-        $this->belongsTo(User::class);
+       return $this->belongsTo(User::class);
+    }
+    public function doctor()
+    {
+       return $this->belongsTo(User::class,'doctor_id');
+    }
+
+    public function scopeDoctroComments($query, $doctor_id)
+    {
+       return  $query->where('doctor_id', $doctor_id)->where('status', CommentStatusEnum::ACCEPTED)->get();
     }
 }

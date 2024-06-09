@@ -181,19 +181,7 @@ class User extends Authenticatable
 
         return  $this->$meta_type?->last()?->meta_key->getOptionName($metaOptions);
     }
-    public function service()
-    {
-        return $this->belongsToMany(Service::class);
-    }
-    public function absence()
-    {
-        return $this->hasMany(Absence::class);
-    }
-
-    public function appointments(): HasMany
-    {
-        return $this->hasMany(AppointmentUser::class);
-    }
+ 
     public static function doctors()
     {
         return Role::find(3)?->users;

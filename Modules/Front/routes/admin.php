@@ -1,6 +1,7 @@
 <?php
-use Modules\Front\Livewire\faq\FaqLivewire;
 
+use Modules\Front\Admin\Livewire\faq\FaqLivewire ;
+use Modules\Front\Livewire\Admin\Comment\Commentlivewire;
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -14,5 +15,6 @@ use Modules\Front\Livewire\faq\FaqLivewire;
 
 Route::group([], function () {
     Route::get('faq', FaqLivewire::class)->name('faq');
+    Route::get('comment', Commentlivewire::class)->name('comment');
 });
 

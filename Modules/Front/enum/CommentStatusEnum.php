@@ -17,4 +17,12 @@ enum CommentStatusEnum: int
             default => '',
         };
     }
+    public function getButtonColor() {
+        return match ($this) {
+            self::PENDING => 'btn-warning',
+            self::ACCEPTED => 'btn-success',
+            self::REJECTED => 'btn-danger',
+            default => '',
+        };
+    }
 }

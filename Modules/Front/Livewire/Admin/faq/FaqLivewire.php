@@ -1,6 +1,6 @@
 <?php
 
-namespace Modules\Front\Livewire\faq;
+namespace Modules\Front\Admin\Livewire\faq;
 
 use Livewire\Component;
 use App\Enum\ActiveEnum;
@@ -98,6 +98,6 @@ class FaqLivewire extends Component
     public function render()
     {
         $faqs =Faq::priority()->get();
-        return view('front::livewire.faq.faq-livewire', compact('faqs'));
+        return view('front::livewire.admin.faq.faq-livewire', compact('faqs'));
     }
 }

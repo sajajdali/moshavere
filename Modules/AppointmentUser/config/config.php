@@ -18,6 +18,7 @@ return [
                 'appointment_user.online' => 'فقط نوبت های آنلاین',
                 'appointment_user.message'  => 'پیام های نوبت آنلاین',
                 'appointment_user.feedBack'  => 'مشاهده نظرسنجی ها',
+                'appointment_user.comment'  => 'کامنت ها',
             ],
         ],
     ],

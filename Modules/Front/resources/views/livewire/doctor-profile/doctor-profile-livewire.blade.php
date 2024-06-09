@@ -159,28 +159,12 @@
                     </div>
                     <div class="bg-white rounded-b-lg p-4 space-y-4">
                         <header>
-                            <form action="" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
                                 <div class="flex items-center">
-                                    <p class="">مشاهده بر اساس</p>
+                                    <p class="">نظرات</p>
                                 </div>
-                                <input type="text" id=""
-                                    class="w-full border border-secondary-300 rounded-lg py-2 px-3"
-                                    placeholder="جستجو" />
-                                <select name="" id="">
-                                    <option value="" disabled selected>مرتبط ترین</option>
-                                    <option value="">ارزان ترین</option>
-                                    <option value="">ارزان ترین</option>
-                                    <option value="">ارزان ترین</option>
-                                </select>
-                                <select name="" id="">
-                                    <option value="" disabled selected>مرتبط ترین</option>
-                                    <option value="">ارزان ترین</option>
-                                    <option value="">ارزان ترین</option>
-                                    <option value="">ارزان ترین</option>
-                                </select>
-                            </form>
                         </header>
                         <main class="flex flex-col gap-3">
+                            @foreach($fetchData['comments'] as $key => $comment)
                             <div class="border-2 border-secondary-200 rounded-lg flex flex-col gap-4 p-4">
                                 <div class="flex flex-col sm:flex-row items-start justify-between gap-3">
                                     <div class="flex items-center gap-4">
@@ -188,31 +172,24 @@
                                             class="w-[65px] h-[65px] rounded-full flex items-center justify-center bg-primary-main text-white font-bold text-2xl">
                                             ن</div>
                                         <div class="w-[calc(100%-65px-0.75rem)] space-y-2">
-                                            <p>نفس ابراهیمی</p>
+                                            <p>{{$comment->user->full_name}}</p>
                                             <div class="flex items-center gap-3 text-sm text-secondary-400">
                                                 <div class="hidden sm:block py-1 px-3 bg-secondary-100 rounded-full">
-                                                    ویزیت شده</div>
-                                                <p>دو ماه پیش</p>
+                                                      <p>{{verta($comment->created_at)->formatDifference()}}</p></div>
                                                 <div class="w-[1px] h-3 bg-secondary-400"></div>
-                                                <p>مطب چهارراه طهماسب آباد</p>
+                                                <p>{{$comment->doctor->dr_display_address}}</p>
                                             </div>
                                         </div>
                                     </div>
                                     <div
-                                        class="flex items-center gap-2 bg-green/20 text-green rounded-full py-1 px-4 text-sm font-bold">
+                                    class="flex items-center gap-2 bg-green/20 text-green rounded-full py-1 px-4 text-sm font-bold">
+                                    <p class="w-[calc(100%-1.75rem)]">{{$comment->star}}</p>
                                         <svg class="w-5 h-5" xmlns="http://www.w3.org/2000/svg">
-                                            <use xlink:href="#sprite-question" />
+                                            <use xlink:href="#sprite-star-full" />
                                         </svg>
-                                        <p class="w-[calc(100%-1.75rem)]">از پزشک راضی بودم</p>
-                                    </div>
-                                    <div class="block sm:hidden py-1 px-3 bg-secondary-100 rounded-full">ویزیت شده
                                     </div>
                                 </div>
-                                <p class="leading-7">من ممنونم از نحوه برخورد منشی آقای دکتر واقعا دست اقای دکتر درد
-                                    نکند من
-                                    بااینکه بار اول بود خیلی از اخلاق خوشم اومد که حق کسی رازایع نمیکرد بابت نوبت از
-                                    اقای دکتر هم
-                                    ممنونم بابت همه چی مرسی</p>
+                                <p class="leading-7">{{$comment->body}}</p>
                                 <div class="flex flex-col md:flex-row gap-3">
                                     <form action=""
                                         class="flex-grow relative flex items-center border-2 border-secondary-200 rounded-lg px-3 h-[40px]">
@@ -233,14 +210,10 @@
                                                 <use xlink:href="#sprite-emoji" />
                                             </svg>
                                         </button>
-                                        <button type="button" class="flex items-center px-1 h-[40px]">
-                                            <svg class="w-5 h-5" xmlns="http://www.w3.org/2000/svg">
-                                                <use xlink:href="#sprite-dots" />
-                                            </svg>
-                                        </button>
                                     </div>
                                 </div>
                             </div>
+                            @endforeach
                         </main>
                         <button type="button" class="w-full py-2 px-5 flex items-center justify-center gap-3">
                             <svg class="w-5 h-5" xmlns="http://www.w3.org/2000/svg">
@@ -251,6 +224,7 @@
                     </div>
                 </div>
                 <!-- end container -->
+
                 <!-- breadcrumb -->
                 <div class="flex flex-wrap items-center gap-2 text-secondary-400">
                     <a href="#" class="hover:text-black">سلامت شرق</a>
@@ -281,7 +255,7 @@
                                 <p class="bg-secondary-200 rounded-lg py-2 px-3 text-sm">
                                     {{ $doc->DocSpecialities() }}
                                 </p>
-                                <p class="text-secondary-400 text-sm">شماره نظام پزشکی: {{$doc->dr_licence_number}}</p>
+                                <p class="text-secondary-400 text-sm">شماره نظام پزشکی: {{ $doc->dr_licence_number }}</p>
                             </div>
                         </main>
                         <footer class="flex flex-col sm:flex-row items-center justify-between text-secondary-400 gap-3">
@@ -387,7 +361,7 @@
                     <main class="flex flex-col gap-3">
                         <div class="text-sm border-2 border-secondary-200 p-3 rounded-lg space-y-3">
                             <div class="flex flex-col sm:flex-row items-center justify-between gap-3">
-                                <p class="font-bold">{{$doc->dr_display_address}}</p>
+                                <p class="font-bold">{{ $doc->dr_display_address }}</p>
                                 <div class="flex gap-3">
                                     <div class="bg-secondary-100 text-black rounded-lg py-2 px-5 text-sm">
                                         تماس
@@ -415,12 +389,15 @@
                                 </p>
                             </div>
                         </div>
-                        <button type="submit" disabled class="btn__blue--round-full-between">
-                            <p>دریافت نوبت دکتر سمیه هاشمیان</p>
+
+                        <button type="submit" @if (isset($doc->ban_user) && $doc->ban_user == false) disabled @endif
+                            class="btn__blue--round-full-between">
+                            <p>دریافت نوبت دکتر {{ $doc->full_name }}</p>
                             <svg class="w-6 h-6" xmlns="http://www.w3.org/2000/svg">
                                 <use xlink:href="#sprite-arrow-left-circle" />
                             </svg>
                         </button>
+                        @if (isset($doc->ban_user) && $doc->ban_user == true)
                         <div class="error_badge">
                             <svg class="w-6 h-6" xmlns="http://www.w3.org/2000/svg">
                                 <use xlink:href="#sprite-warning" />
@@ -429,15 +406,16 @@
                                 هم اکنون نوبت دهی برای این پزشک محدود شده است.
                             </p>
                         </div>
+                        @endif
                     </main>
                 </div>
-                <div class="warning_badge">
+                {{-- <div class="warning_badge">
                     <svg class="w-8 h-8" xmlns="http://www.w3.org/2000/svg">
                         <use xlink:href="#sprite-warning" />
                     </svg>
                     <p>مراجعین محترم نوبت های ویزیت اسفند ماه پر شده است لطفا جهت دریافت نوبت
                         برای فروردین ماه از۲۷اسفند ساعت ۱۲شب به بعد به سایت مراجعه کنید</p>
-                </div>
+                </div> --}}
                 <div class="bg-white p-4 flex flex-col gap-4">
                     <p class="font-bold">
                         راه‌های ارتباطی با پزشک
@@ -445,7 +423,7 @@
                     <div class="border-2 border-secondary-200 rounded-lg flex flex-col p-4 gap-3">
                         <div class="flex items-center justify-between text-sm">
                             <p>
-                                شماره تلفن: <span dir="ltr">{{$doc->dr_display_mobile}}</span>
+                                شماره تلفن: <span dir="ltr">{{ $doc->dr_display_mobile }}</span>
                             </p>
                             <a href="#" class="bg-secondary-100 rounded-lg py-2 px-4">
                                 تماس
@@ -453,7 +431,7 @@
                         </div>
                         <div class="flex items-center justify-between text-sm">
                             <p>
-                                {{$doc->dr_display_address}}
+                                {{ $doc->dr_display_address }}
                             </p>
                             <a href="#" class="bg-secondary-100 rounded-lg py-2 px-4">
                                 مسیریابی به مطب

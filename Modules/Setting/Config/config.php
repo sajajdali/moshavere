@@ -31,16 +31,6 @@ return [
                 'has_child' => false,
                 'children' => null
             ],
-            [
-                'title' => 'سوالات متداول',
-                'gate' => 'faq',
-                'policy_class' => Modules\Front\app\Models\Faq::class,
-                'icon' => 'fe fe-help-circle',
-                'route' => 'admin.faq',
-                'has_badge' => false,
-                'has_child' => false,
-                'children' => null
-            ],
         ],
     ],
 

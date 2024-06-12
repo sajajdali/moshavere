@@ -26,8 +26,22 @@
                     </div>
                 </div>
             </div>
-            <form class="appointment__modal-left">
-                <p class="font-semibold">نوبت مورد نظر را انتخاب کنید</p>
+            <div class="appointment__modal-left">
+                <div class="flex justify-between">
+                    <p class="font-semibold">نوبت مورد نظر را انتخاب کنید</p>
+                    <button class="bg-blue-500 hover:bg-blue-700 text-white py-2 px-4 rounded" wire:click='loadNextDays'>
+                        <svg wire:loading wire:target='loadNextDays' class="animate-spin h-5 w-5 mr-3 text-white" xmlns="http://www.w3.org/2000/svg"
+                        fill="none" viewBox="0 0 24 24">
+                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor"
+                            stroke-width="4"></circle>
+                        <path class="opacity-75" fill="currentColor"
+                            d="M4 12a8 8 0 018-8V0C5.372 0 0 5.372 0 12h4zm2 5.291A7.963 7.963 0 014 12H0c0 3.314 1.343 6.315 3.515 8.485l2.485-2.194z">
+                        </path>
+                    </svg>
+                        <span wire:loading.remove wire:target='loadNextDays'>مشاهده روزهای بعدی</span>
+                      </button>
+
+                </div>
                 <div class="select-appointment__container">
                     <div class="flex flex-col gap-3">
                         @foreach ($fetchData['firstTreeAvailableAppointment'] as $date => $appointmentsWithDaysIndex)
@@ -35,8 +49,9 @@
                                 @foreach ($appointmentsWithDaysIndex as $eachTime => $appointmentDetail)
                                     <label for="appointment-{{ $eachTime }}"
                                         class="border-2 accordion_appointment__container  border-secondary-200 rounded-lg flex items-center gap-4 py-3 px-4">
-                                        <input type="radio" class="scroll_down" name="appointment" id="appointment-{{ $eachTime }}"
-                                            wire:model='form.time' value="{{ $appointmentDetail['time_stamp'] }}" />
+                                        <input type="radio" class="scroll_down" name="appointment"
+                                            id="appointment-{{ $eachTime }}" wire:model='form.time'
+                                            value="{{ $appointmentDetail['time_stamp'] }}" />
                                         <div class="w-[calc(100%-2rem)] space-y-2 text-sm">
                                             <p>نزدیک‌ترین نوبت خالی</p>
                                             <p class="font-bold"> {{ $appointmentDetail['date_of_month'] }} - ساعت
@@ -92,7 +107,7 @@
             @enderror
             <button type="button" class="btn__blue--round-full" id="nextstep_btn"
                 wire:click='TimeForReservesation'>
-                <svg wire:loading class="animate-spin h-5 w-5 mr-3 text-white" xmlns="http://www.w3.org/2000/svg"
+                <svg wire:loading  wire:target='TimeForReservesation' class="animate-spin h-5 w-5 mr-3 text-white" xmlns="http://www.w3.org/2000/svg"
                     fill="none" viewBox="0 0 24 24">
                     <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor"
                         stroke-width="4"></circle>
@@ -100,9 +115,9 @@
                         d="M4 12a8 8 0 018-8V0C5.372 0 0 5.372 0 12h4zm2 5.291A7.963 7.963 0 014 12H0c0 3.314 1.343 6.315 3.515 8.485l2.485-2.194z">
                     </path>
                 </svg>
-                <span wire:loading.remove>مرحله بعد</span>
+                <span wire:loading.remove wire:target='TimeForReservesation' >مرحله بعد</span>
             </button>
-        </form>
+        </div>
     </main>
 </main>
 

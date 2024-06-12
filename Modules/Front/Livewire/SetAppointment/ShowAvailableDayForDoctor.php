@@ -29,8 +29,13 @@ class ShowAvailableDayForDoctor extends Component
         $this->validate(['form.time' => 'required|string']);
         dd('tes');
     }
-
-    private function findFirstTreeAppointment($listOfAppointment)
+    public function loadNextDays()
+    {
+        $this->fetchData['firstTreeAvailableAppointment'] =   $this->findFirstTreeAppointment($this->fetchData['rawlistOfAppointment'], $this->fetchData['lastDate']);
+        // اگه روز های توی کش تموم شد و هنوز این تابع فرا خوانی شد ، کش رو مجدد با تاریخ جدید بساز
+        // حواست باشه که در نهایت آخرین تاریخ از آخرین تاریخی که کاربر میتونه نوبت ثبت بکنه بزرگتر نباشه
+    }
+    private function findFirstTreeAppointment($listOfAppointment, $lastDayActive = null)
     {
         // dd($listOfAppointment);
         $firstTwoEmpty = [];
@@ -53,6 +58,11 @@ class ShowAvailableDayForDoctor extends Component
 
                     if ($day < $isDay && $month < $isMonth && $yeay < $isYear) {
                         continue;
+                    }
+                    if (isset($lastDayActive) && $lastDayActive != null) {
+                        if ($appointment['day_number_gmt'] <= $lastDayActive) {
+                            continue;
+                        }
                     }
                     if ($appointment['empty_appoints'] <= 0 || $appointment['status'] == false) {
                         continue;
@@ -88,6 +98,9 @@ class ShowAvailableDayForDoctor extends Component
                 }
             }
         }
+        $dates = array_keys($result);
+        // Get the last date
+        $this->fetchData['lastDate'] = end($dates);
         return $result;
     }
     private function getAvailableDay()
@@ -103,6 +116,7 @@ class ShowAvailableDayForDoctor extends Component
         $listOfAppointment = Cache::rememberForever('appointmentList.' . $appointmentSetting->id, function () use ($appointmentSetting) {
             return app('AppointmentUserService')->listAppointments($appointmentSetting);
         });
+        $this->fetchData['rawlistOfAppointment'] = $listOfAppointment;
         $this->fetchData['firstTreeAvailableAppointment'] =  $this->findFirstTreeAppointment($listOfAppointment);
         $this->fetchData['appointmentSetting'] = $appointmentSetting->id;
     }

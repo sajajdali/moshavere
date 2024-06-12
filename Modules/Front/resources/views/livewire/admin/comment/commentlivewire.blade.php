@@ -5,9 +5,12 @@
                 <h1 class="page-title">کامنت ها</h1>
             </div>
         </div>
-        <div class="col-md-12 alert alert-success" id="customAlertMessage" role="alert" style="display: none" wire:ignore>
-            <p id="customAlertMessagebody"></p>
-        </div>
+        @if ($alertMessage)
+            <div class="col-md-12 alert alert-success" id="customAlertMessage" role="alert">
+                <i class="fa fa-check-square-o me-1 fa-xl" aria-hidden="true"></i>
+                {{ $alertMessage }}
+            </div>
+        @endif
         @include('admin::layouts.components.alert')
         <div class="row row-sm">
             <div class="col-lg-12">
@@ -80,6 +83,7 @@
                                         <th scope="col">نام پزشک</th>
                                         <th scope="col">تاریخ</th>
                                         <th scope="col">وضعیت</th>
+                                        <th scope="col">پاسخ</th>
                                         <th scope="col">عملیات</th>
                                     </tr>
                                 </thead>
@@ -98,6 +102,11 @@
                                                     {{ $comment->status->getName() }}
                                                 </td>
                                                 <td>
+                                                    {!! isset($comment->reply)
+                                                        ? '<i class="fa fa-check text-success" aria-hidden="true"></i>'
+                                                        : '<i class="fa fa-times text-danger" aria-hidden="true"></i>' !!}
+                                                </td>
+                                                <td>
                                                     @canany(['update', 'delete'], $comment)
                                                         <div class="btn-group mt-2 mb-2">
                                                             <button type="button"
@@ -107,20 +116,22 @@
                                                                 <span class="caret"></span>
                                                             </button>
                                                             <ul class="dropdown-menu" role="menu">
-                                                                <li>
-                                                                    <a wire:click='editAppointment("{{ $comment->id }}")'
-                                                                        href="#">
-                                                                        <i class="fa fa-pencil-square-o"
-                                                                            aria-hidden="true"></i>
-                                                                        ویرایش</a>
-                                                                </li>
-                                                                <li>
-                                                                    <a wire:click='editAppointment("{{ $comment->id }}")'
-                                                                        href="#">
-                                                                        <i class="fa fa-check text-success"
-                                                                            aria-hidden="true"></i>
-                                                                        تایید کردن</a>
-                                                                </li>
+                                                                @if ($comment->status->getCommentBoolean())
+                                                                    <li>
+                                                                        <a wire:click='approveComment("{{ $comment->id }}")'
+                                                                            href="#">
+                                                                            <i class="fa fa-check text-success"
+                                                                                aria-hidden="true"></i>
+                                                                            تایید کردن</a>
+                                                                    </li>
+                                                                @else
+                                                                    <li>
+                                                                        <a wire:click='disaprovedComment("{{ $comment->id }}")'
+                                                                            href="#">
+                                                                            <i class="fa fa-times" aria-hidden="true"></i>
+                                                                            لغو تایید</a>
+                                                                    </li>
+                                                                @endif
                                                                 <li>
                                                                     <a data-bs-toggle="modal" data-bs-target="#commentModal"
                                                                         wire:click='lunchModal("{{ $comment->id }}")'
@@ -129,7 +140,8 @@
                                                                         پاسخ دادن</a>
                                                                 </li>
                                                                 <li>
-                                                                    <a wire:click='editAppointment("{{ $comment->id }}")'
+                                                                    <a class="delete_confirm_alert" data-label="کامنت"
+                                                                    data-id="{{ $comment->id }}"
                                                                         href="#">
                                                                         <i class="fa fa-trash text-danger"
                                                                             aria-hidden="true"></i>
@@ -197,7 +209,16 @@
                     </div>
                     <div class="card">
                         <div class="card-body">
-                            <h4 class="mb-5">پاسخ به کامنت</h4>
+                            <div class="d-flex justify-content-between mb-5">
+                                <h4>پاسخ به کامنت</h4>
+                                @isset($this->form['reply'])
+                                    <button wire:click='removeReply("{{ $comment->id }}")'
+                                        wire:target='removeReply("{{ $comment->id }}")' wire:loading.class='btn-loading'
+                                        class="btn btn-danger">
+                                        حذف پاسخ
+                                    </button>
+                                @endisset
+                            </div>
                             <div class="form-group">
                                 <label for="textarea" class="form-label">متن پاسخ را تایپ کنید</label>
                                 <textarea class="form-control  @error('form.reply') is-invalid @enderror" wire:model='form.reply' maxlength="500"
@@ -230,14 +251,6 @@
                         keyboard: false
                     });
                 commentsModalAwns.hide();
-            });
-            Livewire.on('message', function($message) {
-                var alert = $('#customAlertMessage');
-                console.log(alert.css('display'),$message);
-                if (alert.css('display') === 'none') {
-                    $('#customAlertMessagebody').text($message.message);
-                    alert.fadeIn();
-                }
             });
         });
     </script>

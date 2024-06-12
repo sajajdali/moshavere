@@ -157,71 +157,76 @@
                             ثبت نظر
                         </a>
                     </div>
-                    <div class="bg-white rounded-b-lg p-4 space-y-4">
-                        <header>
+                    @if ($fetchData['comments']->isNotEmpty())
+                        <div class="bg-white rounded-b-lg p-4 space-y-4">
+                            <header>
                                 <div class="flex items-center">
                                     <p class="">نظرات</p>
                                 </div>
-                        </header>
-                        <main class="flex flex-col gap-3">
-                            @foreach($fetchData['comments'] as $key => $comment)
-                            <div class="border-2 border-secondary-200 rounded-lg flex flex-col gap-4 p-4">
-                                <div class="flex flex-col sm:flex-row items-start justify-between gap-3">
-                                    <div class="flex items-center gap-4">
-                                        <div
-                                            class="w-[65px] h-[65px] rounded-full flex items-center justify-center bg-primary-main text-white font-bold text-2xl">
-                                            ن</div>
-                                        <div class="w-[calc(100%-65px-0.75rem)] space-y-2">
-                                            <p>{{$comment->user->full_name}}</p>
-                                            <div class="flex items-center gap-3 text-sm text-secondary-400">
-                                                <div class="hidden sm:block py-1 px-3 bg-secondary-100 rounded-full">
-                                                      <p>{{verta($comment->created_at)->formatDifference()}}</p></div>
-                                                <div class="w-[1px] h-3 bg-secondary-400"></div>
-                                                <p>{{$comment->doctor->dr_display_address}}</p>
+                            </header>
+                            @foreach ($fetchData['comments'] as $key => $comment)
+                                <main class="flex flex-col gap-3">
+                                    <div class="border-2 border-secondary-200 rounded-lg flex flex-col gap-4 p-4">
+                                        <div class="flex flex-col sm:flex-row items-start justify-between gap-3">
+                                            <div class="flex items-center gap-4">
+                                                <div
+                                                    class="w-[65px] h-[65px] rounded-full flex items-center justify-center bg-primary-main text-white font-bold text-2xl">
+                                                    ن</div>
+                                                <div class="w-[calc(100%-65px-0.75rem)] space-y-2">
+                                                    <p>{{ $comment->user->full_name }}</p>
+                                                    <div class="flex items-center gap-3 text-sm text-secondary-400">
+                                                        <div
+                                                            class="hidden sm:block py-1 px-3 bg-secondary-100 rounded-full">
+                                                            <p>{{ verta($comment->created_at)->formatDifference() }}</p>
+                                                        </div>
+                                                        <div class="w-[1px] h-3 bg-secondary-400"></div>
+                                                        <p>{{ $comment->doctor->dr_display_address }}</p>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div
+                                                class="flex items-center gap-2 bg-green/20 text-green rounded-full py-1 px-4 text-sm font-bold">
+                                                <p class="w-[calc(100%-1.75rem)]">{{ $comment->star }}</p>
+                                                <svg class="w-5 h-5" xmlns="http://www.w3.org/2000/svg">
+                                                    <use xlink:href="#sprite-star-full" />
+                                                </svg>
+                                            </div>
+                                        </div>
+                                        <p class="leading-7">{{ $comment->body }}</p>
+                                        <div class="flex flex-col md:flex-row gap-3">
+                                            <form action=""
+                                                class="flex-grow relative flex items-center border-2 border-secondary-200 rounded-lg px-3 h-[40px]">
+                                                <input type="text" class="flex-grow border-none outline-none"
+                                                    placeholder="پاسخ شما" />
+                                                <button class="flex items-center gap-2 font-bold">
+                                                    <p>ارسال</p>
+                                                    <svg class="w-5 h-5 mt-[2px]" xmlns="http://www.w3.org/2000/svg">
+                                                        <use xlink:href="#sprite-chevron-left-circle" />
+                                                    </svg>
+                                                </button>
+                                            </form>
+                                            <div class="flex gap-3">
+                                                <button
+                                                    class="flex-grow flex items-center gap-2 border-2 border-secondary-200 rounded-lg px-3 font-bold h-[40px]">
+                                                    <p>مفید بود</p>
+                                                    <svg class="w-5 h-5" xmlns="http://www.w3.org/2000/svg">
+                                                        <use xlink:href="#sprite-emoji" />
+                                                    </svg>
+                                                </button>
                                             </div>
                                         </div>
                                     </div>
-                                    <div
-                                    class="flex items-center gap-2 bg-green/20 text-green rounded-full py-1 px-4 text-sm font-bold">
-                                    <p class="w-[calc(100%-1.75rem)]">{{$comment->star}}</p>
-                                        <svg class="w-5 h-5" xmlns="http://www.w3.org/2000/svg">
-                                            <use xlink:href="#sprite-star-full" />
-                                        </svg>
-                                    </div>
-                                </div>
-                                <p class="leading-7">{{$comment->body}}</p>
-                                <div class="flex flex-col md:flex-row gap-3">
-                                    <form action=""
-                                        class="flex-grow relative flex items-center border-2 border-secondary-200 rounded-lg px-3 h-[40px]">
-                                        <input type="text" class="flex-grow border-none outline-none"
-                                            placeholder="پاسخ شما" />
-                                        <button class="flex items-center gap-2 font-bold">
-                                            <p>ارسال</p>
-                                            <svg class="w-5 h-5 mt-[2px]" xmlns="http://www.w3.org/2000/svg">
-                                                <use xlink:href="#sprite-chevron-left-circle" />
-                                            </svg>
-                                        </button>
-                                    </form>
-                                    <div class="flex gap-3">
-                                        <button
-                                            class="flex-grow flex items-center gap-2 border-2 border-secondary-200 rounded-lg px-3 font-bold h-[40px]">
-                                            <p>مفید بود</p>
-                                            <svg class="w-5 h-5" xmlns="http://www.w3.org/2000/svg">
-                                                <use xlink:href="#sprite-emoji" />
-                                            </svg>
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
+                                </main>
                             @endforeach
-                        </main>
-                        <button type="button" class="w-full py-2 px-5 flex items-center justify-center gap-3">
-                            <svg class="w-5 h-5" xmlns="http://www.w3.org/2000/svg">
-                                <use xlink:href="#sprite-eye" />
-                            </svg>
-                            <p class="font-bold">نمایش بیشتر</p>
-                        </button>
-                    </div>
+                            <button type="button" class="w-full py-2 px-5 flex items-center justify-center gap-3">
+                                <svg class="w-5 h-5" xmlns="http://www.w3.org/2000/svg">
+                                    <use xlink:href="#sprite-eye" />
+                                </svg>
+                                <p class="font-bold">نمایش بیشتر</p>
+                            </button>
+                        </div>
+                    @endif
+
                 </div>
                 <!-- end container -->
 
@@ -398,14 +403,14 @@
                             </svg>
                         </button>
                         @if (isset($doc->ban_user) && $doc->ban_user == true)
-                        <div class="error_badge">
-                            <svg class="w-6 h-6" xmlns="http://www.w3.org/2000/svg">
-                                <use xlink:href="#sprite-warning" />
-                            </svg>
-                            <p>
-                                هم اکنون نوبت دهی برای این پزشک محدود شده است.
-                            </p>
-                        </div>
+                            <div class="error_badge">
+                                <svg class="w-6 h-6" xmlns="http://www.w3.org/2000/svg">
+                                    <use xlink:href="#sprite-warning" />
+                                </svg>
+                                <p>
+                                    هم اکنون نوبت دهی برای این پزشک محدود شده است.
+                                </p>
+                            </div>
                         @endif
                     </main>
                 </div>

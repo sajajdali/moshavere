@@ -1,4 +1,4 @@
-
 <!-- JQUERY JS -->
-<script src="{{front_asset('js/main.js')}}"></script>
-<script src="{{front_asset('js/spritemap.js')}}"></script>
+<script src="{{ admin_asset('plugins/jquery/jquery.min.js') }}"></script>
+<script src="{{ front_asset('js/main.js') }}"></script>
+<script src="{{ front_asset('js/main.js') }}"></script>

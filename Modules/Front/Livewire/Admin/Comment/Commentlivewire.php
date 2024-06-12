@@ -3,10 +3,12 @@
 namespace Modules\Front\Livewire\Admin\Comment;
 
 use Livewire\Component;
+use Livewire\Attributes\On;
 use Livewire\Attributes\Url;
 use Modules\User\Enum\UserMetaEnum;
 use Modules\Front\app\Models\Comment;
 use Modules\Front\app\Models\FeedBack;
+use Modules\Front\Enum\CommentStatusEnum;
 use Modules\AppointmentUser\app\Models\AppointmentUser;
 
 class Commentlivewire extends Component
@@ -16,6 +18,7 @@ class Commentlivewire extends Component
 
     public array $fetchData = [];
     public array $form = [];
+    public  $alertMessage = false;
 
     public function startSearch()
     {
@@ -27,22 +30,26 @@ class Commentlivewire extends Component
         $this->render();
     }
     #[On('delete')]
-    public function deletePlace(FeedBack $model)
+    public function deletePlace(Comment $model)
     {
+        $this->authorize('delete', $model);
         $model->delete();
-        return redirect()->route('admin.appointment.feedback')->with('success', 'نظر حذف شد');
+        return redirect()->route('admin.comment')->with('success', 'نظر حذف شد');
     }
 
-    public function showModal($id)
-    {
-        $appointmentUSer = AppointmentUser::find($id);
-        $this->fetchData['feedbacks'] = $appointmentUSer->feedbacks;
-        $this->dispatch('lunchFeedBackModal', true);
-    }
 
     public function lunchModal(Comment $comment)
     {
         $this->fetchData['operation']['comment'] = $comment;
+        if (isset($this->fetchData['operation']['comment']->reply)) {
+            $this->form['reply'] = $this->fetchData['operation']['comment']->reply;
+        }
+    }
+    public function removeReply(Comment $comment)
+    {
+        $comment->update(['reply' => null]);
+        $this->alertMessage = 'پاسخ با موفقیت حذف شد';
+        $this->dispatch('closeModal', true);
     }
     public function storeAnswer()
     {
@@ -50,10 +57,32 @@ class Commentlivewire extends Component
         if (isset($this->fetchData['operation']['comment'])) {
             $this->fetchData['operation']['comment']->update(['reply' => $this->form['reply']]);
             $this->dispatch('closeModal', true);
-            $this->dispatch('message', message:'پاسخ با موفقیت برای این کامنت ذخیره شد!');
+            $this->alertMessage = 'پاسخ با موفقیت ثبت شد';
         }
     }
 
+    public function approveComment(Comment $comment)
+    {
+        $this->authorize('update', $comment);
+        $comment->update([
+            'status' => CommentStatusEnum::ACCEPTED,
+        ]);
+        $this->alertMessage = ' با موفقیت تایید شد';
+    }
+    public function disaprovedComment(Comment $comment)
+    {
+        $this->authorize('update', $comment);
+        $comment->update([
+            'status' => CommentStatusEnum::REJECTED,
+        ]);
+        $this->alertMessage = ' با موفقیت لغو تایید شد';
+    }
+    public function boot()
+    {
+        if (isset($this->alertMessage)) {
+            $this->alertMessage = false;
+        }
+    }
     public function render()
     {
 
@@ -68,17 +97,15 @@ class Commentlivewire extends Component
             'search.userName' => [
                 'condition' => isset($this->search['userName']),
                 'callback' => function ($query) {
-                    return $query->whereHas('appointmentUser', function ($qq) {
-                        $qq->whereHas('user', function ($qqq) {
-                            $qqq->whereHas('metas', function ($qqqq) {
-                                $qqqq->where([
-                                    ['meta_key', UserMetaEnum::LAST_NAME],
-                                    ['meta_value', 'LIKE', "%{$this->search['userName']}%"],
-                                ])->orWhere([
-                                    ['meta_key', UserMetaEnum::FIRST_NAME],
-                                    ['meta_value', 'LIKE', "%{$this->search['userName']}%"],
-                                ]);
-                            });
+                    return $query->whereHas('user', function ($qqq) {
+                        $qqq->whereHas('metas', function ($qqqq) {
+                            $qqqq->where([
+                                ['meta_key', UserMetaEnum::LAST_NAME],
+                                ['meta_value', 'LIKE', "%{$this->search['userName']}%"],
+                            ])->orWhere([
+                                ['meta_key', UserMetaEnum::FIRST_NAME],
+                                ['meta_value', 'LIKE', "%{$this->search['userName']}%"],
+                            ]);
                         });
                     });
                 },
@@ -86,17 +113,15 @@ class Commentlivewire extends Component
             'search.doctorName' => [
                 'condition' => isset($this->search['doctorName']),
                 'callback' => function ($query) {
-                    return $query->whereHas('appointmentUser', function ($qq) {
-                        $qq->whereHas('doctor', function ($qqq) {
-                            $qqq->whereHas('metas', function ($qqqq) {
-                                $qqqq->where([
-                                    ['meta_key', UserMetaEnum::LAST_NAME],
-                                    ['meta_value', 'LIKE', "%{$this->search['doctorName']}%"],
-                                ])->orWhere([
-                                    ['meta_key', UserMetaEnum::FIRST_NAME],
-                                    ['meta_value', 'LIKE', "%{$this->search['doctorName']}%"],
-                                ]);
-                            });
+                    return $query->whereHas('doctor', function ($qqq) {
+                        $qqq->whereHas('metas', function ($qqqq) {
+                            $qqqq->where([
+                                ['meta_key', UserMetaEnum::LAST_NAME],
+                                ['meta_value', 'LIKE', "%{$this->search['doctorName']}%"],
+                            ])->orWhere([
+                                ['meta_key', UserMetaEnum::FIRST_NAME],
+                                ['meta_value', 'LIKE', "%{$this->search['doctorName']}%"],
+                            ]);
                         });
                     });
                 },
@@ -122,6 +147,6 @@ class Commentlivewire extends Component
         }
 
 
-        return view('front::livewire.admin.comment.commentlivewire', ['comments' => $query->paginate(10)]);
+        return view('front::livewire.admin.comment.commentlivewire', ['comments' => $query->orderByDesc('status')->paginate(10)]);
     }
 }

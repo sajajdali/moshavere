@@ -30,7 +30,7 @@ class AppointmentApiController extends Controller
 {
     use ApiHandlerTrait;
 
-    public function userInfo( ): \Illuminate\Http\JsonResponse
+    public function userInfo(): \Illuminate\Http\JsonResponse
     {
 
         $user = auth()->user();
@@ -60,7 +60,6 @@ class AppointmentApiController extends Controller
             'status' => true,
             'doctors' => DoctorResource::collection($doctors)
         ]);
-
     }
 
     public function doctorProfile(User $doctor)
@@ -74,7 +73,8 @@ class AppointmentApiController extends Controller
     public function places(User $doctor)
     {
         $places = $doctor->places()->Active()->orderBy('priority')->get();
-        return $this->ok([
+        return $this->ok(
+            [
                 'status' => true,
                 'places' => PlaceResource::collection($places)
             ]
@@ -85,7 +85,8 @@ class AppointmentApiController extends Controller
     {
         $services = ServiceResource::collection($doctor->services()->Active()->orderBy('priority')->get());
 
-        return $this->ok([
+        return $this->ok(
+            [
                 'status' => true,
                 'services' => $services
             ]
@@ -146,11 +147,11 @@ class AppointmentApiController extends Controller
                 continue;
             }
             foreach ($day as $month => $appointments) {
-                if ($month < $isMonth) {
-                    continue;
-                }
                 foreach ($appointments as $day => $appointment) {
-                    if ($day < $isDay || $appointment['empty_appoints'] <= 0 || $appointment['status'] == false) {
+                    if ($day < $isDay && $month < $isMonth && $yeay < $isYear) {
+                        continue;
+                    }
+                    if ($appointment['empty_appoints'] <= 0 || $appointment['status'] == false) {
                         continue;
                     }
                     $dayNumber = $appointment['day_number'];
@@ -234,7 +235,7 @@ class AppointmentApiController extends Controller
         );
 
         // full user model
-        $userModelAppointment = new UserModelAppointment(userModel: $mainUser, forHimself: $foHimself, userSomeoneModel: $someoneModel , needToUpdate: true);
+        $userModelAppointment = new UserModelAppointment(userModel: $mainUser, forHimself: $foHimself, userSomeoneModel: $someoneModel, needToUpdate: true);
 
         $kind = $request->input('kind') == 2 ? AppointmentUserKindEnum::ONLINE : AppointmentUserKindEnum::IN_PERSION;
         // appointment model
@@ -284,16 +285,15 @@ class AppointmentApiController extends Controller
         }
 
         if ($placesId) {
-            if(AppointmentSetting::where('user_id', $doctorId)->where('place_id', $servicesId)->count()) {
+            if (AppointmentSetting::where('user_id', $doctorId)->where('place_id', $servicesId)->count()) {
                 $appointmentSetting->where('place_id', $placesId);
-            }
-            else {
+            } else {
                 $appointmentSetting->whereNull('place_id');
             }
         }
 
         if ($servicesId) {
-            if(AppointmentSetting::where('user_id', $doctorId)->where('service_id', $servicesId)->count()){
+            if (AppointmentSetting::where('user_id', $doctorId)->where('service_id', $servicesId)->count()) {
                 $appointmentSetting->where('service_id', $servicesId);
             } else {
                 $appointmentSetting->whereNull('service_id');
@@ -333,20 +333,20 @@ class AppointmentApiController extends Controller
         });
 
 
-//        $firstTwoEmpty = $this->getFirstTwoEmpty($listDays);
+        //        $firstTwoEmpty = $this->getFirstTwoEmpty($listDays);
         $resultList = $this->getListEmptyAppointment($listDays);
 
         // handle condition dr amiri
-        if ($doctorId == 2){
+        if ($doctorId == 2) {
             // bardari
-            if ($servicesId == 1){
-                if ($hasVisited == 2){
+            if ($servicesId == 1) {
+                if ($hasVisited == 2) {
                     $alert['title'] = 'بسیار مهم';
                     $alert['message'] = 'اولین ویزیت شما در هر هفته از بارداری، توسط دکتر امیری انجام میگردد';
                     $alert['alternative_doctor'] = null;
                     $alert['button_text'] = 'تایید میکنم';
                 } else {
-                    if ($question == 2 || $question == 3){
+                    if ($question == 2 || $question == 3) {
                         $conditions['title'] = 'امکان دریافت نوبت با دکتر امیری فراهم نیست';
                         $conditions['message'] = 'مراجعه کنندگان گرامی ویزیت بارداران فقط تا ۱۲ هفته توسط دکتر امیری انجام میشود . و بعد از آن توسط تیم فوق تخصصی دکتر امیری (دکتر سهامیررضا) انجام میشود.
 ویزیت آخر قبل از سزارین  با دکتر امیری انجام میشود.
@@ -355,11 +355,8 @@ class AppointmentApiController extends Controller
                         $conditions['button_text'] = 'انتخاب پزشک دیگر';
                     }
                 }
-
-            }
-
-            elseif ($servicesId == 2 || $servicesId == 4){
-                if ($hasVisited == 2){
+            } elseif ($servicesId == 2 || $servicesId == 4) {
+                if ($hasVisited == 2) {
                     $conditions['title'] = 'امکان دریافت نوبت با دکتر امیری فراهم نیست';
                     $conditions['message'] = 'مراجعه کننده گرامی شما ویزیت اولیه شما توسط تیم فوق تخصصی دکتر امیری انجام میشود .
 دکتر امیری ویزیت اولیه انجام نمیدهند .
@@ -373,7 +370,6 @@ class AppointmentApiController extends Controller
                     $alert['alternative_doctor'] = null;
                     $alert['button_text'] = 'تایید میکنم';
                 }
-
             }
         }
         // handle condition dr amiri
@@ -404,5 +400,4 @@ class AppointmentApiController extends Controller
             'appointment_user' => AppointmentUserResource::make($appointmentUser),
         ]);
     }
-
 }

@@ -31,11 +31,13 @@ class VoipController extends Controller
                 continue;
             }
             foreach ($day as $month => $appointments) {
-                if ($month < $isMonth) {
-                    continue;
-                }
+
                 foreach ($appointments as $day => $appointment) {
-                    if ($day < $isDay || $appointment['empty_appoints'] <= 0 || $appointment['status'] == false) {
+
+                    if ($day < $isDay && $month < $isMonth && $yeay < $isYear) {
+                        continue;
+                    }
+                    if ($appointment['empty_appoints'] <= 0 || $appointment['status'] == false) {
                         continue;
                     }
                     $dayNumber = $appointment['day_number'];

@@ -65,7 +65,7 @@
              <p class="font-semibold">نماد ها</p>
              <div class="grid grid-cols-2 gap-8">
                 <a href="#" class="flex justify-center">
-                   <img src="../assets/images/enamad.png" class="h-[114px]" />
+                   <img src="{{front_asset('assets/images/enamad.png')}}" class="h-[114px]" />
                 </a>
                 <a href="#" class="flex justify-center">
                    <img src="{{front_asset('assets/images/samandehi.png')}}" class="h-[114px]" />

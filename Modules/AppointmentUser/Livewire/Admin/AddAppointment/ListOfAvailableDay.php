@@ -61,11 +61,13 @@ class ListOfAvailableDay extends Component
                 continue;
             }
             foreach ($day as $month => $appointments) {
-                if ($month < $isMonth) {
-                    continue;
-                }
+
                 foreach ($appointments as $day => $appointment) {
-                    if ($day < $isDay || $appointment['empty_appoints'] <= 0 || $appointment['status'] == false) {
+
+                    if ($day < $isDay && $month < $isMonth && $yeay < $isYear) {
+                        continue;
+                    }
+                    if ($appointment['empty_appoints'] <= 0 || $appointment['status'] == false) {
                         continue;
                     }
                     $dayNumber = $appointment['day_number_gmt'];
@@ -109,9 +111,11 @@ class ListOfAvailableDay extends Component
         $this->fethData['service'] = Service::find($serviceId);
         $this->fethData['doctor']  = User::find($doctorId);
         $this->fethData['place']  = Place::find($placeId);
+
         //check for special setting for special section
         $appointmentSetting = AppointmentSetting::where('service_id', $serviceId)
             ->where('place_id', $placeId)
+            ->where('user_id',$this->fethData['doctor'])
             ->first();
 
         //check for general setting

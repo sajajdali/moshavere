@@ -2,6 +2,7 @@
 
 namespace Modules\Front\Livewire\SetAppointment;
 
+use Carbon\Carbon;
 use Livewire\Component;
 use Livewire\Attributes\Title;
 use Livewire\Attributes\Layout;
@@ -17,7 +18,7 @@ use Modules\AppointmentSetting\app\Models\AppointmentSetting;
 #[Title('ثبت نوبت')]
 class ShowAvailableDayForDoctor extends Component
 {
-
+    public $msg = false;
     public array $form = [];
 
     #[Locked]
@@ -31,9 +32,47 @@ class ShowAvailableDayForDoctor extends Component
     }
     public function loadNextDays()
     {
-        $this->fetchData['firstTreeAvailableAppointment'] =   $this->findFirstTreeAppointment($this->fetchData['rawlistOfAppointment'], $this->fetchData['lastDate']);
-        // اگه روز های توی کش تموم شد و هنوز این تابع فرا خوانی شد ، کش رو مجدد با تاریخ جدید بساز
-        // حواست باشه که در نهایت آخرین تاریخ از آخرین تاریخی که کاربر میتونه نوبت ثبت بکنه بزرگتر نباشه
+        $this->fetchData['dont_show_first_available_day'] = true;
+        //  check if user can access this date of appointments
+        if (isset($this->fetchData['appointmentSetting']->max_day_active)) {
+            $max_days_app_available = Carbon::now()->addDays($this->fetchData['appointmentSetting']->max_day_active);
+            if ($max_days_app_available->lt($this->fetchData['lastDate'])) {
+                return $this->msg = 'امکان دریافت نوبت خارج از این بازه زمانی وجود ندارد!';
+            }
+        }
+        // check if date exist in the log or should recreate the app_log
+        if ($this->fetchData['lastDate']->lt($this->fetchData['last_active_day'])) {
+            // next date exist in log
+            $this->fetchData['firstTreeAvailableAppointment'] =   $this->findFirstTreeAppointment($this->fetchData['rawlistOfAppointment'], $this->fetchData['lastDate']);
+        } else {
+            // next date is not exist in log
+            $details['specialDays'] = $this->fetchData['lastDate'];
+            $this->fetchData['rawlistOfAppointment'] =  app('AppointmentUserService')->listAppointments($this->fetchData['appointmentSetting'], $details);
+            $this->fetchData['firstTreeAvailableAppointment'] = $this->findFirstTreeAppointment($this->fetchData['rawlistOfAppointment']);
+        }
+    }
+    public function loadFirstApp()
+    {
+        unset($this->fetchData['dont_show_first_available_day']);
+        unset($this->fetchData['rawlistOfAppointment']);
+        unset($this->fetchData['firstTreeAvailableAppointment']);
+        $listOfAppointment = Cache::rememberForever('appointmentList.' . $this->fetchData['appointmentSetting']->id, function () {
+            return app('AppointmentUserService')->listAppointments($this->fetchData['appointmentSetting']);
+        });
+        $this->fetchData['rawlistOfAppointment'] = $listOfAppointment;
+        $this->fetchData['firstTreeAvailableAppointment'] =  $this->findFirstTreeAppointment($listOfAppointment);
+    }
+    private function caculateLastActiveDay($listOfAppointment)
+    {
+        $last_exist_month = end($listOfAppointment);
+        $list_of_last_mount_days = end($last_exist_month);
+        $lastActiveDayGmt = null;
+        foreach (array_reverse($list_of_last_mount_days) as $eachDayOfLastMounth) {
+            if ($eachDayOfLastMounth['status'] === true) {
+                $this->fetchData['last_active_day'] = Carbon::parse($eachDayOfLastMounth['day_number_gmt']);
+                break;
+            }
+        }
     }
     private function findFirstTreeAppointment($listOfAppointment, $lastDayActive = null)
     {
@@ -48,6 +87,10 @@ class ShowAvailableDayForDoctor extends Component
         $result = [];
         $maxDay = 2;
         $DaysDisplayed = 0;
+
+        // select the last active day
+        $this->caculateLastActiveDay($listOfAppointment['data']);
+
         foreach ($listOfAppointment['data'] as $yeay => $monthWithAppointment) {
             if ($yeay < $isYear) {
                 continue;
@@ -100,7 +143,7 @@ class ShowAvailableDayForDoctor extends Component
         }
         $dates = array_keys($result);
         // Get the last date
-        $this->fetchData['lastDate'] = end($dates);
+        $this->fetchData['lastDate'] = Carbon::parse(end($dates));
         return $result;
     }
     private function getAvailableDay()
@@ -110,7 +153,7 @@ class ShowAvailableDayForDoctor extends Component
             ->where('user_id', $this->fetchData['doc'])
             ->first();
         //check for general setting
-        if (!isset($$appointmentSetting)) {
+        if (!isset($appointmentSetting)) {
             $appointmentSetting = AppointmentSetting::where('user_id', $this->fetchData['doc']->id)->first();
         }
         $listOfAppointment = Cache::rememberForever('appointmentList.' . $appointmentSetting->id, function () use ($appointmentSetting) {
@@ -118,7 +161,7 @@ class ShowAvailableDayForDoctor extends Component
         });
         $this->fetchData['rawlistOfAppointment'] = $listOfAppointment;
         $this->fetchData['firstTreeAvailableAppointment'] =  $this->findFirstTreeAppointment($listOfAppointment);
-        $this->fetchData['appointmentSetting'] = $appointmentSetting->id;
+        $this->fetchData['appointmentSetting'] = $appointmentSetting;
     }
     public function mount()
     {
@@ -139,6 +182,14 @@ class ShowAvailableDayForDoctor extends Component
         $this->fetchData['service']  =   $service;
 
         $this->getAvailableDay();
+    }
+
+    public function booted()
+    {
+        // clear alert mesage
+        if ($this->msg != false) {
+            $this->msg = false;
+        }
     }
     public function render()
     {

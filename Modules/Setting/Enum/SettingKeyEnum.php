@@ -15,7 +15,6 @@ enum SettingKeyEnum: int implements EnumHasNameInterface, SettingTypeInterface, 
     case DEFAULT_EXERCISE_STATUS = 1;
     case SITE_LOGO_URL = 2;
     case SITE_TITLE = 3;
-    case SITE_SLIDER_TITLE = 11;
     case APPOINTMENT_STATUS = 4;
     case APPOINTMENT_DESCRIPTION_STATUS = 5;
     case APPOINTMENT_DESCRIPTION = 6;
@@ -23,6 +22,9 @@ enum SettingKeyEnum: int implements EnumHasNameInterface, SettingTypeInterface, 
     case APPOINTMENT_USER_PERESENT_STATUS_REGISTRATION = 8;
     case APPOINTMENT_DEADLINE_VIA_ADMIN = 9;
     case APPOINTMENT_DEADLINE_VIA_USER = 10;
+    case SITE_SLIDER_TITLE = 11;
+    case APPOINTMENT_DESCRIPTION_IN_CHECKOUT_PAGE_REFUND = 12 ;
+    case APPOINTMENT_FOR_OTHERS_STATUS = 13 ;
 
         //sms
     case SMS_API_TOKEN = 20;
@@ -71,6 +73,7 @@ enum SettingKeyEnum: int implements EnumHasNameInterface, SettingTypeInterface, 
             self::SITE_LOGO_URL => 'آدرس لوگو',
             self::SITE_TITLE    => 'عنوان سایت',
             self::APPOINTMENT_STATUS    => 'فعال بودن نوبت دهی',
+            self::APPOINTMENT_FOR_OTHERS_STATUS    => 'امکان ثبت نوبت برای دیگران',
             self::APPOINTMENT_DESCRIPTION_STATUS    => 'فعال بودن توضیحات در صفحه جزئیات نوبت',
             self::APPOINTMENT_DESCRIPTION    => 'توضیحات مربوط به صفحه جزئیات نوبت',
             self::APPOINTMENT_CANCEL_DESCRIPTION    => 'توضیحات مربوط به کنسلی نوبت',
@@ -78,6 +81,8 @@ enum SettingKeyEnum: int implements EnumHasNameInterface, SettingTypeInterface, 
             self::APPOINTMENT_DEADLINE_VIA_ADMIN    => 'مدت زمان رزرو بودن نوبت برای پرداخت در زمانی که وضعیت نوبت در انتظار پرداخت میباشد و نوبت از طریق پنل ادمین ثبت شده باشد (ساعت)',
             self::APPOINTMENT_DEADLINE_VIA_USER    => 'مدت زمان رزرو بودن نوبت برای پرداخت در زمانی که وضعیت نوبت در انتظار پرداخت میباشد و نوبت را بیمار دریافت کرده باشد(ساعت)',
             self::SITE_SLIDER_TITLE    => 'عنوان در ابتتدای صفحه ای اصلی و بالای قسمت جست و جو',
+            self::APPOINTMENT_DESCRIPTION_IN_CHECKOUT_PAGE_REFUND    => 'توضیحات در صفحه قبل از تایید نوبت توس کاربر(checkout)',
+
 
             self::SMS_API_TOKEN => 'توکن API پیامک',
             self::DEFAULT_EXERCISE_STATUS => 'وضعیت برنامه بعد از تجویز',
@@ -143,6 +148,7 @@ enum SettingKeyEnum: int implements EnumHasNameInterface, SettingTypeInterface, 
         return match ($this) {
             self::DEFAULT_EXERCISE_STATUS => SettingTypeEnum::SELECT,
             self::PAYMENT_PAYSTAR_STATUS => SettingTypeEnum::CHECK,
+            self::APPOINTMENT_FOR_OTHERS_STATUS => SettingTypeEnum::CHECK,
             self::PAYMENT_ZARINPAL_STATUS => SettingTypeEnum::CHECK,
             self::APPOINTMENT_DESCRIPTION_STATUS => SettingTypeEnum::CHECK,
             self::SECREYERY_SEND_LINK_FOR_APPOINTMENT => SettingTypeEnum::CHECK,
@@ -154,6 +160,7 @@ enum SettingKeyEnum: int implements EnumHasNameInterface, SettingTypeInterface, 
             self::APPOINTMENT_DESCRIPTION => SettingTypeEnum::TEXTAREA,
             self::APPOINTMENT_CANCEL_DESCRIPTION => SettingTypeEnum::TEXTAREA,
             self::PAYMENT_RULES_AND_CONDITION_DESCRIPTION => SettingTypeEnum::TEXTAREA,
+            self::APPOINTMENT_DESCRIPTION_IN_CHECKOUT_PAGE_REFUND => SettingTypeEnum::TEXTAREA,
             default => SettingTypeEnum::TEXT
         };
     }

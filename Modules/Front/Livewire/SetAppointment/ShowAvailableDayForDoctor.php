@@ -28,7 +28,7 @@ class ShowAvailableDayForDoctor extends Component
     public function TimeForReservesation()
     {
         $this->validate(['form.time' => 'required|string']);
-        dd('tes');
+        return $this->redirect(route('setAppointment.checkout',['appointment_time' => $this->form['time']]),true);
     }
     public function loadNextDays()
     {
@@ -182,6 +182,15 @@ class ShowAvailableDayForDoctor extends Component
         $this->fetchData['service']  =   $service;
 
         $this->getAvailableDay();
+
+        //select the nearest appointment
+        foreach ($this->fetchData['firstTreeAvailableAppointment']  as $date => $appointmentsWithDaysIndex) {
+            foreach ($appointmentsWithDaysIndex as $eachTime => $appointmentDetail) {
+                $this->form['time'] = (string) $appointmentDetail['time_stamp'];
+                break 2; // Break out of both foreach loops
+
+            }
+        }
     }
 
     public function booted()

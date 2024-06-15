@@ -35,6 +35,7 @@ return [
         'icon' => 'fa fa-fire',
         'settings' => [
             \Modules\Setting\Enum\SettingKeyEnum::APPOINTMENT_STATUS,
+            \Modules\Setting\Enum\SettingKeyEnum::APPOINTMENT_FOR_OTHERS_STATUS,
             \Modules\Setting\Enum\SettingKeyEnum::APPOINTMENT_DESCRIPTION_STATUS,
             \Modules\Setting\Enum\SettingKeyEnum::APPOINTMENT_DESCRIPTION,
             \Modules\Setting\Enum\SettingKeyEnum::APPOINTMENT_CANCEL_DESCRIPTION,
@@ -42,6 +43,7 @@ return [
             \Modules\Setting\Enum\SettingKeyEnum::SECREYERY_SEND_LINK_FOR_APPOINTMENT,
             \Modules\Setting\Enum\SettingKeyEnum::APPOINTMENT_DEADLINE_VIA_ADMIN,
             \Modules\Setting\Enum\SettingKeyEnum::APPOINTMENT_DEADLINE_VIA_USER,
+            \Modules\Setting\Enum\SettingKeyEnum::APPOINTMENT_DESCRIPTION_IN_CHECKOUT_PAGE_REFUND,
 
         ],
     ],

@@ -4,6 +4,7 @@ use Illuminate\Support\Facades\Route;
 use Modules\Front\Livewire\Payment\Invoice;
 use Modules\Front\Livewire\FeedBack\Questions;
 use Modules\Front\Livewire\AboutUs\AboutUsLiveWire;
+use Modules\Front\Livewire\SetAppointment\Checkout;
 use Modules\Front\Livewire\HomePage\HomePageLivewire;
 use Modules\Front\Livewire\Appointment\AppointmentDetail;
 use Modules\Front\Livewire\DoctorProfile\DoctorProfileLivewire;
@@ -28,5 +29,6 @@ Route::group([], function () {
     Route::get('/', HomePageLivewire::class)->name('front.homePage');
     Route::get('/aboutus', AboutUsLiveWire::class)->name('front.aboutUs');
     Route::get('/appointment/days', ShowAvailableDayForDoctor::class)->name('setAppointment.days');
+    Route::get('/appointment/checkout', Checkout::class)->name('setAppointment.checkout');
     Route::get('/doctor/profile/{doctor_id}', DoctorProfileLivewire::class)->name('front.doctor.profile');
 });

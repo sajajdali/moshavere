@@ -26,7 +26,7 @@
                     </div>
                 </div>
             </div>
-            <div class="appointment__modal-left">
+            <div class="appointment__modal-left" wire:loading.class='opacity-75'>
                 <div class="flex justify-between">
                     <p class="font-semibold">نوبت مورد نظر را انتخاب کنید</p>
                     <div>
@@ -115,7 +115,7 @@
                                                     @endif
                                                 @endonce
                                                 <label for="time-{{ $index + 548752 }}" class="select-time__radio">
-                                                    <input type="radio" class="hidden sr-only scroll_down"
+                                                    <input type="radio" class="hidden sr-only scroll_down" wire:loading.attr='disabled'
                                                         id="time-{{ $index + 548752 }}" wire:model='form.time'
                                                         value="{{ $eachTimeAppointment['time_stamp'] }}" />
                                                     <p>{{ $eachTimeAppointment['from'] }}</p>
@@ -158,18 +158,14 @@
             // Add 'open' class to the clicked accordion container
             $(this).addClass('open');
         });
+
         $('body').on('change', '.scroll_down', function() {
             // Check if the radio input is checked
             if ($(this).is(':checked')) {
                 var nextStepButton = $('#nextstep_btn');
                 // Check if the next step button element exists
                 if (nextStepButton.length) {
-                    // Scroll to the next step button
-                    $('html, body').animate({
-                        scrollTop: nextStepButton.offset().top - 200
-                    }, 1500); // Adjust the duration as needed
-                } else {
-                    console.error("Next step button not found.");
+                    @this.TimeForReservesation();
                 }
             }
         });

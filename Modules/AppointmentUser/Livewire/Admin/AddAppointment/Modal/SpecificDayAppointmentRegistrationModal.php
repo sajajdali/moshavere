@@ -219,6 +219,14 @@ class SpecificDayAppointmentRegistrationModal extends Component
             if (!isset($this->form['kind']) || empty($this->form['kind'])) {
                 return $this->addError('AppKind', 'لطفا نوع نوبت را انتخاب کنید');
             }
+        } else {
+            if ($appointmentSetting->detail[AppointmentSetting::VISIT_TYPE_ONLINE]) {
+                $this->form['kind'] = AppointmentUserKindEnum::ONLINE;
+            } elseif ($appointmentSetting->detail[AppointmentSetting::VISIT_TYPE_INPERSON]) {
+                $this->form['kind'] = AppointmentUserKindEnum::IN_PERSION;
+            } else {
+                $this->form['kind'] = AppointmentUserKindEnum::VOIP;
+            }
         }
 
         // If he wants to take the appointmnet for someone else

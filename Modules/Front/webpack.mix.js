@@ -3,8 +3,8 @@ let SVGSpritemapPlugin = require("svg-spritemap-webpack-plugin");
 
 
 mix
-.js("Resources/assets/src/js/main.js", "js")
-.sass("Resources/assets/src/scss/main.scss", "css")
+.js("resources/assets/src/js/main.js", "js")
+.sass("resources/assets/src/scss/main.scss", "css")
 .setPublicPath("../../public/assets/front")
 .options({
   postCss: [require("tailwindcss")],
@@ -20,7 +20,7 @@ mix
   })
   .webpackConfig({
     plugins: [
-      new SVGSpritemapPlugin("Resources/assets/src/svg/*.svg", {
+      new SVGSpritemapPlugin("resources/assets/src/svg/*.svg", {
         output: {
           filename: "assets/svg/icon.svg",
           svg4everybody: true,

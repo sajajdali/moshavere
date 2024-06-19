@@ -181,7 +181,7 @@ class User extends Authenticatable
 
         return  $this->$meta_type?->last()?->meta_key->getOptionName($metaOptions);
     }
- 
+
     public static function doctors()
     {
         return Role::find(3)?->users;
@@ -286,14 +286,25 @@ class User extends Authenticatable
         });
     }
 
-    public function scopeNewestDocs() {
+    public function scopeNewestDocs()
+    {
 
-         // Define a unique cache key
-         $cacheKey = 'newest_docs';
-         // Attempt to get the data from the cache
-         return Cache::remember($cacheKey, 60 * 60, function ()  {
-             return $this->doctors_query()->orderByDesc('created_at')->get()->take(4);
-         });
+        // Define a unique cache key
+        $cacheKey = 'newest_docs';
+        // Attempt to get the data from the cache
+        return Cache::remember($cacheKey, 60 * 60, function () {
+            return $this->doctors_query()->orderByDesc('created_at')->get()->take(4);
+        });
+    }
 
+    public static function generatePassword()
+    {
+        $pass =  bin2hex(random_bytes(16));;
+        return $pass;
+    }
+    public static function generateDocumentNumber()
+    {
+        $documentNumber =  mt_rand(100000, 999999);
+        return $documentNumber;
     }
 }

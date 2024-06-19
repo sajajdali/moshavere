@@ -468,7 +468,7 @@ class AppointmentUserService
     {
         $appointmentUser->shortLink()->create([
             'link_code' => ShortLink::generateShortLinkCode(),
-            'link_url'  => route('front.appointment.detail', ['tracking_code' => $appointmentUser->tracking_code]),
+            'link_url'  => route('front.setAppointment.detail', ['tracking_code' => $appointmentUser->tracking_code]),
         ]);
     }
 
@@ -489,7 +489,6 @@ class AppointmentUserService
     }
     public function storeAppointment(AppointmentSetting $appointmentSetting, UserModelAppointment $userModelAppointment, AppointmentModel $appointmentData, $detail = [])
     {
-
         // check exist appointment
         $detailAppointment = $detail;
         $detailDatabaseDB = [];

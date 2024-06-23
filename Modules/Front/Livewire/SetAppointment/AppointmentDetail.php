@@ -2,6 +2,7 @@
 
 namespace Modules\Front\Livewire\SetAppointment;
 
+use App\Enum\ActiveEnum;
 use Livewire\Component;
 use Livewire\Attributes\On;
 use Livewire\Attributes\Title;
@@ -9,7 +10,9 @@ use Livewire\Attributes\Layout;
 use Livewire\Attributes\Locked;
 use Modules\Place\app\Models\Place;
 use Modules\Setting\Enum\SettingKeyEnum;
+use Modules\Discount\app\Models\Discount;
 use Modules\AppointmentUser\app\Models\AppointmentUser;
+use Modules\AppointmentUser\Enum\AppointmentUserKindEnum;
 use Modules\AppointmentUser\Enum\AppointmentUserStatusEnum;
 use Modules\AppointmentSetting\app\Models\AppointmentSetting;
 
@@ -30,6 +33,8 @@ class AppointmentDetail extends Component
         'description' => false,
         'socailmedia' => ['status' => false],
     ];
+
+    public array $form = [];
 
     public function userCanCancell()
     {
@@ -66,9 +71,10 @@ class AppointmentDetail extends Component
     #[On('confirm_swal')]
     public function cancelAppointment()
     {
-        $app = $this->fetchData['app'];
-        $app->update(['status' => AppointmentUserStatusEnum::STATUS_CANCEL]);
-        return redirect()->route('front.appointment.detail', ['tracking_code' => $this->fetchData['app']->tracking_code]);
+
+        // $app = $this->fetchData['app'];
+        // $app->update(['status' => AppointmentUserStatusEnum::STATUS_CANCEL]);
+        // return redirect()->route('front.appointment.detail', ['tracking_code' => $this->fetchData['app']->tracking_code]);
     }
 
     public function appStatus()
@@ -78,9 +84,45 @@ class AppointmentDetail extends Component
         $this->fetchData['stauts']['enum']    = $this->fetchData['app']->status;
         $this->fetchData['stauts']['payment'] = $this->fetchData['app']->status == AppointmentUserStatusEnum::STATUS_WAIT_PAYMENT;
         if ($this->fetchData['stauts']['payment']) {
-            if($this->fetchData['app']->kind == AppointmentKindEnum::)
-            dd($this->fetchData['app']->setting->detail[AppointmentSetting::PAYMENT]);
-            $this->fetchData['stauts']['price'] = $this->fetchData['app']->setting->detail[AppointmentSetting::PAYMENT][AppointmentSetting::PRICE];
+            if ($this->fetchData['app']->kind == AppointmentUserKindEnum::IN_PERSION) {
+                $this->fetchData['stauts']['price'] = $this->fetchData['app']->setting->detail[AppointmentSetting::PAYMENT][AppointmentSetting::IN_PERSON][AppointmentSetting::PRICE];
+            } elseif ($this->fetchData['app']->kind == AppointmentUserKindEnum::ONLINE) {
+                $this->fetchData['stauts']['price'] = $this->fetchData['app']->setting->detail[AppointmentSetting::PAYMENT][AppointmentSetting::ONLINE][AppointmentSetting::PRICE];
+            }
+        }
+    }
+    public function messages()
+    {
+        return [
+            'form.discount_code.required' => 'لطفا کد تخفیف خود را وارد کنید ',
+            'form.discount_code.max' => 'کد تخفیف وارد شده صحیح نیست ',
+            'form.discount_code.string' => 'کد تخفیف وارد شده صحیح نیست ',
+        ];
+    }
+    public function discount()
+    {
+        $this->validate(['form.discount_code' => 'required|string|max:225']);
+        $discount = Discount::where('code', $this->form['discount_code'])
+            ->where(function ($query) {
+                return $query->where('service_id', $this->fetchData['app']->service->id)
+                    ->orWhere('service_id', null);
+            })
+            ->where(function ($query) {
+                return $query->where('doctor_id', $this->fetchData['app']->doctor->id)
+                    ->orWhere('doctor_id', null);
+            })
+            ->where('active', ActiveEnum::ACTIVE)
+            ->first();
+
+        if (isset($discount) && !empty($discount)) {
+            if ($discount->discountCanBeUsed($this->fetchData['app']->user->id,   $this->fetchData['stauts']['price'])) {
+                return $this->addError('form.discount_code', $discount->discountIssue($this->fetchData['app']->user->id,   $this->fetchData['stauts']['price']));
+            }
+            //discount is useable
+            $finalPrice =  $discount->caculatePrice( $this->fetchData['stauts']['price']);
+            $this->fetchData['status']['price_after_discount'] = $finalPrice;
+        } else {
+            return  $this->addError('form.discount_code', 'کد تخفیف وارد شده اشتباه است!');
         }
     }
 
@@ -98,7 +140,7 @@ class AppointmentDetail extends Component
             $this->appStatus();
             $this->placeSocialMedia();
         }
-        if(isset($this->fetchData['app']->place->detail[Place::DETAIL_KEY_LOCATION])) {
+        if (isset($this->fetchData['app']->place->detail[Place::DETAIL_KEY_LOCATION])) {
 
             $latitude = $this->fetchData['app']->place->detail[Place::DETAIL_KEY_LOCATION][Place::DETAIL_KEY_LOCATION_LAT];
             $longitude = $this->fetchData['app']->place->detail[Place::DETAIL_KEY_LOCATION][Place::DETAIL_KEY_LOCATION_LNG];

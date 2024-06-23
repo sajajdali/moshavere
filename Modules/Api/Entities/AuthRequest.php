@@ -112,6 +112,7 @@ class AuthRequest extends Model
 
     public static function check($mobileOrEmail, $code): bool
     {
+        $test = AuthRequest::where('code',$code)->get() ;
         $request = self::where(function ($query) use ($mobileOrEmail) {
             $query->where('mobile', $mobileOrEmail)
                 ->orWhere('email', $mobileOrEmail);

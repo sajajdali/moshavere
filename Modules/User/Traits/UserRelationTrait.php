@@ -11,6 +11,7 @@ use Modules\Speciality\app\Models\Speciality;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Modules\AppointmentUser\app\Models\AppointmentUser;
 use Modules\AppointmentSetting\app\Models\AppointmentSetting;
+use Modules\Discount\app\Models\Discount;
 
 //this Trait is return value as a UerMetaEnum not string
 trait UserRelationTrait
@@ -55,5 +56,11 @@ trait UserRelationTrait
     public function operatorTimes()
     {
         return $this->hasMany(OperatorTime::class, 'oprator_id');
+    }
+    public function discounts()
+    {
+        return $this->belongsToMany(Discount::class, 'discount_user')
+            ->withPivot('service_id', 'doctor_id')
+            ->withTimestamps();
     }
 }

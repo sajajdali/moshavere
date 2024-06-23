@@ -75,6 +75,9 @@ class User extends Authenticatable
 {
     use HasRoles, Notifiable, HasFactory, HasApiTokens, UserAttributeTrait, UserRelationTrait;
 
+    const USER_GENDER_MALE = 'male';
+    const USER_GENDER_FEMALE = 'female';
+    
     protected $guarded = ['id'];
 
     protected $hidden = [

@@ -395,7 +395,7 @@
                             </div>
                         </div>
 
-                        <button type="submit" @if (isset($doc->ban_user) && $doc->ban_user == false) disabled @endif
+                        <button type="submit" @if (isset($doc->ban_user) && $doc->ban_user == true) disabled @endif
                             class="btn__blue--round-full-between">
                             <p>دریافت نوبت دکتر {{ $doc->full_name }}</p>
                             <svg class="w-6 h-6" xmlns="http://www.w3.org/2000/svg">

@@ -9,15 +9,65 @@
                         <p class="font-bold text-sm">
                             <span>نوبت شما در حالت </span><span class="text-red">منتظر پرداخت</span><span> است.</span>
                         </p>
-                        <button class="font-bold text-red text-sm">لغو نوبت</button>
+                        <a data-description="میخواهید نوبت به بین مریض تبدیل شود؟" data-title="تغییر وضعیت "
+                            data-confirmbtn="بله تغییر کند" data-action="changeType" data-id="aw"
+                            class=" font-bold text-red confirm_swal_alert text-sm" data-label="نوبت" href="">لغو نوبت</a>
                     </div>
+                    <p class="font-bold my-3">
+                        <a href="#" id="discountBtn" class="text-primary-main  mr-2">کد تخفیف دارید؟</a>
+                    </p>
+                    <div class="my-3" id="collapsible-content" style="display: none" wire:ignore.self>
+                        <div
+                            class="grid gap-4 md:grid-cols-5 items-start border-2 border-solid  border-secondary-100 rounded-2xl py-3.5 px-4  @if (isset($fetchData['status']['price_after_discount'])) opacity-40 @endif ">
+                            <input type="text" id="discount-code" wire:model="form.discount_code"
+                                @if (isset($fetchData['status']['price_after_discount'])) disabled @endif
+                                placeholder="کد تخفیف خود را وارد کنید"
+                                class="col-span-4 w-full px-4 py-2 border @error('form.discount_code') border-rose-500  @else  border-gray-300 @enderror rounded-lg focus:outline-none focus:border-success-500">
+                            <button wire:click='discount' wire:target='discount' wire:loading.attr='disabled'
+                                @if (isset($fetchData['status']['price_after_discount'])) disabled @endif
+                                class="col-span-1   @if (isset($fetchData['status']['price_after_discount'])) bg-lime-500 @else bg-blue-500 @endif hover:bg-blue-700 text-white font-bold py-2 px-6 px-4 rounded text-center">
+                                @if (isset($fetchData['status']['price_after_discount']))
+                                    <span>
+                                        تایید شد
+                                    </span>
+                                @else
+                                    <span wire:loading.remove wire:target='discount'>اعمال کد</span>
+                                    <div role="status" wire:loading wire:target='discount'>
+                                        <svg aria-hidden="true"
+                                            class="w-5 h-5 text-white-200 animate-spin dark:text-white-600 fill-gray-700"
+                                            viewBox="0 0 100 101" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                            <path
+                                                d="M100 50.5908C100 78.2051 77.6142 100.591 50 100.591C22.3858 100.591 0 78.2051 0 50.5908C0 22.9766 22.3858 0.59082 50 0.59082C77.6142 0.59082 100 22.9766 100 50.5908ZM9.08144 50.5908C9.08144 73.1895 27.4013 91.5094 50 91.5094C72.5987 91.5094 90.9186 73.1895 90.9186 50.5908C90.9186 27.9921 72.5987 9.67226 50 9.67226C27.4013 9.67226 9.08144 27.9921 9.08144 50.5908Z"
+                                                fill="currentColor" />
+                                            <path
+                                                d="M93.9676 39.0409C96.393 38.4038 97.8624 35.9116 97.0079 33.5539C95.2932 28.8227 92.871 24.3692 89.8167 20.348C85.8452 15.1192 80.8826 10.7238 75.2124 7.41289C69.5422 4.10194 63.2754 1.94025 56.7698 1.05124C51.7666 0.367541 46.6976 0.446843 41.7345 1.27873C39.2613 1.69328 37.813 4.19778 38.4501 6.62326C39.0873 9.04874 41.5694 10.4717 44.0505 10.1071C47.8511 9.54855 51.7191 9.52689 55.5402 10.0491C60.8642 10.7766 65.9928 12.5457 70.6331 15.2552C75.2735 17.9648 79.3347 21.5619 82.5849 25.841C84.9175 28.9121 86.7997 32.2913 88.1811 35.8758C89.083 38.2158 91.5421 39.6781 93.9676 39.0409Z"
+                                                fill="currentFill" />
+                                        </svg>
+                                        <span class="sr-only">Loading...</span>
+                                    </div>
+                                @endif
+                            </button>
+                        </div>
+                        @error('form.discount_code')
+                            <p class="text-rose-500	 mr-2">{{ $message }}</p>
+                        @enderror
+                    </div>
+
                     <div
                         class="flex flex-col gap-3 md:flex-row items-center justify-between border-2 border-solid border-secondary-100 rounded-2xl py-3.5 px-4">
-                        <p class="font-bold">
-                            جهت فعالسازی نوبت، مبلغ {{ number_format($fetchData['stauts']['price']) }} تومان پرداخت
-                            نمایید
-                        </p>
-
+                        @if (isset($fetchData['status']['price_after_discount']))
+                            <p class="font-bold">
+                                جهت فعالسازی نوبت، مبلغ <s
+                                    class="text-rose-500">{{ number_format($fetchData['stauts']['price']) }}</s>
+                                {{ number_format($fetchData['status']['price_after_discount']) }} تومان پرداخت
+                                نمایید
+                            </p>
+                        @else
+                            <p class="font-bold">
+                                جهت فعالسازی نوبت، مبلغ {{ number_format($fetchData['stauts']['price']) }} تومان پرداخت
+                                نمایید
+                            </p>
+                        @endif
                         <a href="#" class="btn__blue--round-full !w-fit !px-3">
                             <p>پرداخت و فعال سازی</p>
                             <svg class="w-6 h-6" xmlns="http://www.w3.org/2000/svg">
@@ -25,6 +75,7 @@
                             </svg>
                         </a>
                     </div>
+
                 </section>
             @endif
             @if ($fetchData['description'])
@@ -50,8 +101,8 @@
                                 <span class="block w-4 h-4 bg-white p-0.5 absolute right-0 top-0">
                                     <span class="block w-full h-full rounded-full bg-green"></span>
                                 </span>
-                                <img class="w-full h-full object-cover rounded-full" src="../assets/images/doctor/1.png"
-                                    alt="doctor" />
+                                <img class="w-full h-full object-cover rounded-full"
+                                    src="{{ $fetchData['app']->doctor->avatar }}" alt="doctor" />
                             </div>
 
                             <div class="text-sm space-y-2">
@@ -123,7 +174,7 @@
                             <p>
                                 <object class="inline-block"
                                     data="{{ front_asset('assets/svg/timeclock.svg') }}"></object>
-                                <strong>زمان نوبت</strong>
+                                <strong>زمان نوبت:</strong>
                             </p>
                             @if ($this->fetchData['stauts']['enum'] != Modules\AppointmentUser\Enum\AppointmentUserStatusEnum::STATUS_CANCEL)
                                 <span class="mr-3">
@@ -140,50 +191,73 @@
                             @endif
                         </div>
                         @if ($fetchData['stauts']['payment'])
-                            <div class="visit-detail mt-3">
+                            <div class="visit-detail flex mt-3">
                                 <p>
                                     <object class="inline-block"
                                         data="{{ front_asset('assets/svg/solar_card-outline.svg') }}"></object>
-                                    <span>مبلغ ویزیت</span>
+                                    <strong>مبلغ ویزیت:</strong>
                                 </p>
-                                <p>{{ number_format($fetchData['stauts']['price']) }} تومان</p>
+                                <p class="mr-2">{{ number_format($fetchData['stauts']['price']) }} تومان</p>
                             </div>
                         @endif
 
-                            @if (isset($fetchData['app']->place->detail[Modules\Place\app\Models\Place::DETAIL_ADDRESS]))
-                                <div class="visit-detail flex mt-3 !mb-0">
-                                    <p>
-                                        <object class="inline-block"
-                                            data="{{ front_asset('assets/svg/location-icon.svg') }} "></object>
-                                        <span>
-                                            {{ $fetchData['app']->place->detail[Modules\Place\app\Models\Place::DETAIL_ADDRESS] }}
-                                        </span>
-                                    </p>
-                                    <p></p>
-                                </div>
-                            @endif
+                        @if (isset($fetchData['app']->place->detail[Modules\Place\app\Models\Place::DETAIL_ADDRESS]))
+                            <div class="visit-detail flex mt-3 !mb-0">
+                                <p>
+                                    <object class="inline-block"
+                                        data="{{ front_asset('assets/svg/location-icon.svg') }} "></object>
+                                    <span>
+                                        {{ $fetchData['app']->place->detail[Modules\Place\app\Models\Place::DETAIL_ADDRESS] }}
+                                    </span>
+                                </p>
+                                <p></p>
+                            </div>
+                        @endif
                     </div>
                     @if ($fetchData['stauts']['payment'])
-                    <div class="h-0.5 w-full bg-secondary-100"></div>
+                        <div class="h-0.5 w-full bg-secondary-100"></div>
 
-                    <div class="text-sm space-y-2">
-                        <p class="font-bold text-base !mb-4">جزیات پرداخت</p>
+                        <div class="text-sm space-y-2">
+                            <p class="font-bold text-base !mb-4">جزئیات پرداخت</p>
 
-                        <div class="border-card flex justify-between">
-                            <p>مبلغ نوبت رزرو</p>
-                            <p>15,000 تومان</p>
+                            <div class="border-card flex justify-between">
+                                <p>مبلغ قابل پرداخت</p>
+                                @if (isset($fetchData['status']['price_after_discount']))
+                                    <s class="text-rose-500">
+                                        <p>{{ number_format($fetchData['stauts']['price']) }} تومان</p>
+                                    </s>
+                                @else
+                                    <p>{{ number_format($fetchData['stauts']['price']) }} تومان</p>
+                                @endif
+                            </div>
+                            @if (isset($fetchData['status']['price_after_discount']))
+                                <div class="border-card flex justify-between">
+                                    <p>
+                                        <span>مبلغ بعد از تخفیف</span>
+                                    </p>
+                                    <p>{{ number_format($fetchData['status']['price_after_discount']) }} تومان</p>
+                                </div>
+                            @endif
                         </div>
-                        <div class="border-card flex justify-between">
-                            <p>
-                                <span>تخفیف</span>
-                                <a href="#" class="text-primary-main">کد تخفیف دارید؟</a>
-                            </p>
-                            <p>0 تومان</p>
-                        </div>
-                    </div>
                     @endif
                 </div>
             </section>
         </div>
     </main>
 </div>
+@push('scripts')
+    <script src="{{ admin_asset('plugins/sweet-alert/sweetalert.min.js') }}"></script>
+    <script src="{{ admin_asset('plugins/sweet-alert/admin.sweetalert.js') }}"></script>
+    <script>
+        $(document).ready(function() {
+            $('body').on('click', '#discountBtn', function() {
+                var content = $('#collapsible-content');
+                if (content.css('display') === 'none') {
+                    content.fadeIn();
+                } else {
+                    content.fadeOut();
+                }
+            });
+        });
+    </script>
+@endpush

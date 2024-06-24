@@ -48,7 +48,8 @@ class Registration extends Component
             $this->user->national_code = $this->form['national_code'];
         }
         if (isset($this->form['email'])) {
-            $this->user->update(['email' => $this->form['email']]);
+            $userMOdel = User::find($this->user->id);
+            $userMOdel->update(['email' => $this->form['email']]);
         }
         if (session()->has('LoginOrgin')) {
             return redirect()->route(session()->get('LoginOrgin'));

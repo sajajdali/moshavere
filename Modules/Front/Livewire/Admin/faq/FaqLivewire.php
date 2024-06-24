@@ -1,6 +1,6 @@
 <?php
 
-namespace Modules\Front\Admin\Livewire\faq;
+namespace Modules\Front\Livewire\Admin\faq;
 
 use Livewire\Component;
 use App\Enum\ActiveEnum;
@@ -42,7 +42,7 @@ class FaqLivewire extends Component
         $this->dispatch('scroll-to-form');
 
     }
-    public function submit(){
+    public function storefaq(){
         $this->validate([
             'question' => 'required',
             'answer' => 'required',

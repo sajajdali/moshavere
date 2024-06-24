@@ -30,10 +30,10 @@
                         <svg class="w-6 h-6" xmlns="http://www.w3.org/2000/svg">
                             <use xlink:href="#sprite-user" />
                         </svg>
-                        <p>پروفایل</p>
+                        <p>{{auth()->user()->full_name}}</p>
                     </button>
                     <div x-show="open" @click.away="open = false" class="absolute border-bottom border-gray-100 right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1">
-                        <a href="#" class="block px-4 py-2 text-gray-800 hover:bg-gray-100">مشاهده پروفایل</a>
+                        <a href="{{ route('front.user.profile') }}" class="block px-4 py-2 text-gray-800 hover:bg-gray-100">مشاهده پروفایل</a>
                         <a href="{{ route('front.logout') }}" class="w-full block px-4 py-2 text-gray-800 hover:bg-gray-100">خروج</a>
                     </div>
                 @else

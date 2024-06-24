@@ -18,6 +18,7 @@ enum UserMetaEnum: int implements EnumHasNameInterface
     case MOBILE = 9;
     case NATIONAL_CODE = 18;
     case CITY = 19;
+    case FAVORITE_DOCTOR = 20;
 
         // doctor Enum
     case SPECIALITY_TYPE = 10;

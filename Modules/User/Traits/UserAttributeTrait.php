@@ -258,4 +258,17 @@ trait UserAttributeTrait
             set: fn ($value) => $this->metas()->create(['meta_key' => $operator, 'meta_value' => $value])
         );
     }
+    public function favoriteDr(): Attribute
+    {
+        return Attribute::make(
+            get: fn () => json_decode($this->getMeta(UserMetaEnum::FAVORITE_DOCTOR)?->meta_value),
+            set: function ($value) {
+                // Update the meta value
+                $this->metas()->updateOrCreate(
+                    ['user_id' => $this->id, 'meta_key' => UserMetaEnum::FAVORITE_DOCTOR],
+                    ['meta_value' => json_encode($value)]
+                );
+            }
+        );
+    }
 }

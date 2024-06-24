@@ -79,6 +79,7 @@ enum AppointmentUserStatusEnum: int implements EnumHasApiResultInterface
         ];
     }
 
+
     public function apiResult(): array
     {
         return [

@@ -1,6 +1,6 @@
 <?php
 
-use Modules\Front\Admin\Livewire\faq\FaqLivewire ;
+use Modules\Front\Livewire\Admin\faq\FaqLivewire;
 use Modules\Front\Livewire\Admin\Comment\Commentlivewire;
 /*
 |--------------------------------------------------------------------------

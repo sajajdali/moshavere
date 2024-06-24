@@ -9,6 +9,7 @@ use Modules\Front\Livewire\Auth\User\Registration;
 use Modules\Front\Livewire\AboutUs\AboutUsLiveWire;
 use Modules\Front\Livewire\SetAppointment\Checkout;
 use Modules\Front\Livewire\HomePage\HomePageLivewire;
+use Modules\Front\Livewire\Profile\UserProfileLivewire;
 use Modules\Front\Livewire\SetAppointment\AppointmentDetail;
 use Modules\Front\Livewire\DoctorProfile\DoctorProfileLivewire;
 use Modules\Front\Livewire\SetAppointment\ShowAvailableDayForDoctor;

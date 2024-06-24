@@ -36,7 +36,7 @@
                         </div>
                         <a href="javascript:void(0)" wire:loading.attr="disabled"
                             wire:loading.class="btn-loading btn-dark" wire:loading.class.remove="btn-primary"
-                            class="btn btn-primary" wire:click="submit">ذخیره</a>
+                            class="btn btn-primary" wire:click="storefaq">ذخیره</a>
                     </div>
                 </div>
             </div>

@@ -200,6 +200,11 @@ return [
         "form.active" => "وضعیت",
         "form.visitTime" => "مدت زمان مورد نیاز برای ویزیت",
         "form.minDayAvaialbe" => "حداقل زمان دریافت نوبت",
+        "form.first_name" => "نام",
+        "form.last_name" => "نام خانوادگی",
+        "form.gender" => "جنسیت",
+        "form.national_code" => "کد ملی",
+        "form.email" => "ایمیل",
 
     ],
 

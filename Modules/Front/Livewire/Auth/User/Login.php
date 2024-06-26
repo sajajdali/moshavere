@@ -38,9 +38,22 @@ class Login extends Component
             $this->validate([
                 'form.mobileNmber' => 'required|digits:11|numeric'
             ]);
-            AuthRequest::make($this->form['mobileNmber'], request()->ip());
-            $this->step = $this->step + 1;
-            $this->dispatch('startCountDown', true);
+            $oldRequest = AuthRequest::where('mobile', $this->form['mobileNmber'])
+                ->first();
+            // check if request exist
+            if (isset($oldRequest)) {
+                // check for last request time
+                if ($oldRequest->next_request_at->lessThanOrEqualTo(now())) {
+                    AuthRequest::make($this->form['mobileNmber'], request()->ip());
+                    $this->step = $this->step + 1;
+                    $this->dispatch('startCountDown', true);
+                } else {
+                    $this->addError('form.mobileNmber', 'لطفا برای درخواست مجدد چند دقیقه صبر کنید!');
+                }
+            } else {
+                // if record dose not exist
+                AuthRequest::make($this->form['mobileNmber'], request()->ip());
+            }
         } elseif ($this->step == 2) {
             $this->validate([
                 'form.code' => 'required|string|digits:4'
@@ -52,7 +65,7 @@ class Login extends Component
                     $user =  AuthRequest::getUser($this->form['mobileNmber']);
                     auth()->login($user);
                     if (!isset($user->first_name)) {
-                        session()->put('RegistrationUser',$user->id);
+                        session()->put('RegistrationUser', $user->id);
                         return redirect()->route('front.user.registration');
                     }
                     if (session()->has('LoginOrgin')) {

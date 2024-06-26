@@ -42,7 +42,7 @@ class UpdateOrCreate extends Component
         if (isset($this->form['address'])) {
             $this->user->dr_address = $this->form['address'];
         }
-        if ($this->form['dr_display_address']) {
+        if (isset($this->form['dr_display_address'])) {
             $this->user->dr_display_address = $this->form['dr_display_address'];
         }
         if (isset($this->form['dr_display_mobile'])) {
@@ -57,18 +57,17 @@ class UpdateOrCreate extends Component
         if (isset($this->form['drDisplayDiscription'])) {
             $this->user->dr_display_discription =     $this->form['drDisplayDiscription'];
         }
-        $this->user->dr_order = $this->form['order'];
         if (isset($this->form['order'])) {
             $this->user->dr_order = $this->form['order'];
         }
-        if ($this->form['showDocInEmergencyVisit']['status']) {
+        if (isset($this->form['showDocInEmergencyVisit']['status'])) {
             $this->user->dr_emergencyvisit_order    = $this->form['showDocInEmergencyVisit']['status'];
             $this->user->dr_emergencyvisit_status   = $this->form['showDocInEmergencyVisit']['order'];
         } else {
             $this->user->dr_emergencyvisit_order    = false;
             $this->user->dr_emergencyvisit_status   = false;
         }
-        if ($this->form['ShowInIntrodocs']['status']) {
+        if (isset($this->form['ShowInIntrodocs']['status'])) {
 
             $this->user->dr_info_status = $this->form['ShowInIntrodocs']['status'];
             $this->user->dr_info_order  = $this->form['ShowInIntrodocs']['order'];

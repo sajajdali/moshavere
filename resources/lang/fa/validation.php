@@ -205,7 +205,12 @@ return [
         "form.gender" => "جنسیت",
         "form.national_code" => "کد ملی",
         "form.email" => "ایمیل",
-
+        "form.mobile" => "شماره تلفن",
+        "form.password" => "کلمه عبور",
+        "form.passwordConfirm" => "تکرار کلمه عبور",
+        "form.licenceNumber" => "شماره نظام پزشکی",
+        "form.message" => "پیام",
+        "form.full_name" => "نام و نام خانوادگی",
     ],
 
 ];

@@ -82,4 +82,16 @@ return [
             \Modules\Setting\Enum\SettingKeyEnum::WEIGHT_CHART_DESCRIPTION_APP,
         ],
     ],
+    'Contact_us' => [
+        'title' => 'صفحه ی تماس با ما',
+        'icon' => 'fa fa-retweet',
+        'settings' => [
+            \Modules\Setting\Enum\SettingKeyEnum::CONTACTUS_FIRST_SECTION_STATUS,
+            \Modules\Setting\Enum\SettingKeyEnum::CONTACTUS_FIRST_SECTION_TITLE,
+            \Modules\Setting\Enum\SettingKeyEnum::CONTACTUS_FIRST_SECTION_BODY,
+            \Modules\Setting\Enum\SettingKeyEnum::CONTACTUS_FORM_STATUS,
+            \Modules\Setting\Enum\SettingKeyEnum::CONTACTUS_FORM_ADDRESS,
+            \Modules\Setting\Enum\SettingKeyEnum::CONTACTUS_FORM_SUPPORT_EMAIL,
+        ],
+    ],
 ];

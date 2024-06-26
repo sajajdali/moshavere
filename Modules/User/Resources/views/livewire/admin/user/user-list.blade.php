@@ -124,10 +124,17 @@
                                                     @if ($user->roles->isNotEmpty())
                                                         @foreach ($user->roles as $index => $role)
                                                             <span
-                                                                class="badge bg-{{ $index === 0 ? 'info' : ($index === 1 ? 'success' : 'danger') }} my-1 text-bold">{{ $role->name ?? 'کاربر' }}</span>
+                                                                class="badge {{ $user->getUserBadge() }}">{{ $role->name ?? 'کاربر' }}</span>
                                                         @endforeach
                                                     @else
                                                         <span class="badge bg-secondary">کاربر</span>
+                                                    @endif
+                                                    @if ($user->IsDoctor())
+                                                        @if ($user->active_appointment == "0")
+                                                            <span class="badge bg-danger">غیر فعال</span>
+                                                        @else
+                                                            <span class="badge bg-success">فعال</span>
+                                                        @endif
                                                     @endif
                                                 </td>
                                                 <td>
@@ -164,7 +171,8 @@
                                                                 @if ($user->hasRole('اپراتور'))
                                                                     <li>
                                                                         <a
-                                                                            href="{{ route('admin.oprator.timesetting', $user) }}">تنظیمات زمان حضور اپراتور</a>
+                                                                            href="{{ route('admin.oprator.timesetting', $user) }}">تنظیمات
+                                                                            زمان حضور اپراتور</a>
                                                                     </li>
                                                                 @endif
                                                                 @can('delete', $user)

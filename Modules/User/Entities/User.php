@@ -77,7 +77,7 @@ class User extends Authenticatable
 
     const USER_GENDER_MALE = 'male';
     const USER_GENDER_FEMALE = 'female';
-    
+
     protected $guarded = ['id'];
 
     protected $hidden = [
@@ -299,7 +299,23 @@ class User extends Authenticatable
             return $this->doctors_query()->orderByDesc('created_at')->get()->take(4);
         });
     }
-
+    public function getUserBadge()
+    {
+        return match ($this->roles->first()->id) {
+            1 => 'bg-info',
+            2 => 'bg-success',
+            3 => 'bg-warning',
+            default => 'bg-primary',
+        };
+    }
+    public function IsDoctor()
+    {
+        if ($this->hasrole('پزشک')) {
+            return true;
+        } else {
+            return false;
+        }
+    }
     public static function generatePassword()
     {
         $pass =  bin2hex(random_bytes(16));;

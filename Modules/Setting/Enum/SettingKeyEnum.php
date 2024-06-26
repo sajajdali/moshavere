@@ -23,8 +23,8 @@ enum SettingKeyEnum: int implements EnumHasNameInterface, SettingTypeInterface, 
     case APPOINTMENT_DEADLINE_VIA_ADMIN = 9;
     case APPOINTMENT_DEADLINE_VIA_USER = 10;
     case SITE_SLIDER_TITLE = 11;
-    case APPOINTMENT_DESCRIPTION_IN_CHECKOUT_PAGE_REFUND = 12 ;
-    case APPOINTMENT_FOR_OTHERS_STATUS = 13 ;
+    case APPOINTMENT_DESCRIPTION_IN_CHECKOUT_PAGE_REFUND = 12;
+    case APPOINTMENT_FOR_OTHERS_STATUS = 13;
 
         //sms
     case SMS_API_TOKEN = 20;
@@ -57,7 +57,13 @@ enum SettingKeyEnum: int implements EnumHasNameInterface, SettingTypeInterface, 
     case VOIP_USERNAME = 160;
     case VOIP_PASSWORD = 170;
 
-
+        // contact us page 
+    case CONTACTUS_FIRST_SECTION_STATUS = 210;
+    case CONTACTUS_FIRST_SECTION_TITLE = 211;
+    case CONTACTUS_FIRST_SECTION_BODY = 212;
+    case CONTACTUS_FORM_STATUS = 213;
+    case CONTACTUS_FORM_ADDRESS = 214;
+    case CONTACTUS_FORM_SUPPORT_EMAIL = 215;
 
     public function isSupportCache(): bool
     {
@@ -116,6 +122,15 @@ enum SettingKeyEnum: int implements EnumHasNameInterface, SettingTypeInterface, 
             // voip
             self::VOIP_USERNAME => 'نام کاربری برای API ',
             self::VOIP_PASSWORD => 'کلمه عبور برای API ',
+
+            //contact us 
+            self::CONTACTUS_FIRST_SECTION_STATUS => 'فعال سازی بخش اول در صفحه تماس با ما  ',
+            self::CONTACTUS_FIRST_SECTION_TITLE => 'عنوان در بخش اول در صفحه ی تماس با ما   ',
+            self::CONTACTUS_FIRST_SECTION_BODY => 'متن اصلی در بخش اول در صفحه ی تماس با ما   ',
+            self::CONTACTUS_FORM_STATUS => 'فعال بودن فرم ارسال پیام ',
+            self::CONTACTUS_FORM_ADDRESS => 'ادرس نمایشی در صفحه ی تماس با ما ',
+            self::CONTACTUS_FORM_SUPPORT_EMAIL => 'ایمیل نمایشی برای ارتباط با پشتیبانی ',
+
             default => ''
         };
     }
@@ -161,6 +176,11 @@ enum SettingKeyEnum: int implements EnumHasNameInterface, SettingTypeInterface, 
             self::APPOINTMENT_CANCEL_DESCRIPTION => SettingTypeEnum::TEXTAREA,
             self::PAYMENT_RULES_AND_CONDITION_DESCRIPTION => SettingTypeEnum::TEXTAREA,
             self::APPOINTMENT_DESCRIPTION_IN_CHECKOUT_PAGE_REFUND => SettingTypeEnum::TEXTAREA,
+
+            self::CONTACTUS_FIRST_SECTION_STATUS => SettingTypeEnum::CHECK,
+            self::CONTACTUS_FIRST_SECTION_BODY => SettingTypeEnum::TEXTAREA,
+            self::CONTACTUS_FORM_STATUS => SettingTypeEnum::CHECK,
+            self::CONTACTUS_FORM_ADDRESS => SettingTypeEnum::TEXTAREA,
             default => SettingTypeEnum::TEXT
         };
     }

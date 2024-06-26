@@ -40,6 +40,7 @@ enum UserMetaEnum: int implements EnumHasNameInterface
     case DR_WEBSITE_DISPLAY_ADDRESS = 29;
     case DR_WEBSITE_DISPLAY_EXPERINCE = 30;
     case DR_WEBSITE_DISPLAY_DESCRIPTION = 31;
+    case DR_REGISTRATION_DESCRIPTION= 32;
 
 
 

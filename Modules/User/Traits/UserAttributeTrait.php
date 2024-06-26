@@ -258,6 +258,14 @@ trait UserAttributeTrait
             set: fn ($value) => $this->metas()->create(['meta_key' => $operator, 'meta_value' => $value])
         );
     }
+    public function drRegistrationDescription(): Attribute
+    {
+        $operator = UserMetaEnum::DR_REGISTRATION_DESCRIPTION;
+        return Attribute::make(
+            get: fn() => $this->getMeta( $operator)?->meta_value,
+            set: fn ($value) => $this->metas()->create(['meta_key' => $operator, 'meta_value' => $value])
+        );
+    }
     public function favoriteDr(): Attribute
     {
         return Attribute::make(

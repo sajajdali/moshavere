@@ -1,5 +1,5 @@
 <div>
-    <main class="py-16 bg-secondary-100">
+    <main class="pt-16 bg-secondary-100">
         <form wire:submit='LoginAuthForm' class="bg-white rounded-lg w-full max-w-[600px] mx-auto p-5 flex flex-col gap-4"
             wire:loading.class='opacity-50'>
             @if ($step == 1)
@@ -92,7 +92,8 @@
                         </div>
                         <div class="flex items-center justify-center" wire:loading.remove wire:target='resendotpCode'>
                             <p>کد را دریافت نکردید؟</p>
-                            <button type="button" wire:click='resendotpCode' class="text-primary-main font-semibold">ارسال
+                            <button type="button" wire:click='resendotpCode'
+                                class="text-primary-main font-semibold">ارسال
                                 دوباره</button>
                         </div>
                     </div>
@@ -117,12 +118,30 @@
             @endif
         </form>
     </main>
+    @if ($step == 1)
+        <div class="pt-1 pb-16 bg-secondary-100">
+            <div
+                class="rounded-lg w-full max-w-[600px] mx-auto p-5 flex flex-col gap-4">
+                <a class="text-blue-700 hover:text-blue-900 flex" href="{{route('front.login.doctor')}}">
+                    <span>ورود پزشک</span>
+                    <svg class="w-6 h-6 mr-2" xmlns="http://www.w3.org/2000/svg">
+                        <use xlink:href="#sprite-chevron-left-circle"></use>
+                      </svg>
+                </a>
+            </div>
+        </div>
+    @endif
+
 </div>
 @push('scripts')
     <script>
         $(document).ready(function() {
             Livewire.on('startCountDown', function() {
                 $('#resendCode').fadeOut();
+                // Clear any existing interval
+                if (typeof interval !== 'undefined') {
+                    clearInterval(interval);
+                }
                 var timer = "2:00";
                 interval = setInterval(function() {
                     var timeArray = timer.split(':');
@@ -144,8 +163,8 @@
                     timer = minutes + ':' + seconds;
                 }, 1000);
                 setTimeout(() => {
+                    $('#codeInput').focus();
                     $("#codeInput").on("input", function() {
-                        $('#codeInput').focus();
                         let inputValue = $(this).val();
                         if (inputValue.length == 4) {
                             $('#submitCodeBtn').click();

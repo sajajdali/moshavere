@@ -168,14 +168,11 @@ class ShowAvailableDayForDoctor extends Component
         $doc =  request()->input('doctor_id');
         $place =  request()->input('place_id');
         $service =  request()->input('service_id');
+        
         if (!isset($doc) || empty($place) ||  empty($service)) {
             // redirect back with alert
             // return redirect()->route('front.homePage');
         }
-        // TODO:: delete this section
-        $doc = User::find(10);
-        $Place = Place::first();
-        $service = Service::first();
 
         $this->fetchData['doc']     =   $doc;
         $this->fetchData['places']  =   $Place;

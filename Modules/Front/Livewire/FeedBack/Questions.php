@@ -15,9 +15,6 @@ class Questions extends Component
     public array $fetchData = [
         'formAlreadyCopelete' => false
     ];
-    public  $step;
-
-    #[Locked]
     public array $form = [];
 
     #[Locked]
@@ -25,22 +22,18 @@ class Questions extends Component
 
     public $appintment_user_id;
 
-    public function nxtQuestion($key)
-    {
-        if ($key === null) {
-            $this->addError('selectAwnser', true);
-        } else {
-            $this->form[$this->fetchData['questions'][$this->step]['id']->value] = $key;
-            if (count($this->fetchData['questions']) > $this->step + 1) {
-                $this->step++;
-            } else {
-                $this->storeAnswers();
-                $this->feedBackCompelete = true;
-            }
-        }
+    public function messages() {
+        return [
+            'form.required' => 'لطفا یک گزینه را انتخاب کنید',
+        ];
     }
-    private function storeAnswers()
+    public function feedBackAnswered()
     {
+        $this->resetErrorBag();
+        $this->validate(['form' => 'required']);
+        if(count($this->form) < count($this->fetchData['questions'] )) {
+           return $this->addError('form' , 'به تمامی پرسش ها پاسخ داده نشده است');
+        }
         foreach ($this->form as $question => $answer) {
             FeedBack::create([
                 'appointment_user_id' => $this->appintment_user_id,
@@ -48,11 +41,17 @@ class Questions extends Component
                 'answer'              => $answer,
             ]);
         }
+        $this->fetchData['formAlreadyCopelete'] = true ;
     }
     public function mount()
     {
+        $user = auth()->user();
         $app_id = request()->route('appointmentUser_id');
         $appId =  AppointmentUser::find($app_id);
+        if ($user->id != $appId->user_id ) {
+            abort(403, 'Unauthorized action.');
+        }
+
         if (!isset($app_id) ||  empty($appId)) {
             return abort('404');
         }
@@ -60,7 +59,6 @@ class Questions extends Component
             $this->fetchData['formAlreadyCopelete'] = true ;
         }
         $this->appintment_user_id = $app_id;
-        $this->step = 0;
         $this->fetchData['questions'] = feedbackQuestions();
     }
     public function render()

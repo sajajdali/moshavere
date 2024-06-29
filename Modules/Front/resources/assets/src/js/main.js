@@ -31,7 +31,7 @@ if(nav_button && sidebar_container) {
 if (accordion__containers.length) {
   accordion__containers.forEach((item, index) => {
     const button = item.querySelector(".accordion_select__button");
-    
+
     button.addEventListener("click", () => {
       document
       .querySelectorAll(".accordion_select__container")

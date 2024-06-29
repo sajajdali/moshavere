@@ -1,4 +1,10 @@
 <div>
+    <!-- Spinner Overlay -->
+    <div wire:loading>
+        <div class="fixed inset-0 flex items-center justify-center bg-white bg-opacity-50 z-50 ">
+            <div class="animate-spin rounded-full h-32 w-32 border-t-4 border-blue-500"></div>
+        </div>
+    </div>
     <main class="py-10 md:py-16 bg-secondary-100">
         <section class="container flex flex-col md:flex-row gap-10">
             <section class="basis-full md:basis-[60%] flex flex-col gap-6">
@@ -368,35 +374,32 @@
                             <div class="flex flex-col sm:flex-row items-center justify-between gap-3">
                                 <p class="font-bold">{{ $doc->dr_display_address }}</p>
                                 <div class="flex gap-3">
-                                    <div class="bg-secondary-100 text-black rounded-lg py-2 px-5 text-sm">
-                                        تماس
-                                    </div>
-                                    <div class="bg-secondary-100 text-black rounded-lg py-2 px-5 text-sm">
-                                        مسیریابی
-                                    </div>
+                                    @isset($fetchData['tel'])
+                                        <div class="bg-secondary-100 text-black rounded-lg py-2 px-5 text-sm">
+                                            {{ $fetchData['tel'] }}
+                                        </div>
+                                    @endisset
+                                    @isset($fetchData['navigate'])
+                                        <a target="blank" href="{{ $fetchData['navigate'] }}"
+                                            class="bg-secondary-100 text-black rounded-lg py-2 px-5 text-sm">
+                                            مسیریابی
+                                        </a>
+                                    @endisset
                                 </div>
                             </div>
-                            <div class="flex gap-3">
-                                <svg class="w-5 h-5 mt-[2px]" xmlns="http://www.w3.org/2000/svg">
-                                    <use xlink:href="#sprite-location" />
-                                </svg>
-                                <p class="w-[calc(100%-2rem)]">
-                                    خراسان رضوی، مشهد، احمد آباد، بولوار ملاصدرا، بولوار بعثت ، بین بعثت 1 و 3 ، ساختمان
-                                    شماره 11
-                                </p>
-                            </div>
-                            <div class="flex gap-3">
-                                <svg class="w-5 h-5 mt-[2px]" xmlns="http://www.w3.org/2000/svg">
-                                    <use xlink:href="#sprite-date" />
-                                </svg>
-                                <p class="w-[calc(100%-2rem)]">
-                                    نزدیک ترین نوبت خالی: یکشنبه 12 فروردین، ساعت 16
-                                </p>
-                            </div>
+                            @isset($fetchData['address'])
+                                <div class="flex gap-3">
+                                    <svg class="w-5 h-5 mt-[2px]" xmlns="http://www.w3.org/2000/svg">
+                                        <use xlink:href="#sprite-location" />
+                                    </svg>
+                                    <p class="w-[calc(100%-2rem)]">{{ $fetchData['address'] }}
+                                    </p>
+                                </div>
+                            @endisset
                         </div>
 
-                        <button type="submit" @if (isset($doc->ban_user) && $doc->ban_user == true) disabled @endif
-                            class="btn__blue--round-full-between">
+                        <button type="button" wire:click='reserveAppointment'
+                            @if (isset($doc->ban_user) && $doc->ban_user == true) disabled @endif class="btn__blue--round-full-between">
                             <p>دریافت نوبت دکتر {{ $doc->full_name }}</p>
                             <svg class="w-6 h-6" xmlns="http://www.w3.org/2000/svg">
                                 <use xlink:href="#sprite-arrow-left-circle" />
@@ -447,4 +450,17 @@
             </section>
         </section>
     </main>
+    @include('front::components.set-appointment.model')
 </div>
+@push('scripts')
+    <script>
+        $(document).ready(function() {
+            Livewire.on('lucnhModal', function() {
+                $('.appointment__modal').addClass('opened');
+            });
+            $('body').on('click', '.dismissmodal', function() {
+                $('.appointment__modal').removeClass('opened');
+            });
+        });
+    </script>
+@endpush

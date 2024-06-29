@@ -62,7 +62,7 @@
                         ارتباط
                         برقرار کنید.
                     </p>
-                    <a href="#"
+                    <a href="{{route('front.contactUs')}}"
                         class="w-full md:w-auto text-center block bg-secondary-100 hover:bg-secondary-200 transition-colors rounded-xl py-1 px-5">
                         ارتباط پشتیبانی
                     </a>

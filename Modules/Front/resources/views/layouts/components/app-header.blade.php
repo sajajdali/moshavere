@@ -4,7 +4,7 @@
     </div>
     <nav class="navbar">
         <div class="navbar__container">
-            <a href="#">
+            <a href="{{ route('front.homePage') }}">
                 <img src="{{ setting(Modules\Setting\Enum\SettingKeyEnum::SITE_LOGO_URL) }}" class="w-[100px]" />
             </a>
             <ul class="navbar__menu">

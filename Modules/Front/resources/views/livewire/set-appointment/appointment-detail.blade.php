@@ -91,6 +91,7 @@
                     </div>
                 </section>
             @endif
+            @if ($fetchData['app'])
             <section>
                 <h3 class="text-sm font-bold mb-4">اطلاعات نوبت شما</h3>
 
@@ -242,6 +243,8 @@
                     @endif
                 </div>
             </section>
+            @endif
+
         </div>
     </main>
 </div>

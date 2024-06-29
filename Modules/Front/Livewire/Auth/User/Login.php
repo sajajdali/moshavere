@@ -8,6 +8,7 @@ use Livewire\Attributes\Layout;
 use Livewire\Attributes\Locked;
 use Modules\User\Entities\User;
 use Modules\Api\Entities\AuthRequest;
+use Illuminate\Support\Facades\Session;
 
 #[Layout('front::layouts.app')]
 #[Title('ورود')]
@@ -68,11 +69,8 @@ class Login extends Component
                         session()->put('RegistrationUser', $user->id);
                         return redirect()->route('front.user.registration');
                     }
-                    if (session()->has('LoginOrgin')) {
-                        return redirect()->route(session()->get('LoginOrgin'));
-                    } else {
-                        return redirect()->route('front.homePage');
-                    }
+                    $intendedUrl = Session::pull('url.intended', route('front.homePage'));
+                    return redirect()->intended($intendedUrl);
                 }
             } else {
                 $this->addError('form.code', 'کد وارد شده صحیح نیست');

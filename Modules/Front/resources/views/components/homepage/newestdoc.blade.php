@@ -47,7 +47,7 @@
                             <p>زمان انتظار</p>
                             <p>{{ $newDocs->dr_waiting_time}}</p>
                         </div>
-                        <a href="#" class="btn__blue--tint">دریافت نوبت</a>
+                        <a href="{{route('front.doctor.profile',['doctor_id' => $newDocs->id])}}" class="btn__blue--tint">دریافت نوبت</a>
                     </article>
                 @endforeach
 

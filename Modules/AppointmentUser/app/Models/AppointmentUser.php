@@ -12,6 +12,7 @@ use Illuminate\Notifications\Notifiable;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Modules\Transaction\app\Models\Transaction;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Modules\AppointmentSetting\app\Models\AppointmentSegmentItem;
 use Modules\AppointmentUser\Enum\AppointmentUserKindEnum;
 use Modules\AppointmentUser\Enum\AppointmentUserTypeEnum;
 use Modules\AppointmentUser\Enum\AppointmentUserStatusEnum;
@@ -197,5 +198,9 @@ class AppointmentUser extends Model
     public function operator()
     {
         return $this->belongsTo(User::class, 'operator_id');
+    }
+    public function segmentItems()
+    {
+        return $this->hasMany(AppointmentSegmentItem::class);
     }
 }

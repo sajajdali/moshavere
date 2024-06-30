@@ -161,7 +161,9 @@ class AppointmentUserService
             if ($appointmentSettings->count()) {
                 // Get the time for each visit in minutes
                 $timeForVisit = $appointmentSettings->time_for_visit;
-
+                if (isset($details['segment_time'])) {
+                    $timeForVisit += $details['segment_time'];
+                }
                 //  check special date
                 $checkHoliday = false;
                 $attendanceTimes = $appointmentSettingTimes->filter(function ($appointmentTime) use ($currentDate) {
@@ -587,7 +589,7 @@ class AppointmentUserService
         // if set the appointment to be WAIT_FOR_PAYMENT
         if (isset($detail['wait_for_payment'])) {
             $appointmentUserModel['status'] = AppointmentUserStatusEnum::STATUS_WAIT_PAYMENT;
-            $hours =  setting(SettingKeyEnum::APPOINTMENT_DEADLINE_VIA_ADMIN) == null ?   config('app.appointment_dedline') : setting(SettingKeyEnum::APPOINTMENT_DEADLINE_VIA_ADMIN) ;
+            $hours =  setting(SettingKeyEnum::APPOINTMENT_DEADLINE_VIA_ADMIN) == null ?   config('app.appointment_dedline') : setting(SettingKeyEnum::APPOINTMENT_DEADLINE_VIA_ADMIN);
             $appointmentUserModel['deadline_at'] =  \now()->addHours($hours);
         }
 
@@ -626,7 +628,7 @@ class AppointmentUserService
 
         $detailDatabaseDB[AppointmentUser::DETAIL_APPOINTMENT_VIA] = $appointmentData->appointmentVia;
         if (isset($detail['wait_for_payment'])) {
-            $detailDatabaseDB[AppointmentUser::PENDING_APPOINTMENT_BY_SECRETERY] = true ;
+            $detailDatabaseDB[AppointmentUser::PENDING_APPOINTMENT_BY_SECRETERY] = true;
         }
         $appointmentUserModel['details'] = $detailDatabaseDB;
 

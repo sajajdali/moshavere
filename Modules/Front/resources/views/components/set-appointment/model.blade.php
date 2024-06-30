@@ -11,19 +11,18 @@
     <main class="appointment__modal-container p-10 flex flex-column justify-between ">
         @if ($fetchData['modalStep'] == 1)
             <div class="space-y-3 ">
-                <p class="font-semibold mb-3">لطفا مطب مورد نظر خود را امتخاب کنید</p>
+                <p class="font-semibold mb-3">لطفا مطب مورد نظر خود را انتخاب کنید</p>
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
                     @isset($fetchData['places'])
                         @foreach ($fetchData['places'] as $key => $value)
-                            <label for="part-{{ $key }}" class="cart__radio--container">
-                                <input type="radio" id="part-{{ $key }}" wire:model='form.place' name="part" />
+                            <label for="part-{{ $key }}" class="cart__radio--container place">
+                                <input type="radio" id="part-{{ $key }}" value="{{$value->id}}" wire:model='form.place' name="part" />
                                 <div class="cart__radio--text">
                                     <h5>{{ $value->title }}</h5>
                                 </div>
                             </label>
                         @endforeach
                     @endisset
-
                 </div>
             </div>
         @elseif($fetchData['modalStep'] == 2)
@@ -31,12 +30,11 @@
                 <p class="font-semibold">لطفا بخش مورد نظر خود را امتخاب کنید</p>
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
                     @isset($fetchData['services'])
-                        @foreach ($fetchData['services'] as $key => $value)
-                            <label for="part1" class="cart__radio--container">
-                                <input type="radio" id="part1" name="part" />
+                        @foreach ($fetchData['services'] as $key => $item)
+                            <label for="part-{{$key}}" class="cart__radio--container servicechoices">
+                                <input type="radio" id="part-{{$key}}" name="part" value="{{$item->id}}" wire:model='form.service'/>
                                 <div class="cart__radio--text">
-                                    <h5>{{ $value }}</h5>
-                                    <p>متن توضیحی این بخش را در اینجا بنویسید</p>
+                                    <h5>{{ $item->title }}</h5>
                                 </div>
                             </label>
                         @endforeach
@@ -44,32 +42,23 @@
 
                 </div>
             </div>
+            @isset($fetchData['segments'])
             <div class="space-y-3">
-                <p class="font-semibold">ناحیه مورد نظر را انتخاب کنید</p>
+                <p class="font-semibold">لطفا ناحیه مورد نظر خو را انتخاب کنید!</p>
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
-                    <label for="district1" class="cart__radio--container">
-                        <input type="radio" id="district1" name="district" />
+                    @foreach ($fetchData['segments'] as  $index_key => $segmentsItem )
+                    <label for="district-{{$index_key}}" class="cart__radio--container">
+                        <input @if ($fetchData['multiple_choice'])  type="checkbox" @else type="radio" name="district"  @endif value="{{$segmentsItem->id}}"  id="district-{{$index_key}}" wire:model='form.segment.{{$segmentsItem->id}}' />
                         <div class="cart__radio--text">
-                            <h5>پا</h5>
-                            <p>متن توضیحی این بخش را در اینجا بنویسید</p>
+                            <h5>{{$segmentsItem->title}}</h5>
+                            <p>قیمت : {{number_format($segmentsItem->price)}}</p>
                         </div>
                     </label>
-                    <label for="district2" class="cart__radio--container">
-                        <input type="radio" id="district2" name="district" />
-                        <div class="cart__radio--text">
-                            <h5>دست</h5>
-                            <p>متن توضیحی این بخش را در اینجا بنویسید</p>
-                        </div>
-                    </label>
-                    <label for="district3" class="cart__radio--container">
-                        <input type="radio" id="district3" name="district" />
-                        <div class="cart__radio--text">
-                            <h5>صورت</h5>
-                            <p>متن توضیحی این بخش را در اینجا بنویسید</p>
-                        </div>
-                    </label>
+                    @endforeach
                 </div>
             </div>
+            @endisset
+
         @endif
         {{-- <div class="warning_badge">
             <svg class="w-8 h-8" xmlns="http://www.w3.org/2000/svg">

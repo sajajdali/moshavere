@@ -5,6 +5,9 @@ use App\Http\Controllers\ShortLinkController;
 use Modules\Reminder\Enum\ReminderStatusEnum;
 use Modules\Reminder\Enum\ReminderParametersEnum;
 use Modules\Reminder\app\Models\AppointmentReminder;
+use Modules\AppointmentSetting\app\Models\AppointmentSegment;
+use Modules\AppointmentSetting\app\Models\AppointmentSetting;
+use Modules\AppointmentUser\app\Models\AppointmentUser;
 use Modules\AppointmentUser\app\Notifications\AppointmentSmsReminder;
 
 /*
@@ -39,4 +42,15 @@ Route::get('pusher-test/{chat}', function ($chat) {
     $message = \Modules\Api\app\Resources\Api\Chat\ChatDetailResource::make($chatDetail);
     event(new App\Events\PusherBroadcast($message, $chat));
     return "Event has been sent!";
+});
+Route::get('ttt', function () {
+
+    $AppUser = AppointmentUser::find(2);
+    $segment = AppointmentSegment::first();
+    $items = $segment->itmes;
+    $AppUser->appointmentUserSegmentItems->attach([
+        'appointment_segment_id' => $segment->id,
+        'segment_name' => $segment->name,
+        'segment_items' => $items
+    ]);
 });

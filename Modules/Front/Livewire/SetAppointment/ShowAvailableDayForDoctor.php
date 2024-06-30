@@ -7,6 +7,7 @@ use Livewire\Component;
 use Livewire\Attributes\Title;
 use Livewire\Attributes\Layout;
 use Livewire\Attributes\Locked;
+use Modules\AppointmentSetting\app\Models\AppointmentSegmentItem;
 use Modules\User\Entities\User;
 use Modules\Place\app\Models\Place;
 use Illuminate\Support\Facades\Cache;
@@ -28,7 +29,13 @@ class ShowAvailableDayForDoctor extends Component
     public function TimeForReservesation()
     {
         $this->validate(['form.time' => 'required|string']);
-        return $this->redirect(route('setAppointment.checkout',['appointment_time' => $this->form['time']]),true);
+        $parameter = [
+            'doctor_id' => $this->fetchData['doc']->id ,
+            'place_id'  => $this->fetchData['places']->id ,
+            'service_id' => $this->fetchData['service']->id ,
+            'appointment_time' => $this->form['time'] ,
+        ];
+        return $this->redirect(route('setAppointment.checkout', $parameter), true);
     }
     public function loadNextDays()
     {
@@ -56,6 +63,7 @@ class ShowAvailableDayForDoctor extends Component
         unset($this->fetchData['dont_show_first_available_day']);
         unset($this->fetchData['rawlistOfAppointment']);
         unset($this->fetchData['firstTreeAvailableAppointment']);
+        // TODO::consider segment
         $listOfAppointment = Cache::rememberForever('appointmentList.' . $this->fetchData['appointmentSetting']->id, function () {
             return app('AppointmentUserService')->listAppointments($this->fetchData['appointmentSetting']);
         });
@@ -76,7 +84,6 @@ class ShowAvailableDayForDoctor extends Component
     }
     private function findFirstTreeAppointment($listOfAppointment, $lastDayActive = null)
     {
-        // dd($listOfAppointment);
         $firstTwoEmpty = [];
         $report = $listOfAppointment['report'];
         $mainDaActive = $report['min_day_active'];
@@ -156,9 +163,14 @@ class ShowAvailableDayForDoctor extends Component
         if (!isset($appointmentSetting)) {
             $appointmentSetting = AppointmentSetting::where('user_id', $this->fetchData['doc']->id)->first();
         }
-        $listOfAppointment = Cache::rememberForever('appointmentList.' . $appointmentSetting->id, function () use ($appointmentSetting) {
-            return app('AppointmentUserService')->listAppointments($appointmentSetting);
-        });
+        $details = [];
+        if (isset($this->fetchData['segment_time'])) {
+            $details['segment_time'] =  $this->fetchData['segment_time'];
+        }
+        $listOfAppointment =  app('AppointmentUserService')->listAppointments($appointmentSetting, $details);
+        // $listOfAppointment = Cache::rememberForever('appointmentList.' . $appointmentSetting->id, function () use ($appointmentSetting,$details) {
+        //     return app('AppointmentUserService')->listAppointments($appointmentSetting, $details);
+        // });
         $this->fetchData['rawlistOfAppointment'] = $listOfAppointment;
         $this->fetchData['firstTreeAvailableAppointment'] =  $this->findFirstTreeAppointment($listOfAppointment);
         $this->fetchData['appointmentSetting'] = $appointmentSetting;
@@ -168,15 +180,34 @@ class ShowAvailableDayForDoctor extends Component
         $doc =  request()->input('doctor_id');
         $place =  request()->input('place_id');
         $service =  request()->input('service_id');
-        
+
+        if (request()->has('segment')) {
+            $route_segments =  request()->input('segment');
+            foreach ($route_segments as $item) {
+                $this->fetchData['segments'][] =  AppointmentSegmentItem::find($item);
+            }
+            if (count($this->fetchData['segments']) > 1) {
+                foreach ($this->fetchData['segments'] as $eachSegTime) {
+                    $this->fetchData['segment_time'] += $eachSegTime->time;
+                }
+            } else {
+                $this->fetchData['segment_time'] = $this->fetchData['segments'][0]->time;
+            }
+        }
         if (!isset($doc) || empty($place) ||  empty($service)) {
             // redirect back with alert
-            // return redirect()->route('front.homePage');
+            // TODO::insert alert
+            return redirect()->back();
         }
+        $this->fetchData['doc']      =   User::find($doc);
+        $this->fetchData['places']   =  place::find($place);
+        $this->fetchData['service']  =   Service::find($service);
 
-        $this->fetchData['doc']     =   $doc;
-        $this->fetchData['places']  =   $Place;
-        $this->fetchData['service']  =   $service;
+        if (!isset($this->fetchData['doc']) || empty($this->fetchData['places']) ||  empty($this->fetchData['service'])) {
+            // redirect back with alert
+            // TODO::insert alert
+            return redirect()->back();
+        }
 
         $this->getAvailableDay();
 

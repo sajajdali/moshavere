@@ -99,69 +99,68 @@ class Checkout extends Component
         if (isset($national_code)) {
             $user->national_code = $national_code;
         }
-        $this->user = $user ;
+        $this->user = $user;
     }
 
     private function storeappointment()
     {
         // TODO::this function copied from admin panel and not modified for this controlle !!!!!!!!!!!!!!!!!!!
 
-        $user = $this->user ;
+        $user = $this->user;
 
-         // If he wants to take the appointmnet for someone else
-         $someoneModel = null;
-         $foHimself = 1;
+        // If he wants to take the appointmnet for someone else
+        $someoneModel = null;
+        $foHimself = 1;
 
-         // main user data
-         $mainUser = new UserModel(
-             user: $user,
-             firstName: $user->first_name,
-             lastName: $user->last_name,
-         );
-         if (isset($this->appTime)) {
-             $start_visit_time = explode(':', $this->appTime);
-         }
-         $start_visit_time = explode(':', $this->form['time']['from']);
-         $appTime = Verta::parse($this->appDate)->tocarbon()->setTime($start_visit_time[0], $start_visit_time[1]);
+        // main user data
+        $mainUser = new UserModel(
+            user: $user,
+            firstName: $user->first_name,
+            lastName: $user->last_name,
+        );
+        if (isset($this->appTime)) {
+            $start_visit_time = explode(':', $this->appTime);
+        }
+        $start_visit_time = explode(':', $this->form['time']['from']);
+        $appTime = Verta::parse($this->appDate)->tocarbon()->setTime($start_visit_time[0], $start_visit_time[1]);
 
-         // full user model
-         $userModelAppointment = new UserModelAppointment(userModel: $mainUser, forHimself: $foHimself, userSomeoneModel: $someoneModel);
+        // full user model
+        $userModelAppointment = new UserModelAppointment(userModel: $mainUser, forHimself: $foHimself, userSomeoneModel: $someoneModel);
 
-         $appointment_type = $this->form['appType'] == 'main_app' ? AppointmentUserTypeEnum::MAIN__APPOINTMENT : AppointmentUserTypeEnum::BETWEEN_PATIENTS;
-         $sms_status = $this->form['smsType'] == 'send' ? true : false;
+        $appointment_type = $this->form['appType'] == 'main_app' ? AppointmentUserTypeEnum::MAIN__APPOINTMENT : AppointmentUserTypeEnum::BETWEEN_PATIENTS;
+        $sms_status = $this->form['smsType'] == 'send' ? true : false;
 
-         //check if operator
-         if (isset($this->form['operator']) && !empty($this->form['operator'])) {
-             $oprator =  $this->form['operator'];
-         } else {
-             $oprator = null;
-         }
-         // appointment model
-         $appointmentModel = new AppointmentModel(
-             timestamp: $appTime->timestamp,
-             appointmentVia: AppointmentVia::BY_ADMIN,
-             sendSmsToUser: $sms_status,
-             serviceId: $this->appId->service?->id ?? $this->fetchData['service']?->id,
-             placeId: $this->appId->place?->id ?? $this->placeId,
-             agentId: auth()->user()->id,
-             operatorId: $oprator,
-             kind: isset($this->form['kind']) ? $this->form['kind'] : null,
-             smsToDoctor: false,
-             description: isset($this->form['description']) ? $this->form['description'] : '',
-             type: $appointment_type,
-             endTime: Carbon::createFromTimeString($this->form['time']['until'])->toTimeString(),
-         );
+        //check if operator
+        if (isset($this->form['operator']) && !empty($this->form['operator'])) {
+            $oprator =  $this->form['operator'];
+        } else {
+            $oprator = null;
+        }
+        // appointment model
+        $appointmentModel = new AppointmentModel(
+            timestamp: $appTime->timestamp,
+            appointmentVia: AppointmentVia::BY_ADMIN,
+            sendSmsToUser: $sms_status,
+            serviceId: $this->appId->service?->id ?? $this->fetchData['service']?->id,
+            placeId: $this->appId->place?->id ?? $this->placeId,
+            agentId: auth()->user()->id,
+            operatorId: $oprator,
+            kind: isset($this->form['kind']) ? $this->form['kind'] : null,
+            smsToDoctor: false,
+            description: isset($this->form['description']) ? $this->form['description'] : '',
+            type: $appointment_type,
+            endTime: Carbon::createFromTimeString($this->form['time']['until'])->toTimeString(),
+        );
 
-         $detail = [];
+        $detail = [];
 
 
-         if (setting(SettingKeyEnum::SECREYERY_SEND_LINK_FOR_APPOINTMENT) != null && isset($this->form['registerWithoutPayment']) && $this->form['registerWithoutPayment'] == 'true') {
-             $detail['smsTemplate']      = setting(SettingKeyEnum::SMS_APPOINTMENT_WAITING_PAYMENT);
-             $detail['wait_for_payment'] = true;
-         }
-         $storeAppointment = app('AppointmentUserService')->storeAppointment($appointmentSetting, $userModelAppointment, $appointmentModel, $detail);
-         Cache::forget('appointmentList.' . $this->appId);
-
+        if (setting(SettingKeyEnum::SECREYERY_SEND_LINK_FOR_APPOINTMENT) != null && isset($this->form['registerWithoutPayment']) && $this->form['registerWithoutPayment'] == 'true') {
+            $detail['smsTemplate']      = setting(SettingKeyEnum::SMS_APPOINTMENT_WAITING_PAYMENT);
+            $detail['wait_for_payment'] = true;
+        }
+        $storeAppointment = app('AppointmentUserService')->storeAppointment($appointmentSetting, $userModelAppointment, $appointmentModel, $detail);
+        Cache::forget('appointmentList.' . $this->appId);
     }
     public function mount()
     {
@@ -181,15 +180,30 @@ class Checkout extends Component
             // redirect back with alert
             // return redirect()->route('front.homePage');
         }
+        $this->fetchData['doc']      =   User::find($doc);
+        $this->fetchData['places']   =  place::find($place);
+        $this->fetchData['service']  =   Service::find($service);
 
-        $this->user = User::find(4);
-        $doc = User::find(10);
-        $Place = Place::first();
-        $service = Service::first();
+        if (!isset($this->fetchData['doc']) || empty($this->fetchData['places']) ||  empty($this->fetchData['service'])) {
+            // redirect back with alert
+            // TODO::insert alert
+            return redirect()->back();
+        }
 
-        $this->fetchData['doc']         =   $doc;
-        $this->fetchData['places']      =   $Place;
-        $this->fetchData['service']     =   $service;
+        if(auth()->check()) {
+            $this->user =  auth()->user();
+        }else{
+            $parameter = [
+                'doctor_id' => $this->fetchData['doc']->id ,
+                'place_id'  => $this->fetchData['places']->id ,
+                'service_id' => $this->fetchData['service']->id ,
+                'appointment_time' => $selected_time ,
+            ];
+            $route = route('setAppointment.checkout', $parameter) ;
+            session()->put('url.intended',$route);
+            return redirect()->route('front.login.user');
+        }
+
         $this->fetchData['appTime']     =   Carbon::createFromTimestamp($selected_time);
         $this->fetchData['appSetting'] = AppointmentSetting::where('service_id', $this->fetchData['service']->id)
             ->where('place_id', $this->fetchData['places']->id)

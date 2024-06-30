@@ -1,4 +1,9 @@
 <div>
+    <div wire:loading>
+        <div class="fixed inset-0 flex items-center justify-center bg-white bg-opacity-50 z-50 ">
+            <div class="animate-spin rounded-full h-32 w-32 border-t-4 border-blue-500"></div>
+        </div>
+    </div>
     <main class="py-16 bg-secondary-100">
         <main class="appointment__modal-container">
             <div class="appointment__modal-right">
@@ -27,7 +32,7 @@
                 </div>
             </div>
             <div class="appointment__modal-left" wire:loading.class='opacity-75'>
-                <div class="flex justify-between">
+                <div class="flex justify-between mb-4 align-center">
                     <p class="font-semibold">نوبت مورد نظر را انتخاب کنید</p>
                     <div>
                         @if (isset($fetchData['dont_show_first_available_day']))
@@ -132,7 +137,7 @@
             @error('*')
                 <h3>{{ $message }}</h3>
             @enderror
-            <button type="button" class="btn__blue--round-full" id="nextstep_btn"
+            <button type="button" class="btn__blue--round-full mt-4 " id="nextstep_btn"
                 wire:click='TimeForReservesation'>
                 <svg wire:loading wire:target='TimeForReservesation' class="animate-spin h-5 w-5 mr-3 text-white"
                     xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">

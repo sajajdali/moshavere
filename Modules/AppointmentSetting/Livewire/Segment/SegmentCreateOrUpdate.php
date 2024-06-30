@@ -74,7 +74,6 @@ class SegmentCreateOrUpdate extends Component
             'title' => $this->form['title'],
             'active'    => $this->form['active'],
             'multiple_choice' => $this->form['multiple_choice'],
-
         ];
         if ($this->isEdited) {
 

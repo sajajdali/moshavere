@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('appointment_segments', function (Blueprint $table) {
             $table->id();
             $table->string('title');
-            $table->tinyInteger('multiple_choice')->default(0);
+            $table->tinyInteger('multiple_choice')->default(0)->comment('1=>one choise | 0 => multiple choise');
             $table->tinyInteger('active')->default(1);
             $table->softDeletes();
             $table->timestamps();

@@ -461,6 +461,9 @@
             $('body').on('click', '.dismissmodal', function() {
                 $('.appointment__modal').removeClass('opened');
             });
+            $('body').on('click', '.servicechoices', function() {
+                @this.serviceHasSelected();
+            });
         });
     </script>
 @endpush

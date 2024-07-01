@@ -78,8 +78,8 @@ class DoctorProfileLivewire extends Component
                         $this->form['selectedSegmentForRoute'][] = $segmentId;
                     }
                 }
-            }else{
-                $this->form['selectedSegmentForRoute'] = $this->form['segment'] ;
+            } else {
+                $this->form['selectedSegmentForRoute'] = $this->form['segment'];
             }
             $this->redirectToAppointmentDays(
                 $this->doc->id,
@@ -116,6 +116,7 @@ class DoctorProfileLivewire extends Component
             }
         }
     }
+
     public function mount()
     {
         $doctor_id =   request()->route('doctor_id');
@@ -132,6 +133,7 @@ class DoctorProfileLivewire extends Component
             $this->fetchData['navigate'] = "https://maps.google.com/maps?daddr=" . $place->detail[Place::DETAIL_KEY_LOCATION][Place::DETAIL_KEY_LOCATION_LAT] . ',' . $place->detail[Place::DETAIL_KEY_LOCATION][Place::DETAIL_KEY_LOCATION_LNG];
         }
         $this->fetchData['modalStep'] = 1;
+        $this->fetchData['is_app_available'] =  $this->doc->isDoctorActive();
     }
     public function render()
     {

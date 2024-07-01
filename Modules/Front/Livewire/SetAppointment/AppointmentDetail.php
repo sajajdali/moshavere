@@ -131,7 +131,6 @@ class AppointmentDetail extends Component
 
         $trackingCode  = request()->route('tracking_code');
         $cleanedTrackingCode = preg_replace('/[^0-9]/', '', $trackingCode);
-        $cleanedTrackingCode =  24434059;
         $this->fetchData['app'] = AppointmentUser::firstWhere('tracking_code', $cleanedTrackingCode);
         if (isset($this->fetchData['app'])) {
             $this->fetchData['place'] = $this->fetchData['app']->place;

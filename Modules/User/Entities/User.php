@@ -11,8 +11,6 @@ use Modules\User\Enum\UserMetaEnum;
 use Illuminate\Support\Facades\Cache;
 use Modules\Front\app\Models\Province;
 use Spatie\Permission\Traits\HasRoles;
-use Modules\Absence\app\Models\Absence;
-use Modules\Service\app\Models\Service;
 use Illuminate\Notifications\Notifiable;
 use Modules\User\Traits\UserRelationTrait;
 use Modules\User\Traits\UserAttributeTrait;
@@ -22,7 +20,6 @@ use Modules\User\Database\factories\UserFactory;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
-use Modules\AppointmentUser\app\Models\AppointmentUser;
 use Modules\AppointmentSetting\app\Models\AppointmentSetting;
 
 /**
@@ -226,26 +223,6 @@ class User extends Authenticatable
     {
         return  AppointmentSetting::where('user_id', $this->id)->whereNotNull('service_id')->count();
     }
-    public function scopeEmergencyDoctors($query)
-    {
-        // Define a unique cache key
-        $cacheKey = 'emergency_doctors';
-
-        // Attempt to get the data from the cache
-        return Cache::remember($cacheKey, 60 * 60, function () use ($query) {
-            return $query->whereHas('metas', function ($q) {
-                $q->where('meta_key', UserMetaEnum::DR_ENEMRGENCY_STATUS)
-                    ->where('meta_value', true);
-            })
-                ->with(['metas' => function ($q) {
-                    $q->where('meta_key', UserMetaEnum::DR_ENEMRGENCY_ORDER);
-                }])
-                ->get()
-                ->sortBy(function ($user) {
-                    return $user->metas->where('meta_key', UserMetaEnum::DR_ENEMRGENCY_ORDER)->first()->meta_value ?? 0;
-                });
-        });
-    }
     public function DocSpecialities(): string
     {
         $specialities = $this->specialities;
@@ -268,35 +245,43 @@ class User extends Authenticatable
         $provinces = Province::whereIn('id', $provinceIds)->pluck('title')->toArray();
         return implode(',', $provinces);
     }
+    public function scopeEmergencyDoctors($query)
+    {
+        return $query->whereHas('metas', function ($q) {
+            $q->where('meta_key', UserMetaEnum::DR_ENEMRGENCY_STATUS)
+                ->where('meta_value', true);
+        })->whereHas('metas', function ($q) {
+            $q->where('meta_key', UserMetaEnum::BAN_USER)
+                ->where(function ($qqq) {
+                    $qqq->where('meta_value', false)->orWhereNull('meta_value');
+                });
+        })->with(['metas' => function ($q) {
+            $q->where('meta_key', UserMetaEnum::DR_ENEMRGENCY_ORDER);
+        }]);
+    }
+
     public function scopeIntroductionDoctors($query)
     {
-        // Define a unique cache key
-        $cacheKey = 'Introduction_doctors';
-
-        // Attempt to get the data from the cache
-        return Cache::remember($cacheKey, 60 * 60, function () use ($query) {
-            return $query->whereHas('metas', function ($q) {
-                $q->where('meta_key', UserMetaEnum::DR_INFO_STATUS)
-                    ->where('meta_value', true);
-            })
-                ->with(['metas' => function ($q) {
-                    $q->where('meta_key', UserMetaEnum::DR_INFO_ORDER);
-                }])
-                ->get()
-                ->sortBy(function ($user) {
-                    return $user->metas->where('meta_key', UserMetaEnum::DR_INFO_ORDER)->first()->meta_value ?? 0;
+        return $query->whereHas('metas', function ($q) {
+            $q->where('meta_key', UserMetaEnum::DR_INFO_STATUS)
+                ->where('meta_value', true);
+        })->whereHas('metas', function ($q) {
+            $q->where('meta_key', UserMetaEnum::BAN_USER)
+                ->where(function ($qqq) {
+                    $qqq->where('meta_value', false)->orWhereNull('meta_value');
                 });
-        });
+        })->with(['metas' => function ($q) {
+            $q->where('meta_key', UserMetaEnum::DR_INFO_ORDER);
+        }]);
     }
 
     public function scopeNewestDocs()
     {
-
-        // Define a unique cache key
-        $cacheKey = 'newest_docs';
-        // Attempt to get the data from the cache
-        return Cache::remember($cacheKey, 60 * 60, function () {
-            return $this->doctors_query()->orderByDesc('created_at')->get()->take(4);
+        return $this->doctors_query()->whereHas('metas', function ($q) {
+            $q->where('meta_key', UserMetaEnum::BAN_USER)
+                ->where(function ($qqq) {
+                    $qqq->where('meta_value', false)->orWhereNull('meta_value');
+                });
         });
     }
     public function getUserBadge()
@@ -325,5 +310,18 @@ class User extends Authenticatable
     {
         $documentNumber =  mt_rand(100000, 999999);
         return $documentNumber;
+    }
+    public function isDoctorActive()
+    {
+        if (isset($this->doc->ban_user) && $this->doc->ban_user == true) {
+            return   false;
+        }
+        if (! $this->services()->exists()) {
+            return  false;
+        }
+        if (! $this->places()->exists()) {
+            return false;
+        }
+        return true;
     }
 }

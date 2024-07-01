@@ -82,7 +82,7 @@
                                             class="border-2 accordion_appointment__container  border-secondary-200 rounded-lg flex items-center gap-4 py-3 px-4">
                                             <input type="radio" class="scroll_down" name="appointment"
                                                 id="appointment-{{ $eachTime }}" wire:model='form.time'
-                                                value="{{ $appointmentDetail['time_stamp'] }}" />
+                                                value="{{ $appointmentDetail['time_stamp'] . ',' . $appointmentDetail['until'] }}" />
                                             <div class="w-[calc(100%-2rem)] space-y-2 text-sm">
                                                 <p>نزدیک‌ترین نوبت خالی</p>
                                                 <p class="font-bold"> {{ $appointmentDetail['date_of_month'] }} - ساعت
@@ -119,10 +119,10 @@
                                                         @continue
                                                     @endif
                                                 @endonce
-                                                <label for="time-{{ $index + 548752 }}" class="select-time__radio">
+                                                <label for="time-{{ $index + time() }}" class="select-time__radio">
                                                     <input type="radio" class="hidden sr-only scroll_down" wire:loading.attr='disabled'
-                                                        id="time-{{ $index + 548752 }}" wire:model='form.time'
-                                                        value="{{ $eachTimeAppointment['time_stamp'] }}" />
+                                                        id="time-{{ $index + time() }}" wire:model='form.time'
+                                                        value="{{ $eachTimeAppointment['time_stamp'] . ',' . $eachTimeAppointment['until'] }}" />
                                                     <p>{{ $eachTimeAppointment['from'] }}</p>
                                                 </label>
                                             @endforeach

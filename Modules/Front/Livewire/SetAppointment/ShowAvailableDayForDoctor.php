@@ -28,12 +28,23 @@ class ShowAvailableDayForDoctor extends Component
 
     public function TimeForReservesation()
     {
+
         $this->validate(['form.time' => 'required|string']);
+
+        // Extract start and end times from the input value
+        list($startTime, $endTime) = explode(',', $this->form['time']);
+
+        /////////////// startTime contain date and start time as a timestamp
+
+        // Convert the times to endTime
+        $endTimestamp = strtotime($endTime);
+        // Create the parameter array with the converted timestamps
         $parameter = [
-            'doctor_id' => $this->fetchData['doc']->id ,
-            'place_id'  => $this->fetchData['places']->id ,
-            'service_id' => $this->fetchData['service']->id ,
-            'appointment_time' => $this->form['time'] ,
+            'doctor_id' => $this->fetchData['doc']->id,
+            'place_id'  => $this->fetchData['places']->id,
+            'service_id' => $this->fetchData['service']->id,
+            'start_time' => $startTime,
+            'end_time' => $endTimestamp,
         ];
         return $this->redirect(route('setAppointment.checkout', $parameter), true);
     }

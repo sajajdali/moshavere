@@ -162,7 +162,7 @@ class AppointmentUserService
                 // Get the time for each visit in minutes
                 $timeForVisit = $appointmentSettings->time_for_visit;
                 if (isset($details['segment_time'])) {
-                    $timeForVisit += $details['segment_time'];
+                    $timeForVisit = $details['segment_time'];
                 }
                 //  check special date
                 $checkHoliday = false;
@@ -551,6 +551,15 @@ class AppointmentUserService
         // check if end time has set by admin
         $endTime = $appointmentData->endTime ?? $visitDateTime->copy()->addMinutes($appointmentSetting->time_for_visit)->toTimeString();
 
+
+        // check for peyment
+        if (
+            $appointmentSetting->detail[AppointmentSetting::PAYMENT][AppointmentSetting::STATUS]
+            && $appointmentData->appointmentVia == AppointmentVia::SELF
+        ) {
+            $status = AppointmentUserStatusEnum::STATUS_WAIT_PAYMENT;
+        }
+
         //check for monitoring appointment
         if (
             isset($appointmentSetting->detail[AppointmentSetting::MONITORTING_APPOINTMENT])
@@ -561,6 +570,7 @@ class AppointmentUserService
         } else {
             $status = AppointmentUserStatusEnum::STATUS_SUCCESSFUL;
         }
+
         // store appointment
         $appointmentUserModel = [
             'service_id' => $appointmentData->serviceId,

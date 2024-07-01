@@ -2,8 +2,9 @@
 
 namespace Modules\User\Traits;
 
-use Illuminate\Database\Eloquent\Casts\Attribute;
 use Modules\User\Enum\UserMetaEnum;
+use Illuminate\Support\Facades\Cache;
+use Illuminate\Database\Eloquent\Casts\Attribute;
 
 trait UserAttributeTrait
 {
@@ -158,7 +159,16 @@ trait UserAttributeTrait
     {
         return Attribute::make(
             get: fn () => $this->getMeta(UserMetaEnum::BAN_USER)?->meta_value,
-            set: fn ($value) => $this->metas()->updateOrCreate(['meta_key' => UserMetaEnum::BAN_USER, 'meta_value' => $value])
+            set: function ($value) {
+                // Update or create the meta value
+                $this->metas()->updateOrCreate(
+                    ['meta_key' => UserMetaEnum::BAN_USER],
+                    ['meta_value' => $value]
+                );
+                // Remove specific caches
+                Cache::forget('emergency_doctors');
+                Cache::forget('Introduction_doctors');
+            }
         );
     }
 
@@ -166,7 +176,7 @@ trait UserAttributeTrait
     {
         $operator = UserMetaEnum::BIRTHDAY;
         return Attribute::make(
-            get: fn() => $this->getMeta( $operator)?->meta_value,
+            get: fn () => $this->getMeta($operator)?->meta_value,
             set: fn ($value) => $this->metas()->updateOrCreate(['meta_key' => $operator, 'meta_value' => $value])
         );
     }
@@ -174,7 +184,7 @@ trait UserAttributeTrait
     {
         $operator = UserMetaEnum::DR_GALLERY;
         return Attribute::make(
-            get: fn() => $this->getMeta( $operator)?->meta_value,
+            get: fn () => $this->getMeta($operator)?->meta_value,
             set: fn ($value) => $this->metas()->create(['meta_key' => $operator, 'meta_value' => $value])
         );
     }
@@ -182,39 +192,75 @@ trait UserAttributeTrait
     {
         $operator = UserMetaEnum::DR_ENEMRGENCY_STATUS;
         return Attribute::make(
-            get: fn() => $this->getMeta( $operator)?->meta_value,
-            set: fn ($value) => $this->metas()->create(['meta_key' => $operator, 'meta_value' => $value])
+            get: fn () => $this->getMeta($operator)?->meta_value,
+            set: function ($value) use ($operator) {
+                // Update or create the meta value
+                $this->metas()->updateOrCreate(
+                    ['meta_key' => $operator],
+                    ['meta_value' => $value]
+                );
+                // Remove specific caches
+                Cache::forget('emergency_doctors');
+                Cache::forget('Introduction_doctors');
+            }
         );
     }
     public function drEmergencyvisitOrder(): Attribute
     {
         $operator = UserMetaEnum::DR_ENEMRGENCY_ORDER;
         return Attribute::make(
-            get: fn() => $this->getMeta( $operator)?->meta_value,
-            set: fn ($value) => $this->metas()->create(['meta_key' => $operator, 'meta_value' => $value])
+            get: fn () => $this->getMeta($operator)?->meta_value,
+            set: function ($value) use ($operator) {
+                // Update or create the meta value
+                $this->metas()->updateOrCreate(
+                    ['meta_key' => $operator],
+                    ['meta_value' => $value]
+                );
+                // Remove specific caches
+                Cache::forget('emergency_doctors');
+                Cache::forget('Introduction_doctors');
+            }
         );
     }
     public function drInfoStatus(): Attribute
     {
         $operator = UserMetaEnum::DR_INFO_STATUS;
         return Attribute::make(
-            get: fn() => $this->getMeta( $operator)?->meta_value,
-            set: fn ($value) => $this->metas()->create(['meta_key' => $operator, 'meta_value' => $value])
+            get: fn () => $this->getMeta($operator)?->meta_value,
+            set: function ($value) use ($operator) {
+                // Update or create the meta value
+                $this->metas()->updateOrCreate(
+                    ['meta_key' => $operator],
+                    ['meta_value' => $value]
+                );
+                // Remove specific caches
+                Cache::forget('emergency_doctors');
+                Cache::forget('Introduction_doctors');
+            }
         );
     }
     public function drInfoOrder(): Attribute
     {
         $operator = UserMetaEnum::DR_INFO_ORDER;
         return Attribute::make(
-            get: fn() => $this->getMeta( $operator)?->meta_value,
-            set: fn ($value) => $this->metas()->create(['meta_key' => $operator, 'meta_value' => $value])
+            get: fn () => $this->getMeta($operator)?->meta_value,
+            set: function ($value) use ($operator) {
+                // Update or create the meta value
+                $this->metas()->updateOrCreate(
+                    ['meta_key' => $operator],
+                    ['meta_value' => $value]
+                );
+                // Remove specific caches
+                Cache::forget('emergency_doctors');
+                Cache::forget('Introduction_doctors');
+            }
         );
     }
     public function drWaitingTime(): Attribute
     {
         $operator = UserMetaEnum::DR_WAITING_TIME;
         return Attribute::make(
-            get: fn() => $this->getMeta( $operator)?->meta_value,
+            get: fn () => $this->getMeta($operator)?->meta_value,
             set: fn ($value) => $this->metas()->create(['meta_key' => $operator, 'meta_value' => $value])
         );
     }
@@ -222,7 +268,7 @@ trait UserAttributeTrait
     {
         $operator = UserMetaEnum::DR_WEBSITE_DISPLAY_MOBILE;
         return Attribute::make(
-            get: fn() => $this->getMeta( $operator)?->meta_value,
+            get: fn () => $this->getMeta($operator)?->meta_value,
             set: fn ($value) => $this->metas()->create(['meta_key' => $operator, 'meta_value' => $value])
         );
     }
@@ -230,7 +276,7 @@ trait UserAttributeTrait
     {
         $operator = UserMetaEnum::DR_WEBSITE_DISPLAY_NAVIGATION;
         return Attribute::make(
-            get: fn() => $this->getMeta( $operator)?->meta_value,
+            get: fn () => $this->getMeta($operator)?->meta_value,
             set: fn ($value) => $this->metas()->create(['meta_key' => $operator, 'meta_value' => $value])
         );
     }
@@ -238,7 +284,7 @@ trait UserAttributeTrait
     {
         $operator = UserMetaEnum::DR_WEBSITE_DISPLAY_ADDRESS;
         return Attribute::make(
-            get: fn() => $this->getMeta( $operator)?->meta_value,
+            get: fn () => $this->getMeta($operator)?->meta_value,
             set: fn ($value) => $this->metas()->create(['meta_key' => $operator, 'meta_value' => $value])
         );
     }
@@ -246,7 +292,7 @@ trait UserAttributeTrait
     {
         $operator = UserMetaEnum::DR_WEBSITE_DISPLAY_EXPERINCE;
         return Attribute::make(
-            get: fn() => $this->getMeta( $operator)?->meta_value,
+            get: fn () => $this->getMeta($operator)?->meta_value,
             set: fn ($value) => $this->metas()->create(['meta_key' => $operator, 'meta_value' => $value])
         );
     }
@@ -254,7 +300,7 @@ trait UserAttributeTrait
     {
         $operator = UserMetaEnum::DR_WEBSITE_DISPLAY_DESCRIPTION;
         return Attribute::make(
-            get: fn() => $this->getMeta( $operator)?->meta_value,
+            get: fn () => $this->getMeta($operator)?->meta_value,
             set: fn ($value) => $this->metas()->create(['meta_key' => $operator, 'meta_value' => $value])
         );
     }
@@ -262,7 +308,7 @@ trait UserAttributeTrait
     {
         $operator = UserMetaEnum::DR_REGISTRATION_DESCRIPTION;
         return Attribute::make(
-            get: fn() => $this->getMeta( $operator)?->meta_value,
+            get: fn () => $this->getMeta($operator)?->meta_value,
             set: fn ($value) => $this->metas()->create(['meta_key' => $operator, 'meta_value' => $value])
         );
     }

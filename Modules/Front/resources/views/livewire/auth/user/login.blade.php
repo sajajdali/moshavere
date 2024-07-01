@@ -1,5 +1,11 @@
 <div>
     <main class="pt-16 bg-secondary-100">
+        @isset($fetchData['alert'])
+            <div class="bg-cyan-300 text-gray-500 text-lg	 text-center py-3 px-5 rounded-lg mb-5 mx-auto max-w-[600px]">
+               {{ $fetchData['alert'] }}
+            </div>
+        @endisset
+
         <form wire:submit='LoginAuthForm' class="bg-white rounded-lg w-full max-w-[600px] mx-auto p-5 flex flex-col gap-4"
             wire:loading.class='opacity-50'>
             @if ($step == 1)
@@ -120,13 +126,12 @@
     </main>
     @if ($step == 1)
         <div class="pt-1 pb-16 bg-secondary-100">
-            <div
-                class="rounded-lg w-full max-w-[600px] mx-auto p-5 flex flex-col gap-4">
-                <a class="text-blue-700 hover:text-blue-900 flex" href="{{route('front.login.doctor')}}">
+            <div class="rounded-lg w-full max-w-[600px] mx-auto p-5 flex flex-col gap-4">
+                <a class="text-blue-700 hover:text-blue-900 flex" href="{{ route('front.login.doctor') }}">
                     <span>ورود پزشک</span>
                     <svg class="w-6 h-6 mr-2" xmlns="http://www.w3.org/2000/svg">
                         <use xlink:href="#sprite-chevron-left-circle"></use>
-                      </svg>
+                    </svg>
                 </a>
             </div>
         </div>

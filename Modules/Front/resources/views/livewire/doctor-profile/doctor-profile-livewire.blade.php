@@ -370,42 +370,43 @@
                         </p>
                     </header>
                     <main class="flex flex-col gap-3">
-                        <div class="text-sm border-2 border-secondary-200 p-3 rounded-lg space-y-3">
-                            <div class="flex flex-col sm:flex-row items-center justify-between gap-3">
-                                <p class="font-bold">{{ $doc->dr_display_address }}</p>
-                                <div class="flex gap-3">
-                                    @isset($fetchData['tel'])
-                                        <div class="bg-secondary-100 text-black rounded-lg py-2 px-5 text-sm">
-                                            {{ $fetchData['tel'] }}
-                                        </div>
-                                    @endisset
-                                    @isset($fetchData['navigate'])
-                                        <a target="blank" href="{{ $fetchData['navigate'] }}"
-                                            class="bg-secondary-100 text-black rounded-lg py-2 px-5 text-sm">
-                                            مسیریابی
-                                        </a>
-                                    @endisset
+                        @if (isset($fetchData['tel']) && isset($fetchData['navigate']) && isset($fetchData['address']))
+                            <div class="text-sm border-2 border-secondary-200 p-3 rounded-lg space-y-3">
+                                <div class="flex flex-col sm:flex-row items-center justify-between gap-3">
+                                    <p class="font-bold">{{ $doc->dr_display_address }}</p>
+                                    <div class="flex gap-3">
+                                        @isset($fetchData['tel'])
+                                            <div class="bg-secondary-100 text-black rounded-lg py-2 px-5 text-sm">
+                                                {{ $fetchData['tel'] }}
+                                            </div>
+                                        @endisset
+                                        @isset($fetchData['navigate'])
+                                            <a target="blank" href="{{ $fetchData['navigate'] }}"
+                                                class="bg-secondary-100 text-black rounded-lg py-2 px-5 text-sm">
+                                                مسیریابی
+                                            </a>
+                                        @endisset
+                                    </div>
                                 </div>
+                                @isset($fetchData['address'])
+                                    <div class="flex gap-3">
+                                        <svg class="w-5 h-5 mt-[2px]" xmlns="http://www.w3.org/2000/svg">
+                                            <use xlink:href="#sprite-location" />
+                                        </svg>
+                                        <p class="w-[calc(100%-2rem)]">{{ $fetchData['address'] }}
+                                        </p>
+                                    </div>
+                                @endisset
                             </div>
-                            @isset($fetchData['address'])
-                                <div class="flex gap-3">
-                                    <svg class="w-5 h-5 mt-[2px]" xmlns="http://www.w3.org/2000/svg">
-                                        <use xlink:href="#sprite-location" />
-                                    </svg>
-                                    <p class="w-[calc(100%-2rem)]">{{ $fetchData['address'] }}
-                                    </p>
-                                </div>
-                            @endisset
-                        </div>
-
+                        @endif
                         <button type="button" wire:click='reserveAppointment'
-                            @if (isset($doc->ban_user) && $doc->ban_user == true) disabled @endif class="btn__blue--round-full-between">
+                            @if (! $fetchData['is_app_available']) disabled @endif class="btn__blue--round-full-between"  >
                             <p>دریافت نوبت دکتر {{ $doc->full_name }}</p>
                             <svg class="w-6 h-6" xmlns="http://www.w3.org/2000/svg">
                                 <use xlink:href="#sprite-arrow-left-circle" />
                             </svg>
                         </button>
-                        @if (isset($doc->ban_user) && $doc->ban_user == true)
+                        @if (! $fetchData['is_app_available'])
                             <div class="error_badge">
                                 <svg class="w-6 h-6" xmlns="http://www.w3.org/2000/svg">
                                     <use xlink:href="#sprite-warning" />

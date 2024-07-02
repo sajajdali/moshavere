@@ -107,7 +107,7 @@ class GeneralSetting extends Component
     {
         $this->form[$counter][$itrator] =   $this->form[$counter][$itrator]  + 1;
         if ($counter == 'specialTimeCounter') {
-            if (isset($this->form['specialDaytimeValues']) && isset($this->form['specialDaytimeValues'][$itrator]) ) {
+            if (isset($this->form['specialDaytimeValues']) && isset($this->form['specialDaytimeValues'][$itrator])) {
                 $lastArr = array_key_last($this->form['specialDaytimeValues'][$itrator]);
             } else {
                 $lastArr = 0;
@@ -493,6 +493,10 @@ class GeneralSetting extends Component
         if (!$apSet->segments->isEmpty()) {
             $this->form['segments'][AppointmentSetting::STATUS] = true;
             $this->form['segments']['value'] = $apSet->segments->first()->id;
+        }
+        if (isset($apSet->detail[AppointmentSetting::MONITORTING_APPOINTMENT])) {
+            $this->form['monitoring']['status'] = true;
+            $this->form['monitoring']['hour'] = $apSet->detail[AppointmentSetting::MONITORTING_APPOINTMENT];
         }
     }
     private function fillTheTime($apSet)

@@ -1,7 +1,7 @@
 <div>
     <main class="py-6 bg-secondary-100">
         <div class="bg-white rounded-2xl p-4 max-w-3xl mx-auto space-y-4">
-            {{-- @if ($fetchData['monitoring']) --}}
+            @if ($fetchData['monitoring'])
             <div class="border-2 border-indigo-500 bg-indigo-100  p-4 rounded-xl flex items-center gap-3 ">
                 <svg class="w-6 h-6 text-red w-10 h-10 " xmlns="http://www.w3.org/2000/svg">
                     <use xlink:href="#sprite-warning" />
@@ -10,7 +10,7 @@
                     نوبت شما در <strong>انتظار تایید</strong> است و بعد از تایید ، وضعیت نوبت از <strong>طریق پیامک</strong> به شما اطلاع رسانی میشود!
                 </p>
             </div>
-            {{-- @endif --}}
+            @endif
             @if ($fetchData['stauts']['payment'])
                 <section>
                     <div

@@ -25,6 +25,7 @@ enum SettingKeyEnum: int implements EnumHasNameInterface, SettingTypeInterface, 
     case SITE_SLIDER_TITLE = 11;
     case APPOINTMENT_DESCRIPTION_IN_CHECKOUT_PAGE_REFUND = 12;
     case APPOINTMENT_FOR_OTHERS_STATUS = 13;
+    case APPOINTMENT_MORE_THAT_ONE_PER_DAY = 14;
 
         //sms
     case SMS_API_TOKEN = 20;
@@ -57,7 +58,7 @@ enum SettingKeyEnum: int implements EnumHasNameInterface, SettingTypeInterface, 
     case VOIP_USERNAME = 160;
     case VOIP_PASSWORD = 170;
 
-        // contact us page 
+        // contact us page
     case CONTACTUS_FIRST_SECTION_STATUS = 210;
     case CONTACTUS_FIRST_SECTION_TITLE = 211;
     case CONTACTUS_FIRST_SECTION_BODY = 212;
@@ -88,6 +89,7 @@ enum SettingKeyEnum: int implements EnumHasNameInterface, SettingTypeInterface, 
             self::APPOINTMENT_DEADLINE_VIA_USER    => 'مدت زمان رزرو بودن نوبت برای پرداخت در زمانی که وضعیت نوبت در انتظار پرداخت میباشد و نوبت را بیمار دریافت کرده باشد(ساعت)',
             self::SITE_SLIDER_TITLE    => 'عنوان در ابتتدای صفحه ای اصلی و بالای قسمت جست و جو',
             self::APPOINTMENT_DESCRIPTION_IN_CHECKOUT_PAGE_REFUND    => 'توضیحات در صفحه قبل از تایید نوبت توس کاربر(checkout)',
+            self::APPOINTMENT_MORE_THAT_ONE_PER_DAY    => 'امکان رزرو بیشتر از یک نوبت در هر روز برای هر بیمار',
 
 
             self::SMS_API_TOKEN => 'توکن API پیامک',
@@ -123,7 +125,7 @@ enum SettingKeyEnum: int implements EnumHasNameInterface, SettingTypeInterface, 
             self::VOIP_USERNAME => 'نام کاربری برای API ',
             self::VOIP_PASSWORD => 'کلمه عبور برای API ',
 
-            //contact us 
+            //contact us
             self::CONTACTUS_FIRST_SECTION_STATUS => 'فعال سازی بخش اول در صفحه تماس با ما  ',
             self::CONTACTUS_FIRST_SECTION_TITLE => 'عنوان در بخش اول در صفحه ی تماس با ما   ',
             self::CONTACTUS_FIRST_SECTION_BODY => 'متن اصلی در بخش اول در صفحه ی تماس با ما   ',
@@ -162,6 +164,7 @@ enum SettingKeyEnum: int implements EnumHasNameInterface, SettingTypeInterface, 
     {
         return match ($this) {
             self::DEFAULT_EXERCISE_STATUS => SettingTypeEnum::SELECT,
+            self::APPOINTMENT_MORE_THAT_ONE_PER_DAY => SettingTypeEnum::CHECK,
             self::PAYMENT_PAYSTAR_STATUS => SettingTypeEnum::CHECK,
             self::APPOINTMENT_FOR_OTHERS_STATUS => SettingTypeEnum::CHECK,
             self::PAYMENT_ZARINPAL_STATUS => SettingTypeEnum::CHECK,

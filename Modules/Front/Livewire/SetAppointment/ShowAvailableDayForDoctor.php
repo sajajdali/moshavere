@@ -28,7 +28,6 @@ class ShowAvailableDayForDoctor extends Component
 
     public function TimeForReservesation()
     {
-
         $this->validate(['form.time' => 'required|string']);
 
         // Extract start and end times from the input value

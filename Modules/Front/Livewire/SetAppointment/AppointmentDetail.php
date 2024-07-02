@@ -90,6 +90,7 @@ class AppointmentDetail extends Component
                 $this->fetchData['stauts']['price'] = $this->fetchData['app']->setting->detail[AppointmentSetting::PAYMENT][AppointmentSetting::ONLINE][AppointmentSetting::PRICE];
             }
         }
+        $this->fetchData['monitoring'] = ($this->fetchData['app']->status == AppointmentUserStatusEnum::STATUS_MONITORING );
     }
     public function messages()
     {

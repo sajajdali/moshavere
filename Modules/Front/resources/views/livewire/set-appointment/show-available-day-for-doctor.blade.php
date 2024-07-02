@@ -7,7 +7,7 @@
     <main class="py-16 bg-secondary-100">
         <main class="appointment__modal-container">
             <div class="appointment__modal-right">
-                <div class="bg-secondary-100 rounded-lg p-4 flex items-center gap-5">
+                <div class="bg-secondary-100 rounded-lg p-4 flex items-center gap-5 mb-4">
                     <div
                         class="w-[70px] h-[70px] overflow-hidden rounded-full flex items-center justify-center border-2 border-white ring-2 ring-blue-sky">
                         <img src="{{ $fetchData['doc']->avatar }}" alt="doctor-image-name" />

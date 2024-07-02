@@ -1,7 +1,7 @@
 <?php
 
 use Nwidart\Modules\Activators\FileActivator;
-use Nwidart\Modules\Providers\ConsoleServiceProvider;
+use Nwidart\Modules\Commands;
 
 return [
 
@@ -13,6 +13,7 @@ return [
     | Default module namespace.
     |
     */
+
     'namespace' => 'Modules',
 
     /*
@@ -23,6 +24,7 @@ return [
     | Default module stubs.
     |
     */
+
     'stubs' => [
         'enabled' => false,
         'path' => base_path('vendor/nwidart/laravel-modules/src/Commands/stubs'),
@@ -40,8 +42,8 @@ return [
         ],
         'replacements' => [
             'routes/web' => ['LOWER_NAME', 'STUDLY_NAME', 'MODULE_NAMESPACE', 'CONTROLLER_NAMESPACE'],
-            'routes/api' => ['LOWER_NAME', 'STUDLY_NAME', 'MODULE_NAMESPACE', 'CONTROLLER_NAMESPACE'],
-            'vite' => ['LOWER_NAME', 'STUDLY_NAME'],
+            'routes/api' => ['LOWER_NAME', 'STUDLY_NAME'],
+            'vite' => ['LOWER_NAME'],
             'json' => ['LOWER_NAME', 'STUDLY_NAME', 'MODULE_NAMESPACE', 'PROVIDER_NAMESPACE'],
             'views/index' => ['LOWER_NAME'],
             'views/master' => ['LOWER_NAME', 'STUDLY_NAME'],
@@ -54,7 +56,6 @@ return [
                 'AUTHOR_EMAIL',
                 'MODULE_NAMESPACE',
                 'PROVIDER_NAMESPACE',
-                'APP_FOLDER_NAME',
             ],
         ],
         'gitkeep' => true,
@@ -69,8 +70,8 @@ return [
         | This path will also be added automatically to the list of scanned folders.
         |
         */
-        'modules' => base_path('Modules'),
 
+        'modules' => base_path('Modules'),
         /*
         |--------------------------------------------------------------------------
         | Modules assets path
@@ -79,8 +80,8 @@ return [
         | Here you may update the modules' assets path.
         |
         */
-        'assets' => public_path('modules'),
 
+        'assets' => public_path('modules'),
         /*
         |--------------------------------------------------------------------------
         | The migrations' path
@@ -90,81 +91,49 @@ return [
         | the migration files?
         |
         */
+
         'migration' => base_path('database/migrations'),
-
-        /*
-        |--------------------------------------------------------------------------
-        | The app path
-        |--------------------------------------------------------------------------
-        |
-        | app folder name
-        | for example can change it to 'src' or 'App'
-        */
-        // 'app_folder' => 'app/',
-
         /*
         |--------------------------------------------------------------------------
         | Generator path
         |--------------------------------------------------------------------------
         | Customise the paths where the folders will be generated.
-        | Setting the generate key to false will not generate that folder
+        | Set the generate's key to false to not generate that folder
         */
         'generator' => [
-            // app/
-            'actions' => ['path' => 'app/Actions', 'generate' => false],
-            'casts' => ['path' => 'app/Casts', 'generate' => false],
-            'channels' => ['path' => 'app/Broadcasting', 'generate' => false],
-            'class' => ['path' => 'app/Classes', 'generate' => false],
-            'command' => ['path' => 'app/Console', 'generate' => false],
-            'component-class' => ['path' => 'app/View/Components', 'generate' => false],
-            'emails' => ['path' => 'app/Emails', 'generate' => false],
-            'event' => ['path' => 'app/Events', 'generate' => false],
-            'enums' => ['path' => 'app/Enums', 'generate' => false],
-            'exceptions' => ['path' => 'app/Exceptions', 'generate' => false],
-            'jobs' => ['path' => 'app/Jobs', 'generate' => false],
-            'helpers' => ['path' => 'app/Helpers', 'generate' => false],
-            'interfaces' => ['path' => 'app/Interfaces', 'generate' => false],
-            'listener' => ['path' => 'app/Listeners', 'generate' => false],
-            'model' => ['path' => 'app/Models', 'generate' => false],
-            'notifications' => ['path' => 'app/Notifications', 'generate' => false],
-            'observer' => ['path' => 'app/Observers', 'generate' => false],
-            'policies' => ['path' => 'app/Policies', 'generate' => false],
-            'provider' => ['path' => 'app/Providers', 'generate' => true],
-            'repository' => ['path' => 'app/Repositories', 'generate' => false],
-            'resource' => ['path' => 'app/Transformers', 'generate' => false],
-            'route-provider' => ['path' => 'app/Providers', 'generate' => true],
-            'rules' => ['path' => 'app/Rules', 'generate' => false],
-            'services' => ['path' => 'app/Services', 'generate' => false],
-            'scopes' => ['path' => 'app/Models/Scopes', 'generate' => false],
-            'traits' => ['path' => 'app/Traits', 'generate' => false],
-
-            // app/Http/
-            'controller' => ['path' => 'app/Http/Controllers', 'generate' => true],
-            'filter' => ['path' => 'app/Http/Middleware', 'generate' => false],
-            'request' => ['path' => 'app/Http/Requests', 'generate' => false],
-
-            // config/
             'config' => ['path' => 'config', 'generate' => true],
-
-            // database/
-            'factory' => ['path' => 'database/factories', 'generate' => true],
+            'command' => ['path' => 'app/Console', 'generate' => false],
+            'channels' => ['path' => 'app/Broadcasting', 'generate' => false],
             'migration' => ['path' => 'database/migrations', 'generate' => true],
-            'seeder' => ['path' => 'database/seeders', 'generate' => true],
-
-            // lang/
-            'lang' => ['path' => 'lang', 'generate' => false],
-
-            // resource/
-            'assets' => ['path' => 'resources/assets', 'generate' => true],
-            'component-view' => ['path' => 'resources/views/components', 'generate' => false],
-            'views' => ['path' => 'resources/views', 'generate' => true],
-
-            // routes/
+            'seeder' => [
+                'path' => 'database/seeders',
+                'namespace' => 'database/seeders',
+                'generate' => true,
+            ],
+            'factory' => ['path' => 'database/factories', 'generate' => true],
+            'model' => ['path' => 'app/Models', 'generate' => true],
+            'observer' => ['path' => 'app/Observers', 'generate' => false],
             'routes' => ['path' => 'routes', 'generate' => true],
-
-            // tests/
+            'controller' => ['path' => 'Http/Controllers', 'generate' => true],
+            'filter' => ['path' => 'app/Http/Middleware', 'generate' => true],
+            'request' => ['path' => 'app/Http/Requests', 'generate' => true],
+            'provider' => ['path' => 'app/Providers', 'generate' => true],
+            'assets' => ['path' => 'resources/assets', 'generate' => true],
+            'lang' => ['path' => 'lang', 'generate' => true],
+            'views' => ['path' => 'resources/views', 'generate' => true],
+            'test' => ['path' => 'tests/Unit', 'generate' => true],
             'test-feature' => ['path' => 'tests/Feature', 'generate' => true],
-            'test-unit' => ['path' => 'tests/Unit', 'generate' => true],
+            'repository' => ['path' => 'app/Repositories', 'generate' => false],
+            'event' => ['path' => 'app/Events', 'generate' => false],
+            'listener' => ['path' => 'app/Listeners', 'generate' => false],
+            'policies' => ['path' => 'app/Policies', 'generate' => false],
+            'rules' => ['path' => 'app/Rules', 'generate' => false],
+            'jobs' => ['path' => 'app/Jobs', 'generate' => false],
+            'emails' => ['path' => 'app/Emails', 'generate' => false],
+            'notifications' => ['path' => 'app/Notifications', 'generate' => false],
+            'resource' => ['path' => 'app/Resources', 'generate' => false],
+            'component-view' => ['path' => 'resources/views/components', 'generate' => false],
+            'component-class' => ['path' => 'app/View/Components', 'generate' => false],
         ],
     ],
 
@@ -174,13 +143,58 @@ return [
     |--------------------------------------------------------------------------
     |
     | Here you can define which commands will be visible and used in your
-    | application. You can add your own commands to merge section.
+    | application. If for example, you don't use some of the commands provided
+    | you can simply comment them out.
     |
     */
-    'commands' => ConsoleServiceProvider::defaultCommands()
-        ->merge([
-            // New commands go here
-        ])->toArray(),
+    'commands' => [
+        Commands\CommandMakeCommand::class,
+        Commands\ComponentClassMakeCommand::class,
+        Commands\ComponentViewMakeCommand::class,
+        Commands\ControllerMakeCommand::class,
+        Commands\ChannelMakeCommand::class,
+        Commands\DisableCommand::class,
+        Commands\DumpCommand::class,
+        Commands\EnableCommand::class,
+        Commands\EventMakeCommand::class,
+        Commands\FactoryMakeCommand::class,
+        Commands\JobMakeCommand::class,
+        Commands\ListenerMakeCommand::class,
+        Commands\MailMakeCommand::class,
+        Commands\MiddlewareMakeCommand::class,
+        Commands\NotificationMakeCommand::class,
+        Commands\ObserverMakeCommand::class,
+        Commands\PolicyMakeCommand::class,
+        Commands\ProviderMakeCommand::class,
+        Commands\InstallCommand::class,
+        Commands\LaravelModulesV6Migrator::class,
+        Commands\ListCommand::class,
+        Commands\ModuleDeleteCommand::class,
+        Commands\ModuleMakeCommand::class,
+        Commands\MigrateCommand::class,
+        Commands\MigrateFreshCommand::class,
+        Commands\MigrateRefreshCommand::class,
+        Commands\MigrateResetCommand::class,
+        Commands\MigrateRollbackCommand::class,
+        Commands\MigrateStatusCommand::class,
+        Commands\MigrationMakeCommand::class,
+        Commands\ModelMakeCommand::class,
+        Commands\ResourceMakeCommand::class,
+        Commands\RequestMakeCommand::class,
+        Commands\RuleMakeCommand::class,
+        Commands\RouteProviderMakeCommand::class,
+        Commands\PublishCommand::class,
+        Commands\PublishConfigurationCommand::class,
+        Commands\PublishMigrationCommand::class,
+        Commands\PublishTranslationCommand::class,
+        Commands\SeedCommand::class,
+        Commands\SeedMakeCommand::class,
+        Commands\SetupCommand::class,
+        Commands\TestMakeCommand::class,
+        Commands\UnUseCommand::class,
+        Commands\UpdateCommand::class,
+        Commands\UseCommand::class,
+    ],
 
     /*
     |--------------------------------------------------------------------------
@@ -191,13 +205,13 @@ return [
     | directory. This is useful if you host the package in packagist website.
     |
     */
+
     'scan' => [
         'enabled' => false,
         'paths' => [
             base_path('vendor/*/*'),
         ],
     ],
-
     /*
     |--------------------------------------------------------------------------
     | Composer File Template
@@ -206,11 +220,12 @@ return [
     | Here is the config for the composer.json file, generated by this package
     |
     */
+
     'composer' => [
-        'vendor' => env('MODULE_VENDOR', 'nwidart'),
+        'vendor' => 'nwidart',
         'author' => [
-            'name' => env('MODULE_AUTHOR_NAME', 'Nicolas Widart'),
-            'email' => env('MODULE_AUTHOR_EMAIL', 'n.widart@gmail.com'),
+            'name' => 'Nicolas Widart',
+            'email' => 'n.widart@gmail.com',
         ],
         'composer-output' => false,
     ],
@@ -224,12 +239,11 @@ return [
     |
     */
     'cache' => [
-        'enabled' => env('MODULES_CACHE_ENABLED', false),
-        'driver' => env('MODULES_CACHE_DRIVER', 'file'),
-        'key' => env('MODULES_CACHE_KEY', 'laravel-modules'),
-        'lifetime' => env('MODULES_CACHE_LIFETIME', 60),
+        'enabled' => false,
+        'driver' => 'file',
+        'key' => 'laravel-modules',
+        'lifetime' => 60,
     ],
-
     /*
     |--------------------------------------------------------------------------
     | Choose what laravel-modules will register as custom namespaces.
@@ -241,6 +255,10 @@ return [
         'translations' => true,
         /**
          * load files on boot or register method
+         *
+         * Note: boot not compatible with asgardcms
+         *
+         * @example boot|register
          */
         'files' => 'register',
     ],

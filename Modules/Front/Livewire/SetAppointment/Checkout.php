@@ -77,8 +77,13 @@ class Checkout extends Component
             // create a user
             $this->RegisterOtherAsUser();
         }
-        // register the appointment
-        $this->storeAppointment();
+
+        // check user not have active appointment for that day
+        if ($this->checkForActiveAppointment()) {
+
+            // register the appointment
+            $this->storeAppointment();
+        }
     }
     private function RegisterOtherAsUser()
     {
@@ -102,7 +107,22 @@ class Checkout extends Component
         }
         $this->user = $user;
     }
+    private function checkForActiveAppointment():bool
+    {
+        if(setting(SettingKeyEnum::APPOINTMENT_MORE_THAT_ONE_PER_DAY)) {
+            // user can reserve multiple appointment
+            return true ;
+        }
+        $user_selected_date = Carbon::createFromTimestamp($this->fetchData['app_start_time'])->toDateString();
 
+        // Check if user has an appointment on the selected date
+        $existingAppointment = $this->user->appointments()->whereDate('date_visit', $user_selected_date)->exists();
+        if ($existingAppointment) {
+            $this->err = 'شما یک نوبت فعال در این روز دارید!';
+            return false;
+        }
+        return true;
+    }
     private function storeappointment()
     {
 
@@ -129,7 +149,7 @@ class Checkout extends Component
 
         // appointment model
         $appointmentModel = new AppointmentModel(
-            timestamp: $this->fetchData['app_start_time'] ,
+            timestamp: $this->fetchData['app_start_time'],
             appointmentVia: AppointmentVia::SELF,
             sendSmsToUser: true,
             serviceId: $this->fetchData['appSetting']->service?->id ?? $this->fetchData['service']->id,
@@ -156,11 +176,11 @@ class Checkout extends Component
         }
 
         $storeAppointment = app('AppointmentUserService')->storeAppointment($this->fetchData['appSetting'], $userModelAppointment, $appointmentModel, $detail);
-        if($storeAppointment['status']) {
+        if ($storeAppointment['status']) {
             Cache::forget('appointmentList.' . $this->fetchData['appSetting']->id);
-            return redirect()->route('front.setAppointment.detail',['tracking_code' => $storeAppointment['detail']['tracking_code']]) ; 
-        }else{
-            $this->err = $storeAppointment['message'] ;
+            return redirect()->route('front.setAppointment.detail', ['tracking_code' => $storeAppointment['detail']['tracking_code']]);
+        } else {
+            $this->err = $storeAppointment['message'];
         }
     }
 
@@ -199,7 +219,7 @@ class Checkout extends Component
                 'doctor_id' => $this->fetchData['doc']->id,
                 'place_id'  => $this->fetchData['places']->id,
                 'service_id' => $this->fetchData['service']->id,
-                'start_time' => $this->fetchData['app_start_time'] ,
+                'start_time' => $this->fetchData['app_start_time'],
                 'end_time' => $this->fetchData['app_end_time'],
             ];
             $route = route('setAppointment.checkout', $parameter);
@@ -215,9 +235,9 @@ class Checkout extends Component
         //check for general setting
         if (!isset($this->fetchData['appSetting'])) {
             $this->fetchData['appSetting'] = AppointmentSetting::where('user_id', $this->fetchData['doc']->id)
-            ->whereNull('place_id')
-            ->whereNull('service_id')
-            ->first();
+                ->whereNull('place_id')
+                ->whereNull('service_id')
+                ->first();
         }
     }
     public function render()

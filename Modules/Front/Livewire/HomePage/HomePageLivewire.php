@@ -25,7 +25,7 @@ class HomePageLivewire extends Component
     {
         if (isset($this->form['searchProp'])) {
             $sanitizedInput = htmlspecialchars($this->form['searchProp'], ENT_QUOTES, 'UTF-8');
-            return redirect()->route('front.searchPage', ['query' => $sanitizedInput]);
+            return $this->redirect(route('front.searchPage', ['query' => $sanitizedInput]),true);
         }
     }
     private function getIntrudoceDocList()

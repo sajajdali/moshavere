@@ -4,11 +4,11 @@
    <section class="bg-gray-100 py-12">
     <div class="container space-y-6">
        <div class="flex flex-row items-center justify-between gap-3">
-          <p class="font-semibold">پربازدیدترین تخصص‌ها</p>
-          <a href="#" class="flex items-center gap-4 text-primary-main">
+          <p class="font-semibold">پربازدیدترین بخش ها</p>
+          <a  href="{{route('front.searchPage',['query' => 'بخش ها'])}}" class="flex items-center gap-4 text-primary-main">
              <span class="font-semibold">مشاهده همه</span>
              <svg class="w-5 h-5" xmlns="http://www.w3.org/2000/svg">
-                <use xlink:href="../assets/svg/icon.svg#sprite-arrow-left" />
+                <use xlink:href="#sprite-arrow-left" />
              </svg>
           </a>
        </div>

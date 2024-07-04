@@ -4,10 +4,10 @@
         <div class="container space-y-8">
             <div class="flex flex-row items-center justify-between gap-3">
                 <h3 class="font-bold text-xl">جدیدترین پزشکان</h3>
-                <a href="#" class="flex items-center gap-4 text-primary-main">
+                <a href="{{route('front.searchPage',['query' => 'پزشکان'])}}" class="flex items-center gap-4 text-primary-main">
                     <span class="font-semibold">مشاهده همه</span>
                     <svg class="w-5 h-5" xmlns="http://www.w3.org/2000/svg">
-                        <use xlink:href="../assets/svg/icon.svg#sprite-arrow-left" />
+                        <use xlink:href="#sprite-arrow-left" />
                     </svg>
                 </a>
             </div>

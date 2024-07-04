@@ -41,7 +41,7 @@
                 <p>دریافت نوبت اینترنتی برای مراجعه حضوری به مطب پزشکان</p>
              </div>
           </div>
-          <a href="#" class="flex items-center gap-3 text-primary-main">
+          <a href="{{route('front.searchPage',['query' => 'پزشکان'])}}" class="flex items-center gap-3 text-primary-main">
              <span class="font-semibold">مشاهده لیست پزشکان</span>
              <svg class="w-5 h-5" xmlns="http://www.w3.org/2000/svg">
                 <use xlink:href="#sprite-arrow-left" />

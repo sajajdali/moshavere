@@ -3,6 +3,7 @@
 namespace Modules\Front\Livewire\HomePage;
 
 use Livewire\Component;
+use Illuminate\Support\Arr;
 use Livewire\Attributes\Url;
 use Livewire\Attributes\Title;
 use Livewire\Attributes\Layout;
@@ -12,6 +13,7 @@ use Livewire\Attributes\Computed;
 use Modules\Place\app\Models\Place;
 use Modules\User\Enum\UserMetaEnum;
 use Modules\Service\app\Models\Service;
+use Illuminate\Database\Eloquent\Collection;
 use Modules\Speciality\app\Models\Speciality;
 
 #[Layout('front::layouts.app')]
@@ -40,77 +42,132 @@ class SearchLivewire extends Component
         // $this->validate([
         //     'query' => 'required|string|max:225'
         // ]);
+
+        // for load more bottom 
+        if (isset($this->fetchData['wholeContentLoaded'])) {
+            unset($this->fetchData['wholeContentLoaded']);
+        }
+        if (isset($this->fetchData['set_appointment_message'])) {
+            unset($this->fetchData['set_appointment_message']);
+        }
+        $this->searchIn();
         $this->render();
     }
-    #[Computed]
-    public function searchIn(): array
+    public function searchIn($setAppointment_result = null)
     {
         $sanitizedInput = htmlspecialchars($this->query, ENT_QUOTES, 'UTF-8');
-
         // Initialize results array
-        $result = [];
+        if (!empty($setAppointment_result)) {
+            $result = $setAppointment_result;
+        } else {
+            $result = [];
+            if ($sanitizedInput == 'پزشکان') {
+                $doctors = User::doctors_query()->when(isset($this->filter['speciality']), function ($query) {
+                    $query->whereHas('specialities', function ($qq) {
+                        $qq->where('title', 'LIKE', "%{$this->filter['speciality']}%");
+                    });
+                })->get();
+                if ($doctors->isNotEmpty()) {
+                    $result['doctors'] = $doctors;
+                }
+            } elseif ($sanitizedInput == 'بخش ها') {
+                $services = Service::all();
+                if ($services->isNotEmpty()) {
+                    $result['service'] = $services;
+                }
+            } else {
+                // Places query
+                $places = Place::where('title', 'LIKE', '%' . $sanitizedInput . '%')->get();
+                if ($places->isNotEmpty()) {
+                    $result['place'] =  $places;
+                }
 
-        // Places query
-        $places = Place::where('title', 'LIKE', '%' . $sanitizedInput . '%')->get();
-        if ($places->isNotEmpty()) {
-            $result['place'] =  $places;
-        }
+                // Doctors query
+                $doctors = User::doctors_query()->when(isset($this->filter['speciality']), function ($query) {
+                    $query->whereHas('specialities', function ($qq) {
+                        $qq->where('title', 'LIKE', "%{$this->filter['speciality']}%");
+                    });
+                })->whereHas('metas', function ($q) use ($sanitizedInput) {
+                    $q->where(function ($q) use ($sanitizedInput) {
+                        $q->where([
+                            ['meta_key', UserMetaEnum::FIRST_NAME],
+                            ['meta_value', 'LIKE', "%{$sanitizedInput}%"]
+                        ])->orWhere([
+                            ['meta_key', UserMetaEnum::LAST_NAME],
+                            ['meta_value', 'LIKE', "%{$sanitizedInput}%"]
+                        ]);
+                    });
+                })->get();
+                if ($doctors->isNotEmpty()) {
+                    $result['doctors'] =  $doctors;
+                }
 
-        // Doctors query
-        $doctors = User::doctors_query()->when(isset($this->filter['speciality']), function ($query) {
-            $query->whereHas('specialities', function ($qq) {
-                $qq->where('title', 'LIKE', "%{$this->filter['speciality']}%");
-            });
-        })->whereHas('metas', function ($q) use ($sanitizedInput) {
-            $q->where(function ($q) use ($sanitizedInput) {
-                $q->where([
-                    ['meta_key', UserMetaEnum::FIRST_NAME],
-                    ['meta_value', 'LIKE', "%{$sanitizedInput}%"]
-                ])->orWhere([
-                    ['meta_key', UserMetaEnum::LAST_NAME],
-                    ['meta_value', 'LIKE', "%{$sanitizedInput}%"]
-                ]);
-            });
-        })->get();
-        if ($doctors->isNotEmpty()) {
-            $result['doctors'] =  $doctors;
-        }
-
-        // Services query
-        $services = Service::where('title', 'LIKE', "%{$sanitizedInput}%")->get();
-        if ($services->isNotEmpty()) {
-            $result['service'] = $services;
-        }
-        //apply filters 
-        if (isset($this->filter['speciality'])) {
-            if (isset($result['doctors'])) {
-                $result = array_filter($result, function ($key) {
-                    return $key === 'doctors';
-                }, ARRAY_FILTER_USE_KEY);
-                return $result;
+                // Services query
+                $services = Service::where('title', 'LIKE', "%{$sanitizedInput}%")->get();
+                if ($services->isNotEmpty()) {
+                    $result['service'] = $services;
+                }
+                //apply filters
+                if (isset($this->filter['speciality'])) {
+                    if (isset($result['doctors'])) {
+                        $result = array_filter($result, function ($key) {
+                            return $key === 'doctors';
+                        }, ARRAY_FILTER_USE_KEY);
+                        return $result;
+                    }
+                    return [];
+                }
+                //apply filters
+                if (isset($this->filter['service'])) {
+                    if (isset($result['service'])) {
+                        $result = array_filter($result, function ($key) {
+                            return $key === 'service';
+                        }, ARRAY_FILTER_USE_KEY);
+                        return $result;
+                    }
+                    return [];
+                }
             }
-            return [];
-        }
-        //apply filters 
-        if (isset($this->filter['service'])) {
-            if (isset($result['service'])) {
-                $result = array_filter($result, function ($key) {
-                    return $key === 'service';
-                }, ARRAY_FILTER_USE_KEY);
-                return $result;
-            }
-            return [];
         }
 
-        return $result;
+        $result =  $this->paginateTheResult($result);
+        $this->fetchData['reuslt'] =  $result;
     }
-
+    public function loadMoreResult()
+    {
+        $this->fetchData['result_iterator'] = $this->fetchData['result_iterator'] + 10;
+    }
+    private function paginateTheResult($result)
+    {
+        if (!isset($this->fetchData['result_iterator'])) {
+            $this->fetchData['result_iterator'] = 20;
+        }
+        $return_reslut = [];
+        foreach ($result as $key => $collection) {
+            if ($collection instanceof Collection) {
+                foreach ($collection as $value) {
+                    $return_reslut[$key][] = $value;
+                    if (count(array_merge(...array_values($return_reslut))) >= $this->fetchData['result_iterator']) {
+                        break 2; // break out of both foreach loops
+                    }
+                }
+            } else {
+                $return_reslut[$key] = $collection;
+                if (count(array_values($return_reslut)) >= $this->fetchData['result_iterator']) {
+                    break;
+                }
+            }
+        }
+        if (count(array_values(Arr::flatten($return_reslut))) === count(array_values(Arr::flatten($result)))) {
+            $this->fetchData['wholeContentLoaded'] = true;
+        }
+        return $return_reslut;
+    }
     private function fillTheFilters()
     {
         $this->fetchData['specilities'] =  Speciality::all();
         $this->fetchData['services']    =  Service::all();
     }
-
     public function applyFilter($name, $category)
     {
         $this->filter[$category] = $name;
@@ -129,14 +186,54 @@ class SearchLivewire extends Component
             $this->render();
         }
     }
+
+    // set  buttons appointment 
+    public function getAppFromService($service_id)
+    {
+        $service = Service::find($service_id);
+        if (!empty($service)) {
+            $this->fetchData['settApp']['service'] = $service->id;
+            $this->fetchData['set_appointment_message'] = 'لطفا پزشک مورد نظر را انتخاب کنید';
+            $result['doctors'] = $service->user;
+            $this->query == null;
+            $this->searchIn($result);
+        }
+    }
+    public function placeSelected($place_id)
+    {
+        $place = Place::find($place_id);
+        if (!empty($place)) {
+            $this->fetchData['settApp']['place'] = $place->id;
+            $this->fetchData['set_appointment_message'] = 'لطفا پزشک مورد نظر را انتخاب کنید';
+            $result['doctors'] = $place->user;
+            $this->query == null;
+            $this->searchIn($result);
+        }
+    }
+
+    public function getApp($doctor_id)
+    {
+        $doc = User::find($doctor_id);
+        if (isset($doc)) {
+            $param['doctor_id'] = $doc->id;
+            if (isset($this->fechData['settApp']['place'])) {
+                $param['place_id'] = $this->fechData['settApp']['place'];
+            }
+            if (isset($this->fechData['settApp']['service'])) {
+                $param['place_id'] = $this->fechData['settApp']['place'];
+            }
+            return redirect()->route('front.doctor.profile', $param);
+        }
+    }
     public function mount()
     {
         $this->query = request()->get('query');
         $this->fillTheFilters();
+        $this->searchIn();
     }
     public function render()
     {
-        $this->searchIn();
+
         return view('front::livewire.home-page.search-livewire');
     }
 }

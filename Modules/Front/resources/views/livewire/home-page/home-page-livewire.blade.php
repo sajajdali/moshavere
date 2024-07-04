@@ -4,7 +4,7 @@
     {{-- اسلایدر اصلی --}}
     @include('front::components.homepage.mainslider')
 
-    {{-- پربازدید ترین تخصص ها --}}
+    {{-- پربازدید ترین بخش ها --}}
     @include('front::components.homepage.mostviewedservice')
 
     {{-- ویزیت فوری --}}

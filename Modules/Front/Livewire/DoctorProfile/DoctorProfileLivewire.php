@@ -8,6 +8,7 @@ use Livewire\Attributes\Locked;
 use Modules\User\Entities\User;
 use Modules\Place\app\Models\Place;
 use Modules\Front\app\Models\Comment;
+use Modules\Service\app\Models\Service;
 use Modules\AppointmentSetting\app\Models\AppointmentSetting;
 
 #[Layout('front::layouts.app')]
@@ -24,23 +25,29 @@ class DoctorProfileLivewire extends Component
     {
         // lunch modal
         if ($this->doc->places()->count() > 1) {
-            $this->fetchData['places'] = $this->doc->places;
-            $this->fetchData['modalStep'] = 1;
-            if (isset($this->fetchData['services'])) {
-                unset($this->fetchData['services']);
+            if (! isset($this->form['place']) || empty($this->form['place'])) {
+                $this->fetchData['places'] = $this->doc->places;
+                $this->fetchData['modalStep'] = 1;
+                if (isset($this->fetchData['services'])) {
+                    unset($this->fetchData['services']);
+                }
+                if (isset($this->fetchData['place'])) {
+                    unset($this->fetchData['place']);
+                }
             }
-            if (isset($this->fetchData['place'])) {
-                unset($this->fetchData['place']);
-            }
-            return   $this->dispatch('lucnhModal', true);
+            return  $this->lunchModal();
         }
         if ($this->doc->services()->count() > 1) {
             $this->fetchData['services'] = $this->doc->services;
-            return   $this->dispatch('lucnhModal', true);
+            return $this->lunchModal();
         }
 
         // if less than one service exist , redirect to appointment days list
         $this->redirectToAppointmentDays($this->doc->id, $this->doc->places()->first()->id, $this->doc->services()->first()->id);
+    }
+    public function lunchModal()
+    {
+        return $this->dispatch('lucnhModal', true);
     }
     private function redirectToAppointmentDays($doctor_id, $place_id, $service_id, $segment = null)
     {
@@ -61,16 +68,21 @@ class DoctorProfileLivewire extends Component
     public function modalSubmit()
     {
         if ($this->fetchData['modalStep'] == 1) {
-            if ($this->doc->services()->count() > 1) {
-                $this->fetchData['services'] = $this->doc->services;
+            $this->fetchData['services'] = $this->doc->services;
+            if (isset($this->form['service']) && !empty($this->form['service'])) {
+                // user selected service on privous page
+                $this->serviceHasSelected();
+                $this->fetchData['modalStep']++;
             } else {
-                $this->redirectToAppointmentDays(
-                    $this->doc->id,
-                    $this->form['place'],
-                    $this->doc->services()->first()->id
-                );
+                if ($this->doc->services()->count() <= 1) {
+                    $this->redirectToAppointmentDays(
+                        $this->doc->id,
+                        $this->form['place'],
+                        $this->doc->services()->first()->id
+                    );
+                }
+                $this->fetchData['modalStep']++;
             }
-            $this->fetchData['modalStep']++;
         } elseif ($this->fetchData['modalStep'] == 2) {
             if (count($this->form['segment']) > 1) {
                 foreach ($this->form['segment'] as $segmentId => $status) {
@@ -117,6 +129,34 @@ class DoctorProfileLivewire extends Component
         }
     }
 
+
+    // check is user redirect to this page with service_id and place_id
+    private function routeHasServiceOrPlace()
+    {
+        if (request()->has('service_id')) {
+            $santetizeService = htmlspecialchars(request()->input('service_id'), ENT_QUOTES, 'UTF-8');
+            $this->form['service'] =  Service::find($santetizeService)?->id ?? null;
+        }
+        if (request()->has('place_id')) {
+            $santetizeService = htmlspecialchars(request()->input('place_id'), ENT_QUOTES, 'UTF-8');
+            $place =   Place::find($santetizeService) ?? null;
+            if (isset($place) && !empty($place)) {
+                $this->form['place'] = $place->id ;
+                $this->form['place_name'] = $place->title ;
+                $this->fetchData['services'] = $this->doc->services;
+                $this->fetchData['modalStep'] = 2;
+            }
+        }
+        // service has selected
+        if (isset($this->form['service']) && !isset($this->form['place_id'])) {
+            $this->fetchData['modalStep'] = 1;
+        }
+        if (isset($this->form['service']) && isset($this->form['place_id'])) {
+            $this->serviceHasSelected();
+            $this->fetchData['modalStep'] = 2;
+            $this->lucnhModal();
+        }
+    }
     public function mount()
     {
         $doctor_id =   request()->route('doctor_id');
@@ -134,6 +174,8 @@ class DoctorProfileLivewire extends Component
         }
         $this->fetchData['modalStep'] = 1;
         $this->fetchData['is_app_available'] =  $this->doc->isDoctorActive();
+
+        $this->routeHasServiceOrPlace();
     }
     public function render()
     {

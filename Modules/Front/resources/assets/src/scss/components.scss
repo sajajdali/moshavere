@@ -217,7 +217,7 @@ progress[value]::-webkit-progress-value {
   @apply hidden items-center justify-start md:justify-center flex-col gap-4 fixed inset-0 bg-primary-main/70 backdrop-blur-sm z-10 min-h-screen no_scrollbar overflow-y-auto py-5;
 
   & .appointment__modal-header {
-    @apply flex justify-end w-[90%] max-w-[1000px];
+    @apply flex justify-between  w-[90%] max-w-[1000px];
   }
 
   & .select-appointment__container {
@@ -231,7 +231,7 @@ progress[value]::-webkit-progress-value {
 
 .appointment__modal-container {
   @apply w-[90%] max-w-[1000px] mx-auto flex flex-col gap-5 bg-white rounded-lg p-6 h-[calc(100vh-200px)] no_scrollbar overflow-y-auto;
-  
+
   & input[type="radio"] {
     appearance: none;
     -webkit-appearance: none;

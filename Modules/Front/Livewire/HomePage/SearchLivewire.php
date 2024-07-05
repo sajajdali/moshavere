@@ -43,7 +43,7 @@ class SearchLivewire extends Component
         //     'query' => 'required|string|max:225'
         // ]);
 
-        // for load more bottom 
+        // for load more bottom
         if (isset($this->fetchData['wholeContentLoaded'])) {
             unset($this->fetchData['wholeContentLoaded']);
         }
@@ -187,7 +187,7 @@ class SearchLivewire extends Component
         }
     }
 
-    // set  buttons appointment 
+    // set  buttons appointment
     public function getAppFromService($service_id)
     {
         $service = Service::find($service_id);
@@ -216,11 +216,11 @@ class SearchLivewire extends Component
         $doc = User::find($doctor_id);
         if (isset($doc)) {
             $param['doctor_id'] = $doc->id;
-            if (isset($this->fechData['settApp']['place'])) {
-                $param['place_id'] = $this->fechData['settApp']['place'];
+            if (isset($this->fetchData['settApp']['place'])) {
+                $param['place_id'] = $this->fetchData['settApp']['place'];
             }
-            if (isset($this->fechData['settApp']['service'])) {
-                $param['place_id'] = $this->fechData['settApp']['place'];
+            if (isset($this->fetchData['settApp']['service'])) {
+                $param['service_id'] = $this->fetchData['settApp']['service'];
             }
             return redirect()->route('front.doctor.profile', $param);
         }

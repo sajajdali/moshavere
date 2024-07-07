@@ -50,6 +50,9 @@ class SearchLivewire extends Component
         if (isset($this->fetchData['set_appointment_message'])) {
             unset($this->fetchData['set_appointment_message']);
         }
+        if (isset($this->fetchData['service_id'])) {
+            unset($this->fetchData['service_id']);
+        }
         $this->searchIn();
         $this->render();
     }
@@ -75,6 +78,25 @@ class SearchLivewire extends Component
                 if ($services->isNotEmpty()) {
                     $result['service'] = $services;
                 }
+            } elseif (isset($this->fetchData['service_id'])) {
+                $service = Service::find($this->fetchData['service_id']);
+                if (isset($service)) {
+                    $result['doctors'] =  $service->user;
+                    $this->fetchData['set_appointment_message'] = 'لطفا یکی از پزشکان مربوط به این بخش را انتخاب کنید!';
+                } else {
+                    $this->fetchData['set_appointment_message'] = 'بخش مورد نظر یافت نشد!';
+                }
+            } elseif (isset($this->fetchData['province_id'])) {
+                $place = Place::whereNotNull('detail')
+                    ->whereJsonContains('detail->' . Place::DETAIL_PROVINCE, $this->fetchData['province_id'])
+                    ->get();
+                if (isset($place) && $place->isNotEmpty() ) {
+                    $result['place'] =  $place;
+                    $this->fetchData['set_appointment_message'] = 'لطفا یکی از پزشکان مربوط به این بخش را انتخاب کنید!';
+                } else {
+                    $this->fetchData['set_appointment_message'] = 'در استان انتخابی مطبی یافت نشد!';
+                }
+                unset($this->fetchData['province_id']);
             } else {
                 // Places query
                 $places = Place::where('title', 'LIKE', '%' . $sanitizedInput . '%')->get();
@@ -178,7 +200,6 @@ class SearchLivewire extends Component
             $this->dispatch('removeFilterAll', true);
             return $this->filter = [];
         }
-
         if (!empty($this->filter) &&  in_array($item, $this->filter)) {
             $index = array_search($item, $this->filter);
             $this->dispatch('removeFilter', $index);
@@ -225,9 +246,16 @@ class SearchLivewire extends Component
             return redirect()->route('front.doctor.profile', $param);
         }
     }
+
     public function mount()
     {
         $this->query = request()->get('query');
+        if (request()->has('service_id')) {
+            $this->fetchData['service_id'] =  htmlspecialchars(request()->input('service_id'), ENT_QUOTES, 'UTF-8');
+        }
+        if (request()->has('province')) {
+            $this->fetchData['province_id'] =  htmlspecialchars(request()->input('province'), ENT_QUOTES, 'UTF-8');
+        }
         $this->fillTheFilters();
         $this->searchIn();
     }

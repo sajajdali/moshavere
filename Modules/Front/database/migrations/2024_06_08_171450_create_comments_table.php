@@ -18,7 +18,7 @@ return new class extends Migration
             $table->text('body');
             $table->foreignId('parent_id')->nullable()->references('id')->on('comments');
             $table->integer('star')->nullable();
-            $table->integer('like')->default(0);
+            $table->integer('show_in_homePage')->default(0);
             $table->integer('status')->default(0);
             $table->text('reply')->nullable();
             $table->timestamps();

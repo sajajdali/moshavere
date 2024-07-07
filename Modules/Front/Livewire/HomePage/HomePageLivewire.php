@@ -10,7 +10,11 @@ use Modules\User\Entities\User;
 use Modules\Front\app\Models\Faq;
 use Modules\User\Enum\UserMetaEnum;
 use Illuminate\Support\Facades\Cache;
+use Modules\Front\app\Models\Comment;
+use Modules\Front\app\Models\Province;
 use Modules\Service\app\Models\Service;
+use Modules\Front\Enum\CommentStatusEnum;
+use Modules\Front\Enum\CommentShowHomePage;
 
 #[Layout('front::layouts.app')]
 #[Title('صفحه اصلی')]
@@ -25,7 +29,7 @@ class HomePageLivewire extends Component
     {
         if (isset($this->form['searchProp'])) {
             $sanitizedInput = htmlspecialchars($this->form['searchProp'], ENT_QUOTES, 'UTF-8');
-            return $this->redirect(route('front.searchPage', ['query' => $sanitizedInput]),true);
+            return $this->redirect(route('front.searchPage', ['query' => $sanitizedInput]), true);
         }
     }
     private function getIntrudoceDocList()
@@ -67,6 +71,11 @@ class HomePageLivewire extends Component
             };
         })->take(4);
     }
+    public function searchWithProvonce()
+    {
+        $this->validate(['form.province' => 'required|integer']);
+        return redirect()->route('front.searchPage', ['province' => $this->form['province']]);
+    }
     public function mount()
     {
         $this->fetchData['service'] = Service::mostViewedService();
@@ -76,6 +85,12 @@ class HomePageLivewire extends Component
         $this->fetchData['introductionDoctors'] = $this->getIntrudoceDocList();
         $this->fetchData['newestDocs']          = $this->getNewestDoc();
         $this->fetchData['faqs'] = Faq::all();
+        $this->fetchData['comments'] = Cache::rememberForever('homepageComments', function () {
+            return Comment::where('status', CommentStatusEnum::ACCEPTED)->where('show_in_homePage', CommentShowHomePage::SHOW)->get()->take(4);
+        });
+        $this->fetchData['province'] =  cache::rememberForever('front.provinces', function () {
+            return  Province::all();
+        });
     }
     public function render()
     {

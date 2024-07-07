@@ -6,9 +6,11 @@ use Livewire\Component;
 use Livewire\Attributes\On;
 use Livewire\Attributes\Url;
 use Modules\User\Enum\UserMetaEnum;
+use Illuminate\Support\Facades\Cache;
 use Modules\Front\app\Models\Comment;
 use Modules\Front\app\Models\FeedBack;
 use Modules\Front\Enum\CommentStatusEnum;
+use Modules\Front\Enum\CommentShowHomePage;
 use Modules\AppointmentUser\app\Models\AppointmentUser;
 
 class Commentlivewire extends Component
@@ -33,6 +35,7 @@ class Commentlivewire extends Component
     public function deletePlace(Comment $model)
     {
         $this->authorize('delete', $model);
+        Cache::forget('homepageComments');
         $model->delete();
         return redirect()->route('admin.comment')->with('success', 'نظر حذف شد');
     }
@@ -76,6 +79,21 @@ class Commentlivewire extends Component
             'status' => CommentStatusEnum::REJECTED,
         ]);
         $this->alertMessage = ' با موفقیت لغو تایید شد';
+    }
+    public function showInHopePage(Comment $comment,$status)
+    {
+        $this->authorize('update', $comment);
+
+        $h_status  = CommentShowHomePage::tryFrom($status) ; 
+        $comment->update([
+            'show_in_homePage' => $h_status,
+        ]);
+        Cache::forget('homepageComments');
+        if($status == 1 ) {
+            $this->alertMessage = 'نظر در صفحه اصلی نمایش داده میشود';
+        }else{
+            $this->alertMessage = 'نظر در صفحه اصلی نمایش داده نمیشود';
+        }
     }
     public function boot()
     {
@@ -136,8 +154,24 @@ class Commentlivewire extends Component
                     });
                 },
             ],
+            'search.hopePageShowStatus' => [
+                'condition' => isset($this->search['hopePageShowStatus']),
+                'callback' => function ($query) {
+                    return $query->where('show_in_homePage', CommentShowHomePage::tryFrom($this->search['hopePageShowStatus']));
+                },
+            ],
+            'search.reply' => [
+                'condition' => isset($this->search['reply']),
+                'callback' => function ($query) {
+                    if($this->search['reply'] == 'true') {
+                        return $query->whereNotNull('reply');
+                    }else{
+                        return $query->whereNull('reply');
+                    }
+                },
+            ],
         ];
-
+          
         foreach ($searchCriteria as $property => $config) {
             $condition = $config['condition'];
             $callback = $config['callback'];

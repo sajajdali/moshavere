@@ -26,6 +26,7 @@
                                 !empty($search['id']) ||
                                     !empty($search['userName']) ||
                                     !empty($search['doctorName']) ||
+                                    !empty($search['hopePageShowStatus']) ||
                                     !empty($search['serviceName']))
                                 <button class="btn btn-secondary ms-2" type="button" wire:click="resetProperties"
                                     data-bs-toggle="collapse" data-bs-target="#advanceSearch" aria-expanded="false"
@@ -42,6 +43,7 @@
                             !empty($search['id']) ||
                                 !empty($search['userName']) ||
                                 !empty($search['doctorName']) ||
+                                !empty($search['reply']) ||
                                 !empty($search['serviceName'])) show @endif"
                             id="advanceSearch" wire:ignore>
                             <form class="form-horizontal example" autocomplete="off">
@@ -67,6 +69,26 @@
                                             feedBackholder="کد" type="text">
                                     </div>
                                 </div>
+                                <div class="row mb-4">
+                                    <label for="search-name" class="col-md-2 form-label">نمایش در صفحه اصلی</label>
+                                    <div class="col-md-10">
+                                        <select class="form-control w-100" wire:model='search.hopePageShowStatus'>
+                                            <option value="">انتخاب کنید...</option>
+                                            <option value="1">نمایش</option>
+                                            <option value="0">عدم نمایش</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="row mb-4">
+                                    <label for="search-name" class="col-md-2 form-label">پاسخ</label>
+                                    <div class="col-md-10">
+                                        <select class="form-control w-100" wire:model='search.reply'>
+                                            <option value="">انتخاب کنید...</option>
+                                            <option value="true">دارای پاسخ</option>
+                                            <option value="false">بدون پاسخ</option>
+                                        </select>
+                                    </div>
+                                </div>
                                 <button class="btn btn-primary" type="button" wire:click="startSearch"
                                     wire:loading.class="bg-gray btn-loading disabled">جست و
                                     جو
@@ -82,8 +104,8 @@
                                         <th scope="col">نام کاربر</th>
                                         <th scope="col">نام پزشک</th>
                                         <th scope="col">تاریخ</th>
-                                        <th scope="col">وضعیت</th>
                                         <th scope="col">پاسخ</th>
+                                        <th scope="col">نمایش در صفحه اصلی</th>
                                         <th scope="col">عملیات</th>
                                     </tr>
                                 </thead>
@@ -99,12 +121,16 @@
                                                 <td>{{ verta($comment->created_at)->format('Y/m/d') }}
                                                 </td>
                                                 <td>
-                                                    {{ $comment->status->getName() }}
-                                                </td>
-                                                <td>
                                                     {!! isset($comment->reply)
                                                         ? '<i class="fa fa-check text-success" aria-hidden="true"></i>'
                                                         : '<i class="fa fa-times text-danger" aria-hidden="true"></i>' !!}
+                                                </td>
+                                                <td>
+                                                        @if ($comment->show_in_homePage->boolStatus())
+                                                        <i class="fa fa-check text-success" aria-hidden="true"></i>
+                                                        @else
+                                                        <i class="fa fa-times text-danger" aria-hidden="true"></i>
+                                                        @endif
                                                 </td>
                                                 <td>
                                                     @canany(['update', 'delete'], $comment)
@@ -125,6 +151,21 @@
                                                                             تایید کردن</a>
                                                                     </li>
                                                                 @else
+                                                                    @if ($comment->show_in_homePage->boolStatus())
+                                                                        <li>
+                                                                            <a wire:click='showInHopePage("{{ $comment->id }}",0)'
+                                                                                href="#">
+                                                                                <i class="fa fa-eye-slash text-danger" aria-hidden="true"></i>
+                                                                                عدم نمایش</a>
+                                                                        </li>
+                                                                    @else
+                                                                        <li>
+                                                                            <a wire:click='showInHopePage("{{ $comment->id }}",1)'
+                                                                                href="#">
+                                                                                <i class="fa fa-eye" aria-hidden="true"></i>
+                                                                                نمایش در صفحه اصلی</a>
+                                                                        </li>
+                                                                    @endif
                                                                     <li>
                                                                         <a wire:click='disaprovedComment("{{ $comment->id }}")'
                                                                             href="#">
@@ -136,13 +177,13 @@
                                                                     <a data-bs-toggle="modal" data-bs-target="#commentModal"
                                                                         wire:click='lunchModal("{{ $comment->id }}")'
                                                                         href="#">
-                                                                        <i class="fa fa-commenting" aria-hidden="true"></i>
+                                                                        <i class="fa fa-commenting"
+                                                                            aria-hidden="true"></i>
                                                                         پاسخ دادن</a>
                                                                 </li>
                                                                 <li>
                                                                     <a class="delete_confirm_alert" data-label="کامنت"
-                                                                    data-id="{{ $comment->id }}"
-                                                                        href="#">
+                                                                        data-id="{{ $comment->id }}" href="#">
                                                                         <i class="fa fa-trash text-danger"
                                                                             aria-hidden="true"></i>
                                                                         حذف</a>

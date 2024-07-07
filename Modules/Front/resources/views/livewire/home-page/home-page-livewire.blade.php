@@ -14,17 +14,18 @@
     @include('front::components.homepage.docintroducttion')
 
     {{-- نظر مخاطبین --}}
-    @include('front::components.homepage.comments')
-
+    @if(isset($fetchData['comments']) && $fetchData['comments']->isNotEmpty())
+        @include('front::components.homepage.comments')
+    @endif
     {{-- آخرین مطالب --}}
     @include('front::components.homepage.blogs')
 
-    {{-- جدیدترین پزشکان--}}
+    {{-- جدیدترین پزشکان --}}
     @include('front::components.homepage.newestdoc')
 
-    {{-- جست و جو بر اساس شهر--}}
+    {{-- جست و جو بر اساس شهر --}}
     @include('front::components.homepage.searchbyprovince')
 
-    {{-- سوالات متداول--}}
+    {{-- سوالات متداول --}}
     @include('front::components.homepage.faq')
 </div>

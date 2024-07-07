@@ -211,6 +211,7 @@ return [
         "form.licenceNumber" => "شماره نظام پزشکی",
         "form.message" => "پیام",
         "form.full_name" => "نام و نام خانوادگی",
+        "form.province" => "استان/شهر",
     ],
 
 ];

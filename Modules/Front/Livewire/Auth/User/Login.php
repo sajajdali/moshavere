@@ -73,6 +73,7 @@ class Login extends Component
                         return redirect()->route('front.user.registration');
                     }
                     $intendedUrl = Session::pull('url.intended', route('front.homePage'));
+                    session()->forget('url.intended') ; 
                     return redirect()->intended($intendedUrl);
                 }
             } else {
@@ -98,6 +99,12 @@ class Login extends Component
     public function mount() {
         if(request()->has('appointment')){
             $this->fetchData['alert'] = 'برای ادامه مراحل دریافت نوبت لطفا ابتدا وارد شوید';
+        }
+        if(request()->has('comment')){
+            $this->fetchData['alert'] = 'برای گذاشتن نظر، لطفا ابتدا وارد شوید';
+        }
+        if(request()->has('favariteDr')){
+            $this->fetchData['alert'] = 'برای پسندیدن دکتر ، لطفا ابتدا  وارد شوید';
         }
     }
     public function render()

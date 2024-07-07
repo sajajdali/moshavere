@@ -16,7 +16,7 @@
           <div class="swiper-wrapper">
             @foreach ($fetchData['service'] as $service)
              <div class="swiper-slide">
-                <a href="#"
+                <a href="{{route('front.searchPage',['service_id'=> $service->id ])}}"
                    class="flex flex-col items-center gap-4 p-5 border border-secondary-200 bg-white rounded-lg">
                    <img src="{{$service->icon}}" class="h-[66px]" />
                    <p class="font-semibold">{{$service->title}}</p>

@@ -116,9 +116,16 @@
                 </div>
             </aside>
             <article class="w-full basis-full md:w-[60%] md:basis-[60%] flex flex-col gap-6">
-
                 <div class="flex flex-col gap-4">
-                    {{-- @dd($this->searchIn) --}}
+                    @if (empty($fetchData['reuslt']))
+                        <div class="container mb-4">
+                            <div class="bg-rose-100 border border-rose-200 text-gray-600  p-4 rounded-xl flex items-center gap-3">
+                                <p class="w-[calc(100%-3.25rem)] leading-6 text-lg">
+                                 نتیجه ای یافت نشد..
+                                </p>
+                            </div>
+                        </div>
+                    @endif
                     @foreach ($fetchData['reuslt'] as $forPart => $collection)
                         @if ($forPart == 'place' && !empty($collection))
                             @foreach ($collection as $place)
@@ -129,7 +136,7 @@
                                             <div class="space-y-3 text-center md:text-right">
                                                 <p class="text-lg font-bold">{{ $place->title }}</p>
                                                 <p class="bg-secondary-200 rounded-lg py-2 px-3 text-sm">
-                                                    {{ $place->user->count() }} پزشک
+                                                    {{ $place->user?->count() ?? 0 }} پزشک
                                                 </p>
                                             </div>
                                         </div>
@@ -165,7 +172,8 @@
                                         @endif
                                     </div>
                                     <div class="flex justify-end">
-                                        <a href="#" wire:click='placeSelected("{{$place->id}}")' class="btn__blue--round-full-between">
+                                        <a href="#" wire:click='placeSelected("{{ $place->id }}")'
+                                            class="btn__blue--round-full-between">
                                             <span class="font-semibold">دریافت نوبت در این مطب</span>
                                             <svg class="w-6 h-6" xmlns="http://www.w3.org/2000/svg">
                                                 <use xlink:href="#sprite-chevron-left-circle" />
@@ -205,7 +213,8 @@
                                         </div>
                                     </div>
                                     <div class="flex justify-end">
-                                        <a href="#" wire:click='getApp("{{$doctor->id}}")' class="btn__blue--round-full-between">
+                                        <a href="#" wire:click='getApp("{{ $doctor->id }}")'
+                                            class="btn__blue--round-full-between">
                                             <span class="font-semibold">دریافت نوبت دکتر
                                                 {{ $doctor->full_name }}</span>
                                             <svg class="w-6 h-6" xmlns="http://www.w3.org/2000/svg">

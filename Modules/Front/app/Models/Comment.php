@@ -5,6 +5,7 @@ namespace Modules\Front\app\Models;
 use Modules\User\Entities\User;
 use Illuminate\Database\Eloquent\Model;
 use Modules\Front\Enum\CommentStatusEnum;
+use Modules\Front\Enum\CommentShowHomePage;
 use Modules\Front\Database\factories\CommentFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 
@@ -16,7 +17,10 @@ class Comment extends Model
      * The attributes that are mass assignable.
      */
     protected $guarded = ['id'];
-    protected $casts = ['status' => CommentStatusEnum::class];
+    protected $casts = [
+        'status' => CommentStatusEnum::class,
+        'show_in_homePage' => CommentShowHomePage::class , 
+    ];
 
     public function user()
     {

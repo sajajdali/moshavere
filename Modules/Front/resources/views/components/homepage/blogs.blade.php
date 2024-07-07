@@ -1,7 +1,7 @@
 <div>
      <!-- latest posts -->
      <section class="bg-secondary-100">
-        <div class="container space-y-8">
+        <div class="container space-y-8  pt-4">
            <div class="flex flex-row items-center justify-between gap-3">
               <h3 class="font-bold text-xl">آخرین مطالب</h3>
               <a href="#" class="flex items-center gap-4 text-primary-main">

@@ -1,12 +1,12 @@
 <section class="appointment__modal max-h-min" wire:ignore.self>
     <header class="appointment__modal-header  ">
-        @if ($fetchData['modalStep'] == 1)
-        <button type="button"
-        class="bg-white border-2 border-blue-100 text-gray-400 flex items-center py-3 px-5 rounded-xl gap-3">
-        <span>ویرایش مطب</span>
-    </button>
-        @elseif($fetchData['modalStep'] == 2)
-        <span></span>
+        @if ($fetchData['modalStep'] == 2)
+            <button type="button" wire:click='editPlace'
+                class="bg-white hover:bg-sky-100 hover:text-gray-700 border-2 border-blue-100 text-sky-400 flex items-center py-3 px-5 rounded-xl gap-3">
+                <span>ویرایش مطب</span>
+            </button>
+        @elseif($fetchData['modalStep'] == 1)
+            <span></span>
         @endif
         <button type="button"
             class="bg-white border-2 border-red text-red flex items-center py-3 px-5 rounded-xl gap-3 dismissmodal">
@@ -15,7 +15,6 @@
                 <use xlink:href="#sprite-x" />
             </svg>
         </button>
-
     </header>
     <main class="appointment__modal-container p-10 flex flex-column justify-between ">
         @if ($fetchData['modalStep'] == 1)
@@ -39,7 +38,7 @@
             <div class="space-y-3">
                 <div class="w-full flex justify-center">
                     <p class=" text-xl font-semibold">مطب انتخاب شده:
-                        <a wire:click='editPlace' class="text-blue-400">{{ $form['place_name'] }}</a>
+                        <a wire:click='editPlace' class="text-blue-400 hover:text-blue-700 cursor-pointer">{{ $form['place_name'] }}</a>
                     </p>
                 </div>
                 <p class="font-semibold">لطفا بخش مورد نظر خود را امتخاب کنید</p>

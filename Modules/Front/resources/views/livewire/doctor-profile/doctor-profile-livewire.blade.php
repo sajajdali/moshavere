@@ -44,27 +44,34 @@
                         <div class="flex items-center gap-2">
                         </div>
                         <div class="flex items-center text-sm gap-4">
-                            <button type="button" class="flex items-center gap-2">
-                                <svg class="w-5 h-5" xmlns="http://www.w3.org/2000/svg">
-                                    <use xlink:href="#sprite-save" />
-                                </svg>
-                                <p>نشان</p>
-                            </button>
-                            <button type="button" class="flex items-center gap-2">
+                            @if (isset($fetchData['isFavarite']))
+                                <button wire:click='removeFromFavarite' type="button"
+                                    class="flex items-center gap-2 text-lime-700">
+                                    <svg class="w-5 h-5" xmlns="http://www.w3.org/2000/svg">
+                                        <use xlink:href="#sprite-save" />
+                                    </svg>
+                                    <p>نشان شده</p>
+                                </button>
+                            @else
+                                <button wire:click='addFavarite' type="button"
+                                    class="flex items-center gap-2 hover:text-lime-700">
+                                    <svg class="w-5 h-5" xmlns="http://www.w3.org/2000/svg">
+                                        <use xlink:href="#sprite-save" />
+                                    </svg>
+                                    <p>نشان</p>
+                                </button>
+                            @endif
+
+                            <button type="button" id="share" class="flex items-center gap-2 hover:text-blue-500">
                                 <svg class="w-5 h-5" xmlns="http://www.w3.org/2000/svg">
                                     <use xlink:href="#sprite-share" />
                                 </svg>
                                 <p>اشتراک گذاری</p>
                             </button>
-                            <button type="button" class="flex items-center gap-2">
-                                <svg class="w-5 h-5" xmlns="http://www.w3.org/2000/svg">
-                                    <use xlink:href="#sprite-info" />
-                                </svg>
-                                <p>گزارش خطا</p>
-                            </button>
                         </div>
                     </footer>
                 </div>
+
 
                 @if (isset($doc->dr_display_discription))
                     <div class="bg-white rounded-lg px-4 divide-y divide-secondary-200">
@@ -78,181 +85,6 @@
                         </div>
                     </div>
                 @endif
-                <!-- container -->
-                <div class="flex flex-col gap-2">
-                    <div class="bg-white rounded-t-lg space-y-4 p-4">
-                        <header class="flex flex-col sm:flex-row items-center justify-between gap-3">
-                            <p class="text-lg font-semibold">اطلاعات تخصصی پزشک</p>
-                            <div class="flex items-center gap-3">
-                                <div class="flex items-center gap-3 bg-green text-white rounded-full py-2 px-5">
-                                    <svg class="w-5 h-5" xmlns="http://www.w3.org/2000/svg">
-                                        <use xlink:href="#sprite-heart" />
-                                    </svg>
-                                    <p>89% رضایت</p>
-                                </div>
-                                <p>از 200 نفر</p>
-                            </div>
-                        </header>
-                        <main class="flex flex-col gap-3">
-                            <div class="border-2 border-secondary-200 p-4 rounded-lg flex flex-col gap-3">
-                                <div class="flex items-center justify-between">
-                                    <p>برخورد مناسب</p>
-                                    <div class="flex items-center gap-2 font-bold">
-                                        <p>5</p>
-                                        <p class="text-xl">/</p>
-                                        <p class="text-green">4.5</p>
-                                    </div>
-                                </div>
-                                <progress dir="ltr" max="100" value="80"></progress>
-                            </div>
-                            <div class="border-2 border-secondary-200 p-4 rounded-lg flex flex-col gap-3">
-                                <div class="flex items-center justify-between">
-                                    <p>توضیحات مفید پزشک</p>
-                                    <div class="flex items-center gap-2 font-bold">
-                                        <p>5</p>
-                                        <p class="text-xl">/</p>
-                                        <p class="text-green">4.5</p>
-                                    </div>
-                                </div>
-                                <progress dir="ltr" max="100" value="80"></progress>
-                            </div>
-                            <div class="border-2 border-secondary-200 p-4 rounded-lg flex flex-col gap-3">
-                                <div class="flex items-center justify-between">
-                                    <p>مهارت و تخصص</p>
-                                    <div class="flex items-center gap-2 font-bold">
-                                        <p>5</p>
-                                        <p class="text-xl">/</p>
-                                        <p class="text-green">4.5</p>
-                                    </div>
-                                </div>
-                                <progress dir="ltr" max="100" value="80"></progress>
-                            </div>
-                        </main>
-                        <footer class="flex flex-col sm:flex-row items-center justify-between text-secondary-400 gap-4">
-                            <div class="flex items-center gap-2">
-                                <svg class="w-5 h-5" xmlns="http://www.w3.org/2000/svg">
-                                    <use xlink:href="#sprite-eye" />
-                                </svg>
-                                <p>13 هزار بار مشاهده</p>
-                            </div>
-                            <div class="flex items-center text-sm gap-4">
-                                <button type="button" class="flex items-center gap-2">
-                                    <svg class="w-5 h-5" xmlns="http://www.w3.org/2000/svg">
-                                        <use xlink:href="#sprite-save" />
-                                    </svg>
-                                    <p>نشان</p>
-                                </button>
-                                <button type="button" class="flex items-center gap-2">
-                                    <svg class="w-5 h-5" xmlns="http://www.w3.org/2000/svg">
-                                        <use xlink:href="#sprite-share" />
-                                    </svg>
-                                    <p>اشتراک گذاری</p>
-                                </button>
-                                <button type="button" class="flex items-center gap-2">
-                                    <svg class="w-5 h-5" xmlns="http://www.w3.org/2000/svg">
-                                        <use xlink:href="#sprite-info" />
-                                    </svg>
-                                    <p>گزارش خطا</p>
-                                </button>
-                            </div>
-                        </footer>
-                    </div>
-                    <div class="bg-white p-4 flex flex-col sm:flex-row items-center justify-between gap-3">
-                        <p class="font-bold">نظرات خود را با دیگران به اشتراک بگذارید</p>
-                        <a href="#" class="btn__blue--round-full-outline font-semibold">
-                            ثبت نظر
-                        </a>
-                    </div>
-                    @if ($fetchData['comments']->isNotEmpty())
-                        <div class="bg-white rounded-b-lg p-4 space-y-4">
-                            <header>
-                                <div class="flex items-center">
-                                    <p class="">نظرات</p>
-                                </div>
-                            </header>
-                            @foreach ($fetchData['comments'] as $key => $comment)
-                                <main class="flex flex-col gap-3">
-                                    <div class="border-2 border-secondary-200 rounded-lg flex flex-col gap-4 p-4">
-                                        <div class="flex flex-col sm:flex-row items-start justify-between gap-3">
-                                            <div class="flex items-center gap-4">
-                                                <div
-                                                    class="w-[65px] h-[65px] rounded-full flex items-center justify-center bg-primary-main text-white font-bold text-2xl">
-                                                    ن</div>
-                                                <div class="w-[calc(100%-65px-0.75rem)] space-y-2">
-                                                    <p>{{ $comment->user->full_name }}</p>
-                                                    <div class="flex items-center gap-3 text-sm text-secondary-400">
-                                                        <div
-                                                            class="hidden sm:block py-1 px-3 bg-secondary-100 rounded-full">
-                                                            <p>{{ verta($comment->created_at)->formatDifference() }}</p>
-                                                        </div>
-                                                        <div class="w-[1px] h-3 bg-secondary-400"></div>
-                                                        <p>{{ $comment->doctor->dr_display_address }}</p>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <div
-                                                class="flex items-center gap-2 bg-green/20 text-green rounded-full py-1 px-4 text-sm font-bold">
-                                                <p class="w-[calc(100%-1.75rem)]">{{ $comment->star }}</p>
-                                                <svg class="w-5 h-5" xmlns="http://www.w3.org/2000/svg">
-                                                    <use xlink:href="#sprite-star-full" />
-                                                </svg>
-                                            </div>
-                                        </div>
-                                        <p class="leading-7">{{ $comment->body }}</p>
-                                        <div class="flex flex-col md:flex-row gap-3">
-                                            <form action=""
-                                                class="flex-grow relative flex items-center border-2 border-secondary-200 rounded-lg px-3 h-[40px]">
-                                                <input type="text" class="flex-grow border-none outline-none"
-                                                    placeholder="پاسخ شما" />
-                                                <button class="flex items-center gap-2 font-bold">
-                                                    <p>ارسال</p>
-                                                    <svg class="w-5 h-5 mt-[2px]" xmlns="http://www.w3.org/2000/svg">
-                                                        <use xlink:href="#sprite-chevron-left-circle" />
-                                                    </svg>
-                                                </button>
-                                            </form>
-                                            <div class="flex gap-3">
-                                                <button
-                                                    class="flex-grow flex items-center gap-2 border-2 border-secondary-200 rounded-lg px-3 font-bold h-[40px]">
-                                                    <p>مفید بود</p>
-                                                    <svg class="w-5 h-5" xmlns="http://www.w3.org/2000/svg">
-                                                        <use xlink:href="#sprite-emoji" />
-                                                    </svg>
-                                                </button>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </main>
-                            @endforeach
-                            <button type="button" class="w-full py-2 px-5 flex items-center justify-center gap-3">
-                                <svg class="w-5 h-5" xmlns="http://www.w3.org/2000/svg">
-                                    <use xlink:href="#sprite-eye" />
-                                </svg>
-                                <p class="font-bold">نمایش بیشتر</p>
-                            </button>
-                        </div>
-                    @endif
-
-                </div>
-                <!-- end container -->
-
-                <!-- breadcrumb -->
-                <div class="flex flex-wrap items-center gap-2 text-secondary-400">
-                    <a href="#" class="hover:text-black">سلامت شرق</a>
-                    <svg class="w-7 h-7" xmlns="http://www.w3.org/2000/svg">
-                        <use xlink:href="#sprite-chevron-left" />
-                    </svg>
-                    <a href="#" class="hover:text-black">پزشکان و مراکز درمانی</a>
-                    <svg class="w-7 h-7" xmlns="http://www.w3.org/2000/svg">
-                        <use xlink:href="#sprite-chevron-left" />
-                    </svg>
-                    <a href="#" class="hover:text-black">متخصص بی‌هوشی و مراقبت‌های ویژه</a>
-                    <svg class="w-7 h-7" xmlns="http://www.w3.org/2000/svg">
-                        <use xlink:href="#sprite-chevron-left" />
-                    </svg>
-                    <span>هادی مسلم</span>
-                </div>
-                <!-- end breadcrumb -->
                 @isset($doc->dr_biography)
                     <div class="bg-white p-4 space-y-4 rounded-lg">
                         <header>
@@ -273,94 +105,211 @@
                             <div class="flex items-center gap-2">
 
                             </div>
-                            <div class="flex items-center text-sm gap-4">
-                                <button type="button" class="flex items-center gap-2">
-                                    <svg class="w-5 h-5" xmlns="http://www.w3.org/2000/svg">
-                                        <use xlink:href="#sprite-save" />
-                                    </svg>
-                                    <p>نشان</p>
-                                </button>
-                                <button type="button" class="flex items-center gap-2">
-                                    <svg class="w-5 h-5" xmlns="http://www.w3.org/2000/svg">
-                                        <use xlink:href="#sprite-share" />
-                                    </svg>
-                                    <p>اشتراک گذاری</p>
-                                </button>
-                                <button type="button" class="flex items-center gap-2">
-                                    <svg class="w-5 h-5" xmlns="http://www.w3.org/2000/svg">
-                                        <use xlink:href="#sprite-info" />
-                                    </svg>
-                                    <p>گزارش خطا</p>
-                                </button>
-                            </div>
                         </footer>
                     </div>
                 @endisset
+                <!-- breadcrumb -->
+                <div class="flex flex-wrap items-center gap-2 text-secondary-400">
+                    <a href="{{ route('front.homePage') }}" class="hover:text-black">
+                        {{ $fetchData['site_title'] }}</a>
+                    <svg class="w-7 h-7" xmlns="http://www.w3.org/2000/svg">
+                        <use xlink:href="#sprite-chevron-left" />
+                    </svg>
+                    <span>{{ $doc->full_name }} دکتر</span>
+                </div>
+                <!-- end breadcrumb -->
+                <!-- container -->
+                <div class="flex flex-col gap-2">
+                    @if (false)
+                        {{-- feed back --}}
+                        <div class="bg-white rounded-t-lg space-y-4 p-4">
+                            <header class="flex flex-col sm:flex-row items-center justify-between gap-3">
+                                <p class="text-lg font-semibold">اطلاعات تخصصی پزشک</p>
+                                <div class="flex items-center gap-3">
+                                    <div class="flex items-center gap-3 bg-green text-white rounded-full py-2 px-5">
+                                        <svg class="w-5 h-5" xmlns="http://www.w3.org/2000/svg">
+                                            <use xlink:href="#sprite-heart" />
+                                        </svg>
+                                        <p>89% رضایت</p>
+                                    </div>
+                                    <p>از 200 نفر</p>
+                                </div>
+                            </header>
+                            <main class="flex flex-col gap-3">
+                                <div class="border-2 border-secondary-200 p-4 rounded-lg flex flex-col gap-3">
+                                    <div class="flex items-center justify-between">
+                                        <p>برخورد مناسب</p>
+                                        <div class="flex items-center gap-2 font-bold">
+                                            <p>5</p>
+                                            <p class="text-xl">/</p>
+                                            <p class="text-green">4.5</p>
+                                        </div>
+                                    </div>
+                                    <progress dir="ltr" max="100" value="80"></progress>
+                                </div>
+                                <div class="border-2 border-secondary-200 p-4 rounded-lg flex flex-col gap-3">
+                                    <div class="flex items-center justify-between">
+                                        <p>توضیحات مفید پزشک</p>
+                                        <div class="flex items-center gap-2 font-bold">
+                                            <p>5</p>
+                                            <p class="text-xl">/</p>
+                                            <p class="text-green">4.5</p>
+                                        </div>
+                                    </div>
+                                    <progress dir="ltr" max="100" value="80"></progress>
+                                </div>
+                                <div class="border-2 border-secondary-200 p-4 rounded-lg flex flex-col gap-3">
+                                    <div class="flex items-center justify-between">
+                                        <p>مهارت و تخصص</p>
+                                        <div class="flex items-center gap-2 font-bold">
+                                            <p>5</p>
+                                            <p class="text-xl">/</p>
+                                            <p class="text-green">4.5</p>
+                                        </div>
+                                    </div>
+                                    <progress dir="ltr" max="100" value="80"></progress>
+                                </div>
+                            </main>
+                            <footer
+                                class="flex flex-col sm:flex-row items-center justify-between text-secondary-400 gap-4">
+                                <div class="flex items-center gap-2">
+                                    <svg class="w-5 h-5" xmlns="http://www.w3.org/2000/svg">
+                                        <use xlink:href="#sprite-eye" />
+                                    </svg>
+                                    <p>13 هزار بار مشاهده</p>
+                                </div>
+                                <div class="flex items-center text-sm gap-4">
+                                    <button type="button" class="flex items-center gap-2">
+                                        <svg class="w-5 h-5" xmlns="http://www.w3.org/2000/svg">
+                                            <use xlink:href="#sprite-save" />
+                                        </svg>
+                                        <p>نشان</p>
+                                    </button>
+                                    <button type="button" class="flex items-center gap-2">
+                                        <svg class="w-5 h-5" xmlns="http://www.w3.org/2000/svg">
+                                            <use xlink:href="#sprite-share" />
+                                        </svg>
+                                        <p>اشتراک گذاری</p>
+                                    </button>
+                                </div>
+                            </footer>
+                        </div>
+                    @endif
 
-                {{-- <div class="bg-white p-4 flex flex-col gap-4 rounded-lg">
-                    <p class="text-lg">درباره پزشک</p>
-                    <div class="flex flex-col gap-3">
-                        <div class="accordion__container accordion_select__container">
-                            <div class="accordion_select__button">
-                                <p class="accordion_select__text">
-                                    بعد از خرید چه مدت طول می کشد تا خدمات به من ارائه شوند؟
-                                </p>
-                                <div class="accordion_select__icon">
-                                    <svg class="w-8 h-8" xmlns="http://www.w3.org/2000/svg">
-                                        <use xlink:href="#sprite-chevron-down-circle" />
+                    @if ($fetchData['comments']->isNotEmpty())
+                        <div class="bg-white rounded-b-lg p-4 space-y-4">
+                            <header>
+                                <div class="flex items-center">
+                                    <p class="">نظرات</p>
+                                </div>
+                            </header>
+                            @for ($i = 0; $i < $fetchData['iteratorComments']; $i++)
+                                <main class="flex flex-col gap-3">
+                                    <div class="border-2 border-secondary-200 rounded-lg flex flex-col gap-4 p-4">
+                                        <div class="flex flex-col sm:flex-row items-start justify-between gap-3">
+                                            <div class="flex items-center gap-4">
+                                                <div
+                                                    class="w-[65px] h-[65px] rounded-full flex items-center justify-center bg-primary-main text-white font-bold text-2xl">
+                                                    ن</div>
+                                                <div class="w-[calc(100%-65px-0.75rem)] space-y-2">
+                                                    <p>{{ $fetchData['comments'][$i]->user->full_name }}</p>
+                                                    <div class="flex items-center gap-3 text-sm text-secondary-400">
+                                                        <div
+                                                            class="hidden sm:block py-1 px-3 bg-secondary-100 rounded-full">
+                                                            <p>{{ verta($fetchData['comments'][$i]->created_at)->formatDifference() }}
+                                                            </p>
+                                                        </div>
+                                                        <div class="w-[1px] h-3 bg-secondary-400"></div>
+                                                        <p>{{ $fetchData['comments'][$i]->doctor->dr_display_address }}
+                                                        </p>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div
+                                                class="flex items-center gap-2 bg-green/20 text-green rounded-full py-1 px-4 text-sm font-bold">
+                                                <p class="w-[calc(100%-1.75rem)]">
+                                                    {{ $fetchData['comments'][$i]->star }}</p>
+                                                <svg class="w-5 h-5" xmlns="http://www.w3.org/2000/svg">
+                                                    <use xlink:href="#sprite-star-full" />
+                                                </svg>
+                                            </div>
+                                        </div>
+                                        <p class="leading-7">{{ $fetchData['comments'][$i]->body }}</p>
+                                        @if (isset($fetchData['comments'][$i]->reply))
+                                            <div class="text-center border-r-4 border-blue-500  mr-3 text-start">
+                                               <p class="mr-2"> {{ $fetchData['comments'][$i]->reply }}</p>
+                                            </div>
+                                        @endif
+
+                                    </div>
+                                </main>
+                            @endfor
+                            @if (!isset($fetchData['iteratorStop']))
+                                <button wire:click='loadMoreComment' type="button"
+                                    class="w-full py-2 px-5 flex items-center justify-center gap-3">
+                                    <svg class="w-5 h-5" xmlns="http://www.w3.org/2000/svg">
+                                        <use xlink:href="#sprite-eye" />
                                     </svg>
+                                    <p class="font-bold">نمایش بیشتر</p>
+                                </button>
+                            @endif
+                        </div>
+                    @endif
+                    <div class="bg-white p-4 flex flex-col items-center justify-between gap-3">
+                        @error('CommentSuccess')
+                            <div class="container mb-4">
+                                <div
+                                    class="bg-blue-200 border border-2 border-bule-200  p-4 rounded-xl flex items-center gap-3">
+                                    <p class="w-[calc(100%-3.25rem)] text-gray-600 leading-6 text-lg">
+                                        {{ $message }}
+                                    </p>
                                 </div>
                             </div>
-                            <div class="accordion_select__content">
-                                <p class="text-sm leading-[1.65rem] text-justify text-gray-700">
-                                    لورم ایپسوم متن ساختگی با تولید سادگی نامفهوم از صنعت چاپ و با استفاده از طراحان
-                                    گرافیک است
-                                    چاپگرها
-                                    و متون
-                                    بلکه روزنامه و مجله در ستون و سطرآنچنان که لازم است و برای شرایط فعلی تکنولوژی مورد
-                                    نیاز و
-                                    کاربردهای متنوع
-                                    با هدف بهبود ابزارهای کاربردی می باشد
-                                </p>
+                        @else
+                            <div class="w-full flex justify-between">
+                                <p class="font-bold">نظرات خود را با دیگران به اشتراک بگذارید</p>
+                                <button type="button" id="registerComment"
+                                    class="btn__blue--round-full-outline font-semibold">
+                                    ثبت نظر
+                                </button>
                             </div>
-                        </div>
-                        <div class="accordion__container accordion_select__container">
-                            <div class="accordion_select__button">
-                                <p class="accordion_select__text">
-                                    بعد از خرید چه مدت طول می کشد تا خدمات به من ارائه شوند؟
-                                </p>
-                                <div class="accordion_select__icon">
-                                    <svg class="w-8 h-8" xmlns="http://www.w3.org/2000/svg">
-                                        <use xlink:href="#sprite-chevron-down-circle" />
-                                    </svg>
+                            <div class="border-2 border-secondary-200 rounded-lg flex flex-col gap-4 p-4 w-full"
+                                id='registerCommentDiv' style="display: none" wire:ignore.self>
+                                <div class="flex flex-col sm:flex-row items-center justify-between gap-3 mb-3">
+                                    <div
+                                        class="flex items-center gap-2 bg-green/20 text-green rounded-full py-1 px-4 text-sm font-bold">
+                                        <div class="flex items-center gap-2">
+                                            <input type="range" min="1" max="5" step="1"
+                                                wire:model='form.comment.rate' value="5"
+                                                class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer dark:bg-gray-700">
+                                            <span id="ratingValue" class="ml-2 text-gray-700 font-bold">5</span>
+                                        </div>
+                                        <svg class="w-5 h-5" xmlns="http://www.w3.org/2000/svg">
+                                            <use xlink:href="#sprite-star-full" />
+                                        </svg>
+                                    </div>
+                                </div>
+                                <div class="flex flex-col md:flex-row gap-3 mt-3 mb-3">
+                                    <form class="flex-grow relative flex items-center h-[40px]">
+                                        <textarea wire:model='form.comment.body' type="text" rows="3"
+                                            class="flex-grow w-full  border-2 border-secondary-200 rounded-lg px-3" placeholder="متن نظر را بنویسید"></textarea>
+                                        @error('form.comment.body')
+                                            <span class="text-rose-500">{{ $message }}</span>
+                                        @enderror
+                                    </form>
+                                </div>
+                                <div class="w-full flex justify-end">
+                                    <button type="button" wire:click='addComment'
+                                        class="btn__blue--round-full-outline font-semibold">
+                                        ارسال
+                                    </button>
                                 </div>
                             </div>
-                            <div class="accordion_select__content">
-                                <p class="text-sm leading-[1.65rem] text-justify text-gray-700">
-                                    لورم ایپسوم متن ساختگی با تولید سادگی نامفهوم از صنعت چاپ و با استفاده از طراحان
-                                    گرافیک است
-                                    چاپگرها
-                                    و متون
-                                    بلکه روزنامه و مجله در ستون و سطرآنچنان که لازم است و برای شرایط فعلی تکنولوژی مورد
-                                    نیاز و
-                                    کاربردهای متنوع
-                                    با هدف بهبود ابزارهای کاربردی می باشد
-                                </p>
-                            </div>
-                        </div>
+                        @enderror
                     </div>
-                    <div class="flex flex-col md:flex-row gap-3 items-center justify-between">
-                        <p class="text-sm">
-                            در صورتیکه در یافتن پاسخ به مشکل خوردید یا آن را از بین سوالات متداول نیافته‌اید، با
-                            پشتیبانی ارتباط
-                            برقرار کنید.
-                        </p>
-                        <a href="#"
-                            class="w-full md:w-auto text-center block bg-secondary-100 hover:bg-secondary-200 transition-colors rounded-xl py-1 px-5">
-                            ارتباط پشتیبانی
-                        </a>
-                    </div>
-                </div> --}}
+                </div>
+                <!-- end container -->
+
             </section>
             <section class="basis-full md:basis-[40%] flex flex-col gap-6">
                 <div class="bg-white rounded-lg p-4 space-y-4">
@@ -400,13 +349,13 @@
                             </div>
                         @endif
                         <button type="button" wire:click='reserveAppointment'
-                            @if (! $fetchData['is_app_available']) disabled @endif class="btn__blue--round-full-between"  >
+                            @if (!$fetchData['is_app_available']) disabled @endif class="btn__blue--round-full-between">
                             <p>دریافت نوبت دکتر {{ $doc->full_name }}</p>
                             <svg class="w-6 h-6" xmlns="http://www.w3.org/2000/svg">
                                 <use xlink:href="#sprite-arrow-left-circle" />
                             </svg>
                         </button>
-                        @if (! $fetchData['is_app_available'])
+                        @if (!$fetchData['is_app_available'])
                             <div class="error_badge">
                                 <svg class="w-6 h-6" xmlns="http://www.w3.org/2000/svg">
                                     <use xlink:href="#sprite-warning" />
@@ -464,6 +413,32 @@
             });
             $('body').on('click', '.servicechoices', function() {
                 @this.serviceHasSelected();
+            });
+            $(document).on('click', '#registerComment', function() {
+                var $registerCommentDiv = $('#registerCommentDiv');
+
+                if ($registerCommentDiv.css('display') === 'none') {
+                    $registerCommentDiv.fadeIn();
+                } else {
+                    // Do something else if the div is already visible
+                    $registerCommentDiv.fadeOut(); // For example, you could hide it
+                }
+            });
+            const rangeInput = document.querySelector('input[type="range"]');
+            const ratingValue = document.getElementById('ratingValue');
+            rangeInput.addEventListener('input', function() {
+                ratingValue.textContent = rangeInput.value;
+            });
+            $('#share').on('click', function() {
+                var tempInput = document.createElement("input");
+                tempInput.style.position = "absolute";
+                tempInput.style.left = "-1000px";
+                tempInput.value = window.location.href;
+                document.body.appendChild(tempInput);
+                tempInput.select();
+                document.execCommand("copy");
+                document.body.removeChild(tempInput);
+                alert('با موفقیت کپی شد!');
             });
         });
     </script>

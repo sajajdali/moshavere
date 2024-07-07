@@ -30,6 +30,7 @@ enum CommentStatusEnum: int
     {
         return match ($this) {
             self::REJECTED => true,
+            self::PENDING => true,
             default => false,
         };
     }

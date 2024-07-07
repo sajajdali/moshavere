@@ -78,6 +78,10 @@ class UpdateOrCreate extends Component
         if (isset($this->form['drWaitingTime'])) {
             $this->user->dr_waiting_time = $this->form['drWaitingTime'];
         }
+        if (isset($this->form['active'])) {
+            $this->user->active_appointment = $this->form['active'];
+        }
+
         $this->user->ban_user = $this->form['banUser'];
 
         return redirect()->route('admin.user.index')->with('success', 'اطلاعات پزشک با موفقیت ثبت شد');

@@ -9,6 +9,8 @@ use Modules\User\Entities\User;
 use Modules\Place\app\Models\Place;
 use Modules\Front\app\Models\Comment;
 use Modules\Service\app\Models\Service;
+use Modules\Setting\Enum\SettingKeyEnum;
+use Modules\Front\Enum\CommentStatusEnum;
 use Modules\AppointmentSetting\app\Models\AppointmentSetting;
 
 #[Layout('front::layouts.app')]
@@ -19,31 +21,34 @@ class DoctorProfileLivewire extends Component
     public User $doc;
     #[Locked]
     public array $fetchData = [];
-    public array $form = [];
+    public array $form = [
+        'comment' => ['rate' => 5 ]
+    ];
 
     public function reserveAppointment()
     {
-        // lunch modal
-        if ($this->doc->places()->count() > 1) {
-            if (! isset($this->form['place']) || empty($this->form['place'])) {
-                $this->fetchData['places'] = $this->doc->places;
-                $this->fetchData['modalStep'] = 1;
-                if (isset($this->fetchData['services'])) {
-                    unset($this->fetchData['services']);
+        if ($this->isDocAvaiable()) {
+            if ($this->doc->places()->count() > 1) {
+                if (!isset($this->form['place']) || empty($this->form['place'])) {
+                    $this->fetchData['places'] = $this->doc->places;
+                    $this->fetchData['modalStep'] = 1;
+                    if (isset($this->fetchData['services'])) {
+                        unset($this->fetchData['services']);
+                    }
+                    if (isset($this->fetchData['place'])) {
+                        unset($this->fetchData['place']);
+                    }
                 }
-                if (isset($this->fetchData['place'])) {
-                    unset($this->fetchData['place']);
-                }
+                return  $this->lunchModal();
             }
-            return  $this->lunchModal();
-        }
-        if ($this->doc->services()->count() > 1) {
-            $this->fetchData['services'] = $this->doc->services;
-            return $this->lunchModal();
-        }
+            if ($this->doc->services()->count() > 1) {
+                $this->fetchData['services'] = $this->doc->services;
+                return $this->lunchModal();
+            }
 
-        // if less than one service exist , redirect to appointment days list
-        $this->redirectToAppointmentDays($this->doc->id, $this->doc->places()->first()->id, $this->doc->services()->first()->id);
+            // if less than one service exist , redirect to appointment days list
+            $this->redirectToAppointmentDays($this->doc->id, $this->doc->places()->first()->id, $this->doc->services()->first()->id);
+        }
     }
     public function lunchModal()
     {
@@ -68,20 +73,25 @@ class DoctorProfileLivewire extends Component
     public function modalSubmit()
     {
         if ($this->fetchData['modalStep'] == 1) {
-            $this->fetchData['services'] = $this->doc->services;
-            if (isset($this->form['service']) && !empty($this->form['service'])) {
-                // user selected service on privous page
-                $this->serviceHasSelected();
-                $this->fetchData['modalStep']++;
-            } else {
-                if ($this->doc->services()->count() <= 1) {
-                    $this->redirectToAppointmentDays(
-                        $this->doc->id,
-                        $this->form['place'],
-                        $this->doc->services()->first()->id
-                    );
+            if (isset($this->form['place'])) {
+                $this->form['place_name'] = Place::find($this->form['place'])?->title ?? '';
+                $this->fetchData['services'] = $this->doc->services;
+                if (isset($this->form['service']) && !empty($this->form['service'])) {
+                    // user selected service on privous page
+                    $this->serviceHasSelected();
+                    $this->fetchData['modalStep']++;
+                } else {
+                    if ($this->doc->services()->count() <= 1) {
+                        $this->redirectToAppointmentDays(
+                            $this->doc->id,
+                            $this->form['place'],
+                            $this->doc->services()->first()->id
+                        );
+                    }
+                    $this->fetchData['modalStep']++;
                 }
-                $this->fetchData['modalStep']++;
+            } else {
+                $this->fetchData['modalStep'] =  1;
             }
         } elseif ($this->fetchData['modalStep'] == 2) {
             if (count($this->form['segment']) > 1) {
@@ -128,7 +138,17 @@ class DoctorProfileLivewire extends Component
             }
         }
     }
-
+    public function editPlace()
+    {
+        if (isset($this->fetchData['services'])) {
+            unset($this->fetchData['services']);
+        }
+        if (isset($this->fetchData['place'])) {
+            unset($this->fetchData['place']);
+        }
+        $this->fetchData['places'] = $this->doc->places;
+        $this->fetchData['modalStep'] = 1;
+    }
 
     // check is user redirect to this page with service_id and place_id
     private function routeHasServiceOrPlace()
@@ -141,8 +161,8 @@ class DoctorProfileLivewire extends Component
             $santetizeService = htmlspecialchars(request()->input('place_id'), ENT_QUOTES, 'UTF-8');
             $place =   Place::find($santetizeService) ?? null;
             if (isset($place) && !empty($place)) {
-                $this->form['place'] = $place->id ;
-                $this->form['place_name'] = $place->title ;
+                $this->form['place'] = $place->id;
+                $this->form['place_name'] = $place->title;
                 $this->fetchData['services'] = $this->doc->services;
                 $this->fetchData['modalStep'] = 2;
             }
@@ -157,11 +177,136 @@ class DoctorProfileLivewire extends Component
             $this->lucnhModal();
         }
     }
+    public function addComment()
+    {
+         // Check if the user is logged in
+         if (!auth()->check()) {
+            $route = route('front.doctor.profile', ['doctor_id' =>  $this->doc->id]);
+            session()->put('url.intended', $route);
+            return redirect()->route('front.login.user', ['comment' => true]);
+        }
+
+        $this->validate([
+            'form.comment.body' => 'required|string|max:500',
+            'form.comment.rate' => 'nullable',
+        ]);
+        $userHasComment = Comment::where('user_id', auth()->user()->id)->where('doctor_id', $this->doc->id)->where('status', CommentStatusEnum::PENDING)->exists();
+        if (isset($userHasComment) && $userHasComment == true) {
+            $this->addError('CommentSuccess', 'شما قبلا یک نظر برای این پزشک ثبت کرده اید برای ثبت نظر مجدد، صبر کنید تا نظر قبلی شما تایید شود.');
+        } else {
+            $commentModel = [
+                'user_id' => auth()->user()->id,
+                'doctor_id' => $this->doc->id,
+                'body' => $this->form['comment']['body'],
+                'status' => CommentStatusEnum::PENDING,
+            ];
+            if (isset($this->form['comment']['rate'])) {
+                $commentModel['star'] = $this->form['comment']['rate'];
+            }
+            Comment::create($commentModel);
+            $this->addError('CommentSuccess', 'نظر شما با موفقیت ثبت شد و بعد از تایید در سایت نمایش داده میشود');
+        }
+    }
+
+    public function loadMoreComment()
+    {
+        $totallComments =  count($this->fetchData['comments']);
+        if ($totallComments >  $this->fetchData['iteratorComments'] + 2) {
+            $this->fetchData['iteratorComments']  = $this->fetchData['iteratorComments'] + 2;
+        } else {
+            $this->fetchData['iteratorComments'] = $totallComments;
+            $this->fetchData['iteratorStop'] = true;
+        }
+    }
+    public function addFavarite()
+    {
+        // Check if the user is logged in
+        if (!auth()->check()) {
+            $route = route('front.doctor.profile', ['doctor_id' =>  $this->doc->id]);
+            session()->put('url.intended', $route);
+            return redirect()->route('front.login.user', ['favariteDr' => true]);
+        }
+        $privius_docs = auth()->user()->favorite_dr;
+
+        // Retrieve the current user's favorite doctors
+        $user = auth()->user();
+        $privius_docs = $user->favorite_dr;
+        // Ensure $privius_docs is an array
+        if (!is_array($privius_docs)) {
+            $privius_docs = json_decode($privius_docs, true);
+
+            if (!is_array($privius_docs)) {
+                $privius_docs = [];
+            }
+        }
+
+        // Add the new doctor's ID to the array
+        $privius_docs[] = $this->doc->id;
+
+        // Save the updated array back to the user's profile
+        $user->favorite_dr = $privius_docs;
+        $this->fetchData['isFavarite'] = true;
+    }
+
+    public function removeFromFavarite()
+    {
+        // Check if the user is logged in
+        if (!auth()->check()) {
+            $route = route('front.doctor.profile', ['doctor_id' =>  $this->doc->id]);
+            session()->put('url.intended', $route);
+            return redirect()->route('front.login.user', ['favariteDr' => true]);
+        }
+        $privius_docs = auth()->user()->favorite_dr;
+        // Retrieve the current user's favorite doctors
+        $user = auth()->user();
+        $privius_docs = $user->favorite_dr;
+
+        // Ensure $privius_docs is an array
+        if (!is_array($privius_docs)) {
+            $privius_docs = json_decode($privius_docs, true);
+
+            if (!is_array($privius_docs)) {
+                $privius_docs = [];
+            }
+        }
+
+        if (($key = array_search($this->doc->id, $privius_docs)) !== false) {
+            unset($privius_docs[$key]);
+        }
+        // Re-index the array to avoid potential issues with JSON encoding
+        $privius_docs = array_values($privius_docs);
+        $user->favorite_dr = json_encode($privius_docs);
+
+        if (isset($this->fetchData['isFavarite'])) {
+            unset($this->fetchData['isFavarite']);
+        }
+    }
+    private function isDocAvaiable()
+    {
+        // check if doctor active and has setting 
+        $status =  $this->doc->isDoctorActive();
+        $hasSetting = AppointmentSetting::where('user_id', $this->doc->id)->exists();
+        if ($status && $hasSetting) {
+            return true;
+        }
+        return false;
+    }
     public function mount()
     {
         $doctor_id =   request()->route('doctor_id');
         $this->doc =  User::find($doctor_id);
         $this->fetchData['comments'] = Comment::doctroComments($this->doc->id);
+        if (count($this->fetchData['comments']) > 2) {
+            $this->fetchData['iteratorComments'] = 2;
+        } else {
+            $this->fetchData['iteratorComments'] = count($this->fetchData['comments']);
+            $this->fetchData['iteratorStop'] = true;
+        }
+        if (auth()->check()) {
+            if (isset(auth()->user()->favorite_dr) &&  in_array($this->doc->id, auth()->user()->favorite_dr)) {
+                $this->fetchData['isFavarite'] = true;
+            }
+        }
         $place = $this->doc->Places()->first();
         if (isset($place->detail[Place::DETAIL_KEY_NUMBERS])) {
             $this->fetchData['tel'] = implode(',', $place->detail[Place::DETAIL_KEY_NUMBERS]);
@@ -173,9 +318,11 @@ class DoctorProfileLivewire extends Component
             $this->fetchData['navigate'] = "https://maps.google.com/maps?daddr=" . $place->detail[Place::DETAIL_KEY_LOCATION][Place::DETAIL_KEY_LOCATION_LAT] . ',' . $place->detail[Place::DETAIL_KEY_LOCATION][Place::DETAIL_KEY_LOCATION_LNG];
         }
         $this->fetchData['modalStep'] = 1;
-        $this->fetchData['is_app_available'] =  $this->doc->isDoctorActive();
-
+        $this->fetchData['is_app_available'] = $this->isDocAvaiable();
         $this->routeHasServiceOrPlace();
+
+        // bread crumb
+        $this->fetchData['site_title'] = Setting(SettingKeyEnum::SITE_TITLE);
     }
     public function render()
     {

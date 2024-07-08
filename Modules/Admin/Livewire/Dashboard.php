@@ -6,6 +6,9 @@ use Carbon\Carbon;
 use Livewire\Component;
 use Livewire\WithPagination;
 use Livewire\Attributes\Title;
+use Modules\User\Entities\User;
+use Modules\User\Enum\UserMetaEnum;
+use Illuminate\Support\Facades\Cache;
 use Modules\Service\app\Models\Service;
 use Modules\AppointmentUser\app\Models\AppointmentUser;
 use Modules\AppointmentUser\Enum\AppointmentUserStatusEnum;
@@ -25,18 +28,27 @@ class Dashboard extends Component
         $this->fetchData['pendding_appointment'] = AppointmentUser::waitpayment()->get()?->count();
         $this->fetchData['today_canceld_appointment'] = AppointmentUser::disabled()->today()->get()?->count();
         $this->fetchData['chart']['month'] = [verta()->format('F'), verta()->submonths(1)->format('F'), verta()->submonths(2)->format('F'), verta()->submonths(3)->format('F')];
-        $this->fetchData['chart']['data']['successful'] = [
-            AppointmentUser::where('status',AppointmentUserStatusEnum::STATUS_SUCCESSFUL)->whereBetween('date_visit', [verta()->submonths(1)->toCarbon(), verta()->toCarbon()])->count(),
-            AppointmentUser::where('status',AppointmentUserStatusEnum::STATUS_SUCCESSFUL)->whereBetween('date_visit', [verta()->submonths(2)->toCarbon(), verta()->submonths(1)->toCarbon()])->count(),
-            AppointmentUser::where('status',AppointmentUserStatusEnum::STATUS_SUCCESSFUL)->whereBetween('date_visit', [verta()->submonths(3)->toCarbon(), verta()->submonths(2)->toCarbon()])->count(),
-            AppointmentUser::where('status',AppointmentUserStatusEnum::STATUS_SUCCESSFUL)->whereBetween('date_visit', [verta()->submonths(4)->toCarbon(), verta()->submonths(3)->toCarbon()])->count(),
-        ];
-        $this->fetchData['chart']['data']['canceld'] = [
-            AppointmentUser::where('status',AppointmentUserStatusEnum::STATUS_CANCEL)->whereBetween('date_visit', [verta()->submonths(1)->toCarbon(), verta()->toCarbon()])->count(),
-            AppointmentUser::where('status',AppointmentUserStatusEnum::STATUS_CANCEL)->whereBetween('date_visit', [verta()->submonths(2)->toCarbon(), verta()->submonths(1)->toCarbon()])->count(),
-            AppointmentUser::where('status',AppointmentUserStatusEnum::STATUS_CANCEL)->whereBetween('date_visit', [verta()->submonths(3)->toCarbon(), verta()->submonths(2)->toCarbon()])->count(),
-            AppointmentUser::where('status',AppointmentUserStatusEnum::STATUS_CANCEL)->whereBetween('date_visit', [verta()->submonths(4)->toCarbon(), verta()->submonths(3)->toCarbon()])->count(),
-        ];
+
+        $cacheKeySuccessful = 'appointment_successful_counts';
+        $cacheKeyCanceled = 'appointment_canceled_counts';
+        $this->fetchData['chart']['data']['successful'] = Cache::remember($cacheKeySuccessful, now()->addDay(), function () {
+            return [
+                AppointmentUser::where('status', AppointmentUserStatusEnum::STATUS_SUCCESSFUL)->whereBetween('date_visit', [verta()->submonths(1)->toCarbon(), verta()->toCarbon()])->count(),
+                AppointmentUser::where('status', AppointmentUserStatusEnum::STATUS_SUCCESSFUL)->whereBetween('date_visit', [verta()->submonths(2)->toCarbon(), verta()->submonths(1)->toCarbon()])->count(),
+                AppointmentUser::where('status', AppointmentUserStatusEnum::STATUS_SUCCESSFUL)->whereBetween('date_visit', [verta()->submonths(3)->toCarbon(), verta()->submonths(2)->toCarbon()])->count(),
+                AppointmentUser::where('status', AppointmentUserStatusEnum::STATUS_SUCCESSFUL)->whereBetween('date_visit', [verta()->submonths(4)->toCarbon(), verta()->submonths(3)->toCarbon()])->count(),
+            ];
+        });
+
+        $this->fetchData['chart']['data']['canceld'] = Cache::remember($cacheKeyCanceled, now()->addDay(), function () {
+            return [
+                AppointmentUser::where('status', AppointmentUserStatusEnum::STATUS_CANCEL)->whereBetween('date_visit', [verta()->submonths(1)->toCarbon(), verta()->toCarbon()])->count(),
+                AppointmentUser::where('status', AppointmentUserStatusEnum::STATUS_CANCEL)->whereBetween('date_visit', [verta()->submonths(2)->toCarbon(), verta()->submonths(1)->toCarbon()])->count(),
+                AppointmentUser::where('status', AppointmentUserStatusEnum::STATUS_CANCEL)->whereBetween('date_visit', [verta()->submonths(3)->toCarbon(), verta()->submonths(2)->toCarbon()])->count(),
+                AppointmentUser::where('status', AppointmentUserStatusEnum::STATUS_CANCEL)->whereBetween('date_visit', [verta()->submonths(4)->toCarbon(), verta()->submonths(3)->toCarbon()])->count(),
+            ];
+        });
+        $this->fetchData['SelfRegistrationDoctors'] = User::newRegistredDoctor()->get()->take(10);
     }
     public function render()
     {

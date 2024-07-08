@@ -149,7 +149,7 @@
                             placeholder="اواویت نمایش مربوط به این مطب در صورتی که چند مطب داشته باشید را به عدد وارد کنید.">
                     </div>
                 </div>
-                <div class="col-12 mt-5">
+                {{-- <div class="col-12 mt-5">
                     <h4>شبکه های اجتماعی</h4>
                     <hr style="opacity: 0.9">
                     <div class="row">
@@ -184,7 +184,7 @@
                                 <small>به صورت : https://web.whatsapp.com/your_id</small>
                         </div>
                     </div>
-                </div>
+                </div> --}}
                 <div class="col-12 mt-5">
                     <div class="checkbox">
                         <div class="custom-checkbox custom-control">

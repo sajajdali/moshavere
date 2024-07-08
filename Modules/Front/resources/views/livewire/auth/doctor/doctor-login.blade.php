@@ -1,5 +1,10 @@
 <div>
     <main class="py-16 bg-secondary-100">
+        @isset($fetchData['alert'])
+        <div class="bg-rose-400 border border-2 border-rose-400  text-white text-lg	 text-center py-3 px-5 rounded-lg mb-5 mx-auto max-w-[600px]">
+           {{ $fetchData['alert'] }}
+        </div>
+        @endisset
         <form wire:submit='DocLoginForm' class="bg-white rounded-lg w-full max-w-[600px] mx-auto p-5 flex flex-col gap-4" wire:loading.class='opacity-50'>
             <div class="text-center space-y-2">
                 <p class="text-lg font-semibold">ورود / ثبت نام پزشک</p>

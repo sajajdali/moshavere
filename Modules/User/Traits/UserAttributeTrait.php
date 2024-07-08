@@ -325,4 +325,14 @@ trait UserAttributeTrait
             }
         );
     }
+    public function drRegisterFrom(): Attribute
+    {
+        $operator = UserMetaEnum::DR_REGISTRATION_FROM;
+        return Attribute::make(
+            get: fn () => $this->getMeta($operator)?->meta_value,
+            set: fn ($value) => $this->metas()->create(['meta_key' => $operator, 'meta_value' => $value])
+        );
+    }
+
+
 }

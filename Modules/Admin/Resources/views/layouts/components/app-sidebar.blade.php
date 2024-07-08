@@ -3,7 +3,7 @@
     <div class="app-sidebar__overlay" data-bs-toggle="sidebar"></div>
     <div class="app-sidebar">
         <div class="side-header">
-            <a class="header-brand1" href="{{url('index')}}">
+            <a class="header-brand1" href="{{ route('admin.dashboard') }}">
                 <img src="{{ setting(Modules\Setting\Enum\SettingKeyEnum::SITE_LOGO_URL) }}" class="header-brand-img desktop-logo" alt="{{setting(Modules\Setting\Enum\SettingKeyEnum::SITE_TITLE)}}">
                 <img src="{{ setting(Modules\Setting\Enum\SettingKeyEnum::SITE_LOGO_URL) }}" class="header-brand-img toggle-logo" alt="{{setting(Modules\Setting\Enum\SettingKeyEnum::SITE_TITLE)}}">
                 <img src="{{ setting(Modules\Setting\Enum\SettingKeyEnum::SITE_LOGO_URL) }}" class="header-brand-img light-logo" alt="{{setting(Modules\Setting\Enum\SettingKeyEnum::SITE_TITLE)}}">

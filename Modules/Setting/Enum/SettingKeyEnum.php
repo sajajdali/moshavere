@@ -26,6 +26,9 @@ enum SettingKeyEnum: int implements EnumHasNameInterface, SettingTypeInterface, 
     case APPOINTMENT_DESCRIPTION_IN_CHECKOUT_PAGE_REFUND = 12;
     case APPOINTMENT_FOR_OTHERS_STATUS = 13;
     case APPOINTMENT_MORE_THAT_ONE_PER_DAY = 14;
+    case FOOTER_DESCRIPTION = 15;
+    case INSTAGRAM_ADDRESS = 16;
+    case TELEGRAM_ADDRESS = 17;
 
         //sms
     case SMS_API_TOKEN = 20;
@@ -90,6 +93,9 @@ enum SettingKeyEnum: int implements EnumHasNameInterface, SettingTypeInterface, 
             self::SITE_SLIDER_TITLE    => 'عنوان در ابتتدای صفحه ای اصلی و بالای قسمت جست و جو',
             self::APPOINTMENT_DESCRIPTION_IN_CHECKOUT_PAGE_REFUND    => 'توضیحات در صفحه قبل از تایید نوبت توس کاربر(checkout)',
             self::APPOINTMENT_MORE_THAT_ONE_PER_DAY    => 'امکان رزرو بیشتر از یک نوبت در هر روز برای هر بیمار',
+            self::FOOTER_DESCRIPTION    => 'توضیحات در فورتر سایت',
+            self::INSTAGRAM_ADDRESS    => 'ادرس صفحه ی ابنتساگرام شما به صورت :https://www.instagram.com/shemiranweb/ ',
+            self::TELEGRAM_ADDRESS    => 'ادرس تلگرام شما ',
 
 
             self::SMS_API_TOKEN => 'توکن API پیامک',
@@ -184,6 +190,7 @@ enum SettingKeyEnum: int implements EnumHasNameInterface, SettingTypeInterface, 
             self::CONTACTUS_FIRST_SECTION_BODY => SettingTypeEnum::TEXTAREA,
             self::CONTACTUS_FORM_STATUS => SettingTypeEnum::CHECK,
             self::CONTACTUS_FORM_ADDRESS => SettingTypeEnum::TEXTAREA,
+            self::FOOTER_DESCRIPTION => SettingTypeEnum::TEXTAREA,
             default => SettingTypeEnum::TEXT
         };
     }

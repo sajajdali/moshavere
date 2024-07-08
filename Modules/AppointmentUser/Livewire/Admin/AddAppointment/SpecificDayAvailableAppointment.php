@@ -10,11 +10,13 @@ use Livewire\Attributes\Computed;
 use Illuminate\Support\Facades\Cache;
 use Hekmatinasser\Verta\Facades\Verta;
 use Modules\Service\app\Models\Service;
+use Modules\Setting\Enum\SettingKeyEnum;
 use Modules\AppointmentUser\app\Models\AppointmentUser;
 use Modules\Appointmentuser\Traits\OprationButtonsTrait;
 use Modules\AppointmentUser\Enum\AppointmentUserTypeEnum;
 use Modules\AppointmentUser\Enum\AppointmentUserStatusEnum;
 use Modules\AppointmentSetting\app\Models\AppointmentSetting;
+use Modules\AppointmentUser\app\Notifications\AppointmentSmsNotification;
 use Modules\AppointmentUser\Livewire\Admin\AddAppointment\Modal\SpecificDayAppointmentRegistrationModal;
 
 class SpecificDayAvailableAppointment extends Component
@@ -249,7 +251,10 @@ class SpecificDayAvailableAppointment extends Component
 
         // Update the appointment
         $this->edited['old_app']->update($updateData);
-
+        $smsTemplate = setting(SettingKeyEnum::SMS_APPOINTMENT_TIME_UPDATE);
+        if (isset($smsTemplate)) {
+            $this->edited['old_app']->notify(new AppointmentSmsNotification($smsTemplate));
+        }
         return redirect()->route('admin.appointment.add.specificday', [
             'serviceId' => $this->fetchData['service']->id,
             'placeId' => $this->fetchData['place'],

@@ -24,6 +24,12 @@
             عدم تایید نوبت
         </a>
     </li>
+    <li>
+        <a wire:click='disApprovemonitoringAppointmentWithSms({{ $ap->id }})' href="#" data-label="ویرایش">
+            <i class="fa fa-ban text-danger" aria-hidden="true"></i>
+            عدم تایید نوبت (با ارسال پیامک)
+        </a>
+    </li>
 @elseif(
     $ap->status == Modules\AppointmentUser\Enum\AppointmentUserStatusEnum::STATUS_DISAPPROVED ||
         $ap->status == Modules\AppointmentUser\Enum\AppointmentUserStatusEnum::STATUS_CANCEL)

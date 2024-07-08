@@ -1,5 +1,10 @@
 <div>
     <main class="py-16 bg-secondary-100">
+        @isset($fetchData['alert'])
+        <div class="bg-cyan-300 text-gray-500 text-lg	 text-center py-3 px-5 rounded-lg mb-5 mx-auto max-w-[600px]">
+           {{ $fetchData['alert'] }}
+        </div>
+        @endisset
         <form wire:submit='createDocotr' class="bg-white rounded-lg w-full max-w-[600px] mx-auto p-5 flex flex-col gap-4"
             wire:loading.class='opacity-50'>
             <p class="text-lg text-center font-semibold">ایجاد حساب برای پزشک</p>

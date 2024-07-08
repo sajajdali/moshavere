@@ -316,12 +316,23 @@ class User extends Authenticatable
         if (isset($this->doc->ban_user) && $this->doc->ban_user == true) {
             return   false;
         }
-        if (! $this->services()->exists()) {
+        if (!$this->services()->exists()) {
             return  false;
         }
-        if (! $this->places()->exists()) {
+        if (!$this->places()->exists()) {
             return false;
         }
         return true;
+    }
+
+    public function scopeNewRegistredDoctor()
+    {
+       return $this->doctors_query()->whereHas('metas', function ($q) {
+            $q->where([
+                ['meta_key', UserMetaEnum::BAN_USER],
+                ['meta_value', true],
+            ]);
+        })
+            ->orderByDesc('id');
     }
 }

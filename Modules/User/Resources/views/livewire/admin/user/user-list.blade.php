@@ -23,52 +23,124 @@
                         <h3 class="card-title">کاربران شما</h3>
                         @endif
                         <div class="card-options">
-                            <button class="btn btn-primary" type="button" data-bs-toggle="collapse"
-                                data-bs-target="#advanceSearch" aria-expanded="false" aria-controls="advanceSearch">
-                                جست و جوی پیشرفته
-                            </button>
+                            <div>
+                                @empty(!$searchPanel)
+                                    <button class="btn btn-secondary my-1" type="button" data-bs-toggle="collapse"
+                                        wire:click='resetSearch' data-bs-target="#advanceSearch" aria-expanded="false"
+                                        aria-controls="advanceSearch">
+                                        نمایش همه
+                                    </button>
+                                @endempty
+                                <button class="btn btn-primary" type="button" data-bs-toggle="collapse"
+                                    data-bs-target="#advanceSearch" aria-expanded="false" aria-controls="advanceSearch">
+                                    جست و جوی پیشرفته
+                                </button>
+                            </div>
                         </div>
                     </div>
                     <div class="card-body">
+                        {{-- search collaps --}}
                         <div class="mb-5 collapse {{ $searchPanel }}" id="advanceSearch">
                             <form class="form-horizontal example">
-                                <div class="row mb-4">
-                                    <label for="ID" class="col-md-2 form-label">ایدی</label>
-                                    <div class="col-md-10">
-                                        <input class="form-control" id="ID" wire:model="search.id"
-                                            placeholder="ایدی کاربر مورد نظر" type="text">
+                                {{-- user Info search --}}
+                                <div class="row">
+                                    <div class="col-12 col-md-3">
+                                        <h4 class="text-center text-primary text-start ms-1">
+                                            <a data-bs-toggle="collapse" href="#userDataCollaps" role="button"
+                                                aria-expanded="false" aria-controls="userDataCollaps" href="">
+                                                <i class="fa fa-user" aria-hidden="true"></i>
+                                                <span>مشخصات کاربر</span>
+                                            </a>
+                                        </h4>
+                                    </div>
+                                    <div class=" col-12 col-md-9">
+                                        <hr class="my-4">
+                                    </div>
+                                    <div class="collapse show row" id="userDataCollaps" wire:ignore.self>
+                                        <div class="row mb-4">
+                                            <label for="ID" class="col-md-2 form-label">ایدی</label>
+                                            <div class="col-md-10">
+                                                <input class="form-control" id="ID" wire:model="search.id"
+                                                    placeholder="ایدی کاربر مورد نظر" type="text">
+                                            </div>
+                                        </div>
+                                        <div class="row mb-4">
+                                            <label for="email" class="col-md-2 form-label">ایمیل</label>
+                                            <div class="col-md-10">
+                                                <input class="form-control" id="email" wire:model="search.email"
+                                                    placeholder="ایمیل کاربر مورد نظر" type="text">
+                                            </div>
+                                        </div>
+                                        <div class="row mb-4">
+                                            <label for="email" class="col-md-2 form-label">موبایل</label>
+                                            <div class="col-md-10">
+                                                <input class="form-control" id="email" wire:model="search.mobile"
+                                                    placeholder="موبایل کاربر مورد نظر" type="text">
+                                            </div>
+                                        </div>
+                                        <div class="row mb-4">
+                                            <label for="first_name" class="col-md-2 form-label">نام</label>
+                                            <div class="col-md-10">
+                                                <input class="form-control" id="first_name" wire:model="search.first_name"
+                                                    placeholder="نام کاربر مورد نظر" type="text">
+                                            </div>
+                                        </div>
+                                        <div class="row mb-4">
+                                            <label for="last_name" class="col-md-2 form-label">نام خانوادگی</label>
+                                            <div class="col-md-10">
+                                                <input class="form-control" id="last_name" wire:model="search.last_name"
+                                                    placeholder="نام خانوادگی کاربر مورد نظر" type="text">
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
-
-                                <div class="row mb-4">
-                                    <label for="email" class="col-md-2 form-label">ایمیل</label>
-                                    <div class="col-md-10">
-                                        <input class="form-control" id="email" wire:model="search.email"
-                                            placeholder="ایمیل کاربر مورد نظر" type="text">
+                                <div class="row my-4">
+                                    <div class="col-12 col-md-3">
+                                        <h4 class="text-center text-primary text-start ms-1">
+                                            <a data-bs-toggle="collapse" href="#otherFilterSection" role="button"
+                                                aria-expanded="false" aria-controls="otherFilterSection" href="">
+                                                <i class="fa fa-user" aria-hidden="true"></i>
+                                                <span>سایر فیلتر ها</span>
+                                            </a>
+                                        </h4>
                                     </div>
-                                </div>
-
-                                <div class="row mb-4">
-                                    <label for="email" class="col-md-2 form-label">موبایل</label>
-                                    <div class="col-md-10">
-                                        <input class="form-control" id="email" wire:model="search.mobile"
-                                            placeholder="موبایل کاربر مورد نظر" type="text">
+                                    <div class=" col-12 col-md-9">
+                                        <hr class="my-4">
                                     </div>
-                                </div>
-
-                                <div class="row mb-4">
-                                    <label for="first_name" class="col-md-2 form-label">نام</label>
-                                    <div class="col-md-10">
-                                        <input class="form-control" id="first_name" wire:model="search.first_name"
-                                            placeholder="نام کاربر مورد نظر" type="text">
-                                    </div>
-                                </div>
-
-                                <div class="row mb-4">
-                                    <label for="last_name" class="col-md-2 form-label">نام خانوادگی</label>
-                                    <div class="col-md-10">
-                                        <input class="form-control" id="last_name" wire:model="search.last_name"
-                                            placeholder="نام خانوادگی کاربر مورد نظر" type="text">
+                                    <div class="collapse row" id="otherFilterSection" wire:ignore.self>
+                                        <div class="col-md-6">
+                                            <label for="search-kind" class="form-label datePicker"><strong> نقش
+                                                    کاربر</strong></label>
+                                            <select class="form-control" id="search-kind" wire:model="search.role"
+                                                type="text">
+                                                <option value="">انتخاب کنید...</option>
+                                                @foreach ($fetchData['roles'] as $role)
+                                                    <option value="{{ $role->name }}">
+                                                        {{ $role->name }}
+                                                    </option>
+                                                @endforeach
+                                            </select>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label for="search-drRegisteration" class="form-label datePicker"><strong> نوع
+                                                    ثبت نام پزشک</strong></label>
+                                            <select class="form-control" id="search-drRegisteration"
+                                                wire:model="search.drRegisteration" type="text">
+                                                <option value="">انتخاب کنید...</option>
+                                                <option value="admin">ثبت شده توسط پنل ادمین</option>
+                                                <option value="self">ثبت نام شده توسط خود پزشک</option>
+                                            </select>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label for="search-drActiveStatus" class="form-label datePicker"><strong>وضعیت
+                                                    پزشک</strong></label>
+                                            <select class="form-control" id="search-drActiveStatus"
+                                                wire:model="search.drActiveStatus" type="text">
+                                                <option value="">انتخاب کنید...</option>
+                                                <option value="false">فعال</option>
+                                                <option value="true">بن شده</option>
+                                            </select>
+                                        </div>
                                     </div>
                                 </div>
 
@@ -130,7 +202,7 @@
                                                         <span class="badge bg-secondary">کاربر</span>
                                                     @endif
                                                     @if ($user->IsDoctor())
-                                                        @if ($user->active_appointment == "0")
+                                                        @if ($user->active_appointment == '0')
                                                             <span class="badge bg-danger">غیر فعال</span>
                                                         @else
                                                             <span class="badge bg-success">فعال</span>
@@ -225,14 +297,4 @@
     @push('scripts')
         <script src="{{ admin_asset('plugins/sweet-alert/sweetalert.min.js') }}"></script>
         <script src="{{ admin_asset('plugins/sweet-alert/admin.sweetalert.js') }}"></script>
-
-        <script>
-            var myCollapsible = document.getElementById('advanceSearch')
-            myCollapsible.addEventListener('show.bs.collapse', function() {
-                @this.set('searchPanel', 'show');
-            });
-            myCollapsible.addEventListener('hide.bs.collapse', function() {
-                @this.set('searchPanel', '');
-            })
-        </script>
     @endpush

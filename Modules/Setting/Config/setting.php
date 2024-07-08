@@ -28,6 +28,9 @@ return [
             \Modules\Setting\Enum\SettingKeyEnum::SITE_LOGO_URL,
             \Modules\Setting\Enum\SettingKeyEnum::SITE_TITLE,
             \Modules\Setting\Enum\SettingKeyEnum::SITE_SLIDER_TITLE,
+            \Modules\Setting\Enum\SettingKeyEnum::FOOTER_DESCRIPTION,
+            \Modules\Setting\Enum\SettingKeyEnum::INSTAGRAM_ADDRESS,
+            \Modules\Setting\Enum\SettingKeyEnum::TELEGRAM_ADDRESS,
         ],
     ],
     'appointment' => [

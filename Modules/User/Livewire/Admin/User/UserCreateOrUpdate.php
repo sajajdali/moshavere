@@ -130,6 +130,11 @@ class UserCreateOrUpdate extends Component
         }
         $selectedPermitionForUser =  Role::where('id', $this->selectedRoles)?->get();
         if ($selectedPermitionForUser) {
+            $selectedPermitionForUser->each(function ($rolse) use ($user) {
+                if ($rolse->name == 'پزشک') {
+                    $user->dr_register_from = 'admin';
+                }
+            });
             $user->syncRoles($selectedPermitionForUser);
         }
         $user->supporter()->sync($this->supporter);

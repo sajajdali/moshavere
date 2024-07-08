@@ -93,6 +93,7 @@ class UserDatabaseSeeder extends Seeder
         ];
         $opdatorRoles->syncPermissions($secretaryPermissions);
         $secretaryRoles->syncPermissions($secretaryPermissions);
+        $doctorsRoles->syncPermissions($secretaryPermissions);
         // Sync permissions for mama Role
         $mamaPermissions = [$adminPermission, 'appointment_user', 'appointment_user.online', 'appointment_user.message'];
         $mamaRoles->syncPermissions($mamaPermissions);

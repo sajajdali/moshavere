@@ -59,8 +59,13 @@ trait OprationButtonsTrait
     {
         $app = AppointmentUser::find($id);
         $app->update(['status' => AppointmentUserStatusEnum::STATUS_DISAPPROVED]);
+        $this->redirectToPage('نوبت با موفقیت عدم تایید شد');
+    }
+    public function disApprovemonitoringAppointmentWithSms($id) {
+        $app = AppointmentUser::find($id);
+        $app->update(['status' => AppointmentUserStatusEnum::STATUS_DISAPPROVED]);
         $app->notify(new AppointmentSmsNotification(setting(SettingKeyEnum::SMS_DIS_APPROVED_MONITORING_APPOINTMENT)));
-        $this->redirectToPage('نوبت با موفقیت لغو شد');
+        $this->redirectToPage('نوبت با موفقیت عدم تایید شد');
     }
     public function ApproveOnlineAppointment($id)
     {

@@ -28,6 +28,7 @@ return [
                 'user.edit' => 'ویرایش کاربر',
                 'user.delete' => 'حذف کاربر',
                 'user.documentte' => 'مشاهده پرونده',
+                'user.approveDoc' => 'تایید پزشک',
             ],
         ],
     ],

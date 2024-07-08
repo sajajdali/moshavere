@@ -187,6 +187,45 @@
                     </div>
                 </div>
             </div>
+            @can('user.approveDoc')
+            @if (isset($fetchData['SelfRegistrationDoctors']) && $fetchData['SelfRegistrationDoctors']->isNotEmpty())
+            <div class="col-md-6">
+                <div class="card overflow-hidden">
+                    <div class="card-body">
+                        <div class="card-header d-flex justify-content-between py-0">
+                            <span>درخواست ثبت نام پزشک</span>
+                            <a href="{{ route('admin.user.index') }}">مشاهده همه</a>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-responsive mb-3">
+                            <table class="table text-nowrap text-md-nowrap text-center" wire:loading.class="op-0-3">
+                                <thead>
+                                    <tr>
+                                        <th scope="col">#</th>
+                                        <th scope="col">نام</th>
+                                        <th scope="col">ساعت</th>
+                                        <th scope="col">مدیریت</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                        @foreach ($fetchData['SelfRegistrationDoctors'] as $docRequest)
+                                            <tr class="text-center table-info">
+                                                <td>{{ $docRequest->id }}</td>
+                                                <td>{{ $docRequest->full_name }}</td>
+                                                <td>{{ verta($docRequest->created_at)->format('H:i') }}</td>
+                                                <td> <a class="btn btn-success  text-white " href="{{route('admin.doctor.info',['user'=>$docRequest->id]) }}">پروفایل پزشک</a> </td>
+                                            </tr>
+                                        @endforeach
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            @endif
+
+            @endcan
         </div>
     @endcan
 

@@ -18,10 +18,10 @@
                     <a href="{{ route('front.contactUs') }}">تماس با ما</a>
                 </li>
                 <li class="navbar__menu-item">
-                    <a href="#">لیست پزشکان</a>
+                    <a href=""{{route('front.searchPage',['query' => 'پزشکان'])}}">لیست پزشکان</a>
                 </li>
                 <li class="navbar__menu-item">
-                    <a href="#">ثبت شکایات</a>
+                    <a href="{{ route('front.contactUs') }}">ثبت شکایات</a>
                 </li>
             </ul>
             <div x-data="{ open: false }" class="relative">

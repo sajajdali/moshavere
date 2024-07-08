@@ -600,7 +600,7 @@ class AppointmentUserService
         if (isset($detail['wait_for_payment'])) {
             $appointmentUserModel['status'] = AppointmentUserStatusEnum::STATUS_WAIT_PAYMENT;
             $hours =  setting(SettingKeyEnum::APPOINTMENT_DEADLINE_VIA_ADMIN) == null ?   config('app.appointment_dedline') : setting(SettingKeyEnum::APPOINTMENT_DEADLINE_VIA_ADMIN);
-            $appointmentUserModel['deadline_at'] =  \now()->addHours($hours);
+            $appointmentUserModel['deadline_at'] =  \now()->addHours((int)$hours);
         }
 
         //description for app
@@ -663,7 +663,7 @@ class AppointmentUserService
         }
         // send sms
         if (isset($smsTemplate)) {
-            // $appointmentUser->notify(new AppointmentSmsNotification($smsTemplate));
+            $appointmentUser->notify(new AppointmentSmsNotification($smsTemplate));
         }
         event(new StoreAppointmentEvent($appointmentUser));
 

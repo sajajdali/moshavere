@@ -5,12 +5,11 @@
           <div class="space-y-4">
              <img src="{{setting(Modules\Setting\Enum\SettingKeyEnum::SITE_LOGO_URL)}}" class="w-[100px]" />
              <p>
-                لورم ایپسوم متن ساختگی با تولید سادگی نامفهوم از صنعت چاپ و با استفاده از طراحان گرافیک است چاپگرها و
-                متون بلکه روزنامه و مجله در ستون و سطرآنچنان که لازم است
+                {{setting(Modules\Setting\Enum\SettingKeyEnum::FOOTER_DESCRIPTION)}}
              </p>
              <ul class="flex items-center gap-3">
                 <li>
-                   <a href="#"
+                   <a href=" {{setting(Modules\Setting\Enum\SettingKeyEnum::INSTAGRAM_ADDRESS)}}"
                       class="bg-white rounded-full w-[35px] h-[35px] flex items-center justify-center text-black">
                       <svg class="w-6 h-6" xmlns="http://www.w3.org/2000/svg">
                          <use xlink:href="#sprite-instagram" />
@@ -18,7 +17,7 @@
                    </a>
                 </li>
                 <li>
-                   <a href="#"
+                   <a href=" {{setting(Modules\Setting\Enum\SettingKeyEnum::TELEGRAM_ADDRESS)}}"
                       class="bg-white rounded-full w-[35px] h-[35px] flex items-center justify-center text-black">
                       <svg class="w-6 h-6" xmlns="http://www.w3.org/2000/svg">
                          <use xlink:href="#sprite-telegram" />
@@ -27,39 +26,25 @@
                 </li>
              </ul>
           </div>
-          <div class="space-y-4">
+          <div class="space-y-5 mr-10">
              <p class="font-semibold">صفحات اصلی</p>
              <ul class="text-sm space-y-4">
                 <li>
-                   <a href="#">صفحه اصلی</a>
+                   <a href="{{ route('front.homePage') }}">صفحه اصلی</a>
                 </li>
                 <li>
-                   <a href="#">تماس با ما</a>
+                   <a href="{{ route('front.contactUs') }}">تماس با ما</a>
                 </li>
                 <li>
-                   <a href="#">آخرین مطالب وبلاگ</a>
+                    <a href=""{{route('front.searchPage',['query' => 'پزشکان'])}}">لیست پزشکان</a>
                 </li>
                 <li>
                    <a href="#">آخرین مطالب وبلاگ</a>
                 </li>
              </ul>
           </div>
-          <div class="space-y-4">
-             <p class="font-semibold">صفحات اصلی</p>
-             <ul class="text-sm space-y-4">
-                <li>
-                   <a href="#">صفحه اصلی</a>
-                </li>
-                <li>
-                   <a href="#">تماس با ما</a>
-                </li>
-                <li>
-                   <a href="#">آخرین مطالب وبلاگ</a>
-                </li>
-                <li>
-                   <a href="#">آخرین مطالب وبلاگ</a>
-                </li>
-             </ul>
+          <div class="space-y-2">
+
           </div>
           <div class="space-y-6">
              <p class="font-semibold">نماد ها</p>

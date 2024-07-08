@@ -5,6 +5,7 @@ namespace Modules\Front\Livewire\Auth\Doctor;
 use Livewire\Component;
 use Livewire\Attributes\Title;
 use Livewire\Attributes\Layout;
+use Livewire\Attributes\Locked;
 use Modules\User\Entities\User;
 use Modules\Api\Entities\AuthRequest;
 use Spatie\Permission\Models\Role;
@@ -15,6 +16,8 @@ use Spatie\Permission\Models\Role;
 class DoctorRegistration extends Component
 {
     public array $form = [];
+    #[Locked]
+    public array $fetchData = [];
 
     private function checkUserExist(): bool
     {
@@ -47,6 +50,7 @@ class DoctorRegistration extends Component
             $user->dr_licence_number = $this->form['licenceNumber'];
             $user->dr_licence_number = $this->form['licenceNumber'];
             $user->ban_user = true;
+            $user->dr_register_from = 'self';
             $user->active_appointment = false;
             if (isset($this->form['description'])) {
                 $user->drRegistrationDescription =  $this->form['description'];
@@ -54,7 +58,7 @@ class DoctorRegistration extends Component
 
             $doctorRoles = Role::find(3);
             $user->syncRoles($doctorRoles);
-            // alert 'درخواست شما ثبت شد'
+            $this->fetchData['alert'] = 'ثبت نام شما انجام شد و بعد از تایید توسط مدیر، پروفایل شما در سایت نمایش داده میشود.';
         }
     }
     public function render()

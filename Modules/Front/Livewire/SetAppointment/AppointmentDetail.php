@@ -2,24 +2,28 @@
 
 namespace Modules\Front\Livewire\SetAppointment;
 
-use App\Enum\ActiveEnum;
 use Livewire\Component;
+use App\Enum\ActiveEnum;
 use Livewire\Attributes\On;
 use Livewire\Attributes\Title;
+use Shetabit\Multipay\Invoice;
 use Livewire\Attributes\Layout;
 use Livewire\Attributes\Locked;
 use Modules\Place\app\Models\Place;
+use Modules\Front\Traits\Paymenttrait;
 use Modules\Setting\Enum\SettingKeyEnum;
 use Modules\Discount\app\Models\Discount;
 use Modules\AppointmentUser\app\Models\AppointmentUser;
 use Modules\AppointmentUser\Enum\AppointmentUserKindEnum;
 use Modules\AppointmentUser\Enum\AppointmentUserStatusEnum;
 use Modules\AppointmentSetting\app\Models\AppointmentSetting;
+use Modules\AppointmentUser\app\Notifications\AppointmentSmsNotification;
 
 #[Layout('front::layouts.app')]
-#[Title('ثبت نوبت')]
+#[Title('جزئیات نوبت')]
 class AppointmentDetail extends Component
 {
+    use Paymenttrait;
 
     #[Locked]
     public array $fetchData = [
@@ -39,9 +43,9 @@ class AppointmentDetail extends Component
     public function userCanCancell()
     {
         $setting = $this->fetchData['app']->setting;
-        $can_be_Canceld = ($setting->cancellation_by_user != null) && ($this->fetchData['app']->status == AppointmentUserStatusEnum::STATUS_SUCCESSFUL);
+        $can_be_Canceld = (isset($setting->cancellation_by_user)) && ($this->fetchData['app']->status == AppointmentUserStatusEnum::STATUS_SUCCESSFUL);
         if ($can_be_Canceld) {
-            if ($this->fetchData['app']->date_visit->addDays($setting->cancellation_by_user)->gt(\now())) {
+            if ($this->fetchData['app']->date_visit->subDays($setting->cancellation_by_user)->gt(\now())) {
                 $this->fetchData['cancel'] = true;
             }
         }
@@ -68,13 +72,25 @@ class AppointmentDetail extends Component
             $this->fetchData['socailmedia']['status'] = true;
         }
     }
-    #[On('confirm_swal')]
-    public function cancelAppointment()
+    public function cancelAppontment()
     {
+        $user = auth()->user();
+        if ($this->fetchData['app']->user->id == $user->id) {
+            $this->fetchData['app']->update([
+                'status' => AppointmentUserStatusEnum::STATUS_CANCEL,
+            ]);
 
-        // $app = $this->fetchData['app'];
-        // $app->update(['status' => AppointmentUserStatusEnum::STATUS_CANCEL]);
-        // return redirect()->route('front.appointment.detail', ['tracking_code' => $this->fetchData['app']->tracking_code]);
+            // send sms
+            $smsTemplate = setting(SettingKeyEnum::SMS_APPOINTMENT_CANCEL);
+            if (isset($smsTemplate)) {
+                $this->fetchData['app']->notify(new AppointmentSmsNotification($smsTemplate));
+                session()->flash('success', 'نوبت شما با موفقیت کنسل شد');
+            }
+
+            return redirect()->route('front.setAppointment.detail', ['tracking_code' => $this->fetchData['app']->tracking_code]);
+        } else {
+            abort(401);
+        }
     }
 
     public function appStatus()
@@ -89,8 +105,11 @@ class AppointmentDetail extends Component
             } elseif ($this->fetchData['app']->kind == AppointmentUserKindEnum::ONLINE) {
                 $this->fetchData['stauts']['price'] = $this->fetchData['app']->setting->detail[AppointmentSetting::PAYMENT][AppointmentSetting::ONLINE][AppointmentSetting::PRICE];
             }
+            if (setting(SettingKeyEnum::PAYMENT_RULES_AND_CONDITION_STATUS)) {
+                $this->fetchData['payment']['termAndCondition'] = setting(SettingKeyEnum::PAYMENT_RULES_AND_CONDITION_DESCRIPTION);
+            }
         }
-        $this->fetchData['monitoring'] = ($this->fetchData['app']->status == AppointmentUserStatusEnum::STATUS_MONITORING );
+        $this->fetchData['monitoring'] = ($this->fetchData['app']->status == AppointmentUserStatusEnum::STATUS_MONITORING);
     }
     public function messages()
     {
@@ -120,13 +139,66 @@ class AppointmentDetail extends Component
                 return $this->addError('form.discount_code', $discount->discountIssue($this->fetchData['app']->user->id,   $this->fetchData['stauts']['price']));
             }
             //discount is useable
-            $finalPrice =  $discount->caculatePrice( $this->fetchData['stauts']['price']);
+            $this->fetchData['discount_data'] = $discount;
+            $finalPrice =  $discount->caculatePrice($this->fetchData['stauts']['price']);
             $this->fetchData['status']['price_after_discount'] = $finalPrice;
         } else {
             return  $this->addError('form.discount_code', 'کد تخفیف وارد شده اشتباه است!');
         }
     }
+    public function authNeeded()
+    {
+        session()->put('url.intended', route('front.setAppointment.detail', ['tracking_code' => $this->fetchData['app']->tracking_code]));
+        return redirect()->route('front.login.user', ['cancelApp' => true]);
+    }
+    public function GotoPayment()
+    {
+        // Create new invoice.
+        $invoice = (new Invoice)->amount(1000);
 
+        // Purchase the given invoice.
+        Payment::purchase($invoice, function ($driver, $transactionId) {
+            // We can store $transactionId in database.
+        });
+
+        // Purchase method accepts a callback function.
+        Payment::purchase($invoice, function ($driver, $transactionId) {
+            // We can store $transactionId in database.
+        });
+
+        // You can specify callbackUrl
+        Payment::callbackUrl('http://yoursite.com/verify')->purchase(
+            $invoice,
+            function ($driver, $transactionId) {
+                // We can store $transactionId in database.
+            }
+        );
+
+
+        // $data = [];
+        // $data['amount'] = $this->fetchData['stauts']['price'];
+        // $data['user_id'] =  $this->fetchData['app']->user->id;
+        // $data['mobile'] =  $this->fetchData['app']->user->mobile;
+        // $data['appointmentUser_id'] =  $this->fetchData['app']->id;
+        // $data['tracking_code'] =  $this->fetchData['app']->tracking_code;
+        // if (isset($this->fetchData['discount_data'])) {
+        //     $data['discount']['discount_id'] = $this->fetchData['discount_data']->id;
+        //     $data['discount']['discount_amount'] = $this->fetchData['stauts']['price'] -  $data['amount'];
+        //     $data['discount']['discount_code'] = $this->fetchData['discount_data']->code;
+        // }
+        // $this->createPayment($data);
+    }
+
+    #[On('paymentErr')]
+    public function paymentIssue($errmsg)
+    {
+        dd($errmsg);
+        $this->fetchData['alert'] = $errmsg;
+    }
+    public function bankCallback()
+    {
+        //
+    }
     public function mount()
     {
 
@@ -139,6 +211,8 @@ class AppointmentDetail extends Component
             $this->hasDescripion();
             $this->appStatus();
             $this->placeSocialMedia();
+        } else {
+            abort(404);
         }
         if (isset($this->fetchData['app']->place->detail[Place::DETAIL_KEY_LOCATION])) {
 
@@ -147,8 +221,8 @@ class AppointmentDetail extends Component
             $this->fetchData['mapUrl'] = "https://www.google.com/maps/embed?pb=!1m14!1m12!1m3!1d642.0232600631508!2d{$longitude}!3d{$latitude}!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!5e0!3m2!1sen!2s!4v1716538755171!5m2!1sen!2s";
             $this->fetchData['navigation'] = "https://maps.google.com/maps?daddr={$latitude},{$longitude}";
         }
+        $this->fetchData['authCheck'] = auth()->check();
     }
-
     public function render()
     {
         return view('front::livewire.set-appointment.appointment-detail');

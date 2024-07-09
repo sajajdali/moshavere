@@ -1,0 +1,99 @@
+<?php
+
+namespace Modules\Front\Traits;
+
+use Modules\Setting\Enum\SettingKeyEnum;
+use Modules\Transaction\app\Models\Transaction;
+use Modules\Transaction\Enum\TransactionPaidEnum;
+use Modules\Transaction\Enum\TransactionStatusEnum;
+use Modules\AppointmentUser\app\Models\AppointmentUser;
+
+trait Paymenttrait
+{
+    public function createPayment($data)
+    {
+        $paystar_status = setting(SettingKeyEnum::PAYMENT_PAYSTAR_STATUS);
+        $zarinPl_status = setting(SettingKeyEnum::PAYMENT_ZARINPAL_STATUS);
+        if (isset($zarinPl_status)) {
+            return $this->createZarinPlaPayment($data);
+        } else {
+
+            if ($zarinPl_status) {
+                return   $this->createPaystarPayment($data);
+            }
+        }
+    }
+    public function createZarinPlaPayment($initial_data)
+    {
+
+        $amount = $initial_data['amount'] . '0';
+        $transaction =  $this->createTransaction($initial_data);
+        $data = [
+            'merchant_id' => setting(SettingKeyEnum::PAYMENT_ZARINPAL_STATUS),
+            'amount' => intval($amount),
+            'callback_url' => route('front.setAppointment.detail.zarinpal',['tracking_code' => $initial_data['tracking_code'] ]) . '?transaction_id=' . $transaction->id,
+            'currency' => 'IRR',
+            'description' => setting(SettingKeyEnum::SITE_TITLE) ?? "پرداخت هزینه نوبت",
+            'metadata' => ['mobile' => $initial_data['mobile']],
+        ];
+
+        $ch = curl_init('https://api.zarinpal.com/pg/v4/payment/request.json');
+        curl_setopt($ch, CURLOPT_USERAGENT, 'ZarinPal Rest Api v1');
+        curl_setopt($ch, CURLOPT_CUSTOMREQUEST, 'POST');
+        curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($data));
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_HTTPHEADER, [
+            'Content-Type: application/json',
+            'Content-Length: ' . strlen(json_encode($data)),
+        ]);
+
+        try {
+            $result = curl_exec($ch);
+            $err = curl_error($ch);
+            $result = json_decode($result, true, JSON_PRETTY_PRINT);
+            curl_close($ch);
+            if ($err) {
+                $this->dispatch('paymentErr', errmsg: $err);
+            } else {
+                if (isset($result['data']['code']) && $result['data']['code'] === 100) {
+                    $au = $result['data']['authority'] ?? '';
+                    $transaction->update(['au' => $au]);
+                    redirect("https://www.zarinpal.com/pg/StartPay/$au")->send();
+                    return;
+                } else {
+                    return $this->dispatch('paymentErr',  errmsg: $result);
+                }
+            }
+            return;
+        } catch (\Exception $e) {
+            dd($e->getMessage());
+            return $this->dispatch('paymentErr',  errmsg: 'مشکل در ارسال به بانک. لطفا صفحه را رفرش و مجدد تلاش کنید');
+        }
+    }
+
+    public function createPaystarPayment($data)
+    {
+        //
+    }
+
+    public function createTransaction($initial_data)
+    {
+        $transactionData = [
+            'user_id' => $initial_data['user_id'],
+            'transaction_code' =>  Transaction::generateTransactionCode(),
+            'status' => TransactionStatusEnum::PENDING,
+            'cost' => $initial_data['amount'] . '0',
+            'paid_by' => TransactionPaidEnum::ONLINE,
+            'detail' => '',
+        ];
+        if (isset($initial_data['discount'])) {
+            $transactionData['discount_id'] = $initial_data['discount']['discount_id'];
+            $transactionData['cost'] =  $initial_data['amount'] . 0;
+            $transactionData['discount_amount'] =  $initial_data['discount']['discount_amount'];
+            $transactionData['discount_code'] =  $initial_data['discount']['discount_code'];
+        }
+        $appUser = AppointmentUser::find($initial_data['appointmentUser_id'] );
+        $t =  $appUser->transaction()->updateOrCreate($transactionData);
+        return $t;
+    }
+}

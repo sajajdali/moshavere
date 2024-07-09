@@ -73,7 +73,7 @@ class Login extends Component
                         return redirect()->route('front.user.registration');
                     }
                     $intendedUrl = Session::pull('url.intended', route('front.homePage'));
-                    session()->forget('url.intended') ; 
+                    session()->forget('url.intended') ;
                     return redirect()->intended($intendedUrl);
                 }
             } else {
@@ -105,6 +105,9 @@ class Login extends Component
         }
         if(request()->has('favariteDr')){
             $this->fetchData['alert'] = 'برای پسندیدن دکتر ، لطفا ابتدا  وارد شوید';
+        }
+        if(request()->has('cancelApp')){
+            $this->fetchData['alert'] = 'برای کنسل کردن نوبت لازم هست که وارد شوید!';
         }
     }
     public function render()

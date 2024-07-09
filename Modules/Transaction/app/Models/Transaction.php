@@ -20,7 +20,6 @@ class Transaction extends Model
     protected $guarded = ['id'];
     protected $casts = [
         'paid_by'     => TransactionPaidEnum::class ,
-        'payment_for' => TransactionPaymentForEnum::class,
         'status'      => TransactionStatusEnum::class ,
         'detail'      => 'json' ,
     ] ;

@@ -36,6 +36,7 @@
     "@fancyapps/ui": "^4.0.31",
     "chart.js": "^4.3.3",
     "sweetalert": "^2.1.2",
+    "sweetalert2": "^11.12.2",
     "swiper": "^8.4.4"
   }
 }

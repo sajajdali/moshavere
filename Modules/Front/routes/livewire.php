@@ -42,6 +42,7 @@ Route::group([], function () {
     Route::get('/appointment/days', ShowAvailableDayForDoctor::class)->name('front.setAppointment.days');
     Route::get('/appointment/checkout', Checkout::class)->name('setAppointment.checkout');
     Route::get('/appointment/detail/{tracking_code}', AppointmentDetail::class)->name('front.setAppointment.detail');
+    Route::get('/appointment/detail/{tracking_code}/call-back', [\Modules\Front\Livewire\SetAppointment\AppointmentDetail::class, 'bankCallback'])->name('front.setAppointment.detail.zarinpal');
     Route::get('/doctor/profile/{doctor_id}', DoctorProfileLivewire::class)->name('front.doctor.profile');
 });
 Route::middleware(['web', 'auth'])->name('front.')->group(function () {

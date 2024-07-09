@@ -1,9 +1,10 @@
 import Swiper, { Navigation, Pagination } from 'swiper';
+import Swal from 'sweetalert2';
 import 'swiper/css';
 import 'swiper/css/navigation';
 import 'swiper/css/pagination';
 
-// +++++ VARIABLES +++++
+window.Swal = Swal ;
 // sidebar
 const nav_button = document.querySelector('.navbar__menu--button')
 const sidebar_container = document.querySelector('.sidebar__container')

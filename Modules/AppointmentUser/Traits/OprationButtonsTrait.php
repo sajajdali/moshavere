@@ -138,6 +138,10 @@ trait OprationButtonsTrait
     {
         $this->sendfeedBackLink($appointmentUser);
         $this->changeAttendedStatus($appointmentUser, true);
+        $feddBack = setting(SettingKeyEnum::SMS_FEEDBACK);
+        if (isset($feddBack)) {
+            $appointmentUser->notify(new AppointmentSmsNotification($feddBack));
+        }
         $this->redirectToPage('وضعیت نوبت به کاربر حضور پیدا کرده تغییر کرد');
     }
     public function userNotAttenedToAppointment(AppointmentUser $appointmentUser)

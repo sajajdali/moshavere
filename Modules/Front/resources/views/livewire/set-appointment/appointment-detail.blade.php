@@ -6,19 +6,24 @@
         </div>
     </div>
     <main class="py-6 bg-secondary-100">
-        @if (session()->has('success'))
+        @if (session()->has('success') || isset($fetchData['success']))
             <div class="bg-emerald-200 text-gray-500 text-lg max-w-3xl text-center py-3 px-5 rounded-lg mb-5 mx-auto">
-                {{ session()->get('success') }}
+                @if (session()->has('success'))
+                    {{ session()->get('success') }}
+                @endif
+                @isset($fetchData['success'])
+                    {{ $fetchData['success'] }}
+                @endisset
             </div>
         @endif
         @if (isset($fetchData['alert']))
             <div class="bg-red text-white text-lg max-w-3xl text-center py-3 px-5 rounded-lg mb-5 mx-auto">
-                {{$fetchData['alert'] }}
+                {{ $fetchData['alert'] }}
             </div>
         @endif
 
         <div
-            class="@if ($this->fetchData['stauts']['enum'] == Modules\AppointmentUser\Enum\AppointmentUserStatusEnum::STATUS_CANCEL) bg-rose-100
+            class="@if ($fetchData['stauts']['enum'] == Modules\AppointmentUser\Enum\AppointmentUserStatusEnum::STATUS_CANCEL) bg-rose-100
        @else bg-white @endif  rounded-2xl p-4 max-w-3xl mx-auto space-y-4">
             @if ($fetchData['monitoring'])
                 <div class="border-2 border-indigo-500 bg-indigo-100  p-4 rounded-xl flex items-center gap-3 ">
@@ -233,7 +238,7 @@
                                         data="{{ front_asset('assets/svg/timeclock.svg') }}"></object>
                                     <strong>زمان نوبت:</strong>
                                 </p>
-                                @if ($this->fetchData['stauts']['enum'] != Modules\AppointmentUser\Enum\AppointmentUserStatusEnum::STATUS_CANCEL)
+                                @if ($fetchData['stauts']['enum'] != Modules\AppointmentUser\Enum\AppointmentUserStatusEnum::STATUS_CANCEL)
                                     <span class="mr-3">
                                         @if (isset($fetchData['app']->date_visit))
                                             {{ verta($fetchData['app']->date_visit)->format('H:i') }}
@@ -374,13 +379,13 @@
                 }
             });
             $('#termAndConditionAggrement').on('click', function() {
-                if($(this).is(':checked')) {
-                    $('#paymentBtn').prop('disabled', false );
+                if ($(this).is(':checked')) {
+                    $('#paymentBtn').prop('disabled', false);
                     $('#paymentBtn').removeClass('bg-gray-300');
                     $('#paymentBtn').addClass('bg-primary-main');
                     $('#paymentBtn').addClass('border-primary-main');
-                }else{
-                    $('#paymentBtn').prop('disabled', true );
+                } else {
+                    $('#paymentBtn').prop('disabled', true);
                     $('#paymentBtn').removeClass('bg-primary-main');
                     $('#paymentBtn').removeClass('border-primary-main');
                     $('#paymentBtn').addClass('bg-gray-300');

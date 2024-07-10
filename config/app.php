@@ -176,6 +176,7 @@ return [
         App\Providers\RouteServiceProvider::class,
         App\Providers\BroadcastServiceProvider::class,
         Nwidart\Modules\LaravelModulesServiceProvider::class,
+        Shetabit\Payment\Provider\PaymentServiceProvider::class,
     ])->toArray(),
 
     /*
@@ -191,6 +192,7 @@ return [
 
     'aliases' => Facade::defaultAliases()->merge([
         // 'Example' => App\Facades\Example::class,
+        'Payment' => Shetabit\Payment\Facade\Payment::class,
 
     ])->toArray(),
 

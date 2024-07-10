@@ -3,6 +3,7 @@
 namespace Modules\User\Entities;
 
 use Verta;
+use App\Enum\ActiveEnum;
 use Laravel\Sanctum\HasApiTokens;
 use Modules\Chat\app\Models\Chat;
 use Spatie\Permission\Models\Role;
@@ -17,6 +18,7 @@ use Modules\User\Traits\UserAttributeTrait;
 use Illuminate\Database\Eloquent\Collection;
 use Modules\Transaction\app\Models\Transaction;
 use Modules\User\Database\factories\UserFactory;
+use Illuminate\Contracts\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
@@ -327,12 +329,20 @@ class User extends Authenticatable
 
     public function scopeNewRegistredDoctor()
     {
-       return $this->doctors_query()->whereHas('metas', function ($q) {
+        return $this->doctors_query()->whereHas('metas', function ($q) {
             $q->where([
                 ['meta_key', UserMetaEnum::BAN_USER],
                 ['meta_value', true],
             ]);
         })
             ->orderByDesc('id');
+    }
+    public function activeServices(): collection
+    {
+        return $this->services()->where('active', ActiveEnum::ACTIVE)->get();
+    }
+    public function activePlaces(): collection
+    {
+        return $this->places()->where('active', ActiveEnum::ACTIVE)->get();
     }
 }

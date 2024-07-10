@@ -2,7 +2,9 @@
 
 namespace App\Providers;
 
+use Illuminate\Support\Facades\Config;
 use Illuminate\Support\ServiceProvider;
+use Modules\Setting\Enum\SettingKeyEnum;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -19,7 +21,9 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        //if app in develope mode
-
+        // Fetch the Zarinpal merchant ID from the settings
+        $merchantId = setting(SettingKeyEnum::PAYMENT_ZARINPAL_MERCHENID);
+        // Set the Zarinpal merchant ID dynamically
+        Config::set('payment.zarinpal.merchant_id', $merchantId);
     }
 }

@@ -35,14 +35,13 @@ Route::group([], function () {
     Route::get('/login', Login::class)->name('front.login.user')->middleware('throttle:20,1');
     Route::get('/login-doctor', DoctorLogin::class)->name('front.login.doctor');
     Route::get('/registration-doctor', DoctorRegistration::class)->name('front.registration.doctor');
-    Route::get('payment/invoice/{transaction_id}', Invoice::class)->name('front.payment.invoice');
-    Route::get('payment/invoice/call-back', [\Modules\Front\Livewire\Payment\Invoice::class, 'zarinCallback'])->name('front.payment.invoice.callBack');
+    // Route::get('payment/invoice/{transaction_id}', Invoice::class)->name('front.payment.invoice');
+    // Route::get('payment/invoice/call-back', [\Modules\Front\Livewire\Payment\Invoice::class, 'zarinCallback'])->name('front.payment.invoice.callBack');
     Route::get('/aboutus', AboutUsLiveWire::class)->name('front.aboutUs');
     Route::get('/contact-us', ContactUsLivewire::class)->name('front.contactUs');
     Route::get('/appointment/days', ShowAvailableDayForDoctor::class)->name('front.setAppointment.days');
     Route::get('/appointment/checkout', Checkout::class)->name('setAppointment.checkout');
     Route::get('/appointment/detail/{tracking_code}', AppointmentDetail::class)->name('front.setAppointment.detail');
-    Route::get('/appointment/detail/{tracking_code}/call-back', [\Modules\Front\Livewire\SetAppointment\AppointmentDetail::class, 'bankCallback'])->name('front.setAppointment.detail.zarinpal');
     Route::get('/doctor/profile/{doctor_id}', DoctorProfileLivewire::class)->name('front.doctor.profile');
 });
 Route::middleware(['web', 'auth'])->name('front.')->group(function () {

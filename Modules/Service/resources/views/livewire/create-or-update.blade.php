@@ -87,7 +87,8 @@
                                 <div class="custom-checkbox custom-control">
                                     <input type="checkbox" wire:model='form.show_type' data-checkboxes="mygroup"
                                         class="custom-control-input" checked id="check_showType">
-                                    <label for="check_showType" class="custom-control-label">با فعال سازی ، این بخش در صفحه اصلی وبسایت نمایش داده میشود
+                                    <label for="check_showType" class="custom-control-label">با فعال سازی ، این بخش در
+                                        صفحه اصلی وبسایت نمایش داده میشود
                                     </label>
                                 </div>
                                 @error('form.priority')
@@ -152,7 +153,8 @@
                                 <div class="checkbox">
                                     <div class="custom-checkbox custom-control">
                                         <input type="checkbox" wire:model='form.active' data-checkboxes="mygroup"
-                                            class="custom-control-input" checked id="checkbox">
+                                            class="custom-control-input"
+                                            @if ($form['active'] == true) checked @endif id="checkbox">
                                         <label for="checkbox" class="custom-control-label">فعال</label>
                                     </div>
                                 </div>

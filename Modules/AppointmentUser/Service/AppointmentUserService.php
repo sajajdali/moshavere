@@ -272,7 +272,6 @@ class AppointmentUserService
                             } // handle end time visit
 
                             else {
-
                                 $thisStatus = !$currentDate->isPast();
 
                                 // check max appointment per day
@@ -665,6 +664,15 @@ class AppointmentUserService
         if (isset($smsTemplate)) {
             $appointmentUser->notify(new AppointmentSmsNotification($smsTemplate));
         }
+        $smsToOperator = setting(SettingKeyEnum::SMS_APPOINTMENT_TO_OPERATOR);
+        if (isset($smsToOperator)) {
+            $appointmentUser->notify(new AppointmentSmsNotification($smsToOperator));
+        }
+        $smsToDoctor = setting(SettingKeyEnum::SMS_APPOINTMENT_TO_DOCTOR);
+        if (isset($smsToOperator)) {
+            $appointmentUser->notify(new AppointmentSmsNotification($smsToDoctor));
+        }
+
         event(new StoreAppointmentEvent($appointmentUser));
 
         return [

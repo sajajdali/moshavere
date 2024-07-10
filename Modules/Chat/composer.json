@@ -10,15 +10,12 @@
     "extra": {
         "laravel": {
             "providers": [],
-            "aliases": {
-
-            }
+            "aliases": []
         }
     },
     "autoload": {
         "psr-4": {
-            "Modules\\Chat\\": "",
-            "Modules\\Chat\\App\\": "app/",
+            "Modules\\Chat\\": "app/",
             "Modules\\Chat\\Database\\Factories\\": "database/factories/",
             "Modules\\Chat\\Database\\Seeders\\": "database/seeders/"
         }

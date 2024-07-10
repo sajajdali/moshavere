@@ -3,7 +3,6 @@
 namespace Modules\AppointmentUser\Enum;
 
 use App\interface\EnumHasApiResultInterface;
-use PhpParser\Node\Expr\Array_;
 
 enum AppointmentUserStatusEnum: int implements EnumHasApiResultInterface
 {

@@ -113,9 +113,9 @@ class ListOfAvailableDay extends Component
         $this->fethData['place']  = Place::find($placeId);
 
         //check for special setting for special section
-        $appointmentSetting = AppointmentSetting::where('service_id', $serviceId)
-            ->where('place_id', $placeId)
-            ->where('user_id',$this->fethData['doctor'])
+        $appointmentSetting = AppointmentSetting::where('service_id', $this->fethData['service']?->id ?? null)
+            ->where('place_id', $this->fethData['place']?->id ?? null)
+            ->where('user_id', $this->fethData['doctor']?->id ?? null)
             ->first();
 
         //check for general setting

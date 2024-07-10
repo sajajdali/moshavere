@@ -3,9 +3,11 @@
 namespace Modules\AppointmentUser\app\Console;
 
 use Illuminate\Console\Command;
+use Modules\Setting\Enum\SettingKeyEnum;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Input\InputArgument;
 use Modules\AppointmentUser\app\Models\AppointmentUser;
+use Modules\AppointmentUser\app\Notifications\AppointmentSmsNotification;
 
 class CheckAppointmentUserDedlineDateCommand extends Command
 {
@@ -38,6 +40,10 @@ class CheckAppointmentUserDedlineDateCommand extends Command
             ->get();
         if ($appointmentsToDelete->isNotEmpty()) {
             $appointmentsToDelete->each(function ($appointment) {
+                $smsTemplate = setting(SettingKeyEnum::SMS_APPOINTMENT_REMOVAL_WHEN_NON_PAYMENT);
+                if (isset($smsTemplate)) {
+                    $appointment->notify(new AppointmentSmsNotification($smsTemplate));
+                }
                 $appointment->delete();
             });
         }

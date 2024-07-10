@@ -76,24 +76,5 @@ trait Paymenttrait
         //
     }
 
-    public function createTransaction($initial_data)
-    {
-        $transactionData = [
-            'user_id' => $initial_data['user_id'],
-            'transaction_code' =>  Transaction::generateTransactionCode(),
-            'status' => TransactionStatusEnum::PENDING,
-            'cost' => $initial_data['amount'] . '0',
-            'paid_by' => TransactionPaidEnum::ONLINE,
-            'detail' => '',
-        ];
-        if (isset($initial_data['discount'])) {
-            $transactionData['discount_id'] = $initial_data['discount']['discount_id'];
-            $transactionData['cost'] =  $initial_data['amount'] . 0;
-            $transactionData['discount_amount'] =  $initial_data['discount']['discount_amount'];
-            $transactionData['discount_code'] =  $initial_data['discount']['discount_code'];
-        }
-        $appUser = AppointmentUser::find($initial_data['appointmentUser_id'] );
-        $t =  $appUser->transaction()->updateOrCreate($transactionData);
-        return $t;
-    }
+
 }

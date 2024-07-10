@@ -4,17 +4,21 @@ namespace Modules\Front\Livewire\SetAppointment;
 
 use Livewire\Component;
 use App\Enum\ActiveEnum;
-use Livewire\Attributes\On;
 use Livewire\Attributes\Title;
 use Shetabit\Multipay\Invoice;
 use Livewire\Attributes\Layout;
 use Livewire\Attributes\Locked;
 use Modules\Place\app\Models\Place;
+use Shetabit\Payment\Facade\Payment;
 use Modules\Front\Traits\Paymenttrait;
 use Modules\Setting\Enum\SettingKeyEnum;
 use Modules\Discount\app\Models\Discount;
+use Modules\Transaction\app\Models\Transaction;
+use Modules\Transaction\Enum\TransactionPaidEnum;
+use Modules\Transaction\Enum\TransactionStatusEnum;
 use Modules\AppointmentUser\app\Models\AppointmentUser;
 use Modules\AppointmentUser\Enum\AppointmentUserKindEnum;
+use Shetabit\Multipay\Exceptions\InvalidPaymentException;
 use Modules\AppointmentUser\Enum\AppointmentUserStatusEnum;
 use Modules\AppointmentSetting\app\Models\AppointmentSetting;
 use Modules\AppointmentUser\app\Notifications\AppointmentSmsNotification;
@@ -24,7 +28,8 @@ use Modules\AppointmentUser\app\Notifications\AppointmentSmsNotification;
 class AppointmentDetail extends Component
 {
     use Paymenttrait;
-
+    #[Locked]
+    private $transactionId;
     #[Locked]
     public array $fetchData = [
         'stauts' => [
@@ -153,51 +158,81 @@ class AppointmentDetail extends Component
     }
     public function GotoPayment()
     {
-        // Create new invoice.
-        $invoice = (new Invoice)->amount(1000);
+        $amount = $this->fetchData['stauts']['price'];
+        $t_data = [
+            'amount' => $this->fetchData['stauts']['price'],
+            'user_id' => $this->fetchData['app']->user->id,
+            'mobile' =>  $this->fetchData['app']->user->mobile,
+            'appointmentUser_id' =>  $this->fetchData['app']->id,
+            'tracking_code' =>  $this->fetchData['app']->tracking_code,
+        ];
+        if (isset($this->fetchData['discount_data'])) {
+            $t_data['discount']['discount_id'] = $this->fetchData['discount_data']->id;
+            $t_data['discount']['discount_amount'] = $this->fetchData['stauts']['price'] -  $t_data['amount'];
+            $t_data['discount']['discount_code'] = $this->fetchData['discount_data']->code;
+            $amount = $t_data['discount']['discount_amount'];
+        }
+        // set the callback URL dynamically
+        $callbackUrl = route('front.setAppointment.detail', ['tracking_code' => $this->fetchData['app']->tracking_code, 'call_back' => true]);
+        config(['payment.zarinpal.callback_url' => $callbackUrl]);
 
-        // Purchase the given invoice.
-        Payment::purchase($invoice, function ($driver, $transactionId) {
-            // We can store $transactionId in database.
-        });
-
-        // Purchase method accepts a callback function.
-        Payment::purchase($invoice, function ($driver, $transactionId) {
-            // We can store $transactionId in database.
-        });
-
-        // You can specify callbackUrl
-        Payment::callbackUrl('http://yoursite.com/verify')->purchase(
-            $invoice,
-            function ($driver, $transactionId) {
-                // We can store $transactionId in database.
+        // Retrieve json format of Redirection (in this case you can handle redirection to bank gateway)
+        $p =   Payment::purchase(
+            ($invoce  = new Invoice)->amount($amount),
+            function ($driver, $transactionId) use ($invoce) {
+                $invoce->via(setting(SettingKeyEnum::PAYMEN_ACTIVE_DRIVER));
+                $this->transactionId = $transactionId;
             }
-        );
-
-
-        // $data = [];
-        // $data['amount'] = $this->fetchData['stauts']['price'];
-        // $data['user_id'] =  $this->fetchData['app']->user->id;
-        // $data['mobile'] =  $this->fetchData['app']->user->mobile;
-        // $data['appointmentUser_id'] =  $this->fetchData['app']->id;
-        // $data['tracking_code'] =  $this->fetchData['app']->tracking_code;
-        // if (isset($this->fetchData['discount_data'])) {
-        //     $data['discount']['discount_id'] = $this->fetchData['discount_data']->id;
-        //     $data['discount']['discount_amount'] = $this->fetchData['stauts']['price'] -  $data['amount'];
-        //     $data['discount']['discount_code'] = $this->fetchData['discount_data']->code;
-        // }
-        // $this->createPayment($data);
+        )->pay()->toJson();
+        $t_data['detail']['transactionId'] = $this->transactionId;
+        $t_data['detail']['driver'] = setting(SettingKeyEnum::PAYMEN_ACTIVE_DRIVER);
+        $this->createTransaction($t_data);
+        return redirect()->to(json_decode($p, true)['action']);
     }
 
-    #[On('paymentErr')]
-    public function paymentIssue($errmsg)
+    private function createTransaction($initial_data)
     {
-        dd($errmsg);
-        $this->fetchData['alert'] = $errmsg;
+        $transactionData = [
+            'user_id' => $initial_data['user_id'],
+            'transaction_code' =>  Transaction::generateTransactionCode(),
+            'status' => TransactionStatusEnum::PENDING,
+            'cost' => $initial_data['amount'],
+            'total_cost' => $initial_data['amount'],
+            'paid_by' => TransactionPaidEnum::ONLINE,
+            'detail' => $initial_data['detail'],
+        ];
+        if (isset($initial_data['discount'])) {
+            $transactionData['discount_id'] = $initial_data['discount']['discount_id'];
+            $transactionData['cost'] =  $initial_data['amount'] . 0;
+            $transactionData['discount_amount'] =  $initial_data['discount']['discount_amount'];
+            $transactionData['discount_code'] =  $initial_data['discount']['discount_code'];
+        }
+        $appUser = AppointmentUser::find($initial_data['appointmentUser_id']);
+        $t =  $appUser->transaction()->updateOrCreate($transactionData);
+        return $t;
     }
     public function bankCallback()
     {
-        //
+        // TODO::test this callback on server
+        try {
+            $receipt = Payment::amount($this->fetchData['app']->cost)
+                ->transactionId($this->fetchData['app']->transaction->detail['transactionId'])->verify();
+            $this->fetchData['app']->update([
+                'status' => AppointmentUserStatusEnum::STATUS_SUCCESSFUL
+            ]);
+            $smsTemplate = setting(SettingKeyEnum::SMS_APPOINTMENT_AFTER_PAYMENT);
+            if (isset($smsTemplate)) {
+                $this->fetchData['app']->notify(new AppointmentSmsNotification($smsTemplate));
+            }
+            $this->fetchData['success']  = 'پرداخت باموفقیت انجام شد و نوبت شما فعال شد ' ;
+            $this->fetchData['app']->transaction->update(['status' => TransactionStatusEnum::SUCCESSFUL]);
+            $this->render();
+        } catch (InvalidPaymentException $exception) {
+            $this->fetchData['alert'] = 'خطا در انجام تراکنش';
+            $this->fetchData['app']->transaction->update(['status' => TransactionStatusEnum::REJECTED]);
+
+            // dd($exception->getMessage());
+        }
     }
     public function mount()
     {
@@ -206,6 +241,9 @@ class AppointmentDetail extends Component
         $cleanedTrackingCode = preg_replace('/[^0-9]/', '', $trackingCode);
         $this->fetchData['app'] = AppointmentUser::firstWhere('tracking_code', $cleanedTrackingCode);
         if (isset($this->fetchData['app'])) {
+            if (request()->has('call_back')) {
+                $this->bankCallback();
+            }
             $this->fetchData['place'] = $this->fetchData['app']->place;
             $this->userCanCancell();
             $this->hasDescripion();
@@ -214,8 +252,8 @@ class AppointmentDetail extends Component
         } else {
             abort(404);
         }
-        if (isset($this->fetchData['app']->place->detail[Place::DETAIL_KEY_LOCATION])) {
 
+        if (isset($this->fetchData['app']->place->detail[Place::DETAIL_KEY_LOCATION])) {
             $latitude = $this->fetchData['app']->place->detail[Place::DETAIL_KEY_LOCATION][Place::DETAIL_KEY_LOCATION_LAT];
             $longitude = $this->fetchData['app']->place->detail[Place::DETAIL_KEY_LOCATION][Place::DETAIL_KEY_LOCATION_LNG];
             $this->fetchData['mapUrl'] = "https://www.google.com/maps/embed?pb=!1m14!1m12!1m3!1d642.0232600631508!2d{$longitude}!3d{$latitude}!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!5e0!3m2!1sen!2s!4v1716538755171!5m2!1sen!2s";

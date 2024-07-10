@@ -68,13 +68,13 @@ class CreateOrUpdate extends Component
 
     private function addInitialValues()
     {
-        
+
         $this->form['title']     = $this->service->title;
         $this->form['parent_id'] = $this->service->parent_id;
         $this->form['img']       = $this->service->icon;
         $this->form['priority']  = $this->service->priority;
-        $this->form['active']    =  $this->service->active == ActiveEnum::ACTIVE ? 'true' : 'false';
-        $this->form['show_type']    =  $this->service->show_type == ServiceShowTypeEnum::SHOW ? 'true' : 'false';
+        $this->form['active']    =  $this->service->active == ActiveEnum::ACTIVE ? true : false;
+        $this->form['show_type']    =  $this->service->show_type == ServiceShowTypeEnum::SHOW ? true : false;
         $doctors =  $this->service->user->pluck('id')->toArray();
         foreach ($doctors as $doc) {
             $this->form['doctors'][$doc] =  true;

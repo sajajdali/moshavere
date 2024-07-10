@@ -2,13 +2,14 @@
 
 namespace Modules\Setting\Enum;
 
+use Modules\User\Entities\User;
+use Shetabit\Payment\Facade\Payment;
 use App\interface\EnumHasNameInterface;
 use Modules\Exercise\Entities\ExercisePlanRequest;
+use Modules\Setting\Interface\SettingTypeInterface;
 use Modules\Setting\Interface\SettingHasCacheInterface;
 use Modules\Setting\Interface\SettingHasOptionInterface;
 use Modules\Setting\Interface\SettingRenderAbleInterface;
-use Modules\Setting\Interface\SettingTypeInterface;
-use Modules\User\Entities\User;
 
 enum SettingKeyEnum: int implements EnumHasNameInterface, SettingTypeInterface, SettingHasCacheInterface, SettingRenderAbleInterface, SettingHasOptionInterface
 {
@@ -55,6 +56,7 @@ enum SettingKeyEnum: int implements EnumHasNameInterface, SettingTypeInterface, 
     case PAYMENT_RULES_AND_CONDITION_STATUS = 155;
     case PAYMENT_RULES_AND_CONDITION_DESCRIPTION = 156;
     case SECREYERY_SEND_LINK_FOR_APPOINTMENT = 157;
+    case PAYMEN_ACTIVE_DRIVER = 158;
 
 
     case WEIGHT_CHART_DESCRIPTION_APP = 120;
@@ -113,6 +115,7 @@ enum SettingKeyEnum: int implements EnumHasNameInterface, SettingTypeInterface, 
             self::PAYMENT_RULES_AND_CONDITION_STATUS => 'فعال سازی شرایط و قوانین پرداخت',
             self::PAYMENT_RULES_AND_CONDITION_DESCRIPTION => 'شرایط و قوانین مربوط به پرداخت',
             self::SECREYERY_SEND_LINK_FOR_APPOINTMENT => 'امکان ارسال لینک پرداخت نوبت به کاربر توسط منشی',
+            self::PAYMEN_ACTIVE_DRIVER => 'درگاه فعال',
 
             // sms
             self::SMS_APPOINTMENT_RECEIVING_SUCCESSFUL => 'پیامک به کاربر پس از دریافت نوبت موفق',
@@ -170,6 +173,7 @@ enum SettingKeyEnum: int implements EnumHasNameInterface, SettingTypeInterface, 
     {
         return match ($this) {
             self::DEFAULT_EXERCISE_STATUS => SettingTypeEnum::SELECT,
+            self::PAYMEN_ACTIVE_DRIVER => SettingTypeEnum::SELECT,
             self::APPOINTMENT_MORE_THAT_ONE_PER_DAY => SettingTypeEnum::CHECK,
             self::PAYMENT_PAYSTAR_STATUS => SettingTypeEnum::CHECK,
             self::APPOINTMENT_FOR_OTHERS_STATUS => SettingTypeEnum::CHECK,
@@ -202,6 +206,7 @@ enum SettingKeyEnum: int implements EnumHasNameInterface, SettingTypeInterface, 
     {
         return match ($this) {
             self::SUPPORT_USER_ROLE => User::adminSupportRoles(),
+            self::PAYMEN_ACTIVE_DRIVER => ['zrinpal' => 'zrinpal'],
             default => []
         };
     }

@@ -107,11 +107,11 @@ class Checkout extends Component
         }
         $this->user = $user;
     }
-    private function checkForActiveAppointment():bool
+    private function checkForActiveAppointment(): bool
     {
-        if(setting(SettingKeyEnum::APPOINTMENT_MORE_THAT_ONE_PER_DAY)) {
+        if (setting(SettingKeyEnum::APPOINTMENT_MORE_THAT_ONE_PER_DAY)) {
             // user can reserve multiple appointment
-            return true ;
+            return true;
         }
         $user_selected_date = Carbon::createFromTimestamp($this->fetchData['app_start_time'])->toDateString();
 
@@ -159,7 +159,7 @@ class Checkout extends Component
             smsToDoctor: false,
             description: isset($this->form['description']) ? $this->form['description'] : '',
             type: AppointmentUserTypeEnum::MAIN__APPOINTMENT,
-            endTime: Carbon::createFromTimestamp($this->fetchData['app_end_time'])->toTimeString(),
+            endTime: Carbon::createFromTimestamp($this->fetchData['app_end_time'],'Asia/Tehran')->toTimeString(),
         );
 
         $detail = [];
@@ -187,13 +187,10 @@ class Checkout extends Component
 
     public function mount()
     {
+
         // get app time from route
         $this->fetchData['app_start_time'] = request()->input('start_time');
         $this->fetchData['app_end_time'] =  request()->input('end_time');
-        if (empty($this->fetchData['app_start_time']) || empty($this->fetchData['app_end_time'])) {
-            return redirect()->route('setAppointment.days')->with('error', 'لطفا مجدد تاریخ را انتخاب کنید!');
-        }
-        $this->fetchData['date_for_blade'] = Carbon::createFromTimestamp($this->fetchData['app_start_time']);
         $doc =  request()->input('doctor_id');
         $place =  request()->input('place_id');
         $service =  request()->input('service_id');
@@ -201,14 +198,33 @@ class Checkout extends Component
             // redirect back with alert
             // return redirect()->route('front.homePage');
         }
+        if (empty($this->fetchData['app_start_time']) || empty($this->fetchData['app_end_time'])) {
+            return redirect()->route('front.setAppointment.days', ['doctor_id' => $doc, 'place_id' => $place, 'service_id' => $service])->with('error', 'لطفا مجدد تاریخ را انتخاب کنید!');
+        }
+        $this->fetchData['date_for_blade'] = Carbon::createFromTimestamp($this->fetchData['app_start_time']);
+        if($this->fetchData['date_for_blade']->lt(\now())){
+            return abort(404);
+        }
         $this->fetchData['doc']      =   User::find($doc);
         $this->fetchData['places']   =  place::find($place);
         $this->fetchData['service']  =   Service::find($service);
 
-        if (!isset($this->fetchData['doc']) || empty($this->fetchData['places']) ||  empty($this->fetchData['service'])) {
-            // redirect back with alert
-            // TODO::insert alert
-            return redirect()->back();
+        if (
+            !isset($this->fetchData['doc'])        ||
+            !$this->fetchData['doc'] instanceof User ||
+            empty($this->fetchData['places'])        ||
+            empty($this->fetchData['service'])
+        ) {
+            abort(404);
+        }
+
+        // check if service id not manipulate in url
+        $userServices = $this->fetchData['doc']->activeServices()->pluck('id')->toArray();
+        $isServiceBelongToUser =  in_array($this->fetchData['service']->id, $userServices);
+        $PlaceUser = $this->fetchData['doc']->activePlaces()->pluck('id')->toArray();
+        $isPlaceBelongToUser =  in_array($this->fetchData['places']->id, $PlaceUser);
+        if ($isServiceBelongToUser != true  || $isPlaceBelongToUser != true) {
+            return abort(404);
         }
 
         // check for login

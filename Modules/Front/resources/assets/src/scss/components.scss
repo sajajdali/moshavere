@@ -230,7 +230,7 @@ progress[value]::-webkit-progress-value {
 }
 
 .appointment__modal-container {
-  @apply w-[90%] max-w-[1000px] mx-auto flex flex-col gap-5 bg-white rounded-lg p-6 h-[calc(100vh-200px)] no_scrollbar overflow-y-auto;
+  @apply w-[90%] max-w-[1000px] mx-auto flex flex-col gap-5 bg-white rounded-lg p-6  no_scrollbar overflow-y-auto;
 
   & input[type="radio"] {
     appearance: none;

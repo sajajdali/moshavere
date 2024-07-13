@@ -1,4 +1,5 @@
 <div>
+    @include('front::layouts.components.alert')
     <main class="bg-secondary-100 py-10 md:py-16">
         <section class="dashboard__container">
             <aside class="dashboard__side">

@@ -1,12 +1,10 @@
-@if(session()->has('success'))
-    <div class="col-md-12 alert alert-success fade show" role="alert">
-        <i class="fa fa-check-circle-o me-2" aria-hidden="true"></i>
-        {{ session()->get('success') }}
+@if (session()->has('error'))
+    <div class="bg-red text-white text-lg max-w-3xl text-center py-3 px-5 rounded-lg mb-5 mx-auto">
+        {{ session()->get('error') }}
     </div>
 @endif
-@if(session()->has('error'))
-    <div class="col-md-12 alert alert-danger fade show" role="alert">
-        <i class="fa fa-remove me-2" aria-hidden="true"></i>
-        {{ session()->get('error') }}
+@if (session()->has('success'))
+    <div class="bg-emerald-200 text-gray-500 text-lg max-w-3xl text-center py-3 px-5 rounded-lg mb-5 mx-auto">
+        {{ session()->get('success') }}
     </div>
 @endif

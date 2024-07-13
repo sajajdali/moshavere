@@ -6,7 +6,6 @@ use App\Broadcasting\SmsChannel;
 use Illuminate\Bus\Queueable;
 use Illuminate\Notifications\Notification;
 use Illuminate\Contracts\Queue\ShouldQueue;
-use Illuminate\Notifications\Messages\MailMessage;
 use Modules\Setting\Enum\SettingKeyEnum;
 use Modules\User\Entities\User;
 

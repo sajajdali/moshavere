@@ -12,6 +12,7 @@ use Modules\Api\app\Resources\PriceResource;
 use Modules\AppointmentUser\Enum\AppointmentVia;
 use Modules\Api\app\Resources\Api\SomeoneResource;
 use Modules\AppointmentUser\app\Models\AppointmentUser;
+use Modules\User\app\Notifications\UserSmsNotification;
 use Modules\AppointmentUser\Enum\model\AppointmentModel;
 use Modules\AppointmentUser\app\Models\AppointmentOnline;
 use Modules\AppointmentUser\Enum\AppointmentUserKindEnum;
@@ -83,7 +84,7 @@ class AppointmentUserService
     {
         // Get the date range for which you want to fetch appointments and available slots
         $specialDaySelected = false;
-        // if (isset($details['specialDay'])) {
+
         if (array_key_exists('specialDay', $details)) {
             $specialDaySelected = true;
             $startDate = Carbon::parse($details['specialDay'])->subDays(20);
@@ -95,12 +96,13 @@ class AppointmentUserService
             $startDate = Carbon::parse($details['specialDay']);
             $endDate = $startDate->copy()->addDays($details['numberDays']);
         }
-        // }
 
         if (!$specialDaySelected && !isset($startDate)) {
             $startDate = Carbon::today()->subDays(20);
             $endDate = Carbon::today()->addDays($appointmentSetting->max_day_active ?? 90); // Adjust the number of days as needed
         }
+
+
 
         // get holidays
         $holidays = Event::whereBetween('date', [$startDate, $endDate])->where('is_holiday', '1')->get();
@@ -134,9 +136,9 @@ class AppointmentUserService
 
         // Initialize the output array
         $output = [];
-
         // Iterate over the week starting from today
         $firstDayInLog = $firstEmptyDay = $lastDayInLog = null;
+
         for ($currentDate = $startDate; $currentDate->lte($endDate); $currentDate->addDay()) {
             $numberAppointmentsPerDay = 0;
             $year = verta($currentDate)->year;
@@ -152,6 +154,7 @@ class AppointmentUserService
             // Initialize the day's output
             $dayOutput = [
                 'status' => true,
+                'user_status' => true,
                 'day_number' => verta($currentDate)->format("l m/d"),
                 'day_number_gmt' => $currentDate->toDateString(),
                 'is_holiday' => false,
@@ -177,7 +180,6 @@ class AppointmentUserService
                         return $appointmentTime->day_number->value == $currentDate->copy()->addDay()->dayOfWeek;
                     });
                 }
-
                 //list appointments
                 foreach ($appointments as $appointment) {
                     if (Carbon::parse($appointment->date_visit)->isSameDay($currentDate)) {
@@ -189,6 +191,7 @@ class AppointmentUserService
 
                         $dayOutput['times'][] = [
                             'status' => false,
+                            'user_status' => false,
                             'from' => $appointment->start_time,
                             'type' => $appointment->type->value,
                             'app_status' => $appointment->status->value,
@@ -226,6 +229,7 @@ class AppointmentUserService
                     if ($absence->isNotempty()) {
                         $dayOutput['absence'] = true;
                         $dayOutput['status'] = false;
+                        $dayOutput['user_status'] = false;
                         $dayOutput['empty_appoints'] = 0;
                         break;
                     }
@@ -235,9 +239,11 @@ class AppointmentUserService
                     if ($holidays->contains('date', $currentDate->toDateString())) {
                         $dayOutput['is_holiday'] = true;
                         $dayOutput['status'] = true;
+                        $dayOutput['user_status'] = true;
                         $dayOutput['empty_appoints'] = 0;
                         if ($checkHoliday) {
                             $dayOutput['status'] = false;
+                            $dayOutput['user_status'] = false;
                             break;
                         }
                     }
@@ -358,16 +364,25 @@ class AppointmentUserService
                         $startTime->addMinutes($timeForVisit);
                     }
                 }
+
                 if ($dayOutput['empty_appoints'] == 0) {
                     $dayOutput['status'] = false;
+                    $dayOutput['user_status'] = false;
                     $dayOutput['empty_appoints'] = 0;
+                }
+
+                // check for minimum start date from , for user
+                if ($appointmentSetting->min_day_active > 0) {
+                    if ($currentDate->lte(\now()->addDays($appointmentSetting->min_day_active))) {
+                        $dayOutput['user_status'] = false;
+                    }
                 }
 
                 // Fill the slots with appointments
             } else {
                 $dayOutput['status'] = false; // Appointment settings not found for the doctor
+                $dayOutput['user_status'] = false; // Appointment settings not found for the doctor
             }
-
             usort($dayOutput['times'], function ($a, $b) {
                 return strtotime($a['from']) - strtotime($b['from']);
             });
@@ -380,6 +395,7 @@ class AppointmentUserService
                 break;
             }
         }
+
         $paymentStatus = false;
         $notPayinStatus = $paymentPrice = $paymentOnline = $paymentVoip = null;
         if (isset($details['payment']['price']) && $details['payment']['price'] > 0) {
@@ -409,7 +425,6 @@ class AppointmentUserService
             'first_day_in_log' => $firstDayInLog?->toDateString(),
             'interference' => $appointmentSettings->interference == 1,
         ];
-
         // Now $output contains the formatted output for the week with filled appointments and empty slots arranged
         // You can return this array to your view
         return $output;
@@ -664,14 +679,15 @@ class AppointmentUserService
         if (isset($smsTemplate)) {
             $appointmentUser->notify(new AppointmentSmsNotification($smsTemplate));
         }
-        $smsToOperator = setting(SettingKeyEnum::SMS_APPOINTMENT_TO_OPERATOR);
-        if (isset($smsToOperator)) {
-            $appointmentUser->notify(new AppointmentSmsNotification($smsToOperator));
-        }
-        $smsToDoctor = setting(SettingKeyEnum::SMS_APPOINTMENT_TO_DOCTOR);
-        if (isset($smsToOperator)) {
-            $appointmentUser->notify(new AppointmentSmsNotification($smsToDoctor));
-        }
+        // TODO::sms to docotor
+        // $smsToOperator = setting(SettingKeyEnum::SMS_APPOINTMENT_TO_OPERATOR);
+        // if (isset($smsToOperator)) {
+        //     $appointmentUser->operator?->notify(new UserSmsNotification($smsToOperator));
+        // }
+        // $smsToDoctor = setting(SettingKeyEnum::SMS_APPOINTMENT_TO_DOCTOR);
+        // if (isset($smsToOperator)) {
+        //     $appointmentUser->doctor?->notify(new UserSmsNotification($smsToDoctor));
+        // }
 
         event(new StoreAppointmentEvent($appointmentUser));
 

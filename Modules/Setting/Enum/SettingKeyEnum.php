@@ -30,6 +30,7 @@ enum SettingKeyEnum: int implements EnumHasNameInterface, SettingTypeInterface, 
     case FOOTER_DESCRIPTION = 15;
     case INSTAGRAM_ADDRESS = 16;
     case TELEGRAM_ADDRESS = 17;
+    case SHOW_FALSE_APPOINTMENT_STATUS = 18;
 
         //sms
     case SMS_API_TOKEN = 20;
@@ -98,6 +99,7 @@ enum SettingKeyEnum: int implements EnumHasNameInterface, SettingTypeInterface, 
             self::FOOTER_DESCRIPTION    => 'توضیحات در فورتر سایت',
             self::INSTAGRAM_ADDRESS    => 'ادرس صفحه ی ابنتساگرام شما به صورت :https://www.instagram.com/shemiranweb/ ',
             self::TELEGRAM_ADDRESS    => 'ادرس تلگرام شما ',
+            self::SHOW_FALSE_APPOINTMENT_STATUS    => 'نمایش ساعت های پر شده در لیست ساعت ها به کاربران',
 
 
             self::SMS_API_TOKEN => 'توکن API پیامک',
@@ -175,6 +177,7 @@ enum SettingKeyEnum: int implements EnumHasNameInterface, SettingTypeInterface, 
             self::DEFAULT_EXERCISE_STATUS => SettingTypeEnum::SELECT,
             self::PAYMEN_ACTIVE_DRIVER => SettingTypeEnum::SELECT,
             self::APPOINTMENT_MORE_THAT_ONE_PER_DAY => SettingTypeEnum::CHECK,
+            self::SHOW_FALSE_APPOINTMENT_STATUS => SettingTypeEnum::CHECK,
             self::PAYMENT_PAYSTAR_STATUS => SettingTypeEnum::CHECK,
             self::APPOINTMENT_FOR_OTHERS_STATUS => SettingTypeEnum::CHECK,
             self::PAYMENT_ZARINPAL_STATUS => SettingTypeEnum::CHECK,

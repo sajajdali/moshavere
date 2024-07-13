@@ -119,7 +119,7 @@ class DoctorProfileLivewire extends Component
                 $this->fetchData['modalStep'] =  1;
             }
         } elseif ($this->fetchData['modalStep'] == 2) {
-            if(isset($this->form['segment'])){
+            if (isset($this->form['segment'])) {
                 if (count($this->form['segment']) > 1) {
                     foreach ($this->form['segment'] as $segmentId => $status) {
                         if ($status) {
@@ -129,13 +129,21 @@ class DoctorProfileLivewire extends Component
                 } else {
                     $this->form['selectedSegmentForRoute'] = $this->form['segment'];
                 }
+                $this->redirectToAppointmentDays(
+                    $this->doc->id,
+                    $this->form['place'],
+                    $this->form['service'],
+                    $this->form['selectedSegmentForRoute'],
+                );
+            }else{
+                if(isset($this->form['service'])) {
+                    $this->redirectToAppointmentDays(
+                        $this->doc->id,
+                        $this->form['place'],
+                        $this->form['service']
+                    );
+                }
             }
-            $this->redirectToAppointmentDays(
-                $this->doc->id,
-                $this->form['place'],
-                $this->form['service'],
-                $this->form['selectedSegmentForRoute'],
-            );
         }
     }
 
@@ -182,11 +190,11 @@ class DoctorProfileLivewire extends Component
     {
         if (request()->has('service_id')) {
             $santetizeService = htmlspecialchars(request()->input('service_id'), ENT_QUOTES, 'UTF-8');
-            $this->form['service'] =  Service::where('active',ActiveEnum::ACTIVE)->firstWhere('id',$santetizeService)?->id ?? null;
+            $this->form['service'] =  Service::where('active', ActiveEnum::ACTIVE)->firstWhere('id', $santetizeService)?->id ?? null;
         }
         if (request()->has('place_id')) {
             $santetizeService = htmlspecialchars(request()->input('place_id'), ENT_QUOTES, 'UTF-8');
-            $place = Place::where('active',ActiveEnum::ACTIVE)->where('id',$santetizeService)->first() ?? null;
+            $place = Place::where('active', ActiveEnum::ACTIVE)->where('id', $santetizeService)->first() ?? null;
             if (isset($place) && !empty($place)) {
                 $this->form['place'] = $place->id;
                 $this->form['place_name'] = $place->title;
@@ -335,7 +343,7 @@ class DoctorProfileLivewire extends Component
                 $this->fetchData['isFavarite'] = true;
             }
         }
-        $place = $this->doc->Places()->where('active',ActiveEnum::ACTIVE)->first();
+        $place = $this->doc->Places()->where('active', ActiveEnum::ACTIVE)->first();
         if (isset($place->detail[Place::DETAIL_KEY_NUMBERS])) {
             $this->fetchData['tel'] = implode(',', $place->detail[Place::DETAIL_KEY_NUMBERS]);
         }

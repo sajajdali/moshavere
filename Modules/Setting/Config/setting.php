@@ -40,6 +40,7 @@ return [
             \Modules\Setting\Enum\SettingKeyEnum::APPOINTMENT_STATUS,
             \Modules\Setting\Enum\SettingKeyEnum::APPOINTMENT_FOR_OTHERS_STATUS,
             \Modules\Setting\Enum\SettingKeyEnum::APPOINTMENT_MORE_THAT_ONE_PER_DAY,
+            \Modules\Setting\Enum\SettingKeyEnum::SHOW_FALSE_APPOINTMENT_STATUS,
             \Modules\Setting\Enum\SettingKeyEnum::APPOINTMENT_DESCRIPTION_STATUS,
             \Modules\Setting\Enum\SettingKeyEnum::APPOINTMENT_DESCRIPTION,
             \Modules\Setting\Enum\SettingKeyEnum::APPOINTMENT_CANCEL_DESCRIPTION,

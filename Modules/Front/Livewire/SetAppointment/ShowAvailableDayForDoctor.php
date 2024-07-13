@@ -15,6 +15,8 @@ use Hekmatinasser\Verta\Facades\Verta;
 use Modules\Service\app\Models\Service;
 use Modules\AppointmentSetting\app\Models\AppointmentSetting;
 
+use function PHPUnit\Framework\isFalse;
+
 #[Layout('front::layouts.app')]
 #[Title('ثبت نوبت')]
 class ShowAvailableDayForDoctor extends Component
@@ -29,14 +31,14 @@ class ShowAvailableDayForDoctor extends Component
     public function TimeForReservesation()
     {
         $this->validate(['form.time' => 'required|string']);
-
         // Extract start and end times from the input value
         list($startTime, $endTime) = explode(',', $this->form['time']);
 
         /////////////// startTime contain date and start time as a timestamp
 
         // Convert the times to endTime
-        $endTimestamp = strtotime($endTime);
+        $eTime  = Carbon::createFromFormat('H:i', $endTime);
+        $endTimestamp = $eTime->timestamp;
         // Create the parameter array with the converted timestamps
         $parameter = [
             'doctor_id' => $this->fetchData['doc']->id,
@@ -47,39 +49,47 @@ class ShowAvailableDayForDoctor extends Component
         ];
         return $this->redirect(route('setAppointment.checkout', $parameter), true);
     }
-    public function loadNextDays()
+    public function loadMoreDays()
     {
-        $this->fetchData['dont_show_first_available_day'] = true;
-        //  check if user can access this date of appointments
+
+        // //  check if user can access this date of appointments
         if (isset($this->fetchData['appointmentSetting']->max_day_active)) {
             $max_days_app_available = Carbon::now()->addDays($this->fetchData['appointmentSetting']->max_day_active);
             if ($max_days_app_available->lt($this->fetchData['lastDate'])) {
+                $this->dispatch('scrollToTop', true);
                 return $this->msg = 'امکان دریافت نوبت خارج از این بازه زمانی وجود ندارد!';
             }
         }
+        $this->fetchData['maxShowDay'] = $this->fetchData['maxShowDay'] + 2;
+
         // check if date exist in the log or should recreate the app_log
         if ($this->fetchData['lastDate']->lt($this->fetchData['last_active_day'])) {
             // next date exist in log
             $this->fetchData['firstTreeAvailableAppointment'] =   $this->findFirstTreeAppointment($this->fetchData['rawlistOfAppointment'], $this->fetchData['lastDate']);
+            $this->dispatch('scrollToBottom', true);
         } else {
             // next date is not exist in log
             $details['specialDays'] = $this->fetchData['lastDate'];
             $this->fetchData['rawlistOfAppointment'] =  app('AppointmentUserService')->listAppointments($this->fetchData['appointmentSetting'], $details);
             $this->fetchData['firstTreeAvailableAppointment'] = $this->findFirstTreeAppointment($this->fetchData['rawlistOfAppointment']);
+            $this->dispatch('scrollToBottom', true);
         }
     }
-    public function loadFirstApp()
-    {
-        unset($this->fetchData['dont_show_first_available_day']);
-        unset($this->fetchData['rawlistOfAppointment']);
-        unset($this->fetchData['firstTreeAvailableAppointment']);
-        // TODO::consider segment
-        $listOfAppointment = Cache::rememberForever('appointmentList.' . $this->fetchData['appointmentSetting']->id, function () {
-            return app('AppointmentUserService')->listAppointments($this->fetchData['appointmentSetting']);
-        });
-        $this->fetchData['rawlistOfAppointment'] = $listOfAppointment;
-        $this->fetchData['firstTreeAvailableAppointment'] =  $this->findFirstTreeAppointment($listOfAppointment);
-    }
+    // public function loadNextDays()
+    // {
+
+    // public function loadFirstApp()
+    // {
+    //     unset($this->fetchData['dont_show_first_available_day']);
+    //     unset($this->fetchData['rawlistOfAppointment']);
+    //     unset($this->fetchData['firstTreeAvailableAppointment']);
+    //     // TODO::consider segment
+    //     $listOfAppointment = Cache::rememberForever('appointmentList.' . $this->fetchData['appointmentSetting']->id, function () {
+    //         return app('AppointmentUserService')->listAppointments($this->fetchData['appointmentSetting']);
+    //     });
+    //     $this->fetchData['rawlistOfAppointment'] = $listOfAppointment;
+    //     $this->fetchData['firstTreeAvailableAppointment'] =  $this->findFirstTreeAppointment($listOfAppointment);
+    // }
     private function caculateLastActiveDay($listOfAppointment)
     {
         $last_exist_month = end($listOfAppointment);
@@ -102,7 +112,7 @@ class ShowAvailableDayForDoctor extends Component
         $isYear  = verta()->addDays($mainDaActive)->year;
 
         $result = [];
-        $maxDay = 2;
+        $maxDay = $this->fetchData['maxShowDay'];
         $DaysDisplayed = 0;
 
         // select the last active day
@@ -119,12 +129,12 @@ class ShowAvailableDayForDoctor extends Component
                     if ($day < $isDay && $month < $isMonth && $yeay < $isYear) {
                         continue;
                     }
-                    if (isset($lastDayActive) && $lastDayActive != null) {
-                        if ($appointment['day_number_gmt'] <= $lastDayActive) {
-                            continue;
-                        }
-                    }
-                    if ($appointment['empty_appoints'] <= 0 || $appointment['status'] == false) {
+                    // if (isset($lastDayActive) && $lastDayActive != null) {
+                    //     if ($appointment['day_number_gmt'] <= $lastDayActive) {
+                    //         continue;
+                    //     }
+                    // }
+                    if ($appointment['empty_appoints'] <= 0 || $appointment['status'] == false ||   $appointment['user_status'] == false) {
                         continue;
                     }
                     $dayNumber = $appointment['day_number_gmt'];
@@ -139,20 +149,17 @@ class ShowAvailableDayForDoctor extends Component
                                 'day_of_week_name' =>  verta($time['timestamp'])->formatDifference(),
                                 'day_name'            =>  verta($time['timestamp'])->format('l'),
                                 'date_of_month'    =>  verta($time['timestamp'])->format('%d %B'),
-                                'time_stamp' => $time['timestamp'],
+                                'time_stamp' => Carbon::parse($time['timestamp'])->setTimeFromTimeString($time['from'])->timestamp,
                                 'from' => substr($time['from'], 0, 5),
                                 'until' => substr($time['until'], 0, 5),
                             ];
-                            if (count($firstTwoEmpty) < 2) {
-                                $vertaDateTime = Verta::createTimestamp($time['timestamp']);
-                                $firstTwoEmpty[] = [
-                                    'persian_date' => $vertaDateTime->format('ساعت H روز l m/d'),
-                                    'time_stamp' => $time['timestamp'],
+                        } else {
+                            if (setting(\Modules\Setting\Enum\SettingKeyEnum::SHOW_FALSE_APPOINTMENT_STATUS)) {
+                                $result[$dayNumber][] = [
+                                    'status' => false,
                                     'from' => $time['from'],
-                                    'until' => $time['until'],
                                 ];
                             }
-                            // If two matches are found, break out of the loop
                         }
                     }
                 }
@@ -163,6 +170,8 @@ class ShowAvailableDayForDoctor extends Component
         $this->fetchData['lastDate'] = Carbon::parse(end($dates));
         return $result;
     }
+    // 'time_stamp' => (Carbon::parse($time['timestamp'])->setTimeFromTimeString($time['from']))->timestamps,
+
     private function getAvailableDay()
     {
         $appointmentSetting = AppointmentSetting::where('service_id', $this->fetchData['service']->id)
@@ -177,10 +186,13 @@ class ShowAvailableDayForDoctor extends Component
         if (isset($this->fetchData['segment_time'])) {
             $details['segment_time'] =  $this->fetchData['segment_time'];
         }
+
         $listOfAppointment =  app('AppointmentUserService')->listAppointments($appointmentSetting, $details);
+
         // $listOfAppointment = Cache::rememberForever('appointmentList.' . $appointmentSetting->id, function () use ($appointmentSetting,$details) {
         //     return app('AppointmentUserService')->listAppointments($appointmentSetting, $details);
         // });
+
         $this->fetchData['rawlistOfAppointment'] = $listOfAppointment;
         $this->fetchData['firstTreeAvailableAppointment'] =  $this->findFirstTreeAppointment($listOfAppointment);
         $this->fetchData['appointmentSetting'] = $appointmentSetting;
@@ -210,21 +222,31 @@ class ShowAvailableDayForDoctor extends Component
             return redirect()->back();
         }
         $this->fetchData['doc']      =   User::find($doc);
-        $this->fetchData['places']   =  place::find($place);
+        $this->fetchData['places']   =   place::find($place);
         $this->fetchData['service']  =   Service::find($service);
 
         if (!isset($this->fetchData['doc']) || empty($this->fetchData['places']) ||  empty($this->fetchData['service'])) {
-            // redirect back with alert
-            // TODO::insert alert
-            return redirect()->back();
+            return abort(404);
         }
 
+        // check if service id not manipulate in url
+        $userServices = $this->fetchData['doc']->activeServices()->pluck('id')->toArray();
+        $isServiceBelongToUser =  in_array($this->fetchData['service']->id, $userServices);
+        $PlaceUser = $this->fetchData['doc']->activePlaces()->pluck('id')->toArray();
+        $isPlaceBelongToUser =  in_array($this->fetchData['places']->id, $PlaceUser);
+        if ($isServiceBelongToUser != true  || $isPlaceBelongToUser != true) {
+            return abort(404);
+        }
+        $this->fetchData['maxShowDay'] = 2;
         $this->getAvailableDay();
 
         //select the nearest appointment
         foreach ($this->fetchData['firstTreeAvailableAppointment']  as $date => $appointmentsWithDaysIndex) {
             foreach ($appointmentsWithDaysIndex as $eachTime => $appointmentDetail) {
-                $this->form['time'] = (string) $appointmentDetail['time_stamp'];
+                if ($appointmentDetail['status'] == false) {
+                    continue;
+                }
+                $this->form['time'] = (string) $appointmentDetail['time_stamp'] . ',' . $appointmentDetail['until'] ;
                 break 2; // Break out of both foreach loops
 
             }

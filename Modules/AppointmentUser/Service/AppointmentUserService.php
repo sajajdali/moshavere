@@ -167,6 +167,7 @@ class AppointmentUserService
                 if (isset($details['segment_time'])) {
                     $timeForVisit = $details['segment_time'];
                 }
+                
                 //  check special date
                 $checkHoliday = false;
                 $attendanceTimes = $appointmentSettingTimes->filter(function ($appointmentTime) use ($currentDate) {
@@ -512,8 +513,8 @@ class AppointmentUserService
             $dateAppointment = Carbon::now();
             $visitDateTime = Carbon::now();
         } else {
-            $dateAppointment = Carbon::createFromTimestamp($appointmentData->timestamp);
-            $visitDateTime = Carbon::createFromTimestamp($appointmentData->timestamp);
+            $dateAppointment = Carbon::createFromTimestamp($appointmentData->timestamp, 'Asia/Tehran');
+            $visitDateTime = Carbon::createFromTimestamp($appointmentData->timestamp, 'Asia/Tehran');
         }
 
         if ($appointmentData->kind == AppointmentUserKindEnum::IN_PERSION && $appointmentData->appointmentVia == AppointmentVia::SELF && $dateAppointment->isPast()) {
@@ -565,7 +566,7 @@ class AppointmentUserService
         // check if end time has set by admin
         $endTime = $appointmentData->endTime ?? $visitDateTime->copy()->addMinutes($appointmentSetting->time_for_visit)->toTimeString();
 
-
+        $status = AppointmentUserStatusEnum::STATUS_SUCCESSFUL;
         // check for peyment
         if (
             $appointmentSetting->detail[AppointmentSetting::PAYMENT][AppointmentSetting::STATUS]
@@ -573,7 +574,7 @@ class AppointmentUserService
         ) {
             $status = AppointmentUserStatusEnum::STATUS_WAIT_PAYMENT;
         }
-
+       
         //check for monitoring appointment
         if (
             isset($appointmentSetting->detail[AppointmentSetting::MONITORTING_APPOINTMENT])
@@ -581,8 +582,6 @@ class AppointmentUserService
             $appointmentData->appointmentVia == AppointmentVia::SELF
         ) {
             $status = AppointmentUserStatusEnum::STATUS_MONITORING;
-        } else {
-            $status = AppointmentUserStatusEnum::STATUS_SUCCESSFUL;
         }
 
         // store appointment

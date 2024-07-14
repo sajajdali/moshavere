@@ -50,7 +50,7 @@
                             <label class="form-label">انتخاب بخش</label>
                             <select multiple class="form-control select2-show-search form-select"
                                 id="speciificDocSelect2" data-id="services" data-placeholder="انتخاب کنید...">
-                                <option @if ($isEdited  && ! isset($form['services']) ) selected @endif  value="null">تمام بخش ها</option>
+                                <option @if ($isEdited  && $form['services'] == null ) selected @endif  value="null">تمام بخش ها</option>
                                 @foreach ($fetchData['services'] as $service)
                                     <option
                                     @if (isset($form['services']) && in_array($service->id,$form['services']))
@@ -77,7 +77,7 @@
                             <label class="form-label">انتخاب پزشک</label>
                             <select multiple class="form-control select2-show-search form-select"
                                 id="speciificDocSelect2" data-id="doctors" data-placeholder="انتخاب کنید...">
-                                <option @if($isEdited && ! isset($form['doctors'])) selected @endif value="null">تمام پزشکان</option>
+                                <option @if($isEdited && $form['doctors'] == null) selected @endif value="null">تمام پزشکان</option>
                                 @foreach ($fetchData['doctors'] as $service)
                                     <option
                                     @if (isset($form['doctors']) && in_array($service->id,$form['doctors']))

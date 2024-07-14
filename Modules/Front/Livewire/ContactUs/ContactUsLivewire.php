@@ -25,7 +25,8 @@ class ContactUsLivewire extends Component
 
     public function sendSupportMessage()
     {
-        if (isset($user)) {
+        
+        if (auth()->check()) {
             $rules = [
                 'form.message' => 'required|string|max:1500'
             ];
@@ -37,7 +38,7 @@ class ContactUsLivewire extends Component
             ];
         }
         $this->validate($rules);
-        if (isset($user)) {
+        if (auth()->check()) {
             $model = [
                 'user_id' => $this->user->id,
                 'body' => $this->form['message'],
@@ -51,7 +52,7 @@ class ContactUsLivewire extends Component
         }
         Contactus::create($model);
         $this->form = [];
-        // TODO::addAlert
+        $this->dispatch('swalSuccess',true);
     }
     public function mount()
     {

@@ -230,7 +230,7 @@ progress[value]::-webkit-progress-value {
 }
 
 .appointment__modal-container {
-  @apply w-[90%] max-w-[1000px] mx-auto flex flex-col gap-5 bg-white rounded-lg p-6  no_scrollbar overflow-y-auto;
+  @apply w-[90%] max-w-[1000px] mx-auto flex flex-col gap-5 bg-white rounded-lg p-6  no_scrollbar overflow-y-auto h-[calc(100vh-200px)];
 
   & input[type="radio"] {
     appearance: none;
@@ -247,6 +247,24 @@ progress[value]::-webkit-progress-value {
     }
   }
 }
+.list_of_available_day_container {
+    @apply w-[90%] max-w-[1000px] mx-auto flex flex-col gap-5 bg-white rounded-lg p-6  no_scrollbar overflow-y-auto ;
+  
+    & input[type="radio"] {
+      appearance: none;
+      -webkit-appearance: none;
+      -moz-appearance: none;
+      width: 22px;
+      height: 22px;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none'%3E%3Cpath d='M11.9999 22.7918C6.03825 22.7918 1.20825 17.9618 1.20825 12.0002C1.20825 6.0385 6.03825 1.2085 11.9999 1.2085C17.9616 1.2085 22.7916 6.0385 22.7916 12.0002C22.7916 17.9618 17.9616 22.7918 11.9999 22.7918Z' stroke='%23ADB9C7' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3Cpath d='M11.4632 13.8434L9.40991 11.79' stroke='%23D5DDE5' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3Cpath d='M15.5698 9.73682L11.4631 13.8435' stroke='%23D5DDE5' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+      background-size: 100% 100%;
+      background-position: center;
+  
+      &:checked {
+        background-image: url("data:image/svg+xml,%3Csvg width='28' height='28' viewBox='0 0 28 28' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cg id='Checkmark (Circle)'%3E%3Cpath id='Vector' d='M13.9999 2.3335C7.57158 2.3335 2.33325 7.57183 2.33325 14.0002C2.33325 20.4285 7.57158 25.6668 13.9999 25.6668C20.4283 25.6668 25.6666 20.4285 25.6666 14.0002C25.6666 7.57183 20.4283 2.3335 13.9999 2.3335ZM18.1882 12.3552L14.0816 16.4618C13.9066 16.6368 13.6849 16.7185 13.4632 16.7185C13.2416 16.7185 13.0082 16.6368 12.8449 16.4618L10.7916 14.4085C10.4416 14.0702 10.4416 13.5102 10.7916 13.1718C11.1299 12.8335 11.6899 12.8335 12.0282 13.1718L13.4632 14.6068L16.9516 11.1185C17.2899 10.7802 17.8382 10.7802 18.1882 11.1185C18.5266 11.4568 18.5266 12.0168 18.1882 12.3552Z' fill='%231766FF'/%3E%3C/g%3E%3C/svg%3E");
+      }
+    }
+  }
 
 .cart__radio--container {
   @apply p-4 border border-gray-300 rounded-lg flex items-center gap-3;

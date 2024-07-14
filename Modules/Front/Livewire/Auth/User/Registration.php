@@ -7,6 +7,7 @@ use Livewire\Attributes\Title;
 use Livewire\Attributes\Layout;
 use Livewire\Attributes\Locked;
 use Modules\User\Entities\User;
+use Illuminate\Support\Facades\Session;
 
 #[Layout('front::layouts.app')]
 #[Title('ورود')]
@@ -51,11 +52,12 @@ class Registration extends Component
             $userMOdel = User::find($this->user->id);
             $userMOdel->update(['email' => $this->form['email']]);
         }
-        if (session()->has('LoginOrgin')) {
-            return redirect()->route(session()->get('LoginOrgin'));
-        } else {
-            return redirect()->route('front.homePage');
+        $intendedUrl = Session::pull('url.intended', route('front.homePage'));
+        if (isset($intendedUrl)) {
+            session()->forget('url.intended');
+            return redirect()->intended($intendedUrl);
         }
+        return redirect()->route('front.homePage');
     }
     public function mount()
     {

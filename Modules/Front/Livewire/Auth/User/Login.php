@@ -49,7 +49,6 @@ class Login extends Component
                 // check for last request time
                 if ($oldRequest->next_request_at->lessThanOrEqualTo(now())) {
                     AuthRequest::make($this->form['mobileNmber'], request()->ip());
-                    $this->step = $this->step + 1;
                     $this->dispatch('startCountDown', true);
                 } else {
                     $this->addError('form.mobileNmber', 'لطفا برای درخواست مجدد چند دقیقه صبر کنید!');
@@ -58,6 +57,7 @@ class Login extends Component
                 // if record dose not exist
                 AuthRequest::make($this->form['mobileNmber'], request()->ip());
             }
+            $this->step = $this->step + 1;
         } elseif ($this->step == 2) {
             $this->validate([
                 'form.code' => 'required|string|digits:4'
@@ -73,8 +73,11 @@ class Login extends Component
                         return redirect()->route('front.user.registration');
                     }
                     $intendedUrl = Session::pull('url.intended', route('front.homePage'));
-                    session()->forget('url.intended') ;
-                    return redirect()->intended($intendedUrl);
+                    if(isset($intendedUrl)) {
+                        session()->forget('url.intended') ;
+                        return redirect()->intended($intendedUrl);
+                    }
+                    return redirect()->route('front.homePage');
                 }
             } else {
                 $this->addError('form.code', 'کد وارد شده صحیح نیست');

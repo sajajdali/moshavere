@@ -90,15 +90,25 @@
                     <div
                         class="flex flex-col gap-3 md:flex-row items-center justify-between border-2 border-solid border-secondary-100 rounded-2xl py-3.5 px-4">
                         @if (isset($fetchData['status']['price_after_discount']))
-                            <p class="font-bold">
-                                جهت فعالسازی نوبت، مبلغ <s
-                                    class="text-rose-500">{{ number_format($fetchData['stauts']['price']) }}</s>
-                                {{ number_format($fetchData['status']['price_after_discount']) }} تومان پرداخت
-                                نمایید
-                                @if (isset($fetchData['payment']['termAndCondition']))
-                                    <span> با شرایط و قوانین پرداخت موافق هستم. </span>
-                                @endif
-                            </p>
+                            <div>
+                                <p class="font-bold">
+                                    جهت فعالسازی نوبت، مبلغ <s
+                                        class="text-rose-500">{{ number_format($fetchData['stauts']['price']) }}</s>
+                                    {{ number_format($fetchData['status']['price_after_discount']) }} تومان پرداخت
+                                    نمایید
+                                    @if (isset($fetchData['payment']['termAndCondition']))
+                                        <div class="flex items-center mt-3" wire:ignore>
+                                            <input id="termAndConditionAggrement" type="checkbox"
+                                                class="form-checkbox h-3 w-3 text-blue-600" checked>
+                                            <label for="termAndConditionAggrement" class="text-sm text-gray-500 mr-2">
+                                                با
+                                                <button id="termAndConditionModalLunch"
+                                                    class="text-blue-400 hover:text-blue-700">شرایط و قوانین </button>
+                                                پرداخت موافق هستم.</label>
+                                        </div>
+                                    @endif
+                                </p>
+                            </div>
                         @else
                             <div>
                                 <p class="font-bold">
@@ -107,7 +117,7 @@
                                     نمایید
                                 </p>
                                 @if (isset($fetchData['payment']['termAndCondition']))
-                                    <div class="flex items-center mt-3">
+                                    <div class="flex items-center mt-3" wire:ignore>
                                         <input id="termAndConditionAggrement" type="checkbox"
                                             class="form-checkbox h-3 w-3 text-blue-600" checked>
                                         <label for="termAndConditionAggrement" class="text-sm text-gray-500 mr-2"> با
@@ -378,7 +388,7 @@
                     @this.authNeeded();
                 }
             });
-            $('#termAndConditionAggrement').on('click', function() {
+            $('body').on('click','#termAndConditionAggrement', function() {
                 if ($(this).is(':checked')) {
                     $('#paymentBtn').prop('disabled', false);
                     $('#paymentBtn').removeClass('bg-gray-300');

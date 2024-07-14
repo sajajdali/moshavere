@@ -51,7 +51,7 @@ class Discount extends Model
     public function doctors(): string
     {
         return match ($this->doctor_id) {
-            null => 'تمامی بخش ها',
+            null => 'تمامی پزشک ها',
             default => $this->getdoctorName($this->doctor_id),
         };
     }

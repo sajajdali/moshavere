@@ -135,13 +135,15 @@ class DoctorProfileLivewire extends Component
                     $this->form['service'],
                     $this->form['selectedSegmentForRoute'],
                 );
-            }else{
-                if(isset($this->form['service'])) {
+            } else {
+                if (isset($this->form['service'])) {
                     $this->redirectToAppointmentDays(
                         $this->doc->id,
                         $this->form['place'],
                         $this->form['service']
                     );
+                }else{
+                    $this->dispatch('swalError',msg:'لطفا بخش مورد نظر خود را انتخاب کنید!');
                 }
             }
         }
@@ -329,8 +331,12 @@ class DoctorProfileLivewire extends Component
     public function mount()
     {
         $doctor_id =   request()->route('doctor_id');
-        $this->doc =  User::find($doctor_id);
-
+        $checkExistensOfdoctor =  User::find($doctor_id);
+        if (isset($checkExistensOfdoctor) && $checkExistensOfdoctor->isDoctor() ) {
+            $this->doc = $checkExistensOfdoctor;
+        } else {
+            abort(404);
+        }
         $this->fetchData['comments'] = Comment::doctroComments($this->doc->id);
         if (count($this->fetchData['comments']) > 2) {
             $this->fetchData['iteratorComments'] = 2;

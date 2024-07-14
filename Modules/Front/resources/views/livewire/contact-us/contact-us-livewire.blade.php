@@ -76,7 +76,7 @@
                                 </svg>
                                 <span class="sr-only">Loading...</span>
                             </div>
-                            <span wire:loading.remove wire:target='sendSupportMessage' >ارسال پیام</span>
+                            <span wire:loading.remove wire:target='sendSupportMessage'>ارسال پیام</span>
                         </button>
                     </div>
                 </form>
@@ -113,5 +113,22 @@
         <!-- FAQ -->
         @include('front::components.homepage.faq')
     </main>
-
+    @error('*')
+{{$message}}
+    @enderror
 </div>
+@push('scripts')
+    <script>
+        $(document).ready(function() {
+            Livewire.on('swalSuccess', function() {
+                Swal.fire({
+                    position: "center",
+                    icon: "success",
+                    title: "نظر شما با موفقیت ثبت شد!",
+                    showConfirmButton: false,
+                    timer: 2000
+                });
+            });
+        });
+    </script>
+@endpush

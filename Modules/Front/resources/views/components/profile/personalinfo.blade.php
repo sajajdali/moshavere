@@ -1,4 +1,4 @@
-<section class="dashboard__main" id="personalInfoSection">
+<section class="dashboard__main" id="personalInfoSection" wire:ignore.self>
     <form wire:submit='changePersonalInfo' class="flex flex-col gap-4">
         <div class="bg-white p-4 space-y-5 rounded-lg">
             <h3 class="font-bold">ویرایش پروفایل</h3>

@@ -5,7 +5,7 @@
         </div>
     </div>
     <main class="py-16 bg-secondary-100">
-        <main class="appointment__modal-container">
+        <div class="list_of_available_day_container">
             <div class="appointment__modal-right">
                 <div class="bg-secondary-100 rounded-lg p-4 flex items-center gap-5 mb-4">
                     <div
@@ -66,15 +66,7 @@
                     </div> -->
                 </div>
                 <div class="select-appointment__container">
-                    @if (isset($msg) && $msg != false)
-                        <div class="relative bg-rose-200 border border-rose-200 text-gray-600 px-4 py-3 rounded-lg mb-2 "
-                            role="alert">
-                            <strong class="font-bold">نکته!</strong>
-                            <span class="block sm:inline">{{ $msg }}.</span>
-                        </div>
-                    @endif
-                    <div class="flex flex-col gap-3" wire:key='{{uniqId() . '44'}}' wire:ignore.self>
-
+                    <div class="flex flex-col gap-3" wire:key='{{ uniqId() . '44' }}' wire:ignore.self>
                         @foreach ($fetchData['firstTreeAvailableAppointment'] as $date => $appointmentsWithDaysIndex)
                             @once
                                 @foreach ($appointmentsWithDaysIndex as $eachTime => $appointmentDetail)
@@ -92,105 +84,95 @@
                                                 {{ $appointmentDetail['from'] }}</p>
                                         </div>
                                     </label>
-                                    @break
+                                @break
+                            @endforeach
+                        @endonce
+                        <label for="appointment-{{ $date }}"
+                            class="accordion__container accordion_appointment__container">
+                            <div class="accordion_select__button">
+                                <div class="accordion_select__text">
+                                    <input type="radio" name="appointment"
+                                        id="appointment-{{ $date }}" />
+                                    @foreach ($appointmentsWithDaysIndex as $key => $value)
+                                        @if ($value['status'] !== false)
+                                            <p class="font-bold text-sm">
+                                                {{ $value['day_name'] }}
+                                                {{ $value['date_of_month'] }}
+                                            </p>
+                                        @break
+                                    @endif
                                 @endforeach
-                            @endonce
-                            <label for="appointment-{{ $date }}"
-                                class="accordion__container accordion_appointment__container">
-                                <div class="accordion_select__button">
-                                    <div class="accordion_select__text">
-                                        <input type="radio" name="appointment"
-                                            id="appointment-{{ $date }}" />
-                                        @foreach ($appointmentsWithDaysIndex as $key => $value)
-                                            @if ($value['status'] !== false)
-                                                <p class="font-bold text-sm">
-                                                    {{ $value['day_name'] }}
-                                                    {{ $value['date_of_month'] }}</p>
-                                                @break
+                            </div>
+                            <div class="accordion_select__icon">
+                                <svg class="w-7 h-7" xmlns="http://www.w3.org/2000/svg">
+                                    <use xlink:href="#sprite-chevron-left-circle" />
+                                </svg>
+                            </div>
+                        </div>
+                        <div class="accordion_select__content">
+                            <div class="tabbar__container">
+                                <div class="tabbar__container-main">
+                                    <div class="tabbar__container-content grid-4x active">
+                                        @foreach ($appointmentsWithDaysIndex as $index => $eachTimeAppointment)
+                                            @if ($eachTimeAppointment['status'] == false)
+                                                <label class="opacity-30 line-through">
+                                                    <input type="radio" class="hidden sr-only" />
+                                                    <p
+                                                        class="flex items-center justify-center py-2 px-4 border-2 border-transparent rounded-full text-secondary-400 bg-rose-300 cursor-not-allowed font-bold text-center">
+                                                        {{ verta($eachTimeAppointment['from'])->format('H:i') }}
+                                                    </p>
+                                                </label>
+                                            @else
+                                                @once
+                                                    <!-- skip the first time -->
+                                                    @if ($eachTimeAppointment['status'] != false && $loop->first)
+                                                        @continue
+                                                    @endif
+                                                @endonce
+                                                @php
+                                                    $uniqueId = $index . '-' . microtime(true) . '-' . $index;
+                                                @endphp
+                                                <label for="time-{{ $uniqueId }}"
+                                                    class="select-time__radio cursor-pointer">
+                                                    <input type="radio" class="hidden sr-only scroll_down"
+                                                        wire:loading.attr='disabled'
+                                                        id="time-{{ $uniqueId }}" wire:model='form.time'
+                                                        value="{{ $eachTimeAppointment['time_stamp'] . ',' . $eachTimeAppointment['until'] }}" />
+                                                    <p>{{ $eachTimeAppointment['from'] }}</p>
+                                                </label>
                                             @endif
                                         @endforeach
                                     </div>
-                                    <div class="accordion_select__icon">
-                                        <svg class="w-7 h-7" xmlns="http://www.w3.org/2000/svg">
-                                            <use xlink:href="#sprite-chevron-left-circle" />
-                                        </svg>
-                                    </div>
                                 </div>
-                                <div class="accordion_select__content">
-                                    <div class="tabbar__container">
-                                        <div class="tabbar__container-main">
-                                            <div class="tabbar__container-content grid-4x active">
-                                                @foreach ($appointmentsWithDaysIndex as $index => $eachTimeAppointment)
-                                                    @if ($eachTimeAppointment['status'] == false)
-                                                        <label class="opacity-30 line-through">
-                                                            <input type="radio" class="hidden sr-only" />
-                                                            <p class="flex items-center justify-center py-2 px-4 border-2 border-transparent rounded-full text-secondary-400 bg-rose-300 cursor-not-allowed font-bold text-center">
-                                                                {{ verta($eachTimeAppointment['from'])->format('H:i') }}
-                                                            </p>
-                                                        </label>
-                                                    @else
-                                                        @once
-                                                            <!-- skip the first time -->
-                                                            @if ($eachTimeAppointment['status'] != false && $loop->first)
-                                                                @continue
-                                                            @endif
-                                                        @endonce
-                                                        @php
-                                                            $uniqueId = $index . '-' . microtime(true) . '-' . $index;
-                                                        @endphp
-                                                        <label for="time-{{ $uniqueId }}"
-                                                            class="select-time__radio cursor-pointer">
-                                                            <input type="radio" class="hidden sr-only scroll_down"
-                                                                wire:loading.attr='disabled'
-                                                                id="time-{{ $uniqueId }}" wire:model='form.time'
-                                                                value="{{ $eachTimeAppointment['time_stamp'] . ',' . $eachTimeAppointment['until'] }}" />
-                                                            <p>{{ $eachTimeAppointment['from'] }}</p>
-                                                        </label>
-                                                    @endif
-                                                @endforeach
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </label>
-                        @endforeach
-                    </div>
-                    <!-- Commented out code
-                    <button class="bg-blue-500 hover:bg-blue-700 font-thin text-white py-2 px-4 rounded"
-                        wire:click='loadNextDays'>
-                        <svg wire:loading wire:target='loadNextDays' class="animate-spin h-5 w-5 mr-3 text-white"
-                            xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor"
-                                stroke-width="4"></circle>
-                            <path class="opacity-75" fill="currentColor"
-                                d="M4 12a8 8 0 018-8V0C5.372 0 0 5.372 0 12h4zm2 5.291A7.963 7.963 0 014 12H0c0 3.314 1.343 6.315 3.515 8.485l2.485-2.194z">
-                            </path>
-                        </svg>
-                        <span wire:loading.remove wire:target='loadNextDays'>مشاهده روزهای بعدی</span>
-                    </button> -->
-                    <button type="button" wire:click='loadMoreDays'
-                        class="w-full py-2 hover:text-blue-500 px-5 flex items-center justify-center gap-3 mt-5">
-                        <svg class="w-5 h-5" xmlns="http://www.w3.org/2000/svg">
-                            <use xlink:href="#sprite-eye" />
-                        </svg>
-                        <p class="font-bold">نمایش بیشتر</p>
-                    </button>
-                </div>
-                <button type="button" class="btn__blue--round-full mt-4 " id="nextstep_btn"
-                wire:click='TimeForReservesation'>
-                <span >مرحله بعد</span>
-            </button>
+                            </div>
+                        </div>
+                    </label>
+                @endforeach
             </div>
-            
+            @if (isset($msg) && $msg != false)
+                <div class="relative bg-sky-200 border border-sky-200 text-gray-600 px-4 py-3 rounded-lg mt-3"
+                    role="alert">
+                    <strong class="font-bold">نکته!</strong>
+                    <span class="block sm:inline">{{ $msg }}.</span>
+                </div>
+            @else
+                <button type="button" wire:click='loadMoreDays'
+                    class="w-full py-2 hover:text-blue-500 px-5 flex items-center justify-center gap-3 mt-5">
+                    <svg class="w-5 h-5" xmlns="http://www.w3.org/2000/svg">
+                        <use xlink:href="#sprite-eye" />
+                    </svg>
+                    <p class="font-bold">نمایش بیشتر</p>
+                </button>
+            @endif
         </div>
-        @error('*')
-            <h3>{{ $message }}</h3>
-        @enderror
+        <button type="button" class="btn__blue--round-full mt-4" id="nextstep_btn"
+            wire:click='TimeForReservesation'>
+            <span>مرحله بعد</span>
+        </button>
     </div>
 </main>
-</main>
-
 </div>
+
 @push('scripts')
 <script>
     $(document).ready(function() {
@@ -211,11 +193,17 @@
                 }
             }
         });
-        Livewire.on('scrollToTop',function(){
-            $('html, body').animate({scrollTop: 0}, 'slow');
-        })
-        Livewire.on('scrollToBottom',function(){
-            $('html, body').animate({scrollTop: $(document).height() - 100}, 'slow');
+        Livewire.on('scrollToBottom', function() {
+            $('html, body').animate({
+                scrollTop: $(document).height() - 150
+            }, 1000);
+            Swal.fire({
+                position: "center",
+                icon: "success",
+                title: "روز های جدید اضافه شدند",
+                showConfirmButton: false,
+                timer: 1500
+            });
         })
     });
 </script>

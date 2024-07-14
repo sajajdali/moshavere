@@ -103,7 +103,10 @@
                                         </svg>
                                         <p>مبلغ ویزیت</p>
                                     </div>
+                                    @if (isset($appointmentUser->detail[Modules\AppointmentUser\app\Models\AppointmentUser::DETAIL_PAYMENT]))
+
                                     <p>{{number_format($appointmentUser->detail[Modules\AppointmentUser\app\Models\AppointmentUser::DETAIL_PAYMENT][Modules\AppointmentUser\app\Models\AppointmentUser::DETAIL_PAYMENT_PRICE])}} تومان</p>
+                                    @endif
                                 </div>
                             @endif
                         </div>
@@ -117,7 +120,9 @@
                                 <div
                                     class="border border-secondary-200 rounded-lg p-4 flex items-center justify-between">
                                     <p>مبلغ نوبت رزرو</p>
+                                    @if (isset($appointmentUser->detail[Modules\AppointmentUser\app\Models\AppointmentUser::DETAIL_PAYMENT]))
                                     <p><span class="font-bold">{{number_format($appointmentUser->detail[Modules\AppointmentUser\app\Models\AppointmentUser::DETAIL_PAYMENT][Modules\AppointmentUser\app\Models\AppointmentUser::DETAIL_PAYMENT_PRICE])}}</span> تومان</p>
+                                    @endif
                                 </div>
                             </main>
                         </div>

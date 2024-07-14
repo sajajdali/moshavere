@@ -440,6 +440,15 @@
                 document.body.removeChild(tempInput);
                 alert('با موفقیت کپی شد!');
             });
+            Livewire.on('swalError',function($obj){
+                Swal.fire({
+                    position: "center",
+                    icon: "error",
+                    title: $obj.msg,
+                    showConfirmButton: false,
+                    timer: 2000
+                });
+            });
         });
     </script>
 @endpush

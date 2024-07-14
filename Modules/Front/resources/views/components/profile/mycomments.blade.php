@@ -32,6 +32,11 @@
                                       </div>
                                   </div>
                                   <p class="leading-7">{{ $comment->body }}</p>
+                                  @if (isset($comment->reply))
+                                      <div class="text-center border-r-4 border-blue-500  mr-3 text-start">
+                                          <p class="mr-2"> {{ $comment->reply }}</p>
+                                      </div>
+                                  @endif
                               </div>
                           </main>
                       @endforeach

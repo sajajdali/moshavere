@@ -42,7 +42,6 @@ class UpdateOrCreate extends Component
     }
     public function sotrediscount()
     {
-
         $this->validate();
         $detail = [
             Discount::DETAIL_TOTAL_USAGE => $this->form['maximum_usage_totall'] ?? null,
@@ -53,18 +52,29 @@ class UpdateOrCreate extends Component
             Discount::DETAIL_DISCOUNT_AMOUNT => $this->form['payment']['value'] ?? null,
         ];
         $active = $this->form['active'] == true  ? ActiveEnum::ACTIVE : ActiveEnum::DEACTIVE;
+        if (in_array('null', $this->form['services'])) {
+            $service = null;
+        } else {
+            $service = $this->form['services'];
+        }
+        if (in_array('null',  $this->form['doctors'])) {
+            $doctors = null;
+        } else {
+            $doctors = $this->form['doctors'];
+        }
+
         $model = [
-            'service_id' => isset($this->form['services']) ? $this->form['services'] : null,
-            'doctor_id' => isset($this->form['doctors']) ? $this->form['doctors'] : null,
+            'service_id' => $service,
+            'doctor_id' => $doctors,
             'code' => $this->form['code'],
             'start_at' => isset($this->form['startDate']) ? Verta::parse($this->form['startDate'])->toCarbon() : null,
             'end_at' =>  isset($this->form['endDate']) ? Verta::parse($this->form['endDate'])->toCarbon() : null,
             'active' => $active,
             'detail' => $detail,
         ];
-        if($this->isEdited) {
+        if ($this->isEdited) {
             $this->discount->update($model);
-        }else{
+        } else {
             Discount::create($model);
         }
         return redirect()->route('admin.discount.list')->with('success', 'کد تخفیف با موفقیت اضافه شد');
@@ -104,7 +114,7 @@ class UpdateOrCreate extends Component
     {
         $this->fetchData['services'] = Service::all();
         $this->fetchData['doctors'] = User::doctors();
-        if (! empty(request()->route('discount'))) {
+        if (!empty(request()->route('discount'))) {
             $this->isEdited = true;
             $this->discount = Discount::find(request()->route('discount'));
             $this->fillTheInputs();

@@ -48,7 +48,7 @@
                         <hr class="border-secondary-200" />
                     </li>
                     <li class="dashboard__side-item dashboard__side-item--danger">
-                        <a href="{{route('front.logout')}}">
+                        <a href="{{ route('front.logout') }}">
                             <svg class="w-5 h-5" xmlns="http://www.w3.org/2000/svg">
                                 <use xlink:href="#sprite-logout" />
                             </svg>
@@ -83,6 +83,15 @@
                 // Show the section corresponding to the clicked menu item
                 var sectionToShow = $(this).data('section');
                 $('#' + sectionToShow).fadeIn();
+            });
+            Livewire.on('swalSuccess', function() {
+                Swal.fire({
+                    position: "center",
+                    icon: "success",
+                    title: "عملیات با موفقیت انجام شد",
+                    showConfirmButton: false,
+                    timer: 2000
+                });
             });
         });
     </script>

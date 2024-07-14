@@ -200,13 +200,13 @@
                                                 </p>
                                             </div>
                                             <div class="flex flex-col items-end gap-4">
-                                                <div
+                                                {{-- <div
                                                     class="flex items-center gap-3 bg-green/10 text-green rounded-full py-2 px-5">
                                                     <svg class="w-5 h-5" xmlns="http://www.w3.org/2000/svg">
                                                         <use xlink:href="#sprite-heart-outline" />
                                                     </svg>
                                                     <p> پرشک محبوب </p>
-                                                </div>
+                                                </div> --}}
                                                 <p class="text-secondary-400 text-sm">شماره نظام پزشکی:
                                                     {{ $doctor->dr_licence_number }}</p>
                                             </div>

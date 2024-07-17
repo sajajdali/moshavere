@@ -7,10 +7,10 @@
     {{-- پربازدید ترین بخش ها --}}
     @include('front::components.homepage.mostviewedservice')
 
-    {{-- ویزیت فوری --}}
+    {{-- لیست اول پزشکان --}}
     @include('front::components.homepage.emergencyvisit')
 
-    {{-- معرفی پزشکان --}}
+    {{-- لیست دوم پزشکان --}}
     @include('front::components.homepage.docintroducttion')
 
     {{-- نظر مخاطبین --}}

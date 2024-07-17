@@ -55,6 +55,7 @@ class Registration extends Component
         $intendedUrl = Session::pull('url.intended', route('front.homePage'));
         if (isset($intendedUrl)) {
             session()->forget('url.intended');
+            session()->flash('authsuccess','ثبت نام با موفقیت انجام شد');
             return redirect()->intended($intendedUrl);
         }
         return redirect()->route('front.homePage');

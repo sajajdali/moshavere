@@ -31,22 +31,26 @@ enum SettingKeyEnum: int implements EnumHasNameInterface, SettingTypeInterface, 
     case INSTAGRAM_ADDRESS = 16;
     case TELEGRAM_ADDRESS = 17;
     case SHOW_FALSE_APPOINTMENT_STATUS = 18;
+    case SITE_FIRST_SECTION_TITLE = 19;
+    case SITE_FIRST_SECTION_DESCRIPTION = 20;
+    case SITE_SECEND_SECTION_TITLE = 21;
+    case SITE_SECEND_SECTION_DESCRIPTION = 22;
 
         //sms
-    case SMS_API_TOKEN = 20;
-    case SMS_API_LOGIN_TEMPLATE = 30;
-    case SMS_APPOINTMENT_RECEIVING_SUCCESSFUL = 31;
-    case SMS_APPOINTMENT_WAITING_PAYMENT = 32;
-    case SMS_APPOINTMENT_AFTER_PAYMENT = 33;
-    case SMS_APPOINTMENT_REMOVAL_WHEN_NON_PAYMENT = 34;
-    case SMS_APPOINTMENT_TIME_UPDATE = 35;
-    case SMS_APPOINTMENT_CANCEL = 36;
-    case SMS_APPOINTMENT_TO_DOCTOR = 37;
-    case SMS_APPOINTMENT_TO_OPERATOR = 38;
-    case SMS_APPROVED_MONITORING_APPOINTMENT = 39;
-    case SMS_DIS_APPROVED_MONITORING_APPOINTMENT = 40;
-    case SMS_FEEDBACK = 41;
-    case SUPPORT_USER_ROLE = 100;
+    case SMS_API_TOKEN = 60;
+    case SMS_API_LOGIN_TEMPLATE = 61;
+    case SMS_APPOINTMENT_RECEIVING_SUCCESSFUL = 62;
+    case SMS_APPOINTMENT_WAITING_PAYMENT = 63;
+    case SMS_APPOINTMENT_AFTER_PAYMENT = 64;
+    case SMS_APPOINTMENT_REMOVAL_WHEN_NON_PAYMENT = 65;
+    case SMS_APPOINTMENT_TIME_UPDATE = 66;
+    case SMS_APPOINTMENT_CANCEL = 67;
+    case SMS_APPOINTMENT_TO_DOCTOR = 68;
+    case SMS_APPOINTMENT_TO_OPERATOR = 69;
+    case SMS_APPROVED_MONITORING_APPOINTMENT = 70;
+    case SMS_DIS_APPROVED_MONITORING_APPOINTMENT = 71;
+    case SMS_FEEDBACK = 72;
+    case SUPPORT_USER_ROLE = 73;
 
         //payment
     case PAYMENT_PAYSTAR_STATUS = 152;
@@ -100,8 +104,12 @@ enum SettingKeyEnum: int implements EnumHasNameInterface, SettingTypeInterface, 
             self::INSTAGRAM_ADDRESS    => 'ادرس صفحه ی ابنتساگرام شما به صورت :https://www.instagram.com/shemiranweb/ ',
             self::TELEGRAM_ADDRESS    => 'ادرس تلگرام شما ',
             self::SHOW_FALSE_APPOINTMENT_STATUS    => 'نمایش ساعت های پر شده در لیست ساعت ها به کاربران',
+            self::SITE_FIRST_SECTION_TITLE    => 'عنوان بخش اول در صفحه ی اصلی(عنوان پیشنهادی: ویزیت فوری)',
+            self::SITE_FIRST_SECTION_DESCRIPTION    => 'توضیح بخش اول در صفحه ی اصلی',
+            self::SITE_SECEND_SECTION_TITLE    => 'عنوان بخش دوم در صفحه ی اصلی(عنوان پیشنهادی: معرفی پزشکان)',
+            self::SITE_SECEND_SECTION_DESCRIPTION    => 'توضیح بخش دوم در صفحه ی اصلی)',
 
-
+            // SMS
             self::SMS_API_TOKEN => 'توکن API پیامک',
             self::DEFAULT_EXERCISE_STATUS => 'وضعیت برنامه بعد از تجویز',
             self::SUPPORT_USER_ROLE => 'گروه کاربری پشتیبانان',
@@ -195,6 +203,8 @@ enum SettingKeyEnum: int implements EnumHasNameInterface, SettingTypeInterface, 
 
             self::CONTACTUS_FIRST_SECTION_STATUS => SettingTypeEnum::CHECK,
             self::CONTACTUS_FIRST_SECTION_BODY => SettingTypeEnum::TEXTAREA,
+            self::SITE_FIRST_SECTION_DESCRIPTION => SettingTypeEnum::TEXTAREA,
+            self::SITE_SECEND_SECTION_DESCRIPTION => SettingTypeEnum::TEXTAREA,
             self::CONTACTUS_FORM_STATUS => SettingTypeEnum::CHECK,
             self::CONTACTUS_FORM_ADDRESS => SettingTypeEnum::TEXTAREA,
             self::FOOTER_DESCRIPTION => SettingTypeEnum::TEXTAREA,

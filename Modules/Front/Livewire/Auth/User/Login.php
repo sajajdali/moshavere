@@ -51,7 +51,7 @@ class Login extends Component
                     AuthRequest::make($this->form['mobileNmber'], request()->ip());
                     $this->dispatch('startCountDown', true);
                 } else {
-                    $this->addError('form.mobileNmber', 'لطفا برای درخواست مجدد چند دقیقه صبر کنید!');
+                    $this->addError('form.mobileNmber', 'لطفا برای درخواست مجدد دو دقیقه صبر کنید!');
                 }
             } else {
                 // if record dose not exist
@@ -75,6 +75,7 @@ class Login extends Component
                     $intendedUrl = Session::pull('url.intended', route('front.homePage'));
                     if(isset($intendedUrl)) {
                         session()->forget('url.intended') ;
+                        session()->flash('authsuccess','ورود با موفقیت انجام شد');
                         return redirect()->intended($intendedUrl);
                     }
                     return redirect()->route('front.homePage');

@@ -31,6 +31,10 @@ return [
             \Modules\Setting\Enum\SettingKeyEnum::FOOTER_DESCRIPTION,
             \Modules\Setting\Enum\SettingKeyEnum::INSTAGRAM_ADDRESS,
             \Modules\Setting\Enum\SettingKeyEnum::TELEGRAM_ADDRESS,
+            \Modules\Setting\Enum\SettingKeyEnum::SITE_FIRST_SECTION_TITLE,
+            \Modules\Setting\Enum\SettingKeyEnum::SITE_FIRST_SECTION_DESCRIPTION,
+            \Modules\Setting\Enum\SettingKeyEnum::SITE_SECEND_SECTION_TITLE,
+            \Modules\Setting\Enum\SettingKeyEnum::SITE_SECEND_SECTION_DESCRIPTION,
         ],
     ],
     'appointment' => [

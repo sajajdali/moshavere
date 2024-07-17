@@ -22,8 +22,9 @@
                                 data-bs-target="#advanceSearch" aria-expanded="false" aria-controls="advanceSearch">
                                 جست و جوی پیشرفته
                             </button>
-                            @if (isset($search['id']) || isset($search['specialityName']) || isset($search['status']))
-                                <button class="btn btn-secondary ms-2" type="button" wire:click="resetProperties"
+                            @if (isset($search['id']) || isset($search['specialityName']) || isset($search['status']) || isset($search['showHomePage']))
+                                <button class="btn btn-secondary ms-2" type="button" wire:click="resetProperties" data-bs-toggle="collapse"
+                                data-bs-target="#advanceSearch" aria-expanded="false" aria-controls="advanceSearch"
                                     wire:loading.class="bg-gray btn-loading disabled">نمایش همه
                                 </button>
                             @endif
@@ -41,23 +42,37 @@
                                     </div>
                                 </div>
                                 <div class="row mb-4">
-                                    <label for="search-name" class="col-md-2 form-label">نام بخش</label>
+                                    <label for="title" class="col-md-2 form-label">نام بخش</label>
                                     <div class="col-md-10">
-                                        <input class="form-control" id="search-name" wire:model="search.title"
+                                        <input class="form-control" id="title" wire:model="search.title"
                                             placeholder="نام بخش" type="text">
                                     </div>
                                 </div>
                                 <div class="row mb-4">
-                                    <label class="form-label col-md-2" for="default-dropdown">وضعیت</label>
+                                    <label class="form-label col-md-2" for="activeStatus">وضعیت</label>
                                     <div class="col-md-10">
                                         <select wire:model='search.active' name="country"
-                                            class="form-control form-select" id="default-dropdown"
+                                            class="form-control form-select" id="activeStatus"
                                             data-bs-placeholder="انتخاب کنید..">
                                             <option label="انتخاب کنید"></option>
                                             <option>
                                                 فعال</option>
                                             <option>
                                                 غیرفعال</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="row mb-4">
+                                    <label class="form-label col-md-2" for="homepageStatus">نمایش در صفحه ی اصلی</label>
+                                    <div class="col-md-10">
+                                        <select wire:model='search.showHomePage' 
+                                            class="form-control form-select" id="homepageStatus"
+                                            data-bs-placeholder="انتخاب کنید..">
+                                            <option label="انتخاب کنید"></option>
+                                            <option value="1">
+                                                نمایش در صفحه ی اصلی</option>
+                                            <option value="2">
+                                                عدم نمایش در صفحه ی اصلی</option>
                                         </select>
                                     </div>
                                 </div>

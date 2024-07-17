@@ -226,13 +226,13 @@
                                                     id="showDocInEmergencyVisit" type="checkbox" checked />
                                                 <label for="showDocInEmergencyVisit" class="label-info"></label>
                                             </div>
-                                            <p class="card-sub-title">نمایش در لیست ویزیت فوری پزشک</p>
+                                            <p class="card-sub-title">نمایش در لیست {{setting(\Modules\Setting\Enum\SettingKeyEnum::SITE_FIRST_SECTION_TITLE) ?? 'اول در صفحه اصلی'}}</p>
                                         </div>
                                     </div>
                                     <div class="col-md-12" id="orderForEmergencyVisitDiv" wire:ignore.self>
                                         <div class="form-group">
-                                            <label for="order-showDocInEmergencyVisit">ترتیب نمایش در در لیست ویزیت
-                                                فوری پزشک</label>
+                                            <label for="order-showDocInEmergencyVisit">ترتیب نمایش در در {{setting(\Modules\Setting\Enum\SettingKeyEnum::SITE_FIRST_SECTION_TITLE) ?? ' اول در صفحه اصلی'}}
+                                                </label>
                                             <input wire:model='form.showDocInEmergencyVisit.order' type="number"
                                                 class="form-control" id="order-showDocInEmergencyVisit"
                                                 placeholder="به عدد">
@@ -247,13 +247,12 @@
                                                     type="checkbox" checked />
                                                 <label for="OrderStatusInDocInfo" class="label-info"></label>
                                             </div>
-                                            <p class="card-sub-title">نمایش در لیست معرفی پزشکان</p>
+                                            <p class="card-sub-title">نمایش در لیست {{setting(\Modules\Setting\Enum\SettingKeyEnum::SITE_SECEND_SECTION_TITLE) ?? 'دوم در صفحه اصلی'}}</p>
                                         </div>
                                     </div>
                                     <div class="col-md-12" id="orderInDoctorsInfo" wire:ignore.self>
                                         <div class="form-group">
-                                            <label for="order-showDocInEmergencyVisit">ترتیب نمایش در لیست معرفی
-                                                پزشکان</label>
+                                            <label for="order-showDocInEmergencyVisit">ترتیب نمایش در {{setting(\Modules\Setting\Enum\SettingKeyEnum::SITE_SECEND_SECTION_TITLE) ?? 'دوم در صفحه اصلی'}}</label>
                                             <input wire:model='form.ShowInIntrodocs.order' type="number"
                                                 class="form-control" id="order-showDocInEmergencyVisit"
                                                 placeholder="به عدد">

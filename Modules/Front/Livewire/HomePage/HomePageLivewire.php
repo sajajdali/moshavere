@@ -76,6 +76,30 @@ class HomePageLivewire extends Component
         $this->validate(['form.province' => 'required|integer']);
         return redirect()->route('front.searchPage', ['province' => $this->form['province']]);
     }
+
+    public function docpage($id)
+    {
+        $user = User::find($id);
+        if (empty($user)) {
+            return redirect()->to('/404');
+        }
+        if ($user->exists() || $user->isDoctor()) {
+            $docService = $user->activeServices();
+            $docPlace = $user->activePlaces();
+            if ($docService->count() <= 1 && $docPlace->count() <= 1) {
+                return redirect()->route(
+                    'front.setAppointment.days',
+                    [
+                        'doctor_id' => $user->id,
+                        'place_id' => $docPlace->first()->id,
+                        'service_id' => $docService->first()->id,
+                    ]
+                );
+            }
+            return redirect()->route('front.doctor.profile', ['doctor_id' => $id]);
+        }
+        return redirect()->to('/404');
+    }
     public function mount()
     {
         $this->fetchData['service'] = Service::mostViewedService();

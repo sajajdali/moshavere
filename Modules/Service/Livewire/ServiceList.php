@@ -24,12 +24,8 @@ class ServiceList extends Component
     }
     public function resetProperties()
     {
-        $this->search = [
-            'id' => null,
-            'placeName' => null,
-            'active' => null,
-        ];
-        $this->searchPanel = null;
+        $this->search = [];
+        $this->searchPanel = "";
     }
 
     public function passModalData(Service $service)
@@ -50,21 +46,27 @@ class ServiceList extends Component
         $query =  Service::orderBy('priority', 'asc');
         $searchCriteria = [
             'idSearch' => [
-                'condition' => $this->search['id'],
+                'condition' => isset($this->search['id']),
                 'callback' => function ($query) {
                     return $query->whereId($this->search['id']);
                 },
             ],
             'ServiceName' => [
-                'condition' => $this->search['title'],
+                'condition' => isset($this->search['title']),
                 'callback' => function ($query) {
                     return $query->where('title', 'LIKE', '%' . $this->search['title'] . '%');
                 },
             ],
             'activeStatus' => [
-                'condition' => $this->search['active'],
+                'condition' => isset($this->search['active']),
                 'callback' => function ($query) {
                     return $query->where('active', ActiveEnum::tryFrom((int) $this->search['active']));
+                },
+            ],
+            'showHomePage' => [
+                'condition' => isset($this->search['showHomePage']),
+                'callback' => function ($query) {
+                    return $query->where('show_type', 'LIKE', '%' . $this->search['showHomePage'] . '%');
                 },
             ],
         ];

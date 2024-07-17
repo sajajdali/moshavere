@@ -237,7 +237,7 @@
                                         <p class="leading-7">{{ $fetchData['comments'][$i]->body }}</p>
                                         @if (isset($fetchData['comments'][$i]->reply))
                                             <div class="text-center border-r-4 border-blue-500  mr-3 text-start">
-                                               <p class="mr-2"> {{ $fetchData['comments'][$i]->reply }}</p>
+                                                <p class="mr-2"> {{ $fetchData['comments'][$i]->reply }}</p>
                                             </div>
                                         @endif
 
@@ -440,7 +440,7 @@
                 document.body.removeChild(tempInput);
                 alert('با موفقیت کپی شد!');
             });
-            Livewire.on('swalError',function($obj){
+            Livewire.on('swalError', function($obj) {
                 Swal.fire({
                     position: "center",
                     icon: "error",
@@ -449,6 +449,12 @@
                     timer: 2000
                 });
             });
+            let placeName = @json(isset($form['place_name']));
+            let service = @json(isset($form['service']));
+
+            if (placeName || service) {
+                $('.appointment__modal').addClass('opened');
+            }
         });
     </script>
 @endpush

@@ -44,7 +44,6 @@ class DoctorProfileLivewire extends Component
                         unset($this->fetchData['place']);
                     }
                 }
-
                 return  $this->lunchModal();
             } elseif ($this->doc->activePlaces()->count() <= 1) {
 
@@ -165,7 +164,7 @@ class DoctorProfileLivewire extends Component
                     // segment has multiple choise
                     $this->fetchData['multiple_choice'] = true;
                 }
-                $this->fetchData['segments'] = $segment->items()->orderBy('priority')->get();
+                $this->fetchData['segments'] = $segment->items()->where('display_on_site',true)->orderBy('priority')->get();
             } else {
                 $this->redirectToAppointmentDays(
                     $this->doc->id,
@@ -207,11 +206,12 @@ class DoctorProfileLivewire extends Component
         // service has selected
         if (isset($this->form['service']) && !isset($this->form['place_id'])) {
             $this->fetchData['modalStep'] = 1;
+            $this->fetchData['places'] = $this->doc->activePlaces();
         }
         if (isset($this->form['service']) && isset($this->form['place_id'])) {
             $this->serviceHasSelected();
             $this->fetchData['modalStep'] = 2;
-            $this->lucnhModal();
+
         }
     }
     public function addComment()
@@ -362,7 +362,6 @@ class DoctorProfileLivewire extends Component
         $this->fetchData['modalStep'] = 1;
         $this->fetchData['is_app_available'] = $this->isDocAvaiable();
         $this->routeHasServiceOrPlace();
-
         // bread crumb
         $this->fetchData['site_title'] = Setting(SettingKeyEnum::SITE_TITLE);
     }

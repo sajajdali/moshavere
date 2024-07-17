@@ -39,12 +39,16 @@
             @if ($fetchData['stauts']['payment'])
                 <section>
                     <div
-                        class="flex flex-col gap-2 sm:flex-row items-center justify-between bg-red/10 py-3.5 px-4 rounded-2xl mb-4">
+                        class="flex flex-col gap-2 sm:flex-row items-center justify-between bg-red/10 py-3.5 px-4 rounded-2xl mb-4"  style="word-spacing: 0.08rem;">
                         <img src="{{ front_asset('assets/svg/warning-icon.svg') }}" />
-                        <p class="font-bold text-sm">
-                            <span>نوبت شما در حالت </span><span class="text-red">منتظر پرداخت</span><span> است.</span>
+                        <p class="font-bold text-sm px-4 text-gray-700 ">
+                            <span>
+                                نوبت شما با موفقیت <span class="text-red">رزرو شد</span>.
+                                برای تایید نوبت باید مبلغ {{ number_format($fetchData['stauts']['price']) }} را به صورت آنلاین پرداخت کنید تا نوبت شما ثبت شود و در صورت عدم
+                                پرداخت نوبت شما حذف خواهد شد.
+                            </span>
                         </p>
-                        <button type="button" class=" font-bold text-red confirm_swal_alert text-sm cancelApp">لغو
+                        <button type="button" class="font-bold text-red confirm_swal_alert text-sm cancelApp min-w-fit">لغو
                             نوبت</button>
                     </div>
                     <p class="font-bold my-3">
@@ -388,7 +392,7 @@
                     @this.authNeeded();
                 }
             });
-            $('body').on('click','#termAndConditionAggrement', function() {
+            $('body').on('click', '#termAndConditionAggrement', function() {
                 if ($(this).is(':checked')) {
                     $('#paymentBtn').prop('disabled', false);
                     $('#paymentBtn').removeClass('bg-gray-300');

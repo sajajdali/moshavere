@@ -38,13 +38,13 @@ class HomePageLivewire extends Component
         $cacheKey = 'Introduction_doctors';
         //    Attempt to get the data from the cache
         return Cache::rememberForever($cacheKey,  function () {
-            return   User::introductionDoctors()->get()->filter(function ($doc) {
-                if ($doc->services()->exists() && $doc->places()->exists() && $doc->appointmentSettings()->exists() ) {
-                    return true;
-                };
-            })->sortBy(function ($user) {
-                return $user->metas->where('meta_key', UserMetaEnum::DR_INFO_ORDER)->first()->meta_value ?? 0;
-            });
+        return   User::introductionDoctors()->get()->filter(function ($doc) {
+            if ($doc->services()->exists() && $doc->places()->exists() && $doc->appointmentSettings()->exists()) {
+                return true;
+            };
+        })->sortBy(function ($model) {
+            return $model->dr_info_order;
+        });
         });
     }
     private function emergencyDoctors()
@@ -55,11 +55,11 @@ class HomePageLivewire extends Component
         // Attempt to get the data from the cache
         return  Cache::rememberForever($cacheKey, function () {
             return User::emergencyDoctors()->get()->filter(function ($doc) {
-                if ($doc->services()->exists() && $doc->places()->exists() && $doc->appointmentSettings()->exists()) {
+                if ($doc->services()->exists() && $doc->places()->exists() && $doc->appointmentSettings()->exist()) {
                     return true;
                 };
-            })->sortBy(function ($user) {
-                return $user->metas->where('meta_key', UserMetaEnum::DR_ENEMRGENCY_ORDER)->first()->meta_value ?? 0;
+            })->sortBy(function ($model) {
+                return $model->dr_emergencyvisit_order;
             });
         });
     }

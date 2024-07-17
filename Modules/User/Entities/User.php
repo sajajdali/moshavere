@@ -257,9 +257,7 @@ class User extends Authenticatable
                 ->where(function ($qqq) {
                     $qqq->where('meta_value', false)->orWhereNull('meta_value');
                 });
-        })->with(['metas' => function ($q) {
-            $q->where('meta_key', UserMetaEnum::DR_ENEMRGENCY_ORDER);
-        }]);
+        });
     }
 
     public function scopeIntroductionDoctors($query)
@@ -272,9 +270,7 @@ class User extends Authenticatable
                 ->where(function ($qqq) {
                     $qqq->where('meta_value', false)->orWhereNull('meta_value');
                 });
-        })->with(['metas' => function ($q) {
-            $q->where('meta_key', UserMetaEnum::DR_INFO_ORDER);
-        }]);
+        });
     }
 
     public function scopeNewestDocs()

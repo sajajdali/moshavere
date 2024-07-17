@@ -84,15 +84,11 @@ trait UserAttributeTrait
     {
         return Attribute::make(
             get: function () {
-                $avatar = $this->metas->reverse()->firstWhere('meta_key', UserMetaEnum::AVATAR)?->meta_value;
-                if (empty($avatar)) {
-                    return url('default/avatar.png');
-                }
-
-                return $avatar;
+                $avatar = $this->metas->firstWhere('meta_key', UserMetaEnum::AVATAR)?->meta_value;
+                return $avatar ?: url('default/avatar.png');
             },
             set: function (?string $value) {
-                $this->metas()->create(['meta_key' => UserMetaEnum::AVATAR, 'meta_value' => $value]);
+                $this->metas()->updateOrCreate(['meta_key' => UserMetaEnum::AVATAR, 'meta_value' => $value]);
             }
         );
     }

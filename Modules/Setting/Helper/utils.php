@@ -10,7 +10,7 @@ if (!function_exists('setting')) {
             return null;
         }
         // Check if the table exists
-        if (!Schema::hasTable('shw_settings')) {
+        if (!Schema::hasTable('settings')) {
             return null;
         }
         return \Modules\Setting\Entities\Setting::v($key);

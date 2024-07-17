@@ -12,6 +12,7 @@ class FrontDatabaseSeeder extends Seeder
      */
     public function run(): void
     {
+        dd('test');
         $this->call(ProvinceSeeder::class);
     }
 }

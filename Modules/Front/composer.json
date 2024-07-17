@@ -16,8 +16,7 @@
     "autoload": {
         "psr-4": {
             "Modules\\Front\\": "app/",
-            "Modules\\Front\\Database\\Factories\\": "database/factories/",
-            "Modules\\Front\\Database\\Seeders\\": "database/seeders/"
+            "Modules\\Front\\database\\Seeders\\": "database/seeders/"
         }
     },
     "autoload-dev": {

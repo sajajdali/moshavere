@@ -1,6 +1,6 @@
 <?php
 
-namespace Modules\Front\Enum;
+namespace Modules\Front\enum;
 
 enum CommentStatusEnum: int
 {

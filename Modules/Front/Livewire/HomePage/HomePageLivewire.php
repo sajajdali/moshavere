@@ -13,7 +13,7 @@ use Illuminate\Support\Facades\Cache;
 use Modules\Front\app\Models\Comment;
 use Modules\Front\app\Models\Province;
 use Modules\Service\app\Models\Service;
-use Modules\Front\Enum\CommentStatusEnum;
+use Modules\Front\enum\CommentStatusEnum;
 use Modules\Front\Enum\CommentShowHomePage;
 
 #[Layout('front::layouts.app')]

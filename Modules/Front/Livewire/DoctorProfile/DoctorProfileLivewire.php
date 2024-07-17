@@ -11,7 +11,7 @@ use Modules\Place\app\Models\Place;
 use Modules\Front\app\Models\Comment;
 use Modules\Service\app\Models\Service;
 use Modules\Setting\Enum\SettingKeyEnum;
-use Modules\Front\Enum\CommentStatusEnum;
+use Modules\Front\enum\CommentStatusEnum;
 use Modules\AppointmentSetting\app\Models\AppointmentSetting;
 
 #[Layout('front::layouts.app')]

@@ -4,7 +4,7 @@ namespace Modules\Front\app\Models;
 
 use Modules\User\Entities\User;
 use Illuminate\Database\Eloquent\Model;
-use Modules\Front\Enum\CommentStatusEnum;
+use Modules\Front\enum\CommentStatusEnum;
 use Modules\Front\Enum\CommentShowHomePage;
 use Modules\Front\Database\factories\CommentFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;

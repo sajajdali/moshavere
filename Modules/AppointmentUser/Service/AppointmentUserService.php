@@ -167,7 +167,7 @@ class AppointmentUserService
                 if (isset($details['segment_time'])) {
                     $timeForVisit = $details['segment_time'];
                 }
-                
+
                 //  check special date
                 $checkHoliday = false;
                 $attendanceTimes = $appointmentSettingTimes->filter(function ($appointmentTime) use ($currentDate) {
@@ -352,6 +352,11 @@ class AppointmentUserService
 
                                     $getLastOverLapsTime = $this->isTimeRangeAvailable($startTime->toTimeString(), $startTime->copy()->addMinutes($timeForVisit)->toTimeString(), $dayOutput['times']);
                                     $startTimeOverLap = $getLastOverLapsTime['existingUntil'] == $overlapsAgain['existingUntil'] ? $startTime->copy()->toTimeString() : $overlaps['existingUntil'];
+
+                                    // In the event that the final hour is greater than the required time of the visit
+                                    if($timeForVisit > $getLastOverLapsTime['overLapTime'] ){
+                                        $startTime->subMinutes($timeForVisit - $getLastOverLapsTime['overLapTime']);
+                                    }
 
                                     $dayOutput['times'][] = [
                                         'status' => false,
@@ -574,7 +579,7 @@ class AppointmentUserService
         ) {
             $status = AppointmentUserStatusEnum::STATUS_WAIT_PAYMENT;
         }
-       
+
         //check for monitoring appointment
         if (
             isset($appointmentSetting->detail[AppointmentSetting::MONITORTING_APPOINTMENT])

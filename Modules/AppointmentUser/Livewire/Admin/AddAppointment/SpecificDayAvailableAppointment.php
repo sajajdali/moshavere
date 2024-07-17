@@ -12,7 +12,7 @@ use Hekmatinasser\Verta\Facades\Verta;
 use Modules\Service\app\Models\Service;
 use Modules\Setting\Enum\SettingKeyEnum;
 use Modules\AppointmentUser\app\Models\AppointmentUser;
-use Modules\Appointmentuser\Traits\OprationButtonsTrait;
+use Modules\AppointmentUser\Traits\OprationButtonsTrait;
 use Modules\AppointmentUser\Enum\AppointmentUserTypeEnum;
 use Modules\AppointmentUser\Enum\AppointmentUserStatusEnum;
 use Modules\AppointmentSetting\app\Models\AppointmentSetting;

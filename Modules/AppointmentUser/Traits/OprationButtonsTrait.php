@@ -1,10 +1,9 @@
 <?php
 
-namespace Modules\Appointmentuser\Traits;
+namespace Modules\AppointmentUser\Traits;
 
 use App\Models\ShortLink;
 use Modules\Setting\Enum\SettingKeyEnum;
-use Modules\Reminder\app\Models\AppointmentReminder;
 use Modules\AppointmentUser\app\Models\AppointmentUser;
 use Modules\AppointmentUser\app\Models\AppointmentOnline;
 use Modules\AppointmentUser\Enum\AppointmentUserTypeEnum;
@@ -12,7 +11,6 @@ use Modules\AppointmentUser\Enum\AppointmentUserStatusEnum;
 use Modules\AppointmentSetting\app\Models\AppointmentSetting;
 use Modules\AppointmentUser\Enum\AppointmentOnlineStatusEnum;
 use Modules\AppointmentUser\app\Events\CancelAppointmentEvent;
-use Modules\AppointmentUser\app\Events\DeleteAppointmentEvent;
 use Modules\AppointmentUser\app\Notifications\AppointmentSmsNotification;
 use Modules\AppointmentUser\app\Notifications\AppointmentUserFeedbackSmsnotification;
 
@@ -61,7 +59,8 @@ trait OprationButtonsTrait
         $app->update(['status' => AppointmentUserStatusEnum::STATUS_DISAPPROVED]);
         $this->redirectToPage('نوبت با موفقیت عدم تایید شد');
     }
-    public function disApprovemonitoringAppointmentWithSms($id) {
+    public function disApprovemonitoringAppointmentWithSms($id)
+    {
         $app = AppointmentUser::find($id);
         $app->update(['status' => AppointmentUserStatusEnum::STATUS_DISAPPROVED]);
         $app->notify(new AppointmentSmsNotification(setting(SettingKeyEnum::SMS_DIS_APPROVED_MONITORING_APPOINTMENT)));
@@ -170,7 +169,7 @@ trait OprationButtonsTrait
         ]);
         $smsTemplate = setting(SettingKeyEnum::SMS_FEEDBACK);
         if (isset($smsTemplate)) {
-            $appointmentUser->notify(new AppointmentUserFeedbackSmsnotification($smsTemplate,$link_code));
+            $appointmentUser->notify(new AppointmentUserFeedbackSmsnotification($smsTemplate, $link_code));
         }
     }
 }

@@ -13,7 +13,7 @@ use Maatwebsite\Excel\Facades\Excel;
 use Hekmatinasser\Verta\Facades\Verta;
 use Modules\Service\app\Models\Service;
 use Modules\AppointmentUser\app\Models\AppointmentUser;
-use Modules\Appointmentuser\Traits\OprationButtonsTrait;
+use Modules\AppointmentUser\Traits\OprationButtonsTrait;
 use Modules\AppointmentUser\Enum\AppointmentUserKindEnum;
 use Modules\AppointmentUser\Enum\AppointmentUserStatusEnum;
 use Modules\AppointmentUser\app\Exports\AppointmentListExport;

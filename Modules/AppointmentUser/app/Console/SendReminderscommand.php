@@ -11,7 +11,7 @@ use Modules\Reminder\app\Models\AppointmentReminder;
 use Modules\AppointmentUser\app\Notifications\AppointmentSmsReminder;
 use Modules\AppointmentUser\app\Notifications\AppointmentSmsNotification;
 
-class sendReminderscommand extends Command
+class SendReminderscommand extends Command
 {
     /**
      * The name and signature of the console command.

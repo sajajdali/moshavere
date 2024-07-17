@@ -107,6 +107,7 @@ class UserCreateOrUpdate extends Component
                 'mobile' => $this->userMobile,
                 'password' => $this->password,
             ]);
+            $userCreated = true;
         } else {
             /** @var User $user */
             $user = $this->user;
@@ -138,10 +139,11 @@ class UserCreateOrUpdate extends Component
             $user->syncRoles($selectedPermitionForUser);
         }
         $user->supporter()->sync($this->supporter);
-        if ($user->hasrole('پزشک')) {
+
+        session()->flash('success', 'کاربر با موفقیت اضافه شد.');
+        if (isset($userCreated) && $user->hasrole('پزشک')) {
             return redirect()->route('admin.doctor.info', $user)->with('success', 'پزشک با موفقیت اضافه شد ، لطفا اطلاعات تکمیلی مربوط به پزشک را تکمیل نمایید');
         }
-        session()->flash('success', 'کاربر با موفقیت اضافه شد.');
         return redirect()->route('admin.user.index');
     }
 

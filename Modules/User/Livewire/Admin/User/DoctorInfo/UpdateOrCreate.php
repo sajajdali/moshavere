@@ -1,11 +1,10 @@
 <?php
 
 namespace Modules\User\Livewire\Admin\User\DoctorInfo;
-
 use Livewire\Component;
-use Illuminate\Support\Arr;
 use Modules\User\Entities\User;
 use Modules\Place\app\Models\Place;
+use Illuminate\Support\Facades\Cache;
 use Modules\Service\app\Models\Service;
 use Modules\User\Enum\UserSpecialityType;
 use Modules\Speciality\app\Models\Speciality;
@@ -83,6 +82,8 @@ class UpdateOrCreate extends Component
         }
 
         $this->user->ban_user = $this->form['banUser'];
+        Cache::forget('emergency_doctors');
+        Cache::forget('Introduction_doctors');
 
         return redirect()->route('admin.user.index')->with('success', 'اطلاعات پزشک با موفقیت ثبت شد');
     }

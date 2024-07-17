@@ -39,7 +39,7 @@ class HomePageLivewire extends Component
         //    Attempt to get the data from the cache
         return Cache::rememberForever($cacheKey,  function () {
             return   User::introductionDoctors()->get()->filter(function ($doc) {
-                if ($doc->services()->exists() && $doc->places()->exists() && $doc->appointmentSettings()->exist() ) {
+                if ($doc->services()->exists() && $doc->places()->exists() && $doc->appointmentSettings()->exists() ) {
                     return true;
                 };
             })->sortBy(function ($user) {
@@ -55,7 +55,7 @@ class HomePageLivewire extends Component
         // Attempt to get the data from the cache
         return  Cache::rememberForever($cacheKey, function () {
             return User::emergencyDoctors()->get()->filter(function ($doc) {
-                if ($doc->services()->exists() && $doc->places()->exists() && $doc->appointmentSettings()->exist()) {
+                if ($doc->services()->exists() && $doc->places()->exists() && $doc->appointmentSettings()->exists()) {
                     return true;
                 };
             })->sortBy(function ($user) {

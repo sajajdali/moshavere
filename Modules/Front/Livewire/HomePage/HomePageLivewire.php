@@ -14,7 +14,7 @@ use Modules\Front\app\Models\Comment;
 use Modules\Front\app\Models\Province;
 use Modules\Service\app\Models\Service;
 use Modules\Front\enum\CommentStatusEnum;
-use Modules\Front\Enum\CommentShowHomePage;
+use Modules\Front\enum\CommentShowHomePage;
 
 #[Layout('front::layouts.app')]
 #[Title('صفحه اصلی')]

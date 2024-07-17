@@ -10,7 +10,7 @@ use Illuminate\Support\Facades\Cache;
 use Modules\Front\app\Models\Comment;
 use Modules\Front\app\Models\FeedBack;
 use Modules\Front\enum\CommentStatusEnum;
-use Modules\Front\Enum\CommentShowHomePage;
+use Modules\Front\enum\CommentShowHomePage;
 use Modules\AppointmentUser\app\Models\AppointmentUser;
 
 class Commentlivewire extends Component

@@ -90,7 +90,7 @@
                             </svg>
                         </div>
                         <div class="space-y-3">
-                            <h4 class="font-semibold">آدرس شرکت</h4>
+                            <h4 class="font-semibold">آدرس </h4>
                             <h5 class="text-secondary-400">{{ $fetchData['address'] }}</h5>
                         </div>
                     </div>

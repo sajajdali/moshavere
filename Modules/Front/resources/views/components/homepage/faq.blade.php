@@ -30,30 +30,6 @@
                                 </p>
                             </div>
                         </div>
-                        <div class="accordion__container accordion_select__container">
-                            <div class="accordion_select__button">
-                                <p class="accordion_select__text">
-                                    بعد از خرید چه مدت طول می کشد تا خدمات به من ارائه شوند؟
-                                </p>
-                                <div class="accordion_select__icon">
-                                    <svg class="w-8 h-8" xmlns="http://www.w3.org/2000/svg">
-                                        <use xlink:href="../assets/svg/icon.svg#sprite-chevron-down-circle" />
-                                    </svg>
-                                </div>
-                            </div>
-                            <div class="accordion_select__content">
-                                <p class="text-sm leading-[1.65rem] text-justify text-gray-700">
-                                    لورم ایپسوم متن ساختگی با تولید سادگی نامفهوم از صنعت چاپ و با استفاده از طراحان
-                                    گرافیک است
-                                    چاپگرها
-                                    و متون
-                                    بلکه روزنامه و مجله در ستون و سطرآنچنان که لازم است و برای شرایط فعلی تکنولوژی مورد
-                                    نیاز و
-                                    کاربردهای متنوع
-                                    با هدف بهبود ابزارهای کاربردی می باشد
-                                </p>
-                            </div>
-                        </div>
                     </div>
                 @endforeach
                 <div class="flex flex-col md:flex-row gap-3 items-center justify-between">

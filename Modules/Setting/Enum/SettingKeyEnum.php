@@ -36,6 +36,19 @@ enum SettingKeyEnum: int implements EnumHasNameInterface, SettingTypeInterface, 
     case SITE_SECEND_SECTION_TITLE = 21;
     case SITE_SECEND_SECTION_DESCRIPTION = 22;
 
+    // ABOUT US PAGE
+    case ABOUT_US_FIRST_SECTION_TITLE = 23;
+    case ABOUT_US_FIRST_SECTION_DESCRIPTION = 24;
+    case ABOUT_US_SECEND_SECTION_TITLE = 25;
+    case ABOUT_US_SECEND_SECTION_DESCRIPTION = 26;
+    case ABOUT_US_SECEND_SECTION_IMAGE = 27;
+    case ABOUT_US_THIRD_SECTION_TITLE = 28;
+    case ABOUT_US_THIRD_SECTION_DESCRIPTION = 29;
+    case ABOUT_US_THIRD_SECTION_IMAGE = 30;
+    case ABOUT_US_FOURTH_SECTION_TITLE = 31;
+    case ABOUT_US_FOURTH_SECTION_DESCRIPTION = 32;
+    case ABOUT_US_FOURTH_SECTION_IMAGE = 33;
+
         //sms
     case SMS_API_TOKEN = 60;
     case SMS_API_LOGIN_TEMPLATE = 61;
@@ -152,6 +165,19 @@ enum SettingKeyEnum: int implements EnumHasNameInterface, SettingTypeInterface, 
             self::CONTACTUS_FORM_ADDRESS => 'ادرس نمایشی در صفحه ی تماس با ما ',
             self::CONTACTUS_FORM_SUPPORT_EMAIL => 'ایمیل نمایشی برای ارتباط با پشتیبانی ',
 
+            // about us
+              self::ABOUT_US_FIRST_SECTION_TITLE => 'عنوان بخش اول' ,
+              self::ABOUT_US_FIRST_SECTION_DESCRIPTION => 'توضیحات بخش اول' ,
+              self::ABOUT_US_SECEND_SECTION_TITLE => 'عنوان بخش دوم' ,
+              self::ABOUT_US_SECEND_SECTION_DESCRIPTION => 'توضیحات بخش دوم' ,
+              self::ABOUT_US_SECEND_SECTION_IMAGE => 'تصویر بخش دوم' ,
+              self::ABOUT_US_THIRD_SECTION_TITLE => 'عنوان بخش سوم' ,
+              self::ABOUT_US_THIRD_SECTION_DESCRIPTION => 'توضیحات بخش سوم' ,
+              self::ABOUT_US_THIRD_SECTION_IMAGE => 'تصویر بخش سوم' ,
+              self::ABOUT_US_FOURTH_SECTION_TITLE => 'عنوان بخش چهارم',
+              self::ABOUT_US_FOURTH_SECTION_DESCRIPTION => 'توضیحات بخش چهارم',
+              self::ABOUT_US_FOURTH_SECTION_IMAGE => 'تصویر بخش چهارم',
+
             default => ''
         };
     }
@@ -208,6 +234,11 @@ enum SettingKeyEnum: int implements EnumHasNameInterface, SettingTypeInterface, 
             self::CONTACTUS_FORM_STATUS => SettingTypeEnum::CHECK,
             self::CONTACTUS_FORM_ADDRESS => SettingTypeEnum::TEXTAREA,
             self::FOOTER_DESCRIPTION => SettingTypeEnum::TEXTAREA,
+
+            self::ABOUT_US_FIRST_SECTION_DESCRIPTION => SettingTypeEnum::TEXTAREA,
+            self::ABOUT_US_SECEND_SECTION_DESCRIPTION => SettingTypeEnum::TEXTAREA,
+            self::ABOUT_US_THIRD_SECTION_DESCRIPTION => SettingTypeEnum::TEXTAREA,
+            self::ABOUT_US_FOURTH_SECTION_DESCRIPTION => SettingTypeEnum::TEXTAREA,
             default => SettingTypeEnum::TEXT
         };
     }

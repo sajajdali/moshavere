@@ -73,7 +73,7 @@ return [
             \Modules\Setting\Enum\SettingKeyEnum::PAYMENT_ZARINPAL_STATUS,
             \Modules\Setting\Enum\SettingKeyEnum::PAYMENT_ZARINPAL_MERCHENID,
             \Modules\Setting\Enum\SettingKeyEnum::PAYMENT_RULES_AND_CONDITION_STATUS,
-            \Modules\Setting\Enum\SettingKeyEnum::PAYMEN_ACTIVE_DRIVER ,
+            \Modules\Setting\Enum\SettingKeyEnum::PAYMEN_ACTIVE_DRIVER,
         ],
     ],
     'voip' => [
@@ -101,6 +101,23 @@ return [
             \Modules\Setting\Enum\SettingKeyEnum::CONTACTUS_FORM_STATUS,
             \Modules\Setting\Enum\SettingKeyEnum::CONTACTUS_FORM_ADDRESS,
             \Modules\Setting\Enum\SettingKeyEnum::CONTACTUS_FORM_SUPPORT_EMAIL,
+        ],
+    ],
+    'About_us' => [
+        'title' => 'صفحه ی درباره ی ما',
+        'icon' => 'fa fa-address-card-o',
+        'settings' => [
+            \Modules\Setting\Enum\SettingKeyEnum::ABOUT_US_FIRST_SECTION_TITLE,
+            \Modules\Setting\Enum\SettingKeyEnum::ABOUT_US_FIRST_SECTION_DESCRIPTION,
+            \Modules\Setting\Enum\SettingKeyEnum::ABOUT_US_SECEND_SECTION_TITLE,
+            \Modules\Setting\Enum\SettingKeyEnum::ABOUT_US_SECEND_SECTION_DESCRIPTION,
+            \Modules\Setting\Enum\SettingKeyEnum::ABOUT_US_SECEND_SECTION_IMAGE,
+            \Modules\Setting\Enum\SettingKeyEnum::ABOUT_US_THIRD_SECTION_TITLE,
+            \Modules\Setting\Enum\SettingKeyEnum::ABOUT_US_THIRD_SECTION_DESCRIPTION,
+            \Modules\Setting\Enum\SettingKeyEnum::ABOUT_US_THIRD_SECTION_IMAGE,
+            \Modules\Setting\Enum\SettingKeyEnum::ABOUT_US_FOURTH_SECTION_TITLE,
+            \Modules\Setting\Enum\SettingKeyEnum::ABOUT_US_FOURTH_SECTION_DESCRIPTION,
+            \Modules\Setting\Enum\SettingKeyEnum::ABOUT_US_FOURTH_SECTION_IMAGE,
         ],
     ],
 ];

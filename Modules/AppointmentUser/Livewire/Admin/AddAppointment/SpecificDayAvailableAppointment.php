@@ -283,9 +283,10 @@ class SpecificDayAvailableAppointment extends Component
         } else {
             $this->fetchData['time'] = null;
         }
-        // create inital list aof appointment 
-        $this->fetchData['RawlistOfAppointment']  = Cache::rememberForever('appointmentList.' . $app->id, function () use ($app) {
-            return app('AppointmentUserService')->listAppointments($app);
+        // create inital list aof appointment
+        $details['admin'] =true ;
+        $this->fetchData['RawlistOfAppointment']  = Cache::rememberForever('appointmentList.' . $app->id, function () use ($app,$details) {
+            return app('AppointmentUserService')->listAppointments($app,$details);
         });
         $this->fetchData['listOfAppointment'] = $this->listOfAppointment($this->fetchData['RawlistOfAppointment']);
 

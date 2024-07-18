@@ -88,10 +88,10 @@ class AppointmentUserService
         if (array_key_exists('specialDay', $details)) {
             $specialDaySelected = true;
             $startDate = Carbon::parse($details['specialDay'])->subDays(20);
-            $endDate = $startDate->copy()->addDays($details['specialDay_endDate'] ?? 60); // Adjust the number of days as needed
+            $endDate = $startDate->copy()->addDays(20)->addDays($details['specialDay_endDate'] ?? 60); // Adjust the number of days as needed
         } elseif (array_key_exists('specialDays', $details)) {
             $startDate = Carbon::parse($details['specialDays'])->subDays(20);
-            $endDate = $startDate->copy()->addDays($appointmentSetting->max_day_active ?? 90); // Adjust the number of days as needed
+            $endDate = $startDate->copy()->addDays(20)->addDays($appointmentSetting->max_day_active ?? 90); // Adjust the number of days as needed
         } elseif (array_key_exists('completeDays', $details)) {
             $startDate = Carbon::parse($details['specialDay']);
             $endDate = $startDate->copy()->addDays($details['numberDays']);
@@ -100,6 +100,10 @@ class AppointmentUserService
         if (!$specialDaySelected && !isset($startDate)) {
             $startDate = Carbon::today()->subDays(20);
             $endDate = Carbon::today()->addDays($appointmentSetting->max_day_active ?? 90); // Adjust the number of days as needed
+        }
+        // days are loaded from admin panel
+        if (isset($details['admin'])) {
+            $endDate = Carbon::today()->addDays(90);
         }
 
 
@@ -354,7 +358,7 @@ class AppointmentUserService
                                     $startTimeOverLap = $getLastOverLapsTime['existingUntil'] == $overlapsAgain['existingUntil'] ? $startTime->copy()->toTimeString() : $overlaps['existingUntil'];
 
                                     // In the event that the final hour is greater than the required time of the visit
-                                    if($timeForVisit > $getLastOverLapsTime['overLapTime'] ){
+                                    if ($timeForVisit > $getLastOverLapsTime['overLapTime']) {
                                         $startTime->subMinutes($timeForVisit - $getLastOverLapsTime['overLapTime']);
                                     }
 

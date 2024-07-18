@@ -60,7 +60,7 @@ class ShowAvailableDayForDoctor extends Component
                 return $this->msg = 'بازه ی نمایش به اتمام رسیده است!';
             }
         }
-        $this->fetchData['maxShowDay'] = $this->fetchData['maxShowDay'] + 10;
+        $this->fetchData['maxShowDay'] = $this->fetchData['maxShowDay'] + 2;
 
         // check if date exist in the log or should recreate the app_log
         if ($this->fetchData['lastDate']->lt($this->fetchData['last_active_day'])) {
@@ -70,7 +70,7 @@ class ShowAvailableDayForDoctor extends Component
         } else {
             if (isset($this->fetchData['segment_time'])) {
                 $details['segment_time'] =  $this->fetchData['segment_time'];
-            }    
+            }
             // next date is not exist in log
             $details['specialDays'] = $this->fetchData['lastDate'];
             $this->fetchData['rawlistOfAppointment'] =  app('AppointmentUserService')->listAppointments($this->fetchData['appointmentSetting'], $details);
@@ -78,7 +78,7 @@ class ShowAvailableDayForDoctor extends Component
             $this->dispatch('scrollToBottom', true);
         }
     }
-   
+
     private function caculateLastActiveDay($listOfAppointment)
     {
         $last_exist_month = end($listOfAppointment);
@@ -193,8 +193,6 @@ class ShowAvailableDayForDoctor extends Component
         $service =  request()->input('service_id');
 
         if (!isset($doc) || ! isset($place) || !isset($service)) {
-            // redirect back with alert
-            // TODO::insert alert
             return abort(404);
         }
         if (request()->has('segment')) {
@@ -203,7 +201,7 @@ class ShowAvailableDayForDoctor extends Component
                 $this->fetchData['segments'][] =  AppointmentSegmentItem::find($item);
             }
             if (count($this->fetchData['segments']) > 1) {
-                $this->fetchData['segment_time'] = 0 ; 
+                $this->fetchData['segment_time'] = 0 ;
                 foreach ($this->fetchData['segments'] as $eachSegTime) {
                     $this->fetchData['segment_time'] += $eachSegTime->time;
                 }
@@ -229,7 +227,7 @@ class ShowAvailableDayForDoctor extends Component
         }
         $this->fetchData['maxShowDay'] = 2;
         $this->getAvailableDay();
-       
+
         //select the nearest appointment
         foreach ($this->fetchData['firstTreeAvailableAppointment']  as $date => $appointmentsWithDaysIndex) {
             foreach ($appointmentsWithDaysIndex as $eachTime => $appointmentDetail) {

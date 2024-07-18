@@ -283,8 +283,9 @@ class SpecificDayAvailableAppointment extends Component
             $this->fetchData['time'] = null;
         }
         Cache::forget('appointmentList.' .   $app->id);
-        $this->fetchData['RawlistOfAppointment']  = Cache::rememberForever('appointmentList.' . $app->id, function () use ($app) {
-            return app('AppointmentUserService')->listAppointments($app);
+        $details['specialDays'] = $this->fetchData['selectedDate']->toDateString();
+        $this->fetchData['RawlistOfAppointment']  = Cache::rememberForever('appointmentList.' . $app->id, function () use ($app,$details) {
+            return app('AppointmentUserService')->listAppointments($app,$details);
         });
         $this->fetchData['listOfAppointment'] = $this->listOfAppointment($this->fetchData['RawlistOfAppointment']);
         if (request()->has('tracking_code')) {

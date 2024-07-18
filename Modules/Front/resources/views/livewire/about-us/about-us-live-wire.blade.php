@@ -12,7 +12,7 @@
                     <h2 class="font-semibold text-lg">
                         {{ setting(\Modules\Setting\Enum\SettingKeyEnum::ABOUT_US_FIRST_SECTION_TITLE) }}
                     </h2>
-                    <a href="#" class="flex items-center gap-4 text-primary-main">
+                    <a href="{{route('front.searchPage',['query' => 'پزشکان'])}}" class="flex items-center gap-4 text-primary-main">
                         <span class="font-semibold">لیست پزشکان</span>
                         <svg class="w-5 h-5" xmlns="http://www.w3.org/2000/svg">
                             <use xlink:href="#sprite-arrow-left" />
@@ -36,7 +36,7 @@
                 <p class="leading-7 text-secondary-400">
                     {{ setting(\Modules\Setting\Enum\SettingKeyEnum::ABOUT_US_SECEND_SECTION_DESCRIPTION) }}
                 </p>
-                <a href="#" class="btn__blue--round-full">
+                <a href="{{route('front.searchPage',['query' => 'پزشکان'])}}" class="btn__blue--round-full">
                     <span>لیست پزشکان برتر</span>
                     <svg class="w-6 h-6" xmlns="http://www.w3.org/2000/svg">
                         <use xlink:href="#sprite-chevron-left-circle" />
@@ -60,7 +60,7 @@
                 <p class="leading-7 text-secondary-400">
                     {{ setting(\Modules\Setting\Enum\SettingKeyEnum::ABOUT_US_THIRD_SECTION_DESCRIPTION) }}
                 </p>
-                <a href="#" class="btn__blue--round-full">
+                <a href="{{route('front.searchPage',['query' => 'پزشکان'])}}" class="btn__blue--round-full">
                     <span>لیست پزشکان برتر</span>
                     <svg class="w-6 h-6" xmlns="http://www.w3.org/2000/svg">
                         <use xlink:href="#sprite-chevron-left-circle" />
@@ -88,7 +88,7 @@
 
             </div>
             <div class="flex">
-                <a href="#" class="btn__blue--round-full">
+                <a href="{{route('front.searchPage',['query' => 'پزشکان'])}}" class="btn__blue--round-full">
                     <span>لیست پزشکان برتر</span>
                     <svg class="w-6 h-6" xmlns="http://www.w3.org/2000/svg">
                         <use xlink:href="#sprite-chevron-left-circle" />

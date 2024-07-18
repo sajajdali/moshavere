@@ -270,6 +270,7 @@ class SpecificDayAvailableAppointment extends Component
         $this->fetchData['doc'] = $app->user;
         $this->fetchData['appId'] = $app->id;
         $this->fetchData['appointmentSetting'] = $app;
+
         if (!empty(request()->route('date'))) {
             $this->fetchData['selectedDate']  = Verta::parse(request()->route('date'))->toCarbon();
         } else {
@@ -282,16 +283,24 @@ class SpecificDayAvailableAppointment extends Component
         } else {
             $this->fetchData['time'] = null;
         }
-        Cache::forget('appointmentList.' .   $app->id);
-        $details['specialDays'] = $this->fetchData['selectedDate']->toDateString();
-        $this->fetchData['RawlistOfAppointment']  = Cache::rememberForever('appointmentList.' . $app->id, function () use ($app,$details) {
-            return app('AppointmentUserService')->listAppointments($app,$details);
+        // create inital list aof appointment 
+        $this->fetchData['RawlistOfAppointment']  = Cache::rememberForever('appointmentList.' . $app->id, function () use ($app) {
+            return app('AppointmentUserService')->listAppointments($app);
         });
         $this->fetchData['listOfAppointment'] = $this->listOfAppointment($this->fetchData['RawlistOfAppointment']);
+
+        // check if selected date not exist in the log
+        if ($this->fetchData['selectedDate']->gt(\now()->addDays(60))) {
+            $this->form['changeDate'] = verta($this->fetchData['selectedDate'])->format('Y-m-d') ;
+            $this->loadDifferentDayDetail();
+        }
+
+        // if user want to change the date of specific apppointment
         if (request()->has('tracking_code')) {
             $this->edited['status'] = true;
             $this->edited['old_app'] = AppointmentUser::firstWhere('tracking_code', request()->get('tracking_code'));
         }
+
         if (request()->has('serviceId')) {
             $this->fetchData['service'] = Service::find(request()->get('serviceId'));
         }

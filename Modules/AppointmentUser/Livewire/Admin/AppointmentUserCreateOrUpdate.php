@@ -2,6 +2,7 @@
 
 namespace Modules\AppointmentUser\Livewire\Admin;
 
+use App\Enum\ActiveEnum;
 use Livewire\Component;
 use Modules\AppointmentSetting\app\Models\AppointmentSetting;
 use Modules\User\Entities\User;
@@ -56,7 +57,7 @@ class AppointmentUserCreateOrUpdate extends Component
                     !empty($this->form['modalSelectedData']['place'])
                 ) {
                     $doctor = User::find($this->form['modalSelectedData']['doctor']);
-                    $this->fetchData['ServiceList'] = $doctor->service;
+                    $this->fetchData['ServiceList'] = $doctor->activeServices();
                     //check if there is more than 1 service exist
                     if (count($this->fetchData['ServiceList']) == 1) {
                         return redirect()->route(
@@ -128,7 +129,7 @@ class AppointmentUserCreateOrUpdate extends Component
         $this->form['modalSelectedData']['service'] = $service->id;
         $this->fetchData['docList'] = $service->user;
         $associatedService = Service::with('user.places')->find($service->id);
-        $this->fetchData['placeList'] = $associatedService->user->flatMap->places;
+        $this->fetchData['placeList'] = $associatedService->user->flatMap->activePlaces()->unique('id');
         if (count($this->fetchData['placeList']) == 1) {
             $this->placeSelected($this->fetchData['placeList']->first());
         } else {
@@ -169,23 +170,28 @@ class AppointmentUserCreateOrUpdate extends Component
     {
         $docQuery = User::doctors_query();
         if (isset($docQuery)) {
-            $docQuery =  $docQuery->when(isset($this->search['doctors']) && !empty($this->search['doctors']), function ($query) {
-                return $query->where(function ($q) {
-                    $q->whereHas('metas', function ($q) {
-                        $q->where([
-                            ['meta_key', UserMetaEnum::FIRST_NAME],
-                            ['meta_value', 'LIKE', "%{$this->search['doctors']}%"],
-                        ]);
-                    })->orWhereHas('metas', function ($q) {
-                        $q->where([
-                            ['meta_key', UserMetaEnum::LAST_NAME],
-                            ['meta_value', 'LIKE', "%{$this->search['doctors']}%"],
-                        ]);
+            $docQuery =  $docQuery->whereHas('metas', function ($q) {
+                $q->where([
+                    ['meta_key', UserMetaEnum::BAN_USER],
+                    ['meta_value', false],
+                ]);
+            })->when(isset($this->search['doctors']) && !empty($this->search['doctors']), function ($query) {
+                    return $query->where(function ($q) {
+                        $q->whereHas('metas', function ($q) {
+                            $q->where([
+                                ['meta_key', UserMetaEnum::FIRST_NAME],
+                                ['meta_value', 'LIKE', "%{$this->search['doctors']}%"],
+                            ]);
+                        })->orWhereHas('metas', function ($q) {
+                            $q->where([
+                                ['meta_key', UserMetaEnum::LAST_NAME],
+                                ['meta_value', 'LIKE', "%{$this->search['doctors']}%"],
+                            ]);
+                        });
                     });
-                });
-            })->orderByDesc('id')->get();
+                })->orderByDesc('id')->get();
         }
-        $Services = Service::query()
+        $Services = Service::where('active', ActiveEnum::ACTIVE)
             ->when(isset($this->search['searchService']) && !empty($this->search['searchService']), function ($query) {
                 return $query->where('title', 'LIKE', "%{$this->search['searchService']}%");
             })->orderByDesc('id')->get();;

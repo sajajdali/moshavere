@@ -114,7 +114,7 @@
                                         @elseif(isset($eachTime['appointment_user_id']))
                                             @php
                                                 $ap = Modules\AppointmentUser\app\Models\AppointmentUser::find(
-                                                    $eachTime['appointment_user_id'],
+                                                    $eachTime['appointment_user_id']
                                                 );
                                                 $user = $ap->user;
                                             @endphp

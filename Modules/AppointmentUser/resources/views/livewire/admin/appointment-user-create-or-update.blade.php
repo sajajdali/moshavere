@@ -161,7 +161,7 @@
                                                                 </p>
                                                             </div>
                                                         </div>
-                                                        <button class="btn btn-warning w-100"
+                                                        <button class="btn btn-warning w-100" wire:loading.class='btn-loading bg-gray'
                                                             wire:click='serviceSelectedFromServiceSection({{ $service->id }})'>
                                                             <i class="fa fa-check" aria-hidden="true"></i>
                                                             <span>افزودن نوبت</span>

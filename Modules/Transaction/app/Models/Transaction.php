@@ -19,10 +19,10 @@ class Transaction extends Model
      */
     protected $guarded = ['id'];
     protected $casts = [
-        'paid_by'     => TransactionPaidEnum::class ,
-        'status'      => TransactionStatusEnum::class ,
-        'detail'      => 'json' ,
-    ] ;
+        'paid_by'     => TransactionPaidEnum::class,
+        'status'      => TransactionStatusEnum::class,
+        'detail'      => 'json',
+    ];
 
     protected static function generateUniqueCode()
     {
@@ -58,5 +58,10 @@ class Transaction extends Model
     protected function asJson($value)
     {
         return json_encode($value, JSON_UNESCAPED_UNICODE);
+    }
+    public function scopeTodayTransaction()
+    {
+       return  $this->where('status', TransactionStatusEnum::SUCCESSFUL)
+            ->whereDate('created_at', now()->today());
     }
 }

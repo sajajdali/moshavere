@@ -38,13 +38,13 @@ class HomePageLivewire extends Component
         $cacheKey = 'Introduction_doctors';
         //    Attempt to get the data from the cache
         return Cache::rememberForever($cacheKey,  function () {
-        return   User::introductionDoctors()->get()->filter(function ($doc) {
-            if ($doc->services()->exists() && $doc->places()->exists() && $doc->appointmentSettings()->exists()) {
-                return true;
-            };
-        })->sortBy(function ($model) {
-            return $model->dr_info_order;
-        });
+            return   User::introductionDoctors()->get()->filter(function ($doc) {
+                if ($doc->services()->exists() && $doc->places()->exists() && $doc->appointmentSettings()->exists()) {
+                    return true;
+                };
+            })->sortBy(function ($model) {
+                return $model->dr_info_order;
+            });
         });
     }
     private function emergencyDoctors()

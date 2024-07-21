@@ -10,6 +10,7 @@ use Modules\User\Entities\User;
 use Modules\User\Enum\UserMetaEnum;
 use Illuminate\Support\Facades\Cache;
 use Modules\Service\app\Models\Service;
+use Modules\Transaction\app\Models\Transaction;
 use Modules\AppointmentUser\app\Models\AppointmentUser;
 use Modules\AppointmentUser\Enum\AppointmentUserStatusEnum;
 use Modules\AppointmentSetting\app\Models\AppointmentSegment;
@@ -49,6 +50,7 @@ class Dashboard extends Component
             ];
         });
         $this->fetchData['SelfRegistrationDoctors'] = User::newRegistredDoctor()->get()->take(10);
+        $this->fetchData['transactiontotal'] = Transaction::todayTransaction()->sum('total_cost');
     }
     public function render()
     {

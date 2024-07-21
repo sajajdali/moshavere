@@ -116,8 +116,9 @@
                                                 $ap = Modules\AppointmentUser\app\Models\AppointmentUser::find(
                                                     $eachTime['appointment_user_id']
                                                 );
-                                                $user = $ap->user;
+                                                $user = $ap?->user;
                                             @endphp
+                                            @if (isset($ap))
                                             <tr class="{{ $ap->getColor() }} text-center">
                                                 <td class="alert text-center bg-info ">{{ $key + 1 }}</td>
                                                 <td>
@@ -157,6 +158,7 @@
                                                     </div>
                                                 </td>
                                             </tr>
+                                            @endif
                                         @elseif($eachTime['appointment_user_id'] == null)
                                             <tr style="background-color: #f7dcdc;">
                                                 <td class="alert text-center bg-info ">

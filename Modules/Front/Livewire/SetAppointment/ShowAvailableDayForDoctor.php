@@ -151,6 +151,14 @@ class ShowAvailableDayForDoctor extends Component
                             }
                         }
                     }
+                    $checkForFalse = collect($result[$dayNumber]);
+                    $isStatusFalse = $checkForFalse->every(function ($appointment) {
+                        return $appointment['status'] == false;
+                    });
+                    if ($isStatusFalse) {
+                        unset($result[$dayNumber]);
+                        $DaysDisplayed = $DaysDisplayed - 1;
+                    }
                 }
             }
         }
@@ -192,7 +200,7 @@ class ShowAvailableDayForDoctor extends Component
         $place =  request()->input('place_id');
         $service =  request()->input('service_id');
 
-        if (!isset($doc) || ! isset($place) || !isset($service)) {
+        if (!isset($doc) || !isset($place) || !isset($service)) {
             return abort(404);
         }
         if (request()->has('segment')) {
@@ -201,7 +209,7 @@ class ShowAvailableDayForDoctor extends Component
                 $this->fetchData['segments'][] =  AppointmentSegmentItem::find($item);
             }
             if (count($this->fetchData['segments']) > 1) {
-                $this->fetchData['segment_time'] = 0 ;
+                $this->fetchData['segment_time'] = 0;
                 foreach ($this->fetchData['segments'] as $eachSegTime) {
                     $this->fetchData['segment_time'] += $eachSegTime->time;
                 }
@@ -234,7 +242,7 @@ class ShowAvailableDayForDoctor extends Component
                 if ($appointmentDetail['status'] == false) {
                     continue;
                 }
-                $this->form['time'] = (string) $appointmentDetail['time_stamp'] . ',' . $appointmentDetail['until'] ;
+                $this->form['time'] = (string) $appointmentDetail['time_stamp'] . ',' . $appointmentDetail['until'];
                 break 2; // Break out of both foreach loops
 
             }

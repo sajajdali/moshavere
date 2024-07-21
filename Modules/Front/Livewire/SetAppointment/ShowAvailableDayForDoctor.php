@@ -151,6 +151,7 @@ class ShowAvailableDayForDoctor extends Component
                             }
                         }
                     }
+                    // delete the day if all the status are false 
                     $checkForFalse = collect($result[$dayNumber]);
                     $isStatusFalse = $checkForFalse->every(function ($appointment) {
                         return $appointment['status'] == false;

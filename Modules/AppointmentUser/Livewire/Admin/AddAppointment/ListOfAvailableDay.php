@@ -127,11 +127,12 @@ class ListOfAvailableDay extends Component
         if (empty($appointmentSetting)) {
             return redirect()->route('admin.appointment.doctor.list')->with('error', 'لطفا ابتدا تنظیمات حضور پزشک را ثبت کنید');
         }
-        // determinde that log is called throw admin pannel
-        $details['admin'] =true ;
-
-        $listOfAppointment = Cache::rememberForever('appointmentList.' . $appointmentSetting->id, function () use ($appointmentSetting,$details) {
-            return app('AppointmentUserService')->listAppointments($appointmentSetting,$details);
+        if (env('APPOINTMENT_SANDBOX')) {
+            Cache::forget('appointmentList.' . $appointmentSetting->id);
+        }     
+        $listOfAppointment = Cache::rememberForever('appointmentList.' . $appointmentSetting->id, function () use ($appointmentSetting) {
+            $appointmentSetting->update(['updated_log_at' => \now()]);
+            return app('AppointmentUserService')->listAppointments($appointmentSetting);
         });
         $this->fethData['firstTreeAvailableAppointment'] =  $this->findFirstTreeAppointment($listOfAppointment);
         $this->fethData['appointmentSetting'] = $appointmentSetting->id;

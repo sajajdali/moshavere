@@ -281,7 +281,6 @@ class SpecificDayAppointmentRegistrationModal extends Component
             $detail['wait_for_payment'] = true;
         }
         $storeAppointment = app('AppointmentUserService')->storeAppointment($appointmentSetting, $userModelAppointment, $appointmentModel, $detail);
-        Cache::forget('appointmentList.' . $this->appId);
         return redirect()->route('admin.appointment.add.specificday', ['serviceId' => $this->fetchData['service']->id, 'placeId' => $this->placeId,  'appId' => $this->appId, 'date' => $this->appDate])->with('success', $storeAppointment['message']);
     }
 

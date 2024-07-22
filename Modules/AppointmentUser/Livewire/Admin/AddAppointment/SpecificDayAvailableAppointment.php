@@ -165,7 +165,11 @@ class SpecificDayAvailableAppointment extends Component
     public function RebiuldCacheDataWithDoctorId($appId)
     {
         $app = AppointmentSetting::find($appId);
+        if (env('APPOINTMENT_SANDBOX')) {
+            Cache::forget('appointmentList.' . $app->id);
+        }
         $this->fetchData['RawlistOfAppointment']  = Cache::rememberForever('appointmentList.' . $app->id, function () use ($app) {
+            $app->update(['updated_log_at' => \now()]);
             return app('AppointmentUserService')->listAppointments($app);
         });
         // dd($this->fetchData['RawlistOfAppointment']);
@@ -283,10 +287,14 @@ class SpecificDayAvailableAppointment extends Component
         } else {
             $this->fetchData['time'] = null;
         }
+
+        if (env('APPOINTMENT_SANDBOX')) {
+            Cache::forget('appointmentList.' . $app->id);
+        }
         // create inital list aof appointment
-        $details['admin'] =true ;
-        $this->fetchData['RawlistOfAppointment']  = Cache::rememberForever('appointmentList.' . $app->id, function () use ($app,$details) {
-            return app('AppointmentUserService')->listAppointments($app,$details);
+        $this->fetchData['RawlistOfAppointment']  = Cache::rememberForever('appointmentList.' . $app->id, function () use ($app) {
+             $app->update(['updated_log_at' => \now()]);
+            return app('AppointmentUserService')->listAppointments($app);
         });
         $this->fetchData['listOfAppointment'] = $this->listOfAppointment($this->fetchData['RawlistOfAppointment']);
 

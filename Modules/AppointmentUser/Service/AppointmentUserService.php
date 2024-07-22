@@ -5,6 +5,7 @@ namespace Modules\AppointmentUser\Service;
 use App\Event;
 use Carbon\Carbon;
 use App\Models\ShortLink;
+use Illuminate\Support\Facades\Cache;
 use Modules\Service\app\Models\Service;
 use Modules\Setting\Enum\SettingKeyEnum;
 use Modules\Api\Transformers\UserResource;
@@ -88,25 +89,19 @@ class AppointmentUserService
         if (array_key_exists('specialDay', $details)) {
             $specialDaySelected = true;
             $startDate = Carbon::parse($details['specialDay'])->subDays(20);
-            $endDate = $startDate->copy()->addDays(20)->addDays($details['specialDay_endDate'] ?? 60); // Adjust the number of days as needed
+            $endDate = $startDate->copy()->addDays(20)->addDays($details['specialDay_endDate'] ?? 60);
         } elseif (array_key_exists('specialDays', $details)) {
             $startDate = Carbon::parse($details['specialDays'])->subDays(20);
-            $endDate = $startDate->copy()->addDays(20)->addDays($appointmentSetting->max_day_active ?? 90); // Adjust the number of days as needed
+            $endDate = $startDate->copy()->addDays(20)->addDays(90);
         } elseif (array_key_exists('completeDays', $details)) {
             $startDate = Carbon::parse($details['specialDay']);
-            $endDate = $startDate->copy()->addDays($details['numberDays']);
+            $endDate = $startDate->copy()->addDays($details['numberDays'] ?? 90);
         }
 
         if (!$specialDaySelected && !isset($startDate)) {
             $startDate = Carbon::today()->subDays(20);
-            $endDate = Carbon::today()->addDays($appointmentSetting->max_day_active ?? 90); // Adjust the number of days as needed
+            $endDate = Carbon::today()->addDays( 90);
         }
-        // days are loaded from admin panel
-        if (isset($details['admin'])) {
-            $endDate = Carbon::today()->addDays(90);
-        }
-
-
 
         // get holidays
         $holidays = Event::whereBetween('date', [$startDate, $endDate])->where('is_holiday', '1')->get();
@@ -698,6 +693,12 @@ class AppointmentUserService
         // }
 
         event(new StoreAppointmentEvent($appointmentUser));
+
+        Cache::forget('appointmentList.' . $appointmentSetting->id);
+        Cache::rememberForever('appointmentList.' . $appointmentSetting->id, function () use ($appointmentSetting) {
+            $appointmentSetting->update(['updated_log_at' => \now()]);
+            return app('AppointmentUserService')->listAppointments($appointmentSetting);
+        });
 
         return [
             'status' => true,

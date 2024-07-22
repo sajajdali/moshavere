@@ -326,9 +326,11 @@ class AppointmentApiController extends Controller
             ]);
         }
 
-
-        Cache::forget('appointmentList.' . $appointmentSetting->id);
+        if (env('APPOINTMENT_SANDBOX')) {
+            Cache::forget('appointmentList.' . $appointmentSetting->id);
+        }                                                                                      
         $listDays = Cache::rememberForever('appointmentList.' . $appointmentSetting->id, function () use ($appointmentSetting) {
+            $appointmentSetting->update(['updated_log_at' => \now()]);
             return app('AppointmentUserService')->listAppointments($appointmentSetting);
         });
 

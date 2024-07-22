@@ -3,8 +3,9 @@
 namespace App\Console;
 
 use Illuminate\Console\Scheduling\Schedule;
-use Illuminate\Foundation\Console\Kernel as ConsoleKernel;
 use Modules\AppointmentUser\app\Console\MakeCacheCommand;
+use Illuminate\Foundation\Console\Kernel as ConsoleKernel;
+use Modules\AppointmentSetting\App\Console\RenewCacheCommand;
 use Modules\AppointmentUser\app\Console\SendReminderscommand;
 
 class Kernel extends ConsoleKernel
@@ -12,6 +13,7 @@ class Kernel extends ConsoleKernel
     protected $commands = [
         MakeCacheCommand::class ,
         SendReminderscommand::class ,
+        RenewCacheCommand::class ,
     ];
 
     /**
@@ -22,6 +24,7 @@ class Kernel extends ConsoleKernel
         // $schedule->command('inspire')->hourly();
         $schedule->command('appointment:check-deadLine')->hourly();
         $schedule->command('appointment:appointment:sendReminders')->everyFifteenMinutes();
+        $schedule->command('appointmentSetting:renew-cache')->daily();
     }
 
     /**

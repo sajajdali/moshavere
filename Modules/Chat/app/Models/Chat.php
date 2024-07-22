@@ -47,7 +47,7 @@ class Chat extends Model
 
     public static function badgeCount()
     {
-        return 5;
+        return self::whereIn('status',[ChatStatusEnum::JUST_CREATED,ChatStatusEnum::USER_SEND_QUESTION])->count();
     }
 
     protected static function newFactory(): ChatFactory

@@ -131,8 +131,8 @@ class ChatView extends Component
         //get all chats order by type and latest message
         // $chats =   $chats = new Collection();
 
-        $chats = Chat::orderBy('status', 'desc')
-            ->orderByDesc('created_at')->get();
+        $chats = Chat::orderBy('status', 'asc')
+        ->orderBy('created_at')->get();
         return view('chat::livewire.chat-view', compact('chats'));
     }
 }

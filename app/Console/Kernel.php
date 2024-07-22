@@ -5,7 +5,7 @@ namespace App\Console;
 use Illuminate\Console\Scheduling\Schedule;
 use Modules\AppointmentUser\app\Console\MakeCacheCommand;
 use Illuminate\Foundation\Console\Kernel as ConsoleKernel;
-use Modules\AppointmentSetting\App\Console\RenewCacheCommand;
+use Modules\AppointmentSetting\app\Console\RenewCacheCommand;
 use Modules\AppointmentUser\app\Console\SendReminderscommand;
 
 class Kernel extends ConsoleKernel

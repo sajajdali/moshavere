@@ -1,6 +1,6 @@
 <?php
 
-namespace Modules\AppointmentSetting\App\Console;
+namespace Modules\AppointmentSetting\app\Console;
 
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Cache;

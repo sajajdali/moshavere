@@ -18,7 +18,7 @@ use Modules\AppointmentUser\Enum\AppointmentUserStatusEnum;
 use Modules\AppointmentUser\app\Notifications\AppointmentSmsNotification;
 
 class PaymentController extends Controller
-{
+{ 
     use ApiHandlerTrait;
     private $transactionId;
     public function createPaymentLink(AppointmentUser $appointmentUser)

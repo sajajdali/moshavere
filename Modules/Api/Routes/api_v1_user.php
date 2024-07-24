@@ -1,5 +1,6 @@
 <?php
 
+
 /*
 |--------------------------------------------------------------------------
 | API Routes
@@ -47,6 +48,7 @@ Route::prefix('appointment')->group(function () {
     Route::get('list_days', [\Modules\Api\Http\Controllers\Appointment\AppointmentApiController::class, 'listDays'])->name('api.appointment.list_days');
     Route::post('store', [\Modules\Api\Http\Controllers\Appointment\AppointmentApiController::class, 'store'])->name('api.appointment.store');
     Route::get('tracking/{appointmentUser}', [\Modules\Api\Http\Controllers\Appointment\AppointmentApiController::class, 'tracking'])->name('api.appointment.tracking');
+
 
     Route::get('user_info', [\Modules\Api\Http\Controllers\Appointment\AppointmentApiController::class, 'userInfo'])->name('api.user_info');
     //

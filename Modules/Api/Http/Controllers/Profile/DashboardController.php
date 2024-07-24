@@ -62,12 +62,12 @@ class DashboardController extends Controller
         $appointmentOnline = $user->appointments()
             ->whereIn('status' ,[ AppointmentUserStatusEnum::STATUS_SUCCESSFUL , AppointmentUserStatusEnum::STATUS_WAIT_PAYMENT])
             ->where('kind' , AppointmentUserKindEnum::ONLINE)
-            ->whereHas('online' , function (Builder $online) {
-                return $online->whereIn('status' , AppointmentOnlineStatusEnum::showInDashboardApi());
-            })
+            // ->whereHas('online' , function (Builder $online) {
+            //     return $online->whereIn('status' , AppointmentOnlineStatusEnum::showInDashboardApi());
+            // })
             ->orderBy('created_at')
             ->first();
-//        dd($appointmentOnline);
+    //    dd($appointmentOnline);
 
 
         $activeChat = $user->chats()->where('status', '<>', ChatStatusEnum::CLOSED)->where('ban', false)->orderByDesc('id')->first();
@@ -109,7 +109,6 @@ class DashboardController extends Controller
         $kind = $type == "2" ? AppointmentUserKindEnum::ONLINE : AppointmentUserKindEnum::IN_PERSION;
         $user = auth()->user();
         $appointmentListInPerson = $user->appointments()
-            ->whereIn('status' ,[ AppointmentUserStatusEnum::STATUS_SUCCESSFUL ,AppointmentUserStatusEnum::STATUS_ATTENDED , AppointmentUserStatusEnum::STATUS_WAIT_PAYMENT , AppointmentUserStatusEnum::STATUS_NOT_ATTENDED])
             ->where('kind' , $kind->value)
             ->orderByDesc('date_visit')->paginate()
         ;

@@ -5,6 +5,7 @@ namespace Modules\AppointmentUser\Service;
 use App\Event;
 use Carbon\Carbon;
 use App\Models\ShortLink;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Cache;
 use Modules\Service\app\Models\Service;
 use Modules\Setting\Enum\SettingKeyEnum;
@@ -100,7 +101,7 @@ class AppointmentUserService
 
         if (!$specialDaySelected && !isset($startDate)) {
             $startDate = Carbon::today()->subDays(20);
-            $endDate = Carbon::today()->addDays( 90);
+            $endDate = Carbon::today()->addDays(90);
         }
 
         // get holidays
@@ -495,10 +496,7 @@ class AppointmentUserService
 
     private function insertOnlineAppointment(AppointmentUser $appointmentUser): void
     {
-        //        $status = $appointmentUser->details[AppointmentUser::DETAIL_APPOINTMENT_VIA] == AppointmentVia::SELF ? AppointmentOnlineStatusEnum::PENDING : AppointmentOnlineStatusEnum::ACCEPTED;
-        $status = AppointmentOnlineStatusEnum::ACCEPTED; // TODO : Be temporarily active
-
-
+        $status = AppointmentVia::tryFrom($appointmentUser->details[AppointmentUser::DETAIL_APPOINTMENT_VIA]) == AppointmentVia::SELF ? AppointmentOnlineStatusEnum::PENDING : AppointmentOnlineStatusEnum::ACCEPTED;
         $appointmentUser->online()->create([
             'appointment_setting_id' => $appointmentUser->setting->id,
             'user_id' => $appointmentUser->user->id,
@@ -571,12 +569,32 @@ class AppointmentUserService
         $endTime = $appointmentData->endTime ?? $visitDateTime->copy()->addMinutes($appointmentSetting->time_for_visit)->toTimeString();
 
         $status = AppointmentUserStatusEnum::STATUS_SUCCESSFUL;
+
         // check for peyment
         if (
             $appointmentSetting->detail[AppointmentSetting::PAYMENT][AppointmentSetting::STATUS]
             && $appointmentData->appointmentVia == AppointmentVia::SELF
         ) {
-            $status = AppointmentUserStatusEnum::STATUS_WAIT_PAYMENT;
+            if ($appointmentData->kind == AppointmentUserKindEnum::IN_PERSION) {
+                if (
+                    $appointmentSetting->detail[AppointmentSetting::PAYMENT][AppointmentSetting::IN_PERSON][AppointmentSetting::STATUS] == true
+                ) {
+                    $status = AppointmentUserStatusEnum::STATUS_WAIT_PAYMENT;
+                }
+            } elseif ($appointmentData->kind == AppointmentUserKindEnum::ONLINE) {
+
+                if (
+                    $appointmentSetting->detail[AppointmentSetting::PAYMENT][AppointmentSetting::ONLINE][AppointmentSetting::STATUS] == true
+                ) {
+                    $status = AppointmentUserStatusEnum::STATUS_WAIT_PAYMENT;
+                }
+            } elseif ($appointmentData->kind == AppointmentUserKindEnum::VOIP) {
+                if (
+                    $appointmentSetting->detail[AppointmentSetting::PAYMENT][AppointmentSetting::VOIP][AppointmentSetting::STATUS] == true
+                ) {
+                    $status = AppointmentUserStatusEnum::STATUS_WAIT_PAYMENT;
+                }
+            }
         }
 
         //check for monitoring appointment
@@ -608,11 +626,18 @@ class AppointmentUserService
         if ($appointmentData->kind == AppointmentUserKindEnum::ONLINE) {
             $appointmentUserModel['start_time'] = null;
             $appointmentUserModel['end_time'] = null;
-            $appointmentUserModel['status'] =  AppointmentUserStatusEnum::STATUS_PENDING;
+
+            if (
+                $appointmentData->appointmentVia == AppointmentVia::SELF
+                && $appointmentSetting->detail[AppointmentSetting::PAYMENT][AppointmentSetting::ONLINE][AppointmentSetting::STATUS] != true
+            ) {
+                $appointmentUserModel['status'] =  AppointmentUserStatusEnum::STATUS_PENDING;
+            }
         }
         $detailDatabaseDB['payment'] = [
             'status' => false,
         ];
+
         // if set the appointment to be WAIT_FOR_PAYMENT
         if (isset($detail['wait_for_payment'])) {
             $appointmentUserModel['status'] = AppointmentUserStatusEnum::STATUS_WAIT_PAYMENT;
@@ -669,7 +694,7 @@ class AppointmentUserService
 
         // create payment link
         if ($appointmentData->appointmentVia == AppointmentVia::SELF && $paymentstatus['status']) {
-            $paymentLink = route('appointmentUser.payment', $appointmentUser);
+            $paymentLink = route('api.appointment.payment.create', $appointmentUser);
         }
 
         // handel sms
@@ -699,14 +724,14 @@ class AppointmentUserService
             $appointmentSetting->update(['updated_log_at' => \now()]);
             return app('AppointmentUserService')->listAppointments($appointmentSetting);
         });
-
+        $trackingUrl = route('front.setAppointment.detail', ['tracking_code' => $appointmentUser->tracking_code]);
         return [
             'status' => true,
             'message' => 'نوبت با موفقیت برای کاربر ثبت شد',
             'detail' => [
                 'tracking_code' => $appointmentUserModel['tracking_code'],
                 'appointment_user_id' => $appointmentUser->id,
-                'tracking_url' => $appointmentUser->shortLink()->first()->link_url,
+                'tracking_url' => $trackingUrl,
                 'payment_link' => $paymentLink
             ]
         ];

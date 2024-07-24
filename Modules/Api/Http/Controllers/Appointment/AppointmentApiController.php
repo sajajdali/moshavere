@@ -244,7 +244,7 @@ class AppointmentApiController extends Controller
             appointmentVia: AppointmentVia::SELF,
             sendSmsToUser: true,
             serviceId: $request->input('service_id'),
-            placeId: $request->input('place_id'),
+            placeId: $request->input('place_id') ?? $appointmentSetting->user->activePlaces()->first()->id,
             kind: $kind
         );
 
@@ -328,7 +328,7 @@ class AppointmentApiController extends Controller
 
         if (env('APPOINTMENT_SANDBOX')) {
             Cache::forget('appointmentList.' . $appointmentSetting->id);
-        }                                                                                      
+        }
         $listDays = Cache::rememberForever('appointmentList.' . $appointmentSetting->id, function () use ($appointmentSetting) {
             $appointmentSetting->update(['updated_log_at' => \now()]);
             return app('AppointmentUserService')->listAppointments($appointmentSetting);

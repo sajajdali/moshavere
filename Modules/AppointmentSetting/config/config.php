@@ -33,7 +33,7 @@ return [
                 'children' => null
             ],
             [
-                'title' => 'نوبت های آنلاین',
+                'title' => 'نوبت های آنلاین(در انتظار)',
                 'gate' => ['appointment_user.online','appointment_user.own'],
                 'policy_class' => null,
                 'icon' => 'fe fe-wifi',

@@ -186,6 +186,9 @@ Route::get('pp', function () {
 
 Route::get('/notif',function(){
     $user = \Modules\User\Entities\User::find(3);
-    $notify = new \Modules\User\Notifications\UserMessageNotification('های','ممد','ممد');
-        $user->notify($notify);
+        $user->notify(new \Modules\User\Notifications\UserMessageNotification(
+        title: "test title",
+        excerpt: "test excerpt",
+        message: 'test message',
+    ));
 });

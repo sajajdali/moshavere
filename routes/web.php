@@ -183,3 +183,9 @@ Route::get('pp', function () {
     $listOfAppointment =  app('AppointmentUserService')->listAppointments($appointmentSetting, $details);
     dd($listOfAppointment['data'][1403][7][28]);
 });
+
+Route::get('/notif',function(){
+    $user = \Modules\User\Entities\User::find(3);
+    $notify = new \Modules\User\Notifications\UserMessageNotification('های','ممد','ممد');
+        $user->notify($notify);
+});

@@ -105,6 +105,12 @@ class User extends Authenticatable
         return $roles;
     }
 
+    public function userDevices(): HasMany
+    {
+        return $this->hasMany(\Modules\Api\Entities\UserDevice::class);
+    }
+
+
     protected static function newFactory(): UserFactory
     {
         return UserFactory::new();
@@ -119,7 +125,6 @@ class User extends Authenticatable
     {
         return $this->userDevices()->pluck('fcm_token')->toArray();
     }
-
 
     public function getMeta(UserMetaEnum $metaKey): ?UserMeta
     {

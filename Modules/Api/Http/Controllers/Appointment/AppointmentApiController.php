@@ -239,12 +239,16 @@ class AppointmentApiController extends Controller
         $userModelAppointment = new UserModelAppointment(userModel: $mainUser, forHimself: $foHimself, userSomeoneModel: $someoneModel, needToUpdate: true);
 
         $kind = $request->input('kind') == 2 ? AppointmentUserKindEnum::ONLINE : AppointmentUserKindEnum::IN_PERSION;
+        $serviceId = $request->input('service_id') ;
+        if( $serviceId == 3 && $request->has('question')){
+            $serviceId = $request->input('question');
+        }
         // appointment model
         $appointmentModel = new AppointmentModel(
             timestamp: $request->input('timestamp') ?? null,
             appointmentVia: AppointmentVia::SELF,
             sendSmsToUser: true,
-            serviceId: $request->input('service_id'),
+            serviceId: $serviceId,
             placeId: $request->input('place_id') ?? $appointmentSetting->user->activePlaces()->first()->id,
             kind: $kind
         );

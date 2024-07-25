@@ -51,8 +51,8 @@ class ServiceResource extends JsonResource
                 $options = [];
                 foreach ($services as  $service) {
                     $options[] = [
-                        $options['id'] => $service->id,
-                        $options['title'] = $service->title,
+                        'id' => $service->id,
+                        'title' => $service->title,
                     ];
                 }
                 return  [

@@ -18,7 +18,7 @@ class DoctorResource extends JsonResource
             'last_name' => $this->last_name,
             'speciality' => $this->getSpeciality(),
             'avatar' => $this->avatar,
-            'services' => ServiceResource::collection($this->service),
+            'services' => ServiceResource::collection($this->service()->whereNull('parent_id')->get()),
             'check_has_visited_or_not' => true,
             'biography' => $this->drBiography,
             'licenceNumber' => $this->drLicenceNumber,

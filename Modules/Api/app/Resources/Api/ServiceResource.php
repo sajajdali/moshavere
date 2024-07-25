@@ -1,6 +1,7 @@
 <?php
 
 namespace Modules\Api\app\Resources\Api;
+
 use Illuminate\Http\Resources\Json\JsonResource;
 
 class ServiceResource extends JsonResource
@@ -49,7 +50,10 @@ class ServiceResource extends JsonResource
             if (isset($services) && $services->isNotEmpty()) {
                 $options = [];
                 foreach ($services as  $service) {
-                    $options[$service->id] = $service->title;
+                    $options[] = [
+                        $options['id'] => $service->id,
+                        $options['title'] = $service->title,
+                    ];
                 }
                 return  [
                     'question' => 'لطفا بخش مورد نظر خود را انتخاب کنید',

@@ -1,7 +1,6 @@
 <?php
 
 namespace Modules\Api\app\Resources\Api;
-
 use Illuminate\Http\Resources\Json\JsonResource;
 
 class ServiceResource extends JsonResource
@@ -23,9 +22,9 @@ class ServiceResource extends JsonResource
 
     private function questionList()
     {
-        if ($this->id == 1){
+        if ($this->id == 1) {
             return  [
-                'question' => 'در هفته چندم بارداری هستید' ,
+                'question' => 'در هفته چندم بارداری هستید',
                 'options' => [
                     [
                         'id' => 1,
@@ -45,6 +44,18 @@ class ServiceResource extends JsonResource
                     // ],
                 ]
             ];
+        } elseif ($this->id == 3) {
+            $services = \Modules\Service\app\Models\Service::where('parent_id', 3)->get();
+            if (isset($services) && $services->isNotEmpty()) {
+                $options = [];
+                foreach ($services as  $service) {
+                    $options[$service->id] = $service->title;
+                }
+                return  [
+                    'question' => 'لطفا بخش مورد نظر خود را انتخاب کنید',
+                    'options' => $options
+                ];
+            }
         }
         return null;
     }

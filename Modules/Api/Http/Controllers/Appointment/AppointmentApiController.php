@@ -84,7 +84,7 @@ class AppointmentApiController extends Controller
 
     public function services(User $doctor)
     {
-        $services = ServiceResource::collection($doctor->services()->Active()->orderBy('priority')->get());
+        $services = ServiceResource::collection($doctor->services()->whereNull('parent_id')->Active()->orderBy('priority')->get());
 
         return $this->ok(
             [
@@ -300,6 +300,9 @@ class AppointmentApiController extends Controller
                 $appointmentSetting->whereNull('service_id');
             }
         }
+        if ($servicesId ==  3) {
+            $servicesId =  $question;
+        }
 
         $appointmentSetting = $appointmentSetting->first();
 
@@ -354,7 +357,7 @@ class AppointmentApiController extends Controller
                         $conditions['message'] = 'مراجعه کنندگان گرامی ویزیت بارداران فقط تا ۱۲ هفته توسط دکتر امیری انجام میشود . و بعد از آن توسط تیم فوق تخصصی دکتر امیری (دکتر سهامیررضا) انجام میشود.
 ویزیت آخر قبل از سزارین  با دکتر امیری انجام میشود.
 ';
-                        $conditions['alternative_doctor'] = DoctorResource::make(User::whereHas('metas', function ($q) {
+                        $conditions['alternative_doctor'] = DoctorResource::make(User::doctors_query()->whereHas('metas', function ($q) {
                             $q->where([
                                 ['meta_key', UserMetaEnum::FIRST_NAME],
                                 ['meta_value', 'LIKE', "%سها%"]
@@ -375,7 +378,7 @@ class AppointmentApiController extends Controller
 دکتر امیری ویزیت اولیه انجام نمیدهند .
 بررسی های اولیه و آزمایشات لازم زیر نظر دکتر امیری نوشته میشود و شما برای ویزیت های بعدی میتوانید با دکتر امیری نوبت دریافت کنید.
 ';
-                    $conditions['alternative_doctor'] = DoctorResource::make(User::whereHas('metas', function ($q) {
+                    $conditions['alternative_doctor'] = DoctorResource::make(User::doctors_query()->whereHas('metas', function ($q) {
                         $q->where([
                             ['meta_key', UserMetaEnum::FIRST_NAME],
                             ['meta_value', 'LIKE', "%سها%"]

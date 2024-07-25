@@ -2,29 +2,30 @@
 
 namespace Modules\Api\Http\Controllers\Appointment;
 
-use Illuminate\Routing\Controller;
+use Verta;
 use Carbon\Carbon;
-use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
+use Modules\User\Entities\User;
+use Illuminate\Routing\Controller;
+use Modules\User\Enum\UserMetaEnum;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Cache;
-use Modules\Api\app\Http\Requests\Api\Requests\Appointment\StoreAppointmentUserRequest;
-use Modules\Api\app\Resources\Api\Appointments\AppointmentUserResource;
-use Modules\Api\app\Resources\Api\Appointments\DoctorResource;
-use Modules\Api\app\Resources\Api\PlaceResource;
-use Modules\Api\app\Resources\Api\ServiceResource;
 use Modules\Api\Trait\ApiHandlerTrait;
 use Modules\Api\Transformers\UserResource;
-use Modules\AppointmentSetting\app\Models\AppointmentSetting;
-use Modules\AppointmentUser\app\Models\AppointmentUser;
-use Modules\AppointmentUser\Enum\AppointmentUserKindEnum;
+use Modules\Api\app\Resources\Api\PlaceResource;
 use Modules\AppointmentUser\Enum\AppointmentVia;
-use Modules\AppointmentUser\Enum\model\AppointmentModel;
-use Modules\AppointmentUser\Enum\model\BirthdayModel;
 use Modules\AppointmentUser\Enum\model\UserModel;
+use Modules\Api\app\Resources\Api\ServiceResource;
+use Modules\AppointmentUser\Enum\model\BirthdayModel;
+use Modules\AppointmentUser\app\Models\AppointmentUser;
+use Modules\AppointmentUser\Enum\model\AppointmentModel;
+use Modules\AppointmentUser\Enum\AppointmentUserKindEnum;
 use Modules\AppointmentUser\Enum\model\UserModelAppointment;
-use Modules\User\Entities\User;
-use Verta;
+use Modules\AppointmentSetting\app\Models\AppointmentSetting;
+use Modules\Api\app\Resources\Api\Appointments\DoctorResource;
+use Modules\Api\app\Resources\Api\Appointments\AppointmentUserResource;
+use Modules\Api\app\Http\Requests\Api\Requests\Appointment\StoreAppointmentUserRequest;
 
 class AppointmentApiController extends Controller
 {
@@ -353,7 +354,17 @@ class AppointmentApiController extends Controller
                         $conditions['message'] = 'مراجعه کنندگان گرامی ویزیت بارداران فقط تا ۱۲ هفته توسط دکتر امیری انجام میشود . و بعد از آن توسط تیم فوق تخصصی دکتر امیری (دکتر سهامیررضا) انجام میشود.
 ویزیت آخر قبل از سزارین  با دکتر امیری انجام میشود.
 ';
-                        $conditions['alternative_doctor'] = DoctorResource::make(User::find(3));
+                        $conditions['alternative_doctor'] = DoctorResource::make(User::whereHas('metas', function ($q) {
+                            $q->where([
+                                ['meta_key', UserMetaEnum::FIRST_NAME],
+                                ['meta_value', 'LIKE', "%سها%"]
+                            ])->orWhere(function ($query) {
+                                $query->where([
+                                    ['meta_key', UserMetaEnum::LAST_NAME],
+                                    ['meta_value', 'LIKE', "%میررضا%"]
+                                ]);
+                            });
+                        })->first());
                         $conditions['button_text'] = 'انتخاب پزشک دیگر';
                     }
                 }
@@ -364,7 +375,17 @@ class AppointmentApiController extends Controller
 دکتر امیری ویزیت اولیه انجام نمیدهند .
 بررسی های اولیه و آزمایشات لازم زیر نظر دکتر امیری نوشته میشود و شما برای ویزیت های بعدی میتوانید با دکتر امیری نوبت دریافت کنید.
 ';
-                    $conditions['alternative_doctor'] = DoctorResource::make(User::find(3));
+                    $conditions['alternative_doctor'] = DoctorResource::make(User::whereHas('metas', function ($q) {
+                        $q->where([
+                            ['meta_key', UserMetaEnum::FIRST_NAME],
+                            ['meta_value', 'LIKE', "%سها%"]
+                        ])->orWhere(function ($query) {
+                            $query->where([
+                                ['meta_key', UserMetaEnum::LAST_NAME],
+                                ['meta_value', 'LIKE', "%میررضا%"]
+                            ]);
+                        });
+                    })->first());
                     $conditions['button_text'] = 'انتخاب پزشک دیگر';
                 } else {
                     $alert['title'] = 'شما تایید میکنید که قبلا از دکتر امیری نوبت دریافت کرده اید';

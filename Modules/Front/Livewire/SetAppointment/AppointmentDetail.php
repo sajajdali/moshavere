@@ -180,7 +180,7 @@ class AppointmentDetail extends Component
         // Retrieve json format of Redirection (in this case you can handle redirection to bank gateway)
         $p =   Payment::callbackUrl($callbackUrl)->purchase(
             $invoice,
-            function($driver, $transactionId) {
+            function ($driver, $transactionId) {
                 $this->transactionId = $transactionId;
             }
         )->pay()->toJson();
@@ -224,7 +224,7 @@ class AppointmentDetail extends Component
             if (isset($smsTemplate)) {
                 $this->fetchData['app']->notify(new AppointmentSmsNotification($smsTemplate));
             }
-            $this->fetchData['success']  = 'پرداخت باموفقیت انجام شد و نوبت شما فعال شد ' ;
+            $this->fetchData['success']  = 'پرداخت باموفقیت انجام شد و نوبت شما فعال شد ';
             $this->fetchData['app']->transaction->update(['status' => TransactionStatusEnum::SUCCESSFUL]);
             $this->render();
         } catch (InvalidPaymentException $exception) {
@@ -260,6 +260,13 @@ class AppointmentDetail extends Component
             $this->fetchData['navigation'] = "https://maps.google.com/maps?daddr={$latitude},{$longitude}";
         }
         $this->fetchData['authCheck'] = auth()->check();
+        if (request()->has('meg')) {
+            if (request()->get('meg') == 'پرداخت با موفقیت انجام شد') {
+                $this->fetchData['success'] = request()->get('meg');
+            } else {
+                $this->fetchData['alert'] = request()->get('meg');
+            }
+        }
     }
     public function render()
     {

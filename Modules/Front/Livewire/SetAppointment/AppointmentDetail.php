@@ -213,9 +213,9 @@ class AppointmentDetail extends Component
     }
     public function bankCallback()
     {
-        // TODO::test this callback on server
         try {
-            $receipt = Payment::amount($this->fetchData['app']->cost)
+            $amount = $this->fetchData['app']->details[AppointmentUser::DETAIL_PAYMENT][AppointmentUser::DETAIL_PAYMENT_PRICE]['int'] ;
+            $receipt = Payment::amount($amount)
                 ->transactionId($this->fetchData['app']->transaction->detail['transactionId'])->verify();
             $this->fetchData['app']->update([
                 'status' => AppointmentUserStatusEnum::STATUS_SUCCESSFUL
@@ -230,8 +230,6 @@ class AppointmentDetail extends Component
         } catch (InvalidPaymentException $exception) {
             $this->fetchData['alert'] = 'خطا در انجام تراکنش';
             $this->fetchData['app']->transaction->update(['status' => TransactionStatusEnum::REJECTED]);
-
-            // dd($exception->getMessage());
         }
     }
     public function mount()

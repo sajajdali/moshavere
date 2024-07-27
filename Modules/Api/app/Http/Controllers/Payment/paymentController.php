@@ -83,18 +83,12 @@ class PaymentController extends Controller
                 $appointmentUser->notify(new AppointmentSmsNotification($smsTemplate));
             }
             $appointmentUser->transaction->update(['status' => TransactionStatusEnum::SUCCESSFUL]);
-            return $this->ok([
-                'status' => true,
-                'message' => 'پرداخت با موفقیت انجام شد',
-                'user' => UserResource::make($appointmentUser->user),
-            ]);
+            session()->flash('success','پرداخت شما با موفقیت انجام شد');
+            return redirect()->route('front.setAppointment.detail',['tracking_code'=> $appointmentUser->tracking_code]);
         } catch (InvalidPaymentException $exception) {
             $appointmentUser->transaction->update(['status' => TransactionStatusEnum::REJECTED]);
-            return $this->requestException([
-                'status' => false,
-                'message' => 'خطا در انجام تراکنش',
-                'user' => UserResource::make($appointmentUser->user),
-            ]);
+            session()->flash('success','خطا در انجام تراکنش');
+            return redirect()->route('front.setAppointment.detail',['tracking_code'=> $appointmentUser->tracking_code]);
         }
     }
 }

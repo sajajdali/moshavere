@@ -76,6 +76,7 @@ class PaymentController extends Controller
     public function callback(AppointmentUser $appointmentUser, Request $request)
     {
         try {
+            $amount = $appointmentUser->details[AppointmentUser::DETAIL_PAYMENT][AppointmentUser::DETAIL_PAYMENT_PRICE]['int'] ; 
             $receipt = Payment::amount($appointmentUser->cost)
                 ->transactionId($appointmentUser->transaction->detail['transactionId'])->verify();
             $appointmentUser->update([

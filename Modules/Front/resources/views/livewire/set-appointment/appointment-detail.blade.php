@@ -16,9 +16,14 @@
                 @endisset
             </div>
         @endif
-        @if (isset($fetchData['alert']))
+        @if (isset($fetchData['alert']) || session()->has('error'))
             <div class="bg-red text-white text-lg max-w-3xl text-center py-3 px-5 rounded-lg mb-5 mx-auto">
-                {{ $fetchData['alert'] }}
+                @if (session()->has('error'))
+                    {{ session()->get('error') }}
+                @endif
+                @isset($fetchData['alert'])
+                    {{ $fetchData['alert'] }}
+                @endisset
             </div>
         @endif
 
@@ -38,17 +43,19 @@
             @endif
             @if ($fetchData['stauts']['payment'])
                 <section>
-                    <div
-                        class="flex flex-col gap-2 sm:flex-row items-center justify-between bg-red/10 py-3.5 px-4 rounded-2xl mb-4"  style="word-spacing: 0.08rem;">
+                    <div class="flex flex-col gap-2 sm:flex-row items-center justify-between bg-red/10 py-3.5 px-4 rounded-2xl mb-4"
+                        style="word-spacing: 0.08rem;">
                         <img src="{{ front_asset('assets/svg/warning-icon.svg') }}" />
                         <p class="font-bold text-sm px-4 text-gray-700 ">
                             <span>
                                 نوبت شما با موفقیت <span class="text-red">رزرو شد</span>.
-                                برای تایید نوبت باید مبلغ {{ number_format($fetchData['stauts']['price']) }} را به صورت آنلاین پرداخت کنید تا نوبت شما ثبت شود و در صورت عدم
+                                برای تایید نوبت باید مبلغ {{ number_format($fetchData['stauts']['price']) }} را به صورت
+                                آنلاین پرداخت کنید تا نوبت شما ثبت شود و در صورت عدم
                                 پرداخت نوبت شما حذف خواهد شد.
                             </span>
                         </p>
-                        <button type="button" class="font-bold text-red confirm_swal_alert text-sm cancelApp min-w-fit">لغو
+                        <button type="button"
+                            class="font-bold text-red confirm_swal_alert text-sm cancelApp min-w-fit">لغو
                             نوبت</button>
                     </div>
                     <p class="font-bold my-3">

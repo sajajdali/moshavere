@@ -174,13 +174,13 @@ class AppointmentDetail extends Component
         }
         // set the callback URL dynamically
         $callbackUrl = route('front.setAppointment.detail', ['tracking_code' => $this->fetchData['app']->tracking_code, 'call_back' => true]);
-        config(['payment.zarinpal.callbackUrl' => $callbackUrl]);
+        // Config::set('payment.zarinpal.callback_url', $callbackUrl);
 
+        $invoice = (new Invoice)->amount($amount)->via(setting(SettingKeyEnum::PAYMEN_ACTIVE_DRIVER));
         // Retrieve json format of Redirection (in this case you can handle redirection to bank gateway)
-        $p =   Payment::purchase(
-            ($invoce  = new Invoice)->amount($amount),
-            function ($driver, $transactionId) use ($invoce) {
-                $invoce->via(setting(SettingKeyEnum::PAYMEN_ACTIVE_DRIVER));
+        $p =   Payment::callbackUrl($callbackUrl)->purchase(
+            $invoice,
+            function($driver, $transactionId) {
                 $this->transactionId = $transactionId;
             }
         )->pay()->toJson();

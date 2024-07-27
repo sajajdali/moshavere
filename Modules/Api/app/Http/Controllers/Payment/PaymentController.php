@@ -76,8 +76,8 @@ class PaymentController extends Controller
     public function callback(AppointmentUser $appointmentUser, Request $request)
     {
         try {
-            $amount = $appointmentUser->details[AppointmentUser::DETAIL_PAYMENT][AppointmentUser::DETAIL_PAYMENT_PRICE]['int'] ; 
-            $receipt = Payment::amount($appointmentUser->cost)
+            $amount = $appointmentUser->details[AppointmentUser::DETAIL_PAYMENT][AppointmentUser::DETAIL_PAYMENT_PRICE]['int'] ;
+            $receipt = Payment::amount($amount)
                 ->transactionId($appointmentUser->transaction->detail['transactionId'])->verify();
             $appointmentUser->update([
                 'status' => AppointmentUserStatusEnum::STATUS_SUCCESSFUL

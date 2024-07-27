@@ -15,38 +15,49 @@ use Modules\AppointmentUser\app\Models\AppointmentUser;
 use Shetabit\Multipay\Exceptions\InvalidPaymentException;
 use Modules\AppointmentUser\Enum\AppointmentUserStatusEnum;
 use Modules\AppointmentUser\app\Notifications\AppointmentSmsNotification;
+
 class PaymentController extends Controller
 {
     use ApiHandlerTrait;
     private $transactionId;
     public function createPaymentLink(AppointmentUser $appointmentUser)
     {
+        // Extract the necessary details
         $amount = $appointmentUser->details[AppointmentUser::DETAIL_PAYMENT][AppointmentUser::DETAIL_PAYMENT_PRICE]['int'];
         $user = $appointmentUser->user;
         $t_data = [
             'amount' => $amount,
             'user_id' => $user->id,
-            'mobile' =>  $user->mobile,
-            'appointmentUser_id' =>  $appointmentUser->id,
-            'tracking_code' =>  $appointmentUser->tracking_code,
+            'mobile' => $user->mobile,
+            'appointmentUser_id' => $appointmentUser->id,
+            'tracking_code' => $appointmentUser->tracking_code,
         ];
-        // set the callback URL dynamically
-        $callbackUrl = route('api.appointment.payment.callback', ['appointmentUser' => $appointmentUser->id]);
-        config(['payment.zarinpal.callback_url' => $callbackUrl]);
 
-        // Retrieve json format of Redirection (in this case you can handle redirection to bank gateway)
-        $p =   Payment::purchase(
-            ($invoce  = new Invoice)->amount($amount),
-            function ($driver, $transactionId) use ($invoce) {
-                $invoce->via(setting(SettingKeyEnum::PAYMEN_ACTIVE_DRIVER));
+        // Generate the callback URL
+        $callbackUrl = route('api.appointment.payment.callback', ['appointmentUser' => $appointmentUser->id]);
+
+        // Retrieve JSON format of Redirection (handle redirection to bank gateway)
+        $p = Payment::purchase(
+            ($invoice = new Invoice)->amount($amount),
+            function ($driver, $transactionId) use ($invoice, $callbackUrl) {
+                // Set the driver
+                $invoice->via(setting(SettingKeyEnum::PAYMEN_ACTIVE_DRIVER));
+                $invoice->setCallbackUrl($callbackUrl); // Assuming your Invoice model or payment gateway allows setting the callback URL
+
+                // Save the transaction ID
                 $this->transactionId = $transactionId;
             }
         )->pay()->toJson();
+
+        // Update transaction data
         $t_data['detail']['transactionId'] = $this->transactionId;
-        $t_data['detail']['callback'] = $callbackUrl; 
-        
+        $t_data['detail']['callback'] = $callbackUrl;
         $t_data['detail']['driver'] = setting(SettingKeyEnum::PAYMEN_ACTIVE_DRIVER);
+
+        // Create the transaction
         $this->createTransaction($t_data);
+
+        // Redirect to the payment gateway
         return redirect()->to(json_decode($p, true)['action']);
     }
     private function createTransaction($initial_data)
@@ -83,12 +94,12 @@ class PaymentController extends Controller
                 $appointmentUser->notify(new AppointmentSmsNotification($smsTemplate));
             }
             $appointmentUser->transaction->update(['status' => TransactionStatusEnum::SUCCESSFUL]);
-            session()->flash('success','پرداخت شما با موفقیت انجام شد');
-            return redirect()->route('front.setAppointment.detail',['tracking_code'=> $appointmentUser->tracking_code]);
+            session()->flash('success', 'پرداخت شما با موفقیت انجام شد');
+            return redirect()->route('front.setAppointment.detail', ['tracking_code' => $appointmentUser->tracking_code]);
         } catch (InvalidPaymentException $exception) {
             $appointmentUser->transaction->update(['status' => TransactionStatusEnum::REJECTED]);
-            session()->flash('success','خطا در انجام تراکنش');
-            return redirect()->route('front.setAppointment.detail',['tracking_code'=> $appointmentUser->tracking_code]);
+            session()->flash('success', 'خطا در انجام تراکنش');
+            return redirect()->route('front.setAppointment.detail', ['tracking_code' => $appointmentUser->tracking_code]);
         }
     }
 }

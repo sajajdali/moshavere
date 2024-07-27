@@ -1,6 +1,6 @@
 <?php
 
-namespace Modules\Api\app\Http\Controllers\Payment;
+namespace Modules\Api\App\Http\Controllers\Payment;
 
 use Illuminate\Http\Request;
 use Shetabit\Multipay\Invoice;
@@ -8,7 +8,6 @@ use App\Http\Controllers\Controller;
 use Shetabit\Payment\Facade\Payment;
 use Modules\Api\Trait\ApiHandlerTrait;
 use Modules\Setting\Enum\SettingKeyEnum;
-use Modules\Api\Transformers\UserResource;
 use Modules\Transaction\app\Models\Transaction;
 use Modules\Transaction\Enum\TransactionPaidEnum;
 use Modules\Transaction\Enum\TransactionStatusEnum;
@@ -16,7 +15,6 @@ use Modules\AppointmentUser\app\Models\AppointmentUser;
 use Shetabit\Multipay\Exceptions\InvalidPaymentException;
 use Modules\AppointmentUser\Enum\AppointmentUserStatusEnum;
 use Modules\AppointmentUser\app\Notifications\AppointmentSmsNotification;
-
 class PaymentController extends Controller
 {
     use ApiHandlerTrait;

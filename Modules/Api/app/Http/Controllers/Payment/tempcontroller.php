@@ -34,16 +34,17 @@ class PaymentController extends Controller
         ];
         // set the callback URL dynamically
         $callbackUrl = route('api.appointment.payment.callback', ['appointmentUser' => $appointmentUser->id]);
-        Config::set('payment.zarinpal.callback_url', $callbackUrl);
+        // Config::set('payment.zarinpal.callback_url', $callbackUrl);
 
+        $invoice = (new Invoice)->amount($amount)->via(setting(SettingKeyEnum::PAYMEN_ACTIVE_DRIVER));
         // Retrieve json format of Redirection (in this case you can handle redirection to bank gateway)
-        $p =   Payment::purchase(
-            ($invoce  = new Invoice)->amount($amount),
-            function ($driver, $transactionId) use ($invoce) {
-                $invoce->via(setting(SettingKeyEnum::PAYMEN_ACTIVE_DRIVER));
+        $p =   Payment::callbackUrl($callbackUrl)->purchase(
+            $invoice,
+            function($driver, $transactionId) {
                 $this->transactionId = $transactionId;
             }
         )->pay()->toJson();
+
         $t_data['detail']['transactionId'] = $this->transactionId;
         $t_data['detail']['callback'] = $callbackUrl;
 

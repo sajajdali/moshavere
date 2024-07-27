@@ -260,11 +260,11 @@ class AppointmentDetail extends Component
             $this->fetchData['navigation'] = "https://maps.google.com/maps?daddr={$latitude},{$longitude}";
         }
         $this->fetchData['authCheck'] = auth()->check();
-        if (request()->has('meg')) {
-            if (request()->get('meg') == 'پرداخت با موفقیت انجام شد') {
-                $this->fetchData['success'] = request()->get('meg');
+        if (request()->has('msg')) {
+            if (request()->get('msg') == 'پرداخت با موفقیت انجام شد') {
+                $this->fetchData['success'] = request()->get('msg');
             } else {
-                $this->fetchData['alert'] = request()->get('meg');
+                $this->fetchData['alert'] = request()->get('msg');
             }
         }
     }

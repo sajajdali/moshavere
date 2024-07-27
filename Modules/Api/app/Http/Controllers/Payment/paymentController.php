@@ -45,7 +45,8 @@ class PaymentController extends Controller
             }
         )->pay()->toJson();
         $t_data['detail']['transactionId'] = $this->transactionId;
-        $t_data['detail']['callback'] = $callbackUrl;
+        $t_data['detail']['callback'] = $callbackUrl; 
+        
         $t_data['detail']['driver'] = setting(SettingKeyEnum::PAYMEN_ACTIVE_DRIVER);
         $this->createTransaction($t_data);
         return redirect()->to(json_decode($p, true)['action']);

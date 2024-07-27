@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use Shetabit\Multipay\Invoice;
 use App\Http\Controllers\Controller;
 use Shetabit\Payment\Facade\Payment;
+use Illuminate\Support\Facades\Config;
 use Modules\Api\Trait\ApiHandlerTrait;
 use Modules\Setting\Enum\SettingKeyEnum;
 use Modules\Transaction\app\Models\Transaction;
@@ -15,6 +16,7 @@ use Modules\AppointmentUser\app\Models\AppointmentUser;
 use Shetabit\Multipay\Exceptions\InvalidPaymentException;
 use Modules\AppointmentUser\Enum\AppointmentUserStatusEnum;
 use Modules\AppointmentUser\app\Notifications\AppointmentSmsNotification;
+
 class PaymentController extends Controller
 {
     use ApiHandlerTrait;
@@ -32,7 +34,7 @@ class PaymentController extends Controller
         ];
         // set the callback URL dynamically
         $callbackUrl = route('api.appointment.payment.callback', ['appointmentUser' => $appointmentUser->id]);
-        config(['payment.zarinpal.callbackUrl' => $callbackUrl]);
+        Config::set('payment.zarinpal.callback_url', $callbackUrl);
 
         // Retrieve json format of Redirection (in this case you can handle redirection to bank gateway)
         $p =   Payment::purchase(

@@ -13,6 +13,7 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Cache;
 use Modules\Api\Trait\ApiHandlerTrait;
 use Modules\Api\Transformers\UserResource;
+use Modules\Api\Enum\UserVisitedStatusEnum;
 use Modules\Api\app\Resources\Api\PlaceResource;
 use Modules\AppointmentUser\Enum\AppointmentVia;
 use Modules\AppointmentUser\Enum\model\UserModel;
@@ -275,7 +276,7 @@ class AppointmentApiController extends Controller
         $servicesId = $request->get('services_id');
         $kind       = $request->get('kind') ?? 1; // in person or online
         $question  = $request->input('question');
-        $hasVisited = $request->input('has_visited');
+        $hasVisited = \Modules\Api\Enum\UserVisitedStatusEnum::tryFrom($request->input('has_visited'));
 
         $conditions = $alert = null;
 
@@ -347,7 +348,7 @@ class AppointmentApiController extends Controller
         if ($doctorId == 2) {
             // bardari
             if ($servicesId == 1) {
-                if ($hasVisited == 2) {
+                if ($hasVisited == UserVisitedStatusEnum::DOSET_VISITED) {
                     $alert['title'] = 'بسیار مهم';
                     $alert['message'] = 'اولین ویزیت شما در هر هفته از بارداری، توسط دکتر امیری انجام میگردد';
                     $alert['alternative_doctor'] = null;
@@ -373,7 +374,7 @@ class AppointmentApiController extends Controller
                     }
                 }
             } elseif ($servicesId == 2 || $servicesId == 4) {
-                if ($hasVisited == 2) {
+                if ($hasVisited == UserVisitedStatusEnum::DOSET_VISITED) {
                     $conditions['title'] = 'امکان دریافت نوبت با دکتر امیری فراهم نیست';
                     $conditions['message'] = 'مراجعه کننده گرامی  ویزیت اولیه شما توسط تیم فوق تخصصی دکتر امیری انجام میشود.
                                                 بررسی های اولیه و آزمایشات لازم زیر نظر دکتر امیری نوشته میشود و شما برای ویزیت های بعدی میتوانید با دکتر امیری نوبت دریافت کنید.

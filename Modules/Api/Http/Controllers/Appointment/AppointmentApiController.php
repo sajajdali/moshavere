@@ -241,6 +241,9 @@ class AppointmentApiController extends Controller
 
         $kind = $request->input('kind') == 2 ? AppointmentUserKindEnum::ONLINE : AppointmentUserKindEnum::IN_PERSION;
         $serviceId = $request->input('service_id');
+        if ($serviceId == 1 && $request->has('question')) {
+            $serviceId = $request->input('question');
+        }
         if ($serviceId == 3 && $request->has('question')) {
             $serviceId = $request->input('question');
         }

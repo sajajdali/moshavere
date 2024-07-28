@@ -12,6 +12,8 @@ use Modules\User\Enum\UserMetaEnum;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Cache;
 use Modules\Api\Trait\ApiHandlerTrait;
+use Modules\Service\app\Models\Service;
+use Modules\Api\Enum\ServiceQuestionEnum;
 use Modules\Api\Transformers\UserResource;
 use Modules\Api\Enum\UserVisitedStatusEnum;
 use Modules\Api\app\Resources\Api\PlaceResource;
@@ -241,9 +243,16 @@ class AppointmentApiController extends Controller
 
         $kind = $request->input('kind') == 2 ? AppointmentUserKindEnum::ONLINE : AppointmentUserKindEnum::IN_PERSION;
         $serviceId = $request->input('service_id');
+
+        // Pragnency subservice selection
         if ($serviceId == 1 && $request->has('question')) {
-            $serviceId = $request->input('question');
+            $subServiceTitle =   ServiceQuestionEnum::tryFrom($request->input('question'));
+            $service = Service::where('title', 'LIKE', $subServiceTitle->getName())?->first();
+            if (isset($service)) {
+                $serviceId = $service->id;
+            }
         }
+        // zibaii subservice selection 
         if ($serviceId == 3 && $request->has('question')) {
             $serviceId = $request->input('question');
         }

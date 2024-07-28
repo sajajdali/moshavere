@@ -3,6 +3,7 @@
 namespace Modules\Api\app\Resources\Api;
 
 use Modules\Service\app\Models\Service;
+use Modules\Api\Enum\ServiceQuestionEnum;
 use Illuminate\Http\Resources\Json\JsonResource;
 
 class ServiceResource extends JsonResource
@@ -25,41 +26,17 @@ class ServiceResource extends JsonResource
     private function questionList()
     {
         if ($this->id == 1) {
-            $pragnecyService =  Service::firstWhere('title', 'LIKE', '%'.'بارداری' .'%')?->id;
-            if (isset($pragnecyService)) {
-                $preagnencySubServices = Service::where('parent_id', $pragnecyService)->get();
-                $returnService =  [];
-                foreach ($preagnencySubServices as $service) {
-                    $returnService[] = [
-                        'id' => $service->id,
-                        'title' => $service->title,
-                    ];
-                }
-                return  $returnService;
-            } else {
-                // defult
-                return  [
-                    'question' => 'در هفته چندم بارداری هستید',
-                    'options' => [
-                        [
-                            'id' => 1,
-                            'title' => 'هفته 4 تا 12 بارداری',
-                        ],
-                        [
-                            'id' => 2,
-                            'title' => 'هفته ۱۳ تا ۳۵ بارداری'
-                        ],
-                        [
-                            'id' => 3,
-                            'title' => 'هفته ۳۶ تا ۳۸ بارداری'
-                        ],
-                        // [
-                        //     'id' => 5,
-                        //     'title' => 'هفته پنجم بارداری'
-                        // ],
-                    ]
-                ];
-            }
+              $returnService =  [
+                  'question' => 'در هفته چندم بارداری هستید',
+                  'options' => [],
+                  ];
+              foreach (ServiceQuestionEnum::cases() as $questionEnum) {
+                  $returnService['options'][] = [
+                      'id' => $questionEnum->value,
+                      'title' => $questionEnum->getName(),
+                  ];
+              }
+            return $returnService ;
         } elseif ($this->id == 3) {
             $services = \Modules\Service\app\Models\Service::where('parent_id', 3)->get();
             if (isset($services) && $services->isNotEmpty()) {

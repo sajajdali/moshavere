@@ -25,7 +25,7 @@ class ServiceResource extends JsonResource
     private function questionList()
     {
         if ($this->id == 1) {
-            $pragnecyService =  Service::firstWhere('title', 'LIKE', "%{بارداری}%")?->id;
+            $pragnecyService =  Service::firstWhere('title', 'LIKE', '%'.'بارداری' .'%')?->id;
             if (isset($pragnecyService)) {
                 $preagnencySubServices = Service::where('parent_id', $pragnecyService)->get();
                 $returnService =  [];
@@ -37,7 +37,7 @@ class ServiceResource extends JsonResource
                 }
                 return  $returnService;
             } else {
-                // defult 
+                // defult
                 return  [
                     'question' => 'در هفته چندم بارداری هستید',
                     'options' => [
@@ -51,7 +51,7 @@ class ServiceResource extends JsonResource
                         ],
                         [
                             'id' => 3,
-                            'title' => '(هفته ۳۶ تا ۳۸ بارداری(اخرین ویزیت قبل از سزارین'
+                            'title' => 'هفته ۳۶ تا ۳۸ بارداری'
                         ],
                         // [
                         //     'id' => 5,

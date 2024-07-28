@@ -3,6 +3,7 @@
 namespace Modules\AppointmentUser\Traits;
 
 use App\Models\ShortLink;
+use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Cache;
 use Modules\Setting\Enum\SettingKeyEnum;
 use Modules\AppointmentUser\app\Models\AppointmentUser;
@@ -187,5 +188,41 @@ trait OprationButtonsTrait
             $appointmentUser->notify(new AppointmentUserFeedbackSmsnotification($smsTemplate, $link_code));
         }
         Cache::forget('appointmentList.' . $appointmentUser->id);
+    }
+    // TODO :: refund 
+    protected function CancelAndRefoundPayment(AppointmentUser $appointmentUser)
+    {
+        $endpoint = "https://next.zarinpal.com/api/v4/graphql" ;
+        $query = '
+            mutation AddRefund($session_id: ID!, $amount: BigInteger!, $description: String, $reason: RefundReasonEnum) {
+                resource: AddRefund(session_id: $session_id, amount: $amount, description: $description, reason: $reason) {
+                    terminal_id
+                    id
+                    amount
+                    timeline {
+                        refund_amount
+                        refund_time
+                        refund_status
+                    }
+                }
+            }
+        ';
+        $session_id = $appointmentUser->transaciton->detail['transactionId'];
+        $amount     = $appointmentUser->transaciton->total_cost ;
+        $description = 'بازگشت وجه نوبت' . $appointmentUser->id ;
+        $reason     = 'بازگشت وجه نوبت' . $appointmentUser->id ;
+
+        $response = Http::post($endpoint, [
+            'query' => $query,
+            'variables' => [
+                'session_id' => $session_id,
+                'amount' => $amount,
+                'description' => $description,
+                'reason' => $reason,
+            ],
+        ]);
+
+        $response->json();
+
     }
 }

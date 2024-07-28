@@ -239,8 +239,8 @@ class AppointmentApiController extends Controller
         $userModelAppointment = new UserModelAppointment(userModel: $mainUser, forHimself: $foHimself, userSomeoneModel: $someoneModel, needToUpdate: true);
 
         $kind = $request->input('kind') == 2 ? AppointmentUserKindEnum::ONLINE : AppointmentUserKindEnum::IN_PERSION;
-        $serviceId = $request->input('service_id') ;
-        if( $serviceId == 3 && $request->has('question')){
+        $serviceId = $request->input('service_id');
+        if ($serviceId == 3 && $request->has('question')) {
             $serviceId = $request->input('question');
         }
         // appointment model
@@ -317,8 +317,6 @@ class AppointmentApiController extends Controller
             ]);
         }
 
-
-
         if ($kind == AppointmentUserKindEnum::ONLINE->value) {
             return $this->ok([
                 'status' => true,
@@ -326,7 +324,6 @@ class AppointmentApiController extends Controller
                 'appointment_setting_id' => $appointmentSetting->id,
                 'messages' => [
                     'پس از ثبت درخواست امکان آپلود مدارک و طرح سوال فعال میگردد',
-                    'اگر باردار هستید و اولین بار هست که به ما مراجعه میکنید لطفا فرم بارداری رو تکمیل بفرمایید.اگر میخواهید اقدام به بارداری کنید لطفا فرم ویزیت را تکمیل بفرمایید.',
                     'نوبت شما پس از تایید پزشک فعال میشود و در صورت عدم تایید وجه پرداختی عودت داده میشود'
                 ],
                 'first_two_empty' => null,
@@ -356,11 +353,11 @@ class AppointmentApiController extends Controller
                     $alert['alternative_doctor'] = null;
                     $alert['button_text'] = 'تایید میکنم';
                 } else {
-                    if ($question == 2 || $question == 3) {
+                    if ($question == 2) {
                         $conditions['title'] = 'امکان دریافت نوبت با دکتر امیری فراهم نیست';
                         $conditions['message'] = 'مراجعه کنندگان گرامی ویزیت بارداران فقط تا ۱۲ هفته توسط دکتر امیری انجام میشود . و بعد از آن توسط تیم فوق تخصصی دکتر امیری (دکتر سهامیررضا) انجام میشود.
-ویزیت آخر قبل از سزارین  با دکتر امیری انجام میشود.
-';
+                                                    ویزیت آخر قبل از سزارین  با دکتر امیری انجام میشود.
+                                                    ';
                         $conditions['alternative_doctor'] = DoctorResource::make(User::doctors_query()->whereHas('metas', function ($q) {
                             $q->where([
                                 ['meta_key', UserMetaEnum::FIRST_NAME],
@@ -378,10 +375,9 @@ class AppointmentApiController extends Controller
             } elseif ($servicesId == 2 || $servicesId == 4) {
                 if ($hasVisited == 2) {
                     $conditions['title'] = 'امکان دریافت نوبت با دکتر امیری فراهم نیست';
-                    $conditions['message'] = 'مراجعه کننده گرامی شما ویزیت اولیه شما توسط تیم فوق تخصصی دکتر امیری انجام میشود .
-دکتر امیری ویزیت اولیه انجام نمیدهند .
-بررسی های اولیه و آزمایشات لازم زیر نظر دکتر امیری نوشته میشود و شما برای ویزیت های بعدی میتوانید با دکتر امیری نوبت دریافت کنید.
-';
+                    $conditions['message'] = 'مراجعه کننده گرامی  ویزیت اولیه شما توسط تیم فوق تخصصی دکتر امیری انجام میشود.
+                                                بررسی های اولیه و آزمایشات لازم زیر نظر دکتر امیری نوشته میشود و شما برای ویزیت های بعدی میتوانید با دکتر امیری نوبت دریافت کنید.
+                                                ';
                     $conditions['alternative_doctor'] = DoctorResource::make(User::doctors_query()->whereHas('metas', function ($q) {
                         $q->where([
                             ['meta_key', UserMetaEnum::FIRST_NAME],

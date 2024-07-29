@@ -64,6 +64,7 @@ enum SettingKeyEnum: int implements EnumHasNameInterface, SettingTypeInterface, 
     case SMS_DIS_APPROVED_MONITORING_APPOINTMENT = 71;
     case SMS_FEEDBACK = 72;
     case SUPPORT_USER_ROLE = 73;
+    case  SMS_AFTER_REFUND = 74;
 
         //payment
     case PAYMENT_PAYSTAR_STATUS = 152;
@@ -128,6 +129,7 @@ enum SettingKeyEnum: int implements EnumHasNameInterface, SettingTypeInterface, 
             self::SUPPORT_USER_ROLE => 'گروه کاربری پشتیبانان',
             self::SMS_API_LOGIN_TEMPLATE => 'الگو پیامک ورود',
             self::WEIGHT_CHART_DESCRIPTION_APP => 'متن توضیح در صفحه ی مشاهده مودار وزنی ',
+            self::SMS_AFTER_REFUND => 'نام الگوی پیامکی، بعد از استرداد وجه',
 
             //payment
             self::PAYMENT_PAYSTAR_STATUS => 'فعال بودن درگاه پی استار',

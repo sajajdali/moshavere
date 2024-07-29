@@ -189,10 +189,11 @@ trait OprationButtonsTrait
         }
         Cache::forget('appointmentList.' . $appointmentUser->id);
     }
-    // TODO :: refund 
-    protected function CancelAndRefoundPayment(AppointmentUser $appointmentUser)
+    // TODO :: refund
+    protected function refuntPaiedApp($model)
     {
-        $endpoint = "https://next.zarinpal.com/api/v4/graphql" ;
+        $appointmentUser = AppointmentUser::find($model);
+        $endpoint = "https://sandbox.zarinpal.com/api/v4/graphql";
         $query = '
             mutation AddRefund($session_id: ID!, $amount: BigInteger!, $description: String, $reason: RefundReasonEnum) {
                 resource: AddRefund(session_id: $session_id, amount: $amount, description: $description, reason: $reason) {
@@ -207,10 +208,10 @@ trait OprationButtonsTrait
                 }
             }
         ';
-        $session_id = $appointmentUser->transaciton->detail['transactionId'];
-        $amount     = $appointmentUser->transaciton->total_cost ;
-        $description = 'بازگشت وجه نوبت' . $appointmentUser->id ;
-        $reason     = 'بازگشت وجه نوبت' . $appointmentUser->id ;
+        $session_id = $appointmentUser->transaction->detail['transactionId'];
+        $amount     = $appointmentUser->transaction->total_cost;
+        $description = 'بازگشت وجه نوبت' . $appointmentUser->id;
+        $reason     = 'بازگشت وجه نوبت' . $appointmentUser->id;
 
         $response = Http::post($endpoint, [
             'query' => $query,
@@ -221,8 +222,22 @@ trait OprationButtonsTrait
                 'reason' => $reason,
             ],
         ]);
-
-        $response->json();
-
+        if ($response->successful()) {
+            $arr_response = $response->json();
+            if (!empty($arr_response) && isset($arr_response['data']['resource']['amount'])) {
+                $this->cancelAppointment($appointmentUser->id, false);
+                $old_details = $appointmentUser->details;
+                $new_details = array_merge($old_details, ['refund' => $arr_response]);
+                $appointmentUser->update(['details' => $new_details]);
+                $smsTemplate = setting(\Modules\Setting\Enum\SettingKeyEnum::SMS_AFTER_REFUND);
+                if ($smsTemplate) {
+                    $appointmentUser->notify(new AppointmentSmsNotification($smsTemplate));
+                }
+                Cache::forget('appointmentList.' . $appointmentUser->id);
+                $this->redirectToPage('وضعیت نوبت به کاربر حضور پیدا نکرده تغییر کرد');
+            }
+        }else{
+            $this->redirectToPage('خطا');
+        }
     }
 }

@@ -318,7 +318,7 @@ return [
             'zaringateApiPaymentUrl' => 'https://www.zarinpal.com/pg/StartPay/:authority/ZarinGate',
             'zaringateApiVerificationUrl' => 'https://ir.zarinpal.com/pg/services/WebGate/wsdl',
 
-            'mode' => 'sandbox', // can be normal, sandbox, zaringate
+            'mode' => 'normal', // can be normal, sandbox, zaringate
             'merchantId' => 'set dynamicly in AppServiceProvide',
             'callbackUrl' => 'set dynamicly where is used',
             'description' => 'دریافت نوبت',

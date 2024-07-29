@@ -80,6 +80,17 @@
                 به نوبت بین مریض</a>
         </li>
     @endif
+    @if ($ap->status == Modules\AppointmentUser\Enum\AppointmentUserStatusEnum::STATUS_SUCCESSFUL &&
+        $ap->details[\Modules\AppointmentUser\app\Models\AppointmentUser::DETAIL_PAYMENT]['status'])
+        <li>
+            <a data-description="ایا میخواهید مبلغ پرداختی را استرداد کنیید؟" data-title="استرداد وجه"
+                data-confirmbtn="بله" data-action="refundPayment" data-id="{{ $ap->id }}"
+                class="confirm_swal_alert" data-label="استرداد" href="">
+                <i class="fa fa-exchange text-danger" aria-hidden="true"></i>
+                بازگشت وجه نوبت
+                </a>
+        </li>
+    @endif
     <li>
         <a class="confirm_swal_alert" data-label="نوبت" data-description="از کنسل کردن نوبت مطمعن هستید؟"
             data-title="کنسل کردن " data-confirmbtn="بله کنسل شود" data-action="cancelWithSms"

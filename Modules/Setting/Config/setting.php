@@ -18,6 +18,7 @@ return [
             \Modules\Setting\Enum\SettingKeyEnum::SMS_APPROVED_MONITORING_APPOINTMENT,
             \Modules\Setting\Enum\SettingKeyEnum::SMS_DIS_APPROVED_MONITORING_APPOINTMENT,
             \Modules\Setting\Enum\SettingKeyEnum::SMS_FEEDBACK,
+            \Modules\Setting\Enum\SettingKeyEnum::SMS_AFTER_REFUND,
 
         ],
     ],

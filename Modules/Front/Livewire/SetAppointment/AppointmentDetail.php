@@ -177,8 +177,8 @@ class AppointmentDetail extends Component
         // Config::set('payment.zarinpal.callback_url', $callbackUrl);
 
         $invoice = (new Invoice)->amount($amount)->via(setting(SettingKeyEnum::PAYMEN_ACTIVE_DRIVER));
-        // Retrieve json format of Redirection (in this case you can handle redirection to bank gateway)
-        $p =   Payment::callbackUrl($callbackUrl)->purchase(
+        $merchenId = setting(SettingKeyEnum::PAYMENT_ZARINPAL_MERCHENID);
+        $p =  Payment::config(['callbackUrl' => $callbackUrl, 'merchantId' => $merchenId])->purchase(
             $invoice,
             function ($driver, $transactionId) {
                 $this->transactionId = $transactionId;
@@ -214,7 +214,7 @@ class AppointmentDetail extends Component
     public function bankCallback()
     {
         try {
-            $amount = $this->fetchData['app']->details[AppointmentUser::DETAIL_PAYMENT][AppointmentUser::DETAIL_PAYMENT_PRICE]['int'] ;
+            $amount = $this->fetchData['app']->details[AppointmentUser::DETAIL_PAYMENT][AppointmentUser::DETAIL_PAYMENT_PRICE]['int'];
             $receipt = Payment::amount($amount)
                 ->transactionId($this->fetchData['app']->transaction->detail['transactionId'])->verify();
             $this->fetchData['app']->update([

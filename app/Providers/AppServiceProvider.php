@@ -21,9 +21,5 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        // Fetch the Zarinpal merchant ID from the settings
-        $merchantId = setting(SettingKeyEnum::PAYMENT_ZARINPAL_MERCHENID);
-        // Set the Zarinpal merchant ID dynamically
-        Config::set('payment.zarinpal.merchant_id', $merchantId);
     }
 }

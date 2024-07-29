@@ -37,6 +37,7 @@ class PaymentController extends Controller
         // Config::set('payment.zarinpal.callback_url', $callbackUrl);
 
         $invoice = (new Invoice)->amount($amount)->via(setting(SettingKeyEnum::PAYMEN_ACTIVE_DRIVER));
+        $invoice->detail(['description' => 'هزینه ی ویزیت']);
         // Retrieve json format of Redirection (in this case you can handle redirection to bank gateway)
         $merchenId = setting(SettingKeyEnum::PAYMENT_ZARINPAL_MERCHENID);
         $p = Payment::config(['callbackUrl' => $callbackUrl, 'mechandId' => $merchenId])->purchase(
@@ -84,13 +85,8 @@ class PaymentController extends Controller
     {
         try {
             $amount = $appointmentUser->details[AppointmentUser::DETAIL_PAYMENT][AppointmentUser::DETAIL_PAYMENT_PRICE]['int'];
-            // $receipt = Payment::amount($amount)
-            //     ->transactionId($appointmentUser->transaction->detail['transactionId'])->verify();
-
-            $merchenId = setting(SettingKeyEnum::PAYMENT_ZARINPAL_MERCHENID);
-            $p = Payment::config('mechandId', $merchenId)->amount($amount)
-            ->transactionId($appointmentUser->transaction->detail['transactionId'])->verify();
-            
+            $receipt = Payment::amount($amount)
+                ->transactionId($appointmentUser->transaction->detail['transactionId'])->verify();
             $appointmentUser->update([
                 'status' => AppointmentUserStatusEnum::STATUS_SUCCESSFUL
             ]);

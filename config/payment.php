@@ -318,11 +318,11 @@ return [
             'zaringateApiPaymentUrl' => 'https://www.zarinpal.com/pg/StartPay/:authority/ZarinGate',
             'zaringateApiVerificationUrl' => 'https://ir.zarinpal.com/pg/services/WebGate/wsdl',
 
-            'mode' => 'sandbox', // can be normal, sandbox, zaringate
-            'merchantId' => '12b7dd27-0038-4134-9164-15a6ac595d99',
+            'mode' => 'normal', // can be normal, sandbox, zaringate
+            'merchantId' => '',
             'callbackUrl' => 'set dynamicly where is used',
             'description' => 'دریافت نوبت',
-            'currency' => 'T', //Can be R, T (Rial, Toman)
+            'currency' => 'R', //Can be R, T (Rial, Toman)
         ],
         'zibal' => [
             /* normal api */

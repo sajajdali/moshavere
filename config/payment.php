@@ -318,9 +318,9 @@ return [
             'zaringateApiPaymentUrl' => 'https://www.zarinpal.com/pg/StartPay/:authority/ZarinGate',
             'zaringateApiVerificationUrl' => 'https://ir.zarinpal.com/pg/services/WebGate/wsdl',
 
-            'mode' => 'normal', // can be normal, sandbox, zaringate
-            'merchantId' => '',
-            'callbackUrl' => 'set dynamicly where is used',
+            'mode' => 'sandbox', // can be normal, sandbox, zaringate
+            'merchantId' => '', //set dynamicly where is used
+            'callbackUrl' => '', //set dynamicly where is used
             'description' => 'دریافت نوبت',
             'currency' => 'R', //Can be R, T (Rial, Toman)
         ],

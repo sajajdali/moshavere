@@ -193,7 +193,7 @@ trait OprationButtonsTrait
     protected function refuntPaiedApp($model)
     {
         $appointmentUser = AppointmentUser::find($model);
-        $endpoint = "https://sandbox.zarinpal.com/api/v4/graphql";
+        $endpoint = "https://next.zarinpal.com/api/v4/graphql";
         $query = '
             mutation AddRefund($session_id: ID!, $amount: BigInteger!, $description: String, $reason: RefundReasonEnum) {
                 resource: AddRefund(session_id: $session_id, amount: $amount, description: $description, reason: $reason) {
@@ -213,8 +213,13 @@ trait OprationButtonsTrait
         $description = 'بازگشت وجه نوبت' . $appointmentUser->id;
         $reason     = 'بازگشت وجه نوبت' . $appointmentUser->id;
 
-        $response = Http::post($endpoint, [
+        $merchenId  = setting(SettingKeyEnum::PAYMENT_ZARINPAL_MERCHENID);
+        $response = Http::withHeaders([
+            'Accept' => 'application/json',
+            'Authorization' => 'Bearer ' . $merchenId,
+        ])->post('https://next.zarinpal.com/api/v4/graphql/', [
             'query' => $query,
+            'operationName' => 'AddRefund',
             'variables' => [
                 'session_id' => $session_id,
                 'amount' => $amount,
@@ -222,6 +227,7 @@ trait OprationButtonsTrait
                 'reason' => $reason,
             ],
         ]);
+
         if ($response->successful()) {
             $arr_response = $response->json();
             if (!empty($arr_response) && isset($arr_response['data']['resource']['amount'])) {
@@ -237,6 +243,7 @@ trait OprationButtonsTrait
                 $this->redirectToPage('وضعیت نوبت به کاربر حضور پیدا نکرده تغییر کرد');
             }
         }else{
+            dd($response);
             $this->redirectToPage('خطا');
         }
     }

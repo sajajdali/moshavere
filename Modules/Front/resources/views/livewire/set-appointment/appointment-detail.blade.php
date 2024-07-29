@@ -176,7 +176,7 @@
                                 شده</span>
                         @endif
                         @isset($fetchData['returnToApp'])
-                        <a target="blank" href="{{ $fetchData['navigation'] }}"
+                        <a target="blank" href="{{ $fetchData['returnToApp'] }}"
                                     class="bg-rose-500 hover:bg-rose-700 text-white font-bold py-2 px-4 rounded-full">
                                     <span>بازگشت به اپلیکیشن</span>
                                 </a>

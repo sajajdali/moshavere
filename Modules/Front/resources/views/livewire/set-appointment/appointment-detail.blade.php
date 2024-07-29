@@ -168,13 +168,19 @@
             @endif
             @if ($fetchData['app'])
                 <section>
-                    <h3 class="text-sm font-bold mb-4">
+                    <h3 class="text-sm font-bold mb-4 flex justify-between">
                         اطلاعات نوبت شما
                         @if ($this->fetchData['stauts']['enum'] == Modules\AppointmentUser\Enum\AppointmentUserStatusEnum::STATUS_CANCEL)
                             <span
                                 class="inline-flex items-center rounded-md bg-rose-400 px-2 py-1 text-xs font-semibold text-white ring-1 ring-inset ring-gray-500/10 mr-2">کنسل
                                 شده</span>
                         @endif
+                        @isset($fetchData['returnToApp'])
+                        <a target="blank" href="{{ $fetchData['navigation'] }}"
+                                    class="bg-rose-500 hover:bg-rose-700 text-white font-bold py-2 px-4 rounded-full">
+                                    <span>بازگشت به اپلیکیشن</span>
+                                </a>
+                        @endisset
                     </h3>
                     <div class="border-card space-y-4">
                         <div class="flex flex-col md:flex-row items-stretch md:items-start justify-between gap-4">

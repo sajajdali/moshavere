@@ -257,6 +257,10 @@ class AppointmentDetail extends Component
             $this->fetchData['mapUrl'] = "https://www.google.com/maps/embed?pb=!1m14!1m12!1m3!1d642.0232600631508!2d{$longitude}!3d{$latitude}!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!5e0!3m2!1sen!2s!4v1716538755171!5m2!1sen!2s";
             $this->fetchData['navigation'] = "https://maps.google.com/maps?daddr={$latitude},{$longitude}";
         }
+        if(isset($this->fetchData['app']->details[AppointmentUser::STORE_FROM_APPLICATION])){
+            $urlToApplication = 'https://webapp.drmehrnushamiri.com/transaction/show/' . $this->fetchData['app']->transaction->id;
+            $this->fetchData['returnToApp'] = $urlToApplication  ;
+        }
         $this->fetchData['authCheck'] = auth()->check();
         if (request()->has('msg')) {
             if (request()->get('msg') == 'پرداخت با موفقیت انجام شد') {

@@ -262,7 +262,7 @@ class AppointmentApiController extends Controller
             appointmentVia: AppointmentVia::SELF,
             sendSmsToUser: true,
             serviceId: $serviceId,
-            placeId: $request->input('place_id') ?? $appointmentSetting->user->activePlaces()->first()->id,
+            placeId: $request->input('place_id') ?? $appointmentSetting->user->activePlaces()->first()?->id,
             kind: $kind
         );
 

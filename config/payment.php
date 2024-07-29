@@ -322,7 +322,7 @@ return [
             'merchantId' => '12b7dd27-0038-4134-9164-15a6ac595d99',
             'callbackUrl' => 'set dynamicly where is used',
             'description' => 'دریافت نوبت',
-            'currency' => 'R', //Can be R, T (Rial, Toman)
+            'currency' => 'T', //Can be R, T (Rial, Toman)
         ],
         'zibal' => [
             /* normal api */

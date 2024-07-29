@@ -4,6 +4,8 @@ namespace Modules\Api\Entities;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Support\Facades\Mail;
+use Modules\Api\Emails\RegisterMail;
 use Modules\Api\Enum\AuthRequestStatusEnum;
 use Modules\Api\Notifications\AuthSmsNotification;
 use Modules\User\Entities\User;
@@ -99,6 +101,9 @@ class AuthRequest extends Model
         //send notification
         if ($oldRequest->mobile) {
             $oldRequest->notify(new AuthSmsNotification($code));
+        } else {
+            Mail::to($mobileOrEmail)->send(new RegisterMail($code));
+
         }
     }
 

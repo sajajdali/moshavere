@@ -70,6 +70,16 @@ class AuthController extends Controller
     {
 
         $emailOrMobile = $request->input('mobile') ?? $request->input('email'); //input is validated in AuthRequestCode
+
+        $emailOrMobile = convert2english($emailOrMobile);
+        if (filter_var($emailOrMobile, FILTER_VALIDATE_EMAIL)) {
+            $filed = 'mobile';
+        }
+        else if (checkMobileNumber($emailOrMobile)){
+            $filed = 'mobile';
+        } else {
+            return $this->requestException('شماره یا ایمیل وارد شده اشتباه است');
+        }
         //check user can send new request
         if (AuthRequest::canRequest($emailOrMobile)) {
 

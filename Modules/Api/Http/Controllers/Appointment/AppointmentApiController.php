@@ -252,7 +252,7 @@ class AppointmentApiController extends Controller
                 $serviceId = $service->id;
             }
         }
-        // zibaii subservice selection 
+        // zibaii subservice selection
         if ($serviceId == 3 && $request->has('question')) {
             $serviceId = $request->input('question');
         }
@@ -270,6 +270,7 @@ class AppointmentApiController extends Controller
         if ($request->input('question')) {
             $detail[AppointmentUser::DETAIL_QUESTION] = $request->input('question');
         }
+        $detail[AppointmentUser::STORE_FROM_APPLICATION] = true;
         $storeAppointment = app('AppointmentUserService')->storeAppointment($appointmentSetting, $userModelAppointment, $appointmentModel, $detail);
         if (!$storeAppointment['status']) {
             return $this->requestException([

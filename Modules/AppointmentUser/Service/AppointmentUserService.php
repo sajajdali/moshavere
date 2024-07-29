@@ -678,6 +678,11 @@ class AppointmentUserService
             $detailDatabaseDB[AppointmentUser::DETAIL_QUESTION] = $detailAppointment[AppointmentUser::DETAIL_QUESTION];
         }
 
+        $detailDatabaseDB[AppointmentUser::STORE_FROM_APPLICATION] = false;
+        if (isset($detailAppointment[AppointmentUser::STORE_FROM_APPLICATION])) {
+            $detailDatabaseDB[AppointmentUser::STORE_FROM_APPLICATION] = $detailAppointment[AppointmentUser::STORE_FROM_APPLICATION];
+        }
+
         $detailDatabaseDB[AppointmentUser::DETAIL_APPOINTMENT_VIA] = $appointmentData->appointmentVia;
         if (isset($detail['wait_for_payment'])) {
             $detailDatabaseDB[AppointmentUser::PENDING_APPOINTMENT_BY_SECRETERY] = true;

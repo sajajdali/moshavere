@@ -39,19 +39,19 @@ class PaymentController extends Controller
         $invoice = (new Invoice)->amount($amount)->via(setting(SettingKeyEnum::PAYMEN_ACTIVE_DRIVER));
         $invoice->detail(['description' => 'هزینه ی ویزیت']);
         // Retrieve json format of Redirection (in this case you can handle redirection to bank gateway)
-        $merchenId = setting(SettingKeyEnum::PAYMENT_ZARINPAL_MERCHENID);
-        $p = Payment::config(['callbackUrl' => $callbackUrl, 'mechandId' => $merchenId])->purchase(
-            $invoice,
-            function ($driver, $transactionId) {
-                $this->transactionId = $transactionId;
-            }
-        )->pay()->toJson();
-        // $p =   Payment::callbackUrl($callbackUrl)->purchase(
+        // $merchenId = setting(SettingKeyEnum::PAYMENT_ZARINPAL_MERCHENID);
+        // $p = Payment::config(['callbackUrl' => $callbackUrl, 'mechandId' => $merchenId])->purchase(
         //     $invoice,
-        //     function($driver, $transactionId) {
+        //     function ($driver, $transactionId) {
         //         $this->transactionId = $transactionId;
         //     }
         // )->pay()->toJson();
+        $p =   Payment::callbackUrl($callbackUrl)->purchase(
+            $invoice,
+            function($driver, $transactionId) {
+                $this->transactionId = $transactionId;
+            }
+        )->pay()->toJson();
 
         $t_data['detail']['transactionId'] = $this->transactionId;
         $t_data['detail']['callback'] = $callbackUrl;

@@ -381,14 +381,14 @@
                 </div>
             </div>
             <div style="background-color:transparent;">
-                <div class="block-grid" style="Margin: 0 auto; min-width: 320px; max-width: 700px; overflow-wrap: break-word; word-wrap: break-word; word-break: break-word; background-color: #ffd3e0;">
-                    <div style="border-collapse: collapse;display: table;width: 100%;background-color:#ffd3e0;">
+                <div class="block-grid" style="Margin: 0 auto; min-width: 320px; max-width: 700px; overflow-wrap: break-word; word-wrap: break-word; word-break: break-word; background-color: #c8acf6;">
+                    <div style="border-collapse: collapse;display: table;width: 100%;background-color:#c8acf6;">
                         <!--[if (mso)|(IE)]>
                         <table width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color:transparent;">
                             <tr>
                                 <td align="center">
                                     <table cellpadding="0" cellspacing="0" border="0" style="width:700px">
-                                        <tr class="layout-full-width" style="background-color:#ffd3e0">
+                                        <tr class="layout-full-width" style="background-color:#c8acf6">
                         <![endif]-->
                         <!--[if (mso)|(IE)]>
                         <td align="center" width="700" style=";width:700px; border-top: 0px solid transparent; border-left: 0px solid transparent; border-bottom: 0px solid transparent; border-right: 0px solid transparent;" valign="top">

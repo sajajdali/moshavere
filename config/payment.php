@@ -322,7 +322,7 @@ return [
             'merchantId' => 'set dynamicly in AppServiceProvide',
             'callbackUrl' => 'set dynamicly where is used',
             'description' => 'دریافت نوبت',
-            'currency' => 'T', //Can be R, T (Rial, Toman)
+            'currency' => 'R', //Can be R, T (Rial, Toman)
         ],
         'zibal' => [
             /* normal api */

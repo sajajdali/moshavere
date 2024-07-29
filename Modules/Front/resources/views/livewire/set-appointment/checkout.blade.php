@@ -213,7 +213,7 @@
                                         </svg>
                                         <p>مبلغ ویزیت</p>
                                     </div>
-                                    <p>30,000 تومان</p>
+                                    <p>30,000 ریال</p>
                                 </div>
                             @endif
                             @if (isset($fetchData['places']->detial[\Modules\Place\app\Models\Place::DETAIL_ADDRESS]))

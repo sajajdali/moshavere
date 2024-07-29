@@ -105,7 +105,7 @@
                                 <p class="font-bold">
                                     جهت فعالسازی نوبت، مبلغ <s
                                         class="text-rose-500">{{ number_format($fetchData['stauts']['price']) }}</s>
-                                    {{ number_format($fetchData['status']['price_after_discount']) }} تومان پرداخت
+                                    {{ number_format($fetchData['status']['price_after_discount']) }} ریال پرداخت
                                     نمایید
                                     @if (isset($fetchData['payment']['termAndCondition']))
                                         <div class="flex items-center mt-3" wire:ignore>
@@ -123,7 +123,7 @@
                         @else
                             <div>
                                 <p class="font-bold">
-                                    جهت فعالسازی نوبت، مبلغ {{ number_format($fetchData['stauts']['price']) }} تومان
+                                    جهت فعالسازی نوبت، مبلغ {{ number_format($fetchData['stauts']['price']) }} ریال
                                     پرداخت
                                     نمایید
                                 </p>
@@ -280,7 +280,7 @@
                                             data="{{ front_asset('assets/svg/solar_card-outline.svg') }}"></object>
                                         <strong>مبلغ ویزیت:</strong>
                                     </p>
-                                    <p class="mr-2">{{ number_format($fetchData['stauts']['price']) }} تومان</p>
+                                    <p class="mr-2">{{ number_format($fetchData['stauts']['price']) }} ریال</p>
                                 </div>
                             @endif
 
@@ -315,10 +315,10 @@
                                     <p>مبلغ قابل پرداخت</p>
                                     @if (isset($fetchData['status']['price_after_discount']))
                                         <s class="text-rose-500">
-                                            <p>{{ number_format($fetchData['stauts']['price']) }} تومان</p>
+                                            <p>{{ number_format($fetchData['stauts']['price']) }} ریال</p>
                                         </s>
                                     @else
-                                        <p>{{ number_format($fetchData['stauts']['price']) }} تومان</p>
+                                        <p>{{ number_format($fetchData['stauts']['price']) }} ریال</p>
                                     @endif
                                 </div>
                                 @if (isset($fetchData['status']['price_after_discount']))
@@ -326,7 +326,7 @@
                                         <p>
                                             <span>مبلغ بعد از تخفیف</span>
                                         </p>
-                                        <p>{{ number_format($fetchData['status']['price_after_discount']) }} تومان</p>
+                                        <p>{{ number_format($fetchData['status']['price_after_discount']) }} ریال</p>
                                     </div>
                                 @endif
                             </div>

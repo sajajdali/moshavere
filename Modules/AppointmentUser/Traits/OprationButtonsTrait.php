@@ -40,6 +40,7 @@ trait OprationButtonsTrait
         }
 
         Cache::forget('appointmentList.' . $app->setting->id);
+        $this->sendNotification($app,'وضعیت نوبت شما به بین مریض تغییر پیدا کرد');
         event(new CancelAppointmentEvent($app));
         return  $this->redirectToPage('نوبت با موفقیت کنسل شد');
     }
@@ -49,7 +50,6 @@ trait OprationButtonsTrait
         $app = AppointmentUser::find($id);
         $app->delete();
         Cache::forget('appointmentList.' . $app->setting->id);
-        $this->sendNotification($app,'نوبت شما کنسل شد');
         $this->redirectToPage('نوبت با موفقیت حذف شد');
     }
     public function ApprovemonitoringAppointment($id)
@@ -260,7 +260,7 @@ trait OprationButtonsTrait
     private function sendNotification(AppointmentUser $appointmentUser, string $notifMessage)
     {
         if (isset($appointmentUser->details[AppointmentUser::STORE_FROM_APPLICATION]) && $appointmentUser->details[AppointmentUser::STORE_FROM_APPLICATION]) {
-            $this->fetchData['user']->notify(new \Modules\User\Notifications\UserMessageNotification(
+            $appointmentUser->user->notify(new \Modules\User\Notifications\UserMessageNotification(
                 title: "تغییر وضعیت نوبت",
                 excerpt: $notifMessage,
                 message: '',

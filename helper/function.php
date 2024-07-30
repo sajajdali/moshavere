@@ -131,8 +131,10 @@ function chatQuestions()
                             'answer_detail' => [
                                 'title_link' => 'دریافت نوبت آنلاین',
                                 'link' => 'appointment',
-                                'image' => url('storage/help/chat/help.png'),
-                                'video' => url('storage/help/chat/sample.mp4'),
+//                                'image' => url('storage/help/chat/help.png'),
+
+                                'image' => null,
+                                'video' => null,
                                 'show_chat_button' => true,
                                 'call_number' => '+989122978167',
                             ]
@@ -152,7 +154,8 @@ function chatQuestions()
                             'answer_detail' => [
                                 'title_link' => null,
                                 'link' => null,
-                                'image' => url('storage/help/chat/help.png'),
+//                                'image' => url('storage/help/chat/help.png'),
+                                'image' => null,
                                 'video' => null,
                                 'show_chat_button' => true,
                                 'call_number' => '+989122978167',
@@ -175,7 +178,7 @@ function chatQuestions()
                             'answer_detail' => [
                                 'title_link' => null,
                                 'link' => null,
-                                'image' => url('storage/help/chat/help.png'),
+                                'image' =>null,
                                 'video' => null,
                                 'show_chat_button' => true,
                                 'call_number' => '+989122978167',
@@ -274,7 +277,7 @@ function chatQuestions()
                                 'title_link' => null,
                                 'link' => null,
                                 'image' => null,
-                                'video' => url('storage/help/chat/sample.mp4'),
+                                'video' => null,
                                 'show_chat_button' => true,
                                 'call_number' => '+989122978167',
                             ],
@@ -317,7 +320,7 @@ function chatQuestions()
                             'answer_detail' => [
                                 'title_link' => null,
                                 'link' => null,
-                                'image' => url('storage/help/chat/help.png'),
+                                'image' => null,
                                 'video' => null,
                                 'show_chat_button' => true,
                                 'call_number' => '+989122978167',
@@ -395,7 +398,7 @@ function chatQuestions()
                             'answer_detail' => [
                                 'title_link' => 'ورود به نوبت های من',
                                 'link' => 'appointment_lists',
-                                'image' => url('storage/help/chat/help.png'),
+                                'image' => null,
                                 'video' => null,
                                 'show_chat_button' => true,
                                 'call_number' => '+989122978167',

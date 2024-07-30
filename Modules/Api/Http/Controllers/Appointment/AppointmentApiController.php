@@ -370,8 +370,7 @@ class AppointmentApiController extends Controller
                     if ($question == 2) {
                         $conditions['title'] = 'امکان دریافت نوبت با دکتر امیری فراهم نیست';
                         $conditions['message'] = 'مراجعه کنندگان گرامی ویزیت بارداران فقط تا ۱۲ هفته توسط دکتر امیری انجام میشود . و بعد از آن توسط تیم فوق تخصصی دکتر امیری (دکتر سهامیررضا) انجام میشود.
-                                                    ویزیت آخر قبل از سزارین  با دکتر امیری انجام میشود.
-                                                    ';
+ویزیت آخر قبل از سزارین  با دکتر امیری انجام میشود. ';
                         $conditions['alternative_doctor'] = DoctorResource::make(User::doctors_query()->whereHas('metas', function ($q) {
                             $q->where([
                                 ['meta_key', UserMetaEnum::FIRST_NAME],
@@ -390,8 +389,7 @@ class AppointmentApiController extends Controller
                 if ($hasVisited == UserVisitedStatusEnum::DOSET_VISITED) {
                     $conditions['title'] = 'امکان دریافت نوبت با دکتر امیری فراهم نیست';
                     $conditions['message'] = 'مراجعه کننده گرامی  ویزیت اولیه شما توسط تیم فوق تخصصی دکتر امیری انجام میشود.
-                                                بررسی های اولیه و آزمایشات لازم زیر نظر دکتر امیری نوشته میشود و شما برای ویزیت های بعدی میتوانید با دکتر امیری نوبت دریافت کنید.
-                                                ';
+بررسی های اولیه و آزمایشات لازم زیر نظر دکتر امیری نوشته میشود و شما برای ویزیت های بعدی میتوانید با دکتر امیری نوبت دریافت کنید.';
                     $conditions['alternative_doctor'] = DoctorResource::make(User::doctors_query()->whereHas('metas', function ($q) {
                         $q->where([
                             ['meta_key', UserMetaEnum::FIRST_NAME],

@@ -25,6 +25,7 @@ trait OprationButtonsTrait
         $app = AppointmentUser::find($id);
         $app->update(['type' =>  AppointmentUserTypeEnum::BETWEEN_PATIENTS]);
         Cache::forget('appointmentList.' . $app->setting->id);
+        $this->sendNotification($app,'وضعیت نوبت شما به بین مریض تغییر پیدا کرد');
         return  $this->redirectToPage('نوبت به بین مریض تغییر پیدا کرد');
     }
     public function cancelAppointment($id, $sendSmsStatus)
@@ -48,6 +49,7 @@ trait OprationButtonsTrait
         $app = AppointmentUser::find($id);
         $app->delete();
         Cache::forget('appointmentList.' . $app->setting->id);
+        $this->sendNotification($app,'نوبت شما کنسل شد');
         $this->redirectToPage('نوبت با موفقیت حذف شد');
     }
     public function ApprovemonitoringAppointment($id)
@@ -58,6 +60,7 @@ trait OprationButtonsTrait
         $app->update(['status' => AppointmentUserStatusEnum::STATUS_WAIT_PAYMENT, 'deadline_at' => $Appoointment_dedLine]);
         $app->notify(new AppointmentSmsNotification(setting(SettingKeyEnum::SMS_APPROVED_MONITORING_APPOINTMENT)));
         Cache::forget('appointmentList.' . $app->setting->id);
+        $this->sendNotification($app,'نوبت شما تایید شد');
         $this->redirectToPage('نوبت با موفقیت تایید شد');
     }
     public function disApprovemonitoringAppointment($id)
@@ -91,13 +94,16 @@ trait OprationButtonsTrait
         $onlineApp?->update(['status' => AppointmentOnlineStatusEnum::ACCEPTED, 'details' => $detail]);
         $app->update(['status' => AppointmentUserStatusEnum::STATUS_SUCCESSFUL]);
         Cache::forget('appointmentList.' . $app->setting->id);
+        $this->sendNotification($app,'نوبت شما تایید شد');
         $this->redirectToPage('نوبت با موفقیت تایید شد');
     }
     public function disApproveOnlineAppointment($id)
     {
+        $appointmentUser = AppointmentUser::find($id);
         $this->fetchData['disapproveId'] = $id;
         $this->dispatch('lunchModal', true);
-        Cache::forget('appointmentList.' . $app->setting->id);
+
+        Cache::forget('appointmentList.' . $appointmentUser->setting->id);
     }
     public function disaprovedModal()
     {
@@ -135,6 +141,7 @@ trait OprationButtonsTrait
         $app = AppointmentUser::find($id);
         $date = verta($app->date_visit)->format('Y-m-d');
         Cache::forget('appointmentList.' . $app->setting->id);
+        $this->sendNotification($app,'ساعت نوبت شما تغییر کرده است');
         return redirect()->route(
             'admin.appointment.add.specificday',
             [
@@ -145,6 +152,7 @@ trait OprationButtonsTrait
                 'tracking_code' => $app->tracking_code
             ]
         );
+
     }
     public function userAttenedToAppointment(AppointmentUser $appointmentUser)
     {
@@ -154,7 +162,7 @@ trait OprationButtonsTrait
         if (isset($feddBack)) {
             $appointmentUser->notify(new AppointmentSmsNotification($feddBack));
         }
-        Cache::forget('appointmentList.' . $app->setting->id);
+        Cache::forget('appointmentList.' . $appointmentUser->setting->id);
         $this->redirectToPage('وضعیت نوبت به کاربر حضور پیدا کرده تغییر کرد');
     }
     public function userNotAttenedToAppointment(AppointmentUser $appointmentUser)
@@ -172,7 +180,7 @@ trait OprationButtonsTrait
         } else {
             $new_details = $user_attended;
         }
-        Cache::forget('appointmentList.' . $app->setting->id);
+        Cache::forget('appointmentList.' . $appointmentUser->setting->id);
         $appointmentUser->update(['details' => $new_details]);
     }
     protected function sendfeedBackLink(AppointmentUser $appointmentUser)
@@ -192,6 +200,7 @@ trait OprationButtonsTrait
     // TODO :: refund
     protected function refuntPaiedApp($model)
     {
+        // TODO::this isnt working
         $appointmentUser = AppointmentUser::find($model);
         $endpoint = "https://next.zarinpal.com/api/v4/graphql";
         $query = '
@@ -242,9 +251,20 @@ trait OprationButtonsTrait
                 Cache::forget('appointmentList.' . $appointmentUser->id);
                 $this->redirectToPage('وضعیت نوبت به کاربر حضور پیدا نکرده تغییر کرد');
             }
-        }else{
-            dd($response);
+            $this->sendNotification($appointmentUser,'وجه پرداختی به جساب شما بازگشت داده شد');
+        } else {
             $this->redirectToPage('خطا');
+        }
+    }
+
+    private function sendNotification(AppointmentUser $appointmentUser, string $notifMessage)
+    {
+        if (isset($appointmentUser->details[AppointmentUser::STORE_FROM_APPLICATION]) && $appointmentUser->details[AppointmentUser::STORE_FROM_APPLICATION]) {
+            $this->fetchData['user']->notify(new \Modules\User\Notifications\UserMessageNotification(
+                title: "تغییر وضعیت نوبت",
+                excerpt: $notifMessage,
+                message: '',
+            ));
         }
     }
 }

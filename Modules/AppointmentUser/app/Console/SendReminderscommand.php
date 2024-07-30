@@ -65,10 +65,9 @@ class SendReminderscommand extends Command
         AppointmentReminder::where('type', '2')
             ->where('send_at', '<', \now()->subhours(4))
             ->delete();
-        // $notifReminders =  AppointmentReminder::where('type', '2')
-        //     ->where('send_at', '<', now())
-        //     ->get();
-        $notifReminders =  AppointmentReminder::get();
+        $notifReminders =  AppointmentReminder::where('type', '2')
+            ->where('send_at', '<', now())
+            ->get();
         if (isset($notifReminders) && $notifReminders->isNotEmpty()) {
             foreach ($notifReminders as $notifReminder) {
                 if ($notifReminder->reminder->status == ReminderStatusEnum::NOTIFICATION && $notifReminder->reminder->active) {
@@ -79,7 +78,6 @@ class SendReminderscommand extends Command
                             $sendParameter[] = ReminderParametersEnum::tryFrom($p);
                         }
                     }
-                    // $notifReminder->reminder->body, $sendParameter ;
                     if (isset($sendParameter)) {
                         $assignEachParameter =  $this->findPrameterEnum($sendParameter,$notifReminder);
                     }
@@ -90,7 +88,7 @@ class SendReminderscommand extends Command
                         excerpt: $message,
                         message: '',
                     ));
-                    // $notifReminder->delete();
+                    $notifReminder->delete();
                 }
             }
         }

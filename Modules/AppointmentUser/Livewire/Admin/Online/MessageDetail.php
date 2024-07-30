@@ -122,8 +122,8 @@ class MessageDetail extends Component
         $this->addError('success', 'پیام با موفقیت ارسال شد');
         $this->fetchData['user']->notify(new \Modules\User\Notifications\UserMessageNotification(
             title: "پیام جدید",
-            excerpt: "test excerpt",
-            message: 'در نوبت آنلاین یک پیام جدید برای شما ارسال شده است',
+            excerpt: "یک پیام جدید دارید!",
+            message: '',
         ));
         $this->fetchData['messages'] = $this->fetchData['appOnline']->messages;
         $this->dispatch('sendMessage', true);

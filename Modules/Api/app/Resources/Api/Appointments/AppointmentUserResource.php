@@ -78,7 +78,7 @@ class AppointmentUserResource extends JsonResource
             $lastName = $this->details[AppointmentUser::DETAIL_SOMEONE]['last_name'];
             $someoneName = "($firstName $lastName)";
         }
-        return [
+        $result = [
             'id' => $this->id,
             'service' => $this->getServiceName(),
             'badge' => $this->getBadge(),
@@ -102,7 +102,18 @@ class AppointmentUserResource extends JsonResource
             'payment_link' =>  route('api.appointment.payment.create', $this),
             'tracking_url' => route('front.setAppointment.detail', ['tracking_code' => $this->tracking_code]),
             'location_link' => 'https://www.google.com/maps/place/Dr+Mehrnoush+Amiri+Siyavashani/@35.7989335,51.4732843,15z/data=!4m2!3m1!1s0x0:0xd520695f679116d1?sa=X&ved=1t:2428&ictx=111',
-            'online' => $this->online()
+            'online' => $this->online() ,
+
         ];
+        if ($this->kind == AppointmentUserKindEnum::IN_PERSION) {
+            $result['message'] =[
+                'type' => 'warning' ,
+                'title' => 'نکته مهم',
+                'body' => 'کاربر محترم، توجه داشته باشید که در ساعت مورد نظر که اعلام شده است حضور داشته باشید. در صورت عدم حضور به‌موقع نوبت شما لغو می‌گردد.'
+            ];
+        } else {
+            $result['message'] = null;
+        }
+        return $result;
     }
 }

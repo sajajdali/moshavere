@@ -123,7 +123,7 @@ class User extends Authenticatable
      */
     public function routeNotificationForFcm(): array|string
     {
-        return $this->userDevices()->pluck('fcm_token')->toArray();
+        return $this->userDevices()->whereNotNull('fcm_token')->pluck('fcm_token')->toArray();
     }
 
     public function getMeta(UserMetaEnum $metaKey): ?UserMeta

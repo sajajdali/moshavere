@@ -120,6 +120,11 @@ class MessageDetail extends Component
         }
         unset($this->form['typedMessage']);
         $this->addError('success', 'پیام با موفقیت ارسال شد');
+        $this->fetchData['user']->notify(new \Modules\User\Notifications\UserMessageNotification(
+            title: "پیام جدید",
+            excerpt: "test excerpt",
+            message: 'در نوبت آنلاین یک پیام جدید برای شما ارسال شده است',
+        ));
         $this->fetchData['messages'] = $this->fetchData['appOnline']->messages;
         $this->dispatch('sendMessage', true);
     }
@@ -148,25 +153,27 @@ class MessageDetail extends Component
             unset($this->form['reason']);
         }
     }
-    public function approvedAppointment(){
-        $this->fetchData['appOnline']->appointmentUser()->update(['status' => AppointmentOnlineStatusEnum::ACCEPTED]) ;
-        $this->fetchData['appOnline']->update(['status' => AppointmentOnlineStatusEnum::ACCEPTED]) ;
-        return redirect()->route('admin.appointment_user.message.detail',$this->fetchData['appOnline']->id);
+    public function approvedAppointment()
+    {
+        $this->fetchData['appOnline']->appointmentUser()->update(['status' => AppointmentOnlineStatusEnum::ACCEPTED]);
+        $this->fetchData['appOnline']->update(['status' => AppointmentOnlineStatusEnum::ACCEPTED]);
+        return redirect()->route('admin.appointment_user.message.detail', $this->fetchData['appOnline']->id);
     }
-    public function disaprovedModal() {
+    public function disaprovedModal()
+    {
 
         if (isset($this->form['reason'])) {
-           $detail =  $this->fetchData['appOnline']->appointmentUser->details ;
+            $detail =  $this->fetchData['appOnline']->appointmentUser->details;
             if (isset($detail)) {
                 $detail = array_merge($detail, [AppointmentUser::DISAPPROVED_DESCRIPTION => $this->form['reason']]);
             } else {
                 $detail = [AppointmentUser::DISAPPROVED_DESCRIPTION => $this->form['reason']];
             }
         }
-        $this->fetchData['appOnline']->appointmentUser()->update(['status' => AppointmentUserStatusEnum::STATUS_CANCEL]) ;
+        $this->fetchData['appOnline']->appointmentUser()->update(['status' => AppointmentUserStatusEnum::STATUS_CANCEL]);
         $this->fetchData['appOnline']->update(['status' => AppointmentOnlineStatusEnum::REJECT]);
 
-        return redirect()->route('admin.appointment_user.message.detail',$this->fetchData['appOnline']->id);
+        return redirect()->route('admin.appointment_user.message.detail', $this->fetchData['appOnline']->id);
     }
     public function mount()
     {

@@ -47,21 +47,21 @@ class AppointmentSmsReminder extends Notification
     public function toArray($notifiable): array
     {
 
-  $assignEachParameter = [];
-   if( isset($this->params) ){
-        foreach ($this->params as $key => $eachPram) {
-           $assignEachParameter[]=  match ($eachPram) {
-                ReminderParametersEnum::FIRST_NAME      => $notifiable->user->first_name ,
-                ReminderParametersEnum::LAST_NAME       => $notifiable->user->last_name ,
-                ReminderParametersEnum::VISIT_DATE      => verta($notifiable->date_visit)->format('Y/m/d') ,
-                ReminderParametersEnum::VISIT_TIME      => verta($notifiable->date_visit)->format('H:i') ,
-                ReminderParametersEnum::SERVICE_NAME    => $notifiable->service->title ,
-                ReminderParametersEnum::DOCTOR_NAME     => $notifiable->doctor->fullName ,
-                ReminderParametersEnum::LINK            => url('/s/' . $notifiable->shortLink->link_code) ,
-                default => '',
-            };
+        $assignEachParameter = [];
+        if (isset($this->params)) {
+            foreach ($this->params as $key => $eachPram) {
+                $assignEachParameter[] =  match ($eachPram) {
+                    ReminderParametersEnum::FIRST_NAME      => $notifiable->user->first_name,
+                    ReminderParametersEnum::LAST_NAME       => $notifiable->user->last_name,
+                    ReminderParametersEnum::VISIT_DATE      => verta($notifiable->date_visit)->format('Y/m/d'),
+                    ReminderParametersEnum::VISIT_TIME      => verta($notifiable->date_visit)->format('H:i'),
+                    ReminderParametersEnum::SERVICE_NAME    => $notifiable->service->title,
+                    ReminderParametersEnum::DOCTOR_NAME     => $notifiable->doctor->fullName,
+                    ReminderParametersEnum::LINK            => url('/s/' . $notifiable->shortLink->link_code),
+                    default => '',
+                };
+            }
         }
-    }
 
         return [
             'template' => $this->template,

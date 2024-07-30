@@ -19,7 +19,7 @@ class UserMessageNotification extends Notification
      *
      * @return void
      */
-    public function __construct(public string $title, public string $excerpt, public string $message)
+    public function __construct(public string $title, public string $excerpt, public string $message,public mixed $params = null)
     {
     }
 

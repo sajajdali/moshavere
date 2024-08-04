@@ -1,6 +1,6 @@
 <?php
 
-use Modules\Front\Enum\FeedbackId;
+use Modules\Front\enum\FeedbackId;
 
 function getCurrentSeason()
 {

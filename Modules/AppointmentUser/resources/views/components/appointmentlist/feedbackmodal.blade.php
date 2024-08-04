@@ -13,11 +13,11 @@
                             <div class="card">
                                 <div class="card-header">
                                     <p>
-                                        {{ Modules\Front\Enum\FeedbackId::tryFrom($feedback->question)->getQuestion() }}</p>
+                                        {{ Modules\Front\enum\FeedbackId::tryFrom($feedback->question)->getQuestion() }}</p>
 
                                 </div>
                                 <div class="card-body">
-                                    <p>{{ Modules\Front\Enum\FeedbackId::tryFrom($feedback->question)->getQuestionChoises()[$feedback->answer] }}
+                                    <p>{{ Modules\Front\enum\FeedbackId::tryFrom($feedback->question)->getQuestionChoises()[$feedback->answer] }}
                                 </div>
                             </div>
                             @if (! $loop->last)

@@ -17,7 +17,20 @@ enum AppintmentSettingDayNumber: int implements EnumHasDefaultInterface
     {
         return self::SATURDAY;
     }
-    public static function getConstant(string $name): ?AppintmentSettingDayNumber {
+    public static function shortNameForDayTonumber($shortName)
+    {
+        return match ($shortName) {
+            'sat'           => self::SATURDAY,
+            'sun'           => self::SUNDAY,
+            'mon'           => self::MONDAY,
+            'tue'           => self::TUESDAY,
+            'wed'           => self::WEDNESDAY,
+            'thu'           => self::THURSDAY,
+            'fri'           => self::FRIDAY,
+        };
+    }
+    public static function getConstant(string $name): ?AppintmentSettingDayNumber
+    {
         switch ($name) {
             case 'saturday':
                 return self::SATURDAY;

@@ -33,6 +33,7 @@
                                     </tr>
                                 </thead>
                                 <tbody>
+                                @if(!  empty($this->GeneralTimes()))
                                     @foreach ($this->GeneralTimes() as $appsetting)
                                         @if (count($appsetting) > 1)
                                             <tr>
@@ -62,6 +63,7 @@
                                             </tr>
                                         @endif
                                     @endforeach
+                                @endif
                                 </tbody>
                             </table>
                         </div>
@@ -84,12 +86,12 @@
                 <p class="text-muted ">در این قسمت بخش هایی که دارای ساعت و روز اختصاصی میباشد نمایش داده می شود.</p>
                 @if ($fetchData['SpecialAppointmentSetting']->isNotEmpty())
                     @foreach ($fetchData['SpecialAppointmentSetting'] as $key => $specialAppSetting)
-                        <div aria-multiselectable="true" class="accordion"
+                        <div aria-multiselectable="true" class="accordion my-2"
                             id="special_accordion-{{ $specialAppSetting->id }}" role="tablist">
                             <div class="card mb-0 border-0">
                                 <div class="card-header border-bottom-0" id="headingOne" role="tab">
-                                    <a aria-controls="collapsetree" aria-expanded="true" data-bs-toggle="collapse"
-                                        href="#collapsetree"
+                                    <a aria-controls="collapsetree-{{$key}}" aria-expanded="true" data-bs-toggle="collapse"
+                                        href="#collapsetree-{{$key}}"
                                         class="accor-basic d-flex flex-column flex-sm-row justify-content-between">
                                         <span> {{ $specialAppSetting->service->title }}</span>
                                         <div>
@@ -111,7 +113,7 @@
                                     </a>
                                 </div>
                                 <div aria-labelledby="headingOne" class="collapse"
-                                    data-bs-parent="#special_accordion-{{ $specialAppSetting->id }}" id="collapsetree"
+                                    data-bs-parent="#special_accordion-{{ $specialAppSetting->id }}" id="collapsetree-{{$key}}"
                                     role="tabpanel">
                                     <div class="card-body br-bottom-radius-5">
                                         <div class="table-responsive ">

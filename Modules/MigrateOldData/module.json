@@ -1,0 +1,11 @@
+{
+    "name": "MigrateOldData",
+    "alias": "migrateolddata",
+    "description": "",
+    "keywords": [],
+    "priority": 0,
+    "providers": [
+        "Modules\\MigrateOldData\\App\\Providers\\MigrateOldDataServiceProvider"
+    ],
+    "files": []
+}

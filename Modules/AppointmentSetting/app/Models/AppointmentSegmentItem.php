@@ -15,4 +15,9 @@ class AppointmentSegmentItem extends Model
      */
     protected $guarded = ['id'];
 
+    public static function maxPriority(): int
+    {
+        return self::max('priority') + 1;
+    }
+
 }

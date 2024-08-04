@@ -48,5 +48,5 @@ Route::middleware(['web', 'auth'])->name('front.')->group(function () {
     Route::get('/logout', Logout::class)->name('logout');
     Route::get('/registration', Registration::class)->middleware('throttle:20,1')->name('user.registration');
     Route::get('/profile', UserProfileLivewire::class)->middleware('throttle:20,1')->name('user.profile');
-    Route::get('appintment/feedBack/{appointmentUser_id}', Questions::class)->middleware('throttle:20,1')->name('front.feedBack');
+    Route::get('appintment/feedBack/{appointmentUser_id}', Questions::class)->middleware('throttle:20,1')->name('feedBack');
 });

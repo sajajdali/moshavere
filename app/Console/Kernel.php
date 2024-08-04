@@ -3,10 +3,18 @@
 namespace App\Console;
 
 use Illuminate\Console\Scheduling\Schedule;
+use Modules\MigrateOldData\App\Console\MigrateAllOrders;
 use Modules\AppointmentUser\app\Console\MakeCacheCommand;
 use Illuminate\Foundation\Console\Kernel as ConsoleKernel;
+use Modules\MigrateOldData\App\Console\MigrateUsersCommand;
+use Modules\MigrateOldData\App\Console\MigratePlacesCommand;
 use Modules\AppointmentSetting\app\Console\RenewCacheCommand;
 use Modules\AppointmentUser\app\Console\SendReminderscommand;
+use Modules\MigrateOldData\App\Console\MigrateServiceseCommand;
+use Modules\MigrateOldData\App\Console\MigratePlaceUsersCommand;
+use Modules\MigrateOldData\App\Console\MigrateAppointmentSetting;
+use Modules\MigrateOldData\App\Console\MigrateServiceUserCommand;
+use Modules\MigrateOldData\App\Console\MigrateSpecialiteiesCommand;
 
 class Kernel extends ConsoleKernel
 {
@@ -14,6 +22,14 @@ class Kernel extends ConsoleKernel
         MakeCacheCommand::class ,
         SendReminderscommand::class ,
         RenewCacheCommand::class ,
+        MigrateAllOrders::class ,
+        MigratePlacesCommand::class ,
+        MigratePlaceUsersCommand::class ,
+        MigrateServiceseCommand::class ,
+        MigrateServiceUserCommand::class ,
+        MigrateSpecialiteiesCommand::class ,
+        MigrateUsersCommand::class ,
+        MigrateAppointmentSetting::class ,
     ];
 
     /**

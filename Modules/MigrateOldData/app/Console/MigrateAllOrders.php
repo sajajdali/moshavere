@@ -34,12 +34,13 @@ class MigrateAllOrders extends Command
           // List of commands to run
           $commands = [
             // 'migrateData:user',
+            'migrateData:userMetas',
             // 'migrateData:place',
             // 'migrateData:PlaceUserPivot',
             // 'migrateData:service',
             // 'migrateData:migrateData:serviceUserpivot',
             // 'migrateData:specility',
-            'migrateData:appointment_setting'
+            // 'migrateData:appointment_setting'
         ];
         // Run each command
         try{

@@ -17,7 +17,7 @@ class MigrateUsersCommand extends Command
     /**
      * The console command description.
      */
-    protected $description = 'transfer users data.';
+    protected $description = 'transfer users.';
 
     /**
      * Create a new command instance.

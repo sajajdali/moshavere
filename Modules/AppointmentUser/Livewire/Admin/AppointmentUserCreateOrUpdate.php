@@ -171,9 +171,9 @@ class AppointmentUserCreateOrUpdate extends Component
         $docQuery = User::doctors_query();
         if (isset($docQuery)) {
             $docQuery =  $docQuery->whereHas('metas', function ($q) {
-                $q->where([
+                return $q->where([
                     ['meta_key', UserMetaEnum::BAN_USER],
-                    ['meta_value', false],
+                    ['meta_value', "<>",true],
                 ]);
             })->when(isset($this->search['doctors']) && !empty($this->search['doctors']), function ($query) {
                     return $query->where(function ($q) {

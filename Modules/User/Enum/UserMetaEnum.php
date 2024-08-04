@@ -66,4 +66,45 @@ enum UserMetaEnum: int implements EnumHasNameInterface
             self::CITY => 'شهر',
         };
     }
+    public static function fromOldKey(string $oldKey): ?self
+    {
+        // Mapping old string keys to enum cases
+        $map = [
+            'FIRST_NAME' => self::FIRST_NAME,
+            'LAST_NAME' => self::LAST_NAME,
+            'AVATAR' => self::AVATAR,
+            'CREATOR' => self::CREATOR,
+            'GENDER' => self::GENDER,
+            'BIRTHDAY' => self::BIRTHDAY,
+            'DISEASES' => self::DISEASES,
+            'DOCUMENT_NUMBER' => self::DOCUMENT_NUMBER,
+            'MOBILE' => self::MOBILE,
+            'NATIONAL_CODE' => self::NATIONAL_CODE,
+            'CITY' => self::CITY,
+            'FAVORITE_DOCTOR' => self::FAVORITE_DOCTOR,
+            'SPECIALITY_TYPE' => self::SPECIALITY_TYPE,
+            'DOC_BIOGRAPHY' => self::DOC_BIOGRAPHY,
+            'LICENCE_NUMBER' => self::LICENCE_NUMBER,
+            'DOC_ADDRESS' => self::DOC_ADDRESS,
+            'DOCTOR_ORDER' => self::DOCTOR_ORDER,
+            'ACTIVE_APPOINTMENT' => self::ACTIVE_APPOINTMENT,
+            'BAN_USER' => self::BAN_USER,
+            'DR_GALLERY' => self::DR_GALLERY,
+            'DR_BANNER' => self::DR_BANNER,
+            'DR_ENEMRGENCY_STATUS' => self::DR_ENEMRGENCY_STATUS,
+            'DR_ENEMRGENCY_ORDER' => self::DR_ENEMRGENCY_ORDER,
+            'DR_INFO_STATUS' => self::DR_INFO_STATUS,
+            'DR_INFO_ORDER' => self::DR_INFO_ORDER,
+            'DR_WAITING_TIME' => self::DR_WAITING_TIME,
+            'DR_WEBSITE_DISPLAY_MOBILE' => self::DR_WEBSITE_DISPLAY_MOBILE,
+            'DR_WEBSITE_DISPLAY_NAVIGATION' => self::DR_WEBSITE_DISPLAY_NAVIGATION,
+            'DR_WEBSITE_DISPLAY_ADDRESS' => self::DR_WEBSITE_DISPLAY_ADDRESS,
+            'DR_WEBSITE_DISPLAY_EXPERINCE' => self::DR_WEBSITE_DISPLAY_EXPERINCE,
+            'DR_WEBSITE_DISPLAY_DESCRIPTION' => self::DR_WEBSITE_DISPLAY_DESCRIPTION,
+            'DR_REGISTRATION_DESCRIPTION' => self::DR_REGISTRATION_DESCRIPTION,
+            'DR_REGISTRATION_FROM' => self::DR_REGISTRATION_FROM,
+        ];
+
+        return $map[$oldKey] ?? null;
+    }
 }

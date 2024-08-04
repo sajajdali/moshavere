@@ -11,10 +11,12 @@ use Modules\MigrateOldData\App\Console\MigratePlacesCommand;
 use Modules\AppointmentSetting\app\Console\RenewCacheCommand;
 use Modules\AppointmentUser\app\Console\SendReminderscommand;
 use Modules\MigrateOldData\App\Console\MigrateServiceseCommand;
+use Modules\MigrateOldData\App\Console\MigrateUserMetasCommand;
 use Modules\MigrateOldData\App\Console\MigratePlaceUsersCommand;
 use Modules\MigrateOldData\App\Console\MigrateAppointmentSetting;
 use Modules\MigrateOldData\App\Console\MigrateServiceUserCommand;
 use Modules\MigrateOldData\App\Console\MigrateSpecialiteiesCommand;
+use Modules\MigrateOldData\App\Console\MigrateAppointmentUserCommand;
 
 class Kernel extends ConsoleKernel
 {
@@ -30,6 +32,8 @@ class Kernel extends ConsoleKernel
         MigrateSpecialiteiesCommand::class ,
         MigrateUsersCommand::class ,
         MigrateAppointmentSetting::class ,
+        MigrateUserMetasCommand::class ,
+        MigrateAppointmentUserCommand::class ,
     ];
 
     /**

@@ -176,10 +176,10 @@
                                 شده</span>
                         @endif
                         @isset($fetchData['returnToApp'])
-                        <a target="blank" href="{{ $fetchData['returnToApp'] }}"
-                                    class="bg-rose-500 hover:bg-rose-700 text-white font-bold py-2 px-4 rounded-full">
-                                    <span>بازگشت به اپلیکیشن</span>
-                                </a>
+                            <a target="blank" href="{{ $fetchData['returnToApp'] }}"
+                                class="bg-rose-500 hover:bg-rose-700 text-white font-bold py-2 px-4 rounded-full">
+                                <span>بازگشت به اپلیکیشن</span>
+                            </a>
                         @endisset
                     </h3>
                     <div class="border-card space-y-4">
@@ -213,32 +213,33 @@
                                 @endif
                             </div>
                         </div>
-                        <div class="border-card">
-                            <p class="font-bold text-sm mb-2">{{ $fetchData['app']->place->title }}</p>
-                            @if (isset($fetchData['app']->place->detail[Modules\Place\app\Models\Place::DETAIL_ADDRESS]))
-                                <p class="text-sm mb-4">
-                                    <object class="inline-block mb-0.5"
-                                        data="{{ front_asset('assets/svg/location-icon.svg') }}"></object>
-                                    <span>
-                                        {{ $fetchData['app']->place->detail[Modules\Place\app\Models\Place::DETAIL_ADDRESS] }}
-                                    </span>
-                                </p>
-                            @endif
-                            @isset($fetchData['mapUrl'])
-                                <iframe class="w-full mb-4 rounded-2xl" src="{{ $fetchData['mapUrl'] }}" width="400"
-                                    height="300" style="border: 0" allowfullscreen="" loading="lazy"
-                                    referrerpolicy="no-referrer-when-downgrade"></iframe>
+                        @if (!$fetchData['app']->kind->isOnline())
+                            <div class="border-card">
+                                <p class="font-bold text-sm mb-2">{{ $fetchData['app']->place->title }}</p>
+                                @if (isset($fetchData['app']->place->detail[Modules\Place\app\Models\Place::DETAIL_ADDRESS]))
+                                    <p class="text-sm mb-4">
+                                        <object class="inline-block mb-0.5"
+                                            data="{{ front_asset('assets/svg/location-icon.svg') }}"></object>
+                                        <span>
+                                            {{ $fetchData['app']->place->detail[Modules\Place\app\Models\Place::DETAIL_ADDRESS] }}
+                                        </span>
+                                    </p>
+                                @endif
+                                @isset($fetchData['mapUrl'])
+                                    <iframe class="w-full mb-4 rounded-2xl" src="{{ $fetchData['mapUrl'] }}"
+                                        width="400" height="300" style="border: 0" allowfullscreen=""
+                                        loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
 
-                                <a target="blank" href="{{ $fetchData['navigation'] }}"
-                                    class="btn__blue--round-full-between !w-full !font-bold !text-base my-3">
-                                    <span>مسیریابی</span>
-                                    <svg class="w-6 h-6" xmlns="http://www.w3.org/2000/svg">
-                                        <use xlink:href="#sprite-arrow-left-circle" />
-                                    </svg>
-                                </a>
-                            @endisset
-                        </div>
-
+                                    <a target="blank" href="{{ $fetchData['navigation'] }}"
+                                        class="btn__blue--round-full-between !w-full !font-bold !text-base my-3">
+                                        <span>مسیریابی</span>
+                                        <svg class="w-6 h-6" xmlns="http://www.w3.org/2000/svg">
+                                            <use xlink:href="#sprite-arrow-left-circle" />
+                                        </svg>
+                                    </a>
+                                @endisset
+                            </div>
+                        @endif
                         <div class="border-card bg-secondary-100 p-5">
                             <p class="text-sm font-bold mb-3">نوع نوبت: {{ $fetchData['app']->kind->getName() }}</p>
                             <div class="visit-detail flex">
@@ -258,27 +259,28 @@
                                 </p>
                                 <p class="mr-3">{{ verta($fetchData['app']->date_visit)->format('d F') }}</p>
                             </div>
-
-                            <div class="visit-detail flex mt-3">
-                                <p>
-                                    <object class="inline-block"
-                                        data="{{ front_asset('assets/svg/timeclock.svg') }}"></object>
-                                    <strong>زمان نوبت:</strong>
-                                </p>
-                                @if ($fetchData['stauts']['enum'] != Modules\AppointmentUser\Enum\AppointmentUserStatusEnum::STATUS_CANCEL)
-                                    <span class="mr-3">
-                                        @if (isset($fetchData['app']->date_visit))
-                                            {{ verta($fetchData['app']->date_visit)->format('H:i') }}
-                                        @else
-                                            ---
-                                        @endif
-                                    </span>
-                                @else
-                                    <span
-                                        class="inline-flex items-center rounded-md bg-gray-50 px-2 py-1 text-xs font-medium text-gray-600 ring-1 ring-inset ring-gray-500/10">کنسل
-                                        شده</span>
-                                @endif
-                            </div>
+                            @if (!$fetchData['app']->kind->isOnline())
+                                <div class="visit-detail flex mt-3">
+                                    <p>
+                                        <object class="inline-block"
+                                            data="{{ front_asset('assets/svg/timeclock.svg') }}"></object>
+                                        <strong>زمان نوبت:</strong>
+                                    </p>
+                                    @if ($fetchData['stauts']['enum'] != Modules\AppointmentUser\Enum\AppointmentUserStatusEnum::STATUS_CANCEL)
+                                        <span class="mr-3">
+                                            @if (isset($fetchData['app']->date_visit))
+                                                {{ verta($fetchData['app']->date_visit)->format('H:i') }}
+                                            @else
+                                                ---
+                                            @endif
+                                        </span>
+                                    @else
+                                        <span
+                                            class="inline-flex items-center rounded-md bg-gray-50 px-2 py-1 text-xs font-medium text-gray-600 ring-1 ring-inset ring-gray-500/10">کنسل
+                                            شده</span>
+                                    @endif
+                                </div>پ
+                            @endif
                             @if ($fetchData['stauts']['payment'])
                                 <div class="visit-detail flex mt-3">
                                     <p>

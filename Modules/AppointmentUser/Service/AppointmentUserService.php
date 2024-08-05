@@ -710,8 +710,10 @@ class AppointmentUserService
             $smsTemplate = $detail['smsTemplate'];
         }
         // send sms
-        if (isset($smsTemplate)) {
-            $appointmentUser->notify(new AppointmentSmsNotification($smsTemplate));
+        if ($appointmentData->sendSmsToUser) {
+            if (isset($smsTemplate)) {
+                $appointmentUser->notify(new AppointmentSmsNotification($smsTemplate));
+            }
         }
         if (isset($appointmentUser->operator)) {
             $smsToOperator = setting(SettingKeyEnum::SMS_APPOINTMENT_TO_OPERATOR);

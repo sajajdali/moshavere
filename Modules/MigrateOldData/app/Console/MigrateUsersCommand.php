@@ -38,7 +38,7 @@ class MigrateUsersCommand extends Command
     private function migrateUsers()
     {
         // Connect to the old database
-        $oldData = DB::connection('old_mysql')->table('appointment_users')->get();
+        $oldData = DB::connection('old_mysql')->table('users')->get();
         // Loop through each record and transform it
         foreach ($oldData as $data) {
             // Transform the data according to new structure
@@ -63,7 +63,7 @@ class MigrateUsersCommand extends Command
             $role = match($userRole->role_id) {
                 6 => 2 ,
                 2 => 3 ,
-                5 => 7 ,
+                5 => 4 ,
                 4 => 5 ,
                 default => 2 ,
             };
@@ -76,7 +76,7 @@ class MigrateUsersCommand extends Command
                 'model_id' => $userRole->model_id,
             ];
             DB::connection('mysql')->table('model_has_roles')->insert($newUserRole);
-            $this->info("roled has been assigned");
         }
+        $this->info("roled has been assigned");
     }
 }

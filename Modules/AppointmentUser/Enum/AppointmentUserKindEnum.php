@@ -67,4 +67,10 @@ enum AppointmentUserKindEnum: int implements EnumHasNameInterface, EnumHasAdminB
             default => false,
         };
     }
+    public static function OldData($data){ 
+        return match ($data) {
+            'IN_PERSON' => self::ONLINE ,
+            default => self::VOIP,
+        };
+    }
 }

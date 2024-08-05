@@ -160,7 +160,7 @@ trait OprationButtonsTrait
         $this->changeAttendedStatus($appointmentUser, true);
         $feddBack = setting(SettingKeyEnum::SMS_FEEDBACK);
         if (isset($feddBack)) {
-            $appointmentUser->notify(new AppointmentSmsNotification($feddBack));
+            $appointmentUser->notify(new AppointmentUserFeedbackSmsnotification($feddBack));
         }
         Cache::forget('appointmentList.' . $appointmentUser->setting->id);
         $this->redirectToPage('وضعیت نوبت به کاربر حضور پیدا کرده تغییر کرد');
@@ -190,6 +190,8 @@ trait OprationButtonsTrait
         ShortLink::create([
             'link_code' => $link_code,
             'link_url'  => $link_url,
+            'shortlinkable_type'  => 'feedBack',
+            'shortlinkable_id'  => $appointmentUser->id,
         ]);
         $smsTemplate = setting(SettingKeyEnum::SMS_FEEDBACK);
         if (isset($smsTemplate)) {

@@ -33,7 +33,7 @@ class MigrateServiceUserCommand extends Command
     public function handle()
     {
        // Connect to the old database
-       $oldData = DB::connection('old_mysql')->table('appointment_part_user')->orderBy('id')->get();
+       $oldData = DB::connection('old_mysql')->table('appointment_part_user')->get();
 
        // Loop through each record and transform it
        foreach ($oldData as $data) {

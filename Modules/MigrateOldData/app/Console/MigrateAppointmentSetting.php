@@ -118,6 +118,9 @@ class MigrateAppointmentSetting extends Command
         $days = json_decode($data->content);
         $appointment_setting =  AppointmentSetting::find($appointment_setting_id);
         foreach ($days as $dayName => $dayTime) {
+            if ($dayTime->STATUS == false) {
+                continue;
+            }
             $app_setting_times = [
                 'day_number'            => $this->findDayName($dayName),
                 'start_at'              => $this->calculateStartTime($dayTime),
@@ -134,14 +137,15 @@ class MigrateAppointmentSetting extends Command
     {
         return  AppintmentSettingDayNumber::shortNameForDayTonumber($dayName);
     }
-    private function calculateStartTime($dayTime): string
+    private function calculateStartTime($dayTime)
     {
         $start_time = '00:00';
         if (isset($dayTime->TIME)) {
             foreach ($dayTime->TIME as $times) {
                 if ($times->FROM == '00:00' || $times->TO == '00:00') {
                     continue;
-                } else {
+                } elseif ($times->FROM != null) {
+
                     $start_time = $times->FROM;
                     break;
                 }
@@ -149,15 +153,16 @@ class MigrateAppointmentSetting extends Command
         }
         return $start_time;
     }
-    private function calculateEndTime($dayTime): string
+    private function calculateEndTime($dayTime)
     {
         $end_time = '00:00';
         if (isset($dayTime->TIME)) {
             foreach ($dayTime->TIME as $times) {
-                if ($times->FROM == '00:00' || $times->TO == '00:00') {
+                if ($times->TO == '00:00' || $times->TO == '00:00') {
                     continue;
-                } else {
+                } elseif ($times->FROM != null) {
                     $end_time = $times->TO;
+
                     break;
                 }
             }

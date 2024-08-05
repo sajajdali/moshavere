@@ -5,9 +5,12 @@ namespace Modules\MigrateOldData\App\Console;
 use Illuminate\Console\Command;
 use Modules\User\Entities\User;
 use Illuminate\Support\Facades\DB;
+use Hekmatinasser\Verta\Facades\Verta;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Input\InputArgument;
 use Modules\AppointmentUser\app\Models\AppointmentUser;
+use Modules\AppointmentUser\Enum\AppointmentUserKindEnum;
+use Modules\AppointmentSetting\app\Models\AppointmentSetting;
 
 class MigrateAppointmentUserCommand extends Command
 {
@@ -42,24 +45,29 @@ class MigrateAppointmentUserCommand extends Command
             // Transform the data according to new structure
             $newData = [
                 'agent_id' => $data->agent_id,
+                'appointment_setting_id' => $this->settingId($data),
                 'user_id' => $data->user_id,
                 'doctor_id' => $data->doctor_id,
                 'service_id' => $data->appointment_part_id,
                 'place_id' => $data->appointment_office_id,
                 'operator_id' => $this->findOperatorId($data->operator),
                 'tracking_code' => $this->trackingCode($data->code),
+                'kind' => AppointmentUserKindEnum::OldData($data->type),
+                'start_time' => $data->time_from,
+                'end_time' => $data->time_to,
+                'date_visit' => $this->caculateDateVisit($data),
+                'visited_at' => $data->visit_at,
+                'details' => $this->convertDetails(),
             ];
-
             // Insert the transformed data into the new database
             DB::connection('mysql')->table('appointment_users')->insert($newData);
         }
-
         $this->info('appointment user transfered successfuly.');
     }
     private function findOperatorId($oprator)
     {
         $arrop = json_decode($oprator, true);
-        if ($arrop[0] != null) {
+        if (isset($arrop[0]) && $arrop[0] != null) {
             $user = User::find((int)$arrop[0]);
             if (isset($user)) {
                 return $user->id;
@@ -74,5 +82,28 @@ class MigrateAppointmentUserCommand extends Command
         } else {
             return  AppointmentUser::generateTrackingCode();
         }
+    }
+    private function caculateDateVisit($data)
+    {
+        $year = $data->year;
+        $month = $data->month;
+        $day = $data->day;
+        $date =  Verta::parse($year . '-' . $month . '-' . $day)->tocarbon();
+        return $date->TodateString();
+    }
+    public function convertDetails()
+    {
+        $detail = [
+            AppointmentUser::STORE_FROM_APPLICATION => false,
+
+        ];
+        return json_encode($detail);
+    }
+    public function settingId($data)
+    {
+        $serviceId = $data->appointment_part_id;
+        $placeId = $data->appointment_office_id;
+        $setting = AppointmentSetting::where('service_id', $serviceId)->where('place_id', $placeId)->first()?->id ?? null;
+        return $setting;
     }
 }

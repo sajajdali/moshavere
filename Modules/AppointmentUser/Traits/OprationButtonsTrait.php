@@ -55,8 +55,8 @@ trait OprationButtonsTrait
     public function ApprovemonitoringAppointment($id)
     {
         $app = AppointmentUser::find($id);
-        $deadLine_Time = $app->setting->detail[AppointmentSetting::MONITORTING_APPOINTMENT];
-        $Appoointment_dedLine = now()->addHours($deadLine_Time);
+        $deadLine_Time = $app->setting->detail[AppointmentSetting::MONITORTING_APPOINTMENT] ?? 24;
+        $Appoointment_dedLine = now()->addHours((int)$deadLine_Time);
         $app->update(['status' => AppointmentUserStatusEnum::STATUS_WAIT_PAYMENT, 'deadline_at' => $Appoointment_dedLine]);
         $app->notify(new AppointmentSmsNotification(setting(SettingKeyEnum::SMS_APPROVED_MONITORING_APPOINTMENT)));
         Cache::forget('appointmentList.' . $app->setting->id);

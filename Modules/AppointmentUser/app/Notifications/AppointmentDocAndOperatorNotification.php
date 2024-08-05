@@ -26,11 +26,6 @@ class AppointmentDocAndOperatorNotification extends Notification
     {
         return [SmsChannel::class];
     }
-    public function toSms($notifiable)
-    {
-        return $this->mobile;
-    }
-
 
     /**
      * Get the array representation of the notification.
@@ -46,7 +41,7 @@ class AppointmentDocAndOperatorNotification extends Notification
         $hour = substr($notifiable->start_time, 0, -3);
         return [
             'template' => $this->template,
-            'receptor' => $notifiable->user->mobile,
+            'receptor' => $this->mobile,
             'params' => [
                 $firstName,
                 $lastName,

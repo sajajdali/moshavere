@@ -164,7 +164,7 @@ class Checkout extends Component
 
         $detail = [];
 
-        // sms temolate
+        // sms Template
         if (
             $this->fetchData['appSetting']->detail[AppointmentSetting::PAYMENT][AppointmentSetting::STATUS] == true &&
             $this->fetchData['appSetting']->detail[AppointmentSetting::PAYMENT][AppointmentSetting::NOT_PAYING_STATUS] == 'dontSubmit'
@@ -183,7 +183,6 @@ class Checkout extends Component
             $this->err = $storeAppointment['message'];
         }
     }
-
 
     public function mount()
     {

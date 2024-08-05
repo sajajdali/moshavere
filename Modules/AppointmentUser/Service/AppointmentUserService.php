@@ -25,6 +25,7 @@ use Modules\AppointmentSetting\app\Models\AppointmentSetting;
 use Modules\AppointmentUser\app\Events\StoreAppointmentEvent;
 use Modules\AppointmentUser\Enum\AppointmentOnlineStatusEnum;
 use Modules\AppointmentUser\app\Notifications\AppointmentSmsNotification;
+use Modules\AppointmentUser\App\Notifications\AppointmentDocAndOperatorNotification;
 
 class AppointmentUserService
 {
@@ -712,15 +713,18 @@ class AppointmentUserService
         if (isset($smsTemplate)) {
             $appointmentUser->notify(new AppointmentSmsNotification($smsTemplate));
         }
-        // TODO::sms to docotor
-        // $smsToOperator = setting(SettingKeyEnum::SMS_APPOINTMENT_TO_OPERATOR);
-        // if (isset($smsToOperator)) {
-        //     $appointmentUser->operator?->notify(new UserSmsNotification($smsToOperator));
-        // }
-        // $smsToDoctor = setting(SettingKeyEnum::SMS_APPOINTMENT_TO_DOCTOR);
-        // if (isset($smsToOperator)) {
-        //     $appointmentUser->doctor?->notify(new UserSmsNotification($smsToDoctor));
-        // }
+        if (isset($appointmentUser->operator)) {
+            $smsToOperator = setting(SettingKeyEnum::SMS_APPOINTMENT_TO_OPERATOR);
+            if (isset($smsToOperator)) {
+                $appointmentUser->operator?->notify(new AppointmentDocAndOperatorNotification($smsToOperator, $appointmentUser->operator->mobile));
+            }
+        }
+        if (isset($appointmentUser->doctor)) {
+            $smsToDoctor = setting(SettingKeyEnum::SMS_APPOINTMENT_TO_DOCTOR);
+            if (isset($smsToOperator)) {
+                $appointmentUser->doctor?->notify(new AppointmentDocAndOperatorNotification($smsToDoctor, $appointmentUser->doctor->mobile));
+            }
+        }
 
         event(new StoreAppointmentEvent($appointmentUser));
 

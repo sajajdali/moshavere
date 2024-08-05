@@ -25,7 +25,7 @@ use Modules\AppointmentSetting\app\Models\AppointmentSetting;
 use Modules\AppointmentUser\app\Events\StoreAppointmentEvent;
 use Modules\AppointmentUser\Enum\AppointmentOnlineStatusEnum;
 use Modules\AppointmentUser\app\Notifications\AppointmentSmsNotification;
-use Modules\AppointmentUser\App\Notifications\AppointmentDocAndOperatorNotification;
+use Modules\AppointmentUser\app\Notifications\AppointmentDocAndOperatorNotification;
 
 class AppointmentUserService
 {

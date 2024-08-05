@@ -718,13 +718,13 @@ class AppointmentUserService
         if (isset($appointmentUser->operator)) {
             $smsToOperator = setting(SettingKeyEnum::SMS_APPOINTMENT_TO_OPERATOR);
             if (isset($smsToOperator)) {
-                $appointmentUser->operator?->notify(new AppointmentDocAndOperatorNotification($smsToOperator, $appointmentUser->operator->mobile));
+                $appointmentUser->notify(new AppointmentDocAndOperatorNotification($smsToOperator, $appointmentUser->operator->mobile));
             }
         }
         if (isset($appointmentUser->doctor)) {
             $smsToDoctor = setting(SettingKeyEnum::SMS_APPOINTMENT_TO_DOCTOR);
             if (isset($smsToDoctor)) {
-                $appointmentUser->doctor?->notify(new AppointmentDocAndOperatorNotification($smsToDoctor, $appointmentUser->doctor->mobile));
+                $appointmentUser->notify(new AppointmentDocAndOperatorNotification($smsToDoctor, $appointmentUser->doctor->mobile));
             }
         }
 

@@ -26,7 +26,7 @@ class AppointmentDocAndOperatorNotification extends Notification
     {
         return [SmsChannel::class];
     }
-    public function toSms()
+    public function toSms($notifiable)
     {
         return $this->mobile;
     }

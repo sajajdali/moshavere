@@ -723,7 +723,7 @@ class AppointmentUserService
         }
         if (isset($appointmentUser->doctor)) {
             $smsToDoctor = setting(SettingKeyEnum::SMS_APPOINTMENT_TO_DOCTOR);
-            if (isset($smsToOperator)) {
+            if (isset($smsToDoctor)) {
                 $appointmentUser->doctor?->notify(new AppointmentDocAndOperatorNotification($smsToDoctor, $appointmentUser->doctor->mobile));
             }
         }

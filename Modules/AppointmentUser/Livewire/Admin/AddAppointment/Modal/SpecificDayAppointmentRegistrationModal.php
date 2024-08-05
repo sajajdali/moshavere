@@ -249,8 +249,10 @@ class SpecificDayAppointmentRegistrationModal extends Component
         $userModelAppointment = new UserModelAppointment(userModel: $mainUser, forHimself: $foHimself, userSomeoneModel: $someoneModel);
 
         $appointment_type = $this->form['appType'] == 'main_app' ? AppointmentUserTypeEnum::MAIN__APPOINTMENT : AppointmentUserTypeEnum::BETWEEN_PATIENTS;
-        $sms_status = $this->form['smsType'] == 'send' ? true : false;
-
+        $sms_status = false;
+        if ($this->form['smsType'] == 'send') {
+            $sms_status = true;
+        }
         //check if operator
         if (isset($this->form['operator']) && !empty($this->form['operator'])) {
             $oprator =  $this->form['operator'];
@@ -267,7 +269,7 @@ class SpecificDayAppointmentRegistrationModal extends Component
             agentId: auth()->user()->id,
             operatorId: $oprator,
             kind: isset($this->form['kind']) ? $this->form['kind'] : null,
-            smsToDoctor: false,
+            smsToDoctor: true,
             description: isset($this->form['description']) ? $this->form['description'] : '',
             type: $appointment_type,
             endTime: Carbon::createFromTimeString($this->form['time']['until'])->toTimeString(),

@@ -15,7 +15,8 @@
                 </div>
                 <div class="card-body">
                     <ul class="nav1 nav-column flex-column br-7">
-                        @foreach($menuSections as $menu)
+                    @foreach($menuSections as $menu)
+                            @continue(isset($menu['disable_ui']) && $menu['disable_ui'])
                             <li class="nav-item1">
                                 <a class="nav-link thumb text-dark-light @if($menu['id'] === $section) active @endif"
                                    wire:click="changeMenu('{{ $menu['id'] }}')"
@@ -44,6 +45,7 @@
                     <p class="mb-0">
                         @if($options != null && count($options))
                             @foreach($options as $settingItem)
+                                @continue($settingItem->uiDisabled())
                                 @livewire($settingItem->render(),
                                 ['meta' => $settingItem , 'old_value' => $settingValues[$settingItem->value] ?? null]
                                 ,key($settingItem->value))

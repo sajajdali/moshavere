@@ -202,6 +202,20 @@ enum SettingKeyEnum: int implements EnumHasNameInterface, SettingTypeInterface, 
         };
     }
 
+    public function uiDisabled(): bool
+    {
+        return match ($this) {
+            self::SITE_TITLE => true,
+            self::SITE_SLIDER_TITLE => true,
+            self::FOOTER_DESCRIPTION => true,
+            self::SITE_FIRST_SECTION_TITLE => true,
+            self::SITE_FIRST_SECTION_DESCRIPTION => true,
+            self::SITE_SECEND_SECTION_TITLE => true,
+            self::SITE_SECEND_SECTION_DESCRIPTION => true,
+            default => false
+        };
+    }
+
     public function render(): string
     {
         return $this->getType()->component($this->value);

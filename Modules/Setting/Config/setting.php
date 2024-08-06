@@ -1,9 +1,10 @@
 <?php
 
-return [
+$setting = [
     'sms' => [
         'title' => 'پیامک',
         'icon' => 'fa fa-mobile',
+        'disable_ui' => disableUi(),
         'settings' => [
             \Modules\Setting\Enum\SettingKeyEnum::SMS_API_TOKEN,
             \Modules\Setting\Enum\SettingKeyEnum::SMS_API_LOGIN_TEMPLATE,
@@ -94,6 +95,7 @@ return [
     ],
     'Contact_us' => [
         'title' => 'صفحه ی تماس با ما',
+        'disable_ui' => disableUi(),
         'icon' => 'fa fa-retweet',
         'settings' => [
             \Modules\Setting\Enum\SettingKeyEnum::CONTACTUS_FIRST_SECTION_STATUS,
@@ -122,3 +124,5 @@ return [
         ],
     ],
 ];
+
+return $setting;

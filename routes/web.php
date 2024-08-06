@@ -192,3 +192,7 @@ Route::get('/notif',function(){
         message: 'test message',
     ));
 });
+
+Route::get('test_ui', function () {
+    dd(disableUi());
+});

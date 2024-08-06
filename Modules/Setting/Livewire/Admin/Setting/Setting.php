@@ -62,6 +62,7 @@ class Setting extends Component
                 'id' => $key,
                 'title' => $menu['title'],
                 'icon' => $menu['icon'],
+                'disable_ui' => $menu['disable_ui'] ?? false,
             ];
         }
     }

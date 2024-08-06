@@ -1,6 +1,8 @@
    <!-- footer -->
    <footer>
-    <section class="bg-secondary-200 py-8">
+       @unless(disableUi())
+
+       <section class="bg-secondary-200 py-8">
        <div class="container grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
           <div class="space-y-4">
              <img src="{{setting(Modules\Setting\Enum\SettingKeyEnum::SITE_LOGO_URL)}}" class="w-[100px]" />
@@ -59,6 +61,7 @@
           </div>
        </div>
     </section>
+       @endunless
     <section class="bg-secondary-300 py-3 px-4">
        <p class="text-sm text-center">
           تمامی حقوق مادی و معنوی این وب‌سایت، خدمات و محتوای مربوط به آن متعلق به شرکت سلامت شرق است.

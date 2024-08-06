@@ -1,6 +1,6 @@
 <!doctype html>
 <html lang="fa_IR" dir="rtl"
-    style="--primary01:rgba(0, 112, 187, 0.1); --primary02:rgba(0, 112, 187, 0.2); --primary03:rgba(0, 112, 187, 0.3); --primary06:rgba(0, 112, 187, 0.6); --primary09:rgba(0, 112, 187, 0.9); --primary-bg-color:#0070bb; --primary-bg-hover:#0070bb95; --primary-bg-border:#0070bb; --dark-null:rgba(0, 112, 187, 0.5); --transparent-null:#0070bb; --primary-transparentcolor:#0070bb20; --darkprimary-null:#0070bb20; --transparentprimary-null:#0070bb20;">
+      style="--primary01:rgba(0, 112, 187, 0.1); --primary02:rgba(0, 112, 187, 0.2); --primary03:rgba(0, 112, 187, 0.3); --primary06:rgba(0, 112, 187, 0.6); --primary09:rgba(0, 112, 187, 0.9); --primary-bg-color:#0070bb; --primary-bg-hover:#0070bb95; --primary-bg-border:#0070bb; --dark-null:rgba(0, 112, 187, 0.5); --transparent-null:#0070bb; --primary-transparentcolor:#0070bb20; --darkprimary-null:#0070bb20; --transparentprimary-null:#0070bb20;">
 
 <head>
 
@@ -30,26 +30,26 @@
 </head>
 
 <body class="rtl app sidebar-mini">
-    @include('front::layouts.components.app-header')
-    <!-- PAGE -->
-    <div class="page">
-        <div class="page-main">
-            <!--app-content open-->
-            <div class="main-front-container">
-                @yield('content')
-                {{ $slot ?? '' }}
-            </div>
+@include('front::layouts.components.app-header')
+<!-- PAGE -->
+<div class="page">
+    <div class="page-main">
+        <!--app-content open-->
+        <div class="main-front-container">
+            @yield('content')
+            {{ $slot ?? '' }}
         </div>
-
-        @yield('modal')
-
     </div>
-    <!-- page -->
-    @include('front::layouts.components.footer')
-    @include('front::layouts.components.scripts')
 
-    @livewireScripts
-    @stack('scripts')
+    @yield('modal')
+
+</div>
+<!-- page -->
+@include('front::layouts.components.footer')
+@include('front::layouts.components.scripts')
+
+@livewireScripts
+@stack('scripts')
 
 </body>
 

@@ -101,6 +101,10 @@ class Login extends Component
         $this->step = 1;
     }
     public function mount() {
+        // when disable ui template
+        if (disableUi()){
+            return redirect()->route('front.login.doctor');
+        }
         if(request()->has('appointment')){
             $this->fetchData['alert'] = 'برای ادامه مراحل دریافت نوبت لطفا ابتدا وارد شوید';
         }

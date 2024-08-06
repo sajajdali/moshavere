@@ -11,6 +11,8 @@
                 <li class="navbar__menu-item">
                     <a href="{{ route('front.homePage') }}">صفحه اصلی</a>
                 </li>
+                @unless(disableUi())
+
                 <li class="navbar__menu-item">
                     <a href="{{ route('front.aboutUs') }}">درباره ما</a>
                 </li>
@@ -23,6 +25,7 @@
                 <li class="navbar__menu-item">
                     <a href="{{ route('front.contactUs') }}">ثبت شکایات</a>
                 </li>
+                @endunless
             </ul>
             <div x-data="{ open: false }" class="relative">
                 @auth

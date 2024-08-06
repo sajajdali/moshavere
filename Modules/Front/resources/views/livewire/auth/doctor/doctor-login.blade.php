@@ -7,17 +7,26 @@
         @endisset
         <form wire:submit='DocLoginForm' class="bg-white rounded-lg w-full max-w-[600px] mx-auto p-5 flex flex-col gap-4" wire:loading.class='opacity-50'>
             <div class="text-center space-y-2">
-                <p class="text-lg font-semibold">ورود / ثبت نام پزشک</p>
-                <p class="text-secondary-400">شماره تلفن و رمز عبور خود را وارد کنید و در صورت نداشتن حساب ، روی گزینه
-                    ثبت نام کلیک کنید.</p>
+                <p class="text-lg font-semibold">ورود
+                @unless(disableUi())
+                        / ثبت نام پزشک
+                    @endunless
+                </p>
+                <p class="text-secondary-400">شماره تلفن و رمز عبور خود را وارد کنید
+                    @if(!disableUi())
+                        و در صورت نداشتن حساب ، روی گزینه ثبت نام کلیک کنید.
+                    @endif
+                    </p>
             </div>
             <div class="space-y-2">
                 <div class="flex items-center justify-between">
                     <label for="docUserName" class="text-secondary-400 font-semibold">شماره تلفن </label>
+                    @unless(disableUi())
                     <a href="{{route('front.registration.doctor')}}"
                         class="flex items-center gap-3 py-2 px-4 bg-secondary-100 rounded-lg border border-rose-200 hover:bg-secondary-200 hover:text-sky-800">
                         <p class="text-sky-600">ثبت نام</p>
                     </a>
+                    @endunless
                 </div>
             </div>
             <input type="text" id="docUserName"

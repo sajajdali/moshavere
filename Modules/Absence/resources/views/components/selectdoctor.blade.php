@@ -9,6 +9,8 @@
                 </button>
                 @if (isset($search['id']) || isset($search['mobile']) || isset($search['first_name']) || isset($search['last_name']))
                     <button class="btn btn-secondary ms-2" type="button" wire:click="resetProperties"
+                     data-bs-toggle="collapse" data-bs-target="#advanceSearch"
+                    aria-expanded="false" aria-controls="advanceSearch"
                         wire:loading.class="bg-gray btn-loading disabled">نمایش همه
                     </button>
                 @endif
@@ -53,7 +55,7 @@
             </div>
             <div class="d-flex justify-content-center">
                 <div class="row">
-                    @if (isset($fetchData['doctors']))
+                    @if ($doctors->isNotEmpty())
                     <div class="d-flex mt-1 mb-3 align-items-center" wire:ignore>
                         <p style="font-size: medium" class="text-muted">لطفا پزشک و یا پزشکانی که مایل به
                             ویرایش
@@ -69,8 +71,8 @@
                             <span>{{ $message }}</span>
                         </div>
                     @enderror
-                    @foreach ($fetchData['doctors'] as $key => $doctorList)
-                        <div class="col-md-4" wire:ignore>
+                    @foreach ($doctors as $key => $doctorList)
+                        <div class="col-md-4" wire:ignore.self>
                             <div class="form-group mt-2">
                                 <div class="checkbox">
                                     <div class="custom-checkbox custom-control">
@@ -85,6 +87,9 @@
                             </div>
                         </div>
                     @endforeach
+                    <div class="d-flex justify-content-center mt-3">
+                        {{$doctors->links()}}
+                    </div>
                     @else
                     <div class="col-12 alert alert-primary fade show w-100" role="alert">
                         <i class="fa fa-bell-o me-2 ms-1" aria-hidden="true"></i>

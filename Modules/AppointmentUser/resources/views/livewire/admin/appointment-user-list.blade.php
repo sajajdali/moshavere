@@ -360,7 +360,7 @@
                                                 @else
                                                     <span>خود کاربر</span>
                                                 @endif
-                                                @if ($ap->kind == \Modules\AppointmentUser\Enum\AppointmentUserKindEnum::ONLINE)
+                                                @if ($ap->kind == \Modules\AppointmentUser\Enum\AppointmentUserKindEnum::ONLINE && $ap->hasAgent())
                                                     <small class="badge bg-light rounded-pill">
                                                         <span> {{ $ap->confirm_or_reject_by() }}</span>
                                                     </small>

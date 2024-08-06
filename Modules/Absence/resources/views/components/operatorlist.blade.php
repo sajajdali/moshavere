@@ -10,6 +10,9 @@
                 </button>
                 @if (isset($search['operator_name']) || isset($search['operator_mobile']))
                     <button class="btn btn-secondary ms-2" type="button" wire:click="resetPropertiesOperators"
+                    data-bs-toggle="collapse"
+                    data-bs-target="#advanceSearchForoperator" aria-expanded="false"
+                    aria-controls="advanceSearchForoperator"
                         wire:loading.class="bg-gray btn-loading disabled">نمایش همه
                     </button>
                 @endif
@@ -39,7 +42,7 @@
             </div>
             <div>
                 <div class="row">
-                    @if (isset($fetchData['operators']))
+                    @if ($operators->isNotEmpty())
                         <div class="d-flex mt-1 mb-3 align-items-center" wire:ignore>
                             <p style="font-size: medium" class="text-muted">
                                 لطفا اپراتور و یا اپراتور هایی که مایل هستید برای آن عدم حضور را ثبت کنید، انتخاب کنید!
@@ -51,8 +54,8 @@
                                 <span>{{ $message }}</span>
                             </div>
                         @enderror
-                        @foreach ($fetchData['operators'] as $key => $operator)
-                            <div class="col-md-4" wire:ignore>
+                        @foreach ($operators as $key => $operator)
+                            <div class="col-md-4" wire:ignore.self>
                                 <div class="form-group mt-2">
                                     <div class="checkbox">
                                         <div class="custom-checkbox custom-control">
@@ -66,6 +69,9 @@
                                 </div>
                             </div>
                         @endforeach
+                        <div class="d-flex justify-content-center mt-3">
+                            {{$operators->links()}}
+                        </div>
                     @else
                         <div class="col-12 alert alert-primary fade show w-100" role="alert">
                             <i class="fa fa-bell-o me-2 ms-1" aria-hidden="true"></i>

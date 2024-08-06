@@ -131,13 +131,25 @@ class AppointmentUser extends Model
     {
         return $this->hasMany(AppointmentOnline::class);
     }
+
+    public function hasAgent(): bool
+    {
+        $registered_by_user_id =  $this->online()->first()?->details;
+        if (
+            isset($registered_by_user_id) &&
+            isset($registered_by_user_id[AppointmentOnline::COFRIM_OR_REJECT_STATUS]) && isset($registered_by_user_id[AppointmentOnline::COFRIM_OR_REJECT_STATUS][AppointmentOnline::BY])
+        ) {
+            return true;
+        }
+        return false;
+    }
     public function confirm_or_reject_by(): string
     {
         $registered_by_user_id =  $this->online()->first()?->details;
-        if (isset($registered_by_user_id) && isset($registered_by_user_id[AppointmentOnline::COFRIM_OR_REJECT_STATUS]) && isset($registered_by_user_id[AppointmentOnline::COFRIM_OR_REJECT_STATUS][AppointmentOnline::BY])) {
+        if ($this->hasAgent()) {
             return 'تعیین وضعیت: ' . User::find($registered_by_user_id[AppointmentOnline::COFRIM_OR_REJECT_STATUS][AppointmentOnline::BY])->fullName;
         }
-        return 'تایید شده توسط';
+        return '';
     }
     protected function asJson($value)
     {

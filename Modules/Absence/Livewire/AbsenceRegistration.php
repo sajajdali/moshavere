@@ -5,6 +5,7 @@ namespace Modules\Absence\Livewire;
 use Livewire\Component;
 use Illuminate\Support\Arr;
 use Livewire\Attributes\Url;
+use Livewire\WithPagination;
 use Livewire\Attributes\Locked;
 use Modules\User\Entities\User;
 use Spatie\Permission\Models\Role;
@@ -15,6 +16,7 @@ use Modules\AppointmentUser\app\Jobs\CacheJob;
 
 class AbsenceRegistration extends Component
 {
+    use WithPagination;
     public $step = 1;
     #[Url]
     public $search = [];
@@ -222,26 +224,7 @@ class AbsenceRegistration extends Component
 
     public function searchDoctor()
     {
-        $query = User::doctors_query();
-        $this->fetchData['doctors'] = $query->when(isset($this->search['id']) && !empty($this->search['id']), function ($query) {
-            return $query->where('id', 'LIKE', "%{$this->search['id']}%");
-        })->when(isset($this->search['mobile']) && !empty($this->search['mobile']), function ($query) {
-            return $query->where('mobile', 'LIKE', "%{$this->search['mobile']}%");
-        })->when(isset($this->search['first_name']) && !empty($this->search['first_name']), function ($query) {
-            return $query->whereHas('metas', function ($q) {
-                $q->where([
-                    ['meta_key', UserMetaEnum::FIRST_NAME],
-                    ['meta_value', 'LIKE', "%{$this->search['first_name']}%"],
-                ]);
-            });
-        })->when(isset($this->search['last_name']) && !empty($this->search['last_name']), function ($query) {
-            return $query->whereHas('metas', function ($q) {
-                $q->where([
-                    ['meta_key', UserMetaEnum::LAST_NAME],
-                    ['meta_value', 'LIKE', "%{$this->search['last_name']}%"],
-                ]);
-            });
-        })->get();
+        $this->render();
     }
 
     public function resetProperties()
@@ -253,24 +236,7 @@ class AbsenceRegistration extends Component
     //opreator funcions
     public function searchOperators()
     {
-        $query = User::operators_query();
-        $this->fetchData['operators'] =
-            $query->when(isset($this->search['operator_mobile']) && !empty($this->search['operator_mobile']), function ($query) {
-                return $query->where('mobile', 'LIKE', "%{$this->search['operator_mobile']}%");
-            })->when(isset($this->search['operator_name']) && !empty($this->search['operator_name']), function ($query) {
-                $operatorName = $this->search['operator_name'];
-                return $query->whereHas('metas', function ($q) use ($operatorName) {
-                    $q->where(function ($q) use ($operatorName) {
-                        $q->where([
-                            ['meta_key', UserMetaEnum::FIRST_NAME],
-                            ['meta_value', 'LIKE', "%$operatorName%"],
-                        ])->orWhere([
-                            ['meta_key', UserMetaEnum::LAST_NAME],
-                            ['meta_value', 'LIKE', "%$operatorName%"],
-                        ]);
-                    });
-                });
-            })->get();
+        $this->render();
     }
 
     private function SubmitAbsenteForOperator()
@@ -297,18 +263,57 @@ class AbsenceRegistration extends Component
         $this->search = [];
     }
 
-    public function booted() {
-        if($this->step ==1 ) {
+    public function booted()
+    {
+        if ($this->step == 1) {
             $this->dispatch('jsloader', true);
         }
     }
-    public function mount()
-    {
-        $this->fetchData['doctors'] = User::doctors();
-        $this->fetchData['operators'] = User::operators();
-    }
     public function render()
     {
-        return view('absence::livewire.absence-registration');
+        $dotors_q = User::doctors_query()
+            ->when(isset($this->search['id']) && !empty($this->search['id']), function ($query) {
+                return $query->where('id', 'LIKE', "%{$this->search['id']}%");
+            })->when(isset($this->search['mobile']) && !empty($this->search['mobile']), function ($query) {
+                return $query->where('mobile', 'LIKE', "%{$this->search['mobile']}%");
+            })->when(isset($this->search['first_name']) && !empty($this->search['first_name']), function ($query) {
+                return $query->whereHas('metas', function ($q) {
+                    $q->where([
+                        ['meta_key', UserMetaEnum::FIRST_NAME],
+                        ['meta_value', 'LIKE', "%{$this->search['first_name']}%"],
+                    ]);
+                });
+            })->when(isset($this->search['last_name']) && !empty($this->search['last_name']), function ($query) {
+                return $query->whereHas('metas', function ($q) {
+                    $q->where([
+                        ['meta_key', UserMetaEnum::LAST_NAME],
+                        ['meta_value', 'LIKE', "%{$this->search['last_name']}%"],
+                    ]);
+                });
+            });
+
+        $oprators_q = User::operators_query()
+            ->when(isset($this->search['operator_mobile']) && !empty($this->search['operator_mobile']), function ($query) {
+                return $query->where('mobile', 'LIKE', "%{$this->search['operator_mobile']}%");
+            })->when(isset($this->search['operator_name']) && !empty($this->search['operator_name']), function ($query) {
+                $operatorName = $this->search['operator_name'];
+                return $query->whereHas('metas', function ($q) use ($operatorName) {
+                    $q->where(function ($q) use ($operatorName) {
+                        $q->where([
+                            ['meta_key', UserMetaEnum::FIRST_NAME],
+                            ['meta_value', 'LIKE', "%$operatorName%"],
+                        ])->orWhere([
+                            ['meta_key', UserMetaEnum::LAST_NAME],
+                            ['meta_value', 'LIKE', "%$operatorName%"],
+                        ]);
+                    });
+                });
+            });
+
+        // $this->fetchData['operators'] = User::operators();
+        return view('absence::livewire.absence-registration', [
+            'doctors' => $dotors_q->paginate(20),
+            'operators' => $oprators_q->paginate(20),
+        ]);
     }
 }

@@ -865,3 +865,42 @@
       min-height : 0;
     }
   }
+
+  // SCSS for loading overlay
+.loading-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(255, 255, 255, 0.7);
+    z-index: 9999;
+    display: none;
+    justify-content: center;
+    align-items: center;
+    font-size: 2em;
+
+    // Spinner styling (optional, if using a spinner)
+    .spinner-border {
+        width: 3rem;
+        height: 3rem;
+        border-width: 0.3em;
+    }
+
+    .sr-only {
+        position: absolute;
+        width: 1px;
+        height: 1px;
+        margin: -1px;
+        padding: 0;
+        overflow: hidden;
+        clip: rect(0, 0, 0, 0);
+        border: 0;
+    }
+}
+
+// Apply flex display to overlay when wire:loading attribute is present
+.loading-overlay[wire\:loading] {
+    display: flex;
+}
+

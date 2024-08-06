@@ -11,7 +11,8 @@
     <div class="card">
         <div class="card-header border-bottom d-flex flex-column flex-sm-row justify-content-between">
             <h4>ویرایش تنظیمات حضور در <strong>تمام بخش ها</strong></h4>
-            <button wire:click='editGeneralSetting' class="btn btn-info" wire:loading.class='disable btn-loading bg-gray'>
+            <button wire:click='editGeneralSetting' class="btn btn-info loading-btn"
+                wire:loading.class='disable btn-loading bg-gray'>
                 <div class="d-flex">
                     <i class="fa fa-pencil-square-o fa-2x me-2" aria-hidden="true"></i>
                     <span>ویرایش تنظیمات تمام بخش ها</span>
@@ -33,37 +34,37 @@
                                     </tr>
                                 </thead>
                                 <tbody>
-                                @if(!  empty($this->GeneralTimes()))
-                                    @foreach ($this->GeneralTimes() as $appsetting)
-                                        @if (count($appsetting) > 1)
-                                            <tr>
-                                                <td>{{ $appsetting->first()->day_number->getName() }}</td>
-                                                <td>
-                                                    @foreach ($appsetting as $key => $eachDayTime)
+                                    @if (!empty($this->GeneralTimes()))
+                                        @foreach ($this->GeneralTimes() as $appsetting)
+                                            @if (count($appsetting) > 1)
+                                                <tr>
+                                                    <td>{{ $appsetting->first()->day_number->getName() }}</td>
+                                                    <td>
+                                                        @foreach ($appsetting as $key => $eachDayTime)
+                                                            <span class="bg-secondary text-white rounded-pill p-2">از
+                                                                {{ \Carbon\Carbon::createFromFormat('H:i:s', $eachDayTime->start_at)->format('H:i') }}
+                                                                &nbsp;
+                                                                تا
+                                                                &nbsp;
+                                                                {{ \Carbon\Carbon::createFromFormat('H:i:s', $eachDayTime->end_at)->format('H:i') }}</span>
+                                                        @endforeach
+                                                    </td>
+                                                </tr>
+                                            @else
+                                                <tr>
+                                                    <td>{{ $appsetting->first()->day_number->getName() }}</td>
+                                                    <td>
                                                         <span class="bg-secondary text-white rounded-pill p-2">از
-                                                            {{ \Carbon\Carbon::createFromFormat('H:i:s', $eachDayTime->start_at)->format('H:i') }}
+                                                            {{ \Carbon\Carbon::createFromFormat('H:i:s', $appsetting->first()->start_at)->format('H:i') }}
                                                             &nbsp;
                                                             تا
                                                             &nbsp;
-                                                            {{ \Carbon\Carbon::createFromFormat('H:i:s', $eachDayTime->end_at)->format('H:i') }}</span>
-                                                    @endforeach
-                                                </td>
-                                            </tr>
-                                        @else
-                                            <tr>
-                                                <td>{{ $appsetting->first()->day_number->getName() }}</td>
-                                                <td>
-                                                    <span class="bg-secondary text-white rounded-pill p-2">از
-                                                        {{ \Carbon\Carbon::createFromFormat('H:i:s', $appsetting->first()->start_at)->format('H:i') }}
-                                                        &nbsp;
-                                                        تا
-                                                        &nbsp;
-                                                        {{ \Carbon\Carbon::createFromFormat('H:i:s', $appsetting->first()->end_at)->format('H:i') }}</span>
-                                                </td>
-                                            </tr>
-                                        @endif
-                                    @endforeach
-                                @endif
+                                                            {{ \Carbon\Carbon::createFromFormat('H:i:s', $appsetting->first()->end_at)->format('H:i') }}</span>
+                                                    </td>
+                                                </tr>
+                                            @endif
+                                        @endforeach
+                                    @endif
                                 </tbody>
                             </table>
                         </div>
@@ -90,19 +91,19 @@
                             id="special_accordion-{{ $specialAppSetting->id }}" role="tablist">
                             <div class="card mb-0 border-0">
                                 <div class="card-header border-bottom-0" id="headingOne" role="tab">
-                                    <a aria-controls="collapsetree-{{$key}}" aria-expanded="true" data-bs-toggle="collapse"
-                                        href="#collapsetree-{{$key}}"
+                                    <a aria-controls="collapsetree-{{ $key }}" aria-expanded="true"
+                                        data-bs-toggle="collapse" href="#collapsetree-{{ $key }}"
                                         class="accor-basic d-flex flex-column flex-sm-row justify-content-between">
                                         <span> {{ $specialAppSetting->service->title }}</span>
                                         <div>
-                                            <button type="button" class="btn btn-info my-2 my-sm-0"
+                                            <button type="button" class="btn btn-info my-2 my-sm-0 loading-btn"
                                                 wire:click='editSpecialSection({{ $specialAppSetting->id }})'>
                                                 <div class="d-flex">
                                                     <i class="fa fa-cogs fa-lg me-2 mt-1" aria-hidden="true"></i>
                                                     <span>ویرایش تنظیمات این بخش</span>
                                                 </div>
                                             </button>
-                                            <button class="btn btn-danger delete_confirm_alert"
+                                            <button class="btn btn-danger delete_confirm_alert loading-btn"
                                                 data-label="تنظیمات اختصاصی" data-id="{{ $specialAppSetting->id }}">
                                                 <div class="d-flex">
                                                     <i class="fa fa-trash-o fa-lg me-2 mt-1 " aria-hidden="true"></i>
@@ -113,8 +114,8 @@
                                     </a>
                                 </div>
                                 <div aria-labelledby="headingOne" class="collapse"
-                                    data-bs-parent="#special_accordion-{{ $specialAppSetting->id }}" id="collapsetree-{{$key}}"
-                                    role="tabpanel">
+                                    data-bs-parent="#special_accordion-{{ $specialAppSetting->id }}"
+                                    id="collapsetree-{{ $key }}" role="tabpanel">
                                     <div class="card-body br-bottom-radius-5">
                                         <div class="table-responsive ">
                                             <table

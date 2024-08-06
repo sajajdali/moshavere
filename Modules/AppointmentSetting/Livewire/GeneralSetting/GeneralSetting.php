@@ -545,15 +545,21 @@ class GeneralSetting extends Component
         }
         //  check if the setting for sections exist
         //   wich means this section is not the first time that set setting for
+        $generalSetting_exists = AppointmentSetting::whereNull('service_id')
+        ->whereNull('place_id')
+        ->where('user_id', $this->fetchData['user']->id)
+        ->exists();
         $check_Setting_exist = false;
-        if (AppointmentSetting::where('user_id', $this->fetchData['user']->id)->get()->isNotEmpty()) {
+        if ($generalSetting_exists && AppointmentSetting::where('user_id', $this->fetchData['user']->id)->get()->isNotEmpty()) {
             //setting exist
             $check_Setting_exist = true;
         }
         if (session()->has('resetTheSetting')) {
-            $check_Setting_exist = false;
-            $this->isEdited = true;
-            $this->fillTheForm();
+            if ($generalSetting_exists) {
+                $check_Setting_exist = false;
+                $this->isEdited = true;
+                $this->fillTheForm();
+            }
         }
         if ($check_Setting_exist) {
             return redirect()->route('admin.appointment.specialsection', ['user' => $this->fetchData['user']]);

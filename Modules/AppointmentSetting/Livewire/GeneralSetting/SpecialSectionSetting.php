@@ -17,7 +17,6 @@ class SpecialSectionSetting extends Component
 
     public function editGeneralSetting()
     {
-
         session()->flash('resetTheSetting', true);
         return redirect()->route('admin.appointment.setting', ['user' => $this->doctor->id, 'edit' => 'true']);
     }
@@ -31,6 +30,7 @@ class SpecialSectionSetting extends Component
     public function GeneralTimes()
     {
         if(isset($this->fetchData['GeneralAppointmentSetting'])){
+
             return  $this->fetchData['GeneralAppointmentSetting']->times()->whereNull('special_date')->get()->groupBy('day_number');
         }
         return null ;
@@ -53,6 +53,7 @@ class SpecialSectionSetting extends Component
 
     public function editSpecialSection($AppointmentSettingId)
     {
+        $this->dispatch('redirectLoading',true);
         $appTime  = AppointmentSetting::find($AppointmentSettingId);
         session()->flash('resetTheSetting', true);
         return redirect()->route('admin.appointment.setting.specialservice', [$appTime->user_id, $appTime->service_id, $appTime->place_id]);

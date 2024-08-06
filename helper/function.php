@@ -28,6 +28,11 @@ function getCurrentSeason()
     }
 }
 
+function disableUi(): bool
+{
+    return env('DISABLE_TEMPLATE', false) === true;
+}
+
 function convert2english($string) {
     $newNumbers = range(0, 9);
     // 1. Persian HTML decimal

@@ -33,8 +33,16 @@ class DoctorLogin extends Component
             $this->addError('authError', 'مشخصات وارد شده صحیح نیست');
         }
     }
+
+    public function mount()
+    {
+        if (!Auth::guest() && Auth::user()->isAdmin()){
+            return redirect()->route('admin.dashboard')->with('success', 'شما داخل پنل مدیریت هستید');
+        }
+    }
     public function render()
     {
+
         return view('front::livewire.auth.doctor.doctor-login');
     }
 }

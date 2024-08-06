@@ -189,6 +189,10 @@ class User extends Authenticatable
         return  $this->$meta_type?->last()?->meta_key->getOptionName($metaOptions);
     }
 
+    public function isAdmin()
+    {
+        return $this->roles()->where('id' , 1)->count() > 0;
+    }
     public static function doctors()
     {
         return Role::find(3)?->users;

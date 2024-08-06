@@ -102,6 +102,11 @@ class HomePageLivewire extends Component
     }
     public function mount()
     {
+        // when disable ui template
+        if (disableUi()){
+            return redirect()->route('front.login.doctor');
+        }
+
         $this->fetchData['service'] = Service::mostViewedService();
 
         // Fetch doctors with dr_info_status set to true and order them by dr_info_order

@@ -133,7 +133,7 @@ class AppointmentUser extends Model
     }
     public function confirm_or_reject_by(): string
     {
-        $registered_by_user_id =  $this->online()->first()->details;
+        $registered_by_user_id =  $this->online()->first()?->details;
         if (isset($registered_by_user_id) && isset($registered_by_user_id[AppointmentOnline::COFRIM_OR_REJECT_STATUS]) && isset($registered_by_user_id[AppointmentOnline::COFRIM_OR_REJECT_STATUS][AppointmentOnline::BY])) {
             return 'تعیین وضعیت: ' . User::find($registered_by_user_id[AppointmentOnline::COFRIM_OR_REJECT_STATUS][AppointmentOnline::BY])->fullName;
         }

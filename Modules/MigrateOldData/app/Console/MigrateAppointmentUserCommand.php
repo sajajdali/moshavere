@@ -95,6 +95,7 @@ class MigrateAppointmentUserCommand extends Command
     {
         $detail = [
             AppointmentUser::STORE_FROM_APPLICATION => false,
+            AppointmentUser::DETAIL_PAYMENT => ['status' => false],
 
         ];
         return json_encode($detail);

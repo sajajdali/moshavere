@@ -112,6 +112,9 @@
                                     </div>
                                     @endif
                                 </div>
+                                <div class="d-flex justify-content-center">
+                                    {{ $doctors->links() }}
+                                </div>
                             </div>
                             {{-- section panel  --}}
                             <div class="tab-pane @if (isset($this->search['searchService'])) active @endif " id="sections"
@@ -171,6 +174,9 @@
                                             </div>
                                         </div>
                                     @endforeach
+                                </div>
+                                <div class="d-flex justify-content-center">
+                                    {{ $Services->links() }}
                                 </div>
                             </div>
                         </div>

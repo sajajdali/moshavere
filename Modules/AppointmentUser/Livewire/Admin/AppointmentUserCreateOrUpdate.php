@@ -4,6 +4,7 @@ namespace Modules\AppointmentUser\Livewire\Admin;
 
 use App\Enum\ActiveEnum;
 use Livewire\Component;
+use Livewire\WithPagination;
 use Modules\AppointmentSetting\app\Models\AppointmentSetting;
 use Modules\User\Entities\User;
 use Spatie\Permission\Models\Role;
@@ -13,6 +14,7 @@ use Modules\Service\app\Models\Service;
 
 class AppointmentUserCreateOrUpdate extends Component
 {
+    use WithPagination;
     public array $search = [];
     public array $form = [
         'doctorSelected'    => null,
@@ -170,31 +172,31 @@ class AppointmentUserCreateOrUpdate extends Component
     {
         $docQuery = User::doctors_query();
         if (isset($docQuery)) {
-            $docQuery =  $docQuery->whereHas('metas', function ($q) {
-                return $q->where([
-                    ['meta_key', UserMetaEnum::BAN_USER],
-                    ['meta_value', "<>",true],
-                ]);
+            $docQuery =  $docQuery->where(function ($query) {
+                $query->whereDoesntHave('metas', function ($q) {
+                    $q->where('meta_key', UserMetaEnum::BAN_USER)
+                        ->where('meta_value', true);
+                });
             })->when(isset($this->search['doctors']) && !empty($this->search['doctors']), function ($query) {
-                    return $query->where(function ($q) {
-                        $q->whereHas('metas', function ($q) {
-                            $q->where([
-                                ['meta_key', UserMetaEnum::FIRST_NAME],
-                                ['meta_value', 'LIKE', "%{$this->search['doctors']}%"],
-                            ]);
-                        })->orWhereHas('metas', function ($q) {
-                            $q->where([
-                                ['meta_key', UserMetaEnum::LAST_NAME],
-                                ['meta_value', 'LIKE', "%{$this->search['doctors']}%"],
-                            ]);
-                        });
+                return $query->where(function ($q) {
+                    $q->whereHas('metas', function ($q) {
+                        $q->where([
+                            ['meta_key', UserMetaEnum::FIRST_NAME],
+                            ['meta_value', 'LIKE', "%{$this->search['doctors']}%"],
+                        ]);
+                    })->orWhereHas('metas', function ($q) {
+                        $q->where([
+                            ['meta_key', UserMetaEnum::LAST_NAME],
+                            ['meta_value', 'LIKE', "%{$this->search['doctors']}%"],
+                        ]);
                     });
-                })->orderByDesc('id')->get();
+                });
+            })->orderByDesc('id')->paginate(20);
         }
         $Services = Service::where('active', ActiveEnum::ACTIVE)
             ->when(isset($this->search['searchService']) && !empty($this->search['searchService']), function ($query) {
                 return $query->where('title', 'LIKE', "%{$this->search['searchService']}%");
-            })->orderByDesc('id')->get();;
+            })->orderByDesc('id')->paginate(20);
         return view('appointmentuser::livewire.admin.appointment-user-create-or-update', [
             'doctors' => $docQuery,
             'Services' => $Services,

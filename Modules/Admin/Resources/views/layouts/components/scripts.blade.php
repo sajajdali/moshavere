@@ -67,6 +67,9 @@
     $('body').on('click', '.loading-btn', function() {
         appearLoading();
     });
+    window.addEventListener('show-loading', function () {
+            appearLoading();
+        });
     function appearLoading() {
         document.getElementById('loading-indicator').style.display = 'flex';
     }

@@ -94,7 +94,7 @@
                                             </div>
                                             <a href="{{ route('admin.appointment.setting', ['user' => $doctor->id]) }}"
                                                 data-bs-toggle="tooltip" data-bs-placement="top"
-                                                title="تنظمات روز های حضور" class="btn btn-info  d-block">
+                                                title="تنظمات روز های حضور" class="btn btn-info d-block loading-btn">
                                                 <i class="fa fa-calendar"aria-hidden="true"></i> <span>تنظیمات روز های
                                                     حضور</span>
                                             </a>

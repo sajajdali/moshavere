@@ -628,7 +628,7 @@
     <div class="text-end mb-5 me-3">
         <button type="submit" form="setting" wire:click='saveSetting'
             wire:loading.class='btn-loading disabled btn-gray'
-            class="btn btn-success mt-5"><strong>ذخیره</strong></button>
+            class="btn btn-success mt-5 loading-btn"><strong>ذخیره</strong></button>
 
     </div>
 </div>

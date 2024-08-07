@@ -94,6 +94,7 @@ class AppointmentUserCreateOrUpdate extends Component
             $doctor = User::find($this->form['modalSelectedData']['doctor']);
             $this->fetchData['ServiceList'] = $doctor->service;
             if (count($this->fetchData['ServiceList']) == 1) {
+                $this->dispatch('show-loading',true);
                 return redirect()->route(
                     'admin.appointment.add.setTime',
                     [
@@ -113,6 +114,7 @@ class AppointmentUserCreateOrUpdate extends Component
     }
     public function serviceSelected(Service $service)
     {
+        $this->dispatch('show-loading',true);
         return redirect()->route(
             'admin.appointment.add.setTime',
             [
@@ -146,6 +148,7 @@ class AppointmentUserCreateOrUpdate extends Component
             !empty($this->form['modalSelectedData']['doctor']) &&
             !empty($this->form['modalSelectedData']['service'])
         ) {
+            $this->dispatch('show-loading',true);
             return redirect()->route(
                 'admin.appointment.add.setTime',
                 [

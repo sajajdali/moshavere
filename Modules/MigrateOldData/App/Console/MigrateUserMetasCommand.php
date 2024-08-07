@@ -42,7 +42,7 @@ class MigrateUserMetasCommand extends Command
             $newKey = $this->findMetaKeyEnumValue($data->meta_key, $data->user_id);
             $metavalue = $data->meta_value;
             if ($newKey == UserMetaEnum::AVATAR) {
-                $metavalue = url() . 'public/avatar/' . $data->meta_value;
+                $metavalue = url('public/avatar/' . $data->meta_value);
             }
             if ($newKey != null &&  $this->checkUserForegnKey($data->user_id)) {
                 $newData = [

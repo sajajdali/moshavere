@@ -59,7 +59,9 @@ class MigratePlacesCommand extends Command
         $detail = [];
         if (isset($oldValue->phone)) {
             $numbers = json_decode($oldValue->phone, true);
-            $detail[Place::DETAIL_KEY_NUMBERS] = $numbers['number'];
+            if(isset($numbers['number'])){
+                $detail[Place::DETAIL_KEY_NUMBERS] = $numbers['number'];
+            }
         }
         if (isset($oldValue->address)) {
             $detail[Place::DETAIL_ADDRESS] = $oldValue->address;

@@ -47,6 +47,6 @@ class MigrateSpecialiteiesCommand extends Command
             DB::connection('mysql')->table('specialities')->insert($newData);
         }
 
-        $this->info('specialities import successfully.');
+        $this->info('specialities migrate successfully.');
     }
 }

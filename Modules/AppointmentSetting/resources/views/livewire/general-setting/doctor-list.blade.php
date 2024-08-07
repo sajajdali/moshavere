@@ -114,6 +114,9 @@
                                 </div>
                             </div>
                         @endforeach
+                        <div class="d-flex justify-content-center">
+                            {{$doctors->links()}}
+                        </div>
                     </div>
                 </div>
             @elseif($form['services'])

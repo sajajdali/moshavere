@@ -75,7 +75,7 @@ class MigrateAppointmentSetting extends Command
             $this->segmnents($appointment_setting->id, $data);
         }
 
-        $this->info('place migration completed successfully.');
+        $this->info('appointment_setting migration completed successfully.');
     }
     private function createDetail($data, $cost)
     {

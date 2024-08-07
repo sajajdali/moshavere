@@ -47,7 +47,7 @@ class DoctorList extends Component
         } else {
             $this->form['place'] = true;
         }
-       
+
     }
 
 
@@ -77,7 +77,7 @@ class DoctorList extends Component
                         ]);
                     });
                 })
-                ->orderByDesc('id')->paginate(10);
+                ->orderByDesc('id')->paginate(20);
         } else {
             $doctorsQuery = null;
         }

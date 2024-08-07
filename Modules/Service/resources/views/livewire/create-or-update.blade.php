@@ -125,10 +125,12 @@
                         @if (!empty($fetchdata['doctors']))
                             <div class="row mt-5">
                                 <h4>پزشکان مربوط به این بخش</h4>
+                                <input type="text" id="doctor-search" placeholder="جستجوی پزشک..."
+                                class="form-control mb-3">
                                 <hr style="opacity: 0.9">
                                 <div class="row">
                                     @foreach ($fetchdata['doctors'] as $key => $doctor)
-                                        <div class="col-md-6">
+                                        <div class="col-md-6 doctor-item">
                                             <div class="form-group mt-2">
                                                 <div class="checkbox">
                                                     <div class="custom-checkbox custom-control">
@@ -202,7 +204,12 @@
                 //close modal
                 $('#file-selector-modal').modal('hide');
             });
-
+            $('body').on('keyup','#doctor-search',function(){
+                    var value = $(this).val().toLowerCase();
+                    $(".doctor-item").filter(function() {
+                        $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1)
+                    });
+                });
         });
     </script>
 @endpush

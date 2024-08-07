@@ -39,7 +39,7 @@ class MigrateUserMetasCommand extends Command
         // Loop through each record and transform it
         foreach ($oldData as $data) {
             // Transform the data according to new structure
-            $newKey = $this->findMetaKeyEnumValue($data->meta_key);
+            $newKey = $this->findMetaKeyEnumValue($data->meta_key,$data->user_id);
             if ($newKey != null &&  $this->checkUserForegnKey($data->user_id)) {
                 $newData = [
                     'meta_key' => $newKey,
@@ -51,10 +51,9 @@ class MigrateUserMetasCommand extends Command
         }
         $this->info('users meta  migration completed successfully.');
     }
-    private function findMetaKeyEnumValue($metaValue)
+    private function findMetaKeyEnumValue($metaValue,$userid)
     {
-
-        return  UserMetaEnum::fromOldKey($metaValue);
+        return  UserMetaEnum::fromOldKey($metaValue,$userid);
     }
     private function checkUserForegnKey($user_id)
     {

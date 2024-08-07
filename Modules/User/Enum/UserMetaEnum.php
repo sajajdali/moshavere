@@ -73,33 +73,9 @@ enum UserMetaEnum: int implements EnumHasNameInterface
         $map = [
             'FIRST_NAME' => self::FIRST_NAME,
             'LAST_NAME' => self::LAST_NAME,
-            'PROFILE_AVATAR' => self::AVATAR,
-            'BIRTHDAY_MONTH' => self::caclualteBirtDay($userid),
+            'AVATAR' => self::AVATAR,
         ];
-
         return $map[$oldKey] ?? null;
     }
-    private static function caclualteBirtDay($userid)
-    {
-        $day = DB::connection('old_mysql')
-            ->table('user_metas')
-            ->where('user_id', $userid)
-            ->where('meta_key', 'BIRTHDAY_DAY')
-            ->first();
-        $year = DB::connection('old_mysql')
-            ->table('user_metas')
-            ->where('user_id', $userid)
-            ->where('meta_key', 'BIRTHDAY_YEAR')
-            ->first();
-        $month = DB::connection('old_mysql')
-            ->table('user_metas')
-            ->where('user_id', $userid)
-            ->where('meta_key', 'BIRTHDAY_MONTH')
-            ->first();
-        if(isset($day) && isset($month) &&  isset($year)) {
-            $bDay = $day . '/' . $month . '/' . $year;
-            return $bDay;
-        }
-        return null;
-    }
+    
 }

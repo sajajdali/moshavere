@@ -39,25 +39,29 @@ class MigrateUserMetasCommand extends Command
         // Loop through each record and transform it
         foreach ($oldData as $data) {
             // Transform the data according to new structure
-            $newKey = $this->findMetaKeyEnumValue($data->meta_key,$data->user_id);
+            $newKey = $this->findMetaKeyEnumValue($data->meta_key, $data->user_id);
+            $metavalue = $data->meta_value;
+            if ($newKey == UserMetaEnum::AVATAR) {
+                $metavalue = url() . 'public/avatar/' . $data->meta_value;
+            }
             if ($newKey != null &&  $this->checkUserForegnKey($data->user_id)) {
                 $newData = [
                     'meta_key' => $newKey,
                     'user_id' => $data->user_id,
-                    'meta_value' => $data->meta_value,
+                    'meta_value' => $metavalue,
                 ];
                 DB::connection('mysql')->table('user_metas')->insert($newData);
             }
         }
         $this->info('users meta  migration completed successfully.');
     }
-    private function findMetaKeyEnumValue($metaValue,$userid)
+    private function findMetaKeyEnumValue($metaValue, $userid)
     {
-        return  UserMetaEnum::fromOldKey($metaValue,$userid);
+        return  UserMetaEnum::fromOldKey($metaValue, $userid);
     }
     private function checkUserForegnKey($user_id)
     {
         $user_exists = User::find($user_id) !== null;
-        return $user_exists ;
+        return $user_exists;
     }
 }

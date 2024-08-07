@@ -37,15 +37,23 @@ class MigratePlaceUsersCommand extends Command
          // Loop through each record and transform it
          foreach ($oldData as $data) {
              // Transform the data according to new structure
-             $newData = [
-                 'user_id' => $data->user_id,
-                 'place_id' => $data->appointment_office_id,
-             ];
-             // Insert the transformed data into the new database
-             DB::connection('mysql')->table('place_user')->insert($newData);
+             if($this->checkUserForegnKey($data->user_id)) {
+                $newData = [
+                    'user_id' => $data->user_id,
+                    'place_id' => $data->appointment_office_id,
+                ];
+                // Insert the transformed data into the new database
+                DB::connection('mysql')->table('place_user')->insert($newData);
+             }
          }
 
          $this->info('place_user migration completed successfully.');
+    }
+
+    private function checkUserForegnKey($user_id)
+    {
+        $user_exists = \Modules\User\Entities\User::find($user_id) !== null;
+        return $user_exists ;
     }
 
 }

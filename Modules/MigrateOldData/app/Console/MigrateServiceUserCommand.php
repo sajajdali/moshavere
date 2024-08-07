@@ -32,20 +32,28 @@ class MigrateServiceUserCommand extends Command
      */
     public function handle()
     {
-       // Connect to the old database
-       $oldData = DB::connection('old_mysql')->table('appointment_part_user')->get();
+        // Connect to the old database
+        $oldData = DB::connection('old_mysql')->table('appointment_part_user')->get();
 
-       // Loop through each record and transform it
-       foreach ($oldData as $data) {
-           // Transform the data according to new structure
-           $newData = [
-               'service_id' => $data->appointment_part_id,
-               'user_id' => $data->user_id,
-           ];
-           // Insert the transformed data into the new database
-           DB::connection('mysql')->table('service_user')->insert($newData);
-       }
+        // Loop through each record and transform it
+        foreach ($oldData as $data) {
+            // Transform the data according to new structure
+            if ($this->checkUserForegnKey($data->user_id)) {
+                $newData = [
+                    'service_id' => $data->appointment_part_id,
+                    'user_id' => $data->user_id,
+                ];
+                // Insert the transformed data into the new database
+                DB::connection('mysql')->table('service_user')->insert($newData);
+            }
+        }
 
-       $this->info('service_user migration completed successfully.');
+        $this->info('service_user migration completed successfully.');
+    }
+
+    private function checkUserForegnKey($user_id)
+    {
+        $user_exists = \Modules\User\Entities\User::find($user_id) !== null;
+        return $user_exists;
     }
 }

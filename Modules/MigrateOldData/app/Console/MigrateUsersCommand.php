@@ -4,6 +4,7 @@ namespace Modules\MigrateOldData\App\Console;
 
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Hash;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Input\InputArgument;
 
@@ -43,9 +44,9 @@ class MigrateUsersCommand extends Command
         foreach ($oldData as $data) {
             // Transform the data according to new structure
             $newData = [
-                'mobile' => $data->mobile ?? '',
-                'email' => $data->email ?? '',
-                'password' => $data->password ?? '',
+                'mobile' => $data->mobile ?? $this->randomMobile(),
+                'email' => $data->email ?? $data->mobile . uniqId() . '@info.com',
+                'password' => $data->password ?? Hash::make('awjhfawjpofawpokfapow45s6e4ge56sgWedwgpouqoiwmpogjawjgpaowhg2014891@((%&)(@*#@_)*@_)*%UPJVKLEJVIJ)(*&@)(&$)(@)'),
                 'remember_token' => $data->remember_token ?? '',
                 // Add more transformations as needed
             ];
@@ -78,5 +79,10 @@ class MigrateUsersCommand extends Command
             DB::connection('mysql')->table('model_has_roles')->insert($newUserRole);
         }
         $this->info("roled has been assigned");
+    }
+
+    private function randomMobile():string {
+        $rand = mt_rand(1000000,9999999);
+        return '0900'. $rand ;
     }
 }

@@ -43,24 +43,26 @@ class MigrateAppointmentUserCommand extends Command
         // Loop through each record and transform it
         foreach ($oldData as $data) {
             // Transform the data according to new structure
-            $newData = [
-                'agent_id' => $data->agent_id,
-                'appointment_setting_id' => $this->settingId($data),
-                'user_id' => $data->user_id,
-                'doctor_id' => $data->doctor_id,
-                'service_id' => $data->appointment_part_id,
-                'place_id' => $data->appointment_office_id,
-                'operator_id' => $this->findOperatorId($data->operator),
-                'tracking_code' => $this->trackingCode($data->code),
-                'kind' => AppointmentUserKindEnum::OldData($data->type),
-                'start_time' => $data->time_from,
-                'end_time' => $data->time_to,
-                'date_visit' => $this->caculateDateVisit($data),
-                'visited_at' => $data->visit_at,
-                'details' => $this->convertDetails(),
-            ];
-            // Insert the transformed data into the new database
-            DB::connection('mysql')->table('appointment_users')->insert($newData);
+            if ($this->checkUserForegnKey($data->user_id)) {
+                $newData = [
+                    'agent_id' => $data->agent_id,
+                    'appointment_setting_id' => $this->settingId($data),
+                    'user_id' => $data->user_id,
+                    'doctor_id' => $data->doctor_id,
+                    'service_id' => $data->appointment_part_id,
+                    'place_id' => $data->appointment_office_id,
+                    'operator_id' => $this->findOperatorId($data->operator),
+                    'tracking_code' => $this->trackingCode($data->code),
+                    'kind' => AppointmentUserKindEnum::OldData($data->type),
+                    'start_time' => $data->time_from,
+                    'end_time' => $data->time_to,
+                    'date_visit' => $this->caculateDateVisit($data),
+                    'visited_at' => $data->visit_at,
+                    'details' => $this->convertDetails(),
+                ];
+                // Insert the transformed data into the new database
+                DB::connection('mysql')->table('appointment_users')->insert($newData);
+            }
         }
         $this->info('appointment user transfered successfuly.');
     }
@@ -106,5 +108,10 @@ class MigrateAppointmentUserCommand extends Command
         $placeId = $data->appointment_office_id;
         $setting = AppointmentSetting::where('service_id', $serviceId)->where('place_id', $placeId)->first()?->id ?? null;
         return $setting;
+    }
+    private function checkUserForegnKey($user_id)
+    {
+        $user_exists = User::find($user_id) !== null;
+        return $user_exists;
     }
 }

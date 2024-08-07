@@ -3,6 +3,7 @@
 namespace Modules\MigrateOldData\App\Console;
 
 use Illuminate\Console\Command;
+use Modules\User\Entities\User;
 use Illuminate\Support\Facades\DB;
 use Modules\User\Enum\UserMetaEnum;
 use Symfony\Component\Console\Input\InputOption;
@@ -39,7 +40,7 @@ class MigrateUserMetasCommand extends Command
         foreach ($oldData as $data) {
             // Transform the data according to new structure
             $newKey = $this->findMetaKeyEnumValue($data->meta_key);
-            if ($newKey != null) {
+            if ($newKey != null &&  $this->checkUserForegnKey($data->user_id)) {
                 $newData = [
                     'meta_key' => $newKey,
                     'user_id' => $data->user_id,
@@ -54,5 +55,10 @@ class MigrateUserMetasCommand extends Command
     {
 
         return  UserMetaEnum::fromOldKey($metaValue);
+    }
+    private function checkUserForegnKey($user_id)
+    {
+        $user_exists = User::find($user_id) !== null;
+        return $user_exists ;
     }
 }

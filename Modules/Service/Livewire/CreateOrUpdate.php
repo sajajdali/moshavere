@@ -6,6 +6,7 @@ use Livewire\Component;
 use App\Enum\ActiveEnum;
 use Modules\User\Entities\User;
 use Spatie\Permission\Models\Role;
+use Illuminate\Support\Facades\Cache;
 use Modules\Service\app\Models\Service;
 use Modules\Service\Enum\ServiceShowTypeEnum;
 

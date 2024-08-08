@@ -126,6 +126,14 @@ class MessageDetail extends Component
             message: '',
         ));
         $this->fetchData['messages'] = $this->fetchData['appOnline']->messages;
+
+        $this->fetchData['user']->notify(new \Modules\User\Notifications\UserMessageNotification(
+            title: "پیام جدید!",
+            excerpt: 'یک پیام جدید دارید',
+            message: '',
+            link: \App\Enum\RouteEnum::ONLINE_MESSAGE->getLink($this->fetchData['user']->id),
+        ));
+
         $this->dispatch('sendMessage', true);
     }
     public function messages()

@@ -263,6 +263,7 @@ trait OprationButtonsTrait
                 title: "تغییر وضعیت نوبت",
                 excerpt: $notifMessage,
                 message: '',
+                link: \App\Enum\RouteEnum::APPOINTMENT->getLink($appointmentUser->id) ,
             ));
         }
     }

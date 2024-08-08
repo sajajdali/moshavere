@@ -17,7 +17,7 @@ enum AppointmentUserTypeEnum: int implements EnumHasNameInterface , EnumHasApiRe
         };
     }
 
-  
+
     public function getclass() {
         return match($this) {
             self::MAIN__APPOINTMENT => '',

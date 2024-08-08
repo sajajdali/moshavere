@@ -60,8 +60,8 @@ class UpdateOrCreate extends Component
             $this->user->dr_order = $this->form['order'];
         }
         if (isset($this->form['showDocInEmergencyVisit']['status'])) {
-            $this->user->dr_emergencyvisit_order    = $this->form['showDocInEmergencyVisit']['status'];
-            $this->user->dr_emergencyvisit_status   = $this->form['showDocInEmergencyVisit']['order'];
+            $this->user->dr_emergencyvisit_order    = $this->form['showDocInEmergencyVisit']['order'];
+            $this->user->dr_emergencyvisit_status   = $this->form['showDocInEmergencyVisit']['status'];
         } else {
             $this->user->dr_emergencyvisit_order    = false;
             $this->user->dr_emergencyvisit_status   = false;

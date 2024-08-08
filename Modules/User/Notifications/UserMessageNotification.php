@@ -44,6 +44,7 @@ class UserMessageNotification extends Notification
                 'title' => $this->title,
                 'excerpt' => $this->excerpt,
                 'message' => $this->message,
+                // TODO:: 'route' =>
             ])
             ->custom([
                 'android' => [

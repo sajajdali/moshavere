@@ -6,6 +6,7 @@ use Livewire\Component;
 use App\Enum\ActiveEnum;
 use Modules\User\Entities\User;
 use Spatie\Permission\Models\Role;
+use Illuminate\Support\Facades\Cache;
 use Modules\Service\app\Models\Service;
 use Modules\Service\Enum\ServiceShowTypeEnum;
 
@@ -35,7 +36,7 @@ class CreateOrUpdate extends Component
     public function createOrUpdateSection()
     {
         $this->validate();
-
+        Cache::forget('most_viewed_service');
         //data for update Or create Service
         $parentId = $this->form['parent_id'] == 0 || null ? null : $this->form['parent_id'];
         $active = $this->form['active'] == 'true' ? 1 : 0;

@@ -65,7 +65,7 @@
                                 <div class="row mb-4">
                                     <label class="form-label col-md-2" for="homepageStatus">نمایش در صفحه ی اصلی</label>
                                     <div class="col-md-10">
-                                        <select wire:model='search.showHomePage' 
+                                        <select wire:model='search.showHomePage'
                                             class="form-control form-select" id="homepageStatus"
                                             data-bs-placeholder="انتخاب کنید..">
                                             <option label="انتخاب کنید"></option>
@@ -168,8 +168,8 @@
                                 </tbody>
                             </table>
                         </div>
-                        <div>
-                            {{-- {{ $specialities->links() }} --}}
+                        <div class="d-flex justify-content-center mt-1">
+                            {{ $specialities->links() }}
                         </div>
                     </div>
                 </div>

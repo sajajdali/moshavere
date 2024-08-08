@@ -17,8 +17,11 @@
     @if(isset($fetchData['comments']) && $fetchData['comments']->isNotEmpty())
         @include('front::components.homepage.comments')
     @endif
+
+    @if (env('DISABLED_BLOGS'))
     {{-- آخرین مطالب --}}
     @include('front::components.homepage.blogs')
+    @endif
 
     {{-- جدیدترین پزشکان --}}
     @include('front::components.homepage.newestdoc')

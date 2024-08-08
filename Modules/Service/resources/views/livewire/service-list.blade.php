@@ -169,7 +169,7 @@
                             </table>
                         </div>
                         <div class="d-flex justify-content-center mt-1">
-                            {{ $specialities->links() }}
+                            {{ $services->links() }}
                         </div>
                     </div>
                 </div>

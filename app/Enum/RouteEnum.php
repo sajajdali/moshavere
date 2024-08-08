@@ -15,10 +15,11 @@ enum RouteEnum: string implements EnumHasDefaultInterface
         return self::APPOINTMENT;
     }
 
-    public function getLink() {
-        return match($this) {
-            self::APPOINTMENT => '',
-            self::transaction => '',
+    public function getLink(string $replacement = '')
+    {
+        return match ($this) {
+            self::APPOINTMENT => str_replace('{id}', $replacement, $this->value),
+            default => $this->value,
         };
     }
 }

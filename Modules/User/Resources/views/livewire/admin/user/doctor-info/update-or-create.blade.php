@@ -187,6 +187,7 @@
                                                     برای مثال: 26سال تجربه</small>
                                             </div>
                                         </div>
+                                        @unless(disableUi())
                                         <div class="col-md-12">
                                             <div class="form-group">
                                                 <label for="drDisplayDiscription" class="form-label">توضیحات مربوط به پزشک</label>
@@ -196,6 +197,7 @@
                                                     توضیحاتی که مختص به دریافت نوبت از این پزشک می باشد و در صفحه ی پروفایل پزشک نمایش داده می شود</small>
                                             </div>
                                         </div>
+                                        @endunless
                                     </div>
                                     {{-- seperator --}}
                                     <div class="col-12 col-md-3 mt-5">
@@ -218,6 +220,7 @@
                                         </div>
                                     </div>
                                     {{-- emergency status --}}
+                                    @unless(disableUi())
                                     <div class="col-md-12 mt-2">
                                         <div class="d-flex flex-wrap align-items-center">
                                             <div class="material-switch">
@@ -229,6 +232,7 @@
                                             <p class="card-sub-title">نمایش در لیست {{setting(\Modules\Setting\Enum\SettingKeyEnum::SITE_FIRST_SECTION_TITLE) ?? 'اول در صفحه اصلی'}}</p>
                                         </div>
                                     </div>
+                                    @endunless
                                     <div class="col-md-12" id="orderForEmergencyVisitDiv" wire:ignore.self>
                                         <div class="form-group">
                                             <label for="order-showDocInEmergencyVisit">ترتیب نمایش در در {{setting(\Modules\Setting\Enum\SettingKeyEnum::SITE_FIRST_SECTION_TITLE) ?? ' اول در صفحه اصلی'}}
@@ -239,6 +243,7 @@
                                         </div>
                                     </div>
                                     {{-- info status --}}
+                                    @unless(disableUi())
                                     <div class="col-md-12 mt-2">
                                         <div class="d-flex flex-wrap align-items-center">
                                             <div class="material-switch">
@@ -250,6 +255,7 @@
                                             <p class="card-sub-title">نمایش در لیست {{setting(\Modules\Setting\Enum\SettingKeyEnum::SITE_SECEND_SECTION_TITLE) ?? 'دوم در صفحه اصلی'}}</p>
                                         </div>
                                     </div>
+                                    @endunless
                                     <div class="col-md-12" id="orderInDoctorsInfo" wire:ignore.self>
                                         <div class="form-group">
                                             <label for="order-showDocInEmergencyVisit">ترتیب نمایش در {{setting(\Modules\Setting\Enum\SettingKeyEnum::SITE_SECEND_SECTION_TITLE) ?? 'دوم در صفحه اصلی'}}</label>

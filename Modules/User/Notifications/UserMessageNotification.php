@@ -19,7 +19,7 @@ class UserMessageNotification extends Notification
      *
      * @return void
      */
-    public function __construct(public string $title, public string $excerpt, public string $message,public mixed $params = null)
+    public function __construct(public string $title, public string $excerpt, public string $message,public mixed $params = null , public ?string $link = null)
     {
     }
 
@@ -44,6 +44,7 @@ class UserMessageNotification extends Notification
                 'title' => $this->title,
                 'excerpt' => $this->excerpt,
                 'message' => $this->message,
+                'link' => $this->link,
                 // TODO:: 'route' =>
             ])
             ->custom([

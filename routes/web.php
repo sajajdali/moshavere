@@ -190,6 +190,7 @@ Route::get('/notif',function(){
         title: "test title",
         excerpt: "test excerpt",
         message: 'test message',
+        link: \App\Enum\RouteEnum::APPOINTMENT->getLink('2')
     ));
 });
 

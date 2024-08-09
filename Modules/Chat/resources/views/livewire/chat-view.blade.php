@@ -67,7 +67,7 @@
                                 <!-- main-chat-header -->
                                 <div class="main-chat-body flex-2" id="ChatBody">
                                     @if ($this->chatList?->isNotEmpty())
-                                        <div class="content-inner">
+                                        <div class="content-inner" id="lightgallery">
                                             @foreach ($this->chatList as $date => $chatItems)
                                                 <label
                                                     class="main-chat-time"><span>{{ \Carbon\Carbon::parse($date)->diffForHumans() }}</span></label>
@@ -84,7 +84,11 @@
                                                             <div class="media-body">
                                                                 @if ($chatMessage->files()->count())
                                                                     @foreach($chatMessage->files as $file)
-                                                                        @if($file->mime == 'mp3')
+                                                                        @if(in_array($file->mime, ['jpg', 'jpeg', 'png', 'gif', 'webp', 'bmp', 'svg', 'tiff', 'heic', 'heif']))
+                                                                            <a href="{{  Storage::url($file->disk  . $file->server_name) }}" data-fancybox="gallery" data-caption="{{ $file->original_name }}">
+                                                                                <img src="{{  Storage::url($file->disk  . $file->server_name) }}" alt="{{ $file->original_name }}" style="width: 100px; height: auto;"/>
+                                                                            </a>
+                                                                        @elseif($file->mime == 'mp3')
                                                                             <audio src="{{ Storage::url($file->disk  . $file->server_name) }}" controls preload="auto"></audio>
 
 
@@ -170,7 +174,31 @@
     <script src="{{ admin_asset('plugins/tabs/tab-content.js') }}"></script>
     <script src="{{ admin_asset('js/chat.js') }}"></script>
     <script src="{{ admin_asset('plugins/sweet-alert/sweetalert.min.js') }}"></script>
-    <script>
+
+            <!-- Include Fancybox CSS -->
+            <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+            <!-- Include jQuery (if not already included) -->
+            <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+
+            <!-- Include Fancybox JS -->
+            <script src="https://cdnjs.cloudflare.com/ajax/libs/fancybox/3.5.7/jquery.fancybox.min.js"></script>
+            <script>
+                $(document).ready(function() {
+                    $('[data-fancybox="gallery"]').fancybox({
+                        buttons: [
+                            "zoom",
+                            "slideShow",
+                            "thumbs",
+                            "close"
+                        ],
+                        loop: true,
+                        protect: true,
+                        // Add more options as needed
+                    });
+                });
+            </script>
+            <script>
         Livewire.on('error', param => {
             swal({
                 title: "خطا!",

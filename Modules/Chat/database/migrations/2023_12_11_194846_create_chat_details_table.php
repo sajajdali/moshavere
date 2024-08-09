@@ -16,7 +16,7 @@ return new class extends Migration
             $table->foreignId('chat_id')->constrained('chats')->onDelete('cascade');
             $table->foreignId('user_id')->constrained('users')->onDelete('cascade');
             $table->tinyInteger('type')->default(1)->comment('1 = question and 2 = answer');
-            $table->longText('content');
+            $table->longText('content')->nullable();
             $table->timestamps();
         });
     }

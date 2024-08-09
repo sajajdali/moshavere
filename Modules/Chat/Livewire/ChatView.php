@@ -97,13 +97,15 @@ class ChatView extends Component
         }
         $chatDetail = $this->chat?->chatDetails()->create([
             'content' => $this->chatMessage,
-            'type' => ChatDetailTypeEnum::MESSAGE,
+            'type' => ChatDetailTypeEnum::ADMIN_MESSAGE,
             'user_id' => auth()->id(),
         ]);
         $this->chat?->update([
             'status' => ChatStatusEnum::ANSWERED,
             'new_message_by_user' => 0,
         ]);
+        $this->chat?->increment('new_message_by_support');
+
         //clear input
         $this->chatMessage = '';
 

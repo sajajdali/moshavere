@@ -89,7 +89,7 @@
                                                                                 <source src="{{ Storage::url($file->disk  . $file->server_name) }}" type="audio/mpeg">
                                                                                 Your browser does not support the audio element.
                                                                             </audio>
-                                                                        @else
+                                                                        @endif
                                                                             <div class="main-msg-wrapper">
                                                                                 <a class="text-dark"
                                                                                    href="{{ Storage::url($file->disk  . $file->server_name) }}">
@@ -98,7 +98,6 @@
                                                                                         class="fe fe-download mt-3 ms-4 text-muted pe-2"></i>
                                                                                 </a>
                                                                             </div>
-                                                                        @endif
                                                                     @endforeach
                                                                 @endif
                                                                 @if($chatMessage->content)

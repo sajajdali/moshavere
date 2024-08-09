@@ -114,7 +114,6 @@ class ChatView extends Component
 
         event(new PusherBroadcast($message , $this->chat->id));
 
-        dd(\App\Enum\RouteEnum::CHAT->getLink($this->chat->id));
         $this->chat->user->notify(new \Modules\User\Notifications\UserMessageNotification(
             title: "پیام جدید!",
             excerpt: 'یک پیام جدید دارید',

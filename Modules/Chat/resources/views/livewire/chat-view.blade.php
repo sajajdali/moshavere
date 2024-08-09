@@ -85,10 +85,9 @@
                                                                 @if ($chatMessage->files()->count())
                                                                     @foreach($chatMessage->files as $file)
                                                                         @if($file->mime == 'mp3')
-                                                                            <audio controls>
-                                                                                <source src="{{ Storage::url($file->disk  . $file->server_name) }}" type="audio/mpeg">
-                                                                                Your browser does not support the audio element.
-                                                                            </audio>
+                                                                            <audio src="{{ Storage::url($file->disk  . $file->server_name) }}" controls preload="auto"></audio>
+
+
                                                                         @endif
                                                                             <div class="main-msg-wrapper">
                                                                                 <a class="text-dark"

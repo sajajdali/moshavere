@@ -118,7 +118,7 @@ class ChatView extends Component
             title: "پیام جدید!",
             excerpt: 'یک پیام جدید دارید',
             message: '',
-            link: \App\Enum\RouteEnum::CHAT->getLink($this->chat->id),
+            link: \App\Enum\RouteEnum::ONLINE_MESSAGE->getLink($this->chat->id),
         ));
 
         AdminAnswerChatEvent::dispatch($this->chat);

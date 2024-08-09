@@ -72,63 +72,47 @@
                                                 <label
                                                     class="main-chat-time"><span>{{ \Carbon\Carbon::parse($date)->diffForHumans() }}</span></label>
                                                 @foreach ($chatItems as $chatMessage)
-                                                    @if ($chatMessage->user_id != $this->chat?->user_id)
-                                                        <div class="media chat-left">
-                                                            <div class="main-img-user online">
-                                                                <img alt="avatar"
-                                                                    src="{{ $chatMessage->user?->avatar }}">
-                                                            </div>
-                                                            <div class="media-body">
-                                                                @if ($chatMessage->type->is(\Modules\Chat\Enum\ChatDetailTypeEnum::MESSAGE))
-                                                                    <div class="main-msg-wrapper">
-                                                                        {{ $chatMessage->content }}
-                                                                    </div>
-                                                                @else
-                                                                    <div class="main-msg-wrapper">
-                                                                        <a class="text-dark"
-                                                                            href="{{ $chatMessage->content }}">
-                                                                            <span class="fs-13 mt-1"> دانلود فایل
-                                                                            </span> <i
-                                                                                class="fe fe-download mt-3 ms-4 text-muted pe-2"></i>
-                                                                        </a>
-                                                                        {{-- <img src="{{ $chatMessage->content }}"
-                                                                            alt=""> --}}
-                                                                    </div>
-                                                                @endif
-                                                                <div>
-                                                                    <span>{{ $chatMessage->created_at->format('H:i') }}</span>
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                    @else
+                                                        @if ($chatMessage->type->is(\Modules\Chat\Enum\ChatDetailTypeEnum::MESSAGE))
                                                         <div class="media flex-row-reverse chat-right">
-
+                                                            @else
+                                                        <div class="media chat-left">
+                                                            @endif
                                                             <div class="main-img-user online">
                                                                 <img alt="avatar"
                                                                     src="{{ $chatMessage->user?->avatar }}">
                                                             </div>
                                                             <div class="media-body">
-                                                                @if ($chatMessage->type->is(\Modules\Chat\Enum\ChatDetailTypeEnum::MESSAGE))
+                                                                @if ($chatMessage->files()->count())
+                                                                    @foreach($chatMessage->files as $file)
+                                                                        @if($file->mime == 'mp3')
+                                                                            <audio controls>
+                                                                                <source src="{{ Storage::url($file->disk  . $file->server_name) }}" type="audio/mpeg">
+                                                                                Your browser does not support the audio element.
+                                                                            </audio>
+                                                                        @else
+                                                                            <div class="main-msg-wrapper">
+                                                                                <a class="text-dark"
+                                                                                   href="{{ Storage::url($file->disk  . $file->server_name) }}">
+                                                                                    <span class="fs-13 mt-1"> دانلود فایل
+                                                                                    </span> <i
+                                                                                        class="fe fe-download mt-3 ms-4 text-muted pe-2"></i>
+                                                                                </a>
+                                                                            </div>
+                                                                        @endif
+                                                                    @endforeach
+                                                                @endif
+                                                                @if($chatMessage->content)
                                                                     <div class="main-msg-wrapper">
                                                                         {{ $chatMessage->content }}
                                                                     </div>
-                                                                @else
-                                                                    <div class="main-msg-wrapper">
-                                                                        <a class="text-dark"
-                                                                            href="{{ $chatMessage->content }}">
-                                                                            <span class="fs-13 mt-1"> دانلود فایل
-                                                                            </span> <i
-                                                                                class="fe fe-download mt-3 ms-4 text-muted pe-2"></i>
-                                                                        </a>
-                                                                    </div>
                                                                 @endif
+
                                                                 <div>
                                                                     <span>{{ $chatMessage->created_at->format('H:i') }}</span>
                                                                 </div>
                                                             </div>
-
                                                         </div>
-                                                    @endif
+
                                                 @endforeach
                                             @endforeach
                                         </div>

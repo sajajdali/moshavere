@@ -21,6 +21,7 @@ enum RouteEnum: string implements EnumHasDefaultInterface
     {
         return match ($this) {
             self::APPOINTMENT => str_replace('{id}', $replacement, $this->value),
+            self::CHAT => str_replace('{id}', $replacement, $this->value),
             default => $this->value,
         };
     }

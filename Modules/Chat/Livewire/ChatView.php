@@ -111,7 +111,15 @@ class ChatView extends Component
 
         // send pusher event
         $message = ChatDetailResource::make($chatDetail);
+
         event(new PusherBroadcast($message , $this->chat->id));
+
+        $this->chat->user->notify(new \Modules\User\Notifications\UserMessageNotification(
+            title: "پیام جدید!",
+            excerpt: 'یک پیام جدید دارید',
+            message: '',
+            link: \App\Enum\RouteEnum::CHAT->getLink($this->chat->user->id),
+        ));
 
         AdminAnswerChatEvent::dispatch($this->chat);
     }

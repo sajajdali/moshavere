@@ -94,7 +94,7 @@ class AppointmentOnlineMessagesList extends Component
         })->when(isset($this->search['appointment_messages']), function ($q) {
             return $q->where('body', 'LIKE', "%{$this->search['appointment_messages']}%");
         })
-            ->selectRaw('appointment_online_id, MAX(id) as id,MAX(user_id) as user_id,MAX(type) as type,MAX(seen) as seen,MAX(body) as body')
+            ->selectRaw('appointment_online_id, MAX(id) as id,MAX(user_id) as user_id,MAX(type) as type,MAX(seen) as seen,MAX(body) as body,MAX(updated_at) as updated_at')
             ->groupBy('appointment_online_id')
             ->orderBy('updated_at');
 

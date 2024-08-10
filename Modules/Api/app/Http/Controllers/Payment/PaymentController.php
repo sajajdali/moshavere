@@ -3,6 +3,7 @@
 namespace Modules\Api\App\Http\Controllers\Payment;
 
 use Illuminate\Http\Request;
+use Modules\AppointmentUser\Enum\AppointmentUserKindEnum;
 use Shetabit\Multipay\Invoice;
 use App\Http\Controllers\Controller;
 use Shetabit\Payment\Facade\Payment;
@@ -86,7 +87,8 @@ class PaymentController extends Controller
         try {
             $amount = $appointmentUser->details[AppointmentUser::DETAIL_PAYMENT][AppointmentUser::DETAIL_PAYMENT_PRICE]['int'];
             $receipt = Payment::amount($amount)
-                ->transactionId($appointmentUser->transaction->detail['transactionId'])->verify();
+                ->transactionId($appointmentUser->transaction->detail['transactionId'])
+                ->verify();
             $appointmentUser->update([
                 'status' => AppointmentUserStatusEnum::STATUS_SUCCESSFUL
             ]);
@@ -95,6 +97,12 @@ class PaymentController extends Controller
                 $appointmentUser->notify(new AppointmentSmsNotification($smsTemplate));
             }
             $appointmentUser->transaction->update(['status' => TransactionStatusEnum::SUCCESSFUL]);
+
+            // if appointment is online
+            if($appointmentUser->kind == AppointmentUserKindEnum::ONLINE){
+                $appointmentUser->online->first()->update(['status' => \Modules\AppointmentUser\Enum\AppointmentOnlineStatusEnum::ACCEPTED]);
+            }
+
             return redirect()->route('front.setAppointment.detail', ['tracking_code' => $appointmentUser->tracking_code, 'msg' => 'پرداخت با موفقیت انجام شد']);
         } catch (InvalidPaymentException $exception) {
             $appointmentUser->transaction->update(['status' => TransactionStatusEnum::REJECTED]);

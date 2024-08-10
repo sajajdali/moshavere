@@ -120,18 +120,14 @@ class MessageDetail extends Component
         }
         unset($this->form['typedMessage']);
         $this->addError('success', 'پیام با موفقیت ارسال شد');
-        $this->fetchData['user']->notify(new \Modules\User\Notifications\UserMessageNotification(
-            title: "پیام جدید",
-            excerpt: "یک پیام جدید دارید!",
-            message: '',
-        ));
+
         $this->fetchData['messages'] = $this->fetchData['appOnline']->messages;
 
         $this->fetchData['user']->notify(new \Modules\User\Notifications\UserMessageNotification(
             title: "پیام جدید!",
             excerpt: 'یک پیام جدید دارید',
             message: '',
-            link: \App\Enum\RouteEnum::ONLINE_MESSAGE->getLink($this->fetchData['user']->id),
+            link: \App\Enum\RouteEnum::ONLINE_MESSAGE->getLink($this->fetchData['appOnline']->id),
         ));
 
         $this->dispatch('sendMessage', true);

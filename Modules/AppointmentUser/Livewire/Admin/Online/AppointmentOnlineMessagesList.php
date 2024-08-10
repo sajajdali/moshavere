@@ -3,17 +3,23 @@
 namespace Modules\AppointmentUser\Livewire\Admin\Online;
 
 use Livewire\Component;
+use Livewire\WithPagination;
 use Livewire\Attributes\Title;
 use Livewire\Attributes\Computed;
 use Modules\User\Enum\UserMetaEnum;
 use Hekmatinasser\Verta\Facades\Verta;
+use Modules\AppointmentUser\Traits\OprationButtonsTrait;
 use Modules\AppointmentUser\app\Models\AppointmentOnline;
-use Modules\AppointmentUser\Enum\AppointmentOnlineMessageSeenEnum;
 use Modules\AppointmentUser\Enum\AppointmentUserStatusEnum;
+use Modules\AppointmentUser\Enum\AppointmentOnlineStatusEnum;
+use Modules\AppointmentUser\app\Models\AppointmentOnlineMessage;
+use Modules\AppointmentUser\Enum\AppointmentOnlineMessageSeenEnum;
 
 #[Title('پیام های پشتیبانی')]
 class AppointmentOnlineMessagesList extends Component
 {
+    use WithPagination;
+    use OprationButtonsTrait ;
     public array $search = [
         'user_id' => null,
         'user_first_name' => null,
@@ -30,138 +36,77 @@ class AppointmentOnlineMessagesList extends Component
     public array $fetchData = [];
     public function startSearch()
     {
+        $this->handleSearch();
         $this->render();
     }
     public function resetProperties()
     {
-        $this->search = [
-            'user_id' => null,
-            'user_first_name' => null,
-            'user_last_name' => null,
-            'user_mobile' => null,
-            'appointment_date' => null,
-            'appointment_set_date' => null,
-            'appointment_end_date' => null,
-            'appointment_star_date' => null,
-            'AppointmentStatus' => null,
-            'appointment_messages' => null,
-        ];
+        $this->search = [];
+        $this->handleSearch();
         $this->render();
     }
     #[Computed]
     public function handleSearch()
     {
-        $query = AppointmentOnline::with('messages');
-        $searchCriteria = [
-            'user_id_search' => [
-                'condition' => $this->search['user_id'],
-                'callback' => function ($query) {
-                    return $query->where('user_id', $this->search['user_id']);
-                },
-            ],
-            'appointment_messages' => [
-                'condition' => $this->search['appointment_messages'],
-                'callback' => function ($query) {
-                    return $query->whereHas('messages', function ($q) {
-                        return $q->where('body', 'LIKE', "%{$this->search['appointment_messages']}%");
-                    });
-                },
-            ],
-            'user_first_name' => [
-                'condition' => $this->search['user_first_name'],
-                'callback' => function ($query) {
-                    return $query->whereHas('user', function ($q) {
-                        $q->whereHas('metas', function ($qq) {
-                            $qq->where([
-                                ['meta_key', UserMetaEnum::FIRST_NAME],
-                                ['meta_value', 'LIKE', "%{$this->search['user_first_name']}%"],
-                            ]);
-                        });
-                    });
-                },
-            ],
-            'user_last_name' => [
-                'condition' => $this->search['user_last_name'],
-                'callback' => function ($query) {
-                    return $query->whereHas('user', function ($q) {
-                        $q->whereHas('metas', function ($qq) {
-                            $qq->where([
-                                ['meta_key', UserMetaEnum::LAST_NAME],
-                                ['meta_value', 'LIKE', "%{$this->search['user_last_name']}%"],
-                            ]);
-                        });
-                    });
-                },
-            ],
-            'mobile' => [
-                'condition' => $this->search['user_mobile'],
-                'callback' => function ($query) {
-                    return $query->whereHas('user', function ($q) {
-                        $q->whereHas('metas', function ($qq) {
-                            $qq->where([
-                                ['meta_key', UserMetaEnum::MOBILE],
-                                ['meta_value', 'LIKE', "%{$this->search['user_mobile']}%"],
-                            ]);
-                        });
-                    });
-                },
-            ],
-            'appointment_date' => [
-                'condition' => $this->search['appointment_date'],
-                'callback' => function ($query) {
-                    return $query->whereDate('date_visit', Verta::parse($this->search['appointment_date'])->toCarbon());
-                },
-            ],
-            'appointment_set_date' => [
-                'condition' => $this->search['appointment_set_date'],
-                'callback' => function ($query) {
-                    return $query->whereDate('created_at', Verta::parse($this->search['appointment_set_date'])->toCarbon());
-                },
-            ],
-            'appointment_end_date' => [
-                'condition' => $this->search['appointment_end_date'],
-                'callback' => function ($query) {
-                    return $query->whereDate('created_at', '<', Verta::parse($this->search['appointment_end_date'])->toCarbon());
-                },
-            ],
-            'appointment_star_date' => [
-                'condition' => $this->search['appointment_star_date'],
-                'callback' => function ($query) {
-                    return $query->whereDate('created_at', '>', Verta::parse($this->search['appointment_star_date'])->toCarbon());
-                },
-            ],
-            'AppointmentStatus' => [
-                'condition' => $this->search['AppointmentStatus'],
-                'callback' => function ($query) {
-                    return $query->where('status', AppointmentUserStatusEnum::tryFrom($this->search['AppointmentStatus']));
-                },
-            ],
-        ];
-
-        foreach ($searchCriteria as $property => $config) {
-            $condition = $config['condition'];
-            $callback = $config['callback'];
-            if (!empty($condition)) {
-                $query->when($condition, $callback);
-            }
-        }
-        // TODO::sort the chat
-        $query->get()->transform(function ($appointment) {
-            $appointment->messages = $appointment->messages->filter(function ($message) {
-                return $message->seen === AppointmentOnlineMessageSeenEnum::UNSEEN;
+        // $query = AppointmentOnlineMessage::where('type',1)
+        $query = AppointmentOnlineMessage::query()
+        ->when(isset($this->search['user_id']), function ($q) {
+            return $q->where('user_id', $this->search['user_id']);
+        })->when(isset($this->search['user_first_name']), function ($q) {
+            return $q->whereHas('user', function ($qq) {
+                return $qq->whereHas('metas', function ($qqq) {
+                    return $qqq->where([
+                        ['meta_key', UserMetaEnum::FIRST_NAME],
+                        ['meta_value', 'LIKE',"%{$this->search['user_first_name']}%"],
+                    ]);
+                });
             });
-            return $appointment;
-        });
-        // Sort appointments based on the latest unseen message
-        $query->get()->sortByDesc(function ($appointment) {
-            return $appointment->messages->max('updated_at');
-        });
-        return  $query->paginate(10);
+        })->when(isset($this->search['user_last_name']), function ($q) {
+            return $q->whereHas('user', function ($qq) {
+                return $qq->whereHas('metas', function ($qqq) {
+                    return $qqq->where([
+                        ['meta_key', UserMetaEnum::LAST_NAME],
+                        ['meta_value', 'LIKE',"%{$this->search['user_last_name']}%"],
+                    ]);
+                });
+            });
+        })->when(isset($this->search['search-docNumberId']), function ($q) {
+            return $q->whereHas('user', function ($qq) {
+                return $qq->whereHas('metas', function ($qqq) {
+                    return $qqq->where([
+                        ['meta_key', UserMetaEnum::DOCUMENT_NUMBER],
+                        ['meta_value', 'LIKE', "%{$this->search['search-docNumberId']}%"],
+                    ]);
+                });
+            });
+        })->when(isset($this->search['user_mobile']), function ($q) {
+            return $q->whereHas('user', function ($q) {
+                return $q->where('mobile', 'LIKE', "%{$this->search['user_mobile']}%");
+            });
+        })->when(isset($this->search['AppointmentStatus']), function ($q) {
+             $q->whereHas('online', function ($q) {
+                 $q->where('status', AppointmentOnlineStatusEnum::tryFrom($this->search['AppointmentStatus']));
+            });
+        })->when(isset($this->search['appointment_date']), function ($q) {
+            return $q->whereHas('online', function ($qq) {
+                return $qq->whereDate('date_visit', Verta::parse($this->search['appointment_date'])->toCarbon());
+            });
+        })->when(isset($this->search['appointment_messages']), function ($q) {
+            return $q->where('body', 'LIKE', "%{$this->search['appointment_messages']}%");
+        })
+            ->selectRaw('appointment_online_id, MAX(id) as id,MAX(user_id) as user_id,MAX(type) as type,MAX(seen) as seen,MAX(body) as body')
+            ->groupBy('appointment_online_id')
+            ->orderBy('updated_at');
 
+        return  $query->paginate(10);
     }
     public function booted()
     {
         $this->dispatch('loadJs', true);
+    }
+    private function redirectToPage($msg)
+    {
+        return redirect()->route('admin.appointment_user.message.list')->with('success', $msg);
     }
     public function render()
     {

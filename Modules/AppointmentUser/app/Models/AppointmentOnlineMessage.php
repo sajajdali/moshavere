@@ -50,5 +50,8 @@ class AppointmentOnlineMessage extends Model
     {
         return json_encode($value, JSON_UNESCAPED_UNICODE);
     }
-
+    public function countUserMessages()
+    {
+        return self::where('user_id', $this->user_id)->count();
+    }
 }

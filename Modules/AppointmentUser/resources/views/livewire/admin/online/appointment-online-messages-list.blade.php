@@ -1,4 +1,11 @@
 <div>
+    <div wire:loading>
+        <div class="loading-overlay d-flex align-items-center justify-content-center">
+            <div class="spinner-border text-primary" role="status">
+                <span class="sr-only">Loading...</span>
+            </div>
+        </div>
+    </div>
     <!-- PAGE-HEADER -->
     <div class="page-header">
         <div>
@@ -98,9 +105,7 @@
                                         </div>
                                         <div class="collapse row
                                         @if (isset($search['appointment_date']) ||
-                                                isset($search['appointment_set_date']) ||
-                                                isset($search['appointment_star_date']) ||
-                                                isset($search['appointment_end_date'])) show @endif"
+                                                isset($search['appointment_set_date']) ) show @endif"
                                             id="appointmentCollapsSearch" wire:ignore.self>
                                             <div class="col-md-6">
                                                 <label for="search-appointment_date" class="form-label"><strong>زمان
@@ -108,34 +113,6 @@
                                                 <input class="form-control" id="search-appointment_date"
                                                     wire:model="search.appointment_date"
                                                     placeholder="زمانی که نوبت دریافت شده" type="text">
-
-                                            </div>
-                                            <div class="col-md-6">
-                                                <label for="search-id-appointment_set_date"
-                                                    class="form-label"><strong>زمان
-                                                        ثبت
-                                                        نوبت</strong></label>
-                                                <input class="form-control" id="search-appointment_set_date"
-                                                    wire:model="search.appointment_set_date"
-                                                    placeholder="زمانی که نوبت ثبت شده" type="text">
-
-                                            </div>
-                                            <div class="col-md-6">
-                                                <label for="search-id-appointment_star_date"
-                                                    class="form-label"><strong>تاریخ
-                                                        شروع</strong></label>
-                                                <input class="form-control" id="search-appointment_star_date"
-                                                    wire:model="search.appointment_star_date"
-                                                    placeholder="نوبت های از این تاریخ به بعد" type="text">
-
-                                            </div>
-                                            <div class="col-md-6">
-                                                <label for="search-id-appointment_end_date"
-                                                    class="form-label"><strong>تاریخ
-                                                        پایان</strong></label>
-                                                <input class="form-control" id="search-appointment_end_date"
-                                                    wire:model="search.appointment_end_date"
-                                                    placeholder="نوبت هایی ازین تاریخ به قبل" type="text">
 
                                             </div>
                                             <div class="col-md-6">
@@ -211,67 +188,56 @@
                         </div>
                     </div>
                     {{-- chats --}}
-                    <div class="main-chat-list tab-pane mt-5">
-                        @foreach ($this->handleSearch() as $OnlineApp)
-                            <a class="media new"
-                                href="{{ route('admin.appointment_user.message.detail', ['onlineAppId' => $OnlineApp->id]) }}">
-                                <div class="main-img-user">
-                                    <img alt="" src="{{ $OnlineApp->user->avatar }}">
-                                    @php
-                                        $badge = $OnlineApp
-                                            ->messages()
-                                            ->where('type', 1)
-                                            ->where(
-                                                'seen',
-                                                Modules\AppointmentUser\Enum\AppointmentOnlineMessageSeenEnum::UNSEEN,
-                                            )
-                                            ->count();
-                                    @endphp
-                                    @if ($badge > 0)
-                                        <span>{{ $badge }}</span>
-                                    @endif
+                    @foreach ($this->handleSearch() as $message)
+                        <div class="card border-0 shadow rounded-lg mb-4" style="background-color: #f1f1f1">
+                            <div
+                                class="card-header bg-transparent border-0 d-flex justify-content-between align-items-center p-3">
+                                <div class="d-flex flex-column">
+                                    <span class="text-muted">{{ $message->id }}</span>
+                                    <a class="fw-bold ms-2 mt-2 h5 mb-0" href="{{ route('admin.appointment_user.message.detail', ['onlineAppId' => $message->online->id]) }}" >{{ $message->user->full_name }}</a>
                                 </div>
-                                <div class="media-body">
-                                    @if ($OnlineApp->messages->last() !== null)
-                                        <div class="media-contact-name ">
-                                            <div class="d-flex align-items-center">
-                                                <span>{{ $OnlineApp->user->fullName }} </span>
-                                                {!! $OnlineApp->status->getMessageDetailBadge() !!}
-                                            </div>
-                                            <span>{{ verta($OnlineApp->messages->last()?->updated_at)->diffDays() }}
-                                                روز پیش</span>
-                                        </div>
-                                        @if ($OnlineApp->messages?->last()->body != null)
-                                            <p>{{ strip_tags(mb_substr($OnlineApp->messages->last()->body, 0, 50, 'UTF-8'), 'string,br') }}
-                                            </p>
-                                        @endif
-                                    @else
-                                        <div class="media-contact-name ">
-                                            <div class="d-flex align-items-center">
-                                                <span>{{ $OnlineApp->user->fullName }} </span>
-                                                {!! $OnlineApp->status->getMessageDetailBadge() !!}
-                                            </div>
-                                            <span>{{ verta($OnlineApp->messages->last()?->updated_at)->diffDays() }}
-                                                روز پیش</span>
-                                        </div>
-                                        <p>پیامی ارسال نشده است!!
-                                        </p>
-                                    @endif
+                                <div class="text-end">
+                                    <span
+                                        class="text-muted small d-block mt-1">{{ verta($message->updated_at)->diffDays() }}
+                                        روز پیش</span>
                                 </div>
-                            </a>
-                        @endforeach
-                    </div>
-                    <!-- main-chat-list -->
+                            </div>
+                            <div class="card-body d-flex justify-content-between align-items-center p-3">
+                                <a class="btn btn-primary rounded-full"
+                                    href="{{ route('admin.appointment_user.message.detail', ['onlineAppId' => $message->online->id]) }}">
+                                    {{ $message->countUserMessages() }} پیام
+                                </a>
+                                @if ($message->online->status->isPendding())
+                                    <div>
+                                        <button wire:click='ApproveOnlineAppointment("{{ $message->online->appointmentUser->id}}")' class="btn btn-success rounded-pill px-4 py-2 me-2 loading-btn">
+                                            <i class="fa fa-check me-2" aria-hidden="true"></i> تایید نوبت
+                                        </button>
+                                        <button wire:click='disApproveOnlineAppointment("{{ $message->online->appointmentUser->id}}")' class="btn btn-danger rounded-pill px-4 py-2">
+                                            <i class="fa fa-times me-2" aria-hidden="true"></i> رد کردن
+                                        </button>
+                                    </div>
+                                @else
+                                    <div>
+                                        {!! $message->online->status->getMessageDetailBadge() !!}
+                                    </div>
+                                @endif
+                            </div>
+                        </div>
+                    @endforeach
+
+                </div>
+                <div class="d-flex justify-content-center mb-5">
+                    {{-- {{$this->handleSearch()->links()}} --}}
                 </div>
             </div>
         </div>
     </div>
+    @include('appointmentuser::components.appointmentlist.disapprovemodal')
 </div>
 @push('scripts')
     <script>
         $(document).ready(function() {
             function js() {
-                $('.select2-show-search').select2();
                 $('#search-appointment_date').persianDatepicker({
                     initialValue: false,
                     format: 'L',
@@ -314,6 +280,15 @@
                     js();
                 }, 500);
             })
+            Livewire.on('lunchModal', function() {
+            setTimeout(() => {
+                var myModal = new bootstrap.Modal(document.getElementById(
+                    'resoanForDisapproveModal'), {
+                    keyboard: false
+                });
+                myModal.show();
+            }, 1000);
+        });
         });
     </script>
 @endpush

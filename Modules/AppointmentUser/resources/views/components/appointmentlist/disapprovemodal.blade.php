@@ -11,11 +11,14 @@
                         یادداشت کنید</label>
                     <textarea class="form-control" id="validationTextarea" placeholder="بنویسید..." wire:model='form.reason'></textarea>
                 </div>
+                @error('form.reason')
+                    <p class="text-danger mt-3">{{$message}}</p>
+                @enderror
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" wire:click='ignoreDisaproveModal'
                     data-bs-dismiss="modal">بیخیال</button>
-                <button type="button" wire:click='disaprovedModal' class="btn btn-primary">انجام عملیات</button>
+                <button type="button" wire:click='disaprovedModal' class="btn btn-primary loading-btn">انجام عملیات</button>
             </div>
         </div>
     </div>

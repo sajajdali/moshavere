@@ -35,13 +35,13 @@ enum AppointmentOnlineStatusEnum: int implements EnumHasApiResultInterface
     public static function showInDashboardApi(): array
     {
         return [
-            self::ACCEPTED->value ,
+            self::ACCEPTED->value,
             self::REPLY_BY_USER->value,
             self::ANSWER_BY_DOCTOR->value,
             self::REACTIVATED->value
         ];
     }
-    public function canSendMessage() : bool
+    public function canSendMessage(): bool
     {
         return match ($this) {
             self::ACCEPTED, self::REPLY_BY_USER, self::ANSWER_BY_DOCTOR, self::REACTIVATED => true,
@@ -49,10 +49,10 @@ enum AppointmentOnlineStatusEnum: int implements EnumHasApiResultInterface
         };
     }
 
-    public function canShowMessages() : bool
+    public function canShowMessages(): bool
     {
         return match ($this) {
-            self::ACCEPTED, self::REPLY_BY_USER, self::ANSWER_BY_DOCTOR, self::COMPLETED_BY_DOCTOR, self::TIME_IS_OVER , self::REACTIVATED => true,
+            self::ACCEPTED, self::REPLY_BY_USER, self::ANSWER_BY_DOCTOR, self::COMPLETED_BY_DOCTOR, self::TIME_IS_OVER, self::REACTIVATED => true,
             default => false
         };
     }
@@ -78,18 +78,26 @@ enum AppointmentOnlineStatusEnum: int implements EnumHasApiResultInterface
             self::ANSWER_BY_DOCTOR => 'table-primary',
         };
     }
-    public function getMessageDetailBadge() {
+    public function getMessageDetailBadge()
+    {
 
-        return match($this) {
-          self::PENDING => '<span class="badge bg-info  rounded-pill text-white ms-1">در انتظار</span>' ,
-          self::ACCEPTED => '<span class="badge bg-success rounded-pill ms-1">تایید شده</span>' ,
-          self::REJECT => '<span class="badge bg-danger rounded-pill ms-1">رد شده</span>' ,
-          self::CANCEL => '<span class="badge bg-danger rounded-pill ms-1">کنسل شده</span>' ,
-          self::REPLY_BY_USER => '<span class="badge bg-danger rounded-pill ms-1">پاسخ کاربر</span>' ,
-          self::ANSWER_BY_DOCTOR => '<span class="badge bg-danger rounded-pill ms-1">پاسخ داده شده</span>' ,
-          self::COMPLETED_BY_DOCTOR => '<span class="badge bg-danger rounded-pill ms-1">اتمام رسیده</span>' ,
-          self::TIME_IS_OVER => '<span class="badge bg-danger rounded-pill ms-1">زمان ویزیت تمام شده</span>' ,
-          self::REACTIVATED => '<span class="badge bg-danger rounded-pill ms-1" >مجدد فعال شده</span>' ,
+        return match ($this) {
+            self::PENDING => '<span class="badge bg-info  rounded-pill text-white ms-1">در انتظار</span>',
+            self::ACCEPTED => '<span class="badge bg-success rounded-pill ms-1">تایید شده</span>',
+            self::REJECT => '<span class="badge bg-danger rounded-pill ms-1">رد شده</span>',
+            self::CANCEL => '<span class="badge bg-danger rounded-pill ms-1">کنسل شده</span>',
+            self::REPLY_BY_USER => '<span class="badge bg-primary rounded-pill ms-1">پاسخ کاربر</span>',
+            self::ANSWER_BY_DOCTOR => '<span class="badge bg-success rounded-pill ms-1">پاسخ داده شده</span>',
+            self::COMPLETED_BY_DOCTOR => '<span class="badge bg-success rounded-pill ms-1">اتمام رسیده</span>',
+            self::TIME_IS_OVER => '<span class="badge bg-danger rounded-pill ms-1">زمان ویزیت تمام شده</span>',
+            self::REACTIVATED => '<span class="badge bg-success rounded-pill ms-1" >مجدد فعال شده</span>',
+        };
+    }
+    public function isPendding()
+    {
+        return match ($this) {
+            self::PENDING => true,
+            default => false,
         };
     }
 

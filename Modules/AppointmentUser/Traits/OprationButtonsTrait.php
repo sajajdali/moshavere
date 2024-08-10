@@ -81,7 +81,7 @@ trait OprationButtonsTrait
     public function ApproveOnlineAppointment($id)
     {
         $app = AppointmentUser::find($id);
-        $onlineApp = AppointmentOnline::firstWhere('appointment_user_id', $app->setting->id);
+        $onlineApp = AppointmentOnline::firstWhere('appointment_user_id', $app->id);
         $detail = [
             AppointmentOnline::COFRIM_OR_REJECT_STATUS => [
                 AppointmentOnline::BY => auth()->user()->id,
@@ -107,6 +107,7 @@ trait OprationButtonsTrait
     }
     public function disaprovedModal()
     {
+        $this->validate(['form.reason' => 'required'],[ 'form.reason.required' =>  'لطفا دلیل رد شدن را بنویسید']);
         $app = AppointmentUser::find($this->fetchData['disapproveId']);
         $reson_for_disapproved = [
             AppointmentUser::DISAPPROVED_DESCRIPTION => $this->form['reason'],
@@ -116,7 +117,7 @@ trait OprationButtonsTrait
             ],
         ];
         try {
-            $onlineApp = AppointmentOnline::firstWhere('appointment_user_id', $app->setting->id);
+            $onlineApp = AppointmentOnline::firstWhere('appointment_user_id', $app->id);
             $detail = $onlineApp->details;
             if (isset($detail)) {
                 $detail = array_merge($detail, $reson_for_disapproved);

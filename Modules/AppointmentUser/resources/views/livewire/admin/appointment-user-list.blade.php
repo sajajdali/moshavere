@@ -395,11 +395,15 @@
                                         </td>
                                         <td>{{ $ap->service?->title ?? 'سرویس حذف شده ' }}</td>
                                         <td>
+                                            @if($ap->kind == \Modules\AppointmentUser\Enum\AppointmentUserKindEnum::IN_PERSION)
                                             {{ verta($ap->start_time)->format('H:i') }}
                                             <strong>
                                                 الی
                                             </strong>
                                             {{ verta($ap->end_time)->format('H:i') }}
+                                            @else
+                                                -
+                                            @endif
                                         </td>
                                         <td>{{ verta($ap->date_visit)->format('Y/m/d') }}</td>
                                         <td>{{ verta($ap->created_at)->format('Y/m/d') }}</td>

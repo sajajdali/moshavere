@@ -39,7 +39,7 @@
             <i class="fa fa-pencil-square-o" aria-hidden="true"></i>
             ویرایش</a>
     </li>
-    @if (setting(Modules\Setting\Enum\SettingKeyEnum::APPOINTMENT_USER_PERESENT_STATUS_REGISTRATION))
+    @if ( $ap->kind == \Modules\AppointmentUser\Enum\AppointmentUserKindEnum::IN_PERSION  && setting(Modules\Setting\Enum\SettingKeyEnum::APPOINTMENT_USER_PERESENT_STATUS_REGISTRATION))
         @if (isset($ap->details[\Modules\AppointmentUser\app\Models\AppointmentUser::USRE_ATTENDED_STATUS]))
             @if ($ap->details[\Modules\AppointmentUser\app\Models\AppointmentUser::USRE_ATTENDED_STATUS])
                 <li>
@@ -71,7 +71,7 @@
             </li>
         @endif
     @endif
-    @if ($ap->type !== Modules\AppointmentUser\Enum\AppointmentUserTypeEnum::BETWEEN_PATIENTS)
+    @if ( $ap->kind == \Modules\AppointmentUser\Enum\AppointmentUserKindEnum::IN_PERSION && $ap->type !== Modules\AppointmentUser\Enum\AppointmentUserTypeEnum::BETWEEN_PATIENTS)
         <li><a data-description="میخواهید نوبت به بین مریض تبدیل شود؟" data-title="تغییر وضعیت "
                 data-confirmbtn="بله تغییر کند" data-action="changeType" data-id="{{ $ap->id }}"
                 class="confirm_swal_alert" data-label="نوبت" href="">

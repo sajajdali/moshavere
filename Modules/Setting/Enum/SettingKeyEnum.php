@@ -18,6 +18,7 @@ enum SettingKeyEnum: int implements EnumHasNameInterface, SettingTypeInterface, 
     case SITE_TITLE = 3;
     case APPOINTMENT_STATUS = 4;
     case APPOINTMENT_DESCRIPTION_STATUS = 5;
+    case APPOINTMENT_STORE_FROM_ID_STATUS = 75;
     case APPOINTMENT_DESCRIPTION = 6;
     case APPOINTMENT_CANCEL_DESCRIPTION = 7;
     case APPOINTMENT_USER_PERESENT_STATUS_REGISTRATION = 8;
@@ -106,6 +107,7 @@ enum SettingKeyEnum: int implements EnumHasNameInterface, SettingTypeInterface, 
             self::APPOINTMENT_STATUS    => 'فعال بودن نوبت دهی',
             self::APPOINTMENT_FOR_OTHERS_STATUS    => 'امکان ثبت نوبت برای دیگران',
             self::APPOINTMENT_DESCRIPTION_STATUS    => 'فعال بودن توضیحات در صفحه جزئیات نوبت',
+            self::APPOINTMENT_STORE_FROM_ID_STATUS    => 'فعال  بودن ثبت نوبت با شماره پرونده',
             self::APPOINTMENT_DESCRIPTION    => 'توضیحات مربوط به صفحه جزئیات نوبت',
             self::APPOINTMENT_CANCEL_DESCRIPTION    => 'توضیحات مربوط به کنسلی نوبت',
             self::APPOINTMENT_USER_PERESENT_STATUS_REGISTRATION    => 'فعال بودن ثبت حضور و یا عدم حضور بیمار',

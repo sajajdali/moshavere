@@ -138,16 +138,15 @@ class ChatController extends Controller
             $size = $file->getSize();
 
             $disk = 'chat/' . $chatDetail->id .'/' ;
-            $name = $file->store($disk , 'public');
+            $name = $file->storeAs($disk ,$orignName , 'public');
 
-            $extension = pathinfo($name, PATHINFO_EXTENSION);
+            $extension = pathinfo($orignName, PATHINFO_EXTENSION);
 
             $imageName = basename($name);
             $mime = strtok($extension, '/');
             if (strpos($orignName, "audio_123337") === 0) {
                 $mime = 'mp3';
             }
-
             $chatDetail->files()->create([
                 'user_id'   => $user->id,
                 'original_name'   => $orignName,

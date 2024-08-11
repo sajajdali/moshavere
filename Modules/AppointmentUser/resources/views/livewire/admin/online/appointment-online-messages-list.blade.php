@@ -189,11 +189,18 @@
                     </div>
                     {{-- chats --}}
                     @foreach ($this->handleSearch() as $message)
-                        <div class="card border-0 shadow rounded-lg mb-4" style="background-color: #f1f1f1">
+                    @php
+                    $color  = "f1f1f1" ;
+                    if($message->online->status == \Modules\AppointmentUser\Enum\AppointmentOnlineStatusEnum::REJECT ||
+                    $message->online->status == \Modules\AppointmentUser\Enum\AppointmentOnlineStatusEnum::CANCEL) {
+                        $color  = "ffcaca" ;
+                    }
+                    @endphp
+                        <div class="card border-0 shadow rounded-lg mb-4" style="background-color: #{{$color}}">
                             <div
                                 class="card-header bg-transparent border-0 d-flex justify-content-between align-items-center p-3">
-                                <div class="d-flex flex-column">
-                                    <span class="text-muted">{{ $message->id }}</span>
+                                <div class="d-flex flex-column absoloute">
+                                    <span class="text-muted">{{ $message->id }}  </span>
                                     <a class="fw-bold ms-2 mt-2 h5 mb-0" href="{{ route('admin.appointment_user.message.detail', ['onlineAppId' => $message->online->id]) }}" >{{ $message->user->full_name }}</a>
                                 </div>
                                 <div class="text-end">
@@ -203,9 +210,13 @@
                                 </div>
                             </div>
                             <div class="card-body d-flex justify-content-between align-items-center p-3">
-                                <a class="btn btn-primary rounded-full"
+                                <a class="btn  @if ($message->unReadedMessageCount() > 0) btn-secondary @else  btn-primary @endif rounded-full"
                                     href="{{ route('admin.appointment_user.message.detail', ['onlineAppId' => $message->online->id]) }}">
-                                    {{ $message->countUserMessages() }} پیام
+                                    @if ($message->unReadedMessageCount() > 0)
+                                    {{ $message->unReadedMessageCount() }} پیام
+                                    @else
+                                        بدون پیام جدید
+                                    @endif
                                 </a>
                                 @if ($message->online->status->isPendding())
                                     <div>

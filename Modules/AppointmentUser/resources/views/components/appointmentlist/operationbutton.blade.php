@@ -39,7 +39,9 @@
             <i class="fa fa-pencil-square-o" aria-hidden="true"></i>
             ویرایش</a>
     </li>
-    @if ( $ap->kind == \Modules\AppointmentUser\Enum\AppointmentUserKindEnum::IN_PERSION  && setting(Modules\Setting\Enum\SettingKeyEnum::APPOINTMENT_USER_PERESENT_STATUS_REGISTRATION))
+    @if (
+        $ap->kind == \Modules\AppointmentUser\Enum\AppointmentUserKindEnum::IN_PERSION &&
+            setting(Modules\Setting\Enum\SettingKeyEnum::APPOINTMENT_USER_PERESENT_STATUS_REGISTRATION))
         @if (isset($ap->details[\Modules\AppointmentUser\app\Models\AppointmentUser::USRE_ATTENDED_STATUS]))
             @if ($ap->details[\Modules\AppointmentUser\app\Models\AppointmentUser::USRE_ATTENDED_STATUS])
                 <li>
@@ -71,7 +73,18 @@
             </li>
         @endif
     @endif
-    @if ( $ap->kind == \Modules\AppointmentUser\Enum\AppointmentUserKindEnum::IN_PERSION && $ap->type !== Modules\AppointmentUser\Enum\AppointmentUserTypeEnum::BETWEEN_PATIENTS)
+    {{-- return redirect()-)->with('success', 'نوبت با موفقیت کنسل شد'); --}}
+
+    @if ($ap->kind == \Modules\AppointmentUser\Enum\AppointmentUserKindEnum::ONLINE)
+        <li><a href="{{route('admin.appointment_user.message.detail',['onlineAppId'=>$ap->id])}}">
+                <i class="fa fa-comments-o" aria-hidden="true"></i>
+                ورود به چت
+            </a>
+        </li>
+    @endif
+    @if (
+        $ap->kind == \Modules\AppointmentUser\Enum\AppointmentUserKindEnum::IN_PERSION &&
+            $ap->type !== Modules\AppointmentUser\Enum\AppointmentUserTypeEnum::BETWEEN_PATIENTS)
         <li><a data-description="میخواهید نوبت به بین مریض تبدیل شود؟" data-title="تغییر وضعیت "
                 data-confirmbtn="بله تغییر کند" data-action="changeType" data-id="{{ $ap->id }}"
                 class="confirm_swal_alert" data-label="نوبت" href="">
@@ -80,15 +93,17 @@
                 به نوبت بین مریض</a>
         </li>
     @endif
-    @if ($ap->status == Modules\AppointmentUser\Enum\AppointmentUserStatusEnum::STATUS_SUCCESSFUL &&
-        $ap->details[\Modules\AppointmentUser\app\Models\AppointmentUser::DETAIL_PAYMENT]['status'])
+    @if (
+        $ap->status == Modules\AppointmentUser\Enum\AppointmentUserStatusEnum::STATUS_SUCCESSFUL &&
+            $ap->details[\Modules\AppointmentUser\app\Models\AppointmentUser::DETAIL_PAYMENT]['status']
+    )
         <li>
             <a data-description="ایا میخواهید مبلغ پرداختی را استرداد کنیید؟" data-title="استرداد وجه"
                 data-confirmbtn="بله" data-action="refundPayment" data-id="{{ $ap->id }}"
                 class="confirm_swal_alert" data-label="استرداد" href="">
                 <i class="fa fa-exchange text-danger" aria-hidden="true"></i>
                 بازگشت وجه نوبت
-                </a>
+            </a>
         </li>
     @endif
     <li>
@@ -101,9 +116,8 @@
         </a>
     </li>
     <li><a class="confirm_swal_alert" data-label="نوبت" data-description="از کنسل کردن نوبت مطمعن هستید؟"
-            data-title="کنسل کردن " data-confirmbtn="بله کنسل شود"
-            data-action="cancelWithOutSms"
-        data-id="{{ $ap->id }}" href="">
+            data-title="کنسل کردن " data-confirmbtn="بله کنسل شود" data-action="cancelWithOutSms"
+            data-id="{{ $ap->id }}" href="">
             <i class="fa fa-times" aria-hidden="true"></i>
             کنسل
             کردن <small>(بدون ارسال پیامک)</small></a>

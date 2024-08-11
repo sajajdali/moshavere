@@ -17,6 +17,7 @@ use Modules\MigrateOldData\App\Console\MigrateAppointmentSetting;
 use Modules\MigrateOldData\App\Console\MigrateServiceUserCommand;
 use Modules\MigrateOldData\App\Console\MigrateSpecialiteiesCommand;
 use Modules\MigrateOldData\App\Console\MigrateAppointmentUserCommand;
+use Modules\AppointmentUser\app\Console\DisabledAwnsweredOnlineAppointmentCommand;
 
 class Kernel extends ConsoleKernel
 {
@@ -24,6 +25,7 @@ class Kernel extends ConsoleKernel
         MakeCacheCommand::class ,
         SendReminderscommand::class ,
         RenewCacheCommand::class ,
+        DisabledAwnsweredOnlineAppointmentCommand::class ,
         MigrateAllOrders::class ,
         MigratePlacesCommand::class ,
         MigratePlaceUsersCommand::class ,

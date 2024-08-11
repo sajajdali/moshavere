@@ -27,15 +27,17 @@
                             <hr style="opacity: 0.5">
                         </div>
 
-                        <div class="row mb-4">
-                            <label for="parvande" class=" col-form-label">ثبت نوبت با شماره پرونده </label>
-                            <input type="text"
-                                class="form-control @error('form.document_number') is-invalid @enderror" id="parvande"
-                                wire:loading.attr="disabled" wire:model='form.document_number'>
-                            @error('form.document_number')
-                                <span class="text-danger">{{ $message }}</span>
-                            @enderror
-                        </div>
+                        @if(setting( \Modules\Setting\Enum\SettingKeyEnum::APPOINTMENT_SET_APPOINTMENT_WITH_DOCUMENT_NUMBER))
+                            <div class="row mb-4">
+                                <label for="parvande" class=" col-form-label">ثبت نوبت با شماره پرونده </label>
+                                <input type="text"
+                                    class="form-control @error('form.document_number') is-invalid @enderror" id="parvande"
+                                    wire:loading.attr="disabled" wire:model='form.document_number'>
+                                @error('form.document_number')
+                                    <span class="text-danger">{{ $message }}</span>
+                                @enderror
+                            </div>
+                        @endif
                     @elseif($step == 2)
                         <div class="row my-5">
                             <div class="col-md-4">

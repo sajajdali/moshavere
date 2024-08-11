@@ -28,6 +28,7 @@ enum SettingKeyEnum: int implements EnumHasNameInterface, SettingTypeInterface, 
     case APPOINTMENT_DESCRIPTION_IN_CHECKOUT_PAGE_REFUND = 12;
     case APPOINTMENT_FOR_OTHERS_STATUS = 13;
     case APPOINTMENT_MORE_THAT_ONE_PER_DAY = 14;
+    case APPOINTMENT_SET_APPOINTMENT_WITH_DOCUMENT_NUMBER = 220;
     case FOOTER_DESCRIPTION = 15;
     case INSTAGRAM_ADDRESS = 16;
     case TELEGRAM_ADDRESS = 17;
@@ -113,6 +114,7 @@ enum SettingKeyEnum: int implements EnumHasNameInterface, SettingTypeInterface, 
             self::APPOINTMENT_USER_PERESENT_STATUS_REGISTRATION    => 'فعال بودن ثبت حضور و یا عدم حضور بیمار',
             self::APPOINTMENT_DEADLINE_VIA_ADMIN    => 'مدت زمان رزرو بودن نوبت برای پرداخت در زمانی که وضعیت نوبت در انتظار پرداخت میباشد و نوبت از طریق پنل ادمین ثبت شده باشد (ساعت)',
             self::APPOINTMENT_DEADLINE_VIA_USER    => 'مدت زمان رزرو بودن نوبت برای پرداخت در زمانی که وضعیت نوبت در انتظار پرداخت میباشد و نوبت را بیمار دریافت کرده باشد(ساعت)',
+            self::APPOINTMENT_SET_APPOINTMENT_WITH_DOCUMENT_NUMBER    => 'ثبت نوبت با شماره پرونده در پنل منشی',
             self::SITE_SLIDER_TITLE    => 'عنوان در ابتدای صفحه ای اصلی و بالای قسمت جست و جو',
             self::APPOINTMENT_DESCRIPTION_IN_CHECKOUT_PAGE_REFUND    => 'توضیحات در صفحه قبل از تایید نوبت توس کاربر(checkout)',
             self::APPOINTMENT_MORE_THAT_ONE_PER_DAY    => 'امکان رزرو بیشتر از یک نوبت در هر روز برای هر بیمار',
@@ -229,6 +231,7 @@ enum SettingKeyEnum: int implements EnumHasNameInterface, SettingTypeInterface, 
             self::DEFAULT_EXERCISE_STATUS => SettingTypeEnum::SELECT,
             self::PAYMEN_ACTIVE_DRIVER => SettingTypeEnum::SELECT,
             self::APPOINTMENT_MORE_THAT_ONE_PER_DAY => SettingTypeEnum::CHECK,
+            self::APPOINTMENT_SET_APPOINTMENT_WITH_DOCUMENT_NUMBER => SettingTypeEnum::CHECK,
             self::SHOW_FALSE_APPOINTMENT_STATUS => SettingTypeEnum::CHECK,
             self::PAYMENT_PAYSTAR_STATUS => SettingTypeEnum::CHECK,
             self::APPOINTMENT_FOR_OTHERS_STATUS => SettingTypeEnum::CHECK,

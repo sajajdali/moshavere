@@ -2,18 +2,16 @@
 
 namespace Modules\Admin\Livewire;
 
-use Carbon\Carbon;
 use Livewire\Component;
 use Livewire\WithPagination;
 use Livewire\Attributes\Title;
 use Modules\User\Entities\User;
-use Modules\User\Enum\UserMetaEnum;
 use Illuminate\Support\Facades\Cache;
-use Modules\Service\app\Models\Service;
+use Modules\AppointmentUser\app\Models\AppointmentOnline;
+use Modules\AppointmentUser\app\Models\AppointmentOnlineMessage;
 use Modules\Transaction\app\Models\Transaction;
 use Modules\AppointmentUser\app\Models\AppointmentUser;
 use Modules\AppointmentUser\Enum\AppointmentUserStatusEnum;
-use Modules\AppointmentSetting\app\Models\AppointmentSegment;
 
 #[Title('پیشخوان مدیریت')]
 class Dashboard extends Component
@@ -27,7 +25,7 @@ class Dashboard extends Component
         // dd(auth()->user());
         $this->fetchData['today_appointment']    = AppointmentUser::today()->successful()->get()?->count();
         $this->fetchData['pendding_appointment'] = AppointmentUser::waitpayment()->get()?->count();
-        $this->fetchData['today_canceld_appointment'] = AppointmentUser::disabled()->today()->get()?->count();
+        $this->fetchData['new_online_messages'] = AppointmentOnlineMessage::badgeCount();
         $this->fetchData['chart']['month'] = [verta()->format('F'), verta()->submonths(1)->format('F'), verta()->submonths(2)->format('F'), verta()->submonths(3)->format('F')];
 
         $cacheKeySuccessful = 'appointment_successful_counts';

@@ -57,10 +57,9 @@ class AppointmentOnline extends Model
         return $this->belongsTo(User::class, 'doctor_id');
     }
 
-
-
     protected function asJson($value)
     {
         return json_encode($value, JSON_UNESCAPED_UNICODE);
     }
+
 }

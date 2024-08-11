@@ -12,7 +12,7 @@ use Modules\AppointmentUser\Database\factories\AppointmentOnlineMessageFactory;
 
 class AppointmentOnlineMessage extends Model
 {
-    use HasFactory , SoftDeletes;
+    use HasFactory, SoftDeletes;
 
     /**
      * The attributes that are mass assignable.
@@ -28,9 +28,21 @@ class AppointmentOnlineMessage extends Model
 
     public function messageFile()
     {
-        return $this->hasMany(AppointmentOnlineMessageFile::class,'fk_id','id');
+        return $this->hasMany(AppointmentOnlineMessageFile::class, 'fk_id', 'id');
     }
-
+    public static function badgeCount()
+    {
+        return self::where('type', AppointmentOnlineMessageTypeEnum::QUESTION)
+            ->where('seen', AppointmentOnlineMessageSeenEnum::UNSEEN)
+            ->whereNull('answer_by')->count();
+    }
+    public function unReadedMessageCount()
+    {
+        return $this->where('appointment_online_id',$this->appointment_online_id)->
+        where('type', AppointmentOnlineMessageTypeEnum::QUESTION)
+            ->where('seen', AppointmentOnlineMessageSeenEnum::UNSEEN)
+            ->whereNull('answer_by')->count();
+    }
 
     public function user()
     {
@@ -39,12 +51,12 @@ class AppointmentOnlineMessage extends Model
 
     public function online(): \Illuminate\Database\Eloquent\Relations\BelongsTo
     {
-        return $this->belongsTo(AppointmentOnline::class , 'appointment_online_id');
+        return $this->belongsTo(AppointmentOnline::class, 'appointment_online_id');
     }
 
     public function answerBy()
     {
-        return $this->belongsTo(User::class , 'answer_by');
+        return $this->belongsTo(User::class, 'answer_by');
     }
     protected function asJson($value)
     {

@@ -8,13 +8,14 @@ use Livewire\Attributes\Url;
 use Livewire\Attributes\Computed;
 use Illuminate\Support\Facades\Storage;
 use Modules\AppointmentUser\app\Models\AppointmentUser;
+use Modules\AppointmentUser\Traits\OprationButtonsTrait;
 use Modules\AppointmentUser\app\Models\AppointmentOnline;
+use Modules\AppointmentUser\Enum\AppointmentUserStatusEnum;
 use Modules\AppointmentUser\Enum\AppointmentOnlineStatusEnum;
 use Modules\AppointmentUser\app\Models\AppointmentOnlineMessage;
 use Modules\AppointmentUser\Enum\AppointmentOnlineMessageSeenEnum;
 use Modules\AppointmentUser\Enum\AppointmentOnlineMessageTypeEnum;
 use Modules\AppointmentUser\app\Models\AppointmentOnlineMessageFile;
-use Modules\AppointmentUser\Enum\AppointmentUserStatusEnum;
 
 class MessageDetail extends Component
 {
@@ -179,10 +180,22 @@ class MessageDetail extends Component
 
         return redirect()->route('admin.appointment_user.message.detail', $this->fetchData['appOnline']->id);
     }
+
+    public function cancelAppointment(){
+        $this->fetchData['appOnline']->update(['status' => AppointmentOnlineStatusEnum::CANCEL]);
+        return redirect()->route('admin.appointment_user.message.detail',['onlineAppId'=>$this->fetchData['appOnline']->id])->with('success', 'نوبت با موفقیت کنسل شد');
+    }
     public function mount()
     {
         $this->fetchData['appOnline'] = AppointmentOnline::find(request()->route('onlineAppId'));
+        if(empty( $this->fetchData['appOnline'])) {
+            return redirect()->back()->with('error','نوبت یافت نشد');
+        }
         $this->fetchData['messages']  = $this->fetchData['appOnline']->messages;
+        $this->fetchData['appOnline']->messages()
+        ->where('type', AppointmentOnlineMessageTypeEnum::QUESTION)
+        ->where('seen', AppointmentOnlineMessageSeenEnum::UNSEEN)
+        ->update(['seen' => AppointmentOnlineMessageSeenEnum::SEEN]);
         $this->fetchData['user']      =  $this->fetchData['appOnline']->user;
     }
     public function render()

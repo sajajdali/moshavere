@@ -126,10 +126,11 @@
                                     <input class="form-control" placeholder="متن پیام شما..." type="text"
                                         wire:model="chatMessage">
                                     {{-- send File modal --}}
-                                    <a class="nav-link" data-for="userAvatar" data-variable="userAvatar"
+                                    {{-- TODO::fixSendFile --}}
+                                    {{-- <a class="nav-link" data-for="userAvatar" data-variable="userAvatar"
                                         class="btn btn-primary select_file" data-bs-target="#file-selector-modal"
                                         data-bs-toggle="modal">
-                                        <i class="fe fe-paperclip"></i></a>
+                                        <i class="fe fe-paperclip"></i></a> --}}
                                     <button type="button" wire:click="sendMessage"
                                         wire:loading.class="btn btn-light btn-loading"
                                         wire:loading.class.remove="btn-primary"

@@ -78,15 +78,19 @@
                                     <p class="fs-12 text-muted">{{ $fetchData['appOnline']->doctor->fullName }}</p>
                                 </div>
                             </div>
-                            <div class=" d-flex justify-content-center border-top mt-3">
+                            <div class="border-top mt-3">
                                 @if (
                                     $this->fetchData['appOnline']->status == Modules\AppointmentUser\Enum\AppointmentOnlineStatusEnum::REJECT ||
                                         $this->fetchData['appOnline']->status == Modules\AppointmentUser\Enum\AppointmentOnlineStatusEnum::CANCEL)
                                 @else
-                                    <div class="mt-3">
-                                        <button class="btn btn-danger ms-3 rounded-full "
-                                            wire:click='cancelAppointment()' type="button"> <i
+                                    <div class="mt-3 d-flex flex-column justify-content-start">
+                                        <button class="btn btn-danger rounded-full " style="background-color: #d77377 !important"
+                                            wire:click='cancelAppointment()' wire:confirm='میخواهید این نوبت را کنسل کنید؟' type="button"> <i
                                                 class="fa fa-times font-bold" aria-hidden="true"></i> کنسل کردن نوبت
+                                        </button>
+                                        <button class="btn btn-danger mt-3 my-2 rounded-full "
+                                            wire:click='cancelAppointment()' wire:confirm='میخواهید این نوبت را کنسل کنید؟' type="button"> <i
+                                                class="fa fa-times font-bold" aria-hidden="true"></i> کنسل کردن به همراه بازگشت وجه
                                         </button>
                                     </div>
                                 @endif
@@ -235,14 +239,14 @@
                                     wire:model='form.typedMessage'
                                     placeholder="@error('form.typedMessage') {{ $message }} @else متن خود را یادداشت کنید @enderror"
                                     type="text">
-                                <button data-bs-target="#file-selector-modal" data-bs-toggle="modal" class="nav-link"
+                                {{-- <button data-bs-target="#file-selector-modal" data-bs-toggle="modal" class="nav-link"
                                     href="javascript:void(0)">
                                     @if (isset($form['file']))
                                         <i class="fa fa-check" aria-hidden="true"></i>
                                     @else
                                         <i class="fe fe-paperclip"></i>
                                     @endif
-                                </button>
+                                </button> --}}
                                 <button wire:click='sendMessage' wire:target='sendMessage'
                                     wire:loading.class='btn-loading' wire:loading.attr='disabeld' type="button"
                                     class="btn btn-icon btn-primary brround"><i

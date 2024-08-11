@@ -188,9 +188,7 @@ class MessageDetail extends Component
     public function mount()
     {
         $this->fetchData['appOnline'] = AppointmentOnline::find(request()->route('onlineAppId'));
-        if(empty( $this->fetchData['appOnline'])) {
-            return redirect()->back()->with('error','نوبت یافت نشد');
-        }
+
         $this->fetchData['messages']  = $this->fetchData['appOnline']->messages;
         $this->fetchData['appOnline']->messages()
         ->where('type', AppointmentOnlineMessageTypeEnum::QUESTION)

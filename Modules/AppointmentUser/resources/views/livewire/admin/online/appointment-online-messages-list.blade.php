@@ -210,9 +210,6 @@
                                 </div>
                             </div>
                             <div class="card-body d-flex justify-content-between align-items-center p-3">
-                                @if($message->online->id == 17)
-                                @dd($message->unReadedMessageCount())
-                                @endif
                                 <a class="btn  @if ($message->unReadedMessageCount() > 0) btn-secondary @else  btn-primary @endif rounded-full"
                                     href="{{ route('admin.appointment_user.message.detail', ['onlineAppId' => $message->online->id]) }}">
                                     @if ($message->unReadedMessageCount() > 0)

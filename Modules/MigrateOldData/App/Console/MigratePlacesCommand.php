@@ -76,7 +76,7 @@ class MigratePlacesCommand extends Command
     }
     private function StatusCheck($active)
     {
-        if ($active == 5) {
+        if ($active == 10) {
             return \App\Enum\ActiveEnum::ACTIVE;
         } else {
             return \App\Enum\ActiveEnum::DEACTIVE;

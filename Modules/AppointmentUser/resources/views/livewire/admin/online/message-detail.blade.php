@@ -111,7 +111,8 @@
                                         <label class="main-chat-time"><span>{{ $date }}</span></label>
                                         @foreach ($messages as $message)
                                             @if ($message->messageFile->isNotEmpty())
-                                               <div class="@if ($message->type == Modules\AppointmentUser\Enum\AppointmentOnlineMessageTypeEnum::ANSWER) media flex-row-reverse chat-right @else media chat-left @endif">
+                                                <div
+                                                    class="@if ($message->type == Modules\AppointmentUser\Enum\AppointmentOnlineMessageTypeEnum::ANSWER) media flex-row-reverse chat-right @else media chat-left @endif">
                                                     <div class="main-img-user online"><img alt="avatar"
                                                             src="{{ $message->user->avatar }}">
                                                     </div>
@@ -217,16 +218,35 @@
             </div>
         </div>
     </div>
-@include('appointmentuser::components.appointmentlist.disapprovemodal')
-<livewire:admin::file-manager-modal />
-<livewire:appointmentuser::admin.online.sound-recorder />
+    @include('appointmentuser::components.appointmentlist.disapprovemodal')
+    <livewire:admin::file-manager-modal />
+    <livewire:appointmentuser::admin.online.sound-recorder />
 </div>
 @push('scripts')
     <script src="{{ admin_asset('js/sound/Fr.voice.js') }}"></script>
     <script src="{{ admin_asset('js/sound/recorder.js') }}"></script>
     <script src="{{ admin_asset('js/sound/app.js') }}"></script>
+    <!-- Include Fancybox CSS -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+    <!-- Include jQuery (if not already included) -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+
+    <!-- Include Fancybox JS -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/fancybox/3.5.7/jquery.fancybox.min.js"></script>
     <script>
         $(document).ready(function() {
+            $('[data-fancybox="gallery"]').fancybox({
+                buttons: [
+                    "zoom",
+                    "slideShow",
+                    "thumbs",
+                    "close"
+                ],
+                loop: true,
+                protect: true,
+                // Add more options as needed
+            });
             Livewire.on('select_file', (param) => {
                 @this.set('form.file', param.url);
                 $('#file-selector-modal').modal('hide');

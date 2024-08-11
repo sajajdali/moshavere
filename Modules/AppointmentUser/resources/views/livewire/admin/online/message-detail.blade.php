@@ -226,10 +226,11 @@
                                     نوبت رد شده است!
                                 </div>
                             @elseif ($this->fetchData['appOnline']->status != Modules\AppointmentUser\Enum\AppointmentOnlineStatusEnum::REJECT)
-                                <button type="button" class="btn btn-secondary ms-2" data-bs-toggle="modal"
+                            {{-- TODO::VOICE js class activate --}}
+                                {{-- <button type="button" class="btn btn-secondary ms-2" data-bs-toggle="modal"
                                     data-bs-target="#soundRecorderModal">
                                     <i class="fa fa-microphone fa-xl" aria-hidden="true"></i>
-                                </button>
+                                </button> --}}
                                 <input class="form-control ms-2 @error('form.typedMessage') is-invalid @enderror"
                                     wire:model='form.typedMessage'
                                     placeholder="@error('form.typedMessage') {{ $message }} @else متن خود را یادداشت کنید @enderror"
@@ -260,8 +261,8 @@
     <livewire:appointmentuser::admin.online.sound-recorder />
 </div>
 @push('scripts')
-    <script src="{{ admin_asset('js/sound/Fr.voice.js') }}"></script>
     <script src="{{ admin_asset('js/sound/recorder.js') }}"></script>
+    <script src="{{ admin_asset('js/sound/Fr.voice.js') }}"></script>
     <script src="{{ admin_asset('js/sound/app.js') }}"></script>
     <script src="{{ admin_asset('plugins/select2/select2.full.min.js') }}"></script>
     <script src="{{ admin_asset('plugins/sweet-alert/sweetalert.min.js') }}"></script>

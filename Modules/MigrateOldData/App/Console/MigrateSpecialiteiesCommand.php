@@ -37,6 +37,7 @@ class MigrateSpecialiteiesCommand extends Command
         foreach ($oldData as $data) {
             // Transform the data according to new structure
             $newData = [
+                'id' => $data->id,
                 'title' => $data->name,
                 'priority' => \Modules\Speciality\app\Models\Speciality::maxOrder(),
                 'active' => \Modules\Speciality\Enum\SpecialityStatusEnum::ACTIVE,

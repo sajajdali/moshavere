@@ -41,6 +41,7 @@ class MigrateServiceseCommand extends Command
         foreach ($oldData as $data) {
             // Transform the data according to new structure
             $newData = [
+                'id' => $data->id,
                 'title' => $data->title,
                 'parent_id' => $data->parent_id == 0 ? null : ($data->parent_id),
                 'show_type' => ServiceShowTypeEnum::tryFrom($data->show_type),

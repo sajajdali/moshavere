@@ -41,7 +41,8 @@ class MigratePlacesCommand extends Command
         foreach ($oldData as $data) {
             // Transform the data according to new structure
             $newData = [
-                'title' => $data->name,
+                'id' => $data->id,
+                'title' => $data->name ?? 'بدون نام',
                 'active' => $this->StatusCheck($data->status),
                 'priority' => Place::maxPriority(),
                 'detail' => $this->createDetails($data),
@@ -51,7 +52,7 @@ class MigratePlacesCommand extends Command
             DB::connection('mysql')->table('places')->insert($newData);
         }
 
-        $this->info('place migration completed successfully.');
+        $this->info($oldData->count() . ' place migration completed successfully.');
     }
 
     private function createDetails($oldValue)
@@ -59,7 +60,7 @@ class MigratePlacesCommand extends Command
         $detail = [];
         if (isset($oldValue->phone)) {
             $numbers = json_decode($oldValue->phone, true);
-            if(isset($numbers['number'])){
+            if (isset($numbers['number'])) {
                 $detail[Place::DETAIL_KEY_NUMBERS] = $numbers['number'];
             }
         }
@@ -72,14 +73,14 @@ class MigratePlacesCommand extends Command
                 Place::DETAIL_KEY_LOCATION_LNG => $oldValue->longitude,
             ];
         }
-        return json_encode($detail) ;
+        return json_encode($detail);
     }
     private function StatusCheck($active)
     {
-        if ($active == 10) {
-            return \App\Enum\ActiveEnum::ACTIVE;
-        } else {
+        if ($active != '10') {
             return \App\Enum\ActiveEnum::DEACTIVE;
+        } else {
+            return \App\Enum\ActiveEnum::ACTIVE;
         }
     }
 }

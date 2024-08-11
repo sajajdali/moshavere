@@ -45,6 +45,7 @@ class MigrateAppointmentUserCommand extends Command
             // Transform the data according to new structure
             if ($this->checkUserForegnKey($data->user_id)) {
                 $newData = [
+                    'id' => $data->id,
                     'agent_id' => $data->agent_id,
                     'appointment_setting_id' => $this->settingId($data),
                     'user_id' => $data->user_id,

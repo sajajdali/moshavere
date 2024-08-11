@@ -44,6 +44,7 @@ class MigrateUsersCommand extends Command
         foreach ($oldData as $data) {
             // Transform the data according to new structure
             $newData = [
+                'id' => $data->id,
                 'mobile' => $data->mobile ?? $this->randomMobile(),
                 'email' => $data->email ?? $data->mobile . uniqId() . '@info.com',
                 'password' => $data->password ?? Hash::make('awjhfawjpofawpokfapow45s6e4ge56sgWedwgpouqoiwmpogjawjgpaowhg2014891@((%&)(@*#@_)*@_)*%UPJVKLEJVIJ)(*&@)(&$)(@)'),

@@ -110,114 +110,63 @@
                                     @foreach ($this->getMessagesBodys() as $date => $messages)
                                         <label class="main-chat-time"><span>{{ $date }}</span></label>
                                         @foreach ($messages as $message)
-                                            @if ($message->type == Modules\AppointmentUser\Enum\AppointmentOnlineMessageTypeEnum::ANSWER)
-                                                @if ($message->messageFile->isNotEmpty())
-                                                    <div class="media flex-row-reverse chat-right">
-                                                        <div class="main-img-user online"><img alt="avatar"
-                                                                src="{{ $message->user->avatar }}"></div>
-                                                        <div class="media-body">
-                                                            <div class="main-msg-wrapper">
-                                                                @if ($message->messageFile->first()->mime == 'audio/mpeg')
-                                                                    <audio controls>
-                                                                        <source
-                                                                            src="{{ url('storage/' . $message->messageFile->first()->server_name) }}"
-                                                                            type="{{ $message->messageFile->first()->mime }}">
-                                                                    </audio>
-                                                                @elseif($message->messageFile->first()->mime == 'video/mp4')
-                                                                    <video width="320" height="240" controls>
-                                                                        <source
-                                                                            src="{{ url('storage/' . $message->messageFile->first()->server_name) }}"
-                                                                            type="{{ $message->messageFile->first()->mime }}">
-                                                                    </video>
-                                                                @else
-                                                                    <a href="{{ url('storage/' . $message->messageFile->first()->server_name) }}"
-                                                                        download>
-                                                                        <i class="fa fa-download"
-                                                                            aria-hidden="true"></i></a>
-                                                                    <br>
-                                                                    <small
-                                                                        class="text-left">{{ $message->messageFile->first()->size }}kb</small>
-                                                                @endif
-                                                            </div>
-                                                            <div>
-                                                                <span>{{ $message->created_at->format('H:i') }}</span>
-                                                                <a href="javascript:void(0)"><i
-                                                                        class="icon ion-android-more-vertical"></i></a>
-                                                            </div>
-                                                        </div>
+                                            @if ($message->messageFile->isNotEmpty())
+                                               <div class="@if ($message->type == Modules\AppointmentUser\Enum\AppointmentOnlineMessageTypeEnum::ANSWER) media flex-row-reverse chat-right @else media chat-left @endif">
+                                                    <div class="main-img-user online"><img alt="avatar"
+                                                            src="{{ $message->user->avatar }}">
                                                     </div>
-                                                @endif
-                                                @if ($message->body != null)
-                                                    <div class="media flex-row-reverse chat-right">
-                                                        <div class="main-img-user online"><img alt="avatar"
-                                                                src="{{ $message->user->avatar }}"></div>
-                                                        <div class="media-body">
-                                                            <div class="main-msg-wrapper">
-                                                                {{ $message->body }}
-                                                            </div>
-                                                            <div>
-                                                                <span>{{ $message->created_at->format('H:i') }}</span>
-                                                                <a href="javascript:void(0)"><i
-                                                                        class="icon ion-android-more-vertical"></i></a>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                @endif
-                                            @else
-                                                @if ($message->messageFile->isNotEmpty())
-                                                    <div class="media chat-left">
-                                                        <div class="main-img-user online"><img alt="avatar"
-                                                                src="{{ $message->user->avatar }}"></div>
-                                                        <div class="media-body">
-                                                            <div class="main-msg-wrapper">
-                                                                @if ($message->messageFile->first()->mime == 'audio/mpeg')
+                                                    <div class="media-body">
+                                                        <div class="main-msg-wrapper">
+                                                            @if ($message->messageFile()->count())
+                                                                @foreach ($message->messageFile as $file)
+                                                                    @if (in_array($file->mime, ['jpg', 'jpeg', 'png', 'gif', 'webp', 'bmp', 'svg', 'tiff', 'heic', 'heif']))
+                                                                        <a href="{{ Storage::url($file->disk . $file->server_name) }}"
+                                                                            data-fancybox="gallery"
+                                                                            data-caption="{{ $file->original_name }}">
+                                                                            <img src="{{ Storage::url($file->disk . $file->server_name) }}"
+                                                                                alt="{{ $file->original_name }}"
+                                                                                style="width: 100px; height: auto;" />
+                                                                        </a>
+                                                                    @elseif($file->mime == 'mp3')
+                                                                        <audio
+                                                                            src="{{ Storage::url($file->disk . $file->server_name) }}"
+                                                                            controls preload="auto"></audio>
+                                                                    @endif
                                                                     <div class="main-msg-wrapper">
-                                                                        <audio controls>
-                                                                            <source
-                                                                                src="{{ url('storage/' . $message->messageFile->first()->server_name) }}"
-                                                                                type="{{ $message->messageFile->first()->mime }}">
-                                                                        </audio>
+                                                                        <a class="text-dark"
+                                                                            href="{{ Storage::url($file->disk . $file->server_name) }}">
+                                                                            <span class="fs-13 mt-1"> دانلود فایل
+                                                                            </span> <i
+                                                                                class="fe fe-download mt-3 ms-4 text-muted pe-2"></i>
+                                                                        </a>
                                                                     </div>
-                                                                @elseif($message->messageFile->first()->mime == 'video/mp4')
-                                                                    <video width="320" height="240" controls>
-                                                                        <source
-                                                                            src="{{ url('storage/' . $message->messageFile->first()->server_name) }}"
-                                                                            type="{{ $message->messageFile->first()->mime }}">
-                                                                    </video>
-                                                                @else
-                                                                    <a href="{{ url('storage/' . $message->messageFile->first()->server_name) }}"
-                                                                        download>
-                                                                        <i class="fa fa-download"
-                                                                            aria-hidden="true"></i></a>
-                                                                    <br>
-                                                                    <small
-                                                                        class="text-left">{{ $message->messageFile->first()->size }}kb</small>
-                                                                @endif
-                                                            </div>
-                                                            <div>
-                                                                <span>{{ $message->created_at->format('H:i') }}</span>
-                                                                <a href="javascript:void(0)"><i
-                                                                        class="icon ion-android-more-vertical"></i></a>
-                                                            </div>
+                                                                @endforeach
+                                                            @endif
+                                                        </div>
+                                                        <div>
+                                                            <span>{{ $message->created_at->format('H:i') }}</span>
+                                                            <a href="javascript:void(0)"><i
+                                                                    class="icon ion-android-more-vertical"></i></a>
                                                         </div>
                                                     </div>
-                                                @endif
-                                                @if ($message->body != null)
-                                                    <div class="media chat-left">
-                                                        <div class="main-img-user online"><img alt="avatar"
-                                                                src="{{ $message->user->avatar }}"></div>
-                                                        <div class="media-body">
-                                                            <div class="main-msg-wrapper">
-                                                                {{ $message->body ?? $message->file->original_name }}
-                                                            </div>
-                                                            <div>
-                                                                <span>{{ $message->created_at->format('H:i') }}</span>
-                                                                <a href="javascript:void(0)"><i
-                                                                        class="icon ion-android-more-vertical"></i></a>
-                                                            </div>
+                                                </div>
+                                            @endif
+
+                                            @if ($message->body != null)
+                                                <div class="media flex-row-reverse chat-right">
+                                                    <div class="main-img-user online"><img alt="avatar"
+                                                            src="{{ $message->user->avatar }}"></div>
+                                                    <div class="media-body">
+                                                        <div class="main-msg-wrapper">
+                                                            {{ $message->body }}
+                                                        </div>
+                                                        <div>
+                                                            <span>{{ $message->created_at->format('H:i') }}</span>
+                                                            <a href="javascript:void(0)"><i
+                                                                    class="icon ion-android-more-vertical"></i></a>
                                                         </div>
                                                     </div>
-                                                @endif
+                                                </div>
                                             @endif
                                         @endforeach
                                     @endforeach
@@ -226,53 +175,51 @@
                                         پیامی یافت نشد
                                     </div>
                                 @endif
-
                             </div>
                         </div>
-                        <div class="main-chat-footer d-flex justify-content-center pt-5">
-                            @if($this->fetchData['appOnline']->status == Modules\AppointmentUser\Enum\AppointmentOnlineStatusEnum::PENDING)
+                    </div>
+                    <div class="main-chat-footer d-flex justify-content-center pt-5">
+                        @if ($this->fetchData['appOnline']->status == Modules\AppointmentUser\Enum\AppointmentOnlineStatusEnum::PENDING)
                             <button type="button" class="btn btn-success ms-2" wire:click='approvedAppointment'
                                 wire:loading.class='btn-loading btn-gray' wire:target='approvedAppointment'> تایید
                                 این نوبت</button>
                             <button type="button" class="btn btn-danger ms-2" data-bs-toggle="modal"
                                 data-bs-target="#resoanForDisapproveModal"> عدم تایید این نوبت</button>
-                            @elseif ($this->fetchData['appOnline']->status != Modules\AppointmentUser\Enum\AppointmentOnlineStatusEnum::REJECT)
-                                <button type="button" class="btn btn-secondary ms-2" data-bs-toggle="modal"
-                                    data-bs-target="#soundRecorderModal">
-                                    <i class="fa fa-microphone fa-xl" aria-hidden="true"></i>
-                                </button>
-                                <input class="form-control ms-2 @error('form.typedMessage') is-invalid @enderror"
-                                    wire:model='form.typedMessage'
-                                    placeholder="@error('form.typedMessage') {{ $message }} @else متن خود را یادداشت کنید @enderror "
-                                    type="text">
-                                <button data-bs-target="#file-selector-modal" data-bs-toggle="modal" class="nav-link"
-                                    href="javascript:void(0)">
-                                    @if (isset($form['file']))
-                                        <i class="fa fa-check" aria-hidden="true"></i>
-                                    @else
-                                        <i class="fe fe-paperclip"></i>
-                                    @endif
-                                </button>
-                                <button wire:click='sendMessage' wire:target='sendMessage'
-                                    wire:loading.class='btn-loading' wire:loading.attr='disabeld' type="button"
-                                    class="btn btn-icon  btn-primary brround"><i
-                                        class="fa fa-paper-plane-o"></i></button>
-                            @elseif($this->fetchData['appOnline']->status == Modules\AppointmentUser\Enum\AppointmentOnlineStatusEnum::REJECT)
-                                <div class="col-md-12 alert alert-danger fade show mt-4 ms-3" role="alert">
-                                    نوبت رد شده است!
-                                </div>
-                            @endif
-                            <nav class="nav">
-                            </nav>
-                        </div>
+                        @elseif ($this->fetchData['appOnline']->status != Modules\AppointmentUser\Enum\AppointmentOnlineStatusEnum::REJECT)
+                            <button type="button" class="btn btn-secondary ms-2" data-bs-toggle="modal"
+                                data-bs-target="#soundRecorderModal">
+                                <i class="fa fa-microphone fa-xl" aria-hidden="true"></i>
+                            </button>
+                            <input class="form-control ms-2 @error('form.typedMessage') is-invalid @enderror"
+                                wire:model='form.typedMessage'
+                                placeholder="@error('form.typedMessage') {{ $message }} @else متن خود را یادداشت کنید @enderror "
+                                type="text">
+                            <button data-bs-target="#file-selector-modal" data-bs-toggle="modal" class="nav-link"
+                                href="javascript:void(0)">
+                                @if (isset($form['file']))
+                                    <i class="fa fa-check" aria-hidden="true"></i>
+                                @else
+                                    <i class="fe fe-paperclip"></i>
+                                @endif
+                            </button>
+                            <button wire:click='sendMessage' wire:target='sendMessage'
+                                wire:loading.class='btn-loading' wire:loading.attr='disabeld' type="button"
+                                class="btn btn-icon  btn-primary brround"><i class="fa fa-paper-plane-o"></i></button>
+                        @elseif($this->fetchData['appOnline']->status == Modules\AppointmentUser\Enum\AppointmentOnlineStatusEnum::REJECT)
+                            <div class="col-md-12 alert alert-danger fade show mt-4 ms-3" role="alert">
+                                نوبت رد شده است!
+                            </div>
+                        @endif
+                        <nav class="nav">
+                        </nav>
                     </div>
                 </div>
             </div>
         </div>
     </div>
-    @include('appointmentuser::components.appointmentlist.disapprovemodal')
-    <livewire:admin::file-manager-modal />
-    <livewire:appointmentuser::admin.online.sound-recorder />
+@include('appointmentuser::components.appointmentlist.disapprovemodal')
+<livewire:admin::file-manager-modal />
+<livewire:appointmentuser::admin.online.sound-recorder />
 </div>
 @push('scripts')
     <script src="{{ admin_asset('js/sound/Fr.voice.js') }}"></script>

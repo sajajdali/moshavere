@@ -198,8 +198,8 @@
                                 </div>
                                 <div class="text-end">
                                     <span
-                                        class="text-muted small d-block mt-1">{{ verta($message->updated_at)->diffDays() }}
-                                        روز پیش</span>
+                                        class="text-muted small d-block mt-1">{{ ($message->updated_at)->diffForHumans() }}
+                                         </span>
                                 </div>
                             </div>
                             <div class="card-body d-flex justify-content-between align-items-center p-3">

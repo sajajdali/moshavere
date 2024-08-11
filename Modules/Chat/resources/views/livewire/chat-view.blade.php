@@ -90,8 +90,6 @@
                                                                             </a>
                                                                         @elseif($file->mime == 'mp3')
                                                                             <audio src="{{ Storage::url($file->disk  . $file->server_name) }}" controls preload="auto"></audio>
-
-
                                                                         @endif
                                                                             <div class="main-msg-wrapper">
                                                                                 <a class="text-dark"

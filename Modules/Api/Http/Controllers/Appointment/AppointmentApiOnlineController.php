@@ -10,6 +10,7 @@ use Modules\Api\app\Resources\Api\Appointment\online\AppointmentOnlineMessagesRe
 use Modules\Api\app\Resources\Api\Appointment\online\AppointmentOnlinePaginateResource;
 use Modules\Api\Trait\ApiHandlerTrait;
 use Modules\AppointmentUser\app\Models\AppointmentOnline;
+use Modules\AppointmentUser\Enum\AppointmentOnlineMessageSeenEnum;
 use Modules\AppointmentUser\Enum\AppointmentOnlineMessageTypeEnum;
 use Modules\AppointmentUser\Enum\AppointmentOnlineStatusEnum;
 use Validator;
@@ -71,6 +72,7 @@ class AppointmentApiOnlineController extends Controller
         }
         $message = $appointmentOnline->messages()->create([
             'user_id' => $user->id,
+            'seen' => AppointmentOnlineMessageSeenEnum::UNSEEN,
             'type' => $type,
             'body' => $request->input('message')
         ]);

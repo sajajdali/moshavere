@@ -138,16 +138,20 @@ class ChatController extends Controller
             $size = $file->getSize();
 
             $disk = 'chat/' . $chatDetail->id .'/' ;
-            $name = $file->storeAs($disk ,$orignName , 'public');
+//            $name = $file->storeAs($disk ,$orignName , 'public');
+            $name = $file->store($disk , 'public');
+
 
             $extension = pathinfo($orignName, PATHINFO_EXTENSION);
 
             $imageName = basename($name);
             $mime = strtok($extension, '/');
+            $needConvert = false;
             if (strpos($orignName, "audio_123337") === 0) {
+                $needConvert = true;
                 $mime = 'mp3';
             }
-            $chatDetail->files()->create([
+            $file = $chatDetail->files()->create([
                 'user_id'   => $user->id,
                 'original_name'   => $orignName,
                 'server_name'   => $imageName,
@@ -157,6 +161,9 @@ class ChatController extends Controller
                 'mime'   => $mime,
                 'size'   => $size,
             ]);
+            if ($needConvert) {
+                convertVoiceFile('app/public/' .$file['disk'] . $file['path']  );
+            }
         }
     }
 

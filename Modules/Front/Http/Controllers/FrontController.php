@@ -3,15 +3,52 @@
 namespace Modules\Front\Http\Controllers;
 
 use App\Http\Controllers\Controller;
+use FFMpeg\FFMpeg;
+use FFMpeg\Format\Video\X264;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
+use Illuminate\Support\Facades\File;
+use Storage;
 
 class FrontController extends Controller
 {
     /**
      * Display a listing of the resource.
      */
+
+    public function convertWavToMp4(Request $request)
+    {
+        return convertWavToMp4('app/public/chat/audio_old.wav');
+        // Define the input and output file paths
+        $inputFilePath = storage_path('app/public/chat/audio_old.mp4');
+        $outputFilePath = storage_path('app/public/chat/audio_new.mp4');
+
+
+        // Check if the input file exists
+        if (!file_exists($inputFilePath)) {
+            return response()->json(['error' => 'Input file not found.'], 404);
+        }
+
+        // Initialize FFmpeg
+        $ffmpeg = FFMpeg::create([
+            'ffmpeg.binaries'  => env('FFMPEG_BINARIES'),
+            'ffprobe.binaries' => env('FFPROBE_BINARIES'),
+        ]);
+        // Open the WAV file
+        $audio = $ffmpeg->open($inputFilePath);
+
+        // Define the output format
+        $format = new X264();
+
+        // Save the audio as an MP4 video file
+        $audio->save($format, $outputFilePath);
+        File::delete($inputFilePath);
+
+
+        // Return the MP4 file as a download and delete after sending
+        return response()->download($outputFilePath);
+    }
     public function index()
     {
         return view('front::index');

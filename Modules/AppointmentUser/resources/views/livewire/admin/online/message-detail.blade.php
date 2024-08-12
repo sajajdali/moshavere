@@ -78,15 +78,19 @@
                                     <p class="fs-12 text-muted">{{ $fetchData['appOnline']->doctor->fullName }}</p>
                                 </div>
                             </div>
-                            <div class=" d-flex justify-content-center border-top mt-3">
+                            <div class="border-top mt-3">
                                 @if (
                                     $this->fetchData['appOnline']->status == Modules\AppointmentUser\Enum\AppointmentOnlineStatusEnum::REJECT ||
                                         $this->fetchData['appOnline']->status == Modules\AppointmentUser\Enum\AppointmentOnlineStatusEnum::CANCEL)
                                 @else
-                                    <div class="mt-3">
-                                        <button class="btn btn-danger ms-3 rounded-full "
-                                            wire:click='cancelAppointment()' type="button"> <i
+                                    <div class="mt-3 d-flex flex-column justify-content-start">
+                                        <button class="btn btn-danger rounded-full " style="background-color: #d77377 !important"
+                                            wire:click='cancelAppointment()' wire:confirm='میخواهید این نوبت را کنسل کنید؟' type="button"> <i
                                                 class="fa fa-times font-bold" aria-hidden="true"></i> کنسل کردن نوبت
+                                        </button>
+                                        <button class="btn btn-danger mt-3 my-2 rounded-full "
+                                            wire:click='cancelAppointment()' wire:confirm='میخواهید این نوبت را کنسل کنید؟' type="button"> <i
+                                                class="fa fa-times font-bold" aria-hidden="true"></i> کنسل کردن به همراه بازگشت وجه
                                         </button>
                                     </div>
                                 @endif
@@ -226,22 +230,23 @@
                                     نوبت رد شده است!
                                 </div>
                             @elseif ($this->fetchData['appOnline']->status != Modules\AppointmentUser\Enum\AppointmentOnlineStatusEnum::REJECT)
-                                <button type="button" class="btn btn-secondary ms-2" data-bs-toggle="modal"
+                            {{-- TODO::VOICE js class activate --}}
+                                {{-- <button type="button" class="btn btn-secondary ms-2" data-bs-toggle="modal"
                                     data-bs-target="#soundRecorderModal">
                                     <i class="fa fa-microphone fa-xl" aria-hidden="true"></i>
-                                </button>
+                                </button> --}}
                                 <input class="form-control ms-2 @error('form.typedMessage') is-invalid @enderror"
                                     wire:model='form.typedMessage'
                                     placeholder="@error('form.typedMessage') {{ $message }} @else متن خود را یادداشت کنید @enderror"
                                     type="text">
-                                <button data-bs-target="#file-selector-modal" data-bs-toggle="modal" class="nav-link"
+                                {{-- <button data-bs-target="#file-selector-modal" data-bs-toggle="modal" class="nav-link"
                                     href="javascript:void(0)">
                                     @if (isset($form['file']))
                                         <i class="fa fa-check" aria-hidden="true"></i>
                                     @else
                                         <i class="fe fe-paperclip"></i>
                                     @endif
-                                </button>
+                                </button> --}}
                                 <button wire:click='sendMessage' wire:target='sendMessage'
                                     wire:loading.class='btn-loading' wire:loading.attr='disabeld' type="button"
                                     class="btn btn-icon btn-primary brround"><i
@@ -260,8 +265,8 @@
     <livewire:appointmentuser::admin.online.sound-recorder />
 </div>
 @push('scripts')
-    <script src="{{ admin_asset('js/sound/Fr.voice.js') }}"></script>
     <script src="{{ admin_asset('js/sound/recorder.js') }}"></script>
+    <script src="{{ admin_asset('js/sound/Fr.voice.js') }}"></script>
     <script src="{{ admin_asset('js/sound/app.js') }}"></script>
     <script src="{{ admin_asset('plugins/select2/select2.full.min.js') }}"></script>
     <script src="{{ admin_asset('plugins/sweet-alert/sweetalert.min.js') }}"></script>

@@ -351,7 +351,16 @@
                                         </td>
                                         <td class="{{ $ap->type->getclass() }} d-flex flex-column">
                                             {!! $ap->kind->getIcon() !!}
-                                            {!! $ap->kind->getBadge() !!}
+                                            <a
+                                                @if ($ap->kind == \Modules\AppointmentUser\Enum\AppointmentUserKindEnum::ONLINE) href="{{ route('admin.appointment_user.message.detail', ['onlineAppId' => $ap->online->first()?->id]) }}" @else href="" @endif>
+                                                <span
+                                                    class="badge badge-sm {{ $ap->kind->getbadgeColor() }} rounded-pill">
+                                                    {{ $ap->kind->getName() }}
+                                                    @if ($ap->kind == \Modules\AppointmentUser\Enum\AppointmentUserKindEnum::ONLINE)
+                                                        {{ $ap->online->first()?->messages?->first()?->unReadedMessageCount() ?? 0 }}
+                                                    @endif
+                                                </span>
+                                            </a>
                                         </td>
                                         <td>
                                             <div class="d-flex flex-column">
@@ -395,12 +404,12 @@
                                         </td>
                                         <td>{{ $ap->service?->title ?? 'سرویس حذف شده ' }}</td>
                                         <td>
-                                            @if($ap->kind == \Modules\AppointmentUser\Enum\AppointmentUserKindEnum::IN_PERSION)
-                                            {{ verta($ap->start_time)->format('H:i') }}
-                                            <strong>
-                                                الی
-                                            </strong>
-                                            {{ verta($ap->end_time)->format('H:i') }}
+                                            @if ($ap->kind == \Modules\AppointmentUser\Enum\AppointmentUserKindEnum::IN_PERSION)
+                                                {{ verta($ap->start_time)->format('H:i') }}
+                                                <strong>
+                                                    الی
+                                                </strong>
+                                                {{ verta($ap->end_time)->format('H:i') }}
                                             @else
                                                 -
                                             @endif

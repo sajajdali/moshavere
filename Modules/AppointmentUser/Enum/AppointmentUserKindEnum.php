@@ -29,6 +29,14 @@ enum AppointmentUserKindEnum: int implements EnumHasNameInterface, EnumHasAdminB
             self::VOIP => '<span class="badge badge-sm bg-info rounded-pill">تلفنی</span>',
         };
     }
+    public function getbadgeColor()
+    {
+        return match ($this) {
+            self::IN_PERSION => 'bg-success',
+            self::ONLINE => 'bg-danger',
+            self::VOIP => 'bg-info',
+        };
+    }
     public function getIcon()
     {
         return match ($this) {
@@ -67,7 +75,7 @@ enum AppointmentUserKindEnum: int implements EnumHasNameInterface, EnumHasAdminB
             default => false,
         };
     }
-    public static function OldData($data){ 
+    public static function OldData($data){
         return match ($data) {
             'IN_PERSON' => self::ONLINE ,
             default => self::VOIP,

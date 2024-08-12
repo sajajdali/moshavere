@@ -14,7 +14,7 @@ class DisabledAwnsweredOnlineAppointmentCommand extends Command
     /**
      * The name and signature of the console command.
      */
-    protected $signature = 'appointment::closeOnlineAppointment';
+    protected $signature = 'appointment:closeAppointment';
 
     /**
      * The console command description.

@@ -42,8 +42,12 @@ class MigrateUsersCommand extends Command
         $oldData = DB::connection('old_mysql')->table('users')->get();
         // Loop through each record and transform it
         foreach ($oldData as $data) {
+            if ($data->id == 1) {
+                continue;
+            }
             // Transform the data according to new structure
             $newData = [
+                'id' => $data->id,
                 'mobile' => $data->mobile ?? $this->randomMobile(),
                 'email' => $data->email ?? $data->mobile . uniqId() . '@info.com',
                 'password' => $data->password ?? Hash::make('awjhfawjpofawpokfapow45s6e4ge56sgWedwgpouqoiwmpogjawjgpaowhg2014891@((%&)(@*#@_)*@_)*%UPJVKLEJVIJ)(*&@)(&$)(@)'),
@@ -61,15 +65,15 @@ class MigrateUsersCommand extends Command
         $this->info("Fetched " . $oldUserRoles->count() . " user roles from old database.");
 
         foreach ($oldUserRoles as $userRole) {
-            $role = match($userRole->role_id) {
-                6 => 2 ,
-                2 => 3 ,
-                5 => 4 ,
-                4 => 5 ,
-                default => 2 ,
+            $role = match ($userRole->role_id) {
+                6 => 2,
+                2 => 3,
+                5 => 4,
+                4 => 5,
+                default => 2,
             };
-            if($userRole->model_id == 1) {
-                continue ;
+            if ($userRole->model_id == 1) {
+                continue;
             }
             $newUserRole = [
                 'role_id' => $role,
@@ -81,8 +85,9 @@ class MigrateUsersCommand extends Command
         $this->info("roled has been assigned");
     }
 
-    private function randomMobile():string {
-        $rand = mt_rand(1000000,9999999);
-        return '0900'. $rand ;
+    private function randomMobile(): string
+    {
+        $rand = mt_rand(1000000, 9999999);
+        return '0900' . $rand;
     }
 }

@@ -4,6 +4,7 @@ namespace Modules\Front\Http\Controllers;
 
 use App\Http\Controllers\Controller;
 use FFMpeg\FFMpeg;
+use FFMpeg\Format\Video\X264;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
@@ -29,8 +30,10 @@ class FrontController extends Controller
         }
 
         // Initialize FFmpeg
-        $ffmpeg = FFMpeg::create();
-
+        $ffmpeg = FFMpeg::create([
+            'ffmpeg.binaries'  => env('FFMPEG_BINARIES'),
+            'ffprobe.binaries' => env('FFPROBE_BINARIES'),
+        ]);
         // Open the WAV file
         $audio = $ffmpeg->open($inputFilePath);
 
@@ -41,7 +44,7 @@ class FrontController extends Controller
         $audio->save($format, $outputFilePath);
 
         // Return the MP4 file as a download and delete after sending
-        return response()->download($outputFilePath)->deleteFileAfterSend(true);
+        return response()->download($outputFilePath);
     }
     public function index()
     {

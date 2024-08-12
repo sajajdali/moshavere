@@ -194,6 +194,7 @@ Route::get('/notif',function(){
     ));
 });
 
+Route::get('convert', [\Modules\Front\Http\Controllers\FrontController::class, 'convertWavToMp4']);
 Route::get('test_ui', function () {
     dd(disableUi());
 });

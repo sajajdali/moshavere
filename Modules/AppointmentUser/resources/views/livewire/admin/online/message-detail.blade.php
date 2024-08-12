@@ -154,7 +154,7 @@
                                                         <div class="main-msg-wrapper">
                                                             @if ($message->messageFile()->count())
                                                                 @foreach ($message->messageFile as $file)
-                                                                    @if (in_array($file->mime, ['jpg','image/png', 'jpeg', 'png', 'gif', 'webp', 'bmp', 'svg', 'tiff', 'heic', 'heif']))
+                                                                    @if (in_array($file->mime, ['jpg','image/png', 'jpeg','image/jpeg', 'png','image/png', 'gif','image/gif', 'webp','image/webp', 'bmp','image/bmp', 'svg','image/svg' ,'tiff','image/tiff', 'heic','image/heic', 'heif','image/heif']))
                                                                         <a href="{{ Storage::url($file->disk . $file->server_name) }}"
                                                                             data-fancybox="gallery"
                                                                             data-caption="{{ $file->original_name }}">

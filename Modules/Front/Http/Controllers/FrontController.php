@@ -8,6 +8,7 @@ use FFMpeg\Format\Video\X264;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
+use Illuminate\Support\Facades\File;
 use Storage;
 
 class FrontController extends Controller
@@ -21,8 +22,8 @@ class FrontController extends Controller
 
 
         // Define the input and output file paths
-        $inputFilePath = storage_path('app/public/chat/audio.wav');
-        $outputFilePath = storage_path('app/public/chat/audio.mp4');
+        $inputFilePath = storage_path('app/public/chat/audio_old.mp4');
+        $outputFilePath = storage_path('app/public/chat/audio_new.mp4');
 
         // Check if the input file exists
         if (!file_exists($inputFilePath)) {
@@ -42,6 +43,8 @@ class FrontController extends Controller
 
         // Save the audio as an MP4 video file
         $audio->save($format, $outputFilePath);
+        File::delete($inputFilePath);
+
 
         // Return the MP4 file as a download and delete after sending
         return response()->download($outputFilePath);

@@ -148,7 +148,7 @@ class ChatController extends Controller
                 $needConvert = true;
                 $mime = 'mp3';
             }
-            $chatDetail->files()->create([
+            $file = $chatDetail->files()->create([
                 'user_id'   => $user->id,
                 'original_name'   => $orignName,
                 'server_name'   => $imageName,

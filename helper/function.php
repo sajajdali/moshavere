@@ -85,12 +85,12 @@ function add_new_before_extension($filePath, $addNew = true) {
 
     // Save the audio as an MP4 video file
     $audio->save($format, $outputFilePath);
-    File::delete($inputFilePath);
-    File::move($outputFilePath, $file);
-
+    unlink($inputFilePath);
+    File::copy($outputFilePath, $inputFilePath);
+    unlink($outputFilePath);
 
     // Return the MP4 file as a download and delete after sending
-    return response()->download($outputFilePath);
+    return true;
 }
 function convert2english($string) {
     $newNumbers = range(0, 9);

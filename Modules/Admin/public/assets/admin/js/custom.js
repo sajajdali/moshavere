@@ -401,7 +401,7 @@ function _typeof(o) { "@babel/helpers - typeof"; return _typeof = "function" == 
     $("html[lang=en]").attr("dir", "rtl");
     $('body').removeClass('ltr');
     $("head link#style").attr("href", $(this));
-    document.getElementById("style").setAttribute("href", "https://cdn.enabz.org/assets/admin/plugins/bootstrap/css/bootstrap.rtl.min.css");
+    document.getElementById("style").setAttribute("href", "https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.rtl.min.css");
     var carousel = $('.owl-carousel');
     $.each(carousel, function (index, element) {
       // element == this

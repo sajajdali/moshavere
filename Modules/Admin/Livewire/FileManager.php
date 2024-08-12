@@ -36,11 +36,11 @@ class FileManager extends Component
         }
         return rmdir($directory);
     }
-    
+
     #[On('delete')]
     public function delete($file): void
     {
-        $path = implode('/', array_column($this->broadcamp, 'path')) . '/' . $file;
+        $path = implode('/', array_column($this->broadcamp, 'path')).'/'.$file;
         //check if file is directory
         if (Storage::disk('public')->directoryExists($path)) {
             //delete directory recursive
@@ -62,7 +62,7 @@ class FileManager extends Component
             );
             $this->files = $this->listFiles();
         } else {
-            $this->dispatch('error_file_manager', message: 'این پوشه وجود ندارد');
+            $this->dispatch('error_file_manager', message:'این پوشه وجود ندارد');
         }
     }
 
@@ -98,15 +98,13 @@ class FileManager extends Component
             } catch (FilesystemException $ignore) {
             }
             $files[] = [
-                'name' => pathinfo($item, PATHINFO_FILENAME) . '.' . pathinfo($item, PATHINFO_EXTENSION),
+                'name' => pathinfo($item, PATHINFO_FILENAME).'.'.pathinfo($item, PATHINFO_EXTENSION),
                 'pure_name' => pathinfo($item, PATHINFO_FILENAME),
                 'extension' => pathinfo($item, PATHINFO_EXTENSION),
                 'size' => $this->readableFileSize($size),
                 'url' => Storage::disk('public')->url($item),
-                'icon' => isset($icons[pathinfo($item, PATHINFO_EXTENSION)]) ? $icons[pathinfo(
-                    $item,
-                    PATHINFO_EXTENSION
-                )] : $icons['other'],
+                'icon' => isset($icons[pathinfo($item, PATHINFO_EXTENSION)]) ? $icons[pathinfo($item,
+                    PATHINFO_EXTENSION)] : $icons['other'],
             ];
         }
         return array(
@@ -119,8 +117,7 @@ class FileManager extends Component
     {
         $validatedData = Validator::make(
             ['directoryName' => $this->directoryName],
-            ['directoryName' => 'required']
-        );
+            ['directoryName' => 'required']);
         if (!$validatedData->fails()) {
             $current = implode('/', array_column($this->broadcamp, 'path'));
             Storage::disk('public')->makeDirectory($current . '/' . $this->directoryName);
@@ -128,7 +125,7 @@ class FileManager extends Component
             $this->directoryName = '';
             $this->dispatch('close_modal_directory');
         } else {
-            $this->dispatch('error_file_manager', message: 'نام پوشه را وارد کنید');
+            $this->dispatch('error_file_manager', message:'نام پوشه را وارد کنید');
         }
     }
 
@@ -136,8 +133,7 @@ class FileManager extends Component
     {
         $validatedData = Validator::make(
             ['renameTo' => $this->renameTo, 'fileToRename' => $this->fileToRename],
-            ['renameTo' => 'required', 'fileToRename' => 'required']
-        );
+            ['renameTo' => 'required', 'fileToRename' => 'required']);
         if (!$validatedData->fails()) {
             $current = implode('/', array_column($this->broadcamp, 'path'));
             //check if is file extension should not change
@@ -146,7 +142,7 @@ class FileManager extends Component
                 $before = pathinfo($this->fileToRename, PATHINFO_EXTENSION);
                 $after = pathinfo($this->renameTo, PATHINFO_EXTENSION);
                 if ($before != $after) {
-                    $this->dispatch('error_file_manager', message: 'امکان تغییر پسوند فایل وجود ندارد');
+                    $this->dispatch('error_file_manager', message:'امکان تغییر پسوند فایل وجود ندارد');
                     return;
                 }
             }
@@ -156,7 +152,7 @@ class FileManager extends Component
             $this->renameTo = '';
             $this->dispatch('close_modal_rename');
         } else {
-            $this->dispatch('error_file_manager', message: 'لطفا نام جدید را وارد کنید');
+            $this->dispatch('error_file_manager', message:'لطفا نام جدید را وارد کنید');
         }
     }
 
@@ -189,10 +185,9 @@ class FileManager extends Component
     {
         $validatedData = Validator::make(
             ['uploadFile' => $this->uploadFile],
-            ['uploadFile' => 'required']
-        );
+            ['uploadFile' => 'required']);
         if ($validatedData->fails()) {
-            $this->dispatch('error_file_manager', message: 'لطفا فایل را انتخاب کنید');
+            $this->dispatch('error_file_manager', message:'لطفا فایل را انتخاب کنید');
             return;
         }
         //upload file to current directory

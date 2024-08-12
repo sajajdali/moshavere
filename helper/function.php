@@ -61,7 +61,7 @@ function add_new_before_extension($filePath, $addNew = true) {
 
     return $newFilePath;
 }
- function convertWavToMp4($file)
+ function convertVoiceFile($file)
 {
     // Define the input and output file paths
     $inputFilePath = storage_path($file);

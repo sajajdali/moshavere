@@ -34,11 +34,13 @@ class AppointmentApiOnlineController extends Controller
 
             $imageName = basename($name);
             $mime = strtok($extension, '/');
+            $needConvert = false;
             if (strpos($orignName, "audio_123337") === 0) {
+                $needConvert = true;
                 $mime = 'mp3';
             }
 
-            $appointmentMessage->messageFile()->create([
+            $file = $appointmentMessage->messageFile()->create([
                 'user_id'   => $user->id,
                 'original_name'   => $orignName,
                 'server_name'   => $imageName,
@@ -48,6 +50,11 @@ class AppointmentApiOnlineController extends Controller
                 'mime'   => $mime,
                 'size'   => $size,
             ]);
+
+            if ($needConvert) {
+                convertVoiceFile('app/storage/' .$file['disk'] . $file['path']  );
+            }
+
         }
     }
     public function sendMessage(AppointmentOnline $appointmentOnline , Request $request)

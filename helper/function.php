@@ -56,7 +56,7 @@ function add_new_before_extension($filePath, $addNew = true) {
 
     // Add the original extension back if it exists
     if ($extension) {
-        $newFilePath .= '.' . $extension;
+        $newFilePath .= '.' . 'mp4';
     }
 
     return $newFilePath;

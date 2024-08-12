@@ -138,7 +138,9 @@ class ChatController extends Controller
             $size = $file->getSize();
 
             $disk = 'chat/' . $chatDetail->id .'/' ;
-            $name = $file->storeAs($disk ,$orignName , 'public');
+//            $name = $file->storeAs($disk ,$orignName , 'public');
+            $name = $file->store($disk , 'public');
+
 
             $extension = pathinfo($orignName, PATHINFO_EXTENSION);
 

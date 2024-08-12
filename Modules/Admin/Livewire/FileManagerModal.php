@@ -17,6 +17,7 @@ class FileManagerModal extends Component
 
     public $broadcamp = array();
     public $files = array();
+    public $lastUploadTime;
 
     public bool $isDialogShow = false;
     #[On('showDialog')]
@@ -61,13 +62,15 @@ class FileManagerModal extends Component
             } catch (FilesystemException $ignore) {
             }
             $files[] = [
-                'name' => pathinfo($item, PATHINFO_FILENAME).'.'.pathinfo($item, PATHINFO_EXTENSION),
+                'name' => pathinfo($item, PATHINFO_FILENAME) . '.' . pathinfo($item, PATHINFO_EXTENSION),
                 'pure_name' => pathinfo($item, PATHINFO_FILENAME),
                 'extension' => pathinfo($item, PATHINFO_EXTENSION),
                 'size' => $this->readableFileSize($size),
                 'url' => Storage::disk('public')->url($item),
-                'icon' => isset($icons[pathinfo($item, PATHINFO_EXTENSION)]) ? $icons[pathinfo($item,
-                    PATHINFO_EXTENSION)] : $icons['other'],
+                'icon' => isset($icons[pathinfo($item, PATHINFO_EXTENSION)]) ? $icons[pathinfo(
+                    $item,
+                    PATHINFO_EXTENSION
+                )] : $icons['other'],
             ];
         }
         return array(
@@ -118,24 +121,39 @@ class FileManagerModal extends Component
             );
             $this->files = $this->listFiles();
         } else {
-            $this->dispatch('error_file_manager', message:'این پوشه وجود ندارد');
+            $this->dispatch('error_file_manager', message: 'این پوشه وجود ندارد');
         }
     }
 
     public function selectFile($fileUrl): void
     {
-        $this->dispatch('select_file', url:$fileUrl);
+        $this->dispatch('select_file', url: $fileUrl);
     }
 
-    public function updatedUploadFile(){
-        $validatedData = Validator::make(
-            ['uploadFile' => $this->uploadFile],
-            ['uploadFile' => 'required']);
-        if ($validatedData->fails()) {
-            $this->dispatch('error_file_manager', message:'لطفا فایل را انتخاب کنید');
+    public function updatedUploadFile()
+    {
+
+        // Check if the function was called recently
+        $now = now()->timestamp;
+        if ($this->lastUploadTime && ($now - $this->lastUploadTime) < 10) {
+            // Prevent the function from running again within 10 seconds
             return;
         }
-        //upload file to current directory
+
+        $this->lastUploadTime = $now;
+
+        // Validate the uploaded file
+        $validatedData = Validator::make(
+            ['uploadFile' => $this->uploadFile],
+            ['uploadFile' => 'required']
+        );
+
+        if ($validatedData->fails()) {
+            $this->dispatch('error_file_manager', ['message' => 'لطفا فایل را انتخاب کنید']);
+            return;
+        }
+
+        // Upload file to the current directory
         $current = implode('/', array_column($this->broadcamp, 'path'));
         $this->uploadFile->store($current, 'public');
         $this->files = $this->listFiles();

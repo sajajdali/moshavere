@@ -1,5 +1,9 @@
 <?php
 
+use FFMpeg\FFMpeg;
+use FFMpeg\Format\Video\X264;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\File;
 use Modules\Front\enum\FeedbackId;
 
 function getCurrentSeason()
@@ -32,7 +36,61 @@ function disableUi(): bool
 {
     return env('DISABLE_TEMPLATE', false) === true;
 }
+function add_new_before_extension($filePath, $addNew = true) {
+    // Get the file name without extension
+    $pathInfo = pathinfo($filePath);
+    $filename = $pathInfo['filename'];
+    $extension = $pathInfo['extension'] ?? '';
+    $dirname = $pathInfo['dirname'];
 
+    // Determine new filename based on the $addNew flag
+    if ($addNew) {
+        // Add '_new' before the extension
+        $newFilename = $filename . '_new';
+    } else {
+        // Remove '_new' from the filename if it exists
+        $newFilename = str_replace('_new', '', $filename);
+    }
+
+    $newFilePath = $dirname . '/' . $newFilename;
+
+    // Add the original extension back if it exists
+    if ($extension) {
+        $newFilePath .= '.' . $extension;
+    }
+
+    return $newFilePath;
+}
+ function convertWavToMp4($file)
+{
+    // Define the input and output file paths
+    $inputFilePath = storage_path($file);
+    $outputFilePath = storage_path(add_new_before_extension($file));
+
+    // Check if the input file exists
+    if (!file_exists($inputFilePath)) {
+        return response()->json(['error' => 'Input file not found.'], 404);
+    }
+
+    // Initialize FFmpeg
+    $ffmpeg = FFMpeg::create([
+        'ffmpeg.binaries'  => env('FFMPEG_BINARIES'),
+        'ffprobe.binaries' => env('FFPROBE_BINARIES'),
+    ]);
+    // Open the WAV file
+    $audio = $ffmpeg->open($inputFilePath);
+
+    // Define the output format
+    $format = new X264();
+
+    // Save the audio as an MP4 video file
+    $audio->save($format, $outputFilePath);
+    File::delete($inputFilePath);
+
+
+    // Return the MP4 file as a download and delete after sending
+    return response()->download($outputFilePath);
+}
 function convert2english($string) {
     $newNumbers = range(0, 9);
     // 1. Persian HTML decimal

@@ -19,11 +19,11 @@ class FrontController extends Controller
 
     public function convertWavToMp4(Request $request)
     {
-
-
+        return convertWavToMp4('app/public/chat/audio_old.mp4');
         // Define the input and output file paths
         $inputFilePath = storage_path('app/public/chat/audio_old.mp4');
         $outputFilePath = storage_path('app/public/chat/audio_new.mp4');
+
 
         // Check if the input file exists
         if (!file_exists($inputFilePath)) {

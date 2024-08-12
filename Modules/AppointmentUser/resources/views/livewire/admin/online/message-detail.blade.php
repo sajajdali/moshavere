@@ -154,7 +154,7 @@
                                                         <div class="main-msg-wrapper">
                                                             @if ($message->messageFile()->count())
                                                                 @foreach ($message->messageFile as $file)
-                                                                    @if (in_array($file->mime, ['jpg', 'jpeg', 'png', 'gif', 'webp', 'bmp', 'svg', 'tiff', 'heic', 'heif']))
+                                                                    @if (in_array($file->mime, ['jpg','image/png', 'jpeg', 'png', 'gif', 'webp', 'bmp', 'svg', 'tiff', 'heic', 'heif']))
                                                                         <a href="{{ Storage::url($file->disk . $file->server_name) }}"
                                                                             data-fancybox="gallery"
                                                                             data-caption="{{ $file->original_name }}">
@@ -240,14 +240,14 @@
                                     wire:model='form.typedMessage'
                                     placeholder="@error('form.typedMessage') {{ $message }} @else متن خود را یادداشت کنید @enderror"
                                     type="text">
-                                {{-- <button data-bs-target="#file-selector-modal" data-bs-toggle="modal" class="nav-link"
+                                <button data-bs-target="#file-selector-modal" data-bs-toggle="modal" class="nav-link"
                                     href="javascript:void(0)">
                                     @if (isset($form['file']))
                                         <i class="fa fa-check" aria-hidden="true"></i>
                                     @else
                                         <i class="fe fe-paperclip"></i>
                                     @endif
-                                </button> --}}
+                                </button>
                                 <button wire:click='sendMessage' wire:target='sendMessage'
                                     wire:loading.class='btn-loading' wire:loading.attr='disabeld' type="button"
                                     class="btn btn-icon btn-primary brround"><i

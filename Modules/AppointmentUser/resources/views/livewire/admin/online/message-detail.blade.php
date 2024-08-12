@@ -145,8 +145,8 @@
                                         @foreach ($messages as $message)
                                             @if ($message->messageFile->isNotEmpty())
                                                 <div
-                                                    class="@if ($message->type == Modules\AppointmentUser\Enum\AppointmentOnlineMessageTypeEnum::ANSWER) media flex-row-reverse chat-right
-                                                    @else media chat-left @endif">
+                                                    class="@if ($message->type == Modules\AppointmentUser\Enum\AppointmentOnlineMessageTypeEnum::ANSWER) media chat-left
+                                                    @else  media flex-row-reverse chat-right @endif">
                                                     <div class="main-img-user online">
                                                         <img alt="avatar" src="{{ $message->user->avatar }}">
                                                     </div>
@@ -189,7 +189,8 @@
                                             @endif
 
                                             @if ($message->body != null)
-                                                <div class="media flex-row-reverse chat-right">
+                                                <div class="@if ($message->type == Modules\AppointmentUser\Enum\AppointmentOnlineMessageTypeEnum::ANSWER) media chat-left
+                                                    @else  media flex-row-reverse chat-right @endif">
                                                     <div class="main-img-user online">
                                                         <img alt="avatar" src="{{ $message->user->avatar }}">
                                                     </div>

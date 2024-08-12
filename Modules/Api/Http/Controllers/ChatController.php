@@ -145,6 +145,7 @@ class ChatController extends Controller
             $imageName = basename($name);
             $mime = strtok($extension, '/');
             if (strpos($orignName, "audio_123337") === 0) {
+                $needConvert = true;
                 $mime = 'mp3';
             }
             $chatDetail->files()->create([
@@ -157,6 +158,9 @@ class ChatController extends Controller
                 'mime'   => $mime,
                 'size'   => $size,
             ]);
+            if ($needConvert) {
+                convertVoiceFile('app/public/' .$file['disk'] . $file['path']  );
+            }
         }
     }
 

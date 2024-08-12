@@ -35,7 +35,7 @@ class AppointmentApiOnlineController extends Controller
             $imageName = basename($name);
             $mime = strtok($extension, '/');
             $needConvert = false;
-            if (strpos($orignName, "audio_123337") == 0) {
+            if (strpos($orignName, "audio_123337") === 0) {
                 $needConvert = true;
                 $mime = 'mp3';
             }

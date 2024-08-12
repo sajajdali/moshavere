@@ -185,12 +185,12 @@ Route::get('pp', function () {
 });
 
 Route::get('/notif',function(){
-    $user = \Modules\User\Entities\User::find(3);
+    $user = \Modules\User\Entities\User::find(26);
         $user->notify(new \Modules\User\Notifications\UserMessageNotification(
         title: "test title",
         excerpt: "test excerpt",
         message: 'test message',
-        link: \App\Enum\RouteEnum::APPOINTMENT->getLink('2')
+        link: \App\Enum\RouteEnum::ONLINE_MESSAGE->getLink('4')
     ));
 });
 

@@ -39,7 +39,9 @@ class HomePageLivewire extends Component
         //    Attempt to get the data from the cache
         return Cache::rememberForever($cacheKey,  function () {
             return   User::introductionDoctors()->get()->filter(function ($doc) {
-                if ($doc->services()->exists() || $doc->places()->exists() || $doc->appointmentSettings()->exists()) {
+                if ($doc->services()->exists() && $doc->places()->exists() && $doc->appointmentSettings()->exists()) {
+                    return true;
+                } else {
                     return false;
                 };
             })->sortBy(function ($model) {
@@ -55,7 +57,9 @@ class HomePageLivewire extends Component
         // Attempt to get the data from the cache
         return  Cache::rememberForever($cacheKey, function () {
             return User::emergencyDoctors()->get()->filter(function ($doc) {
-                if ($doc->services()->exists() || $doc->places()->exists() || $doc->appointmentSettings()->exists()) {
+                if ($doc->services()->exists() && $doc->places()->exists() && $doc->appointmentSettings()->exists()) {
+                    return true;
+                } else {
                     return false;
                 };
             })->sortBy(function ($model) {
@@ -103,7 +107,7 @@ class HomePageLivewire extends Component
     public function mount()
     {
         // when disable ui template
-        if (disableUi()){
+        if (disableUi()) {
             return redirect()->route('front.login.doctor');
         }
 

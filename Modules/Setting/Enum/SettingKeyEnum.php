@@ -18,6 +18,7 @@ enum SettingKeyEnum: int implements EnumHasNameInterface, SettingTypeInterface, 
     case SITE_TITLE = 3;
     case APPOINTMENT_STATUS = 4;
     case APPOINTMENT_DESCRIPTION_STATUS = 5;
+    case APPOINTMENT_STORE_FROM_ID_STATUS = 75;
     case APPOINTMENT_DESCRIPTION = 6;
     case APPOINTMENT_CANCEL_DESCRIPTION = 7;
     case APPOINTMENT_USER_PERESENT_STATUS_REGISTRATION = 8;

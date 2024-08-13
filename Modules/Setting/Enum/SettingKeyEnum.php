@@ -18,7 +18,6 @@ enum SettingKeyEnum: int implements EnumHasNameInterface, SettingTypeInterface, 
     case SITE_TITLE = 3;
     case APPOINTMENT_STATUS = 4;
     case APPOINTMENT_DESCRIPTION_STATUS = 5;
-    case APPOINTMENT_STORE_FROM_ID_STATUS = 75;
     case APPOINTMENT_DESCRIPTION = 6;
     case APPOINTMENT_CANCEL_DESCRIPTION = 7;
     case APPOINTMENT_USER_PERESENT_STATUS_REGISTRATION = 8;
@@ -38,7 +37,7 @@ enum SettingKeyEnum: int implements EnumHasNameInterface, SettingTypeInterface, 
     case SITE_SECEND_SECTION_TITLE = 21;
     case SITE_SECEND_SECTION_DESCRIPTION = 22;
 
-    // ABOUT US PAGE
+        // ABOUT US PAGE
     case ABOUT_US_FIRST_SECTION_TITLE = 23;
     case ABOUT_US_FIRST_SECTION_DESCRIPTION = 24;
     case ABOUT_US_SECEND_SECTION_TITLE = 25;
@@ -108,7 +107,6 @@ enum SettingKeyEnum: int implements EnumHasNameInterface, SettingTypeInterface, 
             self::APPOINTMENT_STATUS    => 'فعال بودن نوبت دهی',
             self::APPOINTMENT_FOR_OTHERS_STATUS    => 'امکان ثبت نوبت برای دیگران',
             self::APPOINTMENT_DESCRIPTION_STATUS    => 'فعال بودن توضیحات در صفحه جزئیات نوبت',
-            self::APPOINTMENT_STORE_FROM_ID_STATUS    => 'فعال  بودن ثبت نوبت با شماره پرونده',
             self::APPOINTMENT_DESCRIPTION    => 'توضیحات مربوط به صفحه جزئیات نوبت',
             self::APPOINTMENT_CANCEL_DESCRIPTION    => 'توضیحات مربوط به کنسلی نوبت',
             self::APPOINTMENT_USER_PERESENT_STATUS_REGISTRATION    => 'فعال بودن ثبت حضور و یا عدم حضور بیمار',
@@ -172,17 +170,17 @@ enum SettingKeyEnum: int implements EnumHasNameInterface, SettingTypeInterface, 
             self::CONTACTUS_FORM_SUPPORT_EMAIL => 'ایمیل نمایشی برای ارتباط با پشتیبانی ',
 
             // about us
-              self::ABOUT_US_FIRST_SECTION_TITLE => 'عنوان بخش اول' ,
-              self::ABOUT_US_FIRST_SECTION_DESCRIPTION => 'توضیحات بخش اول' ,
-              self::ABOUT_US_SECEND_SECTION_TITLE => 'عنوان بخش دوم' ,
-              self::ABOUT_US_SECEND_SECTION_DESCRIPTION => 'توضیحات بخش دوم' ,
-              self::ABOUT_US_SECEND_SECTION_IMAGE => 'تصویر بخش دوم' ,
-              self::ABOUT_US_THIRD_SECTION_TITLE => 'عنوان بخش سوم' ,
-              self::ABOUT_US_THIRD_SECTION_DESCRIPTION => 'توضیحات بخش سوم' ,
-              self::ABOUT_US_THIRD_SECTION_IMAGE => 'تصویر بخش سوم' ,
-              self::ABOUT_US_FOURTH_SECTION_TITLE => 'عنوان بخش چهارم',
-              self::ABOUT_US_FOURTH_SECTION_DESCRIPTION => 'توضیحات بخش چهارم',
-              self::ABOUT_US_FOURTH_SECTION_IMAGE => 'تصویر بخش چهارم',
+            self::ABOUT_US_FIRST_SECTION_TITLE => 'عنوان بخش اول',
+            self::ABOUT_US_FIRST_SECTION_DESCRIPTION => 'توضیحات بخش اول',
+            self::ABOUT_US_SECEND_SECTION_TITLE => 'عنوان بخش دوم',
+            self::ABOUT_US_SECEND_SECTION_DESCRIPTION => 'توضیحات بخش دوم',
+            self::ABOUT_US_SECEND_SECTION_IMAGE => 'تصویر بخش دوم',
+            self::ABOUT_US_THIRD_SECTION_TITLE => 'عنوان بخش سوم',
+            self::ABOUT_US_THIRD_SECTION_DESCRIPTION => 'توضیحات بخش سوم',
+            self::ABOUT_US_THIRD_SECTION_IMAGE => 'تصویر بخش سوم',
+            self::ABOUT_US_FOURTH_SECTION_TITLE => 'عنوان بخش چهارم',
+            self::ABOUT_US_FOURTH_SECTION_DESCRIPTION => 'توضیحات بخش چهارم',
+            self::ABOUT_US_FOURTH_SECTION_IMAGE => 'تصویر بخش چهارم',
 
             default => ''
         };
@@ -208,16 +206,19 @@ enum SettingKeyEnum: int implements EnumHasNameInterface, SettingTypeInterface, 
 
     public function uiDisabled(): bool
     {
-        return match ($this) {
-            self::SITE_TITLE => true,
-            self::SITE_SLIDER_TITLE => true,
-            self::FOOTER_DESCRIPTION => true,
-            self::SITE_FIRST_SECTION_TITLE => true,
-            self::SITE_FIRST_SECTION_DESCRIPTION => true,
-            self::SITE_SECEND_SECTION_TITLE => true,
-            self::SITE_SECEND_SECTION_DESCRIPTION => true,
-            default => false
-        };
+        if (disableUi()) {
+            return match ($this) {
+                self::SITE_TITLE => true,
+                self::SITE_SLIDER_TITLE => true,
+                self::FOOTER_DESCRIPTION => true,
+                self::SITE_FIRST_SECTION_TITLE => true,
+                self::SITE_FIRST_SECTION_DESCRIPTION => true,
+                self::SITE_SECEND_SECTION_TITLE => true,
+                self::SITE_SECEND_SECTION_DESCRIPTION => true,
+                default => false
+            };
+        }
+        return false ;
     }
 
     public function render(): string
@@ -237,7 +238,6 @@ enum SettingKeyEnum: int implements EnumHasNameInterface, SettingTypeInterface, 
             self::APPOINTMENT_FOR_OTHERS_STATUS => SettingTypeEnum::CHECK,
             self::PAYMENT_ZARINPAL_STATUS => SettingTypeEnum::CHECK,
             self::APPOINTMENT_DESCRIPTION_STATUS => SettingTypeEnum::CHECK,
-            self::APPOINTMENT_STORE_FROM_ID_STATUS => SettingTypeEnum::CHECK,
             self::SECREYERY_SEND_LINK_FOR_APPOINTMENT => SettingTypeEnum::CHECK,
             self::APPOINTMENT_STATUS => SettingTypeEnum::CHECK,
             self::PAYMENT_RULES_AND_CONDITION_STATUS => SettingTypeEnum::CHECK,

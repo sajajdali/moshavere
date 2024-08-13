@@ -104,6 +104,19 @@ class AppointmentUserList extends Component
                     });
                 },
             ],
+            'national_code' => [
+                'condition' => isset($this->search['national_code']),
+                'callback' => function ($query) {
+                    return $query->whereHas('user', function ($q) {
+                        $q->whereHas('metas', function ($qq) {
+                            $qq->where([
+                                ['meta_key', UserMetaEnum::NATIONAL_CODE],
+                                ['meta_value', 'LIKE', "%{$this->search['national_code']}%"],
+                            ]);
+                        });
+                    });
+                },
+            ],
             'mobile' => [
                 'condition' => $this->search['user_mobile'],
                 'callback' => function ($query) {
@@ -250,7 +263,6 @@ class AppointmentUserList extends Component
     }
     public function mount()
     {
-
         // TODO::pass roles that can set appointmet in appointmentSetter property ;
         $this->fetchData['appointmentSetter'] = null;
         $this->fetchData['Services'] = Service::all();

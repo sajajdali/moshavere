@@ -49,7 +49,6 @@ $setting = [
             \Modules\Setting\Enum\SettingKeyEnum::SHOW_FALSE_APPOINTMENT_STATUS,
             \Modules\Setting\Enum\SettingKeyEnum::APPOINTMENT_SET_APPOINTMENT_WITH_DOCUMENT_NUMBER,
             \Modules\Setting\Enum\SettingKeyEnum::APPOINTMENT_DESCRIPTION_STATUS,
-            \Modules\Setting\Enum\SettingKeyEnum::APPOINTMENT_STORE_FROM_ID_STATUS,
             \Modules\Setting\Enum\SettingKeyEnum::APPOINTMENT_DESCRIPTION,
             \Modules\Setting\Enum\SettingKeyEnum::APPOINTMENT_CANCEL_DESCRIPTION,
             \Modules\Setting\Enum\SettingKeyEnum::APPOINTMENT_USER_PERESENT_STATUS_REGISTRATION,

@@ -245,7 +245,7 @@ class Checkout extends Component
         // find app special setting
         $this->fetchData['appSetting'] = AppointmentSetting::where('service_id', $this->fetchData['service']->id)
             ->where('place_id', $this->fetchData['places']->id)
-            ->where('user_id', $this->fetchData['doc'])
+            ->where('user_id', $this->fetchData['doc']->id)
             ->first();
         //check for general setting
         if (!isset($this->fetchData['appSetting'])) {

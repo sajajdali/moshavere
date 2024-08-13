@@ -105,6 +105,12 @@
                                         wire:model="search.user_mobile" placeholder="شماره تماس" type="text">
 
                                 </div>
+                                <div class="col-md-12">
+                                    <label for="search-UserMobile" class="form-label"><strong>کد ملی</strong></label>
+                                    <input class="form-control" id="search-UserMobile"
+                                        wire:model="search.national_code" placeholder="کد ملی کاربر" type="text">
+
+                                </div>
                             </div>
                         </div>
                         <div class="row my-5">
@@ -317,7 +323,7 @@
                                 <th scope="col">ثبت شده توسط</th>
                                 <th scope="col">نام کاربر</th>
                                 <th scope="col">شماره موبایل</th>
-                                <th scope="col">شماره پرونده</th>
+                                <th scope="col">کد ملی</th>
                                 <th scope="col">نام پزشک</th>
                                 <th scope="col">بخش </th>
                                 <th scope="col">ساعت نوبت</th>
@@ -349,19 +355,19 @@
                                                 @endcan
                                             </div>
                                         </td>
-                                        <td class="{{ $ap->type->getclass() }} d-flex flex-column">
-                                            {!! $ap->kind->getIcon() !!}
-                                            <a
-                                                @if ($ap->kind == \Modules\AppointmentUser\Enum\AppointmentUserKindEnum::ONLINE) href="{{ route('admin.appointment_user.message.detail', ['onlineAppId' => $ap->online->first()?->id]) }}" @else href="" @endif>
-                                                <span
-                                                    class="badge badge-sm {{ $ap->kind->getbadgeColor() }} rounded-pill">
-                                                    {{ $ap->kind->getName() }}
-                                                    @if ($ap->kind == \Modules\AppointmentUser\Enum\AppointmentUserKindEnum::ONLINE)
-                                                        {{ $ap->online->first()?->messages?->first()?->unReadedMessageCount() ?? 0 }}
-                                                    @endif
-                                                </span>
-                                            </a>
-                                        </td>
+                                            <td class="{{ $ap->type->getclass() }} d-flex flex-column">
+                                                {!! $ap->kind->getIcon() !!}
+                                                <a
+                                                    @if ($ap->kind == \Modules\AppointmentUser\Enum\AppointmentUserKindEnum::ONLINE &&  $ap->online->isNotEmpty()) href="{{ route('admin.appointment_user.message.detail', ['onlineAppId' => $ap->online->first()?->id]) }}" @else href="" @endif>
+                                                    <span
+                                                        class="badge badge-sm {{ $ap->kind->getbadgeColor() }} rounded-pill">
+                                                        {{ $ap->kind->getName() }}
+                                                        @if ($ap->kind == \Modules\AppointmentUser\Enum\AppointmentUserKindEnum::ONLINE)
+                                                            {{ $ap->online->first()?->messages?->first()?->unReadedMessageCount() ?? 0 }}
+                                                        @endif
+                                                    </span>
+                                                </a>
+                                            </td>
                                         <td>
                                             <div class="d-flex flex-column">
                                                 @if ($ap->agent)
@@ -387,7 +393,7 @@
                                             </div>
                                         </td>
                                         <td>{{ $ap->user?->mobile ?? '-----' }}</td>
-                                        <td>{{ $ap->user?->document_number ?? '---' }}</td>
+                                        <td>{{ $ap->user?->national_code ?? '---' }}</td>
                                         <td>
                                             <div class="d-flex flex-column">
                                                 <span>{{ $ap->doctor?->full_name ?? 'پزشک حذف شده' }}</span>

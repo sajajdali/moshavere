@@ -75,7 +75,7 @@
     @endif
     {{-- return redirect()-)->with('success', 'نوبت با موفقیت کنسل شد'); --}}
 
-    @if ($ap->kind == \Modules\AppointmentUser\Enum\AppointmentUserKindEnum::ONLINE)
+    @if ($ap->kind == \Modules\AppointmentUser\Enum\AppointmentUserKindEnum::ONLINE && $ap->online->isNotEmpty())
         <li><a href="{{route('admin.appointment_user.message.detail',['onlineAppId'=>$ap->online->first()->id])}}">
                 <i class="fa fa-comments-o" aria-hidden="true"></i>
                 ورود به چت

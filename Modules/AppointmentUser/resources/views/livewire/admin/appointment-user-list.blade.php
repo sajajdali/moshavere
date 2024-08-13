@@ -349,19 +349,21 @@
                                                 @endcan
                                             </div>
                                         </td>
-                                        <td class="{{ $ap->type->getclass() }} d-flex flex-column">
-                                            {!! $ap->kind->getIcon() !!}
-                                            <a
-                                                @if ($ap->kind == \Modules\AppointmentUser\Enum\AppointmentUserKindEnum::ONLINE) href="{{ route('admin.appointment_user.message.detail', ['onlineAppId' => $ap->online->first()?->id]) }}" @else href="" @endif>
-                                                <span
-                                                    class="badge badge-sm {{ $ap->kind->getbadgeColor() }} rounded-pill">
-                                                    {{ $ap->kind->getName() }}
-                                                    @if ($ap->kind == \Modules\AppointmentUser\Enum\AppointmentUserKindEnum::ONLINE)
-                                                        {{ $ap->online->first()?->messages?->first()?->unReadedMessageCount() ?? 0 }}
-                                                    @endif
-                                                </span>
-                                            </a>
-                                        </td>
+                                        @if( $ap->online->isNotEmpty())
+                                            <td class="{{ $ap->type->getclass() }} d-flex flex-column">
+                                                {!! $ap->kind->getIcon() !!}
+                                                <a
+                                                    @if ($ap->kind == \Modules\AppointmentUser\Enum\AppointmentUserKindEnum::ONLINE) href="{{ route('admin.appointment_user.message.detail', ['onlineAppId' => $ap->online->first()?->id]) }}" @else href="" @endif>
+                                                    <span
+                                                        class="badge badge-sm {{ $ap->kind->getbadgeColor() }} rounded-pill">
+                                                        {{ $ap->kind->getName() }}
+                                                        @if ($ap->kind == \Modules\AppointmentUser\Enum\AppointmentUserKindEnum::ONLINE)
+                                                            {{ $ap->online->first()?->messages?->first()?->unReadedMessageCount() ?? 0 }}
+                                                        @endif
+                                                    </span>
+                                                </a>
+                                            </td>
+                                        @endif
                                         <td>
                                             <div class="d-flex flex-column">
                                                 @if ($ap->agent)

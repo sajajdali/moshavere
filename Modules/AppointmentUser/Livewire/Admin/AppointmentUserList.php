@@ -250,7 +250,6 @@ class AppointmentUserList extends Component
     }
     public function mount()
     {
-
         // TODO::pass roles that can set appointmet in appointmentSetter property ;
         $this->fetchData['appointmentSetter'] = null;
         $this->fetchData['Services'] = Service::all();

@@ -393,7 +393,7 @@
                                             </div>
                                         </td>
                                         <td>{{ $ap->user?->mobile ?? '-----' }}</td>
-                                        <td>{{ $ap->user?->licence_number ?? '---' }}</td>
+                                        <td>{{ $ap->user?->national_code ?? '---' }}</td>
                                         <td>
                                             <div class="d-flex flex-column">
                                                 <span>{{ $ap->doctor?->full_name ?? 'پزشک حذف شده' }}</span>

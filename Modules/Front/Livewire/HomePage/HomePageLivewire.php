@@ -70,7 +70,9 @@ class HomePageLivewire extends Component
     private function getNewestDoc()
     {
         return User::newestDocs()->orderByDesc('created_at')->get()->filter(function ($doc) {
-            if ($doc->services()->exists() || $doc->places()->exists()) {
+            if ($doc->services()->exists() && $doc->places()->exists() && $doc->appointmentSettings()->exists()) {
+                return true;
+            } else {
                 return false;
             };
         })->take(4);

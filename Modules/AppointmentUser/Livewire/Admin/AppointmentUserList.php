@@ -104,14 +104,14 @@ class AppointmentUserList extends Component
                     });
                 },
             ],
-            'licene_number' => [
-                'condition' => isset($this->search['licene_number']),
+            'national_code' => [
+                'condition' => isset($this->search['national_code']),
                 'callback' => function ($query) {
                     return $query->whereHas('user', function ($q) {
                         $q->whereHas('metas', function ($qq) {
                             $qq->where([
-                                ['meta_key', UserMetaEnum::LICENCE_NUMBER],
-                                ['meta_value', 'LIKE', "%{$this->search['licene_number']}%"],
+                                ['meta_key', UserMetaEnum::NATIONAL_CODE],
+                                ['meta_value', 'LIKE', "%{$this->search['national_code']}%"],
                             ]);
                         });
                     });

@@ -108,7 +108,7 @@
                                 <div class="col-md-12">
                                     <label for="search-UserMobile" class="form-label"><strong>کد ملی</strong></label>
                                     <input class="form-control" id="search-UserMobile"
-                                        wire:model="search.licene_number" placeholder="کد ملی کاربر" type="text">
+                                        wire:model="search.national_code" placeholder="کد ملی کاربر" type="text">
 
                                 </div>
                             </div>

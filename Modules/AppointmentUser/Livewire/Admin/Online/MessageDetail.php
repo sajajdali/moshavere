@@ -31,10 +31,7 @@ class MessageDetail extends Component
     public function storeRecordedVoice()
     {
         if (isset($this->form['voice'])) {
-            $fileUrl = Storage::disk('public')->url($this->form['voice']);
-            $p = explode('/', $this->form['voice']);
-            // $mimeType = Storage::mimeType($this->form['voice']);
-            $size  =  ceil((Storage::size($this->form['voice'])) / 1024);
+            $fileUrl = Storage::url($this->form['voice']);
             $extension = pathinfo($fileUrl, PATHINFO_EXTENSION);
             $model = [
                 'appointment_online_id' =>  $this->fetchData['appOnline']->id,
@@ -55,7 +52,7 @@ class MessageDetail extends Component
                 'path' => $this->form['voice'],
                 'extension' => $extension,
                 'mime' => 'mp3',
-                'size' => $size,
+                'size' => 10,
             ];
             AppointmentOnlineMessageFile::create($fileModel);
             $this->addError('success', 'ویس با موفقیت ارسال شد');

@@ -155,21 +155,21 @@
                                                             @if ($message->messageFile()->count())
                                                                 @foreach ($message->messageFile as $file)
                                                                     @if (in_array($file->mime, ['jpg','image/png', 'jpeg','image/jpeg', 'png','image/png', 'gif','image/gif', 'webp','image/webp', 'bmp','image/bmp', 'svg','image/svg' ,'tiff','image/tiff', 'heic','image/heic', 'heif','image/heif']))
-                                                                        <a href="{{ Storage::url($file->disk . $file->server_name) }}"
+                                                                        <a href="{{ Storage::url($file->disk . $file->path) }}"
                                                                             data-fancybox="gallery"
                                                                             data-caption="{{ $file->original_name }}">
-                                                                            <img src="{{ Storage::url($file->disk . $file->server_name) }}"
+                                                                            <img src="{{ Storage::url($file->disk . $file->path) }}"
                                                                                 alt="{{ $file->original_name }}"
                                                                                 style="width: 100px; height: auto;" />
                                                                         </a>
                                                                     @elseif($file->mime == 'mp3')
                                                                         <audio
-                                                                            src="{{ Storage::url($file->disk . $file->server_name) }}"
+                                                                            src="{{ Storage::url($file->disk . $file->path) }}"
                                                                             controls preload="auto"></audio>
                                                                     @endif
                                                                     <div class="main-msg-wrapper">
                                                                         <a class="text-dark"
-                                                                            href="{{ Storage::url($file->disk . $file->server_name) }}">
+                                                                            href="{{ Storage::url($file->disk . $file->path) }}">
                                                                             <span class="fs-13 mt-1"> دانلود
                                                                                 فایل</span>
                                                                             <i

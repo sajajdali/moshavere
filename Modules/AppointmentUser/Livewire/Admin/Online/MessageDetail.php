@@ -5,7 +5,6 @@ namespace Modules\AppointmentUser\Livewire\Admin\Online;
 use Livewire\Component;
 use Livewire\Attributes\On;
 use Livewire\Attributes\Url;
-use Livewire\WithFileUploads;
 use Livewire\Attributes\Computed;
 use Illuminate\Support\Facades\Storage;
 use Modules\AppointmentUser\app\Models\AppointmentUser;
@@ -20,7 +19,6 @@ use Modules\AppointmentUser\app\Models\AppointmentOnlineMessageFile;
 
 class MessageDetail extends Component
 {
-    use WithFileUploads ;
     #[Url]
     public $search;
     public array $form = [];
@@ -186,14 +184,6 @@ class MessageDetail extends Component
     public function cancelAppointment(){
         $this->fetchData['appOnline']->update(['status' => AppointmentOnlineStatusEnum::CANCEL]);
         return redirect()->route('admin.appointment_user.message.detail',['onlineAppId'=>$this->fetchData['appOnline']->id])->with('success', 'نوبت با موفقیت کنسل شد');
-    }
-
-    public function uploadvoice(){
-        $fileName = time().'.'.$this->form['voiceFile']->extension();
-        $filePath = 'public/online-message/voice';
-        $file_location = Storage::put($filePath,$this->form['voiceFile']);
-        $this->form['voice'] = $file_location ;
-        $this->dispatch('fileHasUpload',true);
     }
     public function mount()
     {

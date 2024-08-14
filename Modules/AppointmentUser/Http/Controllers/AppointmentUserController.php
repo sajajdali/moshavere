@@ -54,7 +54,7 @@ class AppointmentUserController extends Controller
      public function upload(Request $request) {
         $fileName = time().'.'.$request->file->extension();
         $filePath = 'public/online-message/voice';
-        $file_location = Storage::put($filePath,$request->file);
+        $file_location = $request->file->storeAs($filePath, $fileName);
         // $request->file->move(public_path('uploads/voice/'), $fileName);
         return ($file_location);
      }

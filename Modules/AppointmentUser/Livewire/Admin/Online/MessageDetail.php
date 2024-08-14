@@ -128,7 +128,7 @@ class MessageDetail extends Component
             title: "پیام جدید!",
             excerpt: 'یک پیام جدید دارید',
             message: '',
-            link: \App\Enum\RouteEnum::ONLINE_MESSAGE->getLink($this->fetchData['appOnline']->id),
+            link: \App\Enum\RouteEnum::CHAT->getLink($this->fetchData['appOnline']->id),
         ));
 
         $this->dispatch('sendMessage', true);

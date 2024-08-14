@@ -32,36 +32,36 @@ class MessageDetail extends Component
     {
         if (isset($this->form['voice'])) {
             $fileUrl = Storage::disk('public')->url($this->form['voice']);
+            $p = explode('/', $this->form['voice']);
+            // $mimeType = Storage::mimeType($this->form['voice']);
+            $size  =  ceil((Storage::size($this->form['voice'])) / 1024);
+            $extension = pathinfo($fileUrl, PATHINFO_EXTENSION);
+            $model = [
+                'appointment_online_id' =>  $this->fetchData['appOnline']->id,
+                'user_id'               =>  $this->fetchData['user']->id,
+                'answer_by'             =>  auth()->user()->id,
+                'type'                  =>  AppointmentOnlineMessageTypeEnum::ANSWER,
+                'seen'                  =>  AppointmentOnlineMessageSeenEnum::UNSEEN,
+                'body'                  =>  isset($this->form['typedMessage']) ? $this->form['typedMessage'] : '',
+            ];
+            $AOM =  AppointmentOnlineMessage::create($model);
+            $fileModel = [
+                'user_id' => $this->fetchData['user']->id,
+                'answer_by' => auth()->user()->id,
+                'fk_id' => $AOM->id,
+                'original_name' => $this->form['voice'],
+                'server_name' => $this->form['voice'],
+                'disk' => 'public',
+                'path' => $this->form['voice'],
+                'extension' => $extension,
+                'mime' => 'mp3',
+                'size' => $size,
+            ];
+            AppointmentOnlineMessageFile::create($fileModel);
+            $this->addError('success', 'ویس با موفقیت ارسال شد');
+            $this->fetchData['messages'] = $this->fetchData['appOnline']->messages;
+            $this->dispatch('sendMessage', true);
         }
-        $p = explode('/', $this->form['voice']);
-        // $mimeType = Storage::mimeType($this->form['voice']);
-        $size  =  ceil((Storage::size($this->form['voice'])) / 1024);
-        $extension = pathinfo($fileUrl, PATHINFO_EXTENSION);
-        $model = [
-            'appointment_online_id' =>  $this->fetchData['appOnline']->id,
-            'user_id'               =>  $this->fetchData['user']->id,
-            'answer_by'             =>  auth()->user()->id,
-            'type'                  =>  AppointmentOnlineMessageTypeEnum::ANSWER,
-            'seen'                  =>  AppointmentOnlineMessageSeenEnum::UNSEEN,
-            'body'                  =>  isset($this->form['typedMessage']) ? $this->form['typedMessage'] : '',
-        ];
-        $AOM =  AppointmentOnlineMessage::create($model);
-        $fileModel = [
-            'user_id' => $this->fetchData['user']->id,
-            'answer_by' => auth()->user()->id,
-            'fk_id' => $AOM->id,
-            'original_name' => $p[3],
-            'server_name' => $p[3],
-            'disk' => $p[0],
-            'path' => $this->form['voice'],
-            'extension' => $extension,
-            'mime' => 'mp3',
-            'size' => $size,
-        ];
-        AppointmentOnlineMessageFile::create($fileModel);
-        $this->addError('success', 'ویس با موفقیت ارسال شد');
-        $this->fetchData['messages'] = $this->fetchData['appOnline']->messages;
-        $this->dispatch('sendMessage', true);
     }
 
     public function ignoreSearch()
@@ -181,9 +181,10 @@ class MessageDetail extends Component
         return redirect()->route('admin.appointment_user.message.detail', $this->fetchData['appOnline']->id);
     }
 
-    public function cancelAppointment(){
+    public function cancelAppointment()
+    {
         $this->fetchData['appOnline']->update(['status' => AppointmentOnlineStatusEnum::CANCEL]);
-        return redirect()->route('admin.appointment_user.message.detail',['onlineAppId'=>$this->fetchData['appOnline']->id])->with('success', 'نوبت با موفقیت کنسل شد');
+        return redirect()->route('admin.appointment_user.message.detail', ['onlineAppId' => $this->fetchData['appOnline']->id])->with('success', 'نوبت با موفقیت کنسل شد');
     }
     public function mount()
     {
@@ -191,9 +192,9 @@ class MessageDetail extends Component
 
         $this->fetchData['messages']  = $this->fetchData['appOnline']->messages;
         $this->fetchData['appOnline']->messages()
-        ->where('type', AppointmentOnlineMessageTypeEnum::QUESTION)
-        ->where('seen', AppointmentOnlineMessageSeenEnum::UNSEEN)
-        ->update(['seen' => AppointmentOnlineMessageSeenEnum::SEEN]);
+            ->where('type', AppointmentOnlineMessageTypeEnum::QUESTION)
+            ->where('seen', AppointmentOnlineMessageSeenEnum::UNSEEN)
+            ->update(['seen' => AppointmentOnlineMessageSeenEnum::SEEN]);
         $this->fetchData['user']      =  $this->fetchData['appOnline']->user;
     }
     public function render()

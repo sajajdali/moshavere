@@ -188,10 +188,10 @@ class MessageDetail extends Component
         return redirect()->route('admin.appointment_user.message.detail',['onlineAppId'=>$this->fetchData['appOnline']->id])->with('success', 'نوبت با موفقیت کنسل شد');
     }
 
-    public function uploadvoice($file){
-        $fileName = time().'.'.$file->extension();
+    public function uploadvoice(){
+        $fileName = time().'.'.$this->form['voiceFile']->extension();
         $filePath = 'public/online-message/voice';
-        $file_location = Storage::put($filePath,$file);
+        $file_location = Storage::put($filePath,$this->form['voiceFile']);
         $this->form['voice'] = $file_location ;
         $this->dispatch('fileHasUpload',true);
     }

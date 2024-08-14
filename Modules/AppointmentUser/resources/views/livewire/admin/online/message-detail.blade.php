@@ -310,9 +310,10 @@
             });
             $(document).on("click", "#save:not(.disabled)", function() {
                 function upload(blob) {
-                    var formData = new FormData();
-                    formData.append('file', blob);
-                    @this.uploadvoice(blob);
+                    // var formData = new FormData();
+                    // formData.append('file', blob);
+                    @this.set('form.voiceFile',blob)
+                    @this.uploadvoice();
                     // $.ajaxSetup({
                     //     headers: {
                     //         'X-CSRF-TOKEN': "{{ csrf_token() }}"

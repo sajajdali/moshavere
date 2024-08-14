@@ -96,9 +96,9 @@ class MessageDetail extends Component
             $fileName = basename($filePath);
 
             // Get the file mime type
-            $fileMime = Storage::mimeType('/public/' . $filePath);
+            $fileMime = Storage::mimeType('/storage/' . $filePath);
             // Get the file size
-            $fileSizebyte = Storage::size('/public/' . $filePath);
+            $fileSizebyte = Storage::size('/storage/' . $filePath);
             $fileSize = $fileSizebyte / 1024;
             // Get the disk
             $fileDisk = 'public';

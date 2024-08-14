@@ -47,7 +47,7 @@ class AppointmentApiOnlineController extends Controller
                 'disk'   => $disk,
                 'path'   => $imageName,
                 'extension'   => $extension,
-                'mime'   => $mime,
+                'mime'   => getValueAfterSlash($mime),
                 'size'   => $size,
             ]);
 

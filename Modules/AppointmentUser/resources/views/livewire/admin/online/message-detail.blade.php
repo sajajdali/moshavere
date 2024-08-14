@@ -232,10 +232,10 @@
                                 </div>
                             @elseif ($this->fetchData['appOnline']->status != Modules\AppointmentUser\Enum\AppointmentOnlineStatusEnum::REJECT)
                             {{-- TODO::VOICE js class activate --}}
-                                {{-- <button type="button" class="btn btn-secondary ms-2" data-bs-toggle="modal"
+                                <button type="button" class="btn btn-secondary ms-2" data-bs-toggle="modal"
                                     data-bs-target="#soundRecorderModal">
                                     <i class="fa fa-microphone fa-xl" aria-hidden="true"></i>
-                                </button> --}}
+                                </button>
                                 <input class="form-control ms-2 @error('form.typedMessage') is-invalid @enderror"
                                     wire:model='form.typedMessage'
                                     placeholder="@error('form.typedMessage') {{ $message }} @else متن خود را یادداشت کنید @enderror"

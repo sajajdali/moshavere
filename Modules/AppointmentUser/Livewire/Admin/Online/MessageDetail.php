@@ -113,7 +113,7 @@ class MessageDetail extends Component
                 'disk' => $fileDisk,
                 'path' => $filePath,
                 'extension' => $extension,
-                'mime' => $fileMime,
+                'mime' => getValueAfterSlash($fileMime),
                 'size' => $fileSize,
             ];
             AppointmentOnlineMessageFile::create($fileModel);

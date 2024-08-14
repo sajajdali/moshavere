@@ -158,7 +158,7 @@ class ChatController extends Controller
                 'disk'   => $disk,
                 'path'   => $imageName,
                 'extension'   => $extension,
-                'mime'   => $mime,
+                'mime'   => getValueAfterSlash($mime),
                 'size'   => $size,
             ]);
             if ($needConvert) {

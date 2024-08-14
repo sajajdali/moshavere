@@ -32,6 +32,19 @@ function getCurrentSeason()
     }
 }
 
+function getValueAfterSlash($string) {
+    // Check if "/" exists in the string
+    if (strpos($string, '/') !== false) {
+        // Split the string by "/"
+        $parts = explode('/', $string);
+        // Return the last part
+        return end($parts);
+    } else {
+        // Return the original string if "/" is not found
+        return $string;
+    }
+}
+
 function disableUi(): bool
 {
     return env('DISABLE_TEMPLATE', false) === true;

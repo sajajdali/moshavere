@@ -3,6 +3,7 @@
 namespace Modules\AppointmentUser\Livewire\Admin\Online;
 
 use Livewire\Component;
+use Livewire\WithFileUploads;
 use Livewire\WithPagination;
 use Livewire\Attributes\Title;
 use Livewire\Attributes\Computed;

@@ -273,10 +273,6 @@
     <script src="{{ admin_asset('plugins/sweet-alert/sweetalert.min.js') }}"></script> --}}
     <!-- Include Fancybox CSS -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/fancybox/3.5.7/jquery.fancybox.min.css" />
-
-    <!-- Include jQuery (if not already included) -->
-    {{-- <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script> --}}
-
     <!-- Include Fancybox JS -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/fancybox/3.5.7/jquery.fancybox.min.js"></script>
 
@@ -316,24 +312,25 @@
                 function upload(blob) {
                     var formData = new FormData();
                     formData.append('file', blob);
-                    $.ajaxSetup({
-                        headers: {
-                            'X-CSRF-TOKEN': "{{ csrf_token() }}"
-                        }
-                    });
-                    $.ajax({
-                        url: "/admin/appointment_user/storevoice",
-                        type: 'POST',
-                        data: formData,
-                        contentType: false,
-                        processData: false,
-                        success: function(url) {
-                            @this.set('form.voice', url)
-                            @this.dispatch('fileHasUpload');
-                            $("#audio").attr("src", url);
-                            $("#secound_loading").removeClass('d-block').addClass('d-none');
-                        }
-                    });
+                    @this.uploadvoice(blob);
+                    // $.ajaxSetup({
+                    //     headers: {
+                    //         'X-CSRF-TOKEN': "{{ csrf_token() }}"
+                    //     }
+                    // });
+                    // $.ajax({
+                    //     url: "/admin/appointment_user/storevoice",
+                    //     type: 'POST',
+                    //     data: formData,
+                    //     contentType: false,
+                    //     processData: false,
+                    //     success: function(url) {
+                    //         @this.set('form.voice', url)
+                    //         @this.dispatch('fileHasUpload');
+                    //         $("#audio").attr("src", url);
+                    //         $("#secound_loading").removeClass('d-block').addClass('d-none');
+                    //     }
+                    // });
                 }
                 if ($(this).parent().data("type") === "mp3") {
                     Fr.voice.exportMP3(upload, "blob");

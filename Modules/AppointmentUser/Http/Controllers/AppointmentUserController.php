@@ -18,7 +18,7 @@ class AppointmentUserController extends Controller
 
 
 
-        //        return  app('AppointmentUserService')->listAppointments(AppointmentSetting::find(1));
+//        return  app('AppointmentUserService')->listAppointments(AppointmentSetting::find(1));
 
 
         $appointmentSetting = AppointmentSetting::find(1);
@@ -26,46 +26,36 @@ class AppointmentUserController extends Controller
         if (env('APPOINTMENT_SANDBOX')) {
             Cache::forget('appointmentList.' . $appointmentSetting->id);
         }
-        $listUsers = Cache::rememberForever('appointmentList.' . $appointmentSetting->id, function () use ($appointmentSetting) {
+        $listUsers = Cache::rememberForever('appointmentList.'.$appointmentSetting->id, function () use ($appointmentSetting) {
             $appointmentSetting->update(['updated_log_at' => \now()]);
             return app('AppointmentUserService')->listAppointments($appointmentSetting);
         });
-        //        $listUsers = app('AppointmentUserService')->listAppointments($appointmentSetting, ['specialDay' => Carbon::today()->toDateString()]);
+//        $listUsers = app('AppointmentUserService')->listAppointments($appointmentSetting, ['specialDay' => Carbon::today()->toDateString()]);
 
-        //        $updateOneDay = app('AppointmentUserService')->listAppointments(2, null, null, ['specialDay' => Carbon::today()->toDateString()]);
-        //        $dateSelect = verta(Carbon::today());
-        //        Cache::forget('appointmentList_2');
-        //        $listUsers[$dateSelect->year][$dateSelect->month][$dateSelect->day] = $updateOneDay[$dateSelect->year][$dateSelect->month][$dateSelect->day];
-        //        Cache::rememberForever('appointmentList_2', function () use ($listUsers) {
-        //            return $listUsers;
-        //        });
-
-        // Add required days and remove unnecessary days from the log
-        //        $lastDayActive = Carbon::parse($listUsers['report']['last_day'])->diffInDays(Carbon::now());
+//        $updateOneDay = app('AppointmentUserService')->listAppointments(2, null, null, ['specialDay' => Carbon::today()->toDateString()]);
+//        $dateSelect = verta(Carbon::today());
+//        Cache::forget('appointmentList_2');
+//        $listUsers[$dateSelect->year][$dateSelect->month][$dateSelect->day] = $updateOneDay[$dateSelect->year][$dateSelect->month][$dateSelect->day];
+//        Cache::rememberForever('appointmentList_2', function () use ($listUsers) {
+//            return $listUsers;
+//        });
 
         // Add required days and remove unnecessary days from the log
+//        $lastDayActive = Carbon::parse($listUsers['report']['last_day'])->diffInDays(Carbon::now());
 
-        return $listUsers;
+        // Add required days and remove unnecessary days from the log
+
+          return $listUsers;
     }
     /**
      * Display a listing of the resource.
      */
 
-    public function upload(Request $request)
-    {
-        // $fileName = uniqId() . '.' . $request->file->extension();
-        // $filePath = '/online-message/voice';
-        // $file_location = $request->file->storeAs($filePath, $fileName);
-        // // $request->file->move(public_path('uploads/voice/'), $fileName);
-        // return ($file_location);
-        
-        $fileName = uniqId() . '.' . $request->file->getClientOriginalExtension();
-        $filePath = '/online-message/voice';
-        // Store the file and get the path
-        $file_location = $request->file->storeAs($filePath, $fileName);
-        // Optionally, return the public URL of the file
-        return Storage::url($file_location);
-    }
+     public function upload(Request $request) {
+        $fileName = uniqId().'.'.$request->file->extension();
+        $file_location = Storage::disk('public')->putFileAs('online-message/voice', $request->file('file'), $fileName);
+        return ($file_location);
+     }
     public function index()
     {
         return view('appointmentuser::index');

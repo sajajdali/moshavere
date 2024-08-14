@@ -340,7 +340,6 @@
                     $("#secound_loading").removeClass('d-none').addClass('d-block');
                     Fr.voice.export(upload, "blob");
                 }
-                restore();
             });
         });
     </script>

@@ -5,6 +5,13 @@
             <h1 class="page-title">گفت و گو</h1>
         </div>
     </div>
+    <div wire:loading>
+        <div class="loading-overlay d-flex align-items-center justify-content-center">
+            <div class="spinner-border text-primary" role="status">
+                <span class="sr-only">Loading...</span>
+            </div>
+        </div>
+    </div>
     <!-- PAGE-HEADER END -->
     @if ($chats->isNotEmpty())
         <!-- Row -->
@@ -84,29 +91,27 @@
                                                             <div class="media-body">
                                                                 @if ($chatMessage->files()->count())
                                                                     @foreach($chatMessage->files as $file)
-                                                                        @if(in_array($file->mime, ['jpg', 'jpeg', 'png', 'gif', 'webp', 'bmp', 'svg', 'tiff', 'heic', 'heif']))
-                                                                            <a href="{{  Storage::url($file->disk  . $file->server_name) }}" data-fancybox="gallery" data-caption="{{ $file->original_name }}">
-                                                                                <img src="{{  Storage::url($file->disk  . $file->server_name) }}" alt="{{ $file->original_name }}" style="width: 100px; height: auto;"/>
+                                                                        @if(in_array($file->mime,['jpg','image/png', 'jpeg','image/jpeg', 'png','image/png', 'gif','image/gif', 'webp','image/webp', 'bmp','image/bmp', 'svg','image/svg' ,'tiff','image/tiff', 'heic','image/heic', 'heif','image/heif']))
+                                                                            <a href="{{  Storage::url($file->disk . '/' . $file->path) }}" data-fancybox="gallery" data-caption="{{ $file->original_name }}">
+                                                                                <img src="{{  Storage::url($file->disk . '/' . $file->path) }}" alt="{{ $file->original_name }}" style="width: 100px; height: auto;"/>
                                                                             </a>
                                                                         @elseif($file->mime == 'mp3')
-                                                                            <audio src="{{ Storage::url($file->disk  . $file->server_name) }}" controls preload="auto"></audio>
+                                                                            <audio src="{{ Storage::url($file->disk . '/' . $file->path) }}" controls preload="auto"></audio>
                                                                         @endif
                                                                             <div class="main-msg-wrapper">
                                                                                 <a class="text-dark"
-                                                                                   href="{{ Storage::url($file->disk  . $file->server_name) }}">
+                                                                                   href="{{ Storage::url($file->disk . '/' . $file->path) }}">
                                                                                     <span class="fs-13 mt-1"> دانلود فایل
                                                                                     </span> <i
                                                                                         class="fe fe-download mt-3 ms-4 text-muted pe-2"></i>
                                                                                 </a>
                                                                             </div>
                                                                     @endforeach
-                                                                @endif
-                                                                @if($chatMessage->content)
+                                                                @elseif($chatMessage->content)
                                                                     <div class="main-msg-wrapper">
                                                                         {{ $chatMessage->content }}
                                                                     </div>
                                                                 @endif
-
                                                                 <div>
                                                                     <span>{{ $chatMessage->created_at->format('H:i') }}</span>
                                                                 </div>
@@ -126,11 +131,14 @@
                                     <input class="form-control" placeholder="متن پیام شما..." type="text"
                                         wire:model="chatMessage">
                                     {{-- send File modal --}}
-                                    {{-- TODO::fixSendFile --}}
-                                    {{-- <a class="nav-link" data-for="userAvatar" data-variable="userAvatar"
-                                        class="btn btn-primary select_file" data-bs-target="#file-selector-modal"
-                                        data-bs-toggle="modal">
-                                        <i class="fe fe-paperclip"></i></a> --}}
+                                    <button data-bs-target="#file-selector-modal" data-bs-toggle="modal" class="nav-link"
+                                    href="javascript:void(0)">
+                                    @if (isset($form['file']))
+                                        <i class="fa fa-check" aria-hidden="true"></i>
+                                    @else
+                                        <i class="fe fe-paperclip"></i>
+                                    @endif
+                                </button>
                                     <button type="button" wire:click="sendMessage"
                                         wire:loading.class="btn btn-light btn-loading"
                                         wire:loading.class.remove="btn-primary"
@@ -176,10 +184,6 @@
 
             <!-- Include Fancybox CSS -->
             <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/fancybox/3.5.7/jquery.fancybox.min.css" />
-
-            <!-- Include jQuery (if not already included) -->
-            <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
-
             <!-- Include Fancybox JS -->
             <script src="https://cdnjs.cloudflare.com/ajax/libs/fancybox/3.5.7/jquery.fancybox.min.js"></script>
             <script>
@@ -211,12 +215,15 @@
             });
         });
         Livewire.on('select_file', (param) => {
-            @this.set('ImgMessg', param.url);
+            @this.set('form.file', param.url);
             //close modal
             $('#file-selector-modal').modal('hide');
         });
         scroll();
 
+        Livewire.on('messageHasBeenSend', function() {
+            scroll();
+            });
         function scroll() {
             setTimeout(() => {
                 $('#ChatBody').scrollTop($('#ChatBody')[0].scrollHeight);

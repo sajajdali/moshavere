@@ -92,14 +92,11 @@ class MessageDetail extends Component
             // Get the file name
             $fileName = basename($filePath);
 
+            $extension = pathinfo($fileName, PATHINFO_EXTENSION);
             // Get the file mime type
             $fileMime = Storage::mimeType('/storage/' . $filePath);
-            // Get the file size
-            $fileSizebyte = Storage::size('/storage/' . $filePath);
-            $fileSize = $fileSizebyte / 1024;
             // Get the disk
             $fileDisk = 'public';
-            $extension = pathinfo($parsedUrl['path'], PATHINFO_EXTENSION);
 
             $fileModel = [
                 'user_id' => $this->fetchData['user']->id,
@@ -110,8 +107,8 @@ class MessageDetail extends Component
                 'disk' => $fileDisk,
                 'path' => $filePath,
                 'extension' => $extension,
-                'mime' => getValueAfterSlash($fileMime),
-                'size' => $fileSize,
+                'mime' => $extension,
+                'size' => 1,
             ];
             AppointmentOnlineMessageFile::create($fileModel);
             unset($this->form['file']);

@@ -159,7 +159,7 @@
                                                                             data-fancybox="gallery"
                                                                             data-caption="{{ $file->original_name }}">
                                                                             <img src="{{ Storage::url($file->disk . '/' . $file->path) }}"
-                                                                                alt="{{ $file->original_name }}"
+                                                                                alt="image"
                                                                                 style="width: 100px; height: auto;" />
                                                                         </a>
                                                                     @elseif($file->mime == 'mp3')
@@ -167,7 +167,7 @@
                                                                             src="{{ Storage::url($file->disk . '/' . $file->path) }}"
                                                                             controls preload="auto"></audio>
                                                                     @endif
-                                                                    <div class="main-msg-wrapper">
+                                                                    <div class="main-msg-wrapper" data-id ={{$file->id}}>
                                                                         <a class="text-dark"
                                                                             href="{{ Storage::url($file->disk . '/' . $file->path) }}">
                                                                             <span class="fs-13 mt-1"> دانلود
@@ -187,7 +187,6 @@
                                                     </div>
                                                 </div>
                                             @endif
-
                                             @if ($message->body != null)
                                                 <div class="@if ($message->type == Modules\AppointmentUser\Enum\AppointmentOnlineMessageTypeEnum::ANSWER) media chat-left
                                                     @else  media flex-row-reverse chat-right @endif">

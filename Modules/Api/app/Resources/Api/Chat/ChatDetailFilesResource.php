@@ -2,8 +2,8 @@
 
 namespace Modules\Api\app\Resources\Api\Chat;
 
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Http\Resources\Json\JsonResource;
-use Storage;
 
 class ChatDetailFilesResource extends JsonResource
 {
@@ -14,7 +14,8 @@ class ChatDetailFilesResource extends JsonResource
     {
         return [
             'original_name' => $this->original_name,
-            'file_address' => url(Storage::url( $this->disk . $this->path)),
+            'file_address' => url(Storage::url( $this->disk . '/' . $this->path)),
+            // 'file_address' => url(Storage::url( $this->disk . $this->path)),
             'extension' => $this->extension,
             'mime' => $this->mime,
             'size' => formatBytes($this->size),

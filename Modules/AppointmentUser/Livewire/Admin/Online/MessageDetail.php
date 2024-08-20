@@ -180,6 +180,11 @@ class MessageDetail extends Component
         $this->fetchData['appOnline']->update(['status' => AppointmentOnlineStatusEnum::CANCEL]);
         return redirect()->route('admin.appointment_user.message.detail', ['onlineAppId' => $this->fetchData['appOnline']->id])->with('success', 'نوبت با موفقیت کنسل شد');
     }
+    public function closeApp() {
+        $this->fetchData['appOnline']->update(['status' => AppointmentOnlineStatusEnum::COMPLETED_BY_DOCTOR]);
+        return redirect()->route('admin.appointment_user.message.detail', ['onlineAppId' => $this->fetchData['appOnline']->id])->with('success', 'وضعیت نوبت به تمام شده ، تغییر پیدا کرد');
+
+    }
     public function mount()
     {
         $this->fetchData['appOnline'] = AppointmentOnline::find(request()->route('onlineAppId'));

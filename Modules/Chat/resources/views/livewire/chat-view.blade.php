@@ -12,6 +12,7 @@
             </div>
         </div>
     </div>
+    @include('admin::layouts.components.alert')
     <!-- PAGE-HEADER END -->
     @if ($chats->isNotEmpty())
         <!-- Row -->
@@ -67,7 +68,11 @@
                                     </div>
                                     <nav class="nav">
                                         <div>
-                                            <div class="input-group"></div>
+                                            <div class="input-group" wire:key='{{time()}}'>
+                                                @if (isset($this->chatList?->first()?->first()?->chat) && $this->chatList?->first()?->first()?->chat?->status != Modules\Chat\Enum\ChatStatusEnum::CLOSED)
+                                                <button wire:confirm='از بستن چت مطمعن هستید؟' wire:click='closeChat({{$this->chatList?->first()?->first()?->chat->id}})' class="btn btn-warning">بستن چت</button>
+                                                @endif
+                                            </div>
                                         </div>
                                     </nav>
                                 </div>
@@ -127,7 +132,12 @@
                                         </div>
                                     @endif
                                 </div>
-                                <div class="main-chat-footer pt-5 pb-5">
+                                <div class="main-chat-footer pt-5 pb-5" wire:key='{{time() . time()}}'>
+                                    @if (isset($this->chatList?->first()?->first()?->chat) && $this->chatList?->first()?->first()?->chat?->status == Modules\Chat\Enum\ChatStatusEnum::CLOSED)
+                                    <div class="col-md-12 alert alert-primary fade show mt-4 ms-3" role="alert">
+                                        چت بسته شده است!
+                                    </div>
+                                    @else
                                     <input class="form-control" placeholder="متن پیام شما..." type="text"
                                         wire:model="chatMessage">
                                     {{-- send File modal --}}
@@ -138,7 +148,7 @@
                                     @else
                                         <i class="fe fe-paperclip"></i>
                                     @endif
-                                </button>
+                                    </button>
                                     <button type="button" wire:click="sendMessage"
                                         wire:loading.class="btn btn-light btn-loading"
                                         wire:loading.class.remove="btn-primary"
@@ -147,6 +157,7 @@
                                     </button>
                                     <nav class="nav">
                                     </nav>
+                                    @endif
                                 </div>
                             </div>
                         </div>

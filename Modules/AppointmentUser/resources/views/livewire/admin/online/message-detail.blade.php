@@ -55,6 +55,17 @@
                                     <p class="fs-12 text-muted">{{ $fetchData['user']->mobile }}</p>
                                 </div>
                             </div>
+                            <div class="d-flex mb-2 mt-2">
+                                <div>
+                                    <a class="nav-link border rounded-pill chat-profile me-2" href="javascript:void(0)">
+                                        <i class="fa fa-envira" aria-hidden="true"></i>
+                                    </a>
+                                </div>
+                                <div class="ms-2">
+                                    <p class="fs-13 fw-semibold mb-0">کد ملی</p>
+                                    <p class="fs-12 text-muted">{{ $fetchData['user']->national_code }}</p>
+                                </div>
+                            </div>
                             <div class="d-flex mb-2">
                                 <div>
                                     <a class="nav-link border rounded-pill chat-profile me-2" href="javascript:void(0)">
@@ -81,9 +92,15 @@
                             <div class="border-top mt-3">
                                 @if (
                                     $this->fetchData['appOnline']->status == Modules\AppointmentUser\Enum\AppointmentOnlineStatusEnum::REJECT ||
+                                    $this->fetchData['appOnline']->status == Modules\AppointmentUser\Enum\AppointmentOnlineStatusEnum::COMPLETED_BY_DOCTOR ||
                                         $this->fetchData['appOnline']->status == Modules\AppointmentUser\Enum\AppointmentOnlineStatusEnum::CANCEL)
                                 @else
                                     <div class="mt-3 d-flex flex-column justify-content-start">
+                                        <button class="btn btn-primary rounded-full mb-4 py-2"
+                                            wire:click='closeApp()' wire:confirm='از بستن چت مطمعن هستید؟' type="button">
+                                            <i class="fa fa-check me-1" aria-hidden="true"></i>
+                                            اتمام ویزیت و بستن چت
+                                        </button>
                                         <button class="btn btn-danger rounded-full " style="background-color: #d77377 !important"
                                             wire:click='cancelAppointment()' wire:confirm='میخواهید این نوبت را کنسل کنید؟' type="button"> <i
                                                 class="fa fa-times font-bold" aria-hidden="true"></i> کنسل کردن نوبت
@@ -228,6 +245,10 @@
                                     $this->fetchData['appOnline']->status == Modules\AppointmentUser\Enum\AppointmentOnlineStatusEnum::CANCEL)
                                 <div class="col-md-12 alert alert-danger fade show mt-4 ms-3" role="alert">
                                     نوبت رد شده است!
+                                </div>
+                                @elseif($this->fetchData['appOnline']->status == Modules\AppointmentUser\Enum\AppointmentOnlineStatusEnum::COMPLETED_BY_DOCTOR)
+                                <div class="col-md-12 alert alert-primary fade show mt-4 ms-3" role="alert">
+                                    نوبت توسط پزشک پاسخ داده شده است و بسته شده!!
                                 </div>
                             @elseif ($this->fetchData['appOnline']->status != Modules\AppointmentUser\Enum\AppointmentOnlineStatusEnum::REJECT)
                             {{-- TODO::VOICE js class activate --}}

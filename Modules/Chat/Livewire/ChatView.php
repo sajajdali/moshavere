@@ -180,6 +180,13 @@ class ChatView extends Component
         $this->chatId = $chatId;
         $this->dispatch('chatRoomSelected');
     }
+    public function closeChat($id) {
+       $closeChat =  Chat::find($id);
+        $closeChat->update([
+            'status' => ChatStatusEnum::CLOSED ,
+        ]);
+        return redirect()->route('admin.chat',['chatId' => $closeChat->id])->with('success','وضعیت گفت و گو به بسته شده تغییر کرد.');
+    }
 
     public function render()
     {

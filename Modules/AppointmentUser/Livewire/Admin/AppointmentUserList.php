@@ -146,13 +146,13 @@ class AppointmentUserList extends Component
             'appointment_end_date' => [
                 'condition' => $this->search['appointment_end_date'],
                 'callback' => function ($query) {
-                    return $query->whereDate('created_at', '<', Verta::parse($this->search['appointment_end_date'])->toCarbon());
+                    return $query->whereDate('created_at', '<=', Verta::parse($this->search['appointment_end_date'])->toCarbon());
                 },
             ],
             'appointment_star_date' => [
                 'condition' => $this->search['appointment_star_date'],
                 'callback' => function ($query) {
-                    return $query->whereDate('created_at', '>', Verta::parse($this->search['appointment_star_date'])->toCarbon());
+                    return $query->whereDate('created_at', '>=', Verta::parse($this->search['appointment_star_date'])->toCarbon());
                 },
             ],
             'AppointmentStatus' => [

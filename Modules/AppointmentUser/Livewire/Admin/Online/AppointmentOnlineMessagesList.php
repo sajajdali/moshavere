@@ -97,7 +97,7 @@ class AppointmentOnlineMessagesList extends Component
         })
             ->selectRaw('appointment_online_id, MAX(id) as id,MAX(user_id) as user_id,MAX(type) as type,MAX(seen) as seen,MAX(body) as body,MAX(updated_at) as updated_at')
             ->groupBy('appointment_online_id')
-            ->orderBy('updated_at');
+            ->orderByDesc('updated_at');
 
         return  $query->paginate(10);
     }

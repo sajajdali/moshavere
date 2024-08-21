@@ -425,7 +425,7 @@
                                 <input type="text"
                                     class="form-control @error('form.payment.inPerson.price') is-invalid @enderror"
                                     id="inPersonPriceInpout" wire:model='form.payment.inPerson.price'
-                                    placeholder="مبلغ به ریال">
+                                    placeholder="مبلغ به تومان">
                             </div>
                         </div>
                     </div>
@@ -440,7 +440,7 @@
                                 <input type="text"
                                     class="form-control  @error('form.payment.online.price') is-invalid @enderror"
                                     id="onlineProceInpit" wire:model='form.payment.online.price'
-                                    placeholder="مبلغ به ریال">
+                                    placeholder="مبلغ به تومان">
                             </div>
                         </div>
                     </div>
@@ -454,7 +454,7 @@
                             <div class="form-group">
                                 <input type="text"
                                     class="form-control  @error('form.payment.voip.price') is-invalid @enderror"
-                                    id="voipPrice" wire:model='form.payment.voip.price' placeholder="مبلغ به ریال">
+                                    id="voipPrice" wire:model='form.payment.voip.price' placeholder="مبلغ به تومان">
                             </div>
                         </div>
                     </div>

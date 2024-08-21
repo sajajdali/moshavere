@@ -308,7 +308,7 @@
                     </p>
                 </div>
             @enderror
-            <div class="row"  >
+            <div class="row">
                 <div class="col-md-3 pt-2">
                     <label class="text-primary" for="basic-url">انتخاب تاریخ:</label>
                 </div>
@@ -628,7 +628,7 @@
     <div class="text-end mb-5 me-3">
         <button type="submit" form="setting" wire:click='saveSetting'
             wire:loading.class='btn-loading disabled btn-gray'
-            class="btn btn-success mt-5 loading-btn"><strong>ذخیره</strong></button>
+            class="btn btn-success mt-5 "><strong>ذخیره</strong></button>
 
     </div>
 </div>
@@ -730,7 +730,6 @@
             $('.select2-show-search').on('change', function() {
                 @this.set('form.operators.ids', $(this).val());
             });
-
         });
     </script>
 @endpush

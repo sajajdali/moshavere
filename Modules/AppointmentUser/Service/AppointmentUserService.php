@@ -703,6 +703,7 @@ class AppointmentUserService
             $paymentLink = route('api.appointment.payment.create', $appointmentUser);
         }
 
+
         // handel sms
         $this->makeShortLink($appointmentUser);
 
@@ -743,7 +744,7 @@ class AppointmentUserService
                 'tracking_code' => $appointmentUserModel['tracking_code'],
                 'appointment_user_id' => $appointmentUser->id,
                 'tracking_url' => $trackingUrl,
-                'payment_link' => $paymentLink
+                'payment_link' => $paymentLink ?? $trackingUrl
             ]
         ];
 

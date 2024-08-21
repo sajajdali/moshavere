@@ -247,7 +247,7 @@ class ShowAvailableDayForDoctor extends Component
         }
         $this->fetchData['maxShowDay'] = 2;
         $this->getAvailableDay();
-
+        $this->fetchData['isAppointmentActive'] = $this->fetchData['doc']->isDoctorActive();
         //select the nearest appointment
         foreach ($this->fetchData['firstTreeAvailableAppointment']  as $date => $appointmentsWithDaysIndex) {
             foreach ($appointmentsWithDaysIndex as $eachTime => $appointmentDetail) {

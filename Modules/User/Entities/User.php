@@ -320,8 +320,11 @@ class User extends Authenticatable
     }
     public function isDoctorActive()
     {
-        if (isset($this->doc->ban_user) && $this->doc->ban_user == true) {
+        if (isset($this->ban_user) && $this->ban_user == true) {
             return   false;
+        }
+        if(isset($this->active_appointment) && $this->active_appointment != true ) {
+            return false ;
         }
         if (!$this->services()->exists()) {
             return  false;

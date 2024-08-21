@@ -80,7 +80,6 @@ class Checkout extends Component
 
         // check user not have active appointment for that day
         if ($this->checkForActiveAppointment()) {
-
             // register the appointment
             $this->storeAppointment();
         }

@@ -31,8 +31,7 @@
                     </div>
                 </div>
             </div>
-            @if (isset($fetchData['firstTreeAvailableAppointment']) && !empty($fetchData['firstTreeAvailableAppointment']))
-
+            @if (isset($fetchData['firstTreeAvailableAppointment']) && !empty($fetchData['firstTreeAvailableAppointment']) && $fetchData['isAppointmentActive'])
                 <div class="appointment__modal-left" wire:loading.class='opacity-75'>
                     <div class="flex justify-between mb-4 align-center">
                         <p class="font-semibold">نوبت مورد نظر را انتخاب کنید</p>
@@ -137,6 +136,12 @@
                         <p class="font-bold">نمایش بیشتر</p>
                     </button>
                 @endif
+                @elseif($fetchData['isAppointmentActive'] == false)
+                <div class="relative bg-sky-200 border border-sky-200 text-gray-600 px-4 py-3 rounded-lg mt-3"
+                role="alert">
+                <strong class="font-bold">نکته!</strong>
+                <span class="block sm:inline">نوبت دهی پزشک انتخابی محدود شده است!</span>
+            </div>
                 @else
                 <div class="relative bg-sky-200 border border-sky-200 text-gray-600 px-4 py-3 rounded-lg mt-3"
                 role="alert">
@@ -145,7 +150,7 @@
             </div>
             @endif
 </div>
-@if (isset($fetchData['firstTreeAvailableAppointment']) && !empty($fetchData['firstTreeAvailableAppointment']))
+@if (isset($fetchData['firstTreeAvailableAppointment']) && !empty($fetchData['firstTreeAvailableAppointment']) && $fetchData['isAppointmentActive'])
     <button type="button" class="btn__blue--round-full mt-4" id="nextstep_btn"
         wire:click='TimeForReservesation'>
         <span>مرحله بعد</span>

@@ -1,5 +1,7 @@
 <?php
 
+use Modules\User\Entities\User;
+use Modules\User\Enum\UserMetaEnum;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\ShortLinkController;
 
@@ -16,8 +18,16 @@ use App\Http\Controllers\ShortLinkController;
 
 Route::get('/s/{param}', [ShortLinkController::class, 'index']);
 
-// Route::get('test_ui', function () {
-//     $app = AppointmentUser::find(119) ;
-//     $app->user->national_code = '0440668736' ;
-//     dd( $app->user->national_code);
+// Route::get('teettt', function () {
+//     $user = Modules\User\Entities\User::doctors(); // Assuming this returns a collection
+//     $filteredUsers = $user->reject(function ($q) {
+//         return $q->metas->contains(function ($meta) {
+//             return $meta->meta_key === Modules\User\Enum\UserMetaEnum::LAST_NAME &&
+//                 in_array($meta->meta_value, ['تاجپور', 'دهقانی زاده', 'گلشن', 'یوسفی', 'خلیل پور', 'درببان', 'کاظم زاده', 'شایسته', 'اقبالی']);
+//         });
+//     });
+//     $filteredUsers->each(function ($q) {
+//         $q->active_appointment = false;
+//     });
+//     echo 'done';
 // });

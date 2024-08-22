@@ -9,7 +9,6 @@ use Livewire\Attributes\Title;
 use Livewire\Attributes\Layout;
 use Livewire\Attributes\Locked;
 use Modules\User\Entities\User;
-use Livewire\Attributes\Computed;
 use Modules\Place\app\Models\Place;
 use Modules\User\Enum\UserMetaEnum;
 use Modules\Service\app\Models\Service;
@@ -65,7 +64,10 @@ class SearchLivewire extends Component
         } else {
             $result = [];
             if ($sanitizedInput == 'پزشکان') {
-                $doctors = User::doctors_query()->when(isset($this->filter['speciality']), function ($query) {
+                $doctors = User::doctors_query()->where(function ($query) {
+                    $query->whereNull('activeAppointment')
+                          ->orWhere('activeAppointment', '!=', true);
+                })->when(isset($this->filter['speciality']), function ($query) {
                     $query->whereHas('specialities', function ($qq) {
                         $qq->where('title', 'LIKE', "%{$this->filter['speciality']}%");
                     });

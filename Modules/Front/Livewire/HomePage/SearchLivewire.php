@@ -9,7 +9,6 @@ use Livewire\Attributes\Title;
 use Livewire\Attributes\Layout;
 use Livewire\Attributes\Locked;
 use Modules\User\Entities\User;
-use Livewire\Attributes\Computed;
 use Modules\Place\app\Models\Place;
 use Modules\User\Enum\UserMetaEnum;
 use Modules\Service\app\Models\Service;
@@ -65,7 +64,12 @@ class SearchLivewire extends Component
         } else {
             $result = [];
             if ($sanitizedInput == 'پزشکان') {
-                $doctors = User::doctors_query()->when(isset($this->filter['speciality']), function ($query) {
+                $doctors = User::doctors_query()->whereHas('metas', function ($q) {
+                    $q->where('meta_key', UserMetaEnum::ACTIVE_APPOINTMENT)
+                        ->where(function ($qqq) {
+                            $qqq->where('meta_value', true);
+                        });
+                })->when(isset($this->filter['speciality']), function ($query) {
                     $query->whereHas('specialities', function ($qq) {
                         $qq->where('title', 'LIKE', "%{$this->filter['speciality']}%");
                     });
@@ -90,7 +94,7 @@ class SearchLivewire extends Component
                 $place = Place::whereNotNull('detail')
                     ->whereJsonContains('detail->' . Place::DETAIL_PROVINCE, $this->fetchData['province_id'])
                     ->get();
-                if (isset($place) && $place->isNotEmpty() ) {
+                if (isset($place) && $place->isNotEmpty()) {
                     $result['place'] =  $place;
                     $this->fetchData['set_appointment_message'] = 'لطفا یکی از پزشکان مربوط به این بخش را انتخاب کنید!';
                 } else {

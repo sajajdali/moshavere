@@ -4,14 +4,10 @@ namespace Modules\AppointmentUser\app\Console;
 
 use Illuminate\Console\Command;
 use Modules\Reminder\Enum\ReminderStatusEnum;
-use Symfony\Component\Console\Input\InputOption;
 use Modules\Reminder\Enum\ReminderParametersEnum;
-use Symfony\Component\Console\Input\InputArgument;
 use Modules\Reminder\app\Models\AppointmentReminder;
 use Modules\User\Notifications\UserMessageNotification;
-use Modules\AppointmentUser\Enum\AppointmentUserStatusEnum;
 use Modules\AppointmentUser\app\Notifications\AppointmentSmsReminder;
-use Modules\AppointmentUser\app\Notifications\AppointmentSmsNotification;
 
 class SendReminderscommand extends Command
 {

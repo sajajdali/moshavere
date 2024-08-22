@@ -332,9 +332,10 @@ class AppointmentApiController extends Controller
         }
 
         if ($kind == AppointmentUserKindEnum::ONLINE->value) {
+            $payment = app('AppointmentUserService')->paymentstatus($appointmentSetting) ;
             return $this->ok([
                 'status' => true,
-                'payment' => app('AppointmentUserService')->paymentstatus($appointmentSetting),
+                'payment' => $payment['online'],
                 'appointment_setting_id' => $appointmentSetting->id,
                 'messages' => [
                     'پس از ثبت درخواست امکان آپلود مدارک و طرح سوال فعال میگردد',
@@ -412,9 +413,10 @@ class AppointmentApiController extends Controller
         }
         // handle condition dr amiri
 
+        $payment = app('AppointmentUserService')->paymentstatus($appointmentSetting) ;
         return $this->ok([
             'status' => true,
-            'payment' => app('AppointmentUserService')->paymentstatus($appointmentSetting),
+            'payment' => $payment['in_person'],
             'appointment_setting_id' => $appointmentSetting->id,
             'first_two_empty' => $resultList['firstTwoEmpty'],
             'get_list_empty_appointment' => $resultList['listAppointments'],

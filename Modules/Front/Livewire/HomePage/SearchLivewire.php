@@ -66,7 +66,7 @@ class SearchLivewire extends Component
             if ($sanitizedInput == 'پزشکان') {
                 $doctors = User::doctors_query()->whereHas('metas', function ($query) {
                     $query->where('meta_key', UserMetaEnum::ACTIVE_APPOINTMENT)
-                          ->where('meta_value','<>', false)
+                          ->whereNotIn('meta_value', [false, 'false', '0', null, '']);
                 })->when(isset($this->filter['speciality']), function ($query) {
                     $query->whereHas('specialities', function ($qq) {
                         $qq->where('title', 'LIKE', "%{$this->filter['speciality']}%");

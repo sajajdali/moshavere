@@ -487,7 +487,7 @@ class AppointmentUserService
             $inPersonStatusPayment = $detail['payment']['online']['price'];
         }
         return [
-            'onilne' => [
+            'online' => [
                 'status' => $onlineStatusPayment,
                 'deadline' => $deadLineDelete,
                 'force_payment' => $onlineForcePayment,

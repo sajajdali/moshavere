@@ -73,7 +73,12 @@ class SearchLivewire extends Component
                     $query->whereHas('specialities', function ($qq) {
                         $qq->where('title', 'LIKE', "%{$this->filter['speciality']}%");
                     });
-                })->get();
+                })->when(isset($this->filter['services']),function($query){
+                    $query->whereHas('service',function($q){
+                        $q->where('title','Like',"%{$this->filter['services']}%"); 
+                    });
+                })
+                ->get();
                 if ($doctors->isNotEmpty()) {
                     $result['doctors'] = $doctors;
                 }
@@ -198,6 +203,7 @@ class SearchLivewire extends Component
     public function applyFilter($name, $category)
     {
         $this->filter[$category] = $name;
+
     }
     public function removeFilter($item)
     {
@@ -266,7 +272,7 @@ class SearchLivewire extends Component
     }
     public function render()
     {
-
+        $this->searchIn();
         return view('front::livewire.home-page.search-livewire');
     }
 }

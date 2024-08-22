@@ -64,9 +64,9 @@ class SearchLivewire extends Component
         } else {
             $result = [];
             if ($sanitizedInput == 'پزشکان') {
-                $doctors = User::doctors_query()->where(function ($query) {
-                    $query->whereNull('activeAppointment')
-                          ->orWhere('activeAppointment', '!=', true);
+                $doctors = User::doctors_query()->whereHas('metas', function ($query) {
+                    $query->where('meta_key', UserMetaEnum::ACTIVE_APPOINTMENT)
+                          ->where('meta_value','<>', false)
                 })->when(isset($this->filter['speciality']), function ($query) {
                     $query->whereHas('specialities', function ($qq) {
                         $qq->where('title', 'LIKE', "%{$this->filter['speciality']}%");

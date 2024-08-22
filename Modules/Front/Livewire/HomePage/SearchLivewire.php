@@ -161,11 +161,12 @@ class SearchLivewire extends Component
     }
     public function loadMoreResult()
     {
-        $this->fetchData['result_iterator'] = $this->fetchData['result_iterator'] + 10;
+        $this->fetchData['result_iterator'] += 10;
+        $this->searchIn();
     }
     private function paginateTheResult($result)
     {
-        if (!isset($this->fetchData['result_iterator'])) {
+        if (! isset($this->fetchData['result_iterator'])) {
             $this->fetchData['result_iterator'] = 20;
         }
         $return_reslut = [];

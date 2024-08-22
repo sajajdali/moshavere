@@ -73,9 +73,9 @@ class SearchLivewire extends Component
                     $query->whereHas('specialities', function ($qq) {
                         $qq->where('title', 'LIKE', "%{$this->filter['speciality']}%");
                     });
-                })->when(isset($this->filter['services']),function($query){
+                })->when(isset($this->filter['service']),function($query){
                     $query->whereHas('service',function($q){
-                        $q->where('title','Like',"%{$this->filter['services']}%"); 
+                        $q->where('title','Like',"%{$this->filter['service']}%"); 
                     });
                 })
                 ->get();
@@ -203,7 +203,7 @@ class SearchLivewire extends Component
     public function applyFilter($name, $category)
     {
         $this->filter[$category] = $name;
-
+        $this->render();
     }
     public function removeFilter($item)
     {

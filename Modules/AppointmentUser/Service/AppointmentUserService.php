@@ -491,13 +491,13 @@ class AppointmentUserService
                 'status' => $onlineStatusPayment,
                 'deadline' => $deadLineDelete,
                 'force_payment' => $onlineForcePayment,
-                'price' => PriceResource::make(['price' => $onlinePrice]),
+                'price' => $onlinePrice > 0 ?PriceResource::make(['price' => $onlinePrice]) : null,
             ],
             'in_person' => [
                 'status' => $inPersonStatusPayment,
                 'deadline' => $deadLineDelete,
                 'force_payment' => $inPersonForcePayment,
-                'price' => PriceResource::make(['price' => $inPersonPrice]),
+                'price' => $inPersonPrice > 0 ? PriceResource::make(['price' => $inPersonPrice]) : null,
             ]
 
         ];

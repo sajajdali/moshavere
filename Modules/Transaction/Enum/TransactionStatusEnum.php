@@ -14,6 +14,7 @@ enum TransactionStatusEnum : int implements EnumHasNameInterface
     case SUCCESSFUL = 1;
     case REJECTED = 0;
     case PENDING = 2;
+    case INACTIVITY_PAYMENT = 3;
 
 
     public function getName(): string
@@ -24,6 +25,7 @@ enum TransactionStatusEnum : int implements EnumHasNameInterface
             self::SUCCESSFUL => 'موفق' ,
             self::REJECTED => 'ناموفق' ,
             self::PENDING => 'در حال انجام' ,
+            self::INACTIVITY_PAYMENT => 'پرداخت غیر فعال' ,
             default => "",
         } ;
     }
@@ -36,6 +38,7 @@ enum TransactionStatusEnum : int implements EnumHasNameInterface
             self::SUCCESSFUL => '#006D44' ,
             self::REJECTED => '#BE003A' ,
             self::PENDING => '#FDBB21' ,
+            self::INACTIVITY_PAYMENT => '#FDBB21' ,
             default => "#7143BD",
         } ;
     }

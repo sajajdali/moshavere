@@ -2,6 +2,7 @@
 
 namespace Modules\AppointmentUser\Service;
 
+use App\Enum\RouteEnum;
 use App\Event;
 use Carbon\Carbon;
 use App\Models\ShortLink;
@@ -14,6 +15,9 @@ use Modules\Api\app\Resources\PriceResource;
 use Modules\AppointmentUser\Enum\AppointmentVia;
 use Modules\Api\app\Resources\Api\SomeoneResource;
 use Modules\AppointmentUser\app\Models\AppointmentUser;
+use Modules\Transaction\app\Models\Transaction;
+use Modules\Transaction\Enum\TransactionPaidEnum;
+use Modules\Transaction\Enum\TransactionStatusEnum;
 use Modules\User\app\Notifications\UserSmsNotification;
 use Modules\AppointmentUser\Enum\model\AppointmentModel;
 use Modules\AppointmentUser\app\Models\AppointmentOnline;
@@ -777,6 +781,20 @@ class AppointmentUserService
             }
         }
 
+        $transactionId = null;
+        // Create transaction when payment is inactive
+        if ($paymentLink) {
+            $transactionId = Transaction::create([
+                'user_id' => $userModelAppointment->userModel->user->id,
+                'transaction_code' => Transaction::generateTransactionCode(),
+                'status' => TransactionStatusEnum::INACTIVITY_PAYMENT,
+                'cost' => 0,
+                'total_cost' => 0,
+                'paid_by' => TransactionPaidEnum::NO_NEED_TO_PAY,
+            ])->id;
+        }
+
+
         event(new StoreAppointmentEvent($appointmentUser));
 
         Cache::forget('appointmentList.' . $appointmentSetting->id);
@@ -792,6 +810,8 @@ class AppointmentUserService
                 'tracking_code' => $appointmentUserModel['tracking_code'],
                 'appointment_user_id' => $appointmentUser->id,
                 'tracking_url' => $trackingUrl,
+                'transaction_id' => $transactionId,
+                'route' => $transactionId ? RouteEnum::transaction->getLink($transactionId) : null,
                 'payment_link' => $paymentLink ?? $trackingUrl
             ]
         ];

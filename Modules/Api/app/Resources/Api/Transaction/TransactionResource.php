@@ -16,6 +16,12 @@ class TransactionResource extends JsonResource
     public function toArray($request): array
     {
         $transaction = $this->transaction()->orderByDesc('id')->first();
+
+        $buttonText = 'بازگشت به خانه';
+        if (in_array($transaction->status , [TransactionStatusEnum::REJECTED , TransactionStatusEnum::PENDING]) ){
+            $buttonText = 'پرداخت آنلاین';
+        }
+
         return [
             'id' => $transaction->id,
             'user' => UserResource::make($this->user),
@@ -31,7 +37,8 @@ class TransactionResource extends JsonResource
                 'date_visit_format' => verta($this->date_visit)->format('l j F Y'),
                 'doctor' => DoctorResource::make($this->doctor)
             ],
-            'payment' => $this->payment()
+            'payment' => $this->payment(),
+            'button_text' => $buttonText
         ];
     }
 

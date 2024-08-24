@@ -48,6 +48,7 @@ class TransactionResource extends JsonResource
         }
         return [
             'status' => false,
+            'total_cost' => 0,
             'payment_link' => null
         ];
     }

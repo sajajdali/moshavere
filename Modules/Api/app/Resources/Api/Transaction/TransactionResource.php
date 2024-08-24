@@ -42,6 +42,7 @@ class TransactionResource extends JsonResource
         if (in_array($transaction->status , [TransactionStatusEnum::REJECTED , TransactionStatusEnum::PENDING]) ){
             return [
                 'status' => true,
+                'total_cost' => $transaction->total_cost,
                 'payment_link' => route('api.appointment.payment.create', $this),
             ];
         }

@@ -813,7 +813,7 @@ class AppointmentUserService
                 'appointment_user_id' => $appointmentUser->id,
                 'tracking_url' => $trackingUrl,
                 'transaction_id' => $transactionId,
-                'route' => $transactionId ? RouteEnum::transaction->getLink($transactionId) : null,
+                'route' => $transactionId ? RouteEnum::TRANSACTION->getLink($transactionId) : null,
                 'payment_link' => $paymentLink ?? $trackingUrl
             ]
         ];

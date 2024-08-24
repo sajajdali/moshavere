@@ -102,7 +102,7 @@ class HomePageLivewire extends Component
                     ]
                 );
             }
-            return redirect()->route('front.doctor.profile', ['doctor_id' => $id]);
+            return redirect()->route('front.doctor.profile', ['doctor_id' => $id,'doctor_name' => str_replace(' ', '_', $user->full_name)]);
         }
         return redirect()->to('/404');
     }

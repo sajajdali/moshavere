@@ -37,7 +37,7 @@
         @elseif($fetchData['modalStep'] == 2)
             <div class="space-y-3">
                 <div class="w-full flex justify-center">
-                    <p class=" text-xl font-semibold">مطب انتخاب شده:
+                    <p class=" text-xl font-semibold">مطب :
                         <a wire:click='editPlace' class="text-blue-400 hover:text-blue-700 cursor-pointer">{{ $form['place_name'] }}</a>
                     </p>
                 </div>

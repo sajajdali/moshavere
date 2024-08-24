@@ -199,7 +199,8 @@ class Checkout extends Component
         if (empty($this->fetchData['app_start_time']) || empty($this->fetchData['app_end_time'])) {
             return redirect()->route('front.setAppointment.days', ['doctor_id' => $doc, 'place_id' => $place, 'service_id' => $service])->with('error', 'لطفا مجدد تاریخ را انتخاب کنید!');
         }
-        $this->fetchData['date_for_blade'] = Carbon::createFromTimestamp($this->fetchData['app_start_time']);
+        $this->fetchData['date_for_blade'] = Carbon::createFromTimestamp($this->fetchData['app_start_time'],'Asia/Tehran');
+
         if($this->fetchData['date_for_blade']->lt(\now())){
             return abort(404);
         }

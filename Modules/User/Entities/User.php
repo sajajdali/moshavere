@@ -266,7 +266,12 @@ class User extends Authenticatable
                 ->where(function ($qqq) {
                     $qqq->where('meta_value', false)->orWhereNull('meta_value');
                 });
-        });
+        })->whereHas('metas', function ($q) {
+            $q->where('meta_key', UserMetaEnum::ACTIVE_APPOINTMENT)
+                ->where(function ($qqq) {
+                    $qqq->where('meta_value', true);
+                });
+         });
     }
 
     public function scopeIntroductionDoctors($query)
@@ -279,17 +284,28 @@ class User extends Authenticatable
                 ->where(function ($qqq) {
                     $qqq->where('meta_value', false)->orWhereNull('meta_value');
                 });
-        });
+        })->whereHas('metas', function ($q) {
+            $q->where('meta_key', UserMetaEnum::ACTIVE_APPOINTMENT)
+                ->where(function ($qqq) {
+                    $qqq->where('meta_value', true);
+                });
+         });
     }
 
     public function scopeNewestDocs()
     {
-        return $this->doctors_query()->whereHas('metas', function ($q) {
+        return $this->doctors_query()
+        ->whereHas('metas', function ($q) {
             $q->where('meta_key', UserMetaEnum::BAN_USER)
                 ->where(function ($qqq) {
                     $qqq->where('meta_value', false)->orWhereNull('meta_value');
                 });
-        });
+        })->whereHas('metas', function ($q) {
+            $q->where('meta_key', UserMetaEnum::ACTIVE_APPOINTMENT)
+                ->where(function ($qqq) {
+                    $qqq->where('meta_value', true);
+                });
+         });
     }
     public function getUserBadge()
     {

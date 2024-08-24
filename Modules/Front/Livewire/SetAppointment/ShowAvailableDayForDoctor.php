@@ -7,15 +7,16 @@ use Livewire\Component;
 use Livewire\Attributes\Title;
 use Livewire\Attributes\Layout;
 use Livewire\Attributes\Locked;
-use Modules\AppointmentSetting\app\Models\AppointmentSegmentItem;
 use Modules\User\Entities\User;
 use Modules\Place\app\Models\Place;
 use Illuminate\Support\Facades\Cache;
 use Hekmatinasser\Verta\Facades\Verta;
-use Modules\Service\app\Models\Service;
-use Modules\AppointmentSetting\app\Models\AppointmentSetting;
-
 use function PHPUnit\Framework\isFalse;
+use Modules\Service\app\Models\Service;
+use Modules\Setting\Enum\SettingKeyEnum;
+
+use Modules\AppointmentSetting\app\Models\AppointmentSetting;
+use Modules\AppointmentSetting\app\Models\AppointmentSegmentItem;
 
 #[Layout('front::layouts.app')]
 #[Title('ثبت نوبت')]
@@ -248,6 +249,9 @@ class ShowAvailableDayForDoctor extends Component
         $this->fetchData['maxShowDay'] = 2;
         $this->getAvailableDay();
         $this->fetchData['isAppointmentActive'] = $this->fetchData['doc']->isDoctorActive();
+        if(setting(SettingKeyEnum::APPOINTMENT_STATUS) != true  ) {
+            $this->fetchData['isAppointmentActive'] = false;
+        }
         //select the nearest appointment
         foreach ($this->fetchData['firstTreeAvailableAppointment']  as $date => $appointmentsWithDaysIndex) {
             foreach ($appointmentsWithDaysIndex as $eachTime => $appointmentDetail) {

@@ -141,8 +141,8 @@ class DoctorProfileLivewire extends Component
                         $this->form['place'],
                         $this->form['service']
                     );
-                }else{
-                    $this->dispatch('swalError',msg:'لطفا بخش مورد نظر خود را انتخاب کنید!');
+                } else {
+                    $this->dispatch('swalError', msg: 'لطفا بخش مورد نظر خود را انتخاب کنید!');
                 }
             }
         }
@@ -164,7 +164,7 @@ class DoctorProfileLivewire extends Component
                     // segment has multiple choise
                     $this->fetchData['multiple_choice'] = true;
                 }
-                $this->fetchData['segments'] = $segment->items()->where('display_on_site',true)->orderBy('priority')->get();
+                $this->fetchData['segments'] = $segment->items()->where('display_on_site', true)->orderBy('priority')->get();
             } else {
                 $this->redirectToAppointmentDays(
                     $this->doc->id,
@@ -211,14 +211,13 @@ class DoctorProfileLivewire extends Component
         if (isset($this->form['service']) && isset($this->form['place_id'])) {
             $this->serviceHasSelected();
             $this->fetchData['modalStep'] = 2;
-
         }
     }
     public function addComment()
     {
         // Check if the user is logged in
         if (!auth()->check()) {
-            $route = route('front.doctor.profile', ['doctor_id' =>  $this->doc->id]);
+            $route = route('front.doctor.profile', ['doctor_id' =>  $this->doc->id, 'doctor_name' => str_replace(' ', '_', $this->doc->full_name)]);
             session()->put('url.intended', $route);
             return redirect()->route('front.login.user', ['comment' => true]);
         }
@@ -259,7 +258,7 @@ class DoctorProfileLivewire extends Component
     {
         // Check if the user is logged in
         if (!auth()->check()) {
-            $route = route('front.doctor.profile', ['doctor_id' =>  $this->doc->id]);
+            $route = route('front.doctor.profile', ['doctor_id' =>  $this->doc->id, 'doctor_name' => str_replace(' ', '_', $this->doc->full_name)]);
             session()->put('url.intended', $route);
             return redirect()->route('front.login.user', ['favariteDr' => true]);
         }
@@ -289,7 +288,7 @@ class DoctorProfileLivewire extends Component
     {
         // Check if the user is logged in
         if (!auth()->check()) {
-            $route = route('front.doctor.profile', ['doctor_id' =>  $this->doc->id]);
+            $route = route('front.doctor.profile', ['doctor_id' =>  $this->doc->id, 'doctor_name' => str_replace(' ', '_', $this->doc->full_name)]);
             session()->put('url.intended', $route);
             return redirect()->route('front.login.user', ['favariteDr' => true]);
         }
@@ -320,7 +319,7 @@ class DoctorProfileLivewire extends Component
     }
     private function isDocAvaiable()
     {
-        if(setting(SettingKeyEnum::APPOINTMENT_STATUS) != true  ) {
+        if (setting(SettingKeyEnum::APPOINTMENT_STATUS) != true) {
             return false;
         }
         // check if doctor active and has setting
@@ -335,7 +334,7 @@ class DoctorProfileLivewire extends Component
     {
         $doctor_id =   request()->route('doctor_id');
         $checkExistensOfdoctor =  User::find($doctor_id);
-        if (isset($checkExistensOfdoctor) && $checkExistensOfdoctor->isDoctor() ) {
+        if (isset($checkExistensOfdoctor) && $checkExistensOfdoctor->isDoctor()) {
             $this->doc = $checkExistensOfdoctor;
         } else {
             abort(404);
@@ -348,7 +347,7 @@ class DoctorProfileLivewire extends Component
             $this->fetchData['iteratorStop'] = true;
         }
         if (auth()->check()) {
-            if (isset(auth()->user()->favorite_dr) &&  in_array($this->doc->id, auth()->user()->favorite_dr)) {
+            if (isset(auth()->user()->favorite_dr) &&  in_array($this->doc->id, json_decode(auth()->user()->favorite_dr,true))) {
                 $this->fetchData['isFavarite'] = true;
             }
         }

@@ -23,7 +23,7 @@
                         <div
                             class="w-[calc(100%-70px-1.25rem)] flex flex-col sm:flex-row items-center justify-between gap-3">
                             <div class="space-y-3 text-center sm:text-right">
-                                <p class="text-lg font-bold">دکتر {{ $doc->full_name }}</p>
+                                <a class="text-lg font-bold" href="{{route('front.doctor.profile',['doctor_id' =>  $doc->id,'doctor_name' =>  str_replace(' ', '_', $doc->full_name)])}}">دکتر {{ $doc->full_name }}</a>
                                 <p class="bg-secondary-200 rounded-lg py-2 px-3 text-sm">
                                     {{ $doc->DocSpecialities() }}
                                 </p>

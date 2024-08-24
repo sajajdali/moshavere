@@ -26,13 +26,14 @@ class UserList extends Component
     public function delete(User $model)
     {
         $this->authorize('delete', $model);
-
         try {
             $model->delete();
+            $msg='کاربر با موفقیت حذف شد';
         } catch (\Exception $e) {
+            $msg='خطا در حذف کاربر';
         }
 
-        return redirect()->route('admin.user.index')->with('success', 'کاربر با موفقیت حذف شد.');
+        return redirect()->route('admin.user.index')->with('success', $msg);
     }
 
     public function startSearch()

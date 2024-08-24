@@ -73,12 +73,12 @@ class SearchLivewire extends Component
                     $query->whereHas('specialities', function ($qq) {
                         $qq->where('title', 'LIKE', "%{$this->filter['speciality']}%");
                     });
-                })->when(isset($this->filter['service']),function($query){
-                    $query->whereHas('service',function($q){
-                        $q->where('title','Like',"%{$this->filter['service']}%"); 
+                })->when(isset($this->filter['service']), function ($query) {
+                    $query->whereHas('service', function ($q) {
+                        $q->where('title', 'Like', "%{$this->filter['service']}%");
                     });
                 })
-                ->get();
+                    ->get();
                 if ($doctors->isNotEmpty()) {
                     $result['doctors'] = $doctors;
                 }
@@ -160,8 +160,10 @@ class SearchLivewire extends Component
                 }
             }
         }
-
         $result =  $this->paginateTheResult($result);
+        if (isset($this->fetchData['reuslt'])) {
+            unset($this->fetchData['reuslt']);
+        }
         $this->fetchData['reuslt'] =  $result;
     }
     public function loadMoreResult()
@@ -227,7 +229,7 @@ class SearchLivewire extends Component
             $this->fetchData['settApp']['service'] = $service->id;
             $this->fetchData['set_appointment_message'] = 'لطفا پزشک مورد نظر را انتخاب کنید';
             $result['doctors'] = $service->user;
-            $this->query == null;
+            $this->query = null;
             $this->searchIn($result);
         }
     }
@@ -238,7 +240,7 @@ class SearchLivewire extends Component
             $this->fetchData['settApp']['place'] = $place->id;
             $this->fetchData['set_appointment_message'] = 'لطفا پزشک مورد نظر را انتخاب کنید';
             $result['doctors'] = $place->user;
-            $this->query == null;
+            $this->query = null;
             $this->searchIn($result);
         }
     }
@@ -248,6 +250,7 @@ class SearchLivewire extends Component
         $doc = User::find($doctor_id);
         if (isset($doc)) {
             $param['doctor_id'] = $doc->id;
+            $param['doctor_name'] = str_replace(' ', '_', $doc->full_name);
             if (isset($this->fetchData['settApp']['place'])) {
                 $param['place_id'] = $this->fetchData['settApp']['place'];
             }
@@ -263,6 +266,7 @@ class SearchLivewire extends Component
         $this->query = request()->get('query');
         if (request()->has('service_id')) {
             $this->fetchData['service_id'] =  htmlspecialchars(request()->input('service_id'), ENT_QUOTES, 'UTF-8');
+            $this->fetchData['settApp']['service'] =  $this->fetchData['service_id'];
         }
         if (request()->has('province')) {
             $this->fetchData['province_id'] =  htmlspecialchars(request()->input('province'), ENT_QUOTES, 'UTF-8');
@@ -272,7 +276,6 @@ class SearchLivewire extends Component
     }
     public function render()
     {
-        $this->searchIn();
         return view('front::livewire.home-page.search-livewire');
     }
 }

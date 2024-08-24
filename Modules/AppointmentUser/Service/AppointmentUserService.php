@@ -783,7 +783,7 @@ class AppointmentUserService
 
         $transactionId = null;
         // Create transaction when payment is inactive
-        if ($paymentLink) {
+        if ($paymentLink === null) {
             $transactionData =[
                 'user_id' => $userModelAppointment->userModel->user->id,
                 'transaction_code' => Transaction::generateTransactionCode(),

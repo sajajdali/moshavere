@@ -416,7 +416,7 @@ class AppointmentApiController extends Controller
         $payment = app('AppointmentUserService')->paymentstatus($appointmentSetting) ;
         return $this->ok([
             'status' => true,
-            'payment' => !$payment['in_person']['false'] ? null : $payment['in_person'],
+            'payment' => !$payment['in_person']['status'] ? null : $payment['in_person'],
             'appointment_setting_id' => $appointmentSetting->id,
             'first_two_empty' => $resultList['firstTwoEmpty'],
             'get_list_empty_appointment' => $resultList['listAppointments'],

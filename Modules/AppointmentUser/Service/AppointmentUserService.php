@@ -784,14 +784,16 @@ class AppointmentUserService
         $transactionId = null;
         // Create transaction when payment is inactive
         if ($paymentLink) {
-            $transactionId = Transaction::create([
+            $transactionData =[
                 'user_id' => $userModelAppointment->userModel->user->id,
                 'transaction_code' => Transaction::generateTransactionCode(),
                 'status' => TransactionStatusEnum::INACTIVITY_PAYMENT,
                 'cost' => 0,
                 'total_cost' => 0,
                 'paid_by' => TransactionPaidEnum::NO_NEED_TO_PAY,
-            ])->id;
+            ];
+            $transaction = $appointmentUser->transaction()->updateOrCreate($transactionData);
+            $transactionId = $transaction->id;
         }
 
 

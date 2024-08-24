@@ -320,6 +320,9 @@ class DoctorProfileLivewire extends Component
     }
     private function isDocAvaiable()
     {
+        if(setting(SettingKeyEnum::APPOINTMENT_STATUS) != true  ) {
+            return false;
+        }
         // check if doctor active and has setting
         $status =  $this->doc->isDoctorActive();
         $hasSetting = AppointmentSetting::where('user_id', $this->doc->id)->exists();

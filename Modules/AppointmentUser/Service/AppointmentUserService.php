@@ -787,7 +787,7 @@ class AppointmentUserService
             $transactionData =[
                 'user_id' => $userModelAppointment->userModel->user->id,
                 'transaction_code' => Transaction::generateTransactionCode(),
-                'status' => TransactionStatusEnum::INACTIVITY_PAYMENT,
+                'status' => TransactionStatusEnum::SUCCESSFUL,
                 'cost' => 0,
                 'total_cost' => 0,
                 'paid_by' => TransactionPaidEnum::NO_NEED_TO_PAY,

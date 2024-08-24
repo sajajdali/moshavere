@@ -31,9 +31,7 @@ class TransactionResource extends JsonResource
                 'date_visit_format' => verta($this->date_visit)->format('l j F Y'),
                 'doctor' => DoctorResource::make($this->doctor)
             ],
-            'payment' => [
-                'payment_link'
-            ]
+            'payment' => $this->payment()
         ];
     }
 

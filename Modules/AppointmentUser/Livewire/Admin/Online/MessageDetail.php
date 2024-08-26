@@ -117,10 +117,10 @@ class MessageDetail extends Component
         $this->addError('success', 'پیام با موفقیت ارسال شد');
 
         $this->fetchData['messages'] = $this->fetchData['appOnline']->messages;
-
+        $notificationMessage =  isset($this->form['typedMessage']) ? substr($this->form['typedMessage'],0,50) : 'یک پیام جدید دارید' ;
         $this->fetchData['user']->notify(new \Modules\User\Notifications\UserMessageNotification(
             title: "پیام جدید!",
-            excerpt: 'یک پیام جدید دارید',
+            excerpt:  $notificationMessage,
             message: '',
             link: \App\Enum\RouteEnum::CHAT->getLink($this->fetchData['appOnline']->id),
         ));

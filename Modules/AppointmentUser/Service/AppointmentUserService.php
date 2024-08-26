@@ -488,7 +488,7 @@ class AppointmentUserService
                 $deadLineDelete = Carbon::now()->addHours(4)->toDateTimeString();
                 $inPersonForcePayment = true;
             }
-            $inPersonPrice = $detail['payment']['online']['price'];
+            $inPersonPrice = $detail['payment']['inPerson']['price'];
         }
         return [
             'online' => [

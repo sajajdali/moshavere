@@ -119,7 +119,7 @@ class MessageDetail extends Component
 
         $this->fetchData['messages'] = $this->fetchData['appOnline']->messages;
             $this->fetchData['user']->notify(new \Modules\User\Notifications\UserMessageNotification(
-            title: "پیام جدید!",
+            title: "پیام جدید برای نوبت آنلاین!",
             excerpt:  $notificationMessage,
             message: '',
             link: \App\Enum\RouteEnum::CHAT->getLink($this->fetchData['appOnline']->id),

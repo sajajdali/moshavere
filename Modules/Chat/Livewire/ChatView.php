@@ -151,6 +151,7 @@ class ChatView extends Component
         ]);
         $this->chat?->increment('new_message_by_support');
 
+        $notificationMessage =  isset($this->chatMessage) ? substr($this->chatMessage,0,50) : 'یک پیام جدید دارید' ;
         //clear input
         $this->chatMessage = '';
 
@@ -158,10 +159,9 @@ class ChatView extends Component
         $message = ChatDetailResource::make($chatDetail);
 
         event(new PusherBroadcast($message , $this->chat->id));
-
         $this->chat->user->notify(new \Modules\User\Notifications\UserMessageNotification(
             title: "پیام جدید!",
-            excerpt: 'یک پیام جدید دارید',
+            excerpt: $notificationMessage,
             message: '',
             link: \App\Enum\RouteEnum::ONLINE_MESSAGE->getLink($this->chat->id),
         ));

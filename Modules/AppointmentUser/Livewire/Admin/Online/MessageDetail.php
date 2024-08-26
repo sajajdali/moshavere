@@ -113,12 +113,12 @@ class MessageDetail extends Component
             AppointmentOnlineMessageFile::create($fileModel);
             unset($this->form['file']);
         }
+        $notificationMessage =  isset($this->form['typedMessage']) ? substr($this->form['typedMessage'],0,50) : 'یک پیام جدید دارید' ;
         unset($this->form['typedMessage']);
         $this->addError('success', 'پیام با موفقیت ارسال شد');
 
         $this->fetchData['messages'] = $this->fetchData['appOnline']->messages;
-        $notificationMessage =  isset($this->form['typedMessage']) ? substr($this->form['typedMessage'],0,50) : 'یک پیام جدید دارید' ;
-        $this->fetchData['user']->notify(new \Modules\User\Notifications\UserMessageNotification(
+            $this->fetchData['user']->notify(new \Modules\User\Notifications\UserMessageNotification(
             title: "پیام جدید!",
             excerpt:  $notificationMessage,
             message: '',

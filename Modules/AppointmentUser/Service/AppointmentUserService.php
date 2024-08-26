@@ -2,6 +2,7 @@
 
 namespace Modules\AppointmentUser\Service;
 
+use App\Enum\RouteEnum;
 use App\Event;
 use Carbon\Carbon;
 use App\Models\ShortLink;
@@ -14,6 +15,9 @@ use Modules\Api\app\Resources\PriceResource;
 use Modules\AppointmentUser\Enum\AppointmentVia;
 use Modules\Api\app\Resources\Api\SomeoneResource;
 use Modules\AppointmentUser\app\Models\AppointmentUser;
+use Modules\Transaction\app\Models\Transaction;
+use Modules\Transaction\Enum\TransactionPaidEnum;
+use Modules\Transaction\Enum\TransactionStatusEnum;
 use Modules\User\app\Notifications\UserSmsNotification;
 use Modules\AppointmentUser\Enum\model\AppointmentModel;
 use Modules\AppointmentUser\app\Models\AppointmentOnline;
@@ -484,20 +488,20 @@ class AppointmentUserService
                 $deadLineDelete = Carbon::now()->addHours(4)->toDateTimeString();
                 $inPersonForcePayment = true;
             }
-            $inPersonPrice = $detail['payment']['online']['price'];
+            $inPersonPrice = $detail['payment']['inPerson']['price'];
         }
         return [
             'online' => [
                 'status' => $onlineStatusPayment,
                 'deadline' => $deadLineDelete,
                 'force_payment' => $onlineForcePayment,
-                'price' => PriceResource::make(['price' => $onlinePrice]),
+                'price' => $onlinePrice > 0 ?PriceResource::make(['price' => $onlinePrice]) : null,
             ],
             'in_person' => [
                 'status' => $inPersonStatusPayment,
                 'deadline' => $deadLineDelete,
                 'force_payment' => $inPersonForcePayment,
-                'price' => PriceResource::make(['price' => $inPersonPrice]),
+                'price' => $inPersonPrice > 0 ? PriceResource::make(['price' => $inPersonPrice]) : null,
             ]
 
         ];
@@ -671,6 +675,7 @@ class AppointmentUserService
 
         // handel payment
         $paymentLink = null;
+        $needToPayment = false;
         $smsTemplate = setting(SettingKeyEnum::SMS_APPOINTMENT_RECEIVING_SUCCESSFUL);
 
         if (
@@ -678,6 +683,7 @@ class AppointmentUserService
             $appointmentData->kind == AppointmentUserKindEnum::ONLINE &&
             $paymentstatus['online']['status']
         ) {
+            $needToPayment = true;
             $smsTemplate = setting(SettingKeyEnum::SMS_APPOINTMENT_WAITING_PAYMENT);
             $appointmentUserModel['deadline_at'] = $paymentstatus['online']['deadline'];
             if ($paymentstatus['online']['force_payment']) {
@@ -693,6 +699,7 @@ class AppointmentUserService
             $appointmentData->kind == AppointmentUserKindEnum::IN_PERSION &&
             $paymentstatus['in_person']['status']
         ) {
+            $needToPayment = true;
             $smsTemplate = setting(SettingKeyEnum::SMS_APPOINTMENT_WAITING_PAYMENT);
             $appointmentUserModel['deadline_at'] = $paymentstatus['in_person']['deadline'];
             if ($paymentstatus['in_person']['force_payment']) {
@@ -755,27 +762,45 @@ class AppointmentUserService
         // handel sms
         $this->makeShortLink($appointmentUser);
 
-        if (isset($detail['smsTemplate'])) {
-            $smsTemplate = $detail['smsTemplate'];
-        }
-        // send sms
-        if ($appointmentData->sendSmsToUser) {
-            if (isset($smsTemplate)) {
-                $appointmentUser->notify(new AppointmentSmsNotification($smsTemplate));
+        if (!$needToPayment) {
+            if (isset($detail['smsTemplate'])) {
+                $smsTemplate = $detail['smsTemplate'];
+            }
+            // send sms
+            if ($appointmentData->sendSmsToUser) {
+                if (isset($smsTemplate)) {
+                    $appointmentUser->notify(new AppointmentSmsNotification($smsTemplate));
+                }
+            }
+            if (isset($appointmentUser->operator)) {
+                $smsToOperator = setting(SettingKeyEnum::SMS_APPOINTMENT_TO_OPERATOR);
+                if (isset($smsToOperator)) {
+                    $appointmentUser->notify(new AppointmentDocAndOperatorNotification($smsToOperator, $appointmentUser->operator->mobile));
+                }
+            }
+            if (isset($appointmentUser->doctor)) {
+                $smsToDoctor = setting(SettingKeyEnum::SMS_APPOINTMENT_TO_DOCTOR);
+                if (isset($smsToDoctor)) {
+                    $appointmentUser->notify(new AppointmentDocAndOperatorNotification($smsToDoctor, $appointmentUser->doctor->mobile));
+                }
             }
         }
-        if (isset($appointmentUser->operator)) {
-            $smsToOperator = setting(SettingKeyEnum::SMS_APPOINTMENT_TO_OPERATOR);
-            if (isset($smsToOperator)) {
-                $appointmentUser->notify(new AppointmentDocAndOperatorNotification($smsToOperator, $appointmentUser->operator->mobile));
-            }
+
+        $transactionId = null;
+        // Create transaction when payment is inactive
+        if ($paymentLink === null) {
+            $transactionData =[
+                'user_id' => $userModelAppointment->userModel->user->id,
+                'transaction_code' => Transaction::generateTransactionCode(),
+                'status' => TransactionStatusEnum::SUCCESSFUL,
+                'cost' => 0,
+                'total_cost' => 0,
+                'paid_by' => TransactionPaidEnum::NO_NEED_TO_PAY,
+            ];
+            $transaction = $appointmentUser->transaction()->updateOrCreate($transactionData);
+            $transactionId = $transaction->id;
         }
-        if (isset($appointmentUser->doctor)) {
-            $smsToDoctor = setting(SettingKeyEnum::SMS_APPOINTMENT_TO_DOCTOR);
-            if (isset($smsToDoctor)) {
-                $appointmentUser->notify(new AppointmentDocAndOperatorNotification($smsToDoctor, $appointmentUser->doctor->mobile));
-            }
-        }
+
 
         event(new StoreAppointmentEvent($appointmentUser));
 
@@ -792,6 +817,8 @@ class AppointmentUserService
                 'tracking_code' => $appointmentUserModel['tracking_code'],
                 'appointment_user_id' => $appointmentUser->id,
                 'tracking_url' => $trackingUrl,
+                'transaction_id' => $transactionId,
+                'route' => $transactionId ? RouteEnum::TRANSACTION->getLink($transactionId) : null,
                 'payment_link' => $paymentLink ?? $trackingUrl
             ]
         ];

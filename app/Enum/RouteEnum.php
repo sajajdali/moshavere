@@ -7,7 +7,7 @@ use App\interface\EnumHasDefaultInterface;
 enum RouteEnum: string implements EnumHasDefaultInterface
 {
     case APPOINTMENT = '/appointment/{id}';
-    case transaction = '/transaction/show/{id}';
+    case TRANSACTION = '/transaction/show/{id}';
     case ONLINE_MESSAGE = '/support/history/{id}';
     case CHAT = '/chat/{id}';
 
@@ -21,6 +21,7 @@ enum RouteEnum: string implements EnumHasDefaultInterface
     {
         return match ($this) {
             self::APPOINTMENT => str_replace('{id}', $replacement, $this->value),
+            self::TRANSACTION => str_replace('{id}', $replacement, $this->value),
             self::ONLINE_MESSAGE => str_replace('{id}', $replacement, $this->value),
             self::CHAT => str_replace('{id}', $replacement, $this->value),
             default => $this->value,

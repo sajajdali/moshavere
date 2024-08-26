@@ -160,7 +160,7 @@ class ChatView extends Component
 
         event(new PusherBroadcast($message , $this->chat->id));
         $this->chat->user->notify(new \Modules\User\Notifications\UserMessageNotification(
-            title: "پیام جدید!",
+            title: "پیام جدید برای پشتیبانی !",
             excerpt: $notificationMessage,
             message: '',
             link: \App\Enum\RouteEnum::ONLINE_MESSAGE->getLink($this->chat->id),

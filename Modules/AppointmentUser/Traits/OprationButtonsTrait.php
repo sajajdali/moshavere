@@ -46,7 +46,7 @@ trait OprationButtonsTrait
     }
     public function cancelAndDeleteApp($id)
     {
-        $this->cancelAppointment($id, true);
+        $this->cancelAppointment($id, false);
         $app = AppointmentUser::find($id);
         $app->delete();
         Cache::forget('appointmentList.' . $app->setting->id);

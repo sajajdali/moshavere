@@ -675,6 +675,7 @@ class AppointmentUserService
 
         // handel payment
         $paymentLink = null;
+        $needToPayment = false;
         $smsTemplate = setting(SettingKeyEnum::SMS_APPOINTMENT_RECEIVING_SUCCESSFUL);
 
         if (
@@ -682,6 +683,7 @@ class AppointmentUserService
             $appointmentData->kind == AppointmentUserKindEnum::ONLINE &&
             $paymentstatus['online']['status']
         ) {
+            $needToPayment = true;
             $smsTemplate = setting(SettingKeyEnum::SMS_APPOINTMENT_WAITING_PAYMENT);
             $appointmentUserModel['deadline_at'] = $paymentstatus['online']['deadline'];
             if ($paymentstatus['online']['force_payment']) {
@@ -697,6 +699,7 @@ class AppointmentUserService
             $appointmentData->kind == AppointmentUserKindEnum::IN_PERSION &&
             $paymentstatus['in_person']['status']
         ) {
+            $needToPayment = true;
             $smsTemplate = setting(SettingKeyEnum::SMS_APPOINTMENT_WAITING_PAYMENT);
             $appointmentUserModel['deadline_at'] = $paymentstatus['in_person']['deadline'];
             if ($paymentstatus['in_person']['force_payment']) {
@@ -759,25 +762,27 @@ class AppointmentUserService
         // handel sms
         $this->makeShortLink($appointmentUser);
 
-        if (isset($detail['smsTemplate'])) {
-            $smsTemplate = $detail['smsTemplate'];
-        }
-        // send sms
-        if ($appointmentData->sendSmsToUser) {
-            if (isset($smsTemplate)) {
-                $appointmentUser->notify(new AppointmentSmsNotification($smsTemplate));
+        if (!$needToPayment) {
+            if (isset($detail['smsTemplate'])) {
+                $smsTemplate = $detail['smsTemplate'];
             }
-        }
-        if (isset($appointmentUser->operator)) {
-            $smsToOperator = setting(SettingKeyEnum::SMS_APPOINTMENT_TO_OPERATOR);
-            if (isset($smsToOperator)) {
-                $appointmentUser->notify(new AppointmentDocAndOperatorNotification($smsToOperator, $appointmentUser->operator->mobile));
+            // send sms
+            if ($appointmentData->sendSmsToUser) {
+                if (isset($smsTemplate)) {
+                    $appointmentUser->notify(new AppointmentSmsNotification($smsTemplate));
+                }
             }
-        }
-        if (isset($appointmentUser->doctor)) {
-            $smsToDoctor = setting(SettingKeyEnum::SMS_APPOINTMENT_TO_DOCTOR);
-            if (isset($smsToDoctor)) {
-                $appointmentUser->notify(new AppointmentDocAndOperatorNotification($smsToDoctor, $appointmentUser->doctor->mobile));
+            if (isset($appointmentUser->operator)) {
+                $smsToOperator = setting(SettingKeyEnum::SMS_APPOINTMENT_TO_OPERATOR);
+                if (isset($smsToOperator)) {
+                    $appointmentUser->notify(new AppointmentDocAndOperatorNotification($smsToOperator, $appointmentUser->operator->mobile));
+                }
+            }
+            if (isset($appointmentUser->doctor)) {
+                $smsToDoctor = setting(SettingKeyEnum::SMS_APPOINTMENT_TO_DOCTOR);
+                if (isset($smsToDoctor)) {
+                    $appointmentUser->notify(new AppointmentDocAndOperatorNotification($smsToDoctor, $appointmentUser->doctor->mobile));
+                }
             }
         }
 

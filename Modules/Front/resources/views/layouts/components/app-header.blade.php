@@ -2,8 +2,10 @@
     <div class="hidden">
         {!! file_get_contents(public_path('assets/front/assets/svg/icon.svg')) !!}
     </div>
+
     <nav class="navbar">
         <div class="navbar__container">
+            @unless(disableUi())
             <a href="{{ route('front.homePage') }}">
                 <img src="{{ setting(Modules\Setting\Enum\SettingKeyEnum::SITE_LOGO_URL) }}" class="w-[100px]" />
             </a>
@@ -56,6 +58,7 @@
                     </a>
                 @endauth
             </div>
+
             <button type="button" class="block md:hidden navbar__menu--button">
                 <svg class="w-7 h-7" xmlns="http://www.w3.org/2000/svg">
                     <use xlink:href="#sprite-menu" />
@@ -63,6 +66,6 @@
             </button>
         </div>
     </nav>
-
+    @endunless
 
 </div>

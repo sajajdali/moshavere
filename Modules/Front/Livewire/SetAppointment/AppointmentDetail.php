@@ -22,6 +22,7 @@ use Shetabit\Multipay\Exceptions\InvalidPaymentException;
 use Modules\AppointmentUser\Enum\AppointmentUserStatusEnum;
 use Modules\AppointmentSetting\app\Models\AppointmentSetting;
 use Modules\AppointmentUser\app\Notifications\AppointmentSmsNotification;
+use Modules\AppointmentUser\App\Notifications\AppointmentDocAndOperatorNotification;
 
 #[Layout('front::layouts.app')]
 #[Title('جزئیات نوبت')]
@@ -224,6 +225,20 @@ class AppointmentDetail extends Component
             if (isset($smsTemplate)) {
                 $this->fetchData['app']->notify(new AppointmentSmsNotification($smsTemplate));
             }
+            // sms to operator and doctor
+            if (isset($appointmentUser->operator)) {
+                $smsToOperator = setting(SettingKeyEnum::SMS_APPOINTMENT_TO_OPERATOR);
+                if (isset($smsToOperator)) {
+                    $$this->fetchData['app']->notify(new AppointmentDocAndOperatorNotification($smsToOperator, $$this->fetchData['app']->operator->mobile));
+                }
+            }
+            if (isset($appointmentUser->doctor)) {
+                $smsToDoctor = setting(SettingKeyEnum::SMS_APPOINTMENT_TO_DOCTOR);
+                if (isset($smsToDoctor)) {
+                    $$this->fetchData['app']->notify(new AppointmentDocAndOperatorNotification($smsToDoctor, $$this->fetchData['app']->doctor->mobile));
+                }
+            }
+
             $this->fetchData['success']  = 'پرداخت باموفقیت انجام شد و نوبت شما فعال شد ';
             $this->fetchData['app']->transaction->update(['status' => TransactionStatusEnum::SUCCESSFUL]);
             $this->render();
@@ -257,9 +272,9 @@ class AppointmentDetail extends Component
             $this->fetchData['mapUrl'] = "https://www.google.com/maps/embed?pb=!1m14!1m12!1m3!1d642.0232600631508!2d{$longitude}!3d{$latitude}!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!5e0!3m2!1sen!2s!4v1716538755171!5m2!1sen!2s";
             $this->fetchData['navigation'] = "https://maps.google.com/maps?daddr={$latitude},{$longitude}";
         }
-        if(isset($this->fetchData['app']->details[AppointmentUser::STORE_FROM_APPLICATION]) && $this->fetchData['app']->details[AppointmentUser::STORE_FROM_APPLICATION] != false){
+        if (isset($this->fetchData['app']->details[AppointmentUser::STORE_FROM_APPLICATION]) && $this->fetchData['app']->details[AppointmentUser::STORE_FROM_APPLICATION] != false) {
             $urlToApplication = 'https://webapp.drmehrnushamiri.com/transaction/show/' . $this->fetchData['app']->transaction?->id ?? '#';
-            $this->fetchData['returnToApp'] = $urlToApplication  ;
+            $this->fetchData['returnToApp'] = $urlToApplication;
         }
         $this->fetchData['authCheck'] = auth()->check();
         if (request()->has('msg')) {

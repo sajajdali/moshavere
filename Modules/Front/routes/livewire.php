@@ -43,8 +43,11 @@ Route::group([], function () {
     Route::get('/appointment/checkout', Checkout::class)->name('setAppointment.checkout');
     Route::get('/appointment/detail/{tracking_code}', AppointmentDetail::class)->name('front.setAppointment.detail');
     Route::get('/doctor/profile/{doctor_id}/{doctor_name}', DoctorProfileLivewire::class)->name('front.doctor.profile');
+});
+Route::middleware(['web'])->name('front.')->group(function () {
     Route::get('feed/{appointmentUser_id}/{user_id}', Questions::class)->middleware('throttle:20,1')->name('feedBack');
 });
+
 Route::middleware(['web', 'auth'])->name('front.')->group(function () {
     Route::get('/logout', Logout::class)->name('logout');
     Route::get('/registration', Registration::class)->middleware('throttle:20,1')->name('user.registration');

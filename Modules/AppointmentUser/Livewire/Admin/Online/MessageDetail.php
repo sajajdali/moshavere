@@ -189,7 +189,7 @@ class MessageDetail extends Component
 
         $appointmentUser = $this->fetchData['appOnline']->appointmentUser ;
         $link_code = ShortLink::generateShortLinkCode();
-        $link_url = route('front.feedBack', ['appointmentUser_id' => $appointmentUser->id]);
+        $link_url = route('front.feedBack', ['appointmentUser_id' => $appointmentUser->id,'user_id'=> $appointmentUser->user->id]);
         ShortLink::create([
             'link_code' => $link_code,
             'link_url'  => $link_url,

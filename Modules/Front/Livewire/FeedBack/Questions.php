@@ -5,6 +5,7 @@ namespace Modules\Front\Livewire\FeedBack;
 use Livewire\Component;
 use Livewire\Attributes\Layout;
 use Livewire\Attributes\Locked;
+use Modules\User\Entities\User;
 use Modules\Front\app\Models\FeedBack;
 use Modules\AppointmentUser\app\Models\AppointmentUser;
 
@@ -45,7 +46,7 @@ class Questions extends Component
     }
     public function mount()
     {
-        $user = auth()->user();
+        $user = User::find(request()->route('user_id'));
         $app_id = request()->route('appointmentUser_id');
         $appId =  AppointmentUser::find($app_id);
         if ($user->id != $appId->user_id ) {

@@ -29,7 +29,7 @@ use Modules\Front\Livewire\SetAppointment\ShowAvailableDayForDoctor;
 |
 */
 
-Route::group([], function () {
+Route::middleware(['web'])->group( function () {
     Route::get('/', HomePageLivewire::class)->name('front.homePage');
     Route::get('/search', SearchLivewire::class)->name('front.searchPage')->middleware('throttle:5,1');
     Route::get('/login', Login::class)->name('front.login.user')->middleware('throttle:20,1');

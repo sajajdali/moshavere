@@ -519,7 +519,7 @@ class AppointmentUserService
 
     private function insertOnlineAppointment(AppointmentUser $appointmentUser): void
     {
-        $status = AppointmentVia::tryFrom($appointmentUser->details[AppointmentUser::DETAIL_APPOINTMENT_VIA]) == AppointmentVia::SELF ? AppointmentOnlineStatusEnum::PENDING : AppointmentOnlineStatusEnum::ACCEPTED;
+        $status = AppointmentOnlineStatusEnum::ACCEPTED;
         $appointmentUser->online()->create([
             'appointment_setting_id' => $appointmentUser->setting->id,
             'user_id' => $appointmentUser->user->id,
@@ -649,7 +649,7 @@ class AppointmentUserService
         if ($appointmentData->kind == AppointmentUserKindEnum::ONLINE) {
             $appointmentUserModel['start_time'] = null;
             $appointmentUserModel['end_time'] = null;
-                // TODO::تایید نوبت در نوبت های آنلاین 
+                // TODO::تایید نوبت در نوبت های آنلاین
             // if (
             //     $appointmentData->appointmentVia == AppointmentVia::SELF
             //     && $appointmentSetting->detail[AppointmentSetting::PAYMENT][AppointmentSetting::ONLINE][AppointmentSetting::STATUS] != true

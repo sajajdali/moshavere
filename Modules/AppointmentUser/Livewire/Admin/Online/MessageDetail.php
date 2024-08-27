@@ -2,11 +2,15 @@
 
 namespace Modules\AppointmentUser\Livewire\Admin\Online;
 
+use App\Enum\RouteEnum;
 use Livewire\Component;
+use App\Models\ShortLink;
 use Livewire\Attributes\On;
 use Livewire\Attributes\Url;
 use Livewire\Attributes\Computed;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Storage;
+use Modules\Setting\Enum\SettingKeyEnum;
 use Modules\AppointmentUser\app\Models\AppointmentUser;
 use Modules\AppointmentUser\Traits\OprationButtonsTrait;
 use Modules\AppointmentUser\app\Models\AppointmentOnline;
@@ -16,6 +20,7 @@ use Modules\AppointmentUser\app\Models\AppointmentOnlineMessage;
 use Modules\AppointmentUser\Enum\AppointmentOnlineMessageSeenEnum;
 use Modules\AppointmentUser\Enum\AppointmentOnlineMessageTypeEnum;
 use Modules\AppointmentUser\app\Models\AppointmentOnlineMessageFile;
+use Modules\AppointmentUser\app\Notifications\AppointmentUserFeedbackSmsnotification;
 
 class MessageDetail extends Component
 {
@@ -181,6 +186,22 @@ class MessageDetail extends Component
         return redirect()->route('admin.appointment_user.message.detail', ['onlineAppId' => $this->fetchData['appOnline']->id])->with('success', 'نوبت با موفقیت کنسل شد');
     }
     public function closeApp() {
+
+        $appointmentUser = $this->fetchData['appOnline']->appointmentUser ;
+        $link_code = ShortLink::generateShortLinkCode();
+        $link_url = route('front.feedBack', ['appointmentUser_id' => $appointmentUser->id]);
+        ShortLink::create([
+            'link_code' => $link_code,
+            'link_url'  => $link_url,
+            'shortlinkable_type'  => 'feedBack',
+            'shortlinkable_id'  => $appointmentUser->id,
+        ]);
+        $smsTemplate = setting(SettingKeyEnum::SMS_FEEDBACK);
+        if (isset($smsTemplate)) {
+            $appointmentUser->notify(new AppointmentUserFeedbackSmsnotification($smsTemplate, $link_code));
+        }
+        Cache::forget('appointmentList.' . $appointmentUser->id);
+
         $this->fetchData['appOnline']->update(['status' => AppointmentOnlineStatusEnum::COMPLETED_BY_DOCTOR]);
         return redirect()->route('admin.appointment_user.message.detail', ['onlineAppId' => $this->fetchData['appOnline']->id])->with('success', 'وضعیت نوبت به تمام شده ، تغییر پیدا کرد');
 

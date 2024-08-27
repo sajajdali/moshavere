@@ -81,7 +81,20 @@ enum AppointmentUserStatusEnum: int implements EnumHasApiResultInterface
         ];
     }
 
-
+    public function convertToAppointmentOnlineStauts() {
+        return match ($this) {
+            self::STATUS_PENDING      => AppointmentOnlineStatusEnum::PENDING,
+            self::STATUS_SUCCESSFUL   => AppointmentOnlineStatusEnum::ACCEPTED,
+            self::STATUS_WAIT_PAYMENT => AppointmentOnlineStatusEnum::PENDING,
+            self::STATUS_CANCEL       => AppointmentOnlineStatusEnum::CANCEL,
+            self::STATUS_ATTENDED     => AppointmentOnlineStatusEnum::ACCEPTED,
+            self::STATUS_NOT_ATTENDED => AppointmentOnlineStatusEnum::ACCEPTED,
+            self::STATUS_DISAPPROVED  =>  AppointmentOnlineStatusEnum::REJECT,
+            self::STATUS_MONITORING   =>  AppointmentOnlineStatusEnum::PENDING,
+            self::STATUS_ONILNE_CLOSED   => AppointmentOnlineStatusEnum::COMPLETED_BY_DOCTOR,
+            default => AppointmentOnlineStatusEnum::ACCEPTED
+        };
+    }
     public function apiResult(): array
     {
         return [

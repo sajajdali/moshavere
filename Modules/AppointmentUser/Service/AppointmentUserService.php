@@ -519,7 +519,7 @@ class AppointmentUserService
 
     private function insertOnlineAppointment(AppointmentUser $appointmentUser): void
     {
-        $status = AppointmentOnlineStatusEnum::ACCEPTED;
+        $status = $appointmentUser->status->convertToAppointmentOnlineStauts();
         $appointmentUser->online()->create([
             'appointment_setting_id' => $appointmentUser->setting->id,
             'user_id' => $appointmentUser->user->id,

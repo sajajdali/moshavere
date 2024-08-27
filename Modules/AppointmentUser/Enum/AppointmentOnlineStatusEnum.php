@@ -88,7 +88,7 @@ enum AppointmentOnlineStatusEnum: int implements EnumHasApiResultInterface
             self::CANCEL => '<span class="badge bg-danger rounded-pill ms-1">کنسل شده</span>',
             self::REPLY_BY_USER => '<span class="badge bg-primary rounded-pill ms-1">پاسخ کاربر</span>',
             self::ANSWER_BY_DOCTOR => '<span class="badge bg-success rounded-pill ms-1">پاسخ داده شده</span>',
-            self::COMPLETED_BY_DOCTOR => '<span class="badge bg-success rounded-pill ms-1">اتمام رسیده</span>',
+            self::COMPLETED_BY_DOCTOR => '<span class="badge bg-warning rounded-pill ms-1">اتمام رسیده</span>',
             self::TIME_IS_OVER => '<span class="badge bg-danger rounded-pill ms-1">زمان ویزیت تمام شده</span>',
             self::REACTIVATED => '<span class="badge bg-success rounded-pill ms-1" >مجدد فعال شده</span>',
         };

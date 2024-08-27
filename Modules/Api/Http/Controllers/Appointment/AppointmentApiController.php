@@ -335,7 +335,7 @@ class AppointmentApiController extends Controller
             $payment = app('AppointmentUserService')->paymentstatus($appointmentSetting) ;
             return $this->ok([
                 'status' => true,
-                'payment' => $payment['online'],
+                'payment' =>  !$payment['online']['status'] ? null : $payment['online'],
                 'appointment_setting_id' => $appointmentSetting->id,
                 'messages' => [
                     'پس از ثبت درخواست امکان آپلود مدارک و طرح سوال فعال میگردد',

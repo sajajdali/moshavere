@@ -31,11 +31,13 @@
                         <div class="card-header d-flex justify-content-between border-bottom">
                             <h3 class="card-title">لیست نوبت های ثبت شده</h3>
                             <div class="card-options">
+                                <button class="btn btn-warning me-2" type="button" wire:click='showalltheMessages'>
+                                    نمایش نوبت های تمام شده
+                                </button>
                                 <button class="btn btn-primary" type="button" data-bs-toggle="collapse"
                                     data-bs-target="#advanceSearch" aria-expanded="false" aria-controls="advanceSearch">
                                     جست و جوی پیشرفته
                                 </button>
-
                             </div>
                         </div>
                         {{-- search inputs --}}
@@ -194,6 +196,9 @@
                     if($message->online->status == \Modules\AppointmentUser\Enum\AppointmentOnlineStatusEnum::REJECT ||
                     $message->online->status == \Modules\AppointmentUser\Enum\AppointmentOnlineStatusEnum::CANCEL) {
                         $color  = "ffcaca" ;
+                    }
+                    if($message->online->status == \Modules\AppointmentUser\Enum\AppointmentOnlineStatusEnum::COMPLETED_BY_DOCTOR ) {
+                        $color  = "f9f6cf" ;
                     }
                     @endphp
                         <div class="card border-0 shadow rounded-lg mb-4" style="background-color: #{{$color}}">

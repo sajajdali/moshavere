@@ -47,7 +47,7 @@ trait OprationButtonsTrait
     public function cancelAndDeleteApp($id)
     {
         $this->cancelAppointment($id, false);
-        
+
         $app = AppointmentUser::find($id);
         $app->delete();
         Cache::forget('appointmentList.' . $app->setting->id);
@@ -184,7 +184,7 @@ trait OprationButtonsTrait
     protected function sendfeedBackLink(AppointmentUser $appointmentUser)
     {
         $link_code = ShortLink::generateShortLinkCode();
-        $link_url = route('front.feedBack', ['appointmentUser_id' => $appointmentUser->id]);
+        $link_url = route('front.feedBack', ['appointmentUser_id' => $appointmentUser->id,'user_id'=> $appointmentUser->user->id]);
         ShortLink::create([
             'link_code' => $link_code,
             'link_url'  => $link_url,

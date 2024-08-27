@@ -14,6 +14,7 @@ enum AppointmentUserStatusEnum: int implements EnumHasApiResultInterface
     case STATUS_NOT_ATTENDED = 5;
     case STATUS_DISAPPROVED = 6;
     case STATUS_MONITORING = 7;
+    case STATUS_ONILNE_CLOSED = 8;
 
     public function getName(): string
     {
@@ -26,6 +27,7 @@ enum AppointmentUserStatusEnum: int implements EnumHasApiResultInterface
             self::STATUS_NOT_ATTENDED => 'عدم حضور',
             self::STATUS_DISAPPROVED  =>  'رد شده',
             self::STATUS_MONITORING   =>  'در انتظار تایید',
+            self::STATUS_ONILNE_CLOSED   =>  'نوبت آنلاین تکمیل شده',
         };
     }
     public function getBadgeColor(): string
@@ -34,7 +36,7 @@ enum AppointmentUserStatusEnum: int implements EnumHasApiResultInterface
             self::STATUS_PENDING      => 'bg-warning',
             self::STATUS_SUCCESSFUL   => 'bg-success',
             self::STATUS_WAIT_PAYMENT => 'bg-info',
-            self::STATUS_CANCEL, self::STATUS_DISAPPROVED => 'bg-danger',
+            self::STATUS_CANCEL, self::STATUS_DISAPPROVED, self::STATUS_ONILNE_CLOSED => 'bg-danger',
             self::STATUS_ATTENDED     => 'bg-secondary',
             self::STATUS_NOT_ATTENDED => 'bg-primary',
             self::STATUS_MONITORING   => 'bg-warning',
@@ -47,7 +49,7 @@ enum AppointmentUserStatusEnum: int implements EnumHasApiResultInterface
             self::STATUS_PENDING      => 'btn-warning',
             self::STATUS_SUCCESSFUL   => 'btn-success',
             self::STATUS_WAIT_PAYMENT => 'btn-info',
-            self::STATUS_CANCEL, self::STATUS_DISAPPROVED => 'btn-danger',
+            self::STATUS_CANCEL, self::STATUS_DISAPPROVED, self::STATUS_ONILNE_CLOSED => 'btn-danger',
             self::STATUS_ATTENDED     => 'btn-secondary',
             self::STATUS_NOT_ATTENDED => 'btn-primary',
             self::STATUS_MONITORING   => 'btn-warning',
@@ -57,7 +59,7 @@ enum AppointmentUserStatusEnum: int implements EnumHasApiResultInterface
     public function getColor(): string
     {
         return match ($this) {
-            self::STATUS_DISAPPROVED, self::STATUS_CANCEL => 'table-danger',
+            self::STATUS_DISAPPROVED, self::STATUS_CANCEL, self::STATUS_ONILNE_CLOSED => 'table-danger',
             self::STATUS_PENDING        => 'table-warning',
             self::STATUS_SUCCESSFUL     => 'table-success',
             self::STATUS_WAIT_PAYMENT   => 'table-primary',
@@ -75,6 +77,7 @@ enum AppointmentUserStatusEnum: int implements EnumHasApiResultInterface
             self::STATUS_ATTENDED->value,
             self::STATUS_NOT_ATTENDED->value,
             self::STATUS_DISAPPROVED->value,
+            self::STATUS_ONILNE_CLOSED->value,
         ];
     }
 

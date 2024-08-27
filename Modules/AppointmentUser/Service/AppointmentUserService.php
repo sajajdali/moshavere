@@ -621,9 +621,9 @@ class AppointmentUserService
 
         //check for monitoring appointment
         if (
-            isset($appointmentSetting->detail[AppointmentSetting::MONITORTING_APPOINTMENT])
-             && $appointmentSetting->detail[AppointmentSetting::MONITORTING_APPOINTMENT] !== null &&
-             $appointmentSetting->detail[AppointmentSetting::MONITORTING_APPOINTMENT] !== false &&
+            isset($appointmentSetting->detail[AppointmentSetting::MONITORTING_APPOINTMENT])&&
+            $appointmentSetting->detail[AppointmentSetting::MONITORTING_APPOINTMENT] !== null &&
+            $appointmentSetting->detail[AppointmentSetting::MONITORTING_APPOINTMENT] !== false &&
             $appointmentData->appointmentVia == AppointmentVia::SELF
         ) {
             $status = AppointmentUserStatusEnum::STATUS_MONITORING;
@@ -649,13 +649,13 @@ class AppointmentUserService
         if ($appointmentData->kind == AppointmentUserKindEnum::ONLINE) {
             $appointmentUserModel['start_time'] = null;
             $appointmentUserModel['end_time'] = null;
-
-            if (
-                $appointmentData->appointmentVia == AppointmentVia::SELF
-                && $appointmentSetting->detail[AppointmentSetting::PAYMENT][AppointmentSetting::ONLINE][AppointmentSetting::STATUS] != true
-            ) {
-                $appointmentUserModel['status'] =  AppointmentUserStatusEnum::STATUS_PENDING;
-            }
+                // TODO::تایید نوبت در نوبت های آنلاین 
+            // if (
+            //     $appointmentData->appointmentVia == AppointmentVia::SELF
+            //     && $appointmentSetting->detail[AppointmentSetting::PAYMENT][AppointmentSetting::ONLINE][AppointmentSetting::STATUS] != true
+            // ) {
+            //     $appointmentUserModel['status'] =  AppointmentUserStatusEnum::STATUS_PENDING;
+            // }
         }
         $detailDatabaseDB['payment'] = [
             'status' => false,

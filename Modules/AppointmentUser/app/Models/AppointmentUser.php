@@ -106,13 +106,14 @@ class AppointmentUser extends Model
         $color =  match ($this->status) {
             AppointmentUserStatusEnum::STATUS_SUCCESSFUL =>   $this->type == AppointmentUserTypeEnum::MAIN__APPOINTMENT ? 'table-success' : "table-info",
             AppointmentUserStatusEnum::STATUS_CANCEL => 'table-danger',
+            AppointmentUserStatusEnum::STATUS_ONILNE_CLOSED => 'table-danger',
             AppointmentUserStatusEnum::STATUS_WAIT_PAYMENT => 'table-warning',
             AppointmentUserStatusEnum::STATUS_ATTENDED => 'table-secondary',
             AppointmentUserStatusEnum::STATUS_NOT_ATTENDED => 'table-primary',
             AppointmentUserStatusEnum::STATUS_PENDING => 'table-warning',
             AppointmentUserStatusEnum::STATUS_DISAPPROVED => 'table-danger',
             AppointmentUserStatusEnum::STATUS_MONITORING => 'table-warning',
-            default => '',
+            default => 'table-danger',
         };
         if ($this->type == AppointmentUserTypeEnum::BETWEEN_PATIENTS) {
             $color = 'table-info';

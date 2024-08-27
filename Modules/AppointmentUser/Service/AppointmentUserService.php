@@ -621,9 +621,9 @@ class AppointmentUserService
 
         //check for monitoring appointment
         if (
-            isset($appointmentSetting->detail[AppointmentSetting::MONITORTING_APPOINTMENT])
-             && $appointmentSetting->detail[AppointmentSetting::MONITORTING_APPOINTMENT] !== null &&
-             $appointmentSetting->detail[AppointmentSetting::MONITORTING_APPOINTMENT] !== false &&
+            isset($appointmentSetting->detail[AppointmentSetting::MONITORTING_APPOINTMENT])&&
+            $appointmentSetting->detail[AppointmentSetting::MONITORTING_APPOINTMENT] !== null &&
+            $appointmentSetting->detail[AppointmentSetting::MONITORTING_APPOINTMENT] !== false &&
             $appointmentData->appointmentVia == AppointmentVia::SELF
         ) {
             $status = AppointmentUserStatusEnum::STATUS_MONITORING;

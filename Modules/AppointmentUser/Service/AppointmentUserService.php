@@ -605,7 +605,6 @@ class AppointmentUserService
                     $status = AppointmentUserStatusEnum::STATUS_WAIT_PAYMENT;
                 }
             } elseif ($appointmentData->kind == AppointmentUserKindEnum::ONLINE) {
-
                 if (
                     $appointmentSetting->detail[AppointmentSetting::PAYMENT][AppointmentSetting::ONLINE][AppointmentSetting::STATUS] == true
                 ) {
@@ -623,7 +622,8 @@ class AppointmentUserService
         //check for monitoring appointment
         if (
             isset($appointmentSetting->detail[AppointmentSetting::MONITORTING_APPOINTMENT])
-            && $appointmentSetting->detail[AppointmentSetting::MONITORTING_APPOINTMENT] != null &&
+             && $appointmentSetting->detail[AppointmentSetting::MONITORTING_APPOINTMENT] !== null &&
+             $appointmentSetting->detail[AppointmentSetting::MONITORTING_APPOINTMENT] !== false &&
             $appointmentData->appointmentVia == AppointmentVia::SELF
         ) {
             $status = AppointmentUserStatusEnum::STATUS_MONITORING;

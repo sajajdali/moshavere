@@ -81,7 +81,7 @@ class DashboardController extends Controller
             'purchased_courses' => [],
             'courses' => [] ,
             'stories' => $stories ,
-            'chat_badge' => (isset($activeChat) && (int) $activeChat->sum('new_message_by_support') > 0)  ? (int) $activeChat->sum('new_message_by_support') : null,
+            'chat_badge' => (isset($activeChat) && (int) $activeChat->new_message_by_support > 0)  ? (int) $activeChat->new_message_by_support : null,
             'doctors' => $this->doctors(),
             'news' => [
                 [

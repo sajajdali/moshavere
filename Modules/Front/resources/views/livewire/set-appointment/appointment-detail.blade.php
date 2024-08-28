@@ -200,7 +200,7 @@
                                     </p>
                                 </div>
                             </div>
-
+                            @if (!$fetchData['app']->kind->isOnline())
                             <div
                                 class="flex flex-row md:flex-col gap-2 justify-between md:justify-start items-center md:items-end">
                                 <a href="#" class="font-bold text-sm bg-secondary-100 px-3 py-1 rounded-2xl">
@@ -212,6 +212,7 @@
                                     </p>
                                 @endif
                             </div>
+                            @endif
                         </div>
                         @if (!$fetchData['app']->kind->isOnline())
                             <div class="border-card">
@@ -250,16 +251,15 @@
                                 </p>
                                 <p class="mr-3">{{ $fetchData['app']->user->full_name }}</p>
                             </div>
-
-                            <div class="visit-detail flex mt-3">
-                                <p>
-                                    <object class="inline-block"
-                                        data="{{ front_asset('assets/svg/calendar.svg') }}"></object>
-                                    <strong>تاریخ نوبت:</strong>
-                                </p>
-                                <p class="mr-3">{{ verta($fetchData['app']->date_visit)->format('d F') }}</p>
-                            </div>
                             @if (!$fetchData['app']->kind->isOnline())
+                                <div class="visit-detail flex mt-3">
+                                    <p>
+                                        <object class="inline-block"
+                                            data="{{ front_asset('assets/svg/calendar.svg') }}"></object>
+                                        <strong>تاریخ نوبت:</strong>
+                                    </p>
+                                    <p class="mr-3">{{ verta($fetchData['app']->date_visit)->format('d F') }}</p>
+                                </div>
                                 <div class="visit-detail flex mt-3">
                                     <p>
                                         <object class="inline-block"
@@ -279,7 +279,16 @@
                                             class="inline-flex items-center rounded-md bg-gray-50 px-2 py-1 text-xs font-medium text-gray-600 ring-1 ring-inset ring-gray-500/10">کنسل
                                             شده</span>
                                     @endif
-                                </div>پ
+                                </div>
+                            @else
+                                <div class="visit-detail flex mt-3">
+                                    <p>
+                                        <object class="inline-block"
+                                            data="{{ front_asset('assets/svg/calendar.svg') }}"></object>
+                                        <strong>تاریخ دریافت نوبت:</strong>
+                                    </p>
+                                    <p class="mr-3">{{ verta($fetchData['app']->created_at)->format('d F') }}</p>
+                                </div>
                             @endif
                             @if ($fetchData['stauts']['payment'])
                                 <div class="visit-detail flex mt-3">
@@ -292,7 +301,7 @@
                                 </div>
                             @endif
 
-                            @if (isset($fetchData['app']->place->detail[Modules\Place\app\Models\Place::DETAIL_ADDRESS]))
+                            @if (isset($fetchData['app']->place->detail[Modules\Place\app\Models\Place::DETAIL_ADDRESS]) && !$fetchData['app']->kind->isOnline())
                                 <div class="visit-detail flex mt-3 !mb-0">
                                     <p>
                                         <object class="inline-block"

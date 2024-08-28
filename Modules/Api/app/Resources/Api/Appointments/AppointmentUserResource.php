@@ -47,11 +47,10 @@ class AppointmentUserResource extends JsonResource
         }
         $online = $this->online->first();
         return [
-            'new_message' => 0,
             'online_id' => $online->id,
             'online_tracking' => $online->tracking_code,
             'status' => $online->status->apiResult(),
-            'new_messages' => $online->new_messages,
+            'new_messages' => (int) $online->new_messages,
             'accessibility' => [
                 'can_send_message' => $online->status->canSendMessage(),
                 'can_show_messages' => $online->status->canShowMessages(),

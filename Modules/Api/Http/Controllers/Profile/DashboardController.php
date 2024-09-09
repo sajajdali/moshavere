@@ -67,7 +67,6 @@ class DashboardController extends Controller
             // })
             ->orderBy('created_at')
             ->first();
-    //    dd($appointmentOnline);
 
 
         $activeChat = $user->chats()->where('status', '<>', ChatStatusEnum::CLOSED)->where('ban', false)->orderByDesc('id')->first();

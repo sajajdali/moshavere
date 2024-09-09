@@ -3,12 +3,13 @@
 namespace Modules\Api\app\Resources\Api\Appointments;
 
 use Carbon\Carbon;
-use Illuminate\Http\Resources\Json\JsonResource;
-use Modules\Api\app\Resources\Transaction\TransactionResource;
 use Modules\Api\Transformers\UserResource;
+use Illuminate\Http\Resources\Json\JsonResource;
 use Modules\AppointmentUser\app\Models\AppointmentUser;
-use Modules\AppointmentUser\Enum\AppointmentOnlineMessageTypeEnum;
 use Modules\AppointmentUser\Enum\AppointmentUserKindEnum;
+use Modules\AppointmentUser\Enum\AppointmentOnlineStatusEnum;
+use Modules\Api\app\Resources\Transaction\TransactionResource;
+use Modules\AppointmentUser\Enum\AppointmentOnlineMessageTypeEnum;
 
 class AppointmentUserResource extends JsonResource
 {
@@ -45,7 +46,15 @@ class AppointmentUserResource extends JsonResource
         if ($this->kind != AppointmentUserKindEnum::ONLINE) {
             return null;
         }
-        $online = $this->online->first();
+        $online = $this->online->filter(function($c) {
+            return !in_array($c->status, [
+                AppointmentOnlineStatusEnum::CANCEL,
+                AppointmentOnlineStatusEnum::REJECT,
+                AppointmentOnlineStatusEnum::COMPLETED_BY_DOCTOR,
+                AppointmentOnlineStatusEnum::TIME_IS_OVER
+            ]);
+        })->sortBy('created_at')->first();
+        
         return [
             'online_id' => $online->id,
             'online_tracking' => $online->tracking_code,

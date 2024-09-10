@@ -421,7 +421,16 @@
                                             @endif
                                         </td>
                                         <td>{{ verta($ap->date_visit)->format('Y/m/d') }}</td>
-                                        <td>{{ verta($ap->created_at)->format('Y/m/d') }}</td>
+                                        <td>
+                                            <div class="d-flex flex-column align-item-center">
+                                                <span>
+                                                {{ verta($ap->created_at)->format('Y/m/d') }}
+                                                </span>
+                                                <span>
+                                                    {{ verta($ap->created_at)->format('H:i') }}
+                                                </span>
+                                            </div>
+                                        </td>
                                         <td>
                                             @canany(['update', 'delete'], $ap)
                                                 <div class="btn-group mt-2 mb-2">

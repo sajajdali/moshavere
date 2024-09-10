@@ -176,8 +176,10 @@ class AppointmentDetail extends Component
         // set the callback URL dynamically
         $callbackUrl = route('front.setAppointment.detail', ['tracking_code' => $this->fetchData['app']->tracking_code, 'call_back' => true]);
         // Config::set('payment.zarinpal.callback_url', $callbackUrl);
-
-        $invoice = (new Invoice)->amount($amount)->via(setting(SettingKeyEnum::PAYMEN_ACTIVE_DRIVER));
+        $description = 'کاربر پرداخت کننده : '. $this->fetchData['app']->user->full_name . 'شماره تماس: '. $this->fetchData['app']->user->mobile . 'شماره ردیف: ' . $this->fetchData['app']->id  ;
+        $invoice = (new Invoice)->amount($amount)
+        ->detail('description', $description)
+        ->via(setting(SettingKeyEnum::PAYMEN_ACTIVE_DRIVER));
         $merchenId = setting(SettingKeyEnum::PAYMENT_ZARINPAL_MERCHENID);
         $p =  Payment::config(['callbackUrl' => $callbackUrl, 'merchantId' => $merchenId])->purchase(
             $invoice,

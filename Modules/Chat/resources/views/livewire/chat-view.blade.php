@@ -141,7 +141,7 @@
                                     <input class="form-control" placeholder="متن پیام شما..." type="text"
                                         wire:model="chatMessage">
                                     {{-- send File modal --}}
-                                    <button data-bs-target="#file-selector-modal" data-bs-toggle="modal" class="nav-link"
+                                    <button data-bs-target="#file-selector-modal" data-bs-toggle="modal" class="btn btn-light me-3 d-flex justify-content-center p-1 py-2"
                                     href="javascript:void(0)">
                                     @if (isset($form['file']))
                                         <i class="fa fa-check" aria-hidden="true"></i>

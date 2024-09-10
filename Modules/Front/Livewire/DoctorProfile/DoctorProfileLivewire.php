@@ -324,7 +324,7 @@ class DoctorProfileLivewire extends Component
         }
         // check if doctor active and has setting
         $status =  $this->doc->isDoctorActive();
-        $hasSetting = AppointmentSetting::where('user_id', $this->doc->id)->exists();
+        $hasSetting = AppointmentSetting::activeSetting()->where('user_id', $this->doc->id)->exists();
         if ($status && $hasSetting) {
             return true;
         }

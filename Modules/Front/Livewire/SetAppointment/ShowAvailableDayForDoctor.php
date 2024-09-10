@@ -71,7 +71,7 @@ class ShowAvailableDayForDoctor extends Component
                 // if last day active remain same as was before , max_days_app_available is grater that $fetchData['lastDate'] but there is no day to show so you should check if last day active changed or not
                 $this->dispatch('scrollToBottom', true);
                 return $this->msg = 'بازه ی نمایش به اتمام رسیده است!';
-            }else{
+            } else {
                 $this->dispatch('scrollToBottom', true);
             }
         } else {
@@ -179,13 +179,13 @@ class ShowAvailableDayForDoctor extends Component
 
     private function getAvailableDay()
     {
-        $appointmentSetting = AppointmentSetting::where('service_id', $this->fetchData['service']->id)
+        $appointmentSetting = AppointmentSetting::activeSetting()->where('service_id', $this->fetchData['service']->id)
             ->where('place_id', $this->fetchData['places']->id)
             ->where('user_id', $this->fetchData['doc'])
             ->first();
         //check for general setting
         if (!isset($appointmentSetting)) {
-            $appointmentSetting = AppointmentSetting::where('user_id', $this->fetchData['doc']->id)->first();
+            $appointmentSetting = AppointmentSetting::activeSetting()->where('user_id', $this->fetchData['doc']->id)->first();
         }
         Cache::forget('appointmentList.' . $appointmentSetting->id);
         if (isset($this->fetchData['segment_time'])) {
@@ -247,9 +247,15 @@ class ShowAvailableDayForDoctor extends Component
             return abort(404);
         }
         $this->fetchData['maxShowDay'] = 2;
+        //check if doctor has active appointment setting
+        if (! AppointmentSetting::activeSetting()
+            ->where('user_id', $this->fetchData['doc'])
+            ->exists()) {
+            return redirect()->route('front.doctor.profile', ['doctor_id' => $this->fetchData['doc']->id, 'doctor_name' => str_replace(' ', '_',$this->fetchData['doc']->full_name)]);
+        }
         $this->getAvailableDay();
         $this->fetchData['isAppointmentActive'] = $this->fetchData['doc']->isDoctorActive();
-        if(setting(SettingKeyEnum::APPOINTMENT_STATUS) != true  ) {
+        if (setting(SettingKeyEnum::APPOINTMENT_STATUS) != true) {
             $this->fetchData['isAppointmentActive'] = false;
         }
         //select the nearest appointment

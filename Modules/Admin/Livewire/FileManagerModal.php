@@ -155,8 +155,13 @@ class FileManagerModal extends Component
 
         // Upload file to the current directory
         $current = implode('/', array_column($this->broadcamp, 'path'));
-        $this->uploadFile->store($current, 'public');
+        $path =  $this->uploadFile->store($current, 'public');
         $this->files = $this->listFiles();
         $this->dispatch('upload_complete');
+
+        // Get the full URL of the uploaded file
+        $url = asset('storage/' . $path);
+        // Pass the full file URL to selectFile
+        $this->selectFile($url);
     }
 }

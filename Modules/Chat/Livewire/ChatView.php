@@ -190,7 +190,6 @@ class ChatView extends Component
         ]);
         return redirect()->route('admin.chat',['chatId' => $closeChat->id])->with('success','وضعیت گفت و گو به بسته شده تغییر کرد.');
     }
-
     public function render()
     {
         //get all chats order by type and latest message

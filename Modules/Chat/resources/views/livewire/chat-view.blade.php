@@ -242,6 +242,6 @@
         }
         Livewire.on('chatRoomSelected', function() {
             scroll();
-        })
+        });
     </script>
 @endpush

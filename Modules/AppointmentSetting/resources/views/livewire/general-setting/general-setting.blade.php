@@ -610,7 +610,7 @@
                 <div class="selectgroup selectgroup-pills d-flex align-items-center">
                     <label class="colorinput">
                         <input name="color" type="checkbox" value="azure" class="colorinput-input"
-                            wire:model='form.avtive' checked />
+                            wire:model='form.avtive' />
                         <span class="colorinput-color bg-azure"> </span>
                     </label>
                     <p class="card-sub-title mt-1 ms-2">فعال</p>

@@ -331,7 +331,7 @@ class GeneralSetting extends Component
             'first_day_active'      =>  $startAppointmentTime,
             'active_payment'        =>  isset($this->form['payment']['online']) ? AppintmentSettingPaymentStatus::tryFrom($this->form['payment']['status']) : 0,
             'interference'          =>  isset($this->form['interference']['status'])  ? AppintmentSettingInterface::tryFrom($this->form['interference']['status']) : AppintmentSettingInterface::getDefault(),
-            'avtive'                =>  ActiveEnum::tryFrom($this->form['avtive']),
+            'active'                =>  ActiveEnum::tryFrom($this->form['avtive']),
             'detail'                =>  $detail,
         ];
 
@@ -444,8 +444,7 @@ class GeneralSetting extends Component
         $this->form['maxAvailabeAppointment']['eachDay'] = $apSet->detail[AppointmentSetting::MAX_AVAILABLE_APPOINTMENT_EACH_DAY];
         $this->form['maxAvailabeAppointment']['ForSecretery'] = $apSet->detail[AppointmentSetting::MAX_AVAILABLE_APPOINTMENT_FOR_SECRETERY] ?? null;
         $this->form['cancel']['day']                     = $apSet->cancellation_by_user ?? null;
-        $this->form['avtive']                            = $apSet->active->value;
-
+        $this->form['avtive']                            = $apSet->active == ActiveEnum::ACTIVE ? true : false;
         if (isset($apSet->last_day_active)) {
             $this->form['endAppointment']['date'] = verta($apSet->last_day_active)->format('Y/m/d');
         }
@@ -546,9 +545,9 @@ class GeneralSetting extends Component
         //  check if the setting for sections exist
         //   wich means this section is not the first time that set setting for
         $generalSetting_exists = AppointmentSetting::whereNull('service_id')
-        ->whereNull('place_id')
-        ->where('user_id', $this->fetchData['user']->id)
-        ->exists();
+            ->whereNull('place_id')
+            ->where('user_id', $this->fetchData['user']->id)
+            ->exists();
         $check_Setting_exist = false;
         if ($generalSetting_exists && AppointmentSetting::where('user_id', $this->fetchData['user']->id)->get()->isNotEmpty()) {
             //setting exist

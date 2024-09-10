@@ -113,23 +113,23 @@ class ListOfAvailableDay extends Component
         $this->fethData['place']  = Place::find($placeId);
 
         //check for special setting for special section
-        $appointmentSetting = AppointmentSetting::where('service_id', $this->fethData['service']?->id ?? null)
+        $appointmentSetting = AppointmentSetting::activeSetting()->where('service_id', $this->fethData['service']?->id ?? null)
             ->where('place_id', $this->fethData['place']?->id ?? null)
             ->where('user_id', $this->fethData['doctor']?->id ?? null)
             ->first();
 
         //check for general setting
         if (empty($appointmentSetting)) {
-            $appointmentSetting = AppointmentSetting::where('user_id', $doctorId)->first();
+            $appointmentSetting = AppointmentSetting::activeSetting()->where('user_id', $doctorId)->first();
         }
 
         // redirect user if setting dosent exist
         if (empty($appointmentSetting)) {
-            return redirect()->route('admin.appointment.doctor.list')->with('error', 'لطفا ابتدا تنظیمات حضور پزشک را ثبت کنید');
+            return redirect()->route('admin.appointment.doctor.list')->with('error', 'تنظیمات حضور برای پزشک ثبت نشده است یا غیر فعال است');
         }
         if (env('APPOINTMENT_SANDBOX')) {
             Cache::forget('appointmentList.' . $appointmentSetting->id);
-        }     
+        }
         $listOfAppointment = Cache::rememberForever('appointmentList.' . $appointmentSetting->id, function () use ($appointmentSetting) {
             $appointmentSetting->update(['updated_log_at' => \now()]);
             return app('AppointmentUserService')->listAppointments($appointmentSetting);

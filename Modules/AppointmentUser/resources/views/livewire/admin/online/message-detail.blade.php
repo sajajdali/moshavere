@@ -260,7 +260,7 @@
                                     wire:model='form.typedMessage'
                                     placeholder="@error('form.typedMessage') {{ $message }} @else متن خود را یادداشت کنید @enderror"
                                     type="text">
-                                <button data-bs-target="#file-selector-modal" data-bs-toggle="modal" class="nav-link"
+                                <button data-bs-target="#file-selector-modal" data-bs-toggle="modal" class="btn btn-light mx-3 d-flex justify-content-center p-1 py-2"
                                     href="javascript:void(0)">
                                     @if (isset($form['file']))
                                         <i class="fa fa-check" aria-hidden="true"></i>

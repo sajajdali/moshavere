@@ -54,7 +54,11 @@ class AppointmentUserResource extends JsonResource
                 AppointmentOnlineStatusEnum::TIME_IS_OVER
             ]);
         })->sortBy('created_at')->first();
-        
+
+        if (!$online){
+            return null;
+        }
+
         return [
             'online_id' => $online->id,
             'online_tracking' => $online->tracking_code,

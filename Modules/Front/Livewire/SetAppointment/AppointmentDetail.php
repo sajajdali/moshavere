@@ -176,7 +176,7 @@ class AppointmentDetail extends Component
         // set the callback URL dynamically
         $callbackUrl = route('front.setAppointment.detail', ['tracking_code' => $this->fetchData['app']->tracking_code, 'call_back' => true]);
         // Config::set('payment.zarinpal.callback_url', $callbackUrl);
-        $description = 'کاربر پرداخت کننده : '. $this->fetchData['app']->user->full_name . 'شماره تماس: '. $this->fetchData['app']->user->mobile . 'شماره ردیف: ' . $this->fetchData['app']->id  ;
+        $description = 'کاربر پرداخت کننده : '. $this->fetchData['app']->user?->full_name ?? 'بدون نام' . 'شماره تماس: '. $this->fetchData['app']->user?->mobile ?? 'بدون موبایل' . 'شماره ردیف: ' . $this->fetchData['app']->id  ;
         $invoice = (new Invoice)->amount($amount)
         ->detail('description', $description)
         ->via(setting(SettingKeyEnum::PAYMEN_ACTIVE_DRIVER));
@@ -219,7 +219,7 @@ class AppointmentDetail extends Component
         if( ! $this->fetchData['app']->details[AppointmentUser::DETAIL_PAYMENT]['status']){
             $this->fetchData['alert'] = 'خطا در انجام تراکنش';
             $this->fetchData['app']->transaction->update(['status' => TransactionStatusEnum::REJECTED]);
-            return ; 
+            return ;
         }
         try {
             $amount = $this->fetchData['app']->details[AppointmentUser::DETAIL_PAYMENT][AppointmentUser::DETAIL_PAYMENT_PRICE]['int'];

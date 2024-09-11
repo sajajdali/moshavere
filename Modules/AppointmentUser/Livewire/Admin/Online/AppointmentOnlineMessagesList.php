@@ -67,6 +67,15 @@ class AppointmentOnlineMessagesList extends Component
                         AppointmentOnlineStatusEnum::REACTIVATED
                     ]);
                 });
+            })->when(isset($this->fetchData['showCaceledApp']) && $this->fetchData['showCaceledApp'] == false, function ($q) {
+                $q->whereHas('online', function ($qq) {
+                    $qq->whereIn('status', [
+                        AppointmentOnlineStatusEnum::REJECT,
+                        AppointmentOnlineStatusEnum::CANCEL,
+                        AppointmentOnlineStatusEnum::COMPLETED_BY_DOCTOR,
+                        AppointmentOnlineStatusEnum::TIME_IS_OVER,
+                    ]);
+                });
             })
             ->when(isset($this->search['user_id']), function ($q) {
                 return $q->where('user_id', $this->search['user_id']);

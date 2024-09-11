@@ -36,8 +36,8 @@ class PaymentController extends Controller
         // set the callback URL dynamically
         $callbackUrl = route('api.appointment.payment.callback', ['appointmentUser' => $appointmentUser->id]);
         // Config::set('payment.zarinpal.callback_url', $callbackUrl);
-
-        $invoice = (new Invoice)->amount($amount)->via(setting(SettingKeyEnum::PAYMEN_ACTIVE_DRIVER));
+        $description = 'کاربر پرداخت کننده : '. $appointmentUser->user?->full_name ?? 'بدون نام' . 'شماره تماس: '. $appointmentUser->user?->mobile ?? 'بدون موبایل' . 'شماره ردیف: ' . $appointmentUser->id  ;
+        $invoice = (new Invoice)->amount($amount)->detail('description', $description)->via(setting(SettingKeyEnum::PAYMEN_ACTIVE_DRIVER));
         $invoice->detail(['description' => 'هزینه ی ویزیت']);
         // Retrieve json format of Redirection (in this case you can handle redirection to bank gateway)
         // $merchenId = setting(SettingKeyEnum::PAYMENT_ZARINPAL_MERCHENID);

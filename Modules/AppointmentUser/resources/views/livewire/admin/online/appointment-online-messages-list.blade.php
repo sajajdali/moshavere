@@ -210,7 +210,13 @@
                                 </div>
                                 <div class="text-end">
                                     <span
-                                        class="text-muted small d-block mt-1">{{ ($message->updated_at)->diffForHumans() }}
+                                        class=" badge bg-light small d-block mt-1"><strong>اخرین پیام</strong>:  {{ ($message->updated_at)->diffForHumans() }}
+                                         </span>
+                                    <span
+                                        class="mt-1 d-block bg-light bg-light">
+                                        <span class="d-flex flex-column flex-md-row text-center">
+                                            <strong>زمان دریافت نوبت:</strong> <span>{{ verta($message->created_at)-> format('Y/m/d ساعت H:i')}}</span>
+                                            </span>
                                          </span>
                                 </div>
                             </div>

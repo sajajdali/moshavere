@@ -3,18 +3,14 @@
 namespace Modules\AppointmentUser\Livewire\Admin\Online;
 
 use Livewire\Component;
-use Livewire\WithFileUploads;
 use Livewire\WithPagination;
 use Livewire\Attributes\Title;
 use Livewire\Attributes\Computed;
 use Modules\User\Enum\UserMetaEnum;
 use Hekmatinasser\Verta\Facades\Verta;
 use Modules\AppointmentUser\Traits\OprationButtonsTrait;
-use Modules\AppointmentUser\app\Models\AppointmentOnline;
-use Modules\AppointmentUser\Enum\AppointmentUserStatusEnum;
 use Modules\AppointmentUser\Enum\AppointmentOnlineStatusEnum;
 use Modules\AppointmentUser\app\Models\AppointmentOnlineMessage;
-use Modules\AppointmentUser\Enum\AppointmentOnlineMessageSeenEnum;
 
 #[Title('پیام های پشتیبانی')]
 class AppointmentOnlineMessagesList extends Component

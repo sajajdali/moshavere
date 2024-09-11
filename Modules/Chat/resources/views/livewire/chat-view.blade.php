@@ -79,7 +79,7 @@
                                 <!-- main-chat-header -->
                                 <div class="main-chat-body flex-2" id="ChatBody">
                                     @if ($this->chatList?->isNotEmpty())
-                                        <div class="content-inner" id="lightgallery">
+                                        <div class="content-inner" id="lightgallery" wire:key='{{time()}}'>
                                             @foreach ($this->chatList as $date => $chatItems)
                                                 <label
                                                     class="main-chat-time"><span>{{ \Carbon\Carbon::parse($date)->diffForHumans() }}</span></label>

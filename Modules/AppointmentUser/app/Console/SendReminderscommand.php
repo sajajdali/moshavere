@@ -79,11 +79,16 @@ class SendReminderscommand extends Command
                     }
                     $edited_param = $this->changeSmsParameters($assignEachParameter);
                     $message = $this->replaceParam($notifReminder->reminder->body, $edited_param);
-                    $notifReminder->appointmentUser->user->notify(new UserMessageNotification(
-                        title: "یادآوری",
-                        excerpt: $message,
-                        message: '',
-                    ));
+                    try {
+                        $notifReminder->appointmentUser->user->notify(new UserMessageNotification(
+                            title: "یادآوری",
+                            excerpt: $message,
+                            message: '',
+                        ));
+                    } catch (\Throwable $th) {
+                        //throw $th;
+                    }
+
                     $notifReminder->delete();
                 }
             }

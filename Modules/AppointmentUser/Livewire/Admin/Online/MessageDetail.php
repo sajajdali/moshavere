@@ -118,17 +118,19 @@ class MessageDetail extends Component
             AppointmentOnlineMessageFile::create($fileModel);
             unset($this->form['file']);
         }
-        $notificationMessage =  isset($this->form['typedMessage']) ? substr($this->form['typedMessage'],0,50) : 'یک پیام جدید دارید' ;
+        $notificationMessage =  isset($this->form['typedMessage']) ? substr($this->form['typedMessage'], 0, 50) : 'یک پیام جدید دارید';
         unset($this->form['typedMessage']);
         $this->addError('success', 'پیام با موفقیت ارسال شد');
-
         $this->fetchData['messages'] = $this->fetchData['appOnline']->messages;
+        try {
             $this->fetchData['user']->notify(new \Modules\User\Notifications\UserMessageNotification(
-            title: "پیام جدید برای نوبت آنلاین!",
-            excerpt:  $notificationMessage,
-            message: '',
-            link: \App\Enum\RouteEnum::CHAT->getLink($this->fetchData['appOnline']->id),
-        ));
+                title: "پیام جدید برای نوبت آنلاین!",
+                excerpt: $notificationMessage,
+                message: '',
+                link: \App\Enum\RouteEnum::CHAT->getLink($this->fetchData['appOnline']->id),
+            ));
+        } catch (\Throwable $th) {
+        }
 
         $this->dispatch('sendMessage', true);
     }
@@ -186,11 +188,12 @@ class MessageDetail extends Component
         $this->fetchData['appOnline']->appointmentUser()->update(['status' => AppointmentUserStatusEnum::STATUS_CANCEL]);
         return redirect()->route('admin.appointment_user.message.detail', ['onlineAppId' => $this->fetchData['appOnline']->id])->with('success', 'نوبت با موفقیت کنسل شد');
     }
-    public function closeApp() {
+    public function closeApp()
+    {
 
-        $appointmentUser = $this->fetchData['appOnline']->appointmentUser ;
+        $appointmentUser = $this->fetchData['appOnline']->appointmentUser;
         $link_code = ShortLink::generateShortLinkCode();
-        $link_url = route('front.feedBack', ['appointmentUser_id' => $appointmentUser->id,'user_id'=> $appointmentUser->user->id]);
+        $link_url = route('front.feedBack', ['appointmentUser_id' => $appointmentUser->id, 'user_id' => $appointmentUser->user->id]);
         ShortLink::create([
             'link_code' => $link_code,
             'link_url'  => $link_url,
@@ -206,7 +209,6 @@ class MessageDetail extends Component
         $this->fetchData['appOnline']->update(['status' => AppointmentOnlineStatusEnum::COMPLETED_BY_DOCTOR]);
         $this->fetchData['appOnline']->appointmentUser()->update(['status' => AppointmentUserStatusEnum::STATUS_ONILNE_CLOSED]);
         return redirect()->route('admin.appointment_user.message.detail', ['onlineAppId' => $this->fetchData['appOnline']->id])->with('success', 'وضعیت نوبت به تمام شده ، تغییر پیدا کرد');
-
     }
     public function mount()
     {

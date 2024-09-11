@@ -261,12 +261,17 @@ trait OprationButtonsTrait
     private function sendNotification(AppointmentUser $appointmentUser, string $notifMessage)
     {
         if (isset($appointmentUser->details[AppointmentUser::STORE_FROM_APPLICATION]) && $appointmentUser->details[AppointmentUser::STORE_FROM_APPLICATION]) {
-            $appointmentUser->user->notify(new \Modules\User\Notifications\UserMessageNotification(
-                title: "تغییر وضعیت نوبت",
-                excerpt: $notifMessage,
-                message: '',
-                link: \App\Enum\RouteEnum::APPOINTMENT->getLink($appointmentUser->id) ,
-            ));
+            try {
+                $appointmentUser->user->notify(new \Modules\User\Notifications\UserMessageNotification(
+                    title: "تغییر وضعیت نوبت",
+                    excerpt: $notifMessage,
+                    message: '',
+                    link: \App\Enum\RouteEnum::APPOINTMENT->getLink($appointmentUser->id) ,
+                ));
+            } catch (\Throwable $th) {
+                //throw $th;
+            }
+
         }
     }
 }

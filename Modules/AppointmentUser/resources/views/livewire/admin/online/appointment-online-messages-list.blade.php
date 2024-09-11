@@ -215,7 +215,7 @@
                                     <span
                                         class="mt-1 d-block bg-light bg-light">
                                         <span class="d-flex flex-column flex-md-row text-center">
-                                            <strong>زمان دریافت نوبت:</strong> <span>{{ verta($message->created_at)-> format('Y/m/d ساعت H:i')}}</span>
+                                            <strong>زمان دریافت نوبت:</strong> <span>{{ verta($message->online->created_at)-> format('Y/m/d ساعت H:i')}}</span>
                                             </span>
                                          </span>
                                 </div>

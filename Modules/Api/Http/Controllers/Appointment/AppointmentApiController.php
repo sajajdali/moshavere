@@ -63,7 +63,7 @@ class AppointmentApiController extends Controller
         return $this->ok([
             'status' => true,
             'doctors' => DoctorResource::collection($doctors),
-            'message' => 'در حال حاضر امکان نوبت دهی غیر فعال است . لطفا بعدا اقدام کنید'
+            'no_doctors' => 'در حال حاضر امکان نوبت دهی غیر فعال است . لطفا بعدا اقدام کنید'
         ]);
     }
 

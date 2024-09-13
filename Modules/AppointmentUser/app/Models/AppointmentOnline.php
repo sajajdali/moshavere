@@ -4,6 +4,7 @@ namespace Modules\AppointmentUser\app\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Modules\AppointmentSetting\app\Models\AppointmentSetting;
 use Modules\AppointmentUser\Enum\AppointmentOnlineStatusEnum;
 use Modules\User\Entities\User;
 
@@ -34,6 +35,11 @@ class AppointmentOnline extends Model
     public function messages(): \Illuminate\Database\Eloquent\Relations\HasMany
     {
         return $this->hasMany(AppointmentOnlineMessage::class);
+    }
+
+    public function setting()
+    {
+        return $this->belongsTo(AppointmentSetting::class , 'appointment_setting_id' , 'id');
     }
 
 

@@ -130,6 +130,7 @@ class AppointmentApiOnlineController extends Controller
         $accessibility = [
             'can_send_message' => $appointmentOnline->status->canSendMessage(),
             'can_show_messages' => $appointmentOnline->status->canShowMessages(),
+            'can_send_voice' => false,
         ];
         $messages = $appointmentOnline->messages()->orderByDesc('id')->paginate();
         $list = [

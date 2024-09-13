@@ -9,6 +9,7 @@ use Modules\Api\app\Resources\Api\Appointment\online\AppointmentOnlineMessagesPa
 use Modules\Api\app\Resources\Api\Appointment\online\AppointmentOnlineMessagesResource;
 use Modules\Api\app\Resources\Api\Appointment\online\AppointmentOnlinePaginateResource;
 use Modules\Api\Trait\ApiHandlerTrait;
+use Modules\AppointmentSetting\app\Models\AppointmentSetting;
 use Modules\AppointmentUser\app\Models\AppointmentOnline;
 use Modules\AppointmentUser\Enum\AppointmentOnlineMessageSeenEnum;
 use Modules\AppointmentUser\Enum\AppointmentOnlineMessageTypeEnum;
@@ -130,7 +131,7 @@ class AppointmentApiOnlineController extends Controller
         $accessibility = [
             'can_send_message' => $appointmentOnline->status->canSendMessage(),
             'can_show_messages' => $appointmentOnline->status->canShowMessages(),
-            'can_send_voice' => false,
+            'can_send_voice' => isset($appointmentOnline->setting->detail[AppointmentSetting::ONLINE_CAN_SEND_VOICE]) && $appointmentOnline->setting->detail[AppointmentSetting::ONLINE_CAN_SEND_VOICE]
         ];
         $messages = $appointmentOnline->messages()->orderByDesc('id')->paginate();
         $list = [

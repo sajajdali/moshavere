@@ -40,6 +40,11 @@ class GeneralSetting extends Component
         'specialDaydateValues',
         'specialDaytimeValues',
         'monitoring',
+        'accessibility' => [
+            'online' => [
+                'can_send_voice' => true
+            ]
+        ],
         'operators' => [],
     ];
 
@@ -319,6 +324,12 @@ class GeneralSetting extends Component
             ]
         ];
 
+        if (isset($this->form['visitType']['online']) && $this->form['visitType']['online']){
+            $detail[AppointmentSetting::ONLINE_CAN_SEND_VOICE] = isset($this->form['accessibility']['online']['can_send_voice']) && $this->form['accessibility']['online']['can_send_voice'];
+        } else{
+            unset($detail[AppointmentSetting::ONLINE_CAN_SEND_VOICE]);
+        }
+
         $updateOrCreateModel = [
             'user_id'               =>  $this->user->id,
             'service_id'            =>  $this->fetchData['service_id'],
@@ -478,6 +489,12 @@ class GeneralSetting extends Component
                 $this->form['payment'][AppointmentSetting::IN_PERSON][AppointmentSetting::STATUS] = $apSet->detail[AppointmentSetting::PAYMENT][AppointmentSetting::IN_PERSON][AppointmentSetting::STATUS];
                 $this->form['payment'][AppointmentSetting::IN_PERSON][AppointmentSetting::PRICE] = $apSet->detail[AppointmentSetting::PAYMENT][AppointmentSetting::IN_PERSON][AppointmentSetting::PRICE];
             }
+        }
+
+        if (isset($apSet->detail[AppointmentSetting::ONLINE_CAN_SEND_VOICE]) && $apSet->detail[AppointmentSetting::ONLINE_CAN_SEND_VOICE]){
+            $this->form['accessibility']['online']['can_send_voice'] = true;
+        } else{
+            $this->form['accessibility']['online']['can_send_voice'] = false;
         }
 
         if (isset($apSet->detail[AppointmentSetting::MAX_AVAILABLE_APPOINTMENT_FOR_SECRETERY])) {

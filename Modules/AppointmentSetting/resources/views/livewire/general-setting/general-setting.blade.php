@@ -62,6 +62,21 @@
                     </div>
                 </div>
             </div>
+            <div @if (isset($form['visitType']['online']) && $form['visitType']['online']) style="display: block" @else style="display: none" @endif class="row mt-4">
+                <hr>
+                <div class="d-flex align-items-center">
+                    <div class="main-toggle-group d-sm-flex align-items-center ms-0">
+                        <div class="toggle toggle-lg toggle-primary my-1  customCheckbox
+                            @if (isset($form['accessibility']['online']['can_send_voice']) && $form['accessibility']['online']['can_send_voice'] == true) on
+                                @else
+                                off @endif"
+                             data-id="accessibility.online.can_send_voice" id="accessibilityOnline_voice" wire:ignore.self>
+                            <span></span>
+                        </div>
+                    </div>
+                    <span class="ms-2">امکان ارسال ویس برای کاربران در نوبت دهی آنلاین فعال باشد؟</span>
+                </div>
+            </div>
         </div>
     </div>
     {{-- manage day of the week  --}}
@@ -357,7 +372,7 @@
                             @if (isset($form['payment']['inPerson']['status']) && $form['payment']['inPerson']['status'] == true) on
                                 @else
                                 off @endif"
-                                data-id="payment.inPerson.status" id="sitePaymentStatus" wire:ignore.self>
+                                data-id="payment.inPerson.status" id="activeOnlineStatus" wire:ignore.self>
                                 <span></span>
                             </div>
                         </div>

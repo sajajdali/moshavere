@@ -22,4 +22,5 @@ trait AppointmentSettingDetailKeyTrait
     const IN_PERSON = 'inPerson';
     const OPERATORS = 'operators';
     const IDS = 'ids';
+    const ONLINE_CAN_SEND_VOICE = 'onlineCanSendVoice';
 }

@@ -28,13 +28,13 @@
             <div class="main-content-app pt-0">
                 <div class="main-content-left main-content-left-chat">
                     <div class="card custom-card">
-                        <div class="card-header d-flex justify-content-between border-bottom">
+                        <div class="card-header d-flex justify-content-between border-bottom px-1 px-sm-3">
                             <h3 class="card-title">لیست نوبت های ثبت شده</h3>
-                            <div class="card-options">
+                            <div class="card-options flex-column flex-sm-row">
                                 <button class="btn btn-warning me-2" type="button" wire:click='showalltheMessages'>
                                     نمایش نوبت های تمام شده
                                 </button>
-                                <button class="btn btn-primary" type="button" data-bs-toggle="collapse"
+                                <button class="btn btn-primary mt-1 mt-md-0 " type="button" data-bs-toggle="collapse"
                                     data-bs-target="#advanceSearch" aria-expanded="false" aria-controls="advanceSearch">
                                     جست و جوی پیشرفته
                                 </button>
@@ -229,20 +229,23 @@
                                         بدون پیام جدید
                                     @endif
                                 </a>
+
+                                <div class="d-flex flex-column align-items-end">
+                                @if ($message->hasAnswer())
+                                    <span class="badge bg-info mb-2">پاسخ توسط: {{$message->findAwnswerer()}} </span>
+                                @endif
                                 @if ($message->online->status->isPendding())
-                                    <div>
                                         <button wire:click='ApproveOnlineAppointment("{{ $message->online->appointmentUser->id}}")' class="btn btn-success rounded-pill px-4 py-2 me-2 loading-btn">
                                             <i class="fa fa-check me-2" aria-hidden="true"></i> تایید نوبت
                                         </button>
                                         <button wire:click='disApproveOnlineAppointment("{{ $message->online->appointmentUser->id}}")' class="btn btn-danger rounded-pill px-4 py-2">
                                             <i class="fa fa-times me-2" aria-hidden="true"></i> رد کردن
                                         </button>
-                                    </div>
+
                                 @else
-                                    <div>
                                         {!! $message->online->status->getMessageDetailBadge() !!}
-                                    </div>
-                                @endif
+                                        @endif
+                                </div>
                             </div>
                         </div>
                     @endforeach

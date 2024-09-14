@@ -66,4 +66,15 @@ class AppointmentOnlineMessage extends Model
     {
         return self::where('user_id', $this->user_id)->count();
     }
+    public function hasAnswer()
+    {
+        if($this->online?->messages?->last()?->answer_by != null) {
+           return true;
+        }
+        return false ;
+    }
+    public function findAwnswerer():string {
+        $awnsered_by =  $this->online?->messages?->last() ;
+        return $awnsered_by->answerBy?->full_name ?? '';
+    }
 }

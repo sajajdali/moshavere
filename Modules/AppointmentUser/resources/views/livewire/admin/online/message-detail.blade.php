@@ -258,6 +258,7 @@
                                 </button>
                                 <input class="form-control ms-2 @error('form.typedMessage') is-invalid @enderror"
                                     wire:model='form.typedMessage'
+                                       wire:keydown.enter="sendMessage"
                                     placeholder="@error('form.typedMessage') {{ $message }} @else متن خود را یادداشت کنید @enderror"
                                     type="text">
                                 <button data-bs-target="#file-selector-modal" data-bs-toggle="modal" class="btn btn-light mx-3 d-flex justify-content-center p-1 py-2"
@@ -265,7 +266,7 @@
                                     @if (isset($form['file']))
                                         <i class="fa fa-check" aria-hidden="true"></i>
                                     @else
-                                        <i class="fe fe-paperclip"></i>
+                                        <i class="fe fe-camera"></i>
                                     @endif
                                 </button>
                                 <button wire:click='sendMessage' wire:target='sendMessage'

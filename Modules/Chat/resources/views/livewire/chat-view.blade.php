@@ -205,7 +205,7 @@
                                                 @if (isset($form['file']))
                                                     <i class="fa fa-check" aria-hidden="true"></i>
                                                 @else
-                                                    <i class="fe fe-paperclip"></i>
+                                                    <i class="fe fe-camera"></i>
                                                 @endif
                                             </button>
                                             <button type="button" wire:click="sendMessage"

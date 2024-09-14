@@ -66,8 +66,8 @@
                         <div class="col-lg-12">
                             <div class="table-responsive">
                                 <table class="table border  text-md-nowrap ">
-                                    <thead>
-                                        <tr>
+                                    <thead >
+                                        <tr class="text-center">
                                             <th>بخش</th>
                                             <th>مطب</th>
                                             <th>وضعیت نوبت</th>
@@ -79,11 +79,28 @@
                                     <tbody>
                                         @if ($fetchData['appointments']->isNotEmpty())
                                             @foreach ($fetchData['appointments'] as $key => $appointment)
-                                                <tr class=" {{ $appointment->getColor() }}">
+                                                <tr class=" {{ $appointment->getColor() }} text-center">
                                                     <td>{{ $appointment->service->title ?? '-' }}</td>
                                                     <td>{{ $appointment->place->title ?? '-' }}</td>
-                                                    <td>{{ $appointment->status->getName() }}</td>
-                                                    <td>{{ $appointment->kind->getName() }}</td>
+                                                    <td>
+                                                        <div>
+                                                            <span>
+                                                                {{ $appointment->status->getName() }}
+                                                            </span>
+                                                        </div>
+                                                    </td>
+                                                    <td>
+                                                        {{ $appointment->kind->getName() }}
+                                                        @if ($appointment->getUnseenMessageBadge() > 0)
+                                                        <a class="bg-red text-white p-2 rounded-pill small"
+                                                            href="{{ route('admin.appointment_user.message.detail', ['onlineAppId' => $user->onlineApppIdForBadgeList()]) }}">
+                                                            {{ $appointment->getUnseenMessageBadge() }} پیام
+                                                            جدید
+                                                        </a>
+                                                        @else
+                                                        <a class="bg-warning text-dark p-2 rounded-pill small"  href="{{ route('admin.appointment_user.message.detail', ['onlineAppId' => $user->onlineApppIdForBadgeList()]) }}"> مشاهده چت</a>
+                                                    @endif
+                                                    </td>
                                                     <td>{{ verta($appointment->date_visit)->format('Y-m-d') }}</td>
                                                     <td>
                                                         @if ($appointment->visited_at)
@@ -124,10 +141,13 @@
                                         <tbody>
                                             @foreach ($fetchData['comments'] as $comment)
                                                 <tr>
-                                                    <td><textarea disabled cols="70" rows="2" > {{$comment->body}}</textarea></td>
-                                                    <td>{{ verta($comment->created_at)->format('Y-m-d ساعت H:i') }}</td>
+                                                    <td>
+                                                        <textarea disabled cols="70" rows="2"> {{ $comment->body }}</textarea>
+                                                    </td>
+                                                    <td>{{ verta($comment->created_at)->format('Y-m-d ساعت H:i') }}
+                                                    </td>
                                                     <td><button class="btn btn-danger delete_confirm_alert"
-                                                        data-id="{{ $comment->id }}"
+                                                            data-id="{{ $comment->id }}"
                                                             data-label="یادداشت">حذف</button></td>
                                                 </tr>
                                             @endforeach

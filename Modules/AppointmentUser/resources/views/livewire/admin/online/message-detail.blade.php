@@ -27,13 +27,13 @@
                     <div class="main-content-app" style="overflow-y: hidden ; overflow-x: hidden">
                         <div class="text-center chat-image p-4 pb-0 mb-4 br-5">
                             <div class="rounded-circle chat-profile">
-                                <a class="rounded-circle" href="{{ route('admin.user.index') }}">
+                                <a class="rounded-circle" href="{{route('admin.user.document',['user'=>$fetchData['user']->id])}}">
                                     <img alt="profile-avatar" src="{{ $fetchData['user']->avatar }}"
                                         class="avatar avatar-xl rounded-circle">
                                 </a>
                             </div>
                             <div class="main-chat-msg-name">
-                                <a href="{{ route('admin.user.index') }}">
+                                <a href="{{route('admin.user.document',['user'=>$fetchData['user']->id])}}">
                                     <h5 class="mb-1 text-dark fw-semibold mb-1">{{ $fetchData['user']->fullname }}</h5>
                                 </a>
                                 <small class="me-3">تاریخ نوبت</small>
@@ -123,10 +123,16 @@
                     <div class="main-content-body main-content-body-chat h-100">
                         <div class="main-chat-header pt-3 d-block d-sm-flex">
                             <div class="main-img-user online">
-                                <img alt="avatar" src="{{ $fetchData['user']->avatar }}">
+                                <a href="{{route('admin.user.document',['user'=>$fetchData['user']->id])}}">
+                                    <img alt="avatar" src="{{ $fetchData['user']->avatar }}">
+                                </a>
                             </div>
                             <div class="main-chat-msg-name mt-2">
-                                <p class="mb-0">{{ $fetchData['user']->fullname }}</p>
+                                <p class="mb-0">
+                                    <a class="text-dark" href="{{route('admin.user.document',['user'=>$fetchData['user']->id])}}">
+                                        {{ $fetchData['user']->fullname }}
+                                    </a>
+                                    </p>
                                 <span class="dot-label bg-success"></span>
                                 <small class="me-3">
                                     {{ isset($this->fetchData['messages']) && !empty($this->fetchData['messages']) && $this->fetchData['messages']->isNotEmpty() ? $this->fetchData['messages']->last()->seen->getName() : 'بدون پیام' }}

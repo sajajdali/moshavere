@@ -169,29 +169,36 @@
                                                 <td>
                                                     <div class="media mt-4 profile-footer align-items-center text-start">
                                                         <div class="media-user me-2">
-                                                            <div class="main-img-user">
-                                                                <img alt="{{ $user->full_name }}"
-                                                                    title="{{ $user->full_name }}"
-                                                                    class="rounded-circle avatar-md"
-                                                                    src="{{ $user->avatar ?? asset('assets/admin/images/svgs/user.svg') }}">
+                                                            <div class="main-img-user"> <a
+                                                                    href=" @can('documentte', $user){{ route('admin.user.document', $user) }} @else # @endcan">
+                                                                    <img alt="{{ $user->full_name }}"
+                                                                        title="{{ $user->full_name }}"
+                                                                        class="rounded-circle avatar-md"
+                                                                        src="{{ $user->avatar ?? asset('assets/admin/images/svgs/user.svg') }}">
+                                                                </a>
                                                             </div>
                                                         </div>
-                                                        <div class="media-body">
-                                                            @can('documentte', $user)
-                                                                <a href="{{ route('admin.user.document', $user) }}">
-                                                                    <h6 class="mb-0">
-                                                                        {{ $user->full_name }}
-                                                                    </h6>
-                                                                </a>
-                                                            @else
-                                                                <h6 class="mb-0 text-dark-light">
+                                                        <div class="media-body d-flex  justify-content-between align-items-center">
+                                                            <a
+                                                                href=" @can('documentte', $user){{ route('admin.user.document', $user) }} @else # @endcan">
+                                                                <h6 class="mb-0">
                                                                     {{ $user->full_name }}
                                                                 </h6>
-                                                            @endcan
+                                                            </a>
+                                                            @if($user->onlineAppointmentNewMessageCount() > 0 )
+                                                            <a href="{{route('admin.appointment_user.message.detail',['onlineAppId' => $user->onlineApppIdForBadgeList()])}}" class="bg-red text-white p-2 rounded-pill small">
+                                                                {{$user->onlineAppointmentNewMessageCount()}} پیام جدید
+                                                            </a>
+                                                            @endif
                                                         </div>
                                                     </div>
                                                 </td>
-                                                <td> {{ $user->mobile }}</td>
+                                                <td>
+                                                    <a
+                                                        href=" @can('documentte', $user){{ route('admin.user.document', $user) }} @else # @endcan">
+                                                        {{ $user->mobile }}
+                                                    </a>
+                                                </td>
                                                 <td>
                                                     @if ($user->roles->isNotEmpty())
                                                         @foreach ($user->roles as $index => $role)

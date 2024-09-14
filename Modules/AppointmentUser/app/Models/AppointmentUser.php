@@ -217,4 +217,10 @@ class AppointmentUser extends Model
     {
         return $this->hasMany(AppointmentSegmentItem::class);
     }
+    public function getUnseenMessageBadge():int {
+        if($this->kind == AppointmentUserKindEnum::ONLINE) {
+            return $this->online->first()?->messages?->first()?->unReadedMessageCount() ?? 0 ;
+        }
+        return 0 ;
+    }
 }

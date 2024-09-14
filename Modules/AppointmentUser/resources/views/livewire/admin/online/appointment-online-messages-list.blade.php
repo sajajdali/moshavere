@@ -210,14 +210,17 @@
                                 </div>
                                 <div class="text-end">
                                     <span
-                                        class=" badge bg-light small d-block mt-1"><strong>اخرین پیام</strong>:  {{ ($message->updated_at)->diffForHumans() }}
+                                        class=" badge bg-light small d-block mt-1  px-1"><strong>اخرین پیام</strong>:  {{ ($message->updated_at)->diffForHumans() }}
                                          </span>
                                     <span
                                         class="mt-1 d-block bg-light bg-light">
-                                        <span class="d-flex flex-column flex-md-row text-center">
+                                        <span class="d-flex flex-column flex-md-row text-center  px-2">
                                             <strong>زمان دریافت نوبت:</strong> <span>{{ verta($message->online->created_at)-> format('Y/m/d ساعت H:i')}}</span>
                                             </span>
                                          </span>
+                                         @if ($message->hasAnswer())
+                                         <span class="mt-1 d-block bg-light bg-light text-center px-1"><strong>پاسخ توسط</strong>: {{$message->findAwnswerer()}} </span>
+                                     @endif
                                 </div>
                             </div>
                             <div class="card-body d-flex justify-content-between align-items-center p-3">
@@ -231,9 +234,6 @@
                                 </a>
 
                                 <div class="d-flex flex-column align-items-end">
-                                @if ($message->hasAnswer())
-                                    <span class="badge bg-info mb-2">پاسخ توسط: {{$message->findAwnswerer()}} </span>
-                                @endif
                                 @if ($message->online->status->isPendding())
                                         <button wire:click='ApproveOnlineAppointment("{{ $message->online->appointmentUser->id}}")' class="btn btn-success rounded-pill px-4 py-2 me-2 loading-btn">
                                             <i class="fa fa-check me-2" aria-hidden="true"></i> تایید نوبت

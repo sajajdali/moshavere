@@ -7,6 +7,7 @@ use Livewire\Component;
 use Livewire\Attributes\On;
 use Livewire\Attributes\Url;
 use Livewire\Attributes\Computed;
+use Livewire\WithPagination;
 use Modules\Api\app\Resources\Api\Chat\ChatDetailResource;
 use Modules\Chat\app\Models\Chat;
 use Illuminate\Support\Collection;
@@ -15,15 +16,27 @@ use Illuminate\Support\Facades\Storage;
 use Modules\Chat\Enum\ChatDetailTypeEnum;
 use Modules\Chat\app\Models\ChatDetailsFile;
 use Modules\Chat\app\Events\AdminAnswerChatEvent;
+use Modules\User\Enum\UserMetaEnum;
 
 class ChatView extends Component
 {
+    use WithPagination;
+
     #[Url]
     public int $chatId = 0;
 
     public $chatMessage = '';
+    public $searchTerm = ''; // Property to hold the search term
+
     public $ImgMessg;
     public array $form ;
+    public $perPage = 50;
+    private $loadMode = 100;
+    #[Url]
+    public $filterStatus = null;
+    protected $paginationTheme = 'bootstrap'; // Optional, if you're using Bootstrap for styling
+
+
 
     #[Computed]
     public function chatList()
@@ -190,13 +203,59 @@ class ChatView extends Component
         ]);
         return redirect()->route('admin.chat',['chatId' => $closeChat->id])->with('success','وضعیت گفت و گو به بسته شده تغییر کرد.');
     }
+
+    public function loadMore()
+    {
+        // Increase the number of items to display
+        $this->perPage += $this->loadMode;
+    }
+
+    public function performSearch()
+    {
+        $this->queryTerm = $this->searchTerm; // Assign the entered term to queryTerm
+        $this->resetPage(); // Reset pagination to page 1 when searching
+    }
+
+    public function showFilteredChat($value)
+    {
+        $this->filterStatus = $value;
+    }
     public function render()
     {
-        //get all chats order by type and latest message
-        // $chats =   $chats = new Collection();
+        // Start the chat query
+        $chats = Chat::query();
 
-        $chats = Chat::orderBy('status', 'asc')
-        ->orderBy('created_at')->get();
+        // Apply search term filters on chat details and user metas
+        $chats = $chats->where(function ($query) {
+            $query->whereHas('chatDetails', function ($query) {
+                $query->where('content', 'like', '%' . $this->searchTerm . '%');
+            })
+                ->orWhereHas('user', function ($query) {
+                    $query->whereHas('metas', function ($q) {
+                        $q->where([
+                            ['meta_key', UserMetaEnum::FIRST_NAME],
+                            ['meta_value', 'LIKE', "%{$this->searchTerm}%"],
+                        ])->orWhere([
+                            ['meta_key', UserMetaEnum::LAST_NAME],
+                            ['meta_value', 'LIKE', "%{$this->searchTerm}%"],
+                        ]);
+                    })->orWhere('mobile', $this->searchTerm);
+                });
+        });
+
+        // Apply status filter if set
+        if ($this->filterStatus) {
+            $chats->where('status', $this->filterStatus);
+        } else {
+            $chats->where('status' , '!=' , ChatStatusEnum::CLOSED);
+        }
+
+        // Order and paginate the chats
+        $chats = $chats->orderBy('status', 'asc')
+            ->orderBy('created_at', 'asc')
+            ->paginate($this->perPage);
+
         return view('chat::livewire.chat-view', compact('chats'));
     }
+
 }

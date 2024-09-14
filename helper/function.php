@@ -213,7 +213,7 @@ function chatQuestions()
                                 'image' => null,
                                 'video' => null,
                                 'show_chat_button' => true,
-                                'call_number' => '+989122978167',
+                                'call_number' => '+02126118848',
                             ]
                         ]
                     ],
@@ -235,7 +235,7 @@ function chatQuestions()
                                 'image' => null,
                                 'video' => null,
                                 'show_chat_button' => true,
-                                'call_number' => '+989122978167',
+                                'call_number' => '+02126118848',
 
                             ],
                             'children' => [],
@@ -258,7 +258,7 @@ function chatQuestions()
                                 'image' =>null,
                                 'video' => null,
                                 'show_chat_button' => true,
-                                'call_number' => '+989122978167',
+                                'call_number' => '+02126118848',
 
                             ],
                             'children' => [],
@@ -281,7 +281,7 @@ function chatQuestions()
                                 'image' => null,
                                 'video' => null,
                                 'show_chat_button' => true,
-                                'call_number' => '+989122978167',
+                                'call_number' => '+02126118848',
 
                             ],
                             'children' => [],
@@ -310,7 +310,7 @@ function chatQuestions()
                                 'image' => null,
                                 'video' => null,
                                 'show_chat_button' => true,
-                                'call_number' => '+989122978167',
+                                'call_number' => '+02126118848',
 
                             ],
                             'children' => []
@@ -333,7 +333,7 @@ function chatQuestions()
                                 'image' => null,
                                 'video' => null,
                                 'show_chat_button' => true,
-                                'call_number' => '+989122978167',
+                                'call_number' => '+02126118848',
                             ],
                             'children' => []
                         ]
@@ -356,7 +356,7 @@ function chatQuestions()
                                 'image' => null,
                                 'video' => null,
                                 'show_chat_button' => true,
-                                'call_number' => '+989122978167',
+                                'call_number' => '+02126118848',
                             ],
                             'children' => []
                         ]
@@ -378,7 +378,7 @@ function chatQuestions()
                                 'image' => null,
                                 'video' => null,
                                 'show_chat_button' => true,
-                                'call_number' => '+989122978167',
+                                'call_number' => '+02126118848',
                             ],
                             'children' => []
                         ]
@@ -400,7 +400,7 @@ function chatQuestions()
                                 'image' => null,
                                 'video' => null,
                                 'show_chat_button' => true,
-                                'call_number' => '+989122978167',
+                                'call_number' => '+02126118848',
                             ],
                             'children' => []
                         ]
@@ -422,7 +422,7 @@ function chatQuestions()
                                 'image' => null,
                                 'video' => null,
                                 'show_chat_button' => true,
-                                'call_number' => '+989122978167',
+                                'call_number' => '+02126118848',
                             ],
                             'children' => []
                         ]
@@ -447,7 +447,7 @@ function chatQuestions()
                                 'image' => null,
                                 'video' => null,
                                 'show_chat_button' => true,
-                                'call_number' => '+989122978167',
+                                'call_number' => '+02126118848',
                             ],
                             'children' => []
                         ]
@@ -478,7 +478,7 @@ function chatQuestions()
                                 'image' => null,
                                 'video' => null,
                                 'show_chat_button' => true,
-                                'call_number' => '+989122978167',
+                                'call_number' => '+02126118848',
                             ],
                             'children' => []
                         ]

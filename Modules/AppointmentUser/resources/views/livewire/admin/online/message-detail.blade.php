@@ -24,7 +24,7 @@
         <div class="col-md-4">
             <div class="card">
                 <div class="card-body profile-details-main pb-0">
-                    <div class="main-content-app">
+                    <div class="main-content-app" style="overflow-y: hidden ; overflow-x: hidden">
                         <div class="text-center chat-image p-4 pb-0 mb-4 br-5">
                             <div class="rounded-circle chat-profile">
                                 <a class="rounded-circle" href="{{ route('admin.user.index') }}">

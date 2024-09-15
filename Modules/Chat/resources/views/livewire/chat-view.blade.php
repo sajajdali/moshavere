@@ -26,6 +26,12 @@
             </div>
         </div>
     </div>
+    <div id="loading-spinner" class="d-none">
+        <div class="loading-overlay d-flex align-items-center justify-content-center">
+            <div class="spinner-border text-primary" role="status">
+            </div>
+        </div>
+    </div>
     @include('admin::layouts.components.alert')
     <!-- PAGE-HEADER END -->
     {{--    @if ($chats->isNotEmpty())--}}
@@ -195,6 +201,17 @@
                                                 چت بسته شده است!
                                             </div>
                                         @else
+                                                    <!-- Camera Button -->
+                                            <button class="btn @if (isset($form['capturedPic'])) btn-success @else  btn-light @endif mx-3 d-flex justify-content-center p-1 py-2 mt-2"  id="cameraButton" 
+                                                @if (isset($form['capturedPic'])) disabled @endif>
+                                                    @if (isset($form['capturedPic']))
+                                                    <i class="fa fa-check" aria-hidden="true"></i>
+                                                    @else
+                                                    <i class="fa fa-camera" aria-hidden="true"></i>
+                                                    @endif
+                                            </button>
+                                            <input type="file" accept="image/*" capture="environment" id="cameraInput" wire:model='form.capturedPic'
+                                                style="display:none;" />
                                             <textarea rows="3" class="form-control mt-5" placeholder="متن پیام شما..."
                                                    wire:model="chatMessage"
                                                    wire:keydown.enter="sendMessage"></textarea>
@@ -212,7 +229,7 @@
                                                     @if (isset($form['file']))
                                                         <i class="fa fa-check" aria-hidden="true"></i>
                                                     @else
-                                                        <i class="fe fe-camera"></i>
+                                                    <i class="fa fa-file" aria-hidden="true"></i>
                                                     @endif
                                                 </button>
                                             </div>
@@ -318,6 +335,22 @@
 
             Livewire.on('chatRoomSelected', function () {
                 scroll();
+            });
+
+            document.getElementById('cameraButton').addEventListener('click', function() {
+                // Trigger the file input click event to open the camera
+                document.getElementById('cameraInput').click();
+            });
+            document.getElementById('cameraInput').addEventListener('change', function(event) {
+                const file = event.target.files[0];
+                if(file) {
+                    $('#loading-spinner').removeClass('d-none');
+                    $('#loading-spinner').fadeIn();
+                }
+            });
+            Livewire.on('picUploade',function(){
+                $('#loading-spinner').fadeOut();
+                $('#loading-spinner').addClass('d-none');
             });
         </script>
 @endpush

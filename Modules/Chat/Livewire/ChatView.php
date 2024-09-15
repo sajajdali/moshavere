@@ -2,21 +2,24 @@
 
 namespace Modules\Chat\Livewire;
 
-use App\Events\PusherBroadcast;
+use App\Enum\RouteEnum;
 use Livewire\Component;
+use App\Models\ShortLink;
 use Livewire\Attributes\On;
 use Livewire\Attributes\Url;
-use Livewire\Attributes\Computed;
 use Livewire\WithPagination;
-use Modules\Api\app\Resources\Api\Chat\ChatDetailResource;
+use App\Events\PusherBroadcast;
+use Livewire\Attributes\Computed;
 use Modules\Chat\app\Models\Chat;
-use Illuminate\Support\Collection;
+use Modules\User\Enum\UserMetaEnum;
 use Modules\Chat\Enum\ChatStatusEnum;
 use Illuminate\Support\Facades\Storage;
+use Modules\Setting\Enum\SettingKeyEnum;
 use Modules\Chat\Enum\ChatDetailTypeEnum;
 use Modules\Chat\app\Models\ChatDetailsFile;
 use Modules\Chat\app\Events\AdminAnswerChatEvent;
-use Modules\User\Enum\UserMetaEnum;
+use Modules\User\app\Notifications\UserSmsNotification;
+use Modules\Api\app\Resources\Api\Chat\ChatDetailResource;
 
 class ChatView extends Component
 {
@@ -172,6 +175,20 @@ class ChatView extends Component
         $message = ChatDetailResource::make($chatDetail);
         event(new PusherBroadcast($message , $this->chat->id));
 
+        // send sms
+        if(isset($this->form['sendSms']) && $this->form['sendSms'] == true ) {
+            $template = setting(SettingKeyEnum::SMS_FOR_SEND_MESSAGE_IN_CHATS) ;
+            if(isset($template)) {
+                $messageLink = 'https://webapp.mata-app.com'. (\App\Enum\RouteEnum::CHAT->getLink(replacement: $this->chat->id)) ;
+                   $shortLink =  $this->chat->shortLink()->create([
+                        'link_code' => ShortLink::generateShortLinkCode(),
+                        'link_url'  => $messageLink,
+                    ]);
+                $this->chat->user->notify(new UserSmsNotification($template,url('/s/' . $shortLink->link_code)));
+            }
+            unset($this->form['sendSms']);
+        }
+        //send notification
         try {
             $this->chat->user->notify(new \Modules\User\Notifications\UserMessageNotification(
                 title: "پیام جدید برای پشتیبانی !",
@@ -181,6 +198,7 @@ class ChatView extends Component
             ));
         } catch (\Throwable $th) {
         }
+
         $this->dispatch('messageHasBeenSend',true);
         AdminAnswerChatEvent::dispatch($this->chat);
     }

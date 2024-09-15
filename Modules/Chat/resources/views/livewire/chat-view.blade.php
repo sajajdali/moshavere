@@ -189,34 +189,48 @@
                                                     </div>
                                                 @endif
                                     </div>
-                                    <div class="main-chat-footer pt-5 pb-5" wire:key='{{time() . time()}}'>
+                                    <div class="main-chat-footer" wire:key='{{time() . time()}}' style="padding-top :40px !important;">
                                         @if (isset($this->chatList?->first()?->first()?->chat) && $this->chatList?->first()?->first()?->chat?->status == Modules\Chat\Enum\ChatStatusEnum::CLOSED)
                                             <div class="col-md-12 alert alert-primary fade show mt-4 ms-3" role="alert">
                                                 چت بسته شده است!
                                             </div>
                                         @else
-                                            <input class="form-control" placeholder="متن پیام شما..." type="text"
+                                            <textarea rows="3" class="form-control mt-5" placeholder="متن پیام شما..."
                                                    wire:model="chatMessage"
-                                                   wire:keydown.enter="sendMessage">
+                                                   wire:keydown.enter="sendMessage"></textarea>
                                             {{-- send File modal --}}
-                                            <button data-bs-target="#file-selector-modal" data-bs-toggle="modal"
-                                                    class="btn btn-light me-3 d-flex justify-content-center p-1 py-2"
-                                                    href="javascript:void(0)">
-                                                @if (isset($form['file']))
-                                                    <i class="fa fa-check" aria-hidden="true"></i>
-                                                @else
-                                                    <i class="fe fe-camera"></i>
-                                                @endif
-                                            </button>
-                                            <button type="button" wire:click="sendMessage"
-                                                    wire:loading.class="btn btn-light btn-loading"
-                                                    wire:loading.class.remove="btn-primary"
-                                                    class="btn btn-icon  btn-primary brround">
-                                                <i class="fa fa-paper-plane-o"></i>
-                                            </button>
+                                            <div class="mt-5">
+                                                <button type="button" wire:click="sendMessage"
+                                                        wire:loading.class="btn btn-light btn-loading"
+                                                        wire:loading.class.remove="btn-primary"
+                                                        class="btn btn-icon  btn-primary brround mb-2">
+                                                    <i class="fa fa-paper-plane-o"></i>
+                                                </button>
+                                                <button data-bs-target="#file-selector-modal" data-bs-toggle="modal"
+                                                        class="btn btn-light me-3 d-flex justify-content-center p-1 py-2"
+                                                        href="javascript:void(0)">
+                                                    @if (isset($form['file']))
+                                                        <i class="fa fa-check" aria-hidden="true"></i>
+                                                    @else
+                                                        <i class="fe fe-camera"></i>
+                                                    @endif
+                                                </button>
+                                            </div>
                                             <nav class="nav">
                                             </nav>
                                         @endif
+                                    </div>
+                                    <div class="row mt-5  pt-1 pt-sm-3">
+                                        <div class="col-12">
+                                            <span class="rounded-pill ms-1 mt-1 d-flex align-item-center">
+                                                <div class="material-switch">
+                                                    <input wire:model='form.sendSms' id="sendSms" name="siwtch04"
+                                                        type="checkbox" />
+                                                    <label for="sendSms" class="label-info"></label>
+                                                </div>
+                                                <p class="card-sub-title">ارسال پیامک به کاربر</p>
+                                            </span>
+                                        </div>
                                     </div>
                             </div>
                         </div>

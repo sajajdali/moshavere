@@ -6,23 +6,15 @@ use App\Broadcasting\SmsChannel;
 use Illuminate\Bus\Queueable;
 use Illuminate\Notifications\Notification;
 use Illuminate\Contracts\Queue\ShouldQueue;
-use Modules\Setting\Enum\SettingKeyEnum;
 use Modules\User\Entities\User;
 
 class UserSmsNotification extends Notification implements ShouldQueue
 {
     use Queueable;
 
-    private string $template;
-
-    /**
-     * @param $template
-     */
-    public function __construct($template)
+    public function __construct(private string $template,public string $link)
     {
-        $this->template = $template;
     }
-
 
     /**
      * Create a new notification instance.
@@ -50,14 +42,14 @@ class UserSmsNotification extends Notification implements ShouldQueue
      */
     public function toArray(mixed $notifiable): array
     {
-        $loginTemplate = setting(SettingKeyEnum::SMS_API_LOGIN_TEMPLATE);
-        $user = $notifiable;
+
 
         return [
-            'template' => $loginTemplate,
+            'template' => $this->template,
             'receptor' => $notifiable->mobile,
             'params' => [
-                $user
+                $notifiable->full_name,
+                $this->link ,
             ],
         ];
     }

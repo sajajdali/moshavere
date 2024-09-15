@@ -12,7 +12,7 @@ use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Storage;
 use Modules\Setting\Enum\SettingKeyEnum;
 use Modules\AppointmentUser\app\Models\AppointmentUser;
-use Modules\AppointmentUser\Traits\OprationButtonsTrait;
+use Modules\User\app\Notifications\UserSmsNotification;
 use Modules\AppointmentUser\app\Models\AppointmentOnline;
 use Modules\AppointmentUser\Enum\AppointmentUserStatusEnum;
 use Modules\AppointmentUser\Enum\AppointmentOnlineStatusEnum;
@@ -122,6 +122,18 @@ class MessageDetail extends Component
         unset($this->form['typedMessage']);
         $this->addError('success', 'پیام با موفقیت ارسال شد');
         $this->fetchData['messages'] = $this->fetchData['appOnline']->messages;
+        if(isset($this->form['sendSms']) && $this->form['sendSms'] == true ) {
+            $template = setting(SettingKeyEnum::SMS_FOR_SEND_MESSAGE_IN_CHATS) ;
+            if(isset($template)) {
+                $messageLink = 'https://webapp.mata-app.com'. (\App\Enum\RouteEnum::ONLINE_MESSAGE->getLink($this->fetchData['appOnline']->id)) ;
+                   $shortLink =  $this->fetchData['appOnline']->shortLink()->create([
+                        'link_code' => ShortLink::generateShortLinkCode(),
+                        'link_url'  => $messageLink,
+                    ]);
+                $this->fetchData['user']->notify(new UserSmsNotification($template,url('/s/' . $shortLink->link_code)));
+            }
+            unset($this->form['sendSms']);
+        }
         try {
             $this->fetchData['user']->notify(new \Modules\User\Notifications\UserMessageNotification(
                 title: "پیام جدید برای نوبت آنلاین!",

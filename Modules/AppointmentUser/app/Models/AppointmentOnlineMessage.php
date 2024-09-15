@@ -68,13 +68,12 @@ class AppointmentOnlineMessage extends Model
     }
     public function hasAnswer()
     {
-        if($this->online?->messages?->last()?->answer_by != null) {
-           return true;
-        }
-        return false ;
+        return $this->online?->messages?->contains(function($message) {
+            return $message->answer_by != null;
+        });
     }
     public function findAwnswerer():string {
-        $awnsered_by =  $this->online?->messages?->last() ;
-        return $awnsered_by->answerBy?->full_name ?? '';
+        $answer_by =  $this->online?->messages?->firstWhere('answer_by', '!=', null); 
+        return $answer_by->answerBy?->full_name ?? '';
     }
 }

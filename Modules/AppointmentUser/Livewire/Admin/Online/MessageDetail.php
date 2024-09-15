@@ -246,6 +246,9 @@ class MessageDetail extends Component
         $this->fetchData['appOnline']->appointmentUser()->update(['status' => AppointmentUserStatusEnum::STATUS_ONILNE_CLOSED]);
         return redirect()->route('admin.appointment_user.message.detail', ['onlineAppId' => $this->fetchData['appOnline']->id])->with('success', 'وضعیت نوبت به تمام شده ، تغییر پیدا کرد');
     }
+    public function updateComponent() {
+        $this->render();
+    }
     public function mount()
     {
         $this->fetchData['appOnline'] = AppointmentOnline::find(request()->route('onlineAppId'));

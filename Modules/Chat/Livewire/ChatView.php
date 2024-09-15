@@ -8,6 +8,7 @@ use App\Models\ShortLink;
 use Livewire\Attributes\On;
 use Livewire\Attributes\Url;
 use Livewire\WithPagination;
+use Livewire\WithFileUploads;
 use App\Events\PusherBroadcast;
 use Livewire\Attributes\Computed;
 use Modules\Chat\app\Models\Chat;
@@ -23,7 +24,7 @@ use Modules\Api\app\Resources\Api\Chat\ChatDetailResource;
 
 class ChatView extends Component
 {
-    use WithPagination;
+    use WithPagination,WithFileUploads;
 
     #[Url]
     public int $chatId = 0;
@@ -110,7 +111,7 @@ class ChatView extends Component
 
     public function sendMessage()
     {
-        if (empty($this->chatMessage) && ! isset($this->form['file'])) {
+        if (empty($this->chatMessage) && ! isset($this->form['file']) && ! isset($this->form['capturedPic'])) {
             $this->dispatch('error', message: 'متن پیام خود را وارد کنید.');
             return;
         }
@@ -152,6 +153,49 @@ class ChatView extends Component
             ChatDetailsFile::create($fileModel);
             unset($this->form['file']);
             $this->addError('success', 'پیام با موفقیت ارسال شد');
+        }elseif(isset($this->form['capturedPic'])) 
+        {
+            $chatDetail = $this->chat?->chatDetails()->create([
+                'content' => $this->ImgMessg,
+                'type' => ChatDetailTypeEnum::ADMIN_MESSAGE,
+                'user_id' => auth()->id(),
+            ]);
+            
+            // Store the captured image and get the full path
+            $filePath = $this->form['capturedPic']->store('public/uploads');
+            
+            // Strip the 'public/' part to store a relative path
+            $filePath = str_replace('public/', '', $filePath);
+            
+            // Get the file name
+            $fileName = basename($filePath);
+            
+            // Get the file extension
+            $extension = pathinfo($fileName, PATHINFO_EXTENSION);
+            
+            // Define the disk being used (assumed 'public')
+            $fileDisk = 'public';
+            
+            // Prepare the file model for saving in the database
+            $fileModel = [
+                'user_id' => $this->chat?->user->id,
+                'answer_by' => auth()->user()->id,
+                'chat_detail_id' => $chatDetail->id,
+                'original_name' => $fileName,
+                'server_name' => $fileName,
+                'disk' => $fileDisk,
+                'path' => $filePath, // Now it's relative, like in the first method
+                'extension' => $extension,
+                'mime' => $extension,
+                'size' => $this->form['capturedPic']->getSize(),
+            ];
+            
+            // Store the file record in the database
+            ChatDetailsFile::create($fileModel);
+            
+            // Clear the form after submission
+            unset($this->form['capturedPic']);
+        
         }else{
             unset($this->form['typedMessage']);
             $this->addError('success', 'پیام با موفقیت ارسال شد');
@@ -190,12 +234,12 @@ class ChatView extends Component
         }
         //send notification
         try {
-            $this->chat->user->notify(new \Modules\User\Notifications\UserMessageNotification(
-                title: "پیام جدید برای پشتیبانی !",
-                excerpt: $notificationMessage,
-                message: '',
-                link: \App\Enum\RouteEnum::ONLINE_MESSAGE->getLink($this->chat->id),
-            ));
+            // $this->chat->user->notify(new \Modules\User\Notifications\UserMessageNotification(
+            //     title: "پیام جدید برای پشتیبانی !",
+            //     excerpt: $notificationMessage,
+            //     message: '',
+            //     link: \App\Enum\RouteEnum::ONLINE_MESSAGE->getLink($this->chat->id),
+            // ));
         } catch (\Throwable $th) {
         }
 
@@ -237,6 +281,11 @@ class ChatView extends Component
     public function showFilteredChat($value)
     {
         $this->filterStatus = $value;
+    }
+    public function updated($properyty) {
+        if($properyty == 'form.capturedPic'){
+            $this->dispatch('picUploade',true);
+        }
     }
     public function render()
     {

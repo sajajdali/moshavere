@@ -249,6 +249,11 @@ class MessageDetail extends Component
     public function updateComponent() {
         $this->render();
     }
+    public function updated($properyty) {
+        if($properyty == 'form.capturedPic'){
+            $this->dispatch('picUploade',true);
+        }
+    }
     public function mount()
     {
         $this->fetchData['appOnline'] = AppointmentOnline::find(request()->route('onlineAppId'));

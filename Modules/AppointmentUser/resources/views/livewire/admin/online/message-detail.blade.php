@@ -11,6 +11,12 @@
             </div>
         </div>
     </div>
+    <div id="loading-spinner" class="d-none">
+        <div class="loading-overlay d-flex align-items-center justify-content-center">
+            <div class="spinner-border text-primary" role="status">
+            </div>
+        </div>
+    </div>
     <!-- PAGE-HEADER END -->
     @include('admin::layouts.components.alert')
     @error('success')
@@ -304,7 +310,7 @@
                                         <i class="fa fa-camera" aria-hidden="true"></i>
                                         @endif
                                     </button>
-                                    <input type="file" accept="image/*" capture="environment" id="cameraInput" wire:model.live='form.capturedPic'
+                                    <input type="file" accept="image/*" capture="environment" id="cameraInput" wire:model='form.capturedPic'
                                         style="display:none;" />
                                 </div>
                                 <textarea rows="3" class="form-control mt-5 ms-1 @error('form.typedMessage') is-invalid @enderror"
@@ -436,9 +442,17 @@
                 // Trigger the file input click event to open the camera
                 document.getElementById('cameraInput').click();
             });
-            // document.getElementById('cameraInput').addEventListener('change', function(event) {
-            //     const file = event.target.files[0];
-            // });
+            document.getElementById('cameraInput').addEventListener('change', function(event) {
+                const file = event.target.files[0];
+                if(file) {
+                    $('#loading-spinner').removeClass('d-none');
+                    $('#loading-spinner').fadeIn();
+                }
+            });
+            Livewire.on('picUploade',function(){
+                $('#loading-spinner').fadeOut();
+                $('#loading-spinner').addClass('d-none');
+            });
         });
     </script>
 @endpush

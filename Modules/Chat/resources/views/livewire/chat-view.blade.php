@@ -336,12 +336,10 @@
             Livewire.on('chatRoomSelected', function () {
                 scroll();
             });
-
-            document.getElementById('cameraButton').addEventListener('click', function() {
-                // Trigger the file input click event to open the camera
-                document.getElementById('cameraInput').click();
+            $('body').on('click','#cameraButton',function(){
+                $('#cameraInput').click();
             });
-            document.getElementById('cameraInput').addEventListener('change', function(event) {
+            $('body').on('change','#cameraInput',function(event){
                 const file = event.target.files[0];
                 if(file) {
                     $('#loading-spinner').removeClass('d-none');

@@ -18,7 +18,6 @@ use Modules\AppointmentUser\app\Models\AppointmentUser;
 use Modules\Transaction\app\Models\Transaction;
 use Modules\Transaction\Enum\TransactionPaidEnum;
 use Modules\Transaction\Enum\TransactionStatusEnum;
-use Modules\User\app\Notifications\UserSmsNotification;
 use Modules\AppointmentUser\Enum\model\AppointmentModel;
 use Modules\AppointmentUser\app\Models\AppointmentOnline;
 use Modules\AppointmentUser\Enum\AppointmentUserKindEnum;
@@ -27,7 +26,6 @@ use Modules\AppointmentUser\Enum\AppointmentUserStatusEnum;
 use Modules\AppointmentUser\Enum\model\UserModelAppointment;
 use Modules\AppointmentSetting\app\Models\AppointmentSetting;
 use Modules\AppointmentUser\app\Events\StoreAppointmentEvent;
-use Modules\AppointmentUser\Enum\AppointmentOnlineStatusEnum;
 use Modules\AppointmentUser\app\Notifications\AppointmentSmsNotification;
 use Modules\AppointmentUser\app\Notifications\AppointmentDocAndOperatorNotification;
 

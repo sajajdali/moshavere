@@ -2,7 +2,9 @@
 
 namespace Modules\Chat\app\Models;
 
+use App\Models\ShortLink;
 use Modules\User\Entities\User;
+use Modules\Chat\app\Models\Chat;
 use Modules\Chat\Enum\ChatStatusEnum;
 use Illuminate\Database\Eloquent\Model;
 use Modules\Chat\app\Models\ChatDetail;
@@ -74,6 +76,10 @@ class Chat extends Model
     {
         //get excerpt of latest message
         return $this->chatDetails->last()?->content;
+    }
+    public function shortLink(): \Illuminate\Database\Eloquent\Relations\MorphOne
+    {related:
+        return $this->morphOne(ShortLink::class, 'shortlinkable');
     }
 
 }

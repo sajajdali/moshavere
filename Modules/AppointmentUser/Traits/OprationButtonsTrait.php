@@ -193,7 +193,7 @@ trait OprationButtonsTrait
         ]);
         $smsTemplate = setting(SettingKeyEnum::SMS_FEEDBACK);
         if (isset($smsTemplate)) {
-            $appointmentUser->notify(new AppointmentUserFeedbackSmsnotification($smsTemplate, $link_code));
+            $appointmentUser->notify(new AppointmentUserFeedbackSmsnotification(template: $smsTemplate, link_code: $link_code));
 
         }
         Cache::forget('appointmentList.' . $appointmentUser->id);

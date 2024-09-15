@@ -27,13 +27,14 @@
                     <div class="main-content-app" style="overflow-y: hidden ; overflow-x: hidden">
                         <div class="text-center chat-image p-4 pb-0 mb-4 br-5">
                             <div class="rounded-circle chat-profile">
-                                <a class="rounded-circle" href="{{route('admin.user.document',['user'=>$fetchData['user']->id])}}">
+                                <a class="rounded-circle"
+                                    href="{{ route('admin.user.document', ['user' => $fetchData['user']->id]) }}">
                                     <img alt="profile-avatar" src="{{ $fetchData['user']->avatar }}"
                                         class="avatar avatar-xl rounded-circle">
                                 </a>
                             </div>
                             <div class="main-chat-msg-name">
-                                <a href="{{route('admin.user.document',['user'=>$fetchData['user']->id])}}">
+                                <a href="{{ route('admin.user.document', ['user' => $fetchData['user']->id]) }}">
                                     <h5 class="mb-1 text-dark fw-semibold mb-1">{{ $fetchData['user']->fullname }}</h5>
                                 </a>
                                 <small class="me-3">تاریخ نوبت</small>
@@ -92,22 +93,27 @@
                             <div class="border-top mt-3">
                                 @if (
                                     $this->fetchData['appOnline']->status == Modules\AppointmentUser\Enum\AppointmentOnlineStatusEnum::REJECT ||
-                                    $this->fetchData['appOnline']->status == Modules\AppointmentUser\Enum\AppointmentOnlineStatusEnum::COMPLETED_BY_DOCTOR ||
+                                        $this->fetchData['appOnline']->status ==
+                                            Modules\AppointmentUser\Enum\AppointmentOnlineStatusEnum::COMPLETED_BY_DOCTOR ||
                                         $this->fetchData['appOnline']->status == Modules\AppointmentUser\Enum\AppointmentOnlineStatusEnum::CANCEL)
                                 @else
                                     <div class="mt-3 d-flex flex-column justify-content-start">
-                                        <button class="btn btn-primary rounded-full mb-4 py-2"
-                                            wire:click='closeApp()' wire:confirm='از بستن چت مطمعن هستید؟' type="button">
+                                        <button class="btn btn-primary rounded-full mb-4 py-2" wire:click='closeApp()'
+                                            wire:confirm='از بستن چت مطمعن هستید؟' type="button">
                                             <i class="fa fa-check me-1" aria-hidden="true"></i>
                                             اتمام ویزیت و بستن چت
                                         </button>
-                                        <button class="btn btn-danger rounded-full " style="background-color: #d77377 !important"
-                                            wire:click='cancelAppointment()' wire:confirm='میخواهید این نوبت را کنسل کنید؟' type="button"> <i
+                                        <button class="btn btn-danger rounded-full "
+                                            style="background-color: #d77377 !important"
+                                            wire:click='cancelAppointment()'
+                                            wire:confirm='میخواهید این نوبت را کنسل کنید؟' type="button"> <i
                                                 class="fa fa-times font-bold" aria-hidden="true"></i> کنسل کردن نوبت
                                         </button>
                                         <button class="btn btn-danger mt-3 my-2 rounded-full "
-                                            wire:click='cancelAppointment()' wire:confirm='میخواهید این نوبت را کنسل کنید؟' type="button"> <i
-                                                class="fa fa-times font-bold" aria-hidden="true"></i> کنسل کردن به همراه بازگشت وجه
+                                            wire:click='cancelAppointment()'
+                                            wire:confirm='میخواهید این نوبت را کنسل کنید؟' type="button"> <i
+                                                class="fa fa-times font-bold" aria-hidden="true"></i> کنسل کردن به همراه
+                                            بازگشت وجه
                                         </button>
                                     </div>
                                 @endif
@@ -123,16 +129,17 @@
                     <div class="main-content-body main-content-body-chat h-100">
                         <div class="main-chat-header pt-3 d-block d-sm-flex">
                             <div class="main-img-user online">
-                                <a href="{{route('admin.user.document',['user'=>$fetchData['user']->id])}}">
+                                <a href="{{ route('admin.user.document', ['user' => $fetchData['user']->id]) }}">
                                     <img alt="avatar" src="{{ $fetchData['user']->avatar }}">
                                 </a>
                             </div>
                             <div class="main-chat-msg-name mt-2">
                                 <p class="mb-0">
-                                    <a class="text-dark" href="{{route('admin.user.document',['user'=>$fetchData['user']->id])}}">
+                                    <a class="text-dark"
+                                        href="{{ route('admin.user.document', ['user' => $fetchData['user']->id]) }}">
                                         {{ $fetchData['user']->fullname }}
                                     </a>
-                                    </p>
+                                </p>
                                 <span class="dot-label bg-success"></span>
                                 <small class="me-3">
                                     {{ isset($this->fetchData['messages']) && !empty($this->fetchData['messages']) && $this->fetchData['messages']->isNotEmpty() ? $this->fetchData['messages']->last()->seen->getName() : 'بدون پیام' }}
@@ -177,7 +184,28 @@
                                                         <div class="main-msg-wrapper">
                                                             @if ($message->messageFile()->count())
                                                                 @foreach ($message->messageFile as $file)
-                                                                    @if (in_array($file->mime, ['jpg','image/png', 'jpeg','image/jpeg', 'png','image/png', 'gif','image/gif', 'webp','image/webp', 'bmp','image/bmp', 'svg','image/svg' ,'tiff','image/tiff', 'heic','image/heic', 'heif','image/heif']))
+                                                                    @if (in_array($file->mime, [
+                                                                            'jpg',
+                                                                            'image/png',
+                                                                            'jpeg',
+                                                                            'image/jpeg',
+                                                                            'png',
+                                                                            'image/png',
+                                                                            'gif',
+                                                                            'image/gif',
+                                                                            'webp',
+                                                                            'image/webp',
+                                                                            'bmp',
+                                                                            'image/bmp',
+                                                                            'svg',
+                                                                            'image/svg',
+                                                                            'tiff',
+                                                                            'image/tiff',
+                                                                            'heic',
+                                                                            'image/heic',
+                                                                            'heif',
+                                                                            'image/heif',
+                                                                        ]))
                                                                         <a href="{{ Storage::url($file->disk . '/' . $file->path) }}"
                                                                             data-fancybox="gallery"
                                                                             data-caption="{{ $file->original_name }}">
@@ -190,7 +218,8 @@
                                                                             src="{{ Storage::url($file->disk . '/' . $file->path) }}"
                                                                             controls preload="auto"></audio>
                                                                     @endif
-                                                                    <div class="main-msg-wrapper" data-id ={{$file->id}}>
+                                                                    <div class="main-msg-wrapper"
+                                                                        data-id={{ $file->id }}>
                                                                         <a class="text-dark"
                                                                             href="{{ Storage::url($file->disk . '/' . $file->path) }}">
                                                                             <span class="fs-13 mt-1"> دانلود
@@ -211,7 +240,8 @@
                                                 </div>
                                             @endif
                                             @if ($message->body != null)
-                                                <div class="@if ($message->type == Modules\AppointmentUser\Enum\AppointmentOnlineMessageTypeEnum::ANSWER) media chat-left
+                                                <div
+                                                    class="@if ($message->type == Modules\AppointmentUser\Enum\AppointmentOnlineMessageTypeEnum::ANSWER) media chat-left
                                                     @else  media flex-row-reverse chat-right @endif">
                                                     <div class="main-img-user online">
                                                         <img alt="avatar" src="{{ $message->user->avatar }}">
@@ -237,7 +267,8 @@
                                 @endif
                             </div>
                         </div>
-                        <div class="main-chat-footer d-flex justify-content-center pt-5">
+                        <div class="main-chat-footer d-flex justify-content-center pt-5"
+                            style="padding-top :40px !important;">
                             @if ($this->fetchData['appOnline']->status == Modules\AppointmentUser\Enum\AppointmentOnlineStatusEnum::PENDING)
                                 <button type="button" class="btn btn-success ms-2" wire:click='approvedAppointment'
                                     wire:loading.class='btn-loading btn-gray' wire:target='approvedAppointment'> تایید
@@ -252,35 +283,51 @@
                                 <div class="col-md-12 alert alert-danger fade show mt-4 ms-3" role="alert">
                                     نوبت رد شده است!
                                 </div>
-                                @elseif($this->fetchData['appOnline']->status == Modules\AppointmentUser\Enum\AppointmentOnlineStatusEnum::COMPLETED_BY_DOCTOR)
+                            @elseif(
+                                $this->fetchData['appOnline']->status ==
+                                    Modules\AppointmentUser\Enum\AppointmentOnlineStatusEnum::COMPLETED_BY_DOCTOR)
                                 <div class="col-md-12 alert alert-primary fade show mt-4 ms-3" role="alert">
                                     نوبت توسط پزشک پاسخ داده شده است و بسته شده!!
                                 </div>
                             @elseif ($this->fetchData['appOnline']->status != Modules\AppointmentUser\Enum\AppointmentOnlineStatusEnum::REJECT)
-                            {{-- TODO::VOICE js class activate --}}
+                                {{-- TODO::VOICE js class activate --}}
                                 <button type="button" class="btn btn-secondary ms-2" data-bs-toggle="modal"
                                     data-bs-target="#soundRecorderModal">
                                     <i class="fa fa-microphone fa-xl" aria-hidden="true"></i>
                                 </button>
-                                <input class="form-control ms-2 @error('form.typedMessage') is-invalid @enderror"
-                                    wire:model='form.typedMessage'
-                                       wire:keydown.enter="sendMessage"
-                                    placeholder="@error('form.typedMessage') {{ $message }} @else متن خود را یادداشت کنید @enderror"
-                                    type="text">
-                                <button data-bs-target="#file-selector-modal" data-bs-toggle="modal" class="btn btn-light mx-3 d-flex justify-content-center p-1 py-2"
-                                    href="javascript:void(0)">
-                                    @if (isset($form['file']))
-                                        <i class="fa fa-check" aria-hidden="true"></i>
-                                    @else
-                                        <i class="fe fe-camera"></i>
-                                    @endif
-                                </button>
-                                <button wire:click='sendMessage' wire:target='sendMessage'
-                                    wire:loading.class='btn-loading' wire:loading.attr='disabeld' type="button"
-                                    class="btn btn-icon btn-primary brround"><i
-                                        class="fa fa-paper-plane-o"></i></button>
+                                <textarea rows="3" class="form-control mt-5 ms-2 @error('form.typedMessage') is-invalid @enderror"
+                                    wire:model='form.typedMessage' wire:keydown.enter="sendMessage"
+                                    placeholder="@error('form.typedMessage') {{ $message }} @else متن خود را یادداشت کنید @enderror"></textarea>
+                                <div class="d-flex flex-column align-items-center mt-5">
+                                    <button wire:click='sendMessage' wire:target='sendMessage'
+                                        wire:loading.class='btn-loading' wire:loading.attr='disabeld' type="button"
+                                        class="btn btn-icon btn-primary brround mb-2"><i
+                                            class="fa fa-paper-plane-o"></i></button>
+                                    <button data-bs-target="#file-selector-modal" data-bs-toggle="modal"
+                                        class="btn btn-light mx-3 d-flex justify-content-center p-1 py-2"
+                                        href="javascript:void(0)">
+                                        @if (isset($form['file']))
+                                            <i class="fa fa-check" aria-hidden="true"></i>
+                                        @else
+                                            <i class="fe fe-camera"></i>
+                                        @endif
+                                    </button>
+                                </div>
                             @endif
-                            <nav class="nav"></nav>
+                            <nav class="nav">
+                            </nav>
+                        </div>
+                        <div class="row mt-5  pt-1 pt-sm-4">
+                            <div class="col-12">
+                                <span class="rounded-pill ms-1 mt-1 d-flex align-item-center">
+                                    <div class="material-switch">
+                                        <input wire:model='form.sendSms' id="sendSms" name="siwtch04"
+                                            type="checkbox" />
+                                        <label for="sendSms" class="label-info"></label>
+                                    </div>
+                                    <p class="card-sub-title">ارسال پیامک به کاربر</p>
+                                </span>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -306,7 +353,7 @@
     <!-- Include Fancybox JS -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/fancybox/3.5.7/jquery.fancybox.min.js"></script>
 
-   <script>
+    <script>
         $(document).ready(function() {
             $('[data-fancybox="gallery"]').fancybox({
                 buttons: [
@@ -323,15 +370,20 @@
                 @this.set('form.file', param.url);
                 $('#file-selector-modal').modal('hide');
             });
-            $('#ChatBody').scrollTop($('#ChatBody')[0].scrollHeight);
 
+            function scrollToEndOfchat() {
+                setTimeout(() => {
+                    $('#ChatBody').animate({
+                        scrollTop: $('#ChatBody')[0].scrollHeight
+                    }, 600); 
+                }, 100);
+            }
+            scrollToEndOfchat();
             Livewire.on('sendMessage', function() {
-                $('#ChatBody').scrollTop($('#ChatBody')[0].scrollHeight);
+                scrollToEndOfchat();
             });
             Livewire.on('ignoreSearch', function() {
-                setTimeout(() => {
-                    $('#ChatBody').scrollTop($('#ChatBody')[0].scrollHeight);
-                }, 500);
+                scrollToEndOfchat();
             });
             Livewire.on('fileHasUpload', function() {
                 var myModalEl = document.getElementById('soundRecorderModal');

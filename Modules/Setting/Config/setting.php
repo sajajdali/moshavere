@@ -20,6 +20,7 @@ $setting = [
             \Modules\Setting\Enum\SettingKeyEnum::SMS_DIS_APPROVED_MONITORING_APPOINTMENT,
             \Modules\Setting\Enum\SettingKeyEnum::SMS_FEEDBACK,
             \Modules\Setting\Enum\SettingKeyEnum::SMS_AFTER_REFUND,
+            \Modules\Setting\Enum\SettingKeyEnum::SMS_FOR_SEND_MESSAGE_IN_CHATS,
 
         ],
     ],

@@ -2,11 +2,12 @@
 
 namespace Modules\AppointmentUser\app\Models;
 
+use App\Models\ShortLink;
+use Modules\User\Entities\User;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Modules\AppointmentSetting\app\Models\AppointmentSetting;
 use Modules\AppointmentUser\Enum\AppointmentOnlineStatusEnum;
-use Modules\User\Entities\User;
 
 class AppointmentOnline extends Model
 {
@@ -67,5 +68,8 @@ class AppointmentOnline extends Model
     {
         return json_encode($value, JSON_UNESCAPED_UNICODE);
     }
-
+    public function shortLink(): \Illuminate\Database\Eloquent\Relations\MorphOne
+    {
+        return $this->morphOne(ShortLink::class, 'shortlinkable');
+    }
 }

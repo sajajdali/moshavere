@@ -291,11 +291,24 @@
                                 </div>
                             @elseif ($this->fetchData['appOnline']->status != Modules\AppointmentUser\Enum\AppointmentOnlineStatusEnum::REJECT)
                                 {{-- TODO::VOICE js class activate --}}
-                                <button type="button" class="btn btn-secondary ms-2" data-bs-toggle="modal"
-                                    data-bs-target="#soundRecorderModal">
-                                    <i class="fa fa-microphone fa-xl" aria-hidden="true"></i>
-                                </button>
-                                <textarea rows="3" class="form-control mt-5 ms-2 @error('form.typedMessage') is-invalid @enderror"
+                                <div class="d-flex flex-column align-items-center mt-5">
+                                    <button type="button" class="btn btn-secondary " data-bs-toggle="modal"
+                                        data-bs-target="#soundRecorderModal">
+                                        <i class="fa fa-microphone fa-xl" aria-hidden="true"></i>
+                                    </button>
+                                    <!-- Camera Button -->
+                                    <button class="btn @if (isset($form['capturedPic'])) btn-success @else  btn-light @endif mx-3 d-flex justify-content-center p-1 py-2 mt-2"  id="cameraButton" 
+                                    @if (isset($form['capturedPic'])) disabled @endif>
+                                        @if (isset($form['capturedPic']))
+                                        <i class="fa fa-check" aria-hidden="true"></i>
+                                        @else
+                                        <i class="fa fa-camera" aria-hidden="true"></i>
+                                        @endif
+                                    </button>
+                                    <input type="file" accept="image/*" capture="environment" id="cameraInput" wire:model='form.capturedPic'
+                                        style="display:none;" />
+                                </div>
+                                <textarea rows="3" class="form-control mt-5 ms-1 @error('form.typedMessage') is-invalid @enderror"
                                     wire:model='form.typedMessage' wire:keydown.enter="sendMessage"
                                     placeholder="@error('form.typedMessage') {{ $message }} @else متن خود را یادداشت کنید @enderror"></textarea>
                                 <div class="d-flex flex-column align-items-center mt-5">
@@ -309,7 +322,7 @@
                                         @if (isset($form['file']))
                                             <i class="fa fa-check" aria-hidden="true"></i>
                                         @else
-                                            <i class="fe fe-camera"></i>
+                                        <i class="fa fa-file" aria-hidden="true"></i>
                                         @endif
                                     </button>
                                 </div>
@@ -375,7 +388,7 @@
                 setTimeout(() => {
                     $('#ChatBody').animate({
                         scrollTop: $('#ChatBody')[0].scrollHeight
-                    }, 600); 
+                    }, 600);
                 }, 100);
             }
             scrollToEndOfchat();
@@ -419,6 +432,13 @@
                     $("#secound_loading").removeClass('d-none').addClass('d-block');
                     Fr.voice.export(upload, "blob");
                 }
+            });
+            document.getElementById('cameraButton').addEventListener('click', function() {
+                // Trigger the file input click event to open the camera
+                document.getElementById('cameraInput').click();
+            });
+            document.getElementById('cameraInput').addEventListener('change', function(event) {
+                const file = event.target.files[0];
             });
         });
     </script>

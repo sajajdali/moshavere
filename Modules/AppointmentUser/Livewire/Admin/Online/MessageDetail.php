@@ -10,6 +10,7 @@ use Livewire\Attributes\Url;
 use Livewire\Attributes\Computed;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Storage;
+use Livewire\WithFileUploads;
 use Modules\Setting\Enum\SettingKeyEnum;
 use Modules\AppointmentUser\app\Models\AppointmentUser;
 use Modules\User\app\Notifications\UserSmsNotification;
@@ -24,6 +25,7 @@ use Modules\AppointmentUser\app\Notifications\AppointmentUserFeedbackSmsnotifica
 
 class MessageDetail extends Component
 {
+    use WithFileUploads;
     #[Url]
     public $search;
     public array $form = [];
@@ -76,7 +78,7 @@ class MessageDetail extends Component
     public function sendMessage()
     {
         $this->validate([
-            'form.typedMessage' => 'required_without:form.file',
+            'form.typedMessage' => 'required_without_all:form.file,form.capturedPic',
         ]);
         $model = [
             'appointment_online_id' =>  $this->fetchData['appOnline']->id,
@@ -115,22 +117,44 @@ class MessageDetail extends Component
                 'mime' => $extension,
                 'size' => 1,
             ];
-            AppointmentOnlineMessageFile::create($fileModel);
+            AppointmentOnlineMessageFile::create(attributes: $fileModel);
             unset($this->form['file']);
+        }
+        if (isset($this->form['capturedPic'])) 
+        {
+            $filePath = $this->form['capturedPic']->store('public/uploads');
+            $fileName = basename($filePath);
+            $extension = pathinfo($fileName, PATHINFO_EXTENSION);
+            $fileMime = Storage::mimeType($filePath);
+            $fileDisk = 'public';
+            $fileModel = [
+                'user_id' => $this->fetchData['user']->id,       // Set the user ID
+                'answer_by' => auth()->user()->id,              // Authenticated user (answerer)
+                'fk_id' => $AOM->id,                            // Foreign key to appointment/message
+                'original_name' => $fileName,                   // Original file name
+                'server_name' => $fileName,                     // Name used in storage (same in this case)
+                'disk' => $fileDisk,                            // Disk used for storage
+                'path' => str_replace('public/', '', $filePath), // File path relative to storage
+                'extension' => $extension,                      // File extension (jpg, png, etc.)
+                'mime' => $fileMime,                            // MIME type (e.g., image/jpeg)
+                'size' => $this->form['capturedPic']->getSize(), // File size (in bytes)
+            ];
+            AppointmentOnlineMessageFile::create($fileModel);
+            unset($this->form['capturedPic']);
         }
         $notificationMessage =  isset($this->form['typedMessage']) ? substr($this->form['typedMessage'], 0, 50) : 'یک پیام جدید دارید';
         unset($this->form['typedMessage']);
         $this->addError('success', 'پیام با موفقیت ارسال شد');
         $this->fetchData['messages'] = $this->fetchData['appOnline']->messages;
-        if(isset($this->form['sendSms']) && $this->form['sendSms'] == true ) {
-            $template = setting(SettingKeyEnum::SMS_FOR_SEND_MESSAGE_IN_CHATS) ;
-            if(isset($template)) {
-                $messageLink = 'https://webapp.mata-app.com'. (\App\Enum\RouteEnum::ONLINE_MESSAGE->getLink($this->fetchData['appOnline']->id)) ;
-                   $shortLink =  $this->fetchData['appOnline']->shortLink()->create([
-                        'link_code' => ShortLink::generateShortLinkCode(),
-                        'link_url'  => $messageLink,
-                    ]);
-                $this->fetchData['user']->notify(new UserSmsNotification($template,url('/s/' . $shortLink->link_code)));
+        if (isset($this->form['sendSms']) && $this->form['sendSms'] == true) {
+            $template = setting(SettingKeyEnum::SMS_FOR_SEND_MESSAGE_IN_CHATS);
+            if (isset($template)) {
+                $messageLink = 'https://webapp.mata-app.com' . (\App\Enum\RouteEnum::ONLINE_MESSAGE->getLink($this->fetchData['appOnline']->id));
+                $shortLink =  $this->fetchData['appOnline']->shortLink()->create([
+                    'link_code' => ShortLink::generateShortLinkCode(),
+                    'link_url'  => $messageLink,
+                ]);
+                $this->fetchData['user']->notify(new UserSmsNotification($template, url('/s/' . $shortLink->link_code)));
             }
             unset($this->form['sendSms']);
         }

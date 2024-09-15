@@ -8,7 +8,6 @@
     <div wire:loading>
         <div class="loading-overlay d-flex align-items-center justify-content-center">
             <div class="spinner-border text-primary" role="status">
-                <span class="sr-only">Loading...</span>
             </div>
         </div>
     </div>
@@ -439,6 +438,9 @@
             });
             document.getElementById('cameraInput').addEventListener('change', function(event) {
                 const file = event.target.files[0];
+                if(file){
+                    @this.render();
+                }
             });
         });
     </script>

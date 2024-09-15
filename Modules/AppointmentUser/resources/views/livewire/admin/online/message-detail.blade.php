@@ -436,12 +436,9 @@
                 // Trigger the file input click event to open the camera
                 document.getElementById('cameraInput').click();
             });
-            document.getElementById('cameraInput').addEventListener('change', function(event) {
-                const file = event.target.files[0];
-                if(file){
-                    @this.updateComponent();
-                }
-            });
+            // document.getElementById('cameraInput').addEventListener('change', function(event) {
+            //     const file = event.target.files[0];
+            // });
         });
     </script>
 @endpush

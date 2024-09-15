@@ -304,7 +304,7 @@
                                         <i class="fa fa-camera" aria-hidden="true"></i>
                                         @endif
                                     </button>
-                                    <input type="file" accept="image/*" capture="environment" id="cameraInput" wire:model='form.capturedPic'
+                                    <input type="file" accept="image/*" capture="environment" id="cameraInput" wire:model.live='form.capturedPic'
                                         style="display:none;" />
                                 </div>
                                 <textarea rows="3" class="form-control mt-5 ms-1 @error('form.typedMessage') is-invalid @enderror"

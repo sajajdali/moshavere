@@ -173,7 +173,7 @@ class MessageDetail extends Component
     public function messages()
     {
         return [
-            'form.typedMessage.required_without' => 'لطفا پیام را وارد کنید',
+            'form.typedMessage.required_without_all' => 'لطفا پیام را وارد کنید',
         ];
     }
     #[Computed]

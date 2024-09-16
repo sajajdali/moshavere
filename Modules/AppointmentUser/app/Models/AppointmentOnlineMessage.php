@@ -72,8 +72,9 @@ class AppointmentOnlineMessage extends Model
             return $message->answer_by != null;
         });
     }
-    public function findAwnswerer():string {
-        $answer_by =  $this->online?->messages?->firstWhere('answer_by', '!=', null); 
+    public function findAwnswerer():string
+    {
+        $answer_by =  $this->online?->messages?->reverse()->firstWhere('answer_by', '!=', null);
         return $answer_by->answerBy?->full_name ?? '';
     }
 }

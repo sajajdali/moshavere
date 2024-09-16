@@ -125,6 +125,14 @@ $setting = [
             \Modules\Setting\Enum\SettingKeyEnum::ABOUT_US_FOURTH_SECTION_IMAGE,
         ],
     ],
+    'Online_appointment' => [
+        'title' => 'نوبت آنلاین',
+        'icon' => 'fa fa-desktop',
+        'settings' => [
+            \Modules\Setting\Enum\SettingKeyEnum::ONILNE_SEND_ATUOMATIC_MESSAGE_STATUS,
+            \Modules\Setting\Enum\SettingKeyEnum::ONILNE_SEND_ATUOMATIC_MESSAGE_MESSAGE,
+        ],
+    ],
 ];
 
 return $setting;

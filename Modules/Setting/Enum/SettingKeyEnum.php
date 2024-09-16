@@ -93,6 +93,10 @@ enum SettingKeyEnum: int implements EnumHasNameInterface, SettingTypeInterface, 
     case CONTACTUS_FORM_ADDRESS = 214;
     case CONTACTUS_FORM_SUPPORT_EMAIL = 215;
 
+    // onlineApp
+    case ONILNE_SEND_ATUOMATIC_MESSAGE_STATUS = 350 ;
+    case ONILNE_SEND_ATUOMATIC_MESSAGE_MESSAGE = 351 ;
+
     public function isSupportCache(): bool
     {
         return match ($this) {
@@ -185,6 +189,10 @@ enum SettingKeyEnum: int implements EnumHasNameInterface, SettingTypeInterface, 
             self::ABOUT_US_FOURTH_SECTION_DESCRIPTION => 'توضیحات بخش چهارم',
             self::ABOUT_US_FOURTH_SECTION_IMAGE => 'تصویر بخش چهارم',
 
+
+            // ONLINE APP
+            self::ONILNE_SEND_ATUOMATIC_MESSAGE_STATUS => 'ارسال پیام خودکار بعد از ثبت نوبت',
+            self::ONILNE_SEND_ATUOMATIC_MESSAGE_MESSAGE => 'متن پیام',
             default => ''
         };
     }
@@ -235,6 +243,7 @@ enum SettingKeyEnum: int implements EnumHasNameInterface, SettingTypeInterface, 
             self::DEFAULT_EXERCISE_STATUS => SettingTypeEnum::SELECT,
             self::PAYMEN_ACTIVE_DRIVER => SettingTypeEnum::SELECT,
             self::APPOINTMENT_MORE_THAT_ONE_PER_DAY => SettingTypeEnum::CHECK,
+            self::ONILNE_SEND_ATUOMATIC_MESSAGE_STATUS => SettingTypeEnum::CHECK,
             self::APPOINTMENT_SET_APPOINTMENT_WITH_DOCUMENT_NUMBER => SettingTypeEnum::CHECK,
             self::SHOW_FALSE_APPOINTMENT_STATUS => SettingTypeEnum::CHECK,
             self::PAYMENT_PAYSTAR_STATUS => SettingTypeEnum::CHECK,
@@ -260,6 +269,7 @@ enum SettingKeyEnum: int implements EnumHasNameInterface, SettingTypeInterface, 
             self::CONTACTUS_FORM_ADDRESS => SettingTypeEnum::TEXTAREA,
             self::FOOTER_DESCRIPTION => SettingTypeEnum::TEXTAREA,
 
+            self::ONILNE_SEND_ATUOMATIC_MESSAGE_MESSAGE => SettingTypeEnum::TEXTAREA,
             self::ABOUT_US_FIRST_SECTION_DESCRIPTION => SettingTypeEnum::TEXTAREA,
             self::ABOUT_US_SECEND_SECTION_DESCRIPTION => SettingTypeEnum::TEXTAREA,
             self::ABOUT_US_THIRD_SECTION_DESCRIPTION => SettingTypeEnum::TEXTAREA,

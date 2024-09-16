@@ -2,9 +2,9 @@
 
 namespace Modules\AppointmentUser\Service;
 
-use App\Enum\RouteEnum;
 use App\Event;
 use Carbon\Carbon;
+use App\Enum\RouteEnum;
 use App\Models\ShortLink;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Cache;
@@ -12,12 +12,12 @@ use Modules\Service\app\Models\Service;
 use Modules\Setting\Enum\SettingKeyEnum;
 use Modules\Api\Transformers\UserResource;
 use Modules\Api\app\Resources\PriceResource;
-use Modules\AppointmentUser\Enum\AppointmentVia;
-use Modules\Api\app\Resources\Api\SomeoneResource;
-use Modules\AppointmentUser\app\Models\AppointmentUser;
 use Modules\Transaction\app\Models\Transaction;
+use Modules\AppointmentUser\Enum\AppointmentVia;
 use Modules\Transaction\Enum\TransactionPaidEnum;
+use Modules\Api\app\Resources\Api\SomeoneResource;
 use Modules\Transaction\Enum\TransactionStatusEnum;
+use Modules\AppointmentUser\app\Models\AppointmentUser;
 use Modules\AppointmentUser\Enum\model\AppointmentModel;
 use Modules\AppointmentUser\app\Models\AppointmentOnline;
 use Modules\AppointmentUser\Enum\AppointmentUserKindEnum;
@@ -26,6 +26,8 @@ use Modules\AppointmentUser\Enum\AppointmentUserStatusEnum;
 use Modules\AppointmentUser\Enum\model\UserModelAppointment;
 use Modules\AppointmentSetting\app\Models\AppointmentSetting;
 use Modules\AppointmentUser\app\Events\StoreAppointmentEvent;
+use Modules\AppointmentUser\Enum\AppointmentOnlineMessageSeenEnum;
+use Modules\AppointmentUser\Enum\AppointmentOnlineMessageTypeEnum;
 use Modules\AppointmentUser\app\Notifications\AppointmentSmsNotification;
 use Modules\AppointmentUser\app\Notifications\AppointmentDocAndOperatorNotification;
 
@@ -493,7 +495,7 @@ class AppointmentUserService
                 'status' => $onlineStatusPayment,
                 'deadline' => $deadLineDelete,
                 'force_payment' => $onlineForcePayment,
-                'price' => $onlinePrice > 0 ?PriceResource::make(['price' => $onlinePrice]) : null,
+                'price' => $onlinePrice > 0 ? PriceResource::make(['price' => $onlinePrice]) : null,
             ],
             'in_person' => [
                 'status' => $inPersonStatusPayment,
@@ -518,7 +520,7 @@ class AppointmentUserService
     private function insertOnlineAppointment(AppointmentUser $appointmentUser): void
     {
         $status = $appointmentUser->status->convertToAppointmentOnlineStauts();
-        $appointmentUser->online()->create([
+       $appointmentOnline =  $appointmentUser->online()->create([
             'appointment_setting_id' => $appointmentUser->setting->id,
             'user_id' => $appointmentUser->user->id,
             'doctor_id' => $appointmentUser->doctor->id,
@@ -526,6 +528,16 @@ class AppointmentUserService
             'status' => $status,
             'date_visit' => $appointmentUser->date_visit,
         ]);
+        // send online first message
+        if (setting(SettingKeyEnum::ONILNE_SEND_ATUOMATIC_MESSAGE_STATUS)) {
+            $appointmentOnline->messages()->create([
+                'user_id' => $appointmentOnline->user_id,
+                'answer_by' => 1,
+                'type' => AppointmentOnlineMessageTypeEnum::ANSWER,
+                'seen' => AppointmentOnlineMessageSeenEnum::UNSEEN,
+                'body' => setting(SettingKeyEnum::ONILNE_SEND_ATUOMATIC_MESSAGE_MESSAGE) ?? 'سلام لطفا سوال خود را مطرح کنید',
+            ]);
+        }
     }
     public function storeAppointment(AppointmentSetting $appointmentSetting, UserModelAppointment $userModelAppointment, AppointmentModel $appointmentData, $detail = [])
     {
@@ -619,7 +631,7 @@ class AppointmentUserService
 
         //check for monitoring appointment
         if (
-            isset($appointmentSetting->detail[AppointmentSetting::MONITORTING_APPOINTMENT])&&
+            isset($appointmentSetting->detail[AppointmentSetting::MONITORTING_APPOINTMENT]) &&
             $appointmentSetting->detail[AppointmentSetting::MONITORTING_APPOINTMENT] !== null &&
             $appointmentSetting->detail[AppointmentSetting::MONITORTING_APPOINTMENT] !== false &&
             $appointmentData->appointmentVia == AppointmentVia::SELF
@@ -647,7 +659,7 @@ class AppointmentUserService
         if ($appointmentData->kind == AppointmentUserKindEnum::ONLINE) {
             $appointmentUserModel['start_time'] = null;
             $appointmentUserModel['end_time'] = null;
-                // TODO::تایید نوبت در نوبت های آنلاین
+            // TODO::تایید نوبت در نوبت های آنلاین
             // if (
             //     $appointmentData->appointmentVia == AppointmentVia::SELF
             //     && $appointmentSetting->detail[AppointmentSetting::PAYMENT][AppointmentSetting::ONLINE][AppointmentSetting::STATUS] != true
@@ -787,7 +799,7 @@ class AppointmentUserService
         $transactionId = null;
         // Create transaction when payment is inactive
         if ($paymentLink === null) {
-            $transactionData =[
+            $transactionData = [
                 'user_id' => $userModelAppointment->userModel->user->id,
                 'transaction_code' => Transaction::generateTransactionCode(),
                 'status' => TransactionStatusEnum::SUCCESSFUL,
@@ -798,8 +810,6 @@ class AppointmentUserService
             $transaction = $appointmentUser->transaction()->updateOrCreate($transactionData);
             $transactionId = $transaction->id;
         }
-
-
         event(new StoreAppointmentEvent($appointmentUser));
 
         Cache::forget('appointmentList.' . $appointmentSetting->id);

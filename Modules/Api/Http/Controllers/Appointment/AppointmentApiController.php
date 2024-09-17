@@ -430,7 +430,7 @@ class AppointmentApiController extends Controller
             'get_list_empty_appointment' => $resultList['listAppointments'],
             'conditions' => $conditions,
             'alert' => $alert,
-            'messages' => null // only in online
+            'messages' => null
         ]);
     }
 

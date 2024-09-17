@@ -420,11 +420,7 @@ class AppointmentApiController extends Controller
             }
         }
         // handle condition dr amiri
-        $alert['title'] = 'شما تایید میکنید که قبلا از دکتر امیری نوبت دریافت کرده اید';
-        $alert['message'] = 'در صورتی که سابقه ویزیت با دکتر امیری نداشته باشید، نوبت شما حذف میشود .';
-        $alert['alternative_doctor'] = null;
-        $alert['button_text'] = 'تایید میکنم';
-        
+
         $payment = app('AppointmentUserService')->paymentstatus($appointmentSetting);
         return $this->ok([
             'status' => true,
@@ -434,7 +430,7 @@ class AppointmentApiController extends Controller
             'get_list_empty_appointment' => $resultList['listAppointments'],
             'conditions' => $conditions,
             'alert' => $alert,
-            'messages' => null
+            'messages' => 'سام علیک'
         ]);
     }
 

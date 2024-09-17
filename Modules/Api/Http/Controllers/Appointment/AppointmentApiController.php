@@ -132,7 +132,7 @@ class AppointmentApiController extends Controller
         return $firstTwoEmpty;
     }
 
-    private function getListEmptyAppointment($data)
+    private function getListEmptyAppointment($data,$appointmentSetting)
     {
         $firstTwoEmpty = [];
         $report = $data['report'];
@@ -141,11 +141,14 @@ class AppointmentApiController extends Controller
         $isDay = verta()->addDays($mainDaActive)->day;
         $isMonth = verta()->addDays($mainDaActive)->month;
         $isYear = verta()->addDays($mainDaActive)->year;
+        $max_days_app_available = Carbon::now()->addDays($appointmentSetting->max_day_active);
 
         $result = [];
         $maxDay = 15;
+        if(isset($max_days_app_available) && $max_days_app_available != null ) {
+            $maxDay = $max_days_app_available;
+        }
         $DaysDisplayed = 0;
-
         $firstTwoEmpty = [];
         foreach ($data['data'] as $yeay => $day) {
             if ($yeay < $isYear) {
@@ -162,7 +165,7 @@ class AppointmentApiController extends Controller
                     $dayNumber = $appointment['day_number'];
                     $DaysDisplayed++;
 
-                    if ($DaysDisplayed > 15) {
+                    if ($DaysDisplayed > $maxDay) {
                         break 3;
                     }
 
@@ -357,7 +360,7 @@ class AppointmentApiController extends Controller
 
 
         //        $firstTwoEmpty = $this->getFirstTwoEmpty($listDays);
-        $resultList = $this->getListEmptyAppointment($listDays);
+        $resultList = $this->getListEmptyAppointment($listDays,$appointmentSetting);
 
         // handle condition dr amiri
         if ($doctorId == 2) {

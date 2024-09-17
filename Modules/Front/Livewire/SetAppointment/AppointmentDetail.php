@@ -280,7 +280,7 @@ class AppointmentDetail extends Component
             $this->fetchData['navigation'] = "https://maps.google.com/maps?daddr={$latitude},{$longitude}";
         }
         if (isset($this->fetchData['app']->details[AppointmentUser::STORE_FROM_APPLICATION]) && $this->fetchData['app']->details[AppointmentUser::STORE_FROM_APPLICATION] != false) {
-            $urlToApplication = 'https://webapp.drmehrnushamiri.com/transaction/show/' . $this->fetchData['app']->transaction?->id ?? '#';
+            $urlToApplication = 'https://webapp.mata-app.com/transaction/show/' . $this->fetchData['app']->transaction?->id ?? '#';
             $this->fetchData['returnToApp'] = $urlToApplication;
         }
         $this->fetchData['authCheck'] = auth()->check();

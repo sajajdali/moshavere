@@ -84,7 +84,12 @@ trait UserAttributeTrait
     {
         return Attribute::make(
             get: function () {
-                $avatar = $this->metas->firstWhere('meta_key', UserMetaEnum::AVATAR)?->meta_value;
+                $avatar = $this->metas
+                    ->where('meta_key', UserMetaEnum::AVATAR)
+                    ->sortByDesc('created_at')
+                    ->first()?->meta_value;
+
+                // If no avatar found, return the default avatar URL
                 return $avatar ?: url('default/avatar.png');
             },
             set: function (?string $value) {

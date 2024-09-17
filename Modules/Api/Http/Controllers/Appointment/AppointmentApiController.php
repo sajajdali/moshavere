@@ -141,7 +141,7 @@ class AppointmentApiController extends Controller
         $isDay = verta()->addDays($mainDaActive)->day;
         $isMonth = verta()->addDays($mainDaActive)->month;
         $isYear = verta()->addDays($mainDaActive)->year;
-        $max_days_app_available = Carbon::now()->addDays($appointmentSetting->max_day_active);
+        $max_days_app_available = $appointmentSetting->max_day_active;
 
         $result = [];
         $maxDay = 15;

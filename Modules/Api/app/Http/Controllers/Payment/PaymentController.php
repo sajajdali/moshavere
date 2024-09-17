@@ -24,6 +24,9 @@ class PaymentController extends Controller
     private $transactionId;
     public function createPaymentLink(AppointmentUser $appointmentUser)
     {
+        if ($appointmentUser->status == AppointmentUserStatusEnum::STATUS_SUCCESSFUL){
+            return redirect()->to(route('front.setAppointment.detail', ['tracking_code' => $appointmentUser->tracking_code]));
+        }
         $amount = $appointmentUser->details[AppointmentUser::DETAIL_PAYMENT][AppointmentUser::DETAIL_PAYMENT_PRICE]['int'];
         $user = $appointmentUser->user;
         $t_data = [

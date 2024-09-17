@@ -29,7 +29,7 @@ class GeneralSetting extends Component
 
     public array $form = [
         'minDayAvaialbe' => 0,
-        'maxDayAvaialbe' => 90,
+        'maxDayAvaialbe' => 20,
         'avtive' => true,
         // special day setting proprty
         'specialTimeCounter' => [0 => 1],

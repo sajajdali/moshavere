@@ -115,7 +115,7 @@ class AppointmentApiController extends Controller
                             $firstTwoEmpty[$matchesFound]['from'] = $time['from'];
                             $firstTwoEmpty[$matchesFound]['status'] = true;
                             $firstTwoEmpty[$matchesFound]['until'] = $time['until'];
-                            $firstTwoEmpty[$matchesFound]['persian_date'] = $vertaDateTime->format('ساعت H روز l m/d');
+                            $firstTwoEmpty[$matchesFound]['persian_date'] = $vertaDateTime->format('l m/d ساعت H:i دقیقه');
 
                             // Increment the counter
                             $matchesFound++;
@@ -132,7 +132,7 @@ class AppointmentApiController extends Controller
         return $firstTwoEmpty;
     }
 
-    private function getListEmptyAppointment($data,$appointmentSetting)
+    private function getListEmptyAppointment($data, $appointmentSetting)
     {
         $firstTwoEmpty = [];
         $report = $data['report'];
@@ -145,9 +145,10 @@ class AppointmentApiController extends Controller
 
         $result = [];
         $maxDay = 15;
-        if(isset($max_days_app_available) && $max_days_app_available != null ) {
+        if ($max_days_app_available !== null) {
             $maxDay = $max_days_app_available;
         }
+        $minDayActive  = $appointmentSetting->min_day_active;
         $DaysDisplayed = 0;
         $firstTwoEmpty = [];
         foreach ($data['data'] as $yeay => $day) {
@@ -164,11 +165,14 @@ class AppointmentApiController extends Controller
                     }
                     $dayNumber = $appointment['day_number'];
                     $DaysDisplayed++;
-
-                    if ($DaysDisplayed > $maxDay) {
+                    // check max day avaiable
+                    if (Carbon::now()->addDays($maxDay)->lte(carbon::parse(time: $appointment['day_number_gmt']))) {
                         break 3;
                     }
-
+                    // check min day avaiable
+                    if (carbon::parse( $appointment['day_number_gmt'])->setTime('23','59','59')->copy()->subDays( $minDayActive)->isPast()) {
+                        continue;
+                    }
                     foreach ($appointment['times'] as $time) {
 
 
@@ -180,7 +184,7 @@ class AppointmentApiController extends Controller
 
                                 $firstTwoEmpty[] = [
                                     'status' => true,
-                                    'persian_date' => $vertaDateTime->format('ساعت H روز l m/d'),
+                                    'persian_date' => $vertaDateTime->format( 'l m/d ساعت H:i دقیقه'),
                                     'time_stamp' => $time['timestamp'],
                                     'from' => substr($time['from'], 0, -3),
                                     'until' => substr($time['until'], 0, -3),
@@ -188,7 +192,7 @@ class AppointmentApiController extends Controller
                             } else {
                                 $result[$dayNumber][] = [
                                     'status' => true,
-                                    'persian_date' => $vertaDateTime->format('ساعت H روز l m/d'),
+                                    'persian_date' => $vertaDateTime->format('l m/d ساعت H:i دقیقه'),
                                     'time_stamp' => $time['timestamp'],
                                     'from' => substr($time['from'], 0, -3),
                                     'until' => substr($time['until'], 0, -3),
@@ -336,7 +340,7 @@ class AppointmentApiController extends Controller
         }
 
         if ($kind == AppointmentUserKindEnum::ONLINE->value) {
-            $payment = app('AppointmentUserService')->paymentstatus($appointmentSetting) ;
+            $payment = app('AppointmentUserService')->paymentstatus($appointmentSetting);
             return $this->ok([
                 'status' => true,
                 'payment' =>  !$payment['online']['status'] ? null : $payment['online'],
@@ -360,7 +364,7 @@ class AppointmentApiController extends Controller
 
 
         //        $firstTwoEmpty = $this->getFirstTwoEmpty($listDays);
-        $resultList = $this->getListEmptyAppointment($listDays,$appointmentSetting);
+        $resultList = $this->getListEmptyAppointment($listDays, $appointmentSetting);
 
         // handle condition dr amiri
         if ($doctorId == 2) {
@@ -417,7 +421,7 @@ class AppointmentApiController extends Controller
         }
         // handle condition dr amiri
 
-        $payment = app('AppointmentUserService')->paymentstatus($appointmentSetting) ;
+        $payment = app('AppointmentUserService')->paymentstatus($appointmentSetting);
         return $this->ok([
             'status' => true,
             'payment' => !$payment['in_person']['status'] ? null : $payment['in_person'],

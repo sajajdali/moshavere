@@ -284,7 +284,7 @@ class AppointmentUserService
                             } // handle end time visit
 
                             else {
-                                $thisStatus = !$currentDate->isPast();
+                                $thisStatus = !$currentDate->copy()->addDay()->isPast();
 
                                 // check max appointment per day
                                 if ($maxAppointmentEachDay !== null && (int) $maxAppointmentEachDay > 0) {

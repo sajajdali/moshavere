@@ -27,6 +27,9 @@ class PaymentController extends Controller
     private $transactionId;
     public function createPaymentLink(AppointmentUser $appointmentUser)
     {
+        if ($appointmentUser->status == AppointmentUserStatusEnum::STATUS_SUCCESSFUL){
+            return redirect()->to(route('front.setAppointment.detail', ['tracking_code' => $appointmentUser->tracking_code , 'msg' => 'پرداخت شما با موفقیت انجام شده است']));
+        }
         $amount = $appointmentUser->details[AppointmentUser::DETAIL_PAYMENT][AppointmentUser::DETAIL_PAYMENT_PRICE]['int'];
         $user = $appointmentUser->user;
         $t_data = [

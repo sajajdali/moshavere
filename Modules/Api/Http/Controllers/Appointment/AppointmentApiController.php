@@ -420,10 +420,7 @@ class AppointmentApiController extends Controller
             }
         }
         // handle condition dr amiri
-        $conditions['title'] = 'امکان دریافت نوبت با دکتر امیری فراهم نیست';
-        $conditions['message'] = 'مراجعه کننده گرامی  ویزیت اولیه شما توسط تیم فوق تخصصی دکتر امیری انجام میشود.
-      بررسی های اولیه و آزمایشات لازم زیر نظر دکتر امیری نوشته میشود و شما برای ویزیت های بعدی میتوانید با دکتر امیری نوبت دریافت کنید.';
-         $conditions['button_text'] = 'انتخاب پزشک دیگر';
+
         $payment = app('AppointmentUserService')->paymentstatus($appointmentSetting);
         return $this->ok([
             'status' => true,
@@ -433,7 +430,7 @@ class AppointmentApiController extends Controller
             'get_list_empty_appointment' => $resultList['listAppointments'],
             'conditions' => $conditions,
             'alert' => $alert,
-            'messages' => 'سام علیک'
+            'messages' => null
         ]);
     }
 

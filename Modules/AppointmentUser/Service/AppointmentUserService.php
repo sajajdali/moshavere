@@ -517,10 +517,10 @@ class AppointmentUserService
         ]);
     }
 
-    private function insertOnlineAppointment(AppointmentUser $appointmentUser): void
+    private function insertOnlineAppointment(AppointmentUser $appointmentUser): AppointmentUser
     {
         $status = $appointmentUser->status->convertToAppointmentOnlineStauts();
-       $appointmentOnline =  $appointmentUser->online()->create([
+        $appointmentOnline =  $appointmentUser->online()->create([
             'appointment_setting_id' => $appointmentUser->setting->id,
             'user_id' => $appointmentUser->user->id,
             'doctor_id' => $appointmentUser->doctor->id,
@@ -528,16 +528,7 @@ class AppointmentUserService
             'status' => $status,
             'date_visit' => $appointmentUser->date_visit,
         ]);
-        // send online first message
-        if (setting(SettingKeyEnum::ONILNE_SEND_ATUOMATIC_MESSAGE_STATUS)) {
-            $appointmentOnline->messages()->create([
-                'user_id' => $appointmentOnline->user_id,
-                'answer_by' => 1,
-                'type' => AppointmentOnlineMessageTypeEnum::ANSWER,
-                'seen' => AppointmentOnlineMessageSeenEnum::UNSEEN,
-                'body' => setting(SettingKeyEnum::ONILNE_SEND_ATUOMATIC_MESSAGE_MESSAGE) ?? 'سلام لطفا سوال خود را مطرح کنید',
-            ]);
-        }
+        return  $appointmentOnline;
     }
     public function storeAppointment(AppointmentSetting $appointmentSetting, UserModelAppointment $userModelAppointment, AppointmentModel $appointmentData, $detail = [])
     {
@@ -749,7 +740,7 @@ class AppointmentUserService
 
         // insert online appointment
         if ($appointmentData->kind == AppointmentUserKindEnum::ONLINE) {
-            $this->insertOnlineAppointment($appointmentUser);
+            $insertedOnlineAppointment =  $this->insertOnlineAppointment($appointmentUser);
         }
 
         // create payment link
@@ -759,6 +750,20 @@ class AppointmentUserService
             $paymentstatus['online']['status']
         ) {
             $paymentLink = route('api.appointment.payment.create', $appointmentUser);
+        } elseif (
+            $appointmentData->appointmentVia == AppointmentVia::SELF &&
+            $appointmentData->kind == AppointmentUserKindEnum::ONLINE
+        ) {
+            // // send online first message
+            if (setting(SettingKeyEnum::ONILNE_SEND_ATUOMATIC_MESSAGE_STATUS)) {
+                $insertedOnlineAppointment->messages()->create([
+                    'user_id' => $insertedOnlineAppointment->user_id,
+                    'answer_by' => 1,
+                    'type' => AppointmentOnlineMessageTypeEnum::ANSWER,
+                    'seen' => AppointmentOnlineMessageSeenEnum::UNSEEN,
+                    'body' => setting(SettingKeyEnum::ONILNE_SEND_ATUOMATIC_MESSAGE_MESSAGE) ?? 'سلام لطفا سوال خود را مطرح کنید',
+                ]);
+            }
         }
         if (
             $appointmentData->appointmentVia == AppointmentVia::SELF &&

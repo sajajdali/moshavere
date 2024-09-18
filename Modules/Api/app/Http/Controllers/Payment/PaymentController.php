@@ -3,7 +3,6 @@
 namespace Modules\Api\App\Http\Controllers\Payment;
 
 use Illuminate\Http\Request;
-use Modules\AppointmentUser\Enum\AppointmentUserKindEnum;
 use Shetabit\Multipay\Invoice;
 use App\Http\Controllers\Controller;
 use Shetabit\Payment\Facade\Payment;
@@ -14,8 +13,12 @@ use Modules\Transaction\app\Models\Transaction;
 use Modules\Transaction\Enum\TransactionPaidEnum;
 use Modules\Transaction\Enum\TransactionStatusEnum;
 use Modules\AppointmentUser\app\Models\AppointmentUser;
+use Modules\AppointmentUser\Enum\AppointmentUserKindEnum;
 use Shetabit\Multipay\Exceptions\InvalidPaymentException;
 use Modules\AppointmentUser\Enum\AppointmentUserStatusEnum;
+use Modules\AppointmentUser\Enum\AppointmentOnlineStatusEnum;
+use Modules\AppointmentUser\Enum\AppointmentOnlineMessageSeenEnum;
+use Modules\AppointmentUser\Enum\AppointmentOnlineMessageTypeEnum;
 use Modules\AppointmentUser\app\Notifications\AppointmentSmsNotification;
 
 class PaymentController extends Controller
@@ -39,7 +42,7 @@ class PaymentController extends Controller
         // set the callback URL dynamically
         $callbackUrl = route('api.appointment.payment.callback', ['appointmentUser' => $appointmentUser->id]);
         // Config::set('payment.zarinpal.callback_url', $callbackUrl);
-        $description = 'کاربر پرداخت کننده : '. $appointmentUser->user?->full_name ?? 'بدون نام' . 'شماره تماس: '. $appointmentUser->user?->mobile ?? 'بدون موبایل' . 'شماره ردیف: ' . $appointmentUser->id  ;
+        $description = 'کاربر پرداخت کننده : ' . $appointmentUser->user?->full_name ?? 'بدون نام' . 'شماره تماس: ' . $appointmentUser->user?->mobile ?? 'بدون موبایل' . 'شماره ردیف: ' . $appointmentUser->id;
         $invoice = (new Invoice)->amount($amount)->detail('description', $description)->via(setting(SettingKeyEnum::PAYMEN_ACTIVE_DRIVER));
         $invoice->detail(['description' => 'هزینه ی ویزیت']);
         // Retrieve json format of Redirection (in this case you can handle redirection to bank gateway)
@@ -52,7 +55,7 @@ class PaymentController extends Controller
         // )->pay()->toJson();
         $p =   Payment::callbackUrl($callbackUrl)->purchase(
             $invoice,
-            function($driver, $transactionId) {
+            function ($driver, $transactionId) {
                 $this->transactionId = $transactionId;
             }
         )->pay()->toJson();
@@ -102,8 +105,18 @@ class PaymentController extends Controller
             $appointmentUser->transaction->update(['status' => TransactionStatusEnum::SUCCESSFUL]);
 
             // if appointment is online
-            if($appointmentUser->kind == AppointmentUserKindEnum::ONLINE){
+            if ($appointmentUser->kind == AppointmentUserKindEnum::ONLINE) {
                 $appointmentUser->online->first()->update(['status' => \Modules\AppointmentUser\Enum\AppointmentOnlineStatusEnum::ACCEPTED]);
+                // send online first message
+                if (setting(SettingKeyEnum::ONILNE_SEND_ATUOMATIC_MESSAGE_STATUS)) {
+                    $appointmentUser->online->messages()->create([
+                        'user_id' => $appointmentUser->online->user_id,
+                        'answer_by' => 1,
+                        'type' => AppointmentOnlineMessageTypeEnum::ANSWER,
+                        'seen' => AppointmentOnlineMessageSeenEnum::UNSEEN,
+                        'body' => setting(SettingKeyEnum::ONILNE_SEND_ATUOMATIC_MESSAGE_MESSAGE) ?? 'سلام لطفا سوال خود را مطرح کنید',
+                    ]);
+                }
             }
 
             return redirect()->route('front.setAppointment.detail', ['tracking_code' => $appointmentUser->tracking_code, 'msg' => 'پرداخت با موفقیت انجام شد']);

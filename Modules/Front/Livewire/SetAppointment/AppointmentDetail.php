@@ -21,6 +21,8 @@ use Modules\AppointmentUser\Enum\AppointmentUserKindEnum;
 use Shetabit\Multipay\Exceptions\InvalidPaymentException;
 use Modules\AppointmentUser\Enum\AppointmentUserStatusEnum;
 use Modules\AppointmentSetting\app\Models\AppointmentSetting;
+use Modules\AppointmentUser\Enum\AppointmentOnlineMessageSeenEnum;
+use Modules\AppointmentUser\Enum\AppointmentOnlineMessageTypeEnum;
 use Modules\AppointmentUser\app\Notifications\AppointmentSmsNotification;
 use Modules\AppointmentUser\App\Notifications\AppointmentDocAndOperatorNotification;
 
@@ -236,13 +238,27 @@ class AppointmentDetail extends Component
             if (isset($appointmentUser->operator)) {
                 $smsToOperator = setting(SettingKeyEnum::SMS_APPOINTMENT_TO_OPERATOR);
                 if (isset($smsToOperator)) {
-                    $$this->fetchData['app']->notify(new AppointmentDocAndOperatorNotification($smsToOperator, $$this->fetchData['app']->operator->mobile));
+                    $this->fetchData['app']->notify(new AppointmentDocAndOperatorNotification($smsToOperator, $$this->fetchData['app']->operator->mobile));
                 }
             }
             if (isset($appointmentUser->doctor)) {
                 $smsToDoctor = setting(SettingKeyEnum::SMS_APPOINTMENT_TO_DOCTOR);
                 if (isset($smsToDoctor)) {
-                    $$this->fetchData['app']->notify(new AppointmentDocAndOperatorNotification($smsToDoctor, $$this->fetchData['app']->doctor->mobile));
+                    $this->fetchData['app']->notify(new AppointmentDocAndOperatorNotification($smsToDoctor, $$this->fetchData['app']->doctor->mobile));
+                }
+            }
+            // if appointment is online
+            if ($appointmentUser->kind == AppointmentUserKindEnum::ONLINE) {
+                $appointmentUser->online->first()->update(['status' => \Modules\AppointmentUser\Enum\AppointmentOnlineStatusEnum::ACCEPTED]);
+                // send online first message
+                if (setting(SettingKeyEnum::ONILNE_SEND_ATUOMATIC_MESSAGE_STATUS)) {
+                    $appointmentUser->online->messages()->create([
+                        'user_id' => $appointmentUser->online->user_id,
+                        'answer_by' => 1,
+                        'type' => AppointmentOnlineMessageTypeEnum::ANSWER,
+                        'seen' => AppointmentOnlineMessageSeenEnum::UNSEEN,
+                        'body' => setting(SettingKeyEnum::ONILNE_SEND_ATUOMATIC_MESSAGE_MESSAGE) ?? 'سلام لطفا سوال خود را مطرح کنید',
+                    ]);
                 }
             }
 

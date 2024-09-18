@@ -52,6 +52,9 @@ class Questions extends Component
         $user = User::find(request()->route('user_id'));
         $app_id = request()->route('appointmentUser_id');
         $appId =  AppointmentUser::find($app_id);
+        if(!isset($appId)) {
+            return abort('404');
+        }
         if ($user->id != $appId->user_id) {
             abort(403, 'Unauthorized action.');
         }

@@ -29,7 +29,12 @@
                 <div class="main-content-left main-content-left-chat">
                     <div class="card custom-card">
                         <div class="card-header d-flex justify-content-between border-bottom px-1 px-sm-3">
-                            <h3 class="card-title">لیست نوبت های ثبت شده</h3>
+                            <div>
+                                <h3 class="card-title">لیست نوبت های ثبت شده</h3>
+                                <span class="badge bg-light rounded-pill mt-1">
+                                    {{\Modules\AppointmentUser\app\Models\AppointmentOnlineMessage::totalUnreaedMessage()}} نوبت بدون پاسخ
+                                </span>
+                            </div>
                             <div class="card-options flex-column flex-sm-row">
                                 <button class="btn btn-warning me-2" type="button" wire:click='showalltheMessages'>
                                     نمایش نوبت های تمام شده

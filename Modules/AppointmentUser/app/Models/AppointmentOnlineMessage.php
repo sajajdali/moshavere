@@ -32,9 +32,7 @@ class AppointmentOnlineMessage extends Model
     }
     public static function badgeCount()
     {
-        return self::where('type', AppointmentOnlineMessageTypeEnum::QUESTION)
-            ->where('seen', AppointmentOnlineMessageSeenEnum::UNSEEN)
-            ->whereNull('answer_by')->count();
+        return Self::whereNull('answer_by')->groupBy('appointment_online_id')->count();
     }
     public function unReadedMessageCount()
     {
@@ -76,5 +74,8 @@ class AppointmentOnlineMessage extends Model
     {
         $answer_by =  $this->online?->messages?->reverse()->firstWhere('answer_by', '!=', null);
         return $answer_by->answerBy?->full_name ?? '';
+    }
+    public static function totalUnreaedMessage():int {
+        return Self::whereNull('answer_by')->groupBy('appointment_online_id')->count();
     }
 }

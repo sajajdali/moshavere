@@ -252,7 +252,7 @@ class AppointmentDetail extends Component
                 $this->fetchData['app']->online->first()->update(['status' => \Modules\AppointmentUser\Enum\AppointmentOnlineStatusEnum::ACCEPTED]);
                 // send online first message
                 if (setting(SettingKeyEnum::ONILNE_SEND_ATUOMATIC_MESSAGE_STATUS)) {
-                    $this->fetchData['app']->online->messages()->create([
+                    $this->fetchData['app']->online->last()->messages()->create([
                         'user_id' => $$this->fetchData['app']->online->user_id,
                         'answer_by' => 1,
                         'type' => AppointmentOnlineMessageTypeEnum::ANSWER,

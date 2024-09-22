@@ -108,7 +108,7 @@ class PaymentController extends Controller
                 $appointmentUser->online->first()->update(['status' => \Modules\AppointmentUser\Enum\AppointmentOnlineStatusEnum::ACCEPTED]);
                 // send online first message
                 if (setting(SettingKeyEnum::ONILNE_SEND_ATUOMATIC_MESSAGE_STATUS)) {
-                    $appointmentUser->online->messages()->create([
+                    $appointmentUser->online->last()->messages()->create([
                         'user_id' => $appointmentUser->online->user_id,
                         'answer_by' => 1,
                         'type' => AppointmentOnlineMessageTypeEnum::ANSWER,

@@ -517,7 +517,7 @@ class AppointmentUserService
         ]);
     }
 
-    private function insertOnlineAppointment(AppointmentUser $appointmentUser): AppointmentUser
+    private function insertOnlineAppointment(AppointmentUser $appointmentUser):appointmentOnline
     {
         $status = $appointmentUser->status->convertToAppointmentOnlineStauts();
         $appointmentOnline =  $appointmentUser->online()->create([

@@ -3,6 +3,7 @@
 namespace Modules\AppointmentUser\app\Models;
 
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Modules\AppointmentUser\Enum\AppointmentOnlineStatusEnum;
 use Modules\User\Entities\User;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -32,7 +33,7 @@ class AppointmentOnlineMessage extends Model
     }
     public static function badgeCount()
     {
-        return Self::whereNull('answer_by')->groupBy('appointment_online_id')->count();
+        return Self::where('status',AppointmentOnlineStatusEnum::ACCEPTED)->whereNull('answer_by')->groupBy('appointment_online_id')->count();
     }
     public function unReadedMessageCount()
     {
@@ -76,6 +77,6 @@ class AppointmentOnlineMessage extends Model
         return $answer_by->answerBy?->full_name ?? '';
     }
     public static function totalUnreaedMessage():int {
-        return Self::whereNull('answer_by')->groupBy('appointment_online_id')->count();
+        return Self::where('status',AppointmentOnlineStatusEnum::ACCEPTED)->whereNull('answer_by')->groupBy('appointment_online_id')->count();
     }
 }

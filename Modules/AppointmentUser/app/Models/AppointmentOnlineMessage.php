@@ -33,7 +33,7 @@ class AppointmentOnlineMessage extends Model
     }
     public static function badgeCount()
     {
-        return Self::where('status',AppointmentOnlineStatusEnum::ACCEPTED)->whereNull('answer_by')->groupBy('appointment_online_id')->count();
+        return Self::whereNull('answer_by')->groupBy('appointment_online_id')->count();
     }
     public function unReadedMessageCount()
     {
@@ -77,6 +77,6 @@ class AppointmentOnlineMessage extends Model
         return $answer_by->answerBy?->full_name ?? '';
     }
     public static function totalUnreaedMessage():int {
-        return Self::where('status',AppointmentOnlineStatusEnum::ACCEPTED)->whereNull('answer_by')->groupBy('appointment_online_id')->count();
+        return Self::whereNull('answer_by')->groupBy('appointment_online_id')->count();
     }
 }

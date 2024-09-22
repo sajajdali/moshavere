@@ -4,7 +4,6 @@ namespace Modules\Chat\app\Models;
 
 use App\Models\ShortLink;
 use Modules\User\Entities\User;
-use Modules\Chat\app\Models\Chat;
 use Modules\Chat\Enum\ChatStatusEnum;
 use Illuminate\Database\Eloquent\Model;
 use Modules\Chat\app\Models\ChatDetail;

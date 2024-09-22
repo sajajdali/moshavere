@@ -248,12 +248,12 @@ class AppointmentDetail extends Component
                 }
             }
             // if appointment is online
-            if ($appointmentUser->kind == AppointmentUserKindEnum::ONLINE) {
-                $appointmentUser->online->first()->update(['status' => \Modules\AppointmentUser\Enum\AppointmentOnlineStatusEnum::ACCEPTED]);
+            if ($this->fetchData['app']->kind == AppointmentUserKindEnum::ONLINE) {
+                $this->fetchData['app']->online->first()->update(['status' => \Modules\AppointmentUser\Enum\AppointmentOnlineStatusEnum::ACCEPTED]);
                 // send online first message
                 if (setting(SettingKeyEnum::ONILNE_SEND_ATUOMATIC_MESSAGE_STATUS)) {
-                    $appointmentUser->online->messages()->create([
-                        'user_id' => $appointmentUser->online->user_id,
+                    $this->fetchData['app']->online->messages()->create([
+                        'user_id' => $$this->fetchData['app']->online->user_id,
                         'answer_by' => 1,
                         'type' => AppointmentOnlineMessageTypeEnum::ANSWER,
                         'seen' => AppointmentOnlineMessageSeenEnum::UNSEEN,

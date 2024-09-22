@@ -44,7 +44,6 @@ class PaymentController extends Controller
         // Config::set('payment.zarinpal.callback_url', $callbackUrl);
         $description = 'کاربر پرداخت کننده : ' . $appointmentUser->user?->full_name ?? 'بدون نام' . 'شماره تماس: ' . $appointmentUser->user?->mobile ?? 'بدون موبایل' . 'شماره ردیف: ' . $appointmentUser->id;
         $invoice = (new Invoice)->amount($amount)->detail('description', $description)->via(setting(SettingKeyEnum::PAYMEN_ACTIVE_DRIVER));
-        $invoice->detail(['description' => 'هزینه ی ویزیت']);
         // Retrieve json format of Redirection (in this case you can handle redirection to bank gateway)
         // $merchenId = setting(SettingKeyEnum::PAYMENT_ZARINPAL_MERCHENID);
         // $p = Payment::config(['callbackUrl' => $callbackUrl, 'mechandId' => $merchenId])->purchase(

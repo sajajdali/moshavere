@@ -88,10 +88,10 @@ class Checkout extends Component
     {
         $mobile = null;
         $national_code = null;
-        if (isset($this->form['otherApp']['withOutMobile']) && $this->form['otherApp']['mobile']) {
+        if (isset($this->form['otherApp']['mobile']) && $this->form['otherApp']['mobile'] != null) {
             $mobile = $this->form['otherApp']['mobile'];
         }
-        if (isset($this->form['otherApp']['withOutNational_code']) && $this->form['otherApp']['national_code']) {
+        if (isset($this->form['otherApp']['national_code']) && $this->form['otherApp']['national_code'] != null ) {
             $national_code = $this->form['otherApp']['national_code'];
         }
         $pass = User::generatePassword();

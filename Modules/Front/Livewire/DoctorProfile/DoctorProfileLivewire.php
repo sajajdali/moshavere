@@ -189,6 +189,10 @@ class DoctorProfileLivewire extends Component
     // check is user redirect to this page with service_id and place_id
     private function routeHasServiceOrPlace()
     {
+        if (! $this->doc->isDoctorActive()) {
+            // if doc is de active , prevent modal from opening
+            return  ;
+        }
         if (request()->has('service_id')) {
             $santetizeService = htmlspecialchars(request()->input('service_id'), ENT_QUOTES, 'UTF-8');
             $this->form['service'] =  Service::where('active', ActiveEnum::ACTIVE)->firstWhere('id', $santetizeService)?->id ?? null;
@@ -347,7 +351,7 @@ class DoctorProfileLivewire extends Component
             $this->fetchData['iteratorStop'] = true;
         }
         if (auth()->check()) {
-            if (isset(auth()->user()->favorite_dr) &&  in_array($this->doc->id, json_decode(auth()->user()->favorite_dr,true))) {
+            if (isset(auth()->user()->favorite_dr) &&  in_array($this->doc->id, json_decode(auth()->user()->favorite_dr, true))) {
                 $this->fetchData['isFavarite'] = true;
             }
         }

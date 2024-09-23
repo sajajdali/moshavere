@@ -51,7 +51,7 @@ class AppointmentDetail extends Component
     public function userCanCancell()
     {
         $setting = $this->fetchData['app']->setting;
-        $can_be_Canceld = (isset($setting->cancellation_by_user)) && ($this->fetchData['app']->status == AppointmentUserStatusEnum::STATUS_SUCCESSFUL);
+        $can_be_Canceld = (isset($setting->cancellation_by_user)) &&  $setting->cancellation_by_user == true && ($this->fetchData['app']->status == AppointmentUserStatusEnum::STATUS_SUCCESSFUL);
         if ($can_be_Canceld) {
             if ($this->fetchData['app']->date_visit->subDays($setting->cancellation_by_user)->gt(\now())) {
                 $this->fetchData['cancel'] = true;

@@ -13,8 +13,8 @@
         </div>
         <div class="ms-auto pageheader-btn">
             <ol class="breadcrumb">
-                <li class="breadcrumb-item"><a href="javascript:void(0);">Apps</a></li>
-                <li class="breadcrumb-item active" aria-current="page">Chat</li>
+                <li class="breadcrumb-item"><a href="javascript:void(0);">مدیریت</a></li>
+                <li class="breadcrumb-item active" aria-current="page">چت ها</li>
             </ol>
         </div>
 

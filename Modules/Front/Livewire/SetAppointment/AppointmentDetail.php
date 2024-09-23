@@ -271,7 +271,7 @@ class AppointmentDetail extends Component
             $this->fetchData['app']->transaction->last()->update(['status' => TransactionStatusEnum::SUCCESSFUL]);
             $this->render();
         } catch (InvalidPaymentException $exception) {
-            $this->fetchData['alert'] = $exception;
+            $this->fetchData['alert'] = 'خطا در انجام تراکنش';
             $this->fetchData['app']->transaction->update(['status' => TransactionStatusEnum::REJECTED]);
         }
     }

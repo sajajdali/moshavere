@@ -84,7 +84,11 @@ class PaymentController extends Controller
             $transactionData['discount_code'] =  $initial_data['discount']['discount_code'];
         }
         $appUser = AppointmentUser::find($initial_data['appointmentUser_id']);
-        $t =  $appUser->transaction()->updateOrCreate($transactionData);
+        if ($appUser->transaction) {
+            $t = $appUser->transaction->update($transactionData);
+        } else {
+            $t = $appUser->transaction()->create($transactionData);
+        }
         return $t;
     }
     public function callback(AppointmentUser $appointmentUser, Request $request)

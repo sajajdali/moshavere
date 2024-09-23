@@ -88,11 +88,15 @@ class Checkout extends Component
     {
         $mobile = null;
         $national_code = null;
-        if (isset($this->form['otherApp']['mobile']) && $this->form['otherApp']['mobile'] != null) {
-            $mobile = $this->form['otherApp']['mobile'];
+        if (isset($this->form['otherApp']['withOutMobile']) && $this->form['otherApp']['withOutMobile'] != true) {
+            if (isset($this->form['otherApp']['mobile']) && $this->form['otherApp']['mobile'] != null) {
+                $mobile = $this->form['otherApp']['mobile'];
+            }
         }
-        if (isset($this->form['otherApp']['national_code']) && $this->form['otherApp']['national_code'] != null ) {
-            $national_code = $this->form['otherApp']['national_code'];
+        if (isset($this->form['otherApp']['withOutNational_code']) && $this->form['otherApp']['withOutNational_code'] != true) {
+            if (isset($this->form['otherApp']['national_code']) && $this->form['otherApp']['national_code'] != null) {
+                $national_code = $this->form['otherApp']['national_code'];
+            }
         }
         $pass = User::generatePassword();
         $userModel = [
@@ -158,7 +162,7 @@ class Checkout extends Component
             smsToDoctor: false,
             description: isset($this->form['description']) ? $this->form['description'] : '',
             type: AppointmentUserTypeEnum::MAIN__APPOINTMENT,
-            endTime: Carbon::createFromTimestamp($this->fetchData['app_end_time'],'Asia/Tehran')->toTimeString(),
+            endTime: Carbon::createFromTimestamp($this->fetchData['app_end_time'], 'Asia/Tehran')->toTimeString(),
         );
 
         $detail = [];
@@ -199,9 +203,9 @@ class Checkout extends Component
         if (empty($this->fetchData['app_start_time']) || empty($this->fetchData['app_end_time'])) {
             return redirect()->route('front.setAppointment.days', ['doctor_id' => $doc, 'place_id' => $place, 'service_id' => $service])->with('error', 'لطفا مجدد تاریخ را انتخاب کنید!');
         }
-        $this->fetchData['date_for_blade'] = Carbon::createFromTimestamp($this->fetchData['app_start_time'],'Asia/Tehran');
+        $this->fetchData['date_for_blade'] = Carbon::createFromTimestamp($this->fetchData['app_start_time'], 'Asia/Tehran');
 
-        if($this->fetchData['date_for_blade']->lt(\now())){
+        if ($this->fetchData['date_for_blade']->lt(\now())) {
             return abort(404);
         }
         $this->fetchData['doc']      =   User::find($doc);

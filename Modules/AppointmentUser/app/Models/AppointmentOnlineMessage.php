@@ -2,11 +2,12 @@
 
 namespace Modules\AppointmentUser\app\Models;
 
-use Illuminate\Database\Eloquent\SoftDeletes;
-use Modules\AppointmentUser\Enum\AppointmentOnlineStatusEnum;
 use Modules\User\Entities\User;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Modules\AppointmentUser\Enum\AppointmentOnlineStatusEnum;
 use Modules\AppointmentUser\Enum\AppointmentOnlineMessageSeenEnum;
 use Modules\AppointmentUser\Enum\AppointmentOnlineMessageTypeEnum;
 use Modules\AppointmentUser\Database\factories\AppointmentOnlineMessageFactory;
@@ -33,12 +34,16 @@ class AppointmentOnlineMessage extends Model
     }
     public static function badgeCount()
     {
-        return Self::whereNull('answer_by')->groupBy('appointment_online_id')->count();
+        $appointments = AppointmentOnline::whereIn('status', [
+            AppointmentOnlineStatusEnum::ACCEPTED,
+            AppointmentOnlineStatusEnum::REPLY_BY_USER
+        ])->count();
+
+        return $appointments;
     }
     public function unReadedMessageCount()
     {
-        return $this->where('appointment_online_id',$this->appointment_online_id)->
-        where('type', AppointmentOnlineMessageTypeEnum::QUESTION)
+        return $this->where('appointment_online_id', $this->appointment_online_id)->where('type', AppointmentOnlineMessageTypeEnum::QUESTION)
             ->where('seen', AppointmentOnlineMessageSeenEnum::UNSEEN)
             ->whereNull('answer_by')->count();
     }
@@ -67,16 +72,22 @@ class AppointmentOnlineMessage extends Model
     }
     public function hasAnswer()
     {
-        return $this->online?->messages?->contains(function($message) {
+        return $this->online?->messages?->contains(function ($message) {
             return $message->answer_by != null;
         });
     }
-    public function findAwnswerer():string
+    public function findAwnswerer(): string
     {
         $answer_by =  $this->online?->messages?->reverse()->firstWhere('answer_by', '!=', null);
         return $answer_by->answerBy?->full_name ?? '';
     }
-    public static function totalUnreaedMessage():int {
-        return Self::whereNull('answer_by')->groupBy('appointment_online_id')->count();
+    public static function totalUnreaedMessage(): int
+    {
+        $appointments = AppointmentOnline::whereIn('status', [
+            AppointmentOnlineStatusEnum::ACCEPTED,
+            AppointmentOnlineStatusEnum::REPLY_BY_USER
+        ])->count();
+
+        return $appointments;
     }
 }

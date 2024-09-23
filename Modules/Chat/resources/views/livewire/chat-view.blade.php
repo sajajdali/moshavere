@@ -52,7 +52,7 @@
                                         <div class="mb-3">
                                             <input type="text" class="form-control" placeholder="جست و جوی پیشرفته ...."
                                                    wire:model="searchTerm"
-                                                   wire:keydown.enter="performSearch">
+                                                   >
                                         </div>
 
                                         <!-- Chat list -->
@@ -202,7 +202,7 @@
                                             </div>
                                         @else
                                                     <!-- Camera Button -->
-                                            <button class="btn @if (isset($form['capturedPic'])) btn-success @else  btn-light @endif mx-3 d-flex justify-content-center p-1 py-2 mt-2"  id="cameraButton" 
+                                            <button class="btn @if (isset($form['capturedPic'])) btn-success @else  btn-light @endif mx-3 d-flex justify-content-center p-1 py-2 mt-2"  id="cameraButton"
                                                 @if (isset($form['capturedPic'])) disabled @endif>
                                                     @if (isset($form['capturedPic']))
                                                     <i class="fa fa-check" aria-hidden="true"></i>
@@ -213,8 +213,7 @@
                                             <input type="file" accept="image/*" capture="environment" id="cameraInput" wire:model='form.capturedPic'
                                                 style="display:none;" />
                                             <textarea rows="3" class="form-control mt-5" placeholder="متن پیام شما..."
-                                                   wire:model="chatMessage"
-                                                   wire:keydown.enter="sendMessage"></textarea>
+                                                   wire:model="chatMessage"></textarea>
                                             {{-- send File modal --}}
                                             <div class="mt-5">
                                                 <button type="button" wire:click="sendMessage"

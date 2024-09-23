@@ -120,7 +120,7 @@ class MessageDetail extends Component
             AppointmentOnlineMessageFile::create(attributes: $fileModel);
             unset($this->form['file']);
         }
-        if (isset($this->form['capturedPic'])) 
+        if (isset($this->form['capturedPic']))
         {
             $filePath = $this->form['capturedPic']->store('public/uploads');
             $fileName = basename($filePath);
@@ -167,7 +167,7 @@ class MessageDetail extends Component
             ));
         } catch (\Throwable $th) {
         }
-
+        $this->fetchData['appOnline']->update(['status' => AppointmentOnlineStatusEnum::ANSWER_BY_DOCTOR]) ; 
         $this->dispatch('sendMessage', true);
     }
     public function messages()

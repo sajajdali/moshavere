@@ -215,7 +215,7 @@ class AppointmentDetail extends Component
         $appUser = AppointmentUser::find($initial_data['appointmentUser_id']);
         // Check if a transaction exists
         if ($appUser->transaction) {
-            $t = $appUser->transaction;
+            $t = $appUser->transaction->update($transactionData);
         } else {
             $t = $appUser->transaction()->create($transactionData);
         }

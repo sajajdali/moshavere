@@ -302,7 +302,7 @@
                                         <i class="fa fa-microphone fa-xl" aria-hidden="true"></i>
                                     </button>
                                     <!-- Camera Button -->
-                                    <button class="btn @if (isset($form['capturedPic'])) btn-success @else  btn-light @endif mx-3 d-flex justify-content-center p-1 py-2 mt-2"  id="cameraButton" 
+                                    <button class="btn @if (isset($form['capturedPic'])) btn-success @else  btn-light @endif mx-3 d-flex justify-content-center p-1 py-2 mt-2"  id="cameraButton"
                                     @if (isset($form['capturedPic'])) disabled @endif>
                                         @if (isset($form['capturedPic']))
                                         <i class="fa fa-check" aria-hidden="true"></i>
@@ -314,7 +314,7 @@
                                         style="display:none;" />
                                 </div>
                                 <textarea rows="3" class="form-control mt-5 ms-1 @error('form.typedMessage') is-invalid @enderror"
-                                    wire:model='form.typedMessage' wire:keydown.enter="sendMessage"
+                                    wire:model='form.typedMessage'
                                     placeholder="@error('form.typedMessage') {{ $message }} @else متن خود را یادداشت کنید @enderror"></textarea>
                                 <div class="d-flex flex-column align-items-center mt-5">
                                     <button wire:click='sendMessage' wire:target='sendMessage'

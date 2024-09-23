@@ -799,6 +799,8 @@ class AppointmentUserService
                     $appointmentUser->notify(new AppointmentDocAndOperatorNotification($smsToDoctor, $appointmentUser->doctor->mobile));
                 }
             }
+        }else{
+            $appointmentUser->notify( new AppointmentSmsNotification($smsTemplate));
         }
 
         $transactionId = null;

@@ -62,6 +62,6 @@ class AppointmentSetting extends Model
         return $this->hasMany(AppointmentUser::class);
     }
     public function ScopeActiveSetting($query) {
-        return $this->where('active',ActiveEnum::ACTIVE) ; 
+        return $query->where('active',ActiveEnum::ACTIVE) ;
     }
 }

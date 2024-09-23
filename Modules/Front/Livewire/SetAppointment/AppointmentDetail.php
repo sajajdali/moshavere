@@ -51,7 +51,7 @@ class AppointmentDetail extends Component
     public function userCanCancell()
     {
         $setting = $this->fetchData['app']->setting;
-        $can_be_Canceld = (isset($setting->cancellation_by_user)) && ($this->fetchData['app']->status == AppointmentUserStatusEnum::STATUS_SUCCESSFUL);
+        $can_be_Canceld = (isset($setting->cancellation_by_user)) &&  $setting->cancellation_by_user == true && ($this->fetchData['app']->status == AppointmentUserStatusEnum::STATUS_SUCCESSFUL);
         if ($can_be_Canceld) {
             if ($this->fetchData['app']->date_visit->subDays($setting->cancellation_by_user)->gt(\now())) {
                 $this->fetchData['cancel'] = true;
@@ -178,10 +178,10 @@ class AppointmentDetail extends Component
         // set the callback URL dynamically
         $callbackUrl = route('front.setAppointment.detail', ['tracking_code' => $this->fetchData['app']->tracking_code, 'call_back' => true]);
         // Config::set('payment.zarinpal.callback_url', $callbackUrl);
-        $description = 'کاربر پرداخت کننده : '. $this->fetchData['app']->user?->full_name ?? 'بدون نام' . 'شماره تماس: '. $this->fetchData['app']->user?->mobile ?? 'بدون موبایل' . 'شماره ردیف: ' . $this->fetchData['app']->id  ;
+        $description = 'کاربر پرداخت کننده : ' . $this->fetchData['app']->user?->full_name ?? 'بدون نام' . 'شماره تماس: ' . $this->fetchData['app']->user?->mobile ?? 'بدون موبایل' . 'شماره ردیف: ' . $this->fetchData['app']->id;
         $invoice = (new Invoice)->amount($amount)
-        ->detail('description', $description)
-        ->via(setting(SettingKeyEnum::PAYMEN_ACTIVE_DRIVER));
+            ->detail('description', $description)
+            ->via(setting(SettingKeyEnum::PAYMEN_ACTIVE_DRIVER));
         $merchenId = setting(SettingKeyEnum::PAYMENT_ZARINPAL_MERCHENID);
         $p =  Payment::config(['callbackUrl' => $callbackUrl, 'merchantId' => $merchenId])->purchase(
             $invoice,
@@ -213,15 +213,20 @@ class AppointmentDetail extends Component
             $transactionData['discount_code'] =  $initial_data['discount']['discount_code'];
         }
         $appUser = AppointmentUser::find($initial_data['appointmentUser_id']);
-        $t =  $appUser->transaction()->updateOrCreate($transactionData);
+        // Check if a transaction exists
+        if ($appUser->transaction) {
+            $t = $appUser->transaction->update($transactionData);
+        } else {
+            $t = $appUser->transaction()->create($transactionData);
+        }
         return $t;
     }
     public function bankCallback()
     {
-        if( ! $this->fetchData['app']->details[AppointmentUser::DETAIL_PAYMENT]['status']){
+        if (! $this->fetchData['app']->details[AppointmentUser::DETAIL_PAYMENT]['status']) {
             $this->fetchData['alert'] = 'خطا در انجام تراکنش';
             $this->fetchData['app']->transaction->update(['status' => TransactionStatusEnum::REJECTED]);
-            return ;
+            return;
         }
         try {
             $amount = $this->fetchData['app']->details[AppointmentUser::DETAIL_PAYMENT][AppointmentUser::DETAIL_PAYMENT_PRICE]['int'];

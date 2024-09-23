@@ -247,9 +247,9 @@ class ShowAvailableDayForDoctor extends Component
             return abort(404);
         }
         $this->fetchData['maxShowDay'] = 2;
-        //check if doctor has active appointment setting
+        //check if doctor has active appointmentsetting
         if (! AppointmentSetting::activeSetting()
-            ->where('user_id', $this->fetchData['doc'])
+            ->where('user_id', $this->fetchData['doc']->id)
             ->exists()) {
             return redirect()->route('front.doctor.profile', ['doctor_id' => $this->fetchData['doc']->id, 'doctor_name' => str_replace(' ', '_',$this->fetchData['doc']->full_name)]);
         }

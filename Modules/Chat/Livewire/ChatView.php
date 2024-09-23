@@ -15,6 +15,7 @@ use Modules\Chat\app\Models\Chat;
 use Modules\User\Enum\UserMetaEnum;
 use Modules\Chat\Enum\ChatStatusEnum;
 use Illuminate\Support\Facades\Storage;
+use Modules\Chat\app\Models\ChatDetail;
 use Modules\Setting\Enum\SettingKeyEnum;
 use Modules\Chat\Enum\ChatDetailTypeEnum;
 use Modules\Chat\app\Models\ChatDetailsFile;
@@ -24,7 +25,7 @@ use Modules\Api\app\Resources\Api\Chat\ChatDetailResource;
 
 class ChatView extends Component
 {
-    use WithPagination,WithFileUploads;
+    use WithPagination, WithFileUploads;
 
     #[Url]
     public int $chatId = 0;
@@ -33,7 +34,7 @@ class ChatView extends Component
     public $searchTerm = ''; // Property to hold the search term
 
     public $ImgMessg;
-    public array $form ;
+    public array $form;
     public $perPage = 50;
     private $loadMode = 100;
     #[Url]
@@ -80,33 +81,33 @@ class ChatView extends Component
     //     AdminAnswerChatEvent::dispatch($this->chat);
     // }
     // private function insertFileUpload( $chatDetailId){
-        // if (isset($this->ImgMessg)) {
-        //     $fileUrl = Storage::disk('public')->url($this->ImgMessg);
-        // }
-        // $p = explode('/', $this->ImgMessg);
-        // // $mimeType = Storage::mimeType($this->ImgMessg);
-        // $size  =  ceil((Storage::size('public/'. end($p))) / 1024);
-        // $mime  =  Storage::mimeType('public/'. end($p));
-        // $extension = pathinfo($fileUrl, PATHINFO_EXTENSION);
-        // $url = $this->ImgMessg;
-        // // Parse the URL
-        // $parsedUrl = parse_url($url);
-        // // Get the file path
-        // $filePath = str_replace('/storage/', '', $parsedUrl['path']);
+    // if (isset($this->ImgMessg)) {
+    //     $fileUrl = Storage::disk('public')->url($this->ImgMessg);
+    // }
+    // $p = explode('/', $this->ImgMessg);
+    // // $mimeType = Storage::mimeType($this->ImgMessg);
+    // $size  =  ceil((Storage::size('public/'. end($p))) / 1024);
+    // $mime  =  Storage::mimeType('public/'. end($p));
+    // $extension = pathinfo($fileUrl, PATHINFO_EXTENSION);
+    // $url = $this->ImgMessg;
+    // // Parse the URL
+    // $parsedUrl = parse_url($url);
+    // // Get the file path
+    // $filePath = str_replace('/storage/', '', $parsedUrl['path']);
 
-        // $fileModel = [
-        //     'user_id' => $this->chat?->user->id,
-        //     'answer_by' => auth()->user()->id,
-        //     'chat_detail_id' =>  $chatDetailId->id,
-        //     'original_name' => end($p),
-        //     'server_name' => end($p),
-        //     'disk' => 'public',
-        //     'path' => $filePath,
-        //     'extension' => $extension,
-        //     'mime' => $mime,
-        //     'size' => $size,
-        // ];
-        // ChatDetailsFile::create($fileModel);
+    // $fileModel = [
+    //     'user_id' => $this->chat?->user->id,
+    //     'answer_by' => auth()->user()->id,
+    //     'chat_detail_id' =>  $chatDetailId->id,
+    //     'original_name' => end($p),
+    //     'server_name' => end($p),
+    //     'disk' => 'public',
+    //     'path' => $filePath,
+    //     'extension' => $extension,
+    //     'mime' => $mime,
+    //     'size' => $size,
+    // ];
+    // ChatDetailsFile::create($fileModel);
     // }
 
     public function sendMessage()
@@ -134,15 +135,15 @@ class ChatView extends Component
             $extension = pathinfo($parsedUrl['path'], PATHINFO_EXTENSION);
 
             $chatDetail =  $this->chat?->chatDetails()->create([
-                        'content' => $this->ImgMessg,
-                        'type' => ChatDetailTypeEnum::ADMIN_MESSAGE,
-                        'user_id' => auth()->id(),
-                    ]);
+                'content' => $this->ImgMessg,
+                'type' => ChatDetailTypeEnum::ADMIN_MESSAGE,
+                'user_id' => auth()->id(),
+            ]);
             $fileModel = [
                 'user_id' => $this->chat?->user->id,
                 'answer_by' => auth()->user()->id,
                 'chat_detail_id' =>  $chatDetail->id,
-                'original_name' =>$fileName,
+                'original_name' => $fileName,
                 'server_name' => $fileName,
                 'disk' => $fileDisk,
                 'path' => $filePath,
@@ -153,29 +154,28 @@ class ChatView extends Component
             ChatDetailsFile::create($fileModel);
             unset($this->form['file']);
             $this->addError('success', 'پیام با موفقیت ارسال شد');
-        }elseif(isset($this->form['capturedPic'])) 
-        {
+        } elseif (isset($this->form['capturedPic'])) {
             $chatDetail = $this->chat?->chatDetails()->create([
                 'content' => $this->ImgMessg,
                 'type' => ChatDetailTypeEnum::ADMIN_MESSAGE,
                 'user_id' => auth()->id(),
             ]);
-            
+
             // Store the captured image and get the full path
             $filePath = $this->form['capturedPic']->store('public/uploads');
-            
+
             // Strip the 'public/' part to store a relative path
             $filePath = str_replace('public/', '', $filePath);
-            
+
             // Get the file name
             $fileName = basename($filePath);
-            
+
             // Get the file extension
             $extension = pathinfo($fileName, PATHINFO_EXTENSION);
-            
+
             // Define the disk being used (assumed 'public')
             $fileDisk = 'public';
-            
+
             // Prepare the file model for saving in the database
             $fileModel = [
                 'user_id' => $this->chat?->user->id,
@@ -189,14 +189,13 @@ class ChatView extends Component
                 'mime' => $extension,
                 'size' => $this->form['capturedPic']->getSize(),
             ];
-            
+
             // Store the file record in the database
             ChatDetailsFile::create($fileModel);
-            
+
             // Clear the form after submission
             unset($this->form['capturedPic']);
-        
-        }else{
+        } else {
             unset($this->form['typedMessage']);
             $this->addError('success', 'پیام با موفقیت ارسال شد');
             $chatDetail = $this->chat?->chatDetails()->create([
@@ -211,24 +210,24 @@ class ChatView extends Component
         ]);
         $this->chat?->increment('new_message_by_support');
 
-        $notificationMessage =  isset($this->chatMessage) ? substr($this->chatMessage,0,50) : 'یک پیام جدید دارید' ;
+        $notificationMessage =  isset($this->chatMessage) ? substr($this->chatMessage, 0, 50) : 'یک پیام جدید دارید';
         //clear input
         $this->chatMessage = '';
 
         // send pusher event
         $message = ChatDetailResource::make($chatDetail);
-        event(new PusherBroadcast($message , $this->chat->id));
+        event(new PusherBroadcast($message, $this->chat->id));
 
         // send sms
-        if(isset($this->form['sendSms']) && $this->form['sendSms'] == true ) {
-            $template = setting(SettingKeyEnum::SMS_FOR_SEND_MESSAGE_IN_CHATS) ;
-            if(isset($template)) {
-                $messageLink = 'https://webapp.mata-app.com'. (\App\Enum\RouteEnum::CHAT->getLink(replacement: $this->chat->id)) ;
-                   $shortLink =  $this->chat->shortLink()->create([
-                        'link_code' => ShortLink::generateShortLinkCode(),
-                        'link_url'  => $messageLink,
-                    ]);
-                $this->chat->user->notify(new UserSmsNotification($template,url('/s/' . $shortLink->link_code)));
+        if (isset($this->form['sendSms']) && $this->form['sendSms'] == true) {
+            $template = setting(SettingKeyEnum::SMS_FOR_SEND_MESSAGE_IN_CHATS);
+            if (isset($template)) {
+                $messageLink = 'https://webapp.mata-app.com' . (\App\Enum\RouteEnum::CHAT->getLink(replacement: $this->chat->id));
+                $shortLink =  $this->chat->shortLink()->create([
+                    'link_code' => ShortLink::generateShortLinkCode(),
+                    'link_url'  => $messageLink,
+                ]);
+                $this->chat->user->notify(new UserSmsNotification($template, url('/s/' . $shortLink->link_code)));
             }
             unset($this->form['sendSms']);
         }
@@ -243,7 +242,7 @@ class ChatView extends Component
         } catch (\Throwable $th) {
         }
 
-        $this->dispatch('messageHasBeenSend',true);
+        $this->dispatch('messageHasBeenSend', true);
         AdminAnswerChatEvent::dispatch($this->chat);
     }
 
@@ -258,12 +257,13 @@ class ChatView extends Component
         $this->chatId = $chatId;
         $this->dispatch('chatRoomSelected');
     }
-    public function closeChat($id) {
-       $closeChat =  Chat::find($id);
+    public function closeChat($id)
+    {
+        $closeChat =  Chat::find($id);
         $closeChat->update([
-            'status' => ChatStatusEnum::CLOSED ,
+            'status' => ChatStatusEnum::CLOSED,
         ]);
-        return redirect()->route('admin.chat',['chatId' => $closeChat->id])->with('success','وضعیت گفت و گو به بسته شده تغییر کرد.');
+        return redirect()->route('admin.chat', ['chatId' => $closeChat->id])->with('success', 'وضعیت گفت و گو به بسته شده تغییر کرد.');
     }
 
     public function loadMore()
@@ -282,9 +282,10 @@ class ChatView extends Component
     {
         $this->filterStatus = $value;
     }
-    public function updated($properyty) {
-        if($properyty == 'form.capturedPic'){
-            $this->dispatch('picUploade',true);
+    public function updated($properyty)
+    {
+        if ($properyty == 'form.capturedPic') {
+            $this->dispatch('picUploade', true);
         }
     }
     public function render()
@@ -314,15 +315,18 @@ class ChatView extends Component
         if ($this->filterStatus) {
             $chats->where('status', $this->filterStatus);
         } else {
-            $chats->where('status' , '!=' , ChatStatusEnum::CLOSED);
+            $chats->where('status', '!=', ChatStatusEnum::CLOSED);
         }
 
-        // Order and paginate the chats
-        $chats = $chats->orderBy('status', 'asc')
-            ->orderBy('created_at', 'asc')
+        // Order chats based on the last message's created_at from chatDetails
+        $chats = $chats->orderByDesc(
+            ChatDetail::select('created_at')
+                ->whereColumn('chats.id', 'chat_details.chat_id')
+                ->latest()
+                ->limit(1)
+        )
             ->paginate($this->perPage);
 
         return view('chat::livewire.chat-view', compact('chats'));
     }
-
 }

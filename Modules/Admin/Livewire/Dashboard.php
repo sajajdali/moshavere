@@ -7,11 +7,12 @@ use Livewire\WithPagination;
 use Livewire\Attributes\Title;
 use Modules\User\Entities\User;
 use Illuminate\Support\Facades\Cache;
-use Modules\AppointmentUser\app\Models\AppointmentOnline;
-use Modules\AppointmentUser\app\Models\AppointmentOnlineMessage;
+use Modules\Setting\Enum\SettingKeyEnum;
 use Modules\Transaction\app\Models\Transaction;
 use Modules\AppointmentUser\app\Models\AppointmentUser;
+use Modules\AppointmentUser\app\Models\AppointmentOnline;
 use Modules\AppointmentUser\Enum\AppointmentUserStatusEnum;
+use Modules\AppointmentUser\app\Models\AppointmentOnlineMessage;
 
 #[Title('پیشخوان مدیریت')]
 class Dashboard extends Component
@@ -24,7 +25,6 @@ class Dashboard extends Component
         //scope functions can be found  in the models
         // dd(auth()->user());
         $this->fetchData['today_appointment']    = AppointmentUser::today()->successful()->get()?->count();
-        $this->fetchData['pendding_appointment'] = AppointmentUser::waitpayment()->get()?->count();
         $this->fetchData['new_online_messages'] = AppointmentOnlineMessage::badgeCount();
         $this->fetchData['chart']['month'] = [verta()->format('F'), verta()->submonths(1)->format('F'), verta()->submonths(2)->format('F'), verta()->submonths(3)->format('F')];
 
@@ -49,6 +49,15 @@ class Dashboard extends Component
         });
         $this->fetchData['SelfRegistrationDoctors'] = User::newRegistredDoctor()->get()->take(10);
         $this->fetchData['transactiontotal'] = Transaction::todayTransaction()->sum('total_cost');
+        $apiToken = setting(SettingKeyEnum::SMS_API_TOKEN);
+        if (isset($apiToken)) {
+            $response= \Illuminate\Support\Facades\Http::withToken($apiToken)->get('https://shsms.ir/api/v1/budget');
+        }
+        if(isset($response)
+        && isset($response['status'])
+        && $response['status']== true ){
+            $this->fetchData['shsms'] = $response['data']['ballance'] ;
+        }
     }
     public function render()
     {

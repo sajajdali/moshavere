@@ -44,13 +44,18 @@
                     </div>
                 </div>
             </div>
+            @isset($fetchData['shsms'])
             <div class="col-lg-6 col-sm-12 col-md-6 col-xl-3">
                 <div class="card overflow-hidden">
                     <div class="card-body">
                         <div class="row">
                             <div class="col">
-                                <h3 class="mb-2 fw-semibold">{{ $fetchData['pendding_appointment'] }}</h3>
-                                <p class="text-muted fs-13 mb-0">نوبت های در انتظار تایید</p>
+                                <div class="d-flex align-items-center">
+                                    <h3 class="mb-2 fw-semibold">{{ $fetchData['shsms'] }} </h3>
+                                    <small class="me-1">تومان</small>
+                                </div>
+                                <a href="https://shsms.ir" class="fs-13 mb-0">شارژ پنل پیامکی
+                                </a>
                                 <p class="text-muted mb-0 mt-2 fs-12">
                                     <span class="icn-box text-danger fw-semibold fs-13 me-1">
 
@@ -66,6 +71,7 @@
                     </div>
                 </div>
             </div>
+            @endisset
             <div class="col-lg-6 col-sm-12 col-md-6 col-xl-3">
                 <div class="card overflow-hidden">
                     <div class="card-body">

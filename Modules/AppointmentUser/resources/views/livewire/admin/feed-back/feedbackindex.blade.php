@@ -94,17 +94,17 @@
                                         @foreach ($feedBacks as $appointment_user_id => $each_app_feedBack)
                                             <tr class="text-center">
                                                 <td>{{ $each_app_feedBack->first()->id }}</td>
-                                                <td>{{ $each_app_feedBack->first()->appointmentUser->user->fullname }}
+                                                <td>{{ $each_app_feedBack->first()->appointmentUser?->user?->fullname ?? 'نوبت یافت نشد' }}
                                                 </td>
-                                                <td>{{ $each_app_feedBack->first()->appointmentUser->doctor->fullname }}
+                                                <td>{{ $each_app_feedBack->first()->appointmentUser?->doctor?->fullname ?? 'نوبت یافت نشد' }}
                                                 </td>
-                                                <td>{{ $each_app_feedBack->first()->appointmentUser->service->title }}
+                                                <td>{{ $each_app_feedBack->first()->appointmentUser?->service?->title ?? 'نوبت یافت نشد' }}
                                                 </td>
                                                 <td>
                                                     <a href="#"
                                                         wire:click='showModal({{ $appointment_user_id }})'>مشاهده</a>
                                                 </td>
-                                                <td>{{ verta($each_app_feedBack->first()->appointmentUser->date_visit)->format('Y/m/d ساعت H:i') }}
+                                                <td>{{ verta($each_app_feedBack->first()->appointmentUser?->date_visit)->format('Y/m/d ساعت H:i') }}
                                                 </td>
                                                 <td>{{ verta($each_app_feedBack->first()->created_at)->format('Y/m/d ساعت H:i') }}
                                                 </td>

@@ -111,7 +111,7 @@ class Feedbackindex extends Component
             }
         }
         // Get all feedbacks and group by appointment_user_id
-        $feedbacksGrouped = $query->get()->groupBy('appointment_user_id');
+        $feedbacksGrouped = $query->orderByDesc('id')->get()->groupBy('appointment_user_id');
 
         // Convert grouped data to a paginated collection
         $currentPage = LengthAwarePaginator::resolveCurrentPage();

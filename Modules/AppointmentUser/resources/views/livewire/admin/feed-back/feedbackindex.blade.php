@@ -92,7 +92,7 @@
                                 <tbody>
                                     @if ($feedBacks->isNotEmpty())
                                         @foreach ($feedBacks as $appointment_user_id => $each_app_feedBack)
-                                            <tr class="text-center">
+                                            <tr class="text-center @if ($each_app_feedBack->first()->appointmentUser == null)  table-secondary    @endif">
                                                 <td>{{ $each_app_feedBack->first()->id }}</td>
                                                 <td>{{ $each_app_feedBack->first()->appointmentUser?->user?->fullname ?? 'نوبت یافت نشد' }}
                                                 </td>
@@ -145,6 +145,13 @@
                     });
                     feedBackModal.show();
                 }, 1000);
+            });
+            Livewire.on('appointmentNotFound', function() {
+                swal({
+                    title: "نکته!",
+                    text: "نوبت حذف شده است!",
+                    confirmButtonText: 'حله'
+                });
             });
         });
     </script>

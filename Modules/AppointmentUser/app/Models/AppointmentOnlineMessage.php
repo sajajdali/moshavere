@@ -35,7 +35,6 @@ class AppointmentOnlineMessage extends Model
     public static function badgeCount()
     {
         $appointments = AppointmentOnline::whereIn('status', [
-            AppointmentOnlineStatusEnum::ACCEPTED,
             AppointmentOnlineStatusEnum::REPLY_BY_USER
         ])->count();
 
@@ -87,7 +86,6 @@ class AppointmentOnlineMessage extends Model
             AppointmentOnlineStatusEnum::ACCEPTED,
             AppointmentOnlineStatusEnum::REPLY_BY_USER
         ])->count();
-
         return $appointments;
     }
 }

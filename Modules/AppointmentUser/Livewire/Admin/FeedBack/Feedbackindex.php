@@ -37,8 +37,12 @@ class Feedbackindex extends Component
     public function showModal($id)
     {
         $appointmentUSer = AppointmentUser::find($id);
-        $this->fetchData['feedbacks'] = $appointmentUSer->feedbacks;
-        $this->dispatch('lunchFeedBackModal', true);
+        if(isset($appointmentUSer)) {
+            $this->fetchData['feedbacks'] = $appointmentUSer->feedbacks;
+            $this->dispatch('lunchFeedBackModal', true);
+        }else{
+            $this->dispatch('appointmentNotFound',true);
+        }
     }
 
     public function render()

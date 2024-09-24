@@ -83,7 +83,6 @@ class AppointmentOnlineMessage extends Model
     public static function totalUnreaedMessage(): int
     {
         $appointments = AppointmentOnline::whereIn('status', [
-            AppointmentOnlineStatusEnum::ACCEPTED,
             AppointmentOnlineStatusEnum::REPLY_BY_USER
         ])->count();
         return $appointments;

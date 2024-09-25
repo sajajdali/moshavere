@@ -257,7 +257,7 @@
 
                 </div>
                 <div class="d-flex justify-content-center mb-5">
-                    {{-- {{$this->handleSearch()->links()}} --}}
+                    {{$this->handleSearch()->links()}}
                 </div>
             </div>
         </div>

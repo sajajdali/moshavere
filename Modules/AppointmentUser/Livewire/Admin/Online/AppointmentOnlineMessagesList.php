@@ -121,7 +121,7 @@ class AppointmentOnlineMessagesList extends Component
             ->groupBy('appointment_online_id')
             ->orderByDesc('updated_at');
 
-        return  $query->paginate(10);
+        return  $query->paginate(50);
     }
     public function booted()
     {

@@ -48,12 +48,18 @@
                             <div class="tab-pane active" id="ChatList">
                                 <div class="main-chat-list tab-pane">
                                     <div>
-                                        <!-- Search input with 'Enter' key event -->
                                         <div class="mb-3">
-                                            <input type="text" class="form-control" placeholder="جست و جوی پیشرفته ...."
-                                                   wire:model="searchTerm"
-                                                   >
+                                            <div class="input-group">
+                                                <input type="text" id="searchInput" class="form-control" placeholder="جست و جوی پیشرفته ...." wire:model="searchTerm" wire:keydown.enter='runSearch'>
+                                                <button class="btn btn-outline-secondary" type="button">
+                                                    جستجو
+                                                </button>
+                                            </div>
                                         </div>
+
+                                        {{-- <div class="mb-3">
+                                            <input type="text" id="searchInput" class="form-control" placeholder="جست و جوی پیشرفته ...." wire:model="searchTerm" wire:keydown.enter='runSearch'>
+                                        </div> --}}
 
                                         <!-- Chat list -->
                                         @if($chats->count())
@@ -349,5 +355,9 @@
                 $('#loading-spinner').fadeOut();
                 $('#loading-spinner').addClass('d-none');
             });
+            $('body').on('change','#searchInput',function(){
+                @this.runSearch();
+            });
+
         </script>
 @endpush

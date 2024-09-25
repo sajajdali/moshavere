@@ -272,12 +272,6 @@ class ChatView extends Component
         $this->perPage += $this->loadMode;
     }
 
-    public function performSearch()
-    {
-        $this->queryTerm = $this->searchTerm; // Assign the entered term to queryTerm
-        $this->resetPage(); // Reset pagination to page 1 when searching
-    }
-
     public function showFilteredChat($value)
     {
         $this->filterStatus = $value;
@@ -288,19 +282,22 @@ class ChatView extends Component
             $this->dispatch('picUploade', true);
         }
     }
+    public function runSearch()
+    {
+        $this->render();
+    }
     public function render()
     {
         // Start the chat query
         $chats = Chat::query();
 
-        // Apply search term filters on chat details and user metas
-        $chats = $chats->where(function ($query) {
-            $query->whereHas('chatDetails', function ($query) {
-                $query->where('content', 'like', '%' . $this->searchTerm . '%');
-            })
-                ->orWhereHas('user', function ($query) {
-                    $query->whereHas('metas', function ($q) {
-                        $q->where([
+        $chats->when(isset($this->searchTerm), function ($q) {
+            $q->where(function ($qq) {
+                $qq->whereHas('chatDetails', function ($qqq) {
+                    $qqq->where('content', 'like',  "%{$this->searchTerm}%");
+                })->orWhereHas('user', function ($qqq) {
+                    $qqq->whereHas('metas', function ($qqqq) {
+                        $qqqq->where([
                             ['meta_key', UserMetaEnum::FIRST_NAME],
                             ['meta_value', 'LIKE', "%{$this->searchTerm}%"],
                         ])->orWhere([
@@ -309,6 +306,7 @@ class ChatView extends Component
                         ]);
                     })->orWhere('mobile', $this->searchTerm);
                 });
+            });
         });
 
         // Apply status filter if set

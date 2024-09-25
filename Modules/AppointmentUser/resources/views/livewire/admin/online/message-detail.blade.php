@@ -25,11 +25,35 @@
             {{ $message }}
         </div>
     @enderror
+    @push('styles')
+        <style>
+            .overflow-scroll {
+                overflow-y: auto;
+                scrollbar-width: thin;
+                /* For Firefox */
+            }
+
+            .overflow-scroll::-webkit-scrollbar {
+                width: 8px;
+            }
+
+            .overflow-scroll::-webkit-scrollbar-thumb {
+                background-color: rgba(0, 0, 0, 0.5);
+                /* Adjust color */
+                border-radius: 10px;
+            }
+
+            .overflow-scroll::-webkit-scrollbar-track {
+                background-color: #f1f1f1;
+                /* Track color */
+            }
+        </style>
+    @endpush
     <div class="row row-deck">
         <div class="col-md-4">
             <div class="card">
-                <div class="card-body profile-details-main pb-0">
-                    <div class="main-content-app" style="overflow-y: hidden ; overflow-x: hidden">
+                <div class="card-body profile-details-main pb-0 overflow-scroll">
+                    <div class="main-content-app">
                         <div class="text-center chat-image p-4 pb-0 mb-4 br-5">
                             <div class="rounded-circle chat-profile">
                                 <a class="rounded-circle"
@@ -302,16 +326,17 @@
                                         <i class="fa fa-microphone fa-xl" aria-hidden="true"></i>
                                     </button>
                                     <!-- Camera Button -->
-                                    <button class="btn @if (isset($form['capturedPic'])) btn-success @else  btn-light @endif mx-3 d-flex justify-content-center p-1 py-2 mt-2"  id="cameraButton"
-                                    @if (isset($form['capturedPic'])) disabled @endif>
+                                    <button
+                                        class="btn @if (isset($form['capturedPic'])) btn-success @else  btn-light @endif mx-3 d-flex justify-content-center p-1 py-2 mt-2"
+                                        id="cameraButton" @if (isset($form['capturedPic'])) disabled @endif>
                                         @if (isset($form['capturedPic']))
-                                        <i class="fa fa-check" aria-hidden="true"></i>
+                                            <i class="fa fa-check" aria-hidden="true"></i>
                                         @else
-                                        <i class="fa fa-camera" aria-hidden="true"></i>
+                                            <i class="fa fa-camera" aria-hidden="true"></i>
                                         @endif
                                     </button>
-                                    <input type="file" accept="image/*" capture="environment" id="cameraInput" wire:model='form.capturedPic'
-                                        style="display:none;" />
+                                    <input type="file" accept="image/*" capture="environment" id="cameraInput"
+                                        wire:model='form.capturedPic' style="display:none;" />
                                 </div>
                                 <textarea rows="3" class="form-control mt-5 ms-1 @error('form.typedMessage') is-invalid @enderror"
                                     wire:model='form.typedMessage'
@@ -327,7 +352,7 @@
                                         @if (isset($form['file']))
                                             <i class="fa fa-check" aria-hidden="true"></i>
                                         @else
-                                        <i class="fa fa-file" aria-hidden="true"></i>
+                                            <i class="fa fa-file" aria-hidden="true"></i>
                                         @endif
                                     </button>
                                 </div>
@@ -438,17 +463,17 @@
                     Fr.voice.export(upload, "blob");
                 }
             });
-            $('body').on('click','#cameraButton',function(){
+            $('body').on('click', '#cameraButton', function() {
                 $('#cameraInput').click();
             });
-            $('body').on('change','#cameraInput',function(event){
+            $('body').on('change', '#cameraInput', function(event) {
                 const file = event.target.files[0];
-                if(file) {
+                if (file) {
                     $('#loading-spinner').removeClass('d-none');
                     $('#loading-spinner').fadeIn();
                 }
             });
-            Livewire.on('picUploade',function(){
+            Livewire.on('picUploade', function() {
                 $('#loading-spinner').fadeOut();
                 $('#loading-spinner').addClass('d-none');
             });

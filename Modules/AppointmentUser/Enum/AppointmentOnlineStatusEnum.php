@@ -51,10 +51,11 @@ enum AppointmentOnlineStatusEnum: int implements EnumHasApiResultInterface
 
     public function canShowMessages(): bool
     {
-        return match ($this) {
-            self::ACCEPTED, self::REPLY_BY_USER, self::ANSWER_BY_DOCTOR, self::COMPLETED_BY_DOCTOR, self::TIME_IS_OVER, self::REACTIVATED => true,
-            default => false
-        };
+        return true;
+//        return match ($this) {
+//            self::ACCEPTED, self::REPLY_BY_USER, self::ANSWER_BY_DOCTOR, self::COMPLETED_BY_DOCTOR, self::TIME_IS_OVER, self::REACTIVATED => true,
+//            default => false
+//        };
     }
     public function getBadgeColor(): string
     {

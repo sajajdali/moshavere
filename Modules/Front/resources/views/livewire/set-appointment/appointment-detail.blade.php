@@ -49,7 +49,7 @@
                         <p class="font-bold text-sm px-4 text-gray-700 ">
                             <span>
                                 نوبت شما با موفقیت <span class="text-red">رزرو شد</span>.
-                                برای تایید نوبت باید مبلغ {{ number_format($fetchData['stauts']['price']) }} را به صورت
+                                برای تایید نوبت باید مبلغ {{ number_format($fetchData['stauts']['price']) }} ریال را به صورت
                                 آنلاین پرداخت کنید تا نوبت شما ثبت شود و در صورت عدم
                                 پرداخت نوبت شما حذف خواهد شد.
                             </span>

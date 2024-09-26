@@ -104,15 +104,18 @@ class DashboardController extends Controller
 
     public function appointmentList()
     {
-        $type = request()->has('type') ? request()->get('type') : 1;
+        $type = request()->has('type') ? request()->get('type') : "1";
         $kind = $type == "2" ? AppointmentUserKindEnum::ONLINE : AppointmentUserKindEnum::IN_PERSION;
         $user = auth()->user();
-        $appointmentListInPerson = $user->appointments()
+        $appointmentLists = $user->appointments()
             ->where('kind' , $kind->value)
-            ->orderByDesc('date_visit')->paginate()
         ;
+        if ($kind == AppointmentUserKindEnum::ONLINE) {
+            $appointmentLists->whereNotIn('status' , [AppointmentUserStatusEnum::STATUS_WAIT_PAYMENT , AppointmentUserStatusEnum::STATUS_PENDING]);
+        }
+        $appointmentLists = $appointmentLists->orderByDesc('date_visit')->paginate();
 
-        return $this->ok(new AppointmentUserPaginateResource($appointmentListInPerson));
+        return $this->ok(new AppointmentUserPaginateResource($appointmentLists));
 
     }
 

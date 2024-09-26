@@ -50,8 +50,6 @@ class AppointmentUserResource extends JsonResource
             return !in_array($c->status, [
                 AppointmentOnlineStatusEnum::CANCEL,
                 AppointmentOnlineStatusEnum::REJECT,
-                AppointmentOnlineStatusEnum::COMPLETED_BY_DOCTOR,
-                AppointmentOnlineStatusEnum::TIME_IS_OVER
             ]);
         })->sortBy('created_at')->first();
 

@@ -144,7 +144,7 @@
                                     <div class="content-inner" id="lightgallery" wire:key='{{time()}}'>
                                         @foreach ($this->chatList as $date => $chatItems)
                                             <label
-                                                class="main-chat-time"><span>{{ \Carbon\Carbon::parse($date)->diffForHumans() }}</span></label>
+                                                class="main-chat-time"><span>پیام های {{ \Carbon\Carbon::parse($date)->diffForHumans() }}</span></label>
                                             @foreach ($chatItems as $chatMessage)
                                                 @if ($chatMessage->type->is(\Modules\Chat\Enum\ChatDetailTypeEnum::MESSAGE))
                                                     <div class="media flex-row-reverse chat-right">

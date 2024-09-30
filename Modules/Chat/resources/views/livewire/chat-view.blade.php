@@ -5,17 +5,19 @@
             <h1 class="page-title">گفت و گو</h1>
         </div>
         <div class="card-options">
-            @if($filterStatus != null)
+            @if ($filterStatus != null)
                 <button class="btn btn-success me-2" type="button" wire:click="showFilteredChat(null)">
-                   حذف فیلترها ->
+                    حذف فیلترها ->
                 </button>
             @else
-            <button class="btn btn-warning me-2" type="button" wire:click="showFilteredChat({{\Modules\Chat\Enum\ChatStatusEnum::CLOSED}})">
-                نمایش چت های بسته شده
-            </button>
-            <button class="btn btn-info me-2" type="button" wire:click="showFilteredChat({{\Modules\Chat\Enum\ChatStatusEnum::USER_SEND_QUESTION}})">
-                چت های پاسخ کاربر
-            </button>
+                <button class="btn btn-warning me-2" type="button"
+                    wire:click="showFilteredChat({{ \Modules\Chat\Enum\ChatStatusEnum::CLOSED }})">
+                    نمایش چت های بسته شده
+                </button>
+                <button class="btn btn-info me-2" type="button"
+                    wire:click="showFilteredChat({{ \Modules\Chat\Enum\ChatStatusEnum::USER_SEND_QUESTION }})">
+                    چت های پاسخ کاربر
+                </button>
             @endif
         </div>
     </div>
@@ -34,7 +36,7 @@
     </div>
     @include('admin::layouts.components.alert')
     <!-- PAGE-HEADER END -->
-    {{--    @if ($chats->isNotEmpty())--}}
+    {{--    @if ($chats->isNotEmpty()) --}}
     <!-- Row -->
 
     <div class="row row-deck">
@@ -50,7 +52,9 @@
                                     <div>
                                         <div class="mb-3">
                                             <div class="input-group">
-                                                <input type="text" id="searchInput" class="form-control" placeholder="جست و جوی پیشرفته ...." wire:model="searchTerm" wire:keydown.enter='runSearch'>
+                                                <input type="text" id="searchInput" class="form-control"
+                                                    placeholder="جست و جوی پیشرفته ...." wire:model="searchTerm"
+                                                    wire:keydown.enter='runSearch'>
                                                 <button class="btn btn-outline-secondary" type="button">
                                                     جستجو
                                                 </button>
@@ -62,15 +66,16 @@
                                         </div> --}}
 
                                         <!-- Chat list -->
-                                        @if($chats->count())
+                                        @if ($chats->count())
                                             @foreach ($chats as $chatItem)
                                                 <a style="background-color:
-                                                @if($chatItem->status == \Modules\Chat\Enum\ChatStatusEnum::CLOSED) #f4c3c3 @elseif($chatItem->status == \Modules\Chat\Enum\ChatStatusEnum::ANSWERED) #e5e7ff @endif
-                                                " class="cursor-pointer media @if ($chatItem->id == $chatId) selected @else new @endif @if ($loop->first) border-top-0 @endif @if ($loop->last) border-bottom-0 @endif"
-                                                   wire:click="selectChatRoom({{ $chatItem->id }})">
+                                                @if ($chatItem->status == \Modules\Chat\Enum\ChatStatusEnum::CLOSED) #f4c3c3 @elseif($chatItem->status == \Modules\Chat\Enum\ChatStatusEnum::ANSWERED) #e5e7ff @endif
+                                                "
+                                                    class="cursor-pointer media @if ($chatItem->id == $chatId) selected @else new @endif @if ($loop->first) border-top-0 @endif @if ($loop->last) border-bottom-0 @endif"
+                                                    wire:click="selectChatRoom({{ $chatItem->id }})">
                                                     <div class="main-img-user online">
                                                         <img alt="{{ $chatItem->user?->full_name }}"
-                                                             src="{{ $chatItem->user?->avatar }}">
+                                                            src="{{ $chatItem->user?->avatar }}">
                                                         @if ($chatItem->new_message_by_user > 0)
                                                             <span>{{ $chatItem->new_message_by_user }}</span>
                                                         @endif
@@ -98,7 +103,7 @@
                                                 </div>
                                             @endif
                                         @else
-                                            <x-alert type="warning" message="هیچ اطلاعاتی یافت نشد"/>
+                                            <x-alert type="warning" message="هیچ اطلاعاتی یافت نشد" />
 
                                         @endif
                                     </div>
@@ -118,20 +123,26 @@
                     <div class="main-content-app pt-0">
                         <div class="main-content-body main-content-body-chat h-100">
                             <div class="main-chat-header pt-3 d-block d-sm-flex">
-                                <div class="main-img-user online"><img alt="{{ $this->chat?->user?->full_name }}"
-                                                                       src="{{ $this->chat?->user?->avatar }}">
+                                <div class="main-img-user online">
+                                    <img alt="{{ $this->chat?->user?->full_name }}"
+                                        src="{{ $this->chat?->user?->avatar }}">
                                 </div>
                                 <div class="main-chat-msg-name mt-2">
                                     <p class="mb-0">{{ $this->chat?->user?->full_name }}</p>
                                     <span class="dot-label bg-success"></span><small class="me-3">کاربر</small>
                                 </div>
+                                <div class="main-chat-msg-name text-muted mt-2 border-right">
+                                    <p class="mb-0 "> کد ملی: {{ $this->chat?->user?->nationalCode }}</p>
+                                    <p class="mb-0">شماره تماس: {{ $this->chat?->user?->mobile }} </p>
+                                </div>
                                 <nav class="nav">
                                     <div>
-                                        <div class="input-group" wire:key='{{time()}}'>
-                                            @if (isset($this->chatList?->first()?->first()?->chat) && $this->chatList?->first()?->first()?->chat?->status != Modules\Chat\Enum\ChatStatusEnum::CLOSED)
+                                        <div class="input-group" wire:key='{{ time() }}'>
+                                            @if (isset($this->chatList?->first()?->first()?->chat) &&
+                                                    $this->chatList?->first()?->first()?->chat?->status != Modules\Chat\Enum\ChatStatusEnum::CLOSED)
                                                 <button wire:confirm='از بستن چت مطمعن هستید؟'
-                                                        wire:click='closeChat({{$this->chatList?->first()?->first()?->chat->id}})'
-                                                        class="btn btn-warning">بستن چت
+                                                    wire:click='closeChat({{ $this->chatList?->first()?->first()?->chat->id }})'
+                                                    class="btn btn-warning">بستن چت
                                                 </button>
                                             @endif
                                         </div>
@@ -141,223 +152,236 @@
                             <!-- main-chat-header -->
                             <div class="main-chat-body flex-2" id="ChatBody">
                                 @if ($this->chatList?->isNotEmpty())
-                                    <div class="content-inner" id="lightgallery" wire:key='{{time()}}'>
+                                    <div class="content-inner" id="lightgallery" wire:key='{{ time() }}'>
                                         @foreach ($this->chatList as $date => $chatItems)
-                                            <label
-                                                class="main-chat-time"><span>پیام های {{ \Carbon\Carbon::parse($date)->diffForHumans() }}</span></label>
+                                            <label class="main-chat-time"><span>پیام های
+                                                    {{ \Carbon\Carbon::parse($date)->diffForHumans() }}</span></label>
                                             @foreach ($chatItems as $chatMessage)
                                                 @if ($chatMessage->type->is(\Modules\Chat\Enum\ChatDetailTypeEnum::MESSAGE))
                                                     <div class="media flex-row-reverse chat-right">
-                                                        @else
-                                                            <div class="media chat-left">
-                                                                @endif
-                                                                <div class="main-img-user online">
-                                                                    <img alt="avatar"
-                                                                         src="{{ $chatMessage->user?->avatar }}">
-                                                                </div>
-                                                                <div class="media-body">
-                                                                    @if ($chatMessage->files()->count())
-                                                                        @foreach($chatMessage->files as $file)
-                                                                            @if(in_array($file->mime,['jpg','image/png', 'jpeg','image/jpeg', 'png','image/png', 'gif','image/gif', 'webp','image/webp', 'bmp','image/bmp', 'svg','image/svg' ,'tiff','image/tiff', 'heic','image/heic', 'heif','image/heif']))
-                                                                                <a href="{{  Storage::url($file->disk . '/' . $file->path) }}"
-                                                                                   data-fancybox="gallery"
-                                                                                   data-caption="{{ $file->original_name }}">
-                                                                                    <img
-                                                                                        src="{{  Storage::url($file->disk . '/' . $file->path) }}"
-                                                                                        alt="{{ $file->original_name }}"
-                                                                                        style="width: 100px; height: auto;"/>
-                                                                                </a>
-                                                                            @elseif($file->mime == 'mp3')
-                                                                                <audio
-                                                                                    src="{{ Storage::url($file->disk . '/' . $file->path) }}"
-                                                                                    controls preload="auto"></audio>
-                                                                            @endif
-                                                                            <div class="main-msg-wrapper">
-                                                                                <a class="text-dark"
-                                                                                   href="{{ Storage::url($file->disk . '/' . $file->path) }}">
-                                                                                    <span class="fs-13 mt-1"> دانلود فایل
-                                                                                    </span> <i
-                                                                                        class="fe fe-download mt-3 ms-4 text-muted pe-2"></i>
-                                                                                </a>
-                                                                            </div>
-                                                                        @endforeach
-                                                                    @elseif($chatMessage->content)
-                                                                        <div class="main-msg-wrapper">
-                                                                            {{ $chatMessage->content }}
-                                                                        </div>
-                                                                    @endif
-                                                                    <div>
-                                                                        <span>{{ $chatMessage->created_at->format('H:i') }}</span>
-                                                                    </div>
-                                                                </div>
-                                                            </div>
-
-                                                            @endforeach
-                                                            @endforeach
-                                                    </div>
-                                                @else
-                                                    <div class="alert alert-info">
-                                                        هنوز پیامی ارسال نشده است.
-                                                    </div>
+                                                    @else
+                                                        <div class="media chat-left">
                                                 @endif
-                                    </div>
-                                    <div class="main-chat-footer" wire:key='{{time() . time()}}' style="padding-top :40px !important;">
-                                        @if (isset($this->chatList?->first()?->first()?->chat) && $this->chatList?->first()?->first()?->chat?->status == Modules\Chat\Enum\ChatStatusEnum::CLOSED)
-                                            <div class="col-md-12 alert alert-primary fade show mt-4 ms-3" role="alert">
-                                                چت بسته شده است!
-                                            </div>
-                                        @else
-                                                    <!-- Camera Button -->
-                                            <button class="btn @if (isset($form['capturedPic'])) btn-success @else  btn-light @endif mx-3 d-flex justify-content-center p-1 py-2 mt-2"  id="cameraButton"
-                                                @if (isset($form['capturedPic'])) disabled @endif>
-                                                    @if (isset($form['capturedPic']))
-                                                    <i class="fa fa-check" aria-hidden="true"></i>
-                                                    @else
-                                                    <i class="fa fa-camera" aria-hidden="true"></i>
-                                                    @endif
-                                            </button>
-                                            <input type="file" accept="image/*" capture="environment" id="cameraInput" wire:model='form.capturedPic'
-                                                style="display:none;" />
-                                            <textarea rows="3" class="form-control mt-5" placeholder="متن پیام شما..."
-                                                   wire:model="chatMessage"></textarea>
-                                            {{-- send File modal --}}
-                                            <div class="mt-5">
-                                                <button type="button" wire:click="sendMessage"
-                                                        wire:loading.class="btn btn-light btn-loading"
-                                                        wire:loading.class.remove="btn-primary"
-                                                        class="btn btn-icon  btn-primary brround mb-2">
-                                                    <i class="fa fa-paper-plane-o"></i>
-                                                </button>
-                                                <button data-bs-target="#file-selector-modal" data-bs-toggle="modal"
-                                                        class="btn btn-light me-3 d-flex justify-content-center p-1 py-2"
-                                                        href="javascript:void(0)">
-                                                    @if (isset($form['file']))
-                                                        <i class="fa fa-check" aria-hidden="true"></i>
-                                                    @else
-                                                    <i class="fa fa-file" aria-hidden="true"></i>
-                                                    @endif
-                                                </button>
-                                            </div>
-                                            <nav class="nav">
-                                            </nav>
-                                        @endif
-                                    </div>
-                                    <div class="row mt-5  pt-1 pt-sm-3">
-                                        <div class="col-12">
-                                            <span class="rounded-pill ms-1 mt-1 d-flex align-item-center">
-                                                <div class="material-switch">
-                                                    <input wire:model='form.sendSms' id="sendSms" name="siwtch04"
-                                                        type="checkbox" />
-                                                    <label for="sendSms" class="label-info"></label>
+                                                <div class="main-img-user online">
+                                                    <img alt="avatar" src="{{ $chatMessage->user?->avatar }}">
                                                 </div>
-                                                <p class="card-sub-title">ارسال پیامک به کاربر</p>
-                                            </span>
-                                        </div>
+                                                <div class="media-body">
+                                                    @if ($chatMessage->files()->count())
+                                                        @foreach ($chatMessage->files as $file)
+                                                            @if (in_array($file->mime, [
+                                                                    'jpg',
+                                                                    'image/png',
+                                                                    'jpeg',
+                                                                    'image/jpeg',
+                                                                    'png',
+                                                                    'image/png',
+                                                                    'gif',
+                                                                    'image/gif',
+                                                                    'webp',
+                                                                    'image/webp',
+                                                                    'bmp',
+                                                                    'image/bmp',
+                                                                    'svg',
+                                                                    'image/svg',
+                                                                    'tiff',
+                                                                    'image/tiff',
+                                                                    'heic',
+                                                                    'image/heic',
+                                                                    'heif',
+                                                                    'image/heif',
+                                                                ]))
+                                                                <a href="{{ Storage::url($file->disk . '/' . $file->path) }}"
+                                                                    data-fancybox="gallery"
+                                                                    data-caption="{{ $file->original_name }}">
+                                                                    <img src="{{ Storage::url($file->disk . '/' . $file->path) }}"
+                                                                        alt="{{ $file->original_name }}"
+                                                                        style="width: 100px; height: auto;" />
+                                                                </a>
+                                                            @elseif($file->mime == 'mp3')
+                                                                <audio
+                                                                    src="{{ Storage::url($file->disk . '/' . $file->path) }}"
+                                                                    controls preload="auto"></audio>
+                                                            @endif
+                                                            <div class="main-msg-wrapper">
+                                                                <a class="text-dark"
+                                                                    href="{{ Storage::url($file->disk . '/' . $file->path) }}">
+                                                                    <span class="fs-13 mt-1"> دانلود فایل
+                                                                    </span> <i
+                                                                        class="fe fe-download mt-3 ms-4 text-muted pe-2"></i>
+                                                                </a>
+                                                            </div>
+                                                        @endforeach
+                                                    @elseif($chatMessage->content)
+                                                        <div class="main-msg-wrapper">
+                                                            {{ $chatMessage->content }}
+                                                        </div>
+                                                    @endif
+                                                    <div>
+                                                        <span>{{ $chatMessage->created_at->format('H:i') }}</span>
+                                                    </div>
+                                                </div>
                                     </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                @else
-                    <div class="col-sm-12 col-md-12 col-lg-12 col-xl-8">
-                        <div class="card">
-                            <div class="alert alert-info">
-                                برای مشاهده گفت و گو از لیست یکی از گفت و گو ها را انتخاب کنید.
-                            </div>
-                        </div>
-                    </div>
-                @endif
-            </div>
-            <!-- End Row -->
-            {{--    @else--}}
-            {{--        <div class="row">--}}
-            {{--            <div class="col-12">--}}
-            {{--                <div class="alert alert-info">--}}
-            {{--                    هنوز چتی آغاز نشده است.--}}
-            {{--                </div>--}}
-            {{--            </div>--}}
-            {{--        </div>--}}
-            {{--    @endif--}}
-            <livewire:admin::file-manager-modal/>
+                                @endforeach
+        @endforeach
     </div>
-    @push('scripts')
-        <!--- TABS JS -->
-        <script src="{{ admin_asset('js/pusher.js') }}"></script>
-        <script src="{{ admin_asset('plugins/tabs/jquery.multipurpose_tabcontent.js') }}"></script>
-        <script src="{{ admin_asset('plugins/tabs/tab-content.js') }}"></script>
-        <script src="{{ admin_asset('js/chat.js') }}"></script>
-        <script src="{{ admin_asset('plugins/sweet-alert/sweetalert.min.js') }}"></script>
+@else
+    <div class="alert alert-info">
+        هنوز پیامی ارسال نشده است.
+    </div>
+    @endif
+</div>
+<div class="main-chat-footer" wire:key='{{ time() . time() }}' style="padding-top :40px !important;">
+    @if (isset($this->chatList?->first()?->first()?->chat) &&
+            $this->chatList?->first()?->first()?->chat?->status == Modules\Chat\Enum\ChatStatusEnum::CLOSED)
+        <div class="col-md-12 alert alert-primary fade show mt-4 ms-3" role="alert">
+            چت بسته شده است!
+        </div>
+    @else
+        <!-- Camera Button -->
+        <button
+            class="btn @if (isset($form['capturedPic'])) btn-success @else  btn-light @endif mx-3 d-flex justify-content-center p-1 py-2 mt-2"
+            id="cameraButton" @if (isset($form['capturedPic'])) disabled @endif>
+            @if (isset($form['capturedPic']))
+                <i class="fa fa-check" aria-hidden="true"></i>
+            @else
+                <i class="fa fa-camera" aria-hidden="true"></i>
+            @endif
+        </button>
+        <input type="file" accept="image/*" capture="environment" id="cameraInput" wire:model='form.capturedPic'
+            style="display:none;" />
+        <textarea rows="3" class="form-control mt-5" placeholder="متن پیام شما..." wire:model="chatMessage"></textarea>
+        {{-- send File modal --}}
+        <div class="mt-5">
+            <button type="button" wire:click="sendMessage" wire:loading.class="btn btn-light btn-loading"
+                wire:loading.class.remove="btn-primary" class="btn btn-icon  btn-primary brround mb-2">
+                <i class="fa fa-paper-plane-o"></i>
+            </button>
+            <button data-bs-target="#file-selector-modal" data-bs-toggle="modal"
+                class="btn btn-light me-3 d-flex justify-content-center p-1 py-2" href="javascript:void(0)">
+                @if (isset($form['file']))
+                    <i class="fa fa-check" aria-hidden="true"></i>
+                @else
+                    <i class="fa fa-file" aria-hidden="true"></i>
+                @endif
+            </button>
+        </div>
+        <nav class="nav">
+        </nav>
+    @endif
+</div>
+<div class="row mt-5  pt-1 pt-sm-3">
+    <div class="col-12">
+        <span class="rounded-pill ms-1 mt-1 d-flex align-item-center">
+            <div class="material-switch">
+                <input wire:model='form.sendSms' id="sendSms" name="siwtch04" type="checkbox" />
+                <label for="sendSms" class="label-info"></label>
+            </div>
+            <p class="card-sub-title">ارسال پیامک به کاربر</p>
+        </span>
+    </div>
+</div>
+</div>
+</div>
+</div>
+</div>
+@else
+<div class="col-sm-12 col-md-12 col-lg-12 col-xl-8">
+    <div class="card">
+        <div class="alert alert-info">
+            برای مشاهده گفت و گو از لیست یکی از گفت و گو ها را انتخاب کنید.
+        </div>
+    </div>
+</div>
+@endif
+</div>
+<!-- End Row -->
+{{--    @else --}}
+{{--        <div class="row"> --}}
+{{--            <div class="col-12"> --}}
+{{--                <div class="alert alert-info"> --}}
+{{--                    هنوز چتی آغاز نشده است. --}}
+{{--                </div> --}}
+{{--            </div> --}}
+{{--        </div> --}}
+{{--    @endif --}}
+<livewire:admin::file-manager-modal />
+</div>
+@push('scripts')
+    <!--- TABS JS -->
+    <script src="{{ admin_asset('js/pusher.js') }}"></script>
+    <script src="{{ admin_asset('plugins/tabs/jquery.multipurpose_tabcontent.js') }}"></script>
+    <script src="{{ admin_asset('plugins/tabs/tab-content.js') }}"></script>
+    <script src="{{ admin_asset('js/chat.js') }}"></script>
+    <script src="{{ admin_asset('plugins/sweet-alert/sweetalert.min.js') }}"></script>
 
-        <!-- Include Fancybox CSS -->
-        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/fancybox/3.5.7/jquery.fancybox.min.css"/>
-        <!-- Include Fancybox JS -->
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/fancybox/3.5.7/jquery.fancybox.min.js"></script>
-        <script>
-            $(document).ready(function () {
-                $('[data-fancybox="gallery"]').fancybox({
-                    buttons: [
-                        "zoom",
-                        "slideShow",
-                        "thumbs",
-                        "close"
-                    ],
-                    loop: true,
-                    protect: true,
-                    // Add more options as needed
-                });
+    <!-- Include Fancybox CSS -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/fancybox/3.5.7/jquery.fancybox.min.css" />
+    <!-- Include Fancybox JS -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/fancybox/3.5.7/jquery.fancybox.min.js"></script>
+    <script>
+        $(document).ready(function() {
+            $('[data-fancybox="gallery"]').fancybox({
+                buttons: [
+                    "zoom",
+                    "slideShow",
+                    "thumbs",
+                    "close"
+                ],
+                loop: true,
+                protect: true,
+                // Add more options as needed
             });
-        </script>
-        <script>
-            Livewire.on('error', param => {
-                swal({
-                    title: "خطا!",
-                    text: "" + param.message,
-                    type: "error",
-                    showCancelButton: true,
-                    allowOutsideClick: true,
-                    showConfirmButton: false,
-                    cancelButtonText: "متوجه شدم",
-                    closeOnConfirm: false
-                });
+        });
+    </script>
+    <script>
+        Livewire.on('error', param => {
+            swal({
+                title: "خطا!",
+                text: "" + param.message,
+                type: "error",
+                showCancelButton: true,
+                allowOutsideClick: true,
+                showConfirmButton: false,
+                cancelButtonText: "متوجه شدم",
+                closeOnConfirm: false
             });
-            Livewire.on('select_file', (param) => {
-            @this.set('form.file', param.url)
-                ;
-                //close modal
-                $('#file-selector-modal').modal('hide');
-            });
+        });
+        Livewire.on('select_file', (param) => {
+            @this.set('form.file', param.url);
+            //close modal
+            $('#file-selector-modal').modal('hide');
+        });
+        scroll();
+
+        Livewire.on('messageHasBeenSend', function() {
             scroll();
+        });
 
-            Livewire.on('messageHasBeenSend', function () {
-                scroll();
-            });
+        function scroll() {
+            setTimeout(() => {
+                $('#ChatBody').scrollTop($('#ChatBody')[0].scrollHeight);
+            }, 200);
+        }
 
-            function scroll() {
-                setTimeout(() => {
-                    $('#ChatBody').scrollTop($('#ChatBody')[0].scrollHeight);
-                }, 200);
+        Livewire.on('chatRoomSelected', function() {
+            scroll();
+        });
+        $('body').on('click', '#cameraButton', function() {
+            $('#cameraInput').click();
+        });
+        $('body').on('change', '#cameraInput', function(event) {
+            const file = event.target.files[0];
+            if (file) {
+                $('#loading-spinner').removeClass('d-none');
+                $('#loading-spinner').fadeIn();
             }
-
-            Livewire.on('chatRoomSelected', function () {
-                scroll();
-            });
-            $('body').on('click','#cameraButton',function(){
-                $('#cameraInput').click();
-            });
-            $('body').on('change','#cameraInput',function(event){
-                const file = event.target.files[0];
-                if(file) {
-                    $('#loading-spinner').removeClass('d-none');
-                    $('#loading-spinner').fadeIn();
-                }
-            });
-            Livewire.on('picUploade',function(){
-                $('#loading-spinner').fadeOut();
-                $('#loading-spinner').addClass('d-none');
-            });
-            $('body').on('change','#searchInput',function(){
-                @this.runSearch();
-            });
-
-        </script>
+        });
+        Livewire.on('picUploade', function() {
+            $('#loading-spinner').fadeOut();
+            $('#loading-spinner').addClass('d-none');
+        });
+        $('body').on('change', '#searchInput', function() {
+            @this.runSearch();
+        });
+    </script>
 @endpush

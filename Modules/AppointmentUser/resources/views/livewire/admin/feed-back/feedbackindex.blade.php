@@ -6,13 +6,14 @@
             </div>
         </div>
         @include('admin::layouts.components.alert')
-        <div class="row row-sm">
+        <div class="row row-sm"  wire:loading.class="op-0-3">
             <div class="col-lg-12">
-                <div class="card custom-card">
+                <div class="card custom-card" id="resultCard">
                     <div class="card-header d-flex justify-content-between border-bottom">
-                        <h3 class="card-title"></h3>
+                        <h3 class="card-title">لیست همه نظر سنجی ها</h3>
                         <div class="card-options">
-                            <button class="btn btn-primary" type="button" data-bs-toggle="collapse"
+                            <div>
+                                <button class="btn btn-primary" type="button" data-bs-toggle="collapse"
                                 data-bs-target="#advanceSearch" aria-expanded="false" aria-controls="advanceSearch">
                                 جست و جوی پیشرفته
                             </button>
@@ -27,6 +28,8 @@
                                     wire:loading.class="bg-gray btn-loading disabled">نمایش همه
                                 </button>
                             @endif
+                            </div>
+
                         </div>
 
                     </div>
@@ -76,8 +79,7 @@
                             </form>
                         </div>
                         <div class="table-responsive mb-3">
-                            <table class="table text-nowrap text-md-nowrap table-bordered text-center"
-                                wire:loading.class="op-0-3">
+                            <table class="table text-nowrap text-md-nowrap table-bordered text-center">
                                 <thead>
                                     <tr class="table-primary">
                                         <th scope="col">#</th>
@@ -91,22 +93,22 @@
                                 </thead>
                                 <tbody>
                                     @if ($feedBacks->isNotEmpty())
-                                        @foreach ($feedBacks as $appointment_user_id => $each_app_feedBack)
-                                            <tr class="text-center @if ($each_app_feedBack->first()->appointmentUser == null)  table-secondary    @endif">
-                                                <td>{{ $each_app_feedBack->first()->id }}</td>
-                                                <td>{{ $each_app_feedBack->first()->appointmentUser?->user?->fullname ?? 'نوبت یافت نشد' }}
+                                    @foreach ($feedBacks as $key => $each_app_feedBack)
+                                            <tr class="text-center @if ($each_app_feedBack->appointmentUser == null)  table-secondary    @endif">
+                                                <td>{{$loop->index +1  }}</td>
+                                                <td>{{ $each_app_feedBack->appointmentUser?->user?->fullname ?? 'نوبت یافت نشد' }}
                                                 </td>
-                                                <td>{{ $each_app_feedBack->first()->appointmentUser?->doctor?->fullname ?? 'نوبت یافت نشد' }}
+                                                <td>{{ $each_app_feedBack->appointmentUser?->doctor?->fullname ?? 'نوبت یافت نشد' }}
                                                 </td>
-                                                <td>{{ $each_app_feedBack->first()->appointmentUser?->service?->title ?? 'نوبت یافت نشد' }}
+                                                <td>{{ $each_app_feedBack->appointmentUser?->service?->title ?? 'نوبت یافت نشد' }}
                                                 </td>
                                                 <td>
                                                     <a href="#"
-                                                        wire:click='showModal({{ $appointment_user_id }})'>مشاهده</a>
+                                                        wire:click='showModal({{ $each_app_feedBack->appointment_user_id }})'>مشاهده</a>
                                                 </td>
-                                                <td>{{ verta($each_app_feedBack->first()->appointmentUser?->date_visit)->format('Y/m/d ساعت H:i') }}
+                                                <td>{{ verta($each_app_feedBack->appointmentUser?->date_visit)->format('Y/m/d ساعت H:i') }}
                                                 </td>
-                                                <td>{{ verta($each_app_feedBack->first()->created_at)->format('Y/m/d ساعت H:i') }}
+                                                <td>{{ verta($each_app_feedBack->created_at)->format('Y/m/d ساعت H:i') }}
                                                 </td>
                                             </tr>
                                         @endforeach
@@ -122,12 +124,211 @@
                                 </tbody>
                             </table>
                         </div>
-                        <div>
+                        <div class="d-flex justify-content-center">
                             {{ $feedBacks->links() }}
                         </div>
                     </div>
                 </div>
             </div>
+            <div class="col-md-6">
+                <div class="card custom-card">
+                    <div class="card-header d-flex justify-content-between border-bottom">
+                        <h3 class="card-title">نوبت های آنلاین</h3>
+                        <div class="card-options">
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-6 shadow-sm">
+                                <div class="card overflow-hidden">
+                                    <div class="card-body">
+                                        <div class="row">
+                                            <div class="col">
+                                                <h3 class="mb-2 fw-semibold">{{$fetchData['onlineApp']['like']}}</h3>
+                                                <p class="text-muted fs-13 mb-0">راضی از نوبت دهی</p>
+                                                <p class="text-muted mb-0 mt-2 fs-12">
+                                                    <span class="icn-box text-success fw-semibold fs-13 me-1">
+
+                                                </p>
+                                            </div>
+                                            <div wire:click='showSpecialFeedback("onlineLike")' style="cursor: pointer"  data-toggle="tooltip" data-placement="top" title="نمایش نظرات" class="col col-auto top-icn dash">
+                                                <div class="counter-icon bg-success dash ms-auto box-shadow-success">
+                                                    <i class="fa fa-heart text-white text-white" aria-hidden="true"></i>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-6 shadow-sm">
+                                <div class="card overflow-hidden ">
+                                    <div class="card-body">
+                                        <div class="row">
+                                            <div class="col">
+                                                <h3 class="mb-2 fw-semibold">{{$fetchData['onlineDoc']['like']}}</h3>
+                                                <p class="text-muted fs-13 mb-0">راضی از کادر درمان</p>
+                                                <p class="text-muted mb-0 mt-2 fs-12">
+                                                    <span class="icn-box text-success fw-semibold fs-13 me-1">
+
+                                                </p>
+                                            </div>
+                                            <div wire:click='showSpecialFeedback("onlineDocLike")' style="cursor: pointer"  data-toggle="tooltip" data-placement="top" title="نمایش نظرات"  class="col col-auto top-icn dash">
+                                                <div class="counter-icon bg-success dash ms-auto box-shadow-success">
+                                                    <i class="fa fa-heart text-white" aria-hidden="true"></i>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-6 shadow-sm">
+                                <div class="card overflow-hidden">
+                                    <div class="card-body">
+                                        <div class="row">
+                                            <div class="col">
+                                                <h3 class="mb-2 fw-semibold">{{$fetchData['onlineApp']['dislike'] }}</h3>
+                                                <p class="text-muted fs-13 mb-0">ناراضی از نوبت دهی</p>
+                                                <p class="text-muted mb-0 mt-2 fs-12">
+                                                    <span class="icn-box text-danger fw-semibold fs-13 me-1">
+
+                                                </p>
+                                            </div>
+                                            <div class="col col-auto top-icn dash">
+                                                <div wire:click='showSpecialFeedback("onlineAppdislike")' style="cursor: pointer"  data-toggle="tooltip" data-placement="top" title="نمایش نظرات"  class="counter-icon bg-secondary dash ms-auto box-shadow-secondary">
+                                                    <i class="fa fa-thumbs-down text-white" aria-hidden="true"></i>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-6 shadow-sm">
+                                <div class="card overflow-hidden ">
+                                    <div class="card-body">
+                                        <div class="row">
+                                            <div class="col">
+                                                <h3 class="mb-2 fw-semibold">{{$fetchData['onlineDoc']['dislike']}}</h3>
+                                                <p class="text-muted fs-13 mb-0">ناراضی از کادر درمان</p>
+                                                <p class="text-muted mb-0 mt-2 fs-12">
+                                                    <span class="icn-box text-danger fw-semibold fs-13 me-1">
+
+                                                </p>
+                                            </div>
+                                            <div wire:click='showSpecialFeedback("onlineDocdislike")' style="cursor: pointer"  data-toggle="tooltip" data-placement="top" title="نمایش نظرات"  class="col col-auto top-icn dash">
+                                                <div class="counter-icon bg-secondary dash ms-auto box-shadow-secondary">
+                                                    <i class="fa fa-thumbs-down text-white" aria-hidden="true"></i>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="card custom-card">
+                    <div class="card-header d-flex justify-content-between border-bottom">
+                        <h3 class="card-title">نوبت های حضوری</h3>
+                        <div class="card-options">
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-6 shadow-sm">
+                                <div class="card overflow-hidden">
+                                    <div class="card-body">
+                                        <div class="row">
+                                            <div class="col">
+                                                <h3 class="mb-2 fw-semibold">{{$fetchData['inPerson_app']['like']}}</h3>
+                                                <p class="text-muted fs-13 mb-0">راضی از نوبت دهی</p>
+                                                <p class="text-muted mb-0 mt-2 fs-12">
+                                                    <span class="icn-box text-success fw-semibold fs-13 me-1">
+
+                                                </p>
+                                            </div>
+                                            <div class="col col-auto top-icn dash">
+                                                <div wire:click='showSpecialFeedback("inPerson_applike")' style="cursor: pointer"  data-toggle="tooltip" data-placement="top" title="نمایش نظرات" class="counter-icon bg-success dash ms-auto box-shadow-success">
+                                                    <i class="fa fa-heart text-white text-white" aria-hidden="true"></i>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-6 shadow-sm">
+                                <div class="card overflow-hidden ">
+                                    <div class="card-body">
+                                        <div class="row">
+                                            <div class="col">
+                                                <h3 class="mb-2 fw-semibold">{{$fetchData['inPerson_doc']['like']}}</h3>
+                                                <p class="text-muted fs-13 mb-0">راضی از کادر درمان</p>
+                                                <p class="text-muted mb-0 mt-2 fs-12">
+                                                    <span class="icn-box text-success fw-semibold fs-13 me-1">
+
+                                                </p>
+                                            </div>
+                                            <div class="col col-auto top-icn dash">
+                                                <div wire:click='showSpecialFeedback("inPerson_doclike")' style="cursor: pointer"  data-toggle="tooltip" data-placement="top" title="نمایش نظرات" class="counter-icon bg-success dash ms-auto box-shadow-success">
+                                                    <i class="fa fa-heart text-white" aria-hidden="true"></i>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-6 shadow-sm">
+                                <div class="card overflow-hidden">
+                                    <div class="card-body">
+                                        <div class="row">
+                                            <div class="col">
+                                                <h3 class="mb-2 fw-semibold">{{$fetchData['inPerson_app']['dislike'] }}</h3>
+                                                <p class="text-muted fs-13 mb-0">ناراضی از نوبت دهی</p>
+                                                <p class="text-muted mb-0 mt-2 fs-12">
+                                                    <span class="icn-box text-danger fw-semibold fs-13 me-1">
+
+                                                </p>
+                                            </div>
+                                            <div class="col col-auto top-icn dash">
+                                                <div wire:click='showSpecialFeedback("inPerson_appdislike")' style="cursor: pointer"  data-toggle="tooltip" data-placement="top" title="نمایش نظرات" class="counter-icon bg-secondary dash ms-auto box-shadow-secondary">
+                                                    <i class="fa fa-thumbs-down text-white" aria-hidden="true"></i>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-6 shadow-sm">
+                                <div class="card overflow-hidden ">
+                                    <div class="card-body">
+                                        <div class="row">
+                                            <div class="col">
+                                                <h3 class="mb-2 fw-semibold">{{$fetchData['inPerson_doc']['dislike']}}</h3>
+                                                <p class="text-muted fs-13 mb-0">ناراضی از کادر درمان</p>
+                                                <p class="text-muted mb-0 mt-2 fs-12">
+                                                    <span class="icn-box text-danger fw-semibold fs-13 me-1">
+
+                                                </p>
+                                            </div>
+                                            <div class="col col-auto top-icn dash">
+                                                <div wire:click='showSpecialFeedback("inPerson_docdislike")' style="cursor: pointer"  data-toggle="tooltip" data-placement="top" title="نمایش نظرات" class="counter-icon bg-secondary dash ms-auto box-shadow-secondary">
+                                                    <i class="fa fa-thumbs-down text-white" aria-hidden="true"></i>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
         </div>
     </div>
     @include('appointmentuser::components.appointmentlist.feedbackmodal')
@@ -152,6 +353,11 @@
                     text: "نوبت حذف شده است!",
                     confirmButtonText: 'حله'
                 });
+            });
+            Livewire.on('scrollToTop', function() {
+                setTimeout(() => {
+                    $('html, body').animate({ scrollTop: 0 }, '120');
+                }, 50);
             });
         });
     </script>

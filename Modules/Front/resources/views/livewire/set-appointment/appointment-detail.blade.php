@@ -53,6 +53,11 @@
                                 آنلاین پرداخت کنید تا نوبت شما ثبت شود و در صورت عدم
                                 پرداخت نوبت شما حذف خواهد شد.
                             </span>
+                            @if (setting(\Modules\Setting\Enum\SettingKeyEnum::APPOINTMENT_DETAIL_PAYMENT_DESCRIPTION_STATUS) != null && setting(\Modules\Setting\Enum\SettingKeyEnum::APPOINTMENT_DETAIL_PAYMENT_DESCRIPTION_TEXT) != null )
+                                <span>
+                                    {{setting(\Modules\Setting\Enum\SettingKeyEnum::APPOINTMENT_DETAIL_PAYMENT_DESCRIPTION_TEXT)}}
+                                </span>
+                            @endif
                         </p>
                         <button type="button"
                             class="font-bold text-red confirm_swal_alert text-sm cancelApp min-w-fit">لغو

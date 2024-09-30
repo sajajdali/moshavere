@@ -57,6 +57,9 @@ $setting = [
             \Modules\Setting\Enum\SettingKeyEnum::APPOINTMENT_DEADLINE_VIA_ADMIN,
             \Modules\Setting\Enum\SettingKeyEnum::APPOINTMENT_DEADLINE_VIA_USER,
             \Modules\Setting\Enum\SettingKeyEnum::APPOINTMENT_DESCRIPTION_IN_CHECKOUT_PAGE_REFUND,
+            \Modules\Setting\Enum\SettingKeyEnum::APPOINTMENT_DETAIL_PAYMENT_DESCRIPTION_STATUS,
+            \Modules\Setting\Enum\SettingKeyEnum::APPOINTMENT_DETAIL_PAYMENT_DESCRIPTION_TEXT,
+
 
         ],
     ],

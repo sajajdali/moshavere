@@ -150,7 +150,7 @@
                                 </nav>
                             </div>
                             <!-- main-chat-header -->
-                            <div class="main-chat-body flex-2" id="ChatBody">
+                            <div class="main-chat-body flex-2 overflow-scroll" id="ChatBody">
                                 @if ($this->chatList?->isNotEmpty())
                                     <div class="content-inner" id="lightgallery" wire:key='{{ time() }}'>
                                         @foreach ($this->chatList as $date => $chatItems)

@@ -37,6 +37,8 @@ enum SettingKeyEnum: int implements EnumHasNameInterface, SettingTypeInterface, 
     case SITE_FIRST_SECTION_DESCRIPTION = 20;
     case SITE_SECEND_SECTION_TITLE = 21;
     case SITE_SECEND_SECTION_DESCRIPTION = 22;
+    case APPOINTMENT_DETAIL_PAYMENT_DESCRIPTION_STATUS = 400;
+    case APPOINTMENT_DETAIL_PAYMENT_DESCRIPTION_TEXT = 401;
 
         // ABOUT US PAGE
     case ABOUT_US_FIRST_SECTION_TITLE = 23;
@@ -130,6 +132,8 @@ enum SettingKeyEnum: int implements EnumHasNameInterface, SettingTypeInterface, 
             self::SITE_FIRST_SECTION_DESCRIPTION    => 'توضیح بخش اول در صفحه ی اصلی',
             self::SITE_SECEND_SECTION_TITLE    => 'عنوان بخش دوم در صفحه ی اصلی(عنوان پیشنهادی: معرفی پزشکان)',
             self::SITE_SECEND_SECTION_DESCRIPTION    => 'توضیح بخش دوم در صفحه ی اصلی)',
+            self::APPOINTMENT_DETAIL_PAYMENT_DESCRIPTION_STATUS    => ' وضعیت توضیحات در صفحه ی جزئیات نوبت که مربوط به پرداخت میباشد',
+            self::APPOINTMENT_DETAIL_PAYMENT_DESCRIPTION_TEXT    => 'متن توضیحات در صفحه ی جزئیات نوبت که مربوط به پرداخت میباشد ',
 
             // SMS
             self::SMS_API_TOKEN => 'توکن API پیامک',
@@ -243,6 +247,7 @@ enum SettingKeyEnum: int implements EnumHasNameInterface, SettingTypeInterface, 
             self::DEFAULT_EXERCISE_STATUS => SettingTypeEnum::SELECT,
             self::PAYMEN_ACTIVE_DRIVER => SettingTypeEnum::SELECT,
             self::APPOINTMENT_MORE_THAT_ONE_PER_DAY => SettingTypeEnum::CHECK,
+            self::APPOINTMENT_DETAIL_PAYMENT_DESCRIPTION_STATUS => SettingTypeEnum::CHECK,
             self::ONILNE_SEND_ATUOMATIC_MESSAGE_STATUS => SettingTypeEnum::CHECK,
             self::APPOINTMENT_SET_APPOINTMENT_WITH_DOCUMENT_NUMBER => SettingTypeEnum::CHECK,
             self::SHOW_FALSE_APPOINTMENT_STATUS => SettingTypeEnum::CHECK,
@@ -268,6 +273,7 @@ enum SettingKeyEnum: int implements EnumHasNameInterface, SettingTypeInterface, 
             self::CONTACTUS_FORM_STATUS => SettingTypeEnum::CHECK,
             self::CONTACTUS_FORM_ADDRESS => SettingTypeEnum::TEXTAREA,
             self::FOOTER_DESCRIPTION => SettingTypeEnum::TEXTAREA,
+            self::APPOINTMENT_DETAIL_PAYMENT_DESCRIPTION_TEXT => SettingTypeEnum::TEXTAREA,
 
             self::ONILNE_SEND_ATUOMATIC_MESSAGE_MESSAGE => SettingTypeEnum::TEXTAREA,
             self::ABOUT_US_FIRST_SECTION_DESCRIPTION => SettingTypeEnum::TEXTAREA,

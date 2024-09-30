@@ -54,21 +54,20 @@ class Feedbackindex extends Component
         $appointmentQuestion = FeedBack::whereHas('appointmentUser', function ($q) {
             return $q->where('kind', AppointmentUserKindEnum::ONLINE);
         })->where('question', 1);
-        $this->fetchData['onlineApp']['like'] = $appointmentQuestion->whereIn('answer',  [1,2,3])->count();
+        $this->fetchData['onlineApp']['like'] = $appointmentQuestion->whereIn('answer',  [1, 2, 3])->count();
         $this->fetchData['onlineApp']['dislike'] = $appointmentQuestion->where('answer', 4)->count();
         $doctorQuery =  FeedBack::where('question', 2);
-        $this->fetchData['onlineDoc']['like'] = $doctorQuery->whereIn('answer',  [1,2,3])->count();
+        $this->fetchData['onlineDoc']['like'] = $doctorQuery->whereIn('answer',  [1, 2, 3])->count();
         $this->fetchData['onlineDoc']['dislike'] = $doctorQuery->where('answer', 4)->count();
 
         $inPersonApp = FeedBack::whereHas('appointmentUser', function ($q) {
             return $q->where('kind', AppointmentUserKindEnum::IN_PERSION);
         })->where('question', 2);
-        $this->fetchData['inPerson_app']['like'] = $inPersonApp->whereIn('answer',  [1,2,3])->count();
+        $this->fetchData['inPerson_app']['like'] = $inPersonApp->whereIn('answer',  [1, 2, 3])->count();
         $this->fetchData['inPerson_app']['dislike'] = $inPersonApp->where('answer', 4)->count();
         $doctorQuery =  FeedBack::where('question', 2);
-        $this->fetchData['inPerson_doc']['like'] = $inPersonApp->whereIn('answer',  [1,2,3])->count();
+        $this->fetchData['inPerson_doc']['like'] = $inPersonApp->whereIn('answer',  [1, 2, 3])->count();
         $this->fetchData['inPerson_doc']['dislike'] = $inPersonApp->where('answer', 4)->count();
-
     }
     public function showSpecialFeedback($section)
     {
@@ -150,7 +149,7 @@ class Feedbackindex extends Component
                     return $query->whereHas('appointmentUser', function ($q) {
                         return $q->where('kind', AppointmentUserKindEnum::ONLINE);
                     })->where('question', 1)->where(function ($q) {
-                        return $q->whereIn('answer',  [1,2,3]);
+                        return $q->whereIn('answer',  [1, 2, 3]);
                     });
                 },
             ],
@@ -160,7 +159,7 @@ class Feedbackindex extends Component
                     return $query->whereHas('appointmentUser', function ($q) {
                         return $q->where('kind', AppointmentUserKindEnum::ONLINE);
                     })->where('question', 2)->where(function ($q) {
-                        return $q->whereIn('answer',  [1,2,3]);
+                        return $q->whereIn('answer',  [1, 2, 3]);
                     });
                 },
             ],
@@ -190,7 +189,7 @@ class Feedbackindex extends Component
                     return $query->whereHas('appointmentUser', function ($q) {
                         return $q->where('kind', AppointmentUserKindEnum::IN_PERSION);
                     })->where('question', 1)->where(function ($q) {
-                        return $q->whereIn('answer',  [1,2,3]);
+                        return $q->whereIn('answer',  [1, 2, 3]);
                     });
                 },
             ],
@@ -200,7 +199,7 @@ class Feedbackindex extends Component
                     return $query->whereHas('appointmentUser', function ($q) {
                         return $q->where('kind', AppointmentUserKindEnum::IN_PERSION);
                     })->where('question', 2)->where(function ($q) {
-                        return $q->whereIn('answer',  [1,2,3]);
+                        return $q->whereIn('answer',  [1, 2, 3]);
                     });
                 },
             ],
@@ -232,8 +231,9 @@ class Feedbackindex extends Component
                 $query->when($condition, $callback);
             }
         }
-        $query->select('appointment_user_id', DB::raw('MAX(answer) as answer'), DB::raw('MAX(question) as question'))
-        ->groupBy('appointment_user_id')->orderBy('created_at', 'desc') ;
+        $query->select('appointment_user_id', DB::raw('MAX(answer) as answer'), DB::raw('MAX(question) as question'), DB::raw('MAX(created_at) as created_at'))
+            ->groupBy('appointment_user_id')
+            ->orderBy('created_at', 'desc');
         return view(
             'appointmentuser::livewire.admin.feed-back.feedbackindex',
             ['feedBacks' => $query->paginate(10)]

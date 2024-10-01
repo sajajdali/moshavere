@@ -18,5 +18,5 @@ use Modules\Absence\Livewire\AbsenceRegistration;
 
 Route::group([], function () {
     Route::get('appointment/setting/absence', AbsenceRegistration::class)->name('absence.create')->can('create',Absence::class);
-    Route::get('appointment/setting/absence/list', AbsenceList::class)->name('absence.list')->can('viewAny',Absence::class);
+    Route::get('appointment/setting/absence/list', AbsenceList::class)->name('absence.list');
 });

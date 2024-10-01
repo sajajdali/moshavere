@@ -1,11 +1,12 @@
 <?php
 
+//  comment.own permition is define in appointment_user 
 $menu = [
     'name' => 'Front',
 // permistion define in appointmentUser
     'menu' => [
         'title' => 'نمایش',
-        'gate' => ['appointment_user.comment', 'appointment_user.feedback'],
+        'gate' => ['appointment_user.comment', 'appointment_user.feedback','comment.own'],
         'policy_class' => null,
         'has_divider' => true,
         'priority' => 70,
@@ -40,7 +41,7 @@ if (!disableUi()) {
         ],
         [
             'title' => 'کامنت ها',
-            'gate' => 'appointment_user.comment',
+            'gate' => ['appointment_user.comment','comment.own'],
             'policy_class' => null,
             'icon' => 'fe fe-book',
             'route' => 'admin.comment',

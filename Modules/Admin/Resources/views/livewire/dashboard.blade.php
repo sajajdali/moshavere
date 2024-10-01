@@ -44,6 +44,7 @@
                     </div>
                 </div>
             </div>
+            @if(auth()->user()->isAdmin())
             @isset($fetchData['shsms'])
             <div class="col-lg-6 col-sm-12 col-md-6 col-xl-3">
                 <div class="card overflow-hidden">
@@ -72,6 +73,7 @@
                 </div>
             </div>
             @endisset
+            @endif
             <div class="col-lg-6 col-sm-12 col-md-6 col-xl-3">
                 <div class="card overflow-hidden">
                     <div class="card-body">

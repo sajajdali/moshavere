@@ -19,6 +19,7 @@ return [
                 'appointment_user.message'  => 'پیام های نوبت آنلاین',
                 'appointment_user.feedBack'  => 'مشاهده نظرسنجی ها',
                 'appointment_user.comment'  => 'کامنت ها',
+                'comment.own' => 'مشاهده کامنت های مربوط به خود پزشک',
             ],
         ],
     ],

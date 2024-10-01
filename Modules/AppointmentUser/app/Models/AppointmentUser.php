@@ -185,6 +185,14 @@ class AppointmentUser extends Model
     {
         return $query->where('status', AppointmentUserStatusEnum::STATUS_CANCEL)->orWhere('status', AppointmentUserStatusEnum::STATUS_CANCEL);
     }
+    public function scopeDoctorPermittion($query)
+    {
+        if(! auth()->user()->isAdmin() && auth()->user()->can('appointment_user.own') ) {
+            return $query->where('doctor_id', auth()->user()->id);
+        }else{ 
+            return ;
+        }
+    }
 
     public function attendedStatus()
     {

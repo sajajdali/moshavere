@@ -22,7 +22,7 @@
                                         href="#doctors" wire:ignore.self>
                                         پزشک ها
                                     </a>
-                                    @if(auth()->user()->isAdmin())
+                                    @if(auth()->user()->isAdmin() || auth()->user()->hasRole('منشی'))
                                     <a class="nav-link border border-bottom-0 br-sm-5 me-2  @if (isset($this->search['searchService'])) active @endif"
                                         data-bs-toggle="tab" href="#sections" wire:ignore.self>
                                         بخش ها

@@ -63,7 +63,6 @@ class AppointmentApiController extends Controller
         return $this->ok([
             'status' => true,
             'doctors' => DoctorResource::collection($doctors),
-            'client_ip' => $request->ip(),
             'no_doctors' => 'در حال حاضر امکان نوبت دهی غیر فعال است . لطفا بعدا اقدام کنید'
         ]);
     }
@@ -185,7 +184,7 @@ class AppointmentApiController extends Controller
 
                                 $firstTwoEmpty[] = [
                                     'status' => true,
-                                    'persian_date' => $vertaDateTime->format( 'l m/d ساعت H:i دقیقه'),
+                                    'persian_date' => $vertaDateTime->format( 'l m/d ساعت ') . substr($time['from'], 0, -3) ,
                                     'time_stamp' => $time['timestamp'],
                                     'from' => substr($time['from'], 0, -3),
                                     'until' => substr($time['until'], 0, -3),
@@ -193,7 +192,7 @@ class AppointmentApiController extends Controller
                             } else {
                                 $result[$dayNumber][] = [
                                     'status' => true,
-                                    'persian_date' => $vertaDateTime->format('l m/d ساعت H:i دقیقه'),
+                                    'persian_date' => $vertaDateTime->format( 'l m/d ساعت ') . substr($time['from'], 0, -3) ,
                                     'time_stamp' => $time['timestamp'],
                                     'from' => substr($time['from'], 0, -3),
                                     'until' => substr($time['until'], 0, -3),

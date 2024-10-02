@@ -47,6 +47,7 @@ class AppointmentApiController extends Controller
     {
         $query = User::doctors_query();
 
+
         if ($request->has('type') && in_array($request->get('type'), [1, 2])) {
 
             $query->whereHas('appointmentSettings', function ($query) use ($request) {
@@ -57,6 +58,7 @@ class AppointmentApiController extends Controller
                 }
             });
         }
+
 
         $doctors = $query->get();
 
@@ -189,7 +191,7 @@ class AppointmentApiController extends Controller
                                     'from' => substr($time['from'], 0, -3),
                                     'until' => substr($time['until'], 0, -3),
                                 ];
-                            } else {
+                            }
                                 $result[$dayNumber][] = [
                                     'status' => true,
                                     'persian_date' => $vertaDateTime->format( 'l m/d ساعت ') . substr($time['from'], 0, -3) ,
@@ -197,7 +199,7 @@ class AppointmentApiController extends Controller
                                     'from' => substr($time['from'], 0, -3),
                                     'until' => substr($time['until'], 0, -3),
                                 ];
-                            }
+
                             // If two matches are found, break out of the loop
                         } else {
                             $result[$dayNumber][] = [
@@ -387,7 +389,7 @@ class AppointmentApiController extends Controller
                             ])->orWhere(function ($query) {
                                 $query->where([
                                     ['meta_key', UserMetaEnum::LAST_NAME],
-                                    ['meta_value', 'LIKE', "%میررضا%"]
+                                    ['meta_value', 'LIKE', "%پگاه%"]
                                 ]);
                             });
                         })->first());
@@ -420,6 +422,26 @@ class AppointmentApiController extends Controller
             }
         }
         // handle condition dr amiri
+
+        if ($doctorId == 2 && $conditions == null) {
+            $resultList['firstTwoEmpty'] = null;
+            $resultList['listAppointments'] = null;
+            $conditions['title'] = 'امکان دریافت نوبت با دکتر امیری فراهم نیست';
+            $conditions['message'] = 'مراجعه کننده گرامی: نوبت های دکتر امیری تکمیل و یا غیر فعال است. در صورتی که بیمار دکتر امیری هستید از طریق ویزیت آنلاین اقدام به دریافت نوبت فرمایید. اگر ویزیت اولیه هستید ، تیم فوق تخصص دکتر امیری نوبت دریافت نمایید';
+
+
+            $conditions['alternative_doctor'] = DoctorResource::make(User::doctors_query()->whereHas('metas', function ($q) {
+                $q->where([
+                    ['meta_key', UserMetaEnum::FIRST_NAME],
+                    ['meta_value', 'LIKE', "%سها%"]
+                ])->orWhere(function ($query) {
+                    $query->where([
+                        ['meta_key', UserMetaEnum::LAST_NAME],
+                        ['meta_value', 'LIKE', "%میررضا%"]
+                    ]);
+                });
+            })->first());
+        }
 
         $payment = app('AppointmentUserService')->paymentstatus($appointmentSetting);
         return $this->ok([

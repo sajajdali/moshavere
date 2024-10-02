@@ -70,8 +70,19 @@ class AppointmentUserList extends Component
     #[Computed]
     private function handleSearch()
     {
+        $permisstion_check = auth()->user();
         $query = AppointmentUser::query();
         $searchCriteria = [
+            'permition' => [
+                'condition' => ! $permisstion_check->isAdmin(),
+                'callback' => function ($query) use ($permisstion_check) {
+                    if (! $permisstion_check->can('appointment_user') && $permisstion_check->can('appointment_user.own')) {
+                        return $query->where('doctor_id', $permisstion_check->id);
+                    } else {
+                        return;
+                    }
+                },
+            ],
             'user_id_search' => [
                 'condition' => $this->search['user_id'],
                 'callback' => function ($query) {

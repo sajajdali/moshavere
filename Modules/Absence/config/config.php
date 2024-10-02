@@ -6,6 +6,7 @@ return [
         [
             'gate' => [
                 'absence' => 'تنظیمات عدم حضور',
+                'absence.own' => 'زمان های حضور خود پزشک',
             ],
             'type' => 'light',
             'display_name' => 'تنظیمات عدم حضور',

@@ -40,8 +40,17 @@ class AbsenceList extends Component
     }
     public function render()
     {
+        $permistion_check= auth()->user();
+        if (!$permistion_check->can('absence', Absence::class) 
+        && !$permistion_check->can('absence.own', Absence::class)) {
+            abort(403, 'Unauthorized');
+        }
         $query = Absence::when(isset($this->search['id']) && !empty($this->search['id']), function ($q) {
             return $q->where('id', $this->search['id']);
+        })->when(! $permistion_check->isAdmin() && $permistion_check->can('absence.own'), function ($q) use($permistion_check) {
+            return $q->whereHas('user', function ($qq) use($permistion_check) {
+                return $qq->where('id',$permistion_check->id) ;
+            });
         })->when(isset($this->search['doc_name']) && !empty($this->search['doc_name']), function ($q) {
             return $q->whereHas('user', function ($qq) {
                 $qq->whereHas('metas', function ($qqq) {

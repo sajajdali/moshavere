@@ -53,12 +53,14 @@ class DoctorList extends Component
 
     public function render()
     {
+        $permission_check = auth()->user();
         $doctorsQuery = User::doctors_query();
         if ($doctorsQuery->get()->isNotEmpty()) {
             $doctorsQuery =  $doctorsQuery->when(isset($this->search['id']) && (int) $this->search['id'] !== 0, function ($query) {
                 return $query->where('id', $this->search['id']);
-            })
-                ->when(isset($this->search['mobile']) && !empty($this->search['mobile']), function ($query) {
+            })->when(! $permission_check->isAdmin() && $permission_check->can('AppointmentSetting.own'), function ($query) use($permission_check) {
+                    return $query->where('id',$permission_check->id);
+                })->when(isset($this->search['mobile']) && !empty($this->search['mobile']), function ($query) {
                     return $query->where('mobile', 'LIKE', "%{$this->search['mobile']}%");
                 })
                 ->when(isset($this->search['first_name']) && !empty($this->search['first_name']), function ($query) {

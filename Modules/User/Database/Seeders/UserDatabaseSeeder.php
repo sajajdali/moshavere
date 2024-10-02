@@ -66,7 +66,6 @@ class UserDatabaseSeeder extends Seeder
 
         // Sync permissions for secretery Role
         $secretaryPermissions  = [
-            $adminPermission,
             $secretaryPermission,
             'appointment_user',
             'appointment_user.addApp',
@@ -90,10 +89,36 @@ class UserDatabaseSeeder extends Seeder
             'user.delete',
             'user.documentte',
             'appointment_user.feedBack',
+            'comment.own',
+        ];
+        $doc  = [
+            'appointment_user.own',
+            'AppointmentSetting.own',
+            'absence.own',
+            'appointment_user.addApp',
+            'appointment_user.edit',
+            'appointment_user.delete',
+            'appointment_user.list',
+            'appointment_user.online',
+            'appointment_user.message',
+            'absence.create',
+            'absence.delete',
+            'admin.dashboard',
+            'admin.dashboard.appointments',
+            'admin.dashboard.analytic',
+            'AppointmentSetting',
+            'AppointmentSetting.update',
+            'chat',
+            'user',
+            'user.create',
+            'user.edit',
+            'user.delete',
+            'user.documentte',
+            'appointment_user.feedBack',
         ];
         $opdatorRoles->syncPermissions($secretaryPermissions);
         $secretaryRoles->syncPermissions($secretaryPermissions);
-        $doctorsRoles->syncPermissions($secretaryPermissions);
+        $doctorsRoles->syncPermissions($doc);
         // Sync permissions for mama Role
         $mamaPermissions = [$adminPermission, 'appointment_user', 'appointment_user.online', 'appointment_user.message'];
         $mamaRoles->syncPermissions($mamaPermissions);

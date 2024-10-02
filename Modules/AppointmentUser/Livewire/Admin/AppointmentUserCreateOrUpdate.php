@@ -3,6 +3,7 @@
 namespace Modules\AppointmentUser\Livewire\Admin;
 
 use App\Enum\ActiveEnum;
+use Livewire\Attributes\Locked;
 use Livewire\Component;
 use Livewire\WithPagination;
 use Modules\AppointmentSetting\app\Models\AppointmentSetting;
@@ -15,6 +16,8 @@ use Modules\Service\app\Models\Service;
 class AppointmentUserCreateOrUpdate extends Component
 {
     use WithPagination;
+    #[Locked]
+    public bool $permitionCheck ; 
     public array $search = [];
     public array $form = [
         'doctorSelected'    => null,
@@ -167,13 +170,18 @@ class AppointmentUserCreateOrUpdate extends Component
 
     public function mount()
     {
+      
         if (!Service::exists()) {
             return redirect()->route('admin.service.list')->with('error', 'لطفا حداقل یک بخش به سیستم اضافه کنید');
         }
     }
     public function render()
     {
-        $docQuery = User::doctors_query();
+        $permitionCheck = auth()->user();
+        $permitionCondition = !$permitionCheck->isAdmin() && $permitionCheck->hasRole('پزشک') ; 
+        $docQuery = User::doctors_query()->when( $permitionCondition,function($q){
+                return $q->where('id',auth()->user()->id);
+        });
         if (isset($docQuery)) {
             $docQuery =  $docQuery->where(function ($query) {
                 $query->whereDoesntHave('metas', function ($q) {
@@ -196,7 +204,11 @@ class AppointmentUserCreateOrUpdate extends Component
                 });
             })->orderByDesc('id')->paginate(20);
         }
-        $Services = Service::where('active', ActiveEnum::ACTIVE)
+        $Services = Service::when( $permitionCondition,function($q){
+            return $q->whereHas('user',function($qq){
+                 $qq->where('users.id',auth()->user()->id);
+            });
+        })->where('active', ActiveEnum::ACTIVE)
             ->when(isset($this->search['searchService']) && !empty($this->search['searchService']), function ($query) {
                 return $query->where('title', 'LIKE', "%{$this->search['searchService']}%");
             })->orderByDesc('id')->paginate(20);

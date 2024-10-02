@@ -186,7 +186,33 @@ function formatBytes($bytes, $precision = 2)
     }
 }
 
+function get_client_ip($trusted_proxies=[]) {
+    // In cli mode, there is no remote address
+    if (empty($_SERVER['REMOTE_ADDR'])) {
+        return null;
+    }
 
+    $client_ip = $_SERVER['REMOTE_ADDR'];
+    // If the remote address is not a trusted proxy, we shouldn't trust
+    // any headers that malicious clients may send
+    if (!in_array($client_ip, $trusted_proxies)) {
+        return $client_ip;
+    }
+
+    // The request is coming from a trusted proxy, so we can trust the
+    // "forwarded for" headers
+    if (isset($_SERVER['HTTP_X_FORWARDED_FOR'])) {
+        return $_SERVER['HTTP_X_FORWARDED_FOR'];
+    }
+
+    if (isset($_SERVER['HTTP_CLIENT_IP'])) {
+        return $_SERVER['HTTP_CLIENT_IP'];
+    }
+
+    // No forwarded client IP header provided; this might be some kind
+    // of health check request. Just return the trusted proxy IP.
+    return $client_ip;
+}
 function chatQuestions()
 {
     return [

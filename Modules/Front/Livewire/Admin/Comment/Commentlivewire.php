@@ -103,9 +103,17 @@ class Commentlivewire extends Component
     }
     public function render()
     {
-
+        $permitionCheck = auth()->user();
         $query =  Comment::query();
         $searchCriteria = [
+            'permition' => [
+                'condition' => ! $permitionCheck->isAdmin() && $permitionCheck->can('comment.own') ,
+                'callback' => function ($query) use($permitionCheck) {
+                    return $query->whereHas('doctor',function($q) use($permitionCheck) {
+                        return $q->where('id',$permitionCheck->id);
+                    });
+                },
+            ],
             'idSearch' => [
                 'condition' => isset($this->search['id']),
                 'callback' => function ($query) {

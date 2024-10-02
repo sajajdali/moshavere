@@ -423,7 +423,23 @@ class AppointmentApiController extends Controller
         }
         // handle condition dr amiri
 
-        if ($doctorId == 2 && $conditions == null) {
+        $ip = request()->header('X-Forwarded-For', request()->header('X-Real-Ip', request()->header('ar-real-ip')));
+        if ($ip == '91.92.122.120') {
+
+            $payment = app('AppointmentUserService')->paymentstatus($appointmentSetting);
+
+            return $this->ok([
+                'status' => false,
+                'payment' => $payment['in_person'],
+                'appointment_setting_id' => null,
+                'first_two_empty' => null,
+                'get_list_empty_appointment' => null,
+                'conditions' => $conditions,
+                'alert' => $alert,
+                'messages' => null
+            ]);
+        }
+        if ( $doctorId == 2 && $conditions == null) {
             $resultList['firstTwoEmpty'] = null;
             $resultList['listAppointments'] = null;
             $conditions['title'] = 'امکان دریافت نوبت با دکتر امیری فراهم نیست';

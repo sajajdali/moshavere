@@ -118,16 +118,6 @@ return [
                 'has_child' => false,
                 'children' => null
             ],
-            [
-                'title' => 'نظر سنجی ',
-                'gate' => 'appointment_user.feedback',
-                'policy_class' => null,
-                'icon' => 'fe fe-help-circle',
-                'route' => 'admin.appointment.feedback',
-                'has_badge' => false,
-                'has_child' => false,
-                'children' => null
-            ],
         ],
     ],
 ];

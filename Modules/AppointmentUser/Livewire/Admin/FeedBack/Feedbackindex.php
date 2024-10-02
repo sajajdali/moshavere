@@ -51,23 +51,23 @@ class Feedbackindex extends Component
 
     public function mount()
     {
-        $appointmentQuestion = FeedBack::whereHas('appointmentUser', function ($q) {
+        $appointmentQuestion = FeedBack::where('question', 1)->whereHas('appointmentUser', function ($q) {
             return $q->where('kind', AppointmentUserKindEnum::ONLINE);
-        })->where('question', 1);
-        $this->fetchData['onlineApp']['like'] = $appointmentQuestion->whereIn('answer',  [1, 2, 3])->count();
-        $this->fetchData['onlineApp']['dislike'] = $appointmentQuestion->where('answer', 4)->count();
+        });
+        $this->fetchData['onlineApp']['like'] = $appointmentQuestion->clone()->whereIn('answer',  [0,1, 2])->count();
+        $this->fetchData['onlineApp']['dislike'] = $appointmentQuestion->clone()->where('answer',  "3")->count();
         $doctorQuery =  FeedBack::where('question', 2);
-        $this->fetchData['onlineDoc']['like'] = $doctorQuery->whereIn('answer',  [1, 2, 3])->count();
-        $this->fetchData['onlineDoc']['dislike'] = $doctorQuery->where('answer', 4)->count();
+        $this->fetchData['onlineDoc']['like'] = $doctorQuery->clone()->whereIn('answer',  [1, 2, 0])->count();
+        $this->fetchData['onlineDoc']['dislike'] = $doctorQuery->clone()->where('answer', 3)->count();
 
         $inPersonApp = FeedBack::whereHas('appointmentUser', function ($q) {
             return $q->where('kind', AppointmentUserKindEnum::IN_PERSION);
         })->where('question', 2);
-        $this->fetchData['inPerson_app']['like'] = $inPersonApp->whereIn('answer',  [1, 2, 3])->count();
-        $this->fetchData['inPerson_app']['dislike'] = $inPersonApp->where('answer', 4)->count();
+        $this->fetchData['inPerson_app']['like'] = $inPersonApp->clone()->whereIn('answer',  [1, 2, 0])->count();
+        $this->fetchData['inPerson_app']['dislike'] = $inPersonApp->clone()->where('answer', 3)->count();
         $doctorQuery =  FeedBack::where('question', 2);
-        $this->fetchData['inPerson_doc']['like'] = $inPersonApp->whereIn('answer',  [1, 2, 3])->count();
-        $this->fetchData['inPerson_doc']['dislike'] = $inPersonApp->where('answer', 4)->count();
+        $this->fetchData['inPerson_doc']['like'] = $inPersonApp->clone()->whereIn('answer',  [0,1, 2])->count();
+        $this->fetchData['inPerson_doc']['dislike'] = $inPersonApp->clone()->where('answer', 3)->count();
     }
     public function showSpecialFeedback($section)
     {
@@ -149,7 +149,7 @@ class Feedbackindex extends Component
                     return $query->whereHas('appointmentUser', function ($q) {
                         return $q->where('kind', AppointmentUserKindEnum::ONLINE);
                     })->where('question', 1)->where(function ($q) {
-                        return $q->whereIn('answer',  [1, 2, 3]);
+                        return $q->whereIn('answer',  [1, 2, 0]);
                     });
                 },
             ],
@@ -159,7 +159,7 @@ class Feedbackindex extends Component
                     return $query->whereHas('appointmentUser', function ($q) {
                         return $q->where('kind', AppointmentUserKindEnum::ONLINE);
                     })->where('question', 2)->where(function ($q) {
-                        return $q->whereIn('answer',  [1, 2, 3]);
+                        return $q->whereIn('answer',  [1, 2, 0]);
                     });
                 },
             ],
@@ -169,7 +169,7 @@ class Feedbackindex extends Component
                     return $query->whereHas('appointmentUser', function ($q) {
                         return $q->where('kind', AppointmentUserKindEnum::ONLINE);
                     })->where('question', 1)->where(function ($q) {
-                        return $q->where('answer', 4);
+                        return $q->where('answer', 3);
                     });
                 },
             ],
@@ -179,7 +179,7 @@ class Feedbackindex extends Component
                     return $query->whereHas('appointmentUser', function ($q) {
                         return $q->where('kind', AppointmentUserKindEnum::ONLINE);
                     })->where('question', 2)->where(function ($q) {
-                        return $q->where('answer', 4);
+                        return $q->where('answer', 3);
                     });
                 },
             ],
@@ -189,7 +189,7 @@ class Feedbackindex extends Component
                     return $query->whereHas('appointmentUser', function ($q) {
                         return $q->where('kind', AppointmentUserKindEnum::IN_PERSION);
                     })->where('question', 1)->where(function ($q) {
-                        return $q->whereIn('answer',  [1, 2, 3]);
+                        return $q->whereIn('answer',  [1, 2, 0]);
                     });
                 },
             ],
@@ -199,7 +199,7 @@ class Feedbackindex extends Component
                     return $query->whereHas('appointmentUser', function ($q) {
                         return $q->where('kind', AppointmentUserKindEnum::IN_PERSION);
                     })->where('question', 2)->where(function ($q) {
-                        return $q->whereIn('answer',  [1, 2, 3]);
+                        return $q->whereIn('answer',  [1, 2, 0]);
                     });
                 },
             ],
@@ -209,7 +209,7 @@ class Feedbackindex extends Component
                     return $query->whereHas('appointmentUser', function ($q) {
                         return $q->where('kind', AppointmentUserKindEnum::IN_PERSION);
                     })->where('question', 1)->where(function ($q) {
-                        return $q->whereIn('answer',  4);
+                        return $q->whereIn('answer',  3);
                     });
                 },
             ],
@@ -219,7 +219,7 @@ class Feedbackindex extends Component
                     return $query->whereHas('appointmentUser', function ($q) {
                         return $q->where('kind', AppointmentUserKindEnum::IN_PERSION);
                     })->where('question', 2)->where(function ($q) {
-                        return $q->whereIn('answer',  4);
+                        return $q->whereIn('answer',  3);
                     });
                 },
             ],

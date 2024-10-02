@@ -186,7 +186,7 @@ class AppointmentApiController extends Controller
 
                                 $firstTwoEmpty[] = [
                                     'status' => true,
-                                    'persian_date' => $vertaDateTime->format( 'l m/d ساعت ') . substr($time['from'], 0, -3) ,
+                                    'persian_date' => $vertaDateTime->format( 'l m/d ساعت H:i دقیقه'),
                                     'time_stamp' => $time['timestamp'],
                                     'from' => substr($time['from'], 0, -3),
                                     'until' => substr($time['until'], 0, -3),
@@ -194,7 +194,7 @@ class AppointmentApiController extends Controller
                             }
                                 $result[$dayNumber][] = [
                                     'status' => true,
-                                    'persian_date' => $vertaDateTime->format( 'l m/d ساعت ') . substr($time['from'], 0, -3) ,
+                                    'persian_date' => $vertaDateTime->format('l m/d ساعت H:i دقیقه'),
                                     'time_stamp' => $time['timestamp'],
                                     'from' => substr($time['from'], 0, -3),
                                     'until' => substr($time['until'], 0, -3),

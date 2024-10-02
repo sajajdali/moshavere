@@ -20,7 +20,7 @@ class FeedBack extends Model
 
     public function appointmentUser()
     {
-        return $this->belongsTo(AppointmentUser::class);
+        return $this->belongsTo(AppointmentUser::class,'appointment_user_id');
     }
     public function shortLink(): \Illuminate\Database\Eloquent\Relations\MorphOne
     {

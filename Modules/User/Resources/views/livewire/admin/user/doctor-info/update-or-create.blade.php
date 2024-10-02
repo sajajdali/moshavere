@@ -188,13 +188,20 @@
                                             </div>
                                         </div>
                                         <div class="col-md-12">
-                                            <div class="form-group">
-                                                <label for="drBanner" class="form-label">بنر</label>
-                                                <input wire:model='form.drBanner' class="form-control" id="drBanner">
-                                                <small class="text-gray ms-2">
-                                                    <i class="fa fa-info-circle" aria-hidden="true"></i>
-                                                    متخص اپلیکیشن</small>
+                                            <label for="drDisplayExperince" class="form-label">بنر</label>
+                                            <div class="input-group ">
+                                                <span class="input-group-btn">
+                                                    <button class="btn btn-primary select_file"
+                                                        data-bs-target="#file-selector-modal" data-bs-toggle="modal" type="button">
+                                                        <i class="fa fa-picture-o"></i>
+                                                        انتخاب تصویر
+                                                    </button>
+                                                </span>
+                                                <input id="thumbnail" class="form-control" type="text" name="filepath" wire:model="form.drBanner">
                                             </div>
+                                            <small class="text-gray ms-2">
+                                                <i class="fa fa-info-circle" aria-hidden="true"></i>
+                                                برای اپلیکیشن</small>
                                         </div>
                                         @unless(disableUi())
                                         <div class="col-md-12">
@@ -305,6 +312,7 @@
             </div>
         </div>
     </div>
+    <livewire:admin::file-manager-modal />
 </div>
 @push('scripts')
     <script src="{{ admin_asset('plugins/select2/select2.full.min.js') }}"></script>
@@ -337,6 +345,10 @@
                 } else {
                     $('#' + inputOrderId).fadeOut();
                 }
+            });
+            Livewire.on('select_file', (param) => {
+                @this.set('form.drBanner' , param.url);
+                $('#file-selector-modal').modal('hide');
             });
         });
     </script>

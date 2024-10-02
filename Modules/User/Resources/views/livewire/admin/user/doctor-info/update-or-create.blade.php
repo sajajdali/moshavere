@@ -187,6 +187,15 @@
                                                     برای مثال: 26سال تجربه</small>
                                             </div>
                                         </div>
+                                        <div class="col-md-12">
+                                            <div class="form-group">
+                                                <label for="drBanner" class="form-label">بنر</label>
+                                                <input wire:model='form.drBanner' class="form-control" id="drBanner">
+                                                <small class="text-gray ms-2">
+                                                    <i class="fa fa-info-circle" aria-hidden="true"></i>
+                                                    متخص اپلیکیشن</small>
+                                            </div>
+                                        </div>
                                         @unless(disableUi())
                                         <div class="col-md-12">
                                             <div class="form-group">

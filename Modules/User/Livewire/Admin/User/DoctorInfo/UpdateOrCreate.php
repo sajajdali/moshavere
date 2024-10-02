@@ -80,6 +80,9 @@ class UpdateOrCreate extends Component
         if (isset($this->form['active'])) {
             $this->user->active_appointment = $this->form['active'];
         }
+        if (isset($this->form['drBanner'])) {
+            $this->user->dr_banner = $this->form['drBanner'];
+        }
 
         $this->user->ban_user = $this->form['banUser'];
         Cache::forget('emergency_doctors');
@@ -125,6 +128,9 @@ class UpdateOrCreate extends Component
         }
         if (isset($this->user->dr_order)) {
             $this->form['order'] = $this->user->dr_order;
+        }
+        if (isset($this->user->dr_banner)) {
+            $this->form['drBanner'] = $this->user->dr_banner;
         }
         if (isset($this->user->active_appointment) &&  $this->user->active_appointment != 1) {
             $this->form['active'] =  false;

@@ -41,6 +41,10 @@ class GeneralSetting extends Component
         'specialDaytimeValues',
         'monitoring',
         'accessibility' => [
+            'dont_show_times' => [
+                'status' => false,
+                'message' => null
+            ],
             'online' => [
                 'can_send_voice' => true
             ]
@@ -330,6 +334,17 @@ class GeneralSetting extends Component
             unset($detail[AppointmentSetting::ONLINE_CAN_SEND_VOICE]);
         }
 
+        $detail[AppointmentSetting::DONT_SHOW_TIMES] = [
+            AppointmentSetting::DONT_SHOW_TIMES_STATUS  => $this->form['accessibility']['dont_show_times']['status'] == 'on' ,
+            AppointmentSetting::DONT_SHOW_TIMES_MESSAGE => $this->form['accessibility']['dont_show_times']['message'] ?? null,
+        ];
+
+        // Clearing the message if it is inactive and does not display the message
+        if (!$detail[AppointmentSetting::DONT_SHOW_TIMES][AppointmentSetting::DONT_SHOW_TIMES_STATUS]){
+            $detail[AppointmentSetting::DONT_SHOW_TIMES][AppointmentSetting::DONT_SHOW_TIMES_MESSAGE] = null;
+        }
+
+
         $updateOrCreateModel = [
             'user_id'               =>  $this->user->id,
             'service_id'            =>  $this->fetchData['service_id'],
@@ -496,6 +511,14 @@ class GeneralSetting extends Component
         } else{
             $this->form['accessibility']['online']['can_send_voice'] = false;
         }
+
+        // dont show times
+        if (isset($apSet->detail[AppointmentSetting::DONT_SHOW_TIMES])){
+            $this->form['accessibility']['dont_show_times']['status'] = isset($apSet->detail[AppointmentSetting::DONT_SHOW_TIMES][AppointmentSetting::STATUS]) && $apSet->detail[AppointmentSetting::DONT_SHOW_TIMES][AppointmentSetting::STATUS] == 'on';
+            $this->form['accessibility']['dont_show_times']['message'] = $apSet->detail[AppointmentSetting::DONT_SHOW_TIMES][AppointmentSetting::DONT_SHOW_TIMES_MESSAGE] ?? null;
+        }
+
+
 
         if (isset($apSet->detail[AppointmentSetting::MAX_AVAILABLE_APPOINTMENT_FOR_SECRETERY])) {
             $this->form['maxAvailabeAppointment']['ForSecretery'] = $apSet->detail[AppointmentSetting::MAX_AVAILABLE_APPOINTMENT_FOR_SECRETERY];

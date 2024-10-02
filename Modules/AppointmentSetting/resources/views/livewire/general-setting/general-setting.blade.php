@@ -77,6 +77,27 @@
                     <span class="ms-2">امکان ارسال ویس برای کاربران در نوبت دهی آنلاین فعال باشد؟</span>
                 </div>
             </div>
+            <div  class="row mt-4">
+                <hr>
+                <div class="d-flex align-items-center">
+                    <div class="main-toggle-group d-sm-flex align-items-center ms-0">
+                        <div class="toggle toggle-lg toggle-primary my-1  customCheckbox
+                            @if (isset($form['accessibility']['dont_show_times']['status']) && $form['accessibility']['dont_show_times']['status'] == true) on
+                                @else
+                                off @endif"
+                             data-id="accessibility.dont_show_times.status" id="accessibilityOnline_voice" wire:ignore.self>
+                            <span></span>
+                        </div>
+                    </div>
+                    <span class="ms-2">غیر فعال بودن مشاهده ساعت های دکتر</span>
+                </div>
+                @if (isset($form['accessibility']['dont_show_times']['status']) && $form['accessibility']['dont_show_times']['status'] == true)
+                    <br>
+                    <div class="d-flex align-items-center">
+                        <textarea rows="3" class="form-control mt-5 ms-1 " wire:model="form.accessibility.dont_show_times.message" placeholder=" متن پیغام نمایشی در صورتی غیر فعال بودن "></textarea>
+                    </div>
+                @endif
+            </div>
         </div>
     </div>
     {{-- manage day of the week  --}}
@@ -611,6 +632,9 @@
             </div>
         </div>
     </div>
+
+
+
     {{-- add operator  --}}
     <div class="card @error('form.operators.*') border border-danger @enderror">
         @include('appointmentsetting::components.generalsetting.addoperator')

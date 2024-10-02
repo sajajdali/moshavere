@@ -23,4 +23,9 @@ trait AppointmentSettingDetailKeyTrait
     const OPERATORS = 'operators';
     const IDS = 'ids';
     const ONLINE_CAN_SEND_VOICE = 'onlineCanSendVoice';
+    const DONT_SHOW_TIMES =   'dontShowTimes';
+
+    const DONT_SHOW_TIMES_STATUS = 'status';
+    const DONT_SHOW_TIMES_MESSAGE = 'message';
+
 }

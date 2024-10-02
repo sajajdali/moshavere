@@ -5,6 +5,12 @@
         </div>
 
     </div>
+    @isset($msg)
+    <div class="col-md-12 alert alert-success fade show" role="alert">
+        <i class="fa fa-check-circle-o me-2" aria-hidden="true"></i>
+        {{ $msg}}
+    </div>
+    @endisset
     <div wire:loading>
         <div class="loading-overlay d-flex align-items-center justify-content-center">
             <div class="spinner-border text-primary" role="status">
@@ -316,7 +322,12 @@
                                 $this->fetchData['appOnline']->status ==
                                     Modules\AppointmentUser\Enum\AppointmentOnlineStatusEnum::COMPLETED_BY_DOCTOR)
                                 <div class="col-md-12 alert alert-primary fade show mt-4 ms-3" role="alert">
-                                    نوبت توسط پزشک پاسخ داده شده است و بسته شده!!
+                                    <span>
+                                        نوبت توسط پزشک پاسخ داده شده است و بسته شده!!
+                                    </span>
+                                    <button class="btn btn-success" wire.loading.class='btn-loading' wire:click='reactivateChat'>
+                                        باز کردن مجدد چت
+                                    </button>
                                 </div>
                             @elseif ($this->fetchData['appOnline']->status != Modules\AppointmentUser\Enum\AppointmentOnlineStatusEnum::REJECT)
                                 {{-- TODO::VOICE js class activate --}}

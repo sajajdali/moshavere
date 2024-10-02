@@ -30,6 +30,7 @@ class MessageDetail extends Component
     public $search;
     public array $form = [];
     public array $fetchData = [];
+    public ?string $msg = null ;
     public function runSearch()
     {
         $this->getMessages();
@@ -167,7 +168,7 @@ class MessageDetail extends Component
             ));
         } catch (\Throwable $th) {
         }
-        $this->fetchData['appOnline']->update(['status' => AppointmentOnlineStatusEnum::ANSWER_BY_DOCTOR]) ; 
+        $this->fetchData['appOnline']->update(['status' => AppointmentOnlineStatusEnum::ANSWER_BY_DOCTOR]) ;
         $this->dispatch('sendMessage', true);
     }
     public function messages()
@@ -254,10 +255,14 @@ class MessageDetail extends Component
             $this->dispatch('picUploade',true);
         }
     }
+    public function reactivateChat() {
+        $this->fetchData['appOnline']->update(['status' => AppointmentOnlineStatusEnum::REACTIVATED]);
+        $this->msg = 'چت با موفقیت فعال شد';
+        return $this->render();
+    }
     public function mount()
     {
         $this->fetchData['appOnline'] = AppointmentOnline::find(request()->route('onlineAppId'));
-
         $this->fetchData['messages']  = $this->fetchData['appOnline']->messages;
         $this->fetchData['appOnline']->messages()
             ->where('type', AppointmentOnlineMessageTypeEnum::QUESTION)

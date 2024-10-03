@@ -275,11 +275,9 @@ class AppointmentApiController extends Controller
             placeId: $request->input('place_id') ?? $appointmentSetting->user->activePlaces()->first()?->id,
             kind: $kind
         );
-        // check if time is full 
-        $appoiutnemtTime = Carbon::createFromTimestamp($request->input('timestamp'), 'Asia/Tehran');
+        // check if time is full
+        $appoiutnemtTime = Carbon::createFromTimestamp($request->input('timestamp'), 'Asia/Tehran')->toDateTimeString();
         $checkForAppointmentExists = AppointmentUser::where('appointment_setting_id', $appointmentSetting->id)
-            ->where('service_id', $serviceId)
-            ->where('place_id', $request->input('place_id'))
             ->where('date_visit', $appoiutnemtTime)->exists();
         if ($checkForAppointmentExists) {
             return $this->requestException([

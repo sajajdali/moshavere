@@ -274,7 +274,7 @@ class AppointmentApiController extends Controller
             kind: $kind
         );
         // check if time is full
-        $appoiutnemtTime = Carbon::createFromTimestamp($request->input('timestamp'), 'Asia/Tehran');
+        $appoiutnemtTime = Carbon::createFromTimestamp($request->input('timestamp'), 'Asia/Tehran')->toDateTimeString();
         $checkForAppointmentExists = AppointmentUser::where('appointment_setting_id', $appointmentSetting->id)
             ->where('date_visit', $appoiutnemtTime)->exists();
         if ($checkForAppointmentExists) {

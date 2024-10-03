@@ -170,7 +170,7 @@ class AppointmentApiController extends Controller
                         break 3;
                     }
                     // check min day avaiable
-                    if (carbon::parse( $appointment['day_number_gmt'])->setTime('23','59','59')->copy()->subDays( $minDayActive)->isPast()) {
+                    if (carbon::parse($appointment['day_number_gmt'])->setTime('23', '59', '59')->copy()->subDays($minDayActive)->isPast()) {
                         continue;
                     }
                     foreach ($appointment['times'] as $time) {
@@ -184,7 +184,7 @@ class AppointmentApiController extends Controller
 
                                 $firstTwoEmpty[] = [
                                     'status' => true,
-                                    'persian_date' => $vertaDateTime->format( 'l m/d ساعت H:i دقیقه'),
+                                    'persian_date' => $vertaDateTime->format('l m/d ساعت H:i دقیقه'),
                                     'time_stamp' => $time['timestamp'],
                                     'from' => substr($time['from'], 0, -3),
                                     'until' => substr($time['until'], 0, -3),
@@ -273,6 +273,19 @@ class AppointmentApiController extends Controller
             placeId: $request->input('place_id') ?? $appointmentSetting->user->activePlaces()->first()?->id,
             kind: $kind
         );
+        // check if time is full 
+        $appoiutnemtTime = Carbon::createFromTimestamp($request->input('timestamp'), 'Asia/Tehran');
+        $checkForAppointmentExists = AppointmentUser::where('appointment_setting_id', $appointmentSetting->id)
+            ->where('service_id', $serviceId)
+            ->where('place_id', $request->input('place_id'))
+            ->where('date_visit', $appoiutnemtTime)->exists();
+        if ($checkForAppointmentExists) {
+            return $this->requestException([
+                'status' => false,
+                'message' => 'ساعت انتخابی شما پر شده است، لطفا بازگردید و ساعت دیگری را انتخاب کنید',
+                'route' => 'time'
+            ]);
+        }
 
         $detail = [];
         if ($request->input('question')) {

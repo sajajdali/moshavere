@@ -186,7 +186,7 @@ class AppointmentApiController extends Controller
 
                                 $firstTwoEmpty[] = [
                                     'status' => true,
-                                    'persian_date' => $vertaDateTime->format('l m/d ساعت H:i دقیقه'),
+                                    'persian_date' => $vertaDateTime->format('l m/d ساعت') . ' '. substr($time['from'], 0, -3),
                                     'time_stamp' => $time['timestamp'],
                                     'from' => substr($time['from'], 0, -3),
                                     'until' => substr($time['until'], 0, -3),
@@ -194,7 +194,7 @@ class AppointmentApiController extends Controller
                             }
                                 $result[$dayNumber][] = [
                                     'status' => true,
-                                    'persian_date' => $vertaDateTime->format('l m/d ساعت H:i دقیقه'),
+                                    'persian_date' => $vertaDateTime->format('l m/d ساعت') .  ' '. substr($time['from'], 0, -3),
                                     'time_stamp' => $time['timestamp'],
                                     'from' => substr($time['from'], 0, -3),
                                     'until' => substr($time['until'], 0, -3),
@@ -434,22 +434,22 @@ class AppointmentApiController extends Controller
         }
         // handle condition dr amiri
 
-        $ip = request()->header('X-Forwarded-For', request()->header('X-Real-Ip', request()->header('ar-real-ip')));
-        if ($ip == '91.92.122.120') {
+        // $ip = request()->header('X-Forwarded-For', request()->header('X-Real-Ip', request()->header('ar-real-ip')));
+        // if ($ip == '91.92.122.120') {
 
-            $payment = app('AppointmentUserService')->paymentstatus($appointmentSetting);
+        //     $payment = app('AppointmentUserService')->paymentstatus($appointmentSetting);
 
-            return $this->ok([
-                'status' => false,
-                'payment' => $payment['in_person'],
-                'appointment_setting_id' => null,
-                'first_two_empty' => null,
-                'get_list_empty_appointment' => null,
-                'conditions' => $conditions,
-                'alert' => $alert,
-                'messages' => null
-            ]);
-        }
+        //     return $this->ok([
+        //         'status' => false,
+        //         'payment' => $payment['in_person'],
+        //         'appointment_setting_id' => null,
+        //         'first_two_empty' => null,
+        //         'get_list_empty_appointment' => null,
+        //         'conditions' => $conditions,
+        //         'alert' => $alert,
+        //         'messages' => null
+        //     ]);
+        // }
         if ( $doctorId == 2 && $conditions == null) {
             $resultList['firstTwoEmpty'] = null;
             $resultList['listAppointments'] = null;

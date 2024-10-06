@@ -458,14 +458,18 @@ class AppointmentApiController extends Controller
                 });
             })->first());
         }
-
+        if(count($resultList['firstTwoEmpty']) == 0 && count($resultList['listAppointments']) == 0) {
+            $conditions['title'] = 'نوبت خالی یافت نشد';
+            $conditions['message'] = 'هم اکنون تمامی ساعت های نوبت دهی تکمیل است، لطفا در ساعات دیگر مجدد تلاش کنید!';
+            $conditions['alternative_doctor'] = null ; 
+        }
         $payment = app('AppointmentUserService')->paymentstatus($appointmentSetting);
         return $this->ok([
             'status' => true,
             'payment' => !$payment['in_person']['status'] ? null : $payment['in_person'],
             'appointment_setting_id' => $appointmentSetting->id,
-            'first_two_empty' => $resultList['firstTwoEmpty'],
-            'get_list_empty_appointment' => $resultList['listAppointments'],
+            'first_two_empty' =>  count( $resultList['firstTwoEmpty']) == 0 ? null : $resultList['firstTwoEmpty'],
+            'get_list_empty_appointment' => count($resultList['listAppointments']) == 0 ? null : $resultList['listAppointments'] ,
             'conditions' => $conditions,
             'alert' => $alert,
             'messages' => null

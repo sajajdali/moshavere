@@ -517,7 +517,7 @@ class AppointmentUserService
         ]);
     }
 
-    private function insertOnlineAppointment(AppointmentUser $appointmentUser):appointmentOnline
+    private function insertOnlineAppointment(AppointmentUser $appointmentUser): appointmentOnline
     {
         $status = $appointmentUser->status->convertToAppointmentOnlineStauts();
         $appointmentOnline =  $appointmentUser->online()->create([
@@ -543,7 +543,10 @@ class AppointmentUserService
             $visitDateTime = Carbon::createFromTimestamp($appointmentData->timestamp, 'Asia/Tehran');
         }
 
-        if ($appointmentData->kind == AppointmentUserKindEnum::IN_PERSION && $appointmentData->appointmentVia == AppointmentVia::SELF && $dateAppointment->isPast()) {
+        if (
+            $appointmentData->kind == AppointmentUserKindEnum::IN_PERSION
+            && $appointmentData->appointmentVia == AppointmentVia::SELF && $dateAppointment->isPast()
+        ) {
             return [
                 'status' => false,
                 'message' => 'زمان ارسالی برای ثبت نوبت اشتباه است و لطفا مجدد اقدام کنید',
@@ -585,6 +588,27 @@ class AppointmentUserService
                 //                ];
             }
         }
+
+        // check if time is full
+        $appoiutnemtTime = Carbon::createFromTimestamp($appointmentData->timestamp, 'Asia/Tehran')->toDateTimeString();
+        $checkForAppointmentExists = AppointmentUser::where('appointment_setting_id', $appointmentSetting->id)
+            ->whereIn('status', [
+                AppointmentUserStatusEnum::STATUS_PENDING,
+                AppointmentUserStatusEnum::STATUS_SUCCESSFUL,
+                AppointmentUserStatusEnum::STATUS_ATTENDED,
+                AppointmentUserStatusEnum::STATUS_WAIT_PAYMENT,
+                AppointmentUserStatusEnum::STATUS_NOT_ATTENDED,
+                AppointmentUserStatusEnum::STATUS_MONITORING,
+            ])
+            ->where('date_visit', $appoiutnemtTime)->exists();
+        if ($checkForAppointmentExists) {
+            return [
+                'status' => false,
+                'message' => 'ساعت انتخابی شما پر شده است، لطفا بازگردید و ساعت دیگری را انتخاب کنید',
+                'route' => 'time'
+            ];
+        }
+
 
         $paymentstatus = $this->paymentstatus($appointmentSetting);
         // create payment link
@@ -799,8 +823,8 @@ class AppointmentUserService
                     $appointmentUser->notify(new AppointmentDocAndOperatorNotification($smsToDoctor, $appointmentUser->doctor->mobile));
                 }
             }
-        }else{
-            $appointmentUser->notify( new AppointmentSmsNotification($smsTemplate));
+        } else {
+            $appointmentUser->notify(new AppointmentSmsNotification($smsTemplate));
         }
 
         $transactionId = null;

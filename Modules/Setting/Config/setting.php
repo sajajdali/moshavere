@@ -136,6 +136,14 @@ $setting = [
             \Modules\Setting\Enum\SettingKeyEnum::ONILNE_SEND_ATUOMATIC_MESSAGE_MESSAGE,
         ],
     ],
+    'APPLICATION' => [
+        'title' => 'اپلیکیشن',
+        'icon' => 'fa fa-paperclip',
+        'settings' => [
+            \Modules\Setting\Enum\SettingKeyEnum::APP_FULL_APPOINTMENT_HEADER,
+            \Modules\Setting\Enum\SettingKeyEnum::APP_FULL_APPOINTMENT_BODY,
+        ],
+    ],
 ];
 
 return $setting;

@@ -3,9 +3,7 @@
 namespace Modules\Setting\Enum;
 
 use Modules\User\Entities\User;
-use Shetabit\Payment\Facade\Payment;
 use App\interface\EnumHasNameInterface;
-use Modules\Exercise\Entities\ExercisePlanRequest;
 use Modules\Setting\Interface\SettingTypeInterface;
 use Modules\Setting\Interface\SettingHasCacheInterface;
 use Modules\Setting\Interface\SettingHasOptionInterface;
@@ -98,6 +96,10 @@ enum SettingKeyEnum: int implements EnumHasNameInterface, SettingTypeInterface, 
     // onlineApp
     case ONILNE_SEND_ATUOMATIC_MESSAGE_STATUS = 350 ;
     case ONILNE_SEND_ATUOMATIC_MESSAGE_MESSAGE = 351 ;
+
+    // application
+    case APP_FULL_APPOINTMENT_HEADER = 352 ;
+    case APP_FULL_APPOINTMENT_BODY = 353 ;
 
     public function isSupportCache(): bool
     {
@@ -197,6 +199,10 @@ enum SettingKeyEnum: int implements EnumHasNameInterface, SettingTypeInterface, 
             // ONLINE APP
             self::ONILNE_SEND_ATUOMATIC_MESSAGE_STATUS => 'ارسال پیام خودکار بعد از ثبت نوبت',
             self::ONILNE_SEND_ATUOMATIC_MESSAGE_MESSAGE => 'متن پیام',
+
+            // APPLICATION
+            self::APP_FULL_APPOINTMENT_HEADER => 'تیتر برای زمانی که نوبت های پزشک پر هست',
+            self::APP_FULL_APPOINTMENT_BODY => 'متن برای زمانی که نوبت های پزشک پر هست',
             default => ''
         };
     }
@@ -280,6 +286,7 @@ enum SettingKeyEnum: int implements EnumHasNameInterface, SettingTypeInterface, 
             self::ABOUT_US_SECEND_SECTION_DESCRIPTION => SettingTypeEnum::TEXTAREA,
             self::ABOUT_US_THIRD_SECTION_DESCRIPTION => SettingTypeEnum::TEXTAREA,
             self::ABOUT_US_FOURTH_SECTION_DESCRIPTION => SettingTypeEnum::TEXTAREA,
+            self::APP_FULL_APPOINTMENT_BODY => SettingTypeEnum::TEXTAREA,
             default => SettingTypeEnum::TEXT
         };
     }

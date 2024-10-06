@@ -13,6 +13,7 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Cache;
 use Modules\Api\Trait\ApiHandlerTrait;
 use Modules\Service\app\Models\Service;
+use Modules\Setting\Enum\SettingKeyEnum;
 use Modules\Api\Enum\ServiceQuestionEnum;
 use Modules\Api\Transformers\UserResource;
 use Modules\Api\Enum\UserVisitedStatusEnum;
@@ -459,9 +460,9 @@ class AppointmentApiController extends Controller
             })->first());
         }
         if(count($resultList['firstTwoEmpty']) == 0 && count($resultList['listAppointments']) == 0) {
-            $conditions['title'] = 'نوبت خالی یافت نشد';
-            $conditions['message'] = 'هم اکنون تمامی ساعت های نوبت دهی تکمیل است، لطفا در ساعات دیگر مجدد تلاش کنید!';
-            $conditions['alternative_doctor'] = null ; 
+            $conditions['title'] = setting(SettingKeyEnum::APP_FULL_APPOINTMENT_HEADER);
+            $conditions['message'] = setting(SettingKeyEnum::APP_FULL_APPOINTMENT_BODY);
+            $conditions['alternative_doctor'] = null ;
         }
         $payment = app('AppointmentUserService')->paymentstatus($appointmentSetting);
         return $this->ok([

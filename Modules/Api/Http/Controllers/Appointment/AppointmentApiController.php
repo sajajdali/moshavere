@@ -24,6 +24,7 @@ use Modules\AppointmentUser\Enum\model\BirthdayModel;
 use Modules\AppointmentUser\app\Models\AppointmentUser;
 use Modules\AppointmentUser\Enum\model\AppointmentModel;
 use Modules\AppointmentUser\Enum\AppointmentUserKindEnum;
+use Modules\AppointmentUser\Enum\AppointmentUserStatusEnum;
 use Modules\AppointmentUser\Enum\model\UserModelAppointment;
 use Modules\AppointmentSetting\app\Models\AppointmentSetting;
 use Modules\Api\app\Resources\Api\Appointments\DoctorResource;
@@ -275,18 +276,6 @@ class AppointmentApiController extends Controller
             placeId: $request->input('place_id') ?? $appointmentSetting->user->activePlaces()->first()?->id,
             kind: $kind
         );
-        // check if time is full
-        $appoiutnemtTime = Carbon::createFromTimestamp($request->input('timestamp'), 'Asia/Tehran')->toDateTimeString();
-        $checkForAppointmentExists = AppointmentUser::where('appointment_setting_id', $appointmentSetting->id)
-            ->where('date_visit', $appoiutnemtTime)->exists();
-        if ($checkForAppointmentExists) {
-            return $this->requestException([
-                'status' => false,
-                'message' => 'ساعت انتخابی شما پر شده است، لطفا بازگردید و ساعت دیگری را انتخاب کنید',
-                'route' => 'time'
-            ]);
-        }
-
         $detail = [];
         if ($request->input('question')) {
             $detail[AppointmentUser::DETAIL_QUESTION] = $request->input('question');

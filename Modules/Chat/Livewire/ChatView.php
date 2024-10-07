@@ -12,6 +12,7 @@ use Livewire\WithFileUploads;
 use App\Events\PusherBroadcast;
 use Livewire\Attributes\Computed;
 use Modules\Chat\app\Models\Chat;
+use Illuminate\Support\Facades\Log;
 use Modules\User\Enum\UserMetaEnum;
 use Modules\Chat\Enum\ChatStatusEnum;
 use Illuminate\Support\Facades\Storage;
@@ -215,9 +216,14 @@ class ChatView extends Component
         $this->chatMessage = '';
 
         // send pusher event
-        $message = ChatDetailResource::make($chatDetail);
-        event(new PusherBroadcast($message, $this->chat->id));
-
+        try {
+            $message = ChatDetailResource::make($chatDetail);
+            event(new PusherBroadcast($message, $this->chat->id));
+        } catch (\Throwable $th) {
+            Log::error('An error occurred during chat processing: ' . $th->getMessage(), [
+                'exception' => $th,
+            ]);
+        }
         // send sms
         if (isset($this->form['sendSms']) && $this->form['sendSms'] == true) {
             $template = setting(SettingKeyEnum::SMS_FOR_SEND_MESSAGE_IN_CHATS);

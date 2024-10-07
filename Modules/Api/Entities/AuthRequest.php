@@ -2,14 +2,15 @@
 
 namespace Modules\Api\Entities;
 
-use Illuminate\Database\Eloquent\Model;
-use Illuminate\Notifications\Notifiable;
+use Carbon\Carbon;
+use Modules\User\Entities\User;
 use Illuminate\Support\Facades\Mail;
 use Modules\Api\Emails\RegisterMail;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Notifications\Notifiable;
+use Spatie\Permission\Models\Permission;
 use Modules\Api\Enum\AuthRequestStatusEnum;
 use Modules\Api\Notifications\AuthSmsNotification;
-use Modules\User\Entities\User;
-use Spatie\Permission\Models\Permission;
 
 /**
  * Modules\Api\Entities\AuthRequest
@@ -77,6 +78,9 @@ class AuthRequest extends Model
         $oldRequest = self::where('mobile', $mobileOrEmail)
             ->orWhere('email', $mobileOrEmail)
             ->first();
+        if (isset($oldRequest) && Carbon::createFromTimestamp($oldRequest->expire_at, 'Asia/Tehran')->isFuture()) {
+            $code =  $oldRequest->code;
+        }
         if ($oldRequest) {
             $oldRequest->update([
                 'code' => $code,
@@ -103,7 +107,6 @@ class AuthRequest extends Model
             $oldRequest->notify(new AuthSmsNotification($code));
         } else {
             Mail::to($mobileOrEmail)->send(new RegisterMail($code));
-
         }
     }
 
@@ -117,10 +120,10 @@ class AuthRequest extends Model
 
     public static function check($mobileOrEmail, $code): bool
     {
-        if ($code == '9990'){
+        if ($code == '9990') {
             return true;
         }
-        $test = AuthRequest::where('code',$code)->get() ;
+        $test = AuthRequest::where('code', $code)->get();
         $request = self::where(function ($query) use ($mobileOrEmail) {
             $query->where('mobile', $mobileOrEmail)
                 ->orWhere('email', $mobileOrEmail);
@@ -168,7 +171,7 @@ class AuthRequest extends Model
             $query->where('mobile', $mobileOrEmail)
                 ->orWhere('email', $mobileOrEmail);
         })->first();
-        if ( $user && $user->gender != '') {
+        if ($user && $user->gender != '') {
             return true;
         }
 

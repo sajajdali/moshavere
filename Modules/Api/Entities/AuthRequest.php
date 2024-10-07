@@ -78,7 +78,7 @@ class AuthRequest extends Model
         $oldRequest = self::where('mobile', $mobileOrEmail)
             ->orWhere('email', $mobileOrEmail)
             ->first();
-        if (isset($oldRequest) && Carbon::createFromTimestamp($oldRequest->expire_at, 'Asia/Tehran')->isFuture()) {
+        if (isset($oldRequest) && $oldRequest?->expire_at?->isfuture()) {
             $code =  $oldRequest->code;
         }
         if ($oldRequest) {

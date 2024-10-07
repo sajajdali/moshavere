@@ -103,7 +103,7 @@
                             </svg>
                         </div>
                         <div class="space-y-3">
-                            <h4 class="font-semibold">ایمیل پشتیبانی</h4>
+                            <h4 class="font-semibold">شماره پشتیبانی</h4>
                             <h5 class="text-secondary-400">{{ $fetchData['email'] }}</h5>
                         </div>
                     </div>

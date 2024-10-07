@@ -1,12 +1,12 @@
 <?php
 
-//  comment.own permition is define in appointment_user 
+//  comment.own permition is define in appointment_user
 $menu = [
     'name' => 'Front',
 // permistion define in appointmentUser
     'menu' => [
         'title' => 'نمایش',
-        'gate' => ['appointment_user.comment', 'appointment_user.feedback','comment.own'],
+        'gate' => ['appointment_user.comment', 'appointment_user.feedback','comment.own','contact-us'],
         'policy_class' => null,
         'has_divider' => true,
         'priority' => 70,
@@ -45,6 +45,16 @@ if (!disableUi()) {
             'policy_class' => null,
             'icon' => 'fe fe-book',
             'route' => 'admin.comment',
+            'has_badge' => false,
+            'has_child' => false,
+            'children' => null
+        ],
+        [
+            'title' => 'فرم تماس با ما',
+            'gate' => ['contact-us'],
+            'policy_class' => null,
+            'icon' => 'fe fe-printer',
+            'route' => 'admin.contactus',
             'has_badge' => false,
             'has_child' => false,
             'children' => null

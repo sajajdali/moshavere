@@ -2,6 +2,8 @@
 
 use Modules\Front\Livewire\Admin\faq\FaqLivewire;
 use Modules\Front\Livewire\Admin\Comment\Commentlivewire;
+use Modules\Front\Livewire\Admin\ContactUs\ContanctUsList;
+
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -16,5 +18,6 @@ use Modules\Front\Livewire\Admin\Comment\Commentlivewire;
 Route::group([], function () {
     Route::get('faq', FaqLivewire::class)->name('faq');
     Route::get('comment', Commentlivewire::class)->name('comment');
+    Route::get('contanctus', ContanctUsList::class)->name('contactus');
 });
 

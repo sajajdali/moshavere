@@ -44,7 +44,10 @@ class Dashboard extends Component
             $this->fetchData['transactiontotal'] = Transaction::todayTransaction()->sum('total_cost');
             $apiToken = setting(SettingKeyEnum::SMS_API_TOKEN);
             if (isset($apiToken)) {
-                $response = \Illuminate\Support\Facades\Http::withToken($apiToken)->get('https://shsms.ir/api/v1/budget');
+                try {
+                    $response = \Illuminate\Support\Facades\Http::withToken($apiToken)->timeout(10)->get('https://shsms.ir/api/v1/budget');
+                } catch (\Throwable $th) {
+                }
             }
             if (
                 isset($response)

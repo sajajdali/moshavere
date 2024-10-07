@@ -3,8 +3,9 @@
 namespace Modules\Front\Livewire\Admin\ContactUs;
 
 use Livewire\Component;
-use Modules\Front\app\Models\Contactus;
+use Livewire\Attributes\On;
 use Modules\User\Enum\UserMetaEnum;
+use Modules\Front\app\Models\Contactus;
 
 class ContanctUsList extends Component
 {
@@ -38,6 +39,13 @@ class ContanctUsList extends Component
         unset($this->form['search']);
         $this->render();
     }
+    #[On('delete')]
+    public function deletePlace(ContactUs  $model)
+    {
+        $model->delete();
+        return redirect()->route('admin.contactus')->with('success', 'نظر حذف شد');
+    }
+
 
     public function render()
     {

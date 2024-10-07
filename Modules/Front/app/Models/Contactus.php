@@ -46,10 +46,10 @@ class Contactus extends Model
         }
         return 'بررسی نشده';
     }
-    public function contact() {
+    public function getUserName() {
         if(isset($this->user)) {
             return $this->user->full_name ;
         }
-        return $this->name ; 
+        return $this->name ;
     }
 }

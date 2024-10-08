@@ -50,9 +50,15 @@
                    <div class="space-y-6">
                        <p class="font-semibold">نماد ها</p>
                        <div class="grid grid-cols-2 gap-8">
-                           <a  href='https://trustseal.enamad.ir/?id=524685&Code=XbRtaf8YeLbNzaEfJdrxZzyGgINAyaCR' referrerpolicy='origin' target='_blank' class="flex justify-center">
+                           <a referrerpolicy='origin' target='_blank'
+                               href='https://trustseal.enamad.ir/?id=524685&Code=XbRtaf8YeLbNzaEfJdrxZzyGgINAyaCR'><img class="h-[114px]"
+                                   referrerpolicy='origin'
+                                   src='https://trustseal.enamad.ir/logo.aspx?id=524685&Code=XbRtaf8YeLbNzaEfJdrxZzyGgINAyaCR'
+                                   alt='' style='cursor:pointer' code='XbRtaf8YeLbNzaEfJdrxZzyGgINAyaCR'></a>
+                           {{-- <a href='https://trustseal.enamad.ir/?id=524685&Code=XbRtaf8YeLbNzaEfJdrxZzyGgINAyaCR'
+                               referrerpolicy='origin' target='_blank' class="flex justify-center">
                                <img src="{{ front_asset('assets/images/enamad.png') }}" class="h-[114px]" />
-                           </a>
+                           </a> --}}
                            <a href="#" class="flex justify-center">
                                <img src="{{ front_asset('assets/images/samandehi.png') }}" class="h-[114px]" />
                            </a>

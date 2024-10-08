@@ -386,11 +386,11 @@ class AppointmentApiController extends Controller
                         $conditions['alternative_doctor'] = DoctorResource::make(User::doctors_query()->whereHas('metas', function ($q) {
                             $q->where([
                                 ['meta_key', UserMetaEnum::FIRST_NAME],
-                                ['meta_value', 'LIKE', "%پگاه%"]
+                                ['meta_value', 'LIKE', "%سها%"]
                             ])->orWhere(function ($query) {
                                 $query->where([
                                     ['meta_key', UserMetaEnum::LAST_NAME],
-                                    ['meta_value', 'LIKE', "%کامکارفر%"]
+                                    ['meta_value', 'LIKE', "%پگاه%"]
                                 ]);
                             });
                         })->first());
@@ -405,11 +405,11 @@ class AppointmentApiController extends Controller
                     $conditions['alternative_doctor'] = DoctorResource::make(User::doctors_query()->whereHas('metas', function ($q) {
                         $q->where([
                             ['meta_key', UserMetaEnum::FIRST_NAME],
-                            ['meta_value', 'LIKE', "%پگاه%"]
+                            ['meta_value', 'LIKE', "%سها%"]
                         ])->orWhere(function ($query) {
                             $query->where([
                                 ['meta_key', UserMetaEnum::LAST_NAME],
-                                ['meta_value', 'LIKE', "%کامکارفر%"]
+                                ['meta_value', 'LIKE', "%میررضا%"]
                             ]);
                         });
                     })->first());

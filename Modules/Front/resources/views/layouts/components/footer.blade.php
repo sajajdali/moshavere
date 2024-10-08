@@ -41,7 +41,7 @@
                     <a href=""{{route('front.searchPage',['query' => 'پزشکان'])}}">لیست پزشکان</a>
                 </li>
                 <li>
-                   <a href="#">آخرین مطالب وبلاگ</a>
+                   <a href="https://blog.pezeshkam.com/">آخرین مطالب وبلاگ</a>
                 </li>
              </ul>
           </div>
@@ -64,7 +64,7 @@
        @endunless
     <section class="bg-secondary-300 py-3 px-4">
        <p class="text-sm text-center">
-          تمامی حقوق مادی و معنوی این وب‌سایت، خدمات و محتوای مربوط به آن متعلق به شرکت سلامت شرق است.
+          تمامی حقوق مادی و معنوی این وب‌سایت، خدمات و محتوای مربوط به آن متعلق به شرکت پزشکم است.
        </p>
     </section>
  </footer>

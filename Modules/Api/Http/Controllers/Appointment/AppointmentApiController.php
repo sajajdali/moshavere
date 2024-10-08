@@ -383,17 +383,7 @@ class AppointmentApiController extends Controller
                         $conditions['title'] = 'امکان دریافت نوبت با دکتر امیری فراهم نیست';
                         $conditions['message'] = 'مراجعه کنندگان گرامی ویزیت بارداران فقط تا ۱۲ هفته توسط دکتر امیری انجام میشود . و بعد از آن توسط تیم فوق تخصصی دکتر امیری (دکتر سهامیررضا) انجام میشود.
 ویزیت آخر قبل از سزارین  با دکتر امیری انجام میشود. ';
-                        $conditions['alternative_doctor'] = DoctorResource::make(User::doctors_query()->whereHas('metas', function ($q) {
-                            $q->where([
-                                ['meta_key', UserMetaEnum::FIRST_NAME],
-                                ['meta_value', 'LIKE', "%سها%"]
-                            ])->orWhere(function ($query) {
-                                $query->where([
-                                    ['meta_key', UserMetaEnum::LAST_NAME],
-                                    ['meta_value', 'LIKE', "%پگاه%"]
-                                ]);
-                            });
-                        })->first());
+                        $conditions['alternative_doctor'] = DoctorResource::make(User::find(5));
                         $conditions['button_text'] = 'انتخاب پزشک دیگر';
                     }
                 }
@@ -402,17 +392,7 @@ class AppointmentApiController extends Controller
                     $conditions['title'] = 'امکان دریافت نوبت با دکتر امیری فراهم نیست';
                     $conditions['message'] = 'مراجعه کننده گرامی  ویزیت اولیه شما توسط تیم فوق تخصصی دکتر امیری انجام میشود.
 بررسی های اولیه و آزمایشات لازم زیر نظر دکتر امیری نوشته میشود و شما برای ویزیت های بعدی میتوانید با دکتر امیری نوبت دریافت کنید.';
-                    $conditions['alternative_doctor'] = DoctorResource::make(User::doctors_query()->whereHas('metas', function ($q) {
-                        $q->where([
-                            ['meta_key', UserMetaEnum::FIRST_NAME],
-                            ['meta_value', 'LIKE', "%سها%"]
-                        ])->orWhere(function ($query) {
-                            $query->where([
-                                ['meta_key', UserMetaEnum::LAST_NAME],
-                                ['meta_value', 'LIKE', "%میررضا%"]
-                            ]);
-                        });
-                    })->first());
+                    $conditions['alternative_doctor'] = DoctorResource::make(User::find(5));
                     $conditions['button_text'] = 'انتخاب پزشک دیگر';
                 } else {
                     $alert['title'] = 'شما تایید میکنید که قبلا از دکتر امیری نوبت دریافت کرده اید';
@@ -441,28 +421,18 @@ class AppointmentApiController extends Controller
         //     ]);
         // }
         if ( $doctorId == 2 && $conditions == null) {
-            $resultList['firstTwoEmpty'] = null;
-            $resultList['listAppointments'] = null;
+            $resultList['firstTwoEmpty'] = [];
+            $resultList['listAppointments'] = [];
             $conditions['title'] = 'امکان دریافت نوبت با دکتر امیری فراهم نیست';
             $conditions['message'] = 'مراجعه کننده گرامی: نوبت های دکتر امیری تکمیل و یا غیر فعال است. در صورتی که بیمار دکتر امیری هستید از طریق ویزیت آنلاین اقدام به دریافت نوبت فرمایید. اگر ویزیت اولیه هستید ، تیم فوق تخصص دکتر امیری نوبت دریافت نمایید';
+            $conditions['button_text'] = 'انتخاب پزشک دیگر';
 
-
-            $conditions['alternative_doctor'] = DoctorResource::make(User::doctors_query()->whereHas('metas', function ($q) {
-                $q->where([
-                    ['meta_key', UserMetaEnum::FIRST_NAME],
-                    ['meta_value', 'LIKE', "%سها%"]
-                ])->orWhere(function ($query) {
-                    $query->where([
-                        ['meta_key', UserMetaEnum::LAST_NAME],
-                        ['meta_value', 'LIKE', "%میررضا%"]
-                    ]);
-                });
-            })->first());
+            $conditions['alternative_doctor'] = DoctorResource::make(User::find(5));
         }
         if(count($resultList['firstTwoEmpty']) == 0 && count($resultList['listAppointments']) == 0) {
             $conditions['title'] = setting(SettingKeyEnum::APP_FULL_APPOINTMENT_HEADER);
             $conditions['message'] = setting(SettingKeyEnum::APP_FULL_APPOINTMENT_BODY);
-            $conditions['alternative_doctor'] = null ;
+           $conditions['alternative_doctor'] = DoctorResource::make(User::find(5));
         }
         $payment = app('AppointmentUserService')->paymentstatus($appointmentSetting);
         return $this->ok([

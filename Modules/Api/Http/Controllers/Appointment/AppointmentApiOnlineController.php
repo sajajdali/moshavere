@@ -67,6 +67,12 @@ class AppointmentApiOnlineController extends Controller
                 'message' => 'نوبت متعلق به این کاربر نیست'
             ]);
         }
+        if (! $appointmentOnline->status->canSendMessage()){
+            return $this->requestException([
+                'status' => false,
+                'message' => 'ویزیت تمام شده و نوبت بسته شده است.'
+            ]);
+        }
 //        if ($request->input('message') == null){
 //            return $this->requestException([
 //                'status' => false,

@@ -433,7 +433,7 @@ class AppointmentApiController extends Controller
             $conditions['title'] = setting(SettingKeyEnum::APP_FULL_APPOINTMENT_HEADER);
             $conditions['message'] = setting(SettingKeyEnum::APP_FULL_APPOINTMENT_BODY);
             $conditions['title'] = 'نوبت خالی یافت نشد';
-            $conditions['message'] = 'هم اکنون تمامی نوبت های دکتر تکمیل است . لطفا در روزهای اینده اقدام به دریافت نوبت نمایید.';
+            $conditions['message'] = 'هم اکنون تمامی نوبت های دکتر تکمیل است . لطفا در روزهای اینده اقدام به دریافت نوبت نمایید.'; 
             $conditions['button_text'] = null;
             $conditions['alternative_doctor'] = null;
         }

@@ -432,7 +432,10 @@ class AppointmentApiController extends Controller
         if(count($resultList['firstTwoEmpty']) == 0 && count($resultList['listAppointments']) == 0) {
             $conditions['title'] = setting(SettingKeyEnum::APP_FULL_APPOINTMENT_HEADER);
             $conditions['message'] = setting(SettingKeyEnum::APP_FULL_APPOINTMENT_BODY);
-           $conditions['alternative_doctor'] = DoctorResource::make(User::find(5));
+            $conditions['title'] = 'نوبت خالی یافت نشد';
+            $conditions['message'] = 'هم اکنون تمامی نوبت های دکتر تکمیل است . لطفا در روزهای اینده اقدام به دریافت نوبت نمایید.';
+            $conditions['button_text'] = null;
+            $conditions['alternative_doctor'] = null;
         }
         $payment = app('AppointmentUserService')->paymentstatus($appointmentSetting);
         return $this->ok([

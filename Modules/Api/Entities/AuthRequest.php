@@ -68,7 +68,7 @@ class AuthRequest extends Model
             ->count() === 0;
     }
 
-    public static function make($mobileOrEmail, $ip): void
+    public static function make($mobileOrEmail, $ip , $sendForCall = false): void
     {
         $code = self::makeCode();
         $expireAt = now()->addMinutes(5);

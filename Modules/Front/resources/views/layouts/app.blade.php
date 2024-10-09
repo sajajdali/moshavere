@@ -32,6 +32,7 @@
 <body class="rtl app sidebar-mini">
     @include('front::layouts.components.app-header')
     <!-- Icons Fixed on Left Side -->
+    @if(disableUi())
     <div class="fixed-icons">
         <!-- Instagram SVG Icon -->
         <a href="https://www.instagram.com/alijangi2020/profilecard/?igsh=Mnc1czQyMW56cjY0" target="_blank"
@@ -52,6 +53,7 @@
             </svg>
         </a>
     </div>
+    @endif
     <!-- PAGE -->
     <div class="page">
         <div class="page-main">

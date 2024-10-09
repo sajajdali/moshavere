@@ -162,7 +162,7 @@ trait UserAttributeTrait
     {
         return Attribute::make(
             get: fn () => $this->getMeta(UserMetaEnum::ACTIVE_APPOINTMENT)?->meta_value,
-            set: function ($value) {
+            set:function ($value) {
                 // Update or create the meta value
                 $this->metas()->updateOrCreate(
                     ['meta_key' => UserMetaEnum::ACTIVE_APPOINTMENT],
@@ -171,8 +171,6 @@ trait UserAttributeTrait
                 // Remove specific caches
                 Cache::forget('emergency_doctors');
                 Cache::forget('Introduction_doctors');
-
-                return $value; // Ensure the value is returned after setting
             }
         );
     }

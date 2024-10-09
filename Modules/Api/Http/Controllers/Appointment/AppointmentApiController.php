@@ -138,10 +138,20 @@ class AppointmentApiController extends Controller
 
     private function getListEmptyAppointment($data, $appointmentSetting)
     {
+        if (
+            ! $appointmentSetting->detail[AppointmentSetting::VISIT_TYPE_INPERSON] &&
+            ! $appointmentSetting->detail[AppointmentSetting::VISIT_TYPE_ONLINE] &&
+            ! $appointmentSetting->detail[AppointmentSetting::VISIT_TYPE_VOIP]
+        ) {
+            return  [
+                'firstTwoEmpty' => null,
+                'listAppointments' => null
+            ];
+        }
+
         $firstTwoEmpty = [];
         $report = $data['report'];
         $mainDaActive = $report['min_day_active'];
-
         $isDay = verta()->addDays($mainDaActive)->day;
         $isMonth = verta()->addDays($mainDaActive)->month;
         $isYear = verta()->addDays($mainDaActive)->year;
@@ -188,19 +198,19 @@ class AppointmentApiController extends Controller
 
                                 $firstTwoEmpty[] = [
                                     'status' => true,
-                                    'persian_date' => $vertaDateTime->format('l m/d ساعت') . ' '. substr($time['from'], 0, -3),
+                                    'persian_date' => $vertaDateTime->format('l m/d ساعت') . ' ' . substr($time['from'], 0, -3),
                                     'time_stamp' => $time['timestamp'],
                                     'from' => substr($time['from'], 0, -3),
                                     'until' => substr($time['until'], 0, -3),
                                 ];
                             }
-                                $result[$dayNumber][] = [
-                                    'status' => true,
-                                    'persian_date' => $vertaDateTime->format('l m/d ساعت') .  ' '. substr($time['from'], 0, -3),
-                                    'time_stamp' => $time['timestamp'],
-                                    'from' => substr($time['from'], 0, -3),
-                                    'until' => substr($time['until'], 0, -3),
-                                ];
+                            $result[$dayNumber][] = [
+                                'status' => true,
+                                'persian_date' => $vertaDateTime->format('l m/d ساعت') .  ' ' . substr($time['from'], 0, -3),
+                                'time_stamp' => $time['timestamp'],
+                                'from' => substr($time['from'], 0, -3),
+                                'until' => substr($time['until'], 0, -3),
+                            ];
 
                             // If two matches are found, break out of the loop
                         } else {
@@ -368,7 +378,11 @@ class AppointmentApiController extends Controller
 
         //        $firstTwoEmpty = $this->getFirstTwoEmpty($listDays);
         $resultList = $this->getListEmptyAppointment($listDays, $appointmentSetting);
-
+        $findAlterNateDoctor = $this->findAlterNateDoctor();
+        $alterDoc = null ;
+        if(isset($findAlterNateDoctor)) {
+            $alterDoc = DoctorResource::make($findAlterNateDoctor) ;
+        }
         // handle condition dr amiri
         if ($doctorId == 2) {
             // bardari
@@ -383,8 +397,10 @@ class AppointmentApiController extends Controller
                         $conditions['title'] = 'امکان دریافت نوبت با دکتر امیری فراهم نیست';
                         $conditions['message'] = 'مراجعه کنندگان گرامی ویزیت بارداران فقط تا ۱۲ هفته توسط دکتر امیری انجام میشود . و بعد از آن توسط تیم فوق تخصصی دکتر امیری (دکتر سهامیررضا) انجام میشود.
 ویزیت آخر قبل از سزارین  با دکتر امیری انجام میشود. ';
-                        $conditions['alternative_doctor'] = DoctorResource::make(User::find(5));
-                        $conditions['button_text'] = 'انتخاب پزشک دیگر';
+                        $conditions['alternative_doctor'] =  $alterDoc;
+                        if($alterDoc){
+                            $conditions['button_text'] = 'انتخاب پزشک دیگر';
+                        }
                     }
                 }
             } elseif ($servicesId == 2 || $servicesId == 4) {
@@ -392,8 +408,10 @@ class AppointmentApiController extends Controller
                     $conditions['title'] = 'امکان دریافت نوبت با دکتر امیری فراهم نیست';
                     $conditions['message'] = 'مراجعه کننده گرامی  ویزیت اولیه شما توسط تیم فوق تخصصی دکتر امیری انجام میشود.
 بررسی های اولیه و آزمایشات لازم زیر نظر دکتر امیری نوشته میشود و شما برای ویزیت های بعدی میتوانید با دکتر امیری نوبت دریافت کنید.';
-                    $conditions['alternative_doctor'] = DoctorResource::make(User::find(5));
-                    $conditions['button_text'] = 'انتخاب پزشک دیگر';
+                    $conditions['alternative_doctor'] = $alterDoc;
+                    if($alterDoc){
+                        $conditions['button_text'] = 'انتخاب پزشک دیگر';
+                    }
                 } else {
                     $alert['title'] = 'شما تایید میکنید که قبلا از دکتر امیری نوبت دریافت کرده اید';
                     $alert['message'] = 'در صورتی که سابقه ویزیت با دکتر امیری نداشته باشید، نوبت شما حذف میشود .';
@@ -420,16 +438,17 @@ class AppointmentApiController extends Controller
         //         'messages' => null
         //     ]);
         // }
-        if ( $doctorId == 2 && $conditions == null) {
+        if ($doctorId == 2 && $conditions == null) {
             $resultList['firstTwoEmpty'] = [];
             $resultList['listAppointments'] = [];
             $conditions['title'] = 'امکان دریافت نوبت با دکتر امیری فراهم نیست';
             $conditions['message'] = 'مراجعه کننده گرامی: نوبت های دکتر امیری تکمیل و یا غیر فعال است. در صورتی که بیمار دکتر امیری هستید از طریق ویزیت آنلاین اقدام به دریافت نوبت فرمایید. اگر ویزیت اولیه هستید ، تیم فوق تخصص دکتر امیری نوبت دریافت نمایید';
-            $conditions['button_text'] = 'انتخاب پزشک دیگر';
-
-            $conditions['alternative_doctor'] = DoctorResource::make(User::find(5));
+            if($alterDoc){
+                $conditions['button_text'] = 'انتخاب پزشک دیگر';
+            }
+            $conditions['alternative_doctor'] = $alterDoc;
         }
-        if(count($resultList['firstTwoEmpty']) == 0 && count($resultList['listAppointments']) == 0) {
+        if ($doctorId != 2 && count($resultList['firstTwoEmpty']) == 0 && count($resultList['listAppointments']) == 0) {
             $conditions['title'] = setting(SettingKeyEnum::APP_FULL_APPOINTMENT_HEADER);
             $conditions['message'] = setting(SettingKeyEnum::APP_FULL_APPOINTMENT_BODY);
             $conditions['title'] = 'نوبت خالی یافت نشد';
@@ -442,8 +461,8 @@ class AppointmentApiController extends Controller
             'status' => true,
             'payment' => !$payment['in_person']['status'] ? null : $payment['in_person'],
             'appointment_setting_id' => $appointmentSetting->id,
-            'first_two_empty' =>  count( $resultList['firstTwoEmpty']) == 0 ? null : $resultList['firstTwoEmpty'],
-            'get_list_empty_appointment' => count($resultList['listAppointments']) == 0 ? null : $resultList['listAppointments'] ,
+            'first_two_empty' =>  count($resultList['firstTwoEmpty']) == 0 ? null : $resultList['firstTwoEmpty'],
+            'get_list_empty_appointment' => count($resultList['listAppointments']) == 0 ? null : $resultList['listAppointments'],
             'conditions' => $conditions,
             'alert' => $alert,
             'messages' => null
@@ -463,5 +482,45 @@ class AppointmentApiController extends Controller
             'status' => true,
             'appointment_user' => AppointmentUserResource::make($appointmentUser),
         ]);
+    }
+    private function findAlterNateDoctor()
+    {
+        $pegah = User::find(5);
+        $pegah_setting =   $pegah->appointmentSettings->first();
+        $PlistDays = Cache::rememberForever('appointmentList.' . $pegah_setting->id, function () use ($pegah_setting) {
+            $pegah_setting->update(['updated_log_at' => \now()]);
+            return app('AppointmentUserService')->listAppointments($pegah_setting);
+        });
+        $pegahResult  = $this->getListEmptyAppointment($PlistDays, $pegah_setting);
+        $soha = User::find(4);
+        $soha_setting =   $soha->appointmentSettings->first();
+        $listDays = Cache::rememberForever('appointmentList.' . $soha_setting->id, function () use ($soha_setting) {
+            $soha_setting->update(['updated_log_at' => \now()]);
+            return app('AppointmentUserService')->listAppointments($soha_setting);
+        });
+        $sohaResult  = $this->getListEmptyAppointment($listDays, $soha_setting);
+        if (isset($pegahResult['firstTwoEmpty'])  &&  isset($pegahResult['firstTwoEmpty'][0]['time_stamp'])) {
+            $pegah_first_empty_app_date = Carbon::createFromTimestamp($pegahResult['firstTwoEmpty'][0]['time_stamp'], 'Asia/Tehran');
+        }
+        if (isset($sohaResult['firstTwoEmpty'])  && isset($sohaResult['firstTwoEmpty'][0]['time_stamp'])) {
+            $soha_first_empty_app_date = Carbon::createFromTimestamp($sohaResult['firstTwoEmpty'][0]['time_stamp'], 'Asia/Tehran');
+        }
+
+        // check wich one have closer empty app
+        if (isset($pegah_first_empty_app_date) && isset($soha_first_empty_app_date)) {
+            // both have empty app
+            if ($pegah_first_empty_app_date->gt($soha_first_empty_app_date)) {
+                return $soha;
+            } else {
+                return $pegah;
+            }
+        } elseif (!isset($pegah_first_empty_app_date) && isset($soha_first_empty_app_date)) {
+            // pegah dosent have empty app
+            return $soha;
+        } elseif (!isset($soha_first_empty_app_date) && isset($pegah_first_empty_app_date)) {
+            // soha dosent have empty app
+            return $pegah;
+        }
+        return null;
     }
 }

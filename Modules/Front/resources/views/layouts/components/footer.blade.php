@@ -67,9 +67,17 @@
                </div>
            </section>
        @endunless
-       <section class="bg-secondary-300 py-3 px-4">
-           <p class="text-sm text-center">
-               تمامی حقوق مادی و معنوی این وب‌سایت، خدمات و محتوای مربوط به آن متعلق به شرکت پزشکم است.
-           </p>
-       </section>
+           @if(!disableUi())
+               <section class="bg-secondary-300 py-3 px-4">
+                   <p class="text-sm text-center">
+                       تمامی حقوق مادی و معنوی این وب‌سایت، خدمات و محتوای مربوط به آن متعلق به شرکت پزشکم است.
+                   </p>
+               </section>
+           @else
+               <section class="bg-secondary-300 py-3 px-4">
+                   <p class="text-sm text-center">
+                       تمامی حقوق مادی و معنوی این وب‌سایت، خدمات و محتوای مربوط به آن متعلق به سایت نوبت دهی میباشد.
+                   </p>
+               </section>
+           @endif
    </footer>

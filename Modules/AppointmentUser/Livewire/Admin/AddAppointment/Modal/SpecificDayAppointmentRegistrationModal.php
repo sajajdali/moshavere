@@ -268,7 +268,7 @@ class SpecificDayAppointmentRegistrationModal extends Component
             placeId: $this->appId->place?->id ?? $this->placeId,
             agentId: auth()->user()->id,
             operatorId: $oprator,
-            kind: isset($this->form['kind']) ? AppointmentUserKindEnum::tryFrom($this->form['kind']) : null,
+            kind: isset($this->form['kind']) ? $this->form['kind'] : null,
             smsToDoctor: true,
             description: isset($this->form['description']) ? $this->form['description'] : '',
             type: $appointment_type,

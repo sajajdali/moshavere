@@ -78,7 +78,7 @@ class UpdateOrCreate extends Component
             $this->user->dr_waiting_time = $this->form['drWaitingTime'];
         }
         if (isset($this->form['active'])) {
-            $this->user->active_appointment = $this->form['active'];
+            $this->user->active_appointment = $this->form['active'] == false ? 0 : 1;
         }
         if (isset($this->form['drBanner'])) {
             $this->user->dr_banner = $this->form['drBanner'];

@@ -446,12 +446,17 @@ class AppointmentApiController extends Controller
             $conditions['message'] = 'مراجعه کننده گرامی: نوبت های دکتر امیری تکمیل و یا غیر فعال است. در صورتی که بیمار دکتر امیری هستید از طریق ویزیت آنلاین اقدام به دریافت نوبت فرمایید. اگر ویزیت اولیه هستید ، تیم فوق تخصص دکتر امیری نوبت دریافت نمایید';
             if($alterDoc){
                 $conditions['button_text'] = 'انتخاب پزشک دیگر';
+            } else {
+                $conditions['button_text'] = null;
             }
             $conditions['alternative_doctor'] = $alterDoc;
             $conditions['get_online_appointment'] = [
                 'button' => 'دریافت نوبت آنلاین از دکتر امیری',
                 'route' => RouteEnum::GET_ONLINE_APPOINTMENT
             ];
+            if (ip() == '91.92.122.120'){
+                $conditions['button_text'] = 'انتخاب پزشک دیگر';
+            }
         }
         if ($doctorId != 2 && count($resultList['firstTwoEmpty']) == 0 && count($resultList['listAppointments']) == 0) {
             $conditions['title'] = setting(SettingKeyEnum::APP_FULL_APPOINTMENT_HEADER);

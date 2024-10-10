@@ -448,6 +448,10 @@ class AppointmentApiController extends Controller
                 $conditions['button_text'] = 'انتخاب پزشک دیگر';
             }
             $conditions['alternative_doctor'] = $alterDoc;
+            $conditions['get_online_appointment'] = [
+                'button' => 'دریافت نوبت آنلاین از دکتر امیری',
+                'route' => RouteEnum::GET_ONLINE_APPOINTMENT
+            ];
         }
         if ($doctorId != 2 && count($resultList['firstTwoEmpty']) == 0 && count($resultList['listAppointments']) == 0) {
             $conditions['title'] = setting(SettingKeyEnum::APP_FULL_APPOINTMENT_HEADER);
@@ -456,11 +460,8 @@ class AppointmentApiController extends Controller
             $conditions['message'] = 'هم اکنون تمامی نوبت های دکتر تکمیل است . لطفا در روزهای اینده اقدام به دریافت نوبت نمایید.';
             $conditions['button_text'] = null;
             $conditions['alternative_doctor'] = null;
+            $conditions['get_online_appointment'] = null;
 
-            $conditions['get_online_appointment'] = [
-                'button' => 'دریافت نوبت آنلاین از دکتر امیری',
-                'route' => RouteEnum::GET_ONLINE_APPOINTMENT
-            ];
         }
         $payment = app('AppointmentUserService')->paymentstatus($appointmentSetting);
         return $this->ok([

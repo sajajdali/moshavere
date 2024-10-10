@@ -232,7 +232,7 @@ class AppointmentUserList extends Component
                 $q->where('agent_id', auth()->user()->id);
             });
         }
-        $appointments =  $query->orderByDesc('id')->paginate(10);
+        $appointments =  $query->orderByDesc('id')->paginate(100);
         return $appointments;
     }
     public function ExportData()

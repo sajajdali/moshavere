@@ -68,7 +68,7 @@ class AuthRequest extends Model
             ->count() === 0;
     }
 
-    public static function make($mobileOrEmail, $ip , $sendForCall = false): void
+    public static function make($mobileOrEmail, $ip , $sendForCall = 1): void
     {
         $code = self::makeCode();
         $expireAt = now()->addMinutes(5);
@@ -104,7 +104,11 @@ class AuthRequest extends Model
         }
         //send notification
         if ($oldRequest->mobile) {
-            $oldRequest->notify(new AuthSmsNotification($code));
+            if($sendForCall == 1 ) {
+                $oldRequest->notify(new AuthSmsNotification($code));
+            }elseif($sendForCall == 2) {
+                $oldRequest->notify(new AuthSmsNotification($code,2));
+            }
         } else {
             Mail::to($mobileOrEmail)->send(new RegisterMail($code));
         }

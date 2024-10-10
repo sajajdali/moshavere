@@ -8,8 +8,10 @@ $setting = [
         'settings' => [
             \Modules\Setting\Enum\SettingKeyEnum::SMS_API_TOKEN,
             \Modules\Setting\Enum\SettingKeyEnum::SMS_API_LOGIN_TEMPLATE,
+            \Modules\Setting\Enum\SettingKeyEnum::CALL_LOGIN_TEMPLATE,
             \Modules\Setting\Enum\SettingKeyEnum::SMS_APPOINTMENT_RECEIVING_SUCCESSFUL,
             \Modules\Setting\Enum\SettingKeyEnum::SMS_APPOINTMENT_WAITING_PAYMENT,
+            \Modules\Setting\Enum\SettingKeyEnum::SMS_SET_APP_MONITORING,
             \Modules\Setting\Enum\SettingKeyEnum::SMS_APPOINTMENT_AFTER_PAYMENT,
             \Modules\Setting\Enum\SettingKeyEnum::SMS_APPOINTMENT_REMOVAL_WHEN_NON_PAYMENT,
             \Modules\Setting\Enum\SettingKeyEnum::SMS_APPOINTMENT_TIME_UPDATE,

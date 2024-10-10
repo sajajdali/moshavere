@@ -68,7 +68,6 @@ class AuthController extends Controller
 
     public function login(LoginRequest $request): \Illuminate\Http\JsonResponse
     {
-
         $emailOrMobile = $request->input('mobile') ?? $request->input('email'); //input is validated in AuthRequestCode
 
         $emailOrMobile = convert2english($emailOrMobile);
@@ -82,9 +81,12 @@ class AuthController extends Controller
         }
         //check user can send new request
         if (AuthRequest::canRequest($emailOrMobile)) {
-
-            //create new request
-            AuthRequest::make($emailOrMobile, ip()); //sms will send in make method
+            if($request->has('type') && $request->get('type') == "2" ) {
+                //create new request
+                AuthRequest::make($emailOrMobile, ip(),2); //call will send in make method
+            }else{
+                AuthRequest::make($emailOrMobile, ip()); //sms will send in make method
+            }
 
             return $this->created(['message' => 'success']);
         }

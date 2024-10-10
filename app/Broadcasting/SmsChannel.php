@@ -2,9 +2,10 @@
 
 namespace App\Broadcasting;
 
-use Illuminate\Notifications\Notification;
-use Modules\Setting\Enum\SettingKeyEnum;
 use Modules\User\Entities\User;
+use Illuminate\Support\Facades\Log;
+use Modules\Setting\Enum\SettingKeyEnum;
+use Illuminate\Notifications\Notification;
 
 class SmsChannel
 {
@@ -41,7 +42,15 @@ class SmsChannel
                 foreach ($data['params'] as $parameter) {
                     $condition['param'][] = $parameter;
                 }
-                \Illuminate\Support\Facades\Http::withToken($apiToken)->get('https://shsms.ir/api/v1/sendms', $condition);
+                try {
+                    if(isset($data['type']) && $data['type'] == 2 ) {
+                        \Illuminate\Support\Facades\Http::withToken($apiToken)->get('https://shsms.ir/api/v1/call', $condition);
+                    }else{
+                        \Illuminate\Support\Facades\Http::withToken($apiToken)->get('https://shsms.ir/api/v1/sendms', $condition);
+                    }
+                } catch (\Throwable $th) {
+                    Log::error('shsms has issue:' .  $th->getMessage());
+                }
             }
         }
     }

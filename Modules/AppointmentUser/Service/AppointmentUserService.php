@@ -460,8 +460,6 @@ class AppointmentUserService
 
         return !$existingAppointments;
     }
-
-
     public function paymentstatus(AppointmentSetting $appointmentSetting)
     {
         //TODO::change this function for VOIP and inPerson Payment
@@ -796,8 +794,9 @@ class AppointmentUserService
         ) {
             $paymentLink = route('api.appointment.payment.create', $appointmentUser);
         }
-
-
+        if ($status == AppointmentUserStatusEnum::STATUS_MONITORING) {
+            $smsTemplate = setting(SettingKeyEnum::SMS_SET_APP_MONITORING);
+        }
         // handel sms
         $this->makeShortLink($appointmentUser);
 

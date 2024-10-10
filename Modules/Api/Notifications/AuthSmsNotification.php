@@ -17,7 +17,7 @@ class AuthSmsNotification extends Notification implements ShouldQueue
      *
      * @return void
      */
-    public function __construct(public string $code)
+    public function __construct(public string $code,public int $type = 1 )
     {
         //
     }
@@ -44,10 +44,13 @@ class AuthSmsNotification extends Notification implements ShouldQueue
     public function toArray(mixed $notifiable): array
     {
         $loginTemplate = setting(SettingKeyEnum::SMS_API_LOGIN_TEMPLATE);
-
+        if($this->type ==  2 ){
+            $loginTemplate = setting(SettingKeyEnum::CALL_LOGIN_TEMPLATE);
+        }
         return [
             'template' => $loginTemplate,
             'receptor' => $notifiable->mobile,
+            'type'     => $this->type ,
             'params' => [
                 $this->code,
             ],

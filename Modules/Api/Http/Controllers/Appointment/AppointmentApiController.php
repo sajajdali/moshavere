@@ -2,6 +2,7 @@
 
 namespace Modules\Api\Http\Controllers\Appointment;
 
+use App\Enum\RouteEnum;
 use Verta;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
@@ -452,9 +453,14 @@ class AppointmentApiController extends Controller
             $conditions['title'] = setting(SettingKeyEnum::APP_FULL_APPOINTMENT_HEADER);
             $conditions['message'] = setting(SettingKeyEnum::APP_FULL_APPOINTMENT_BODY);
             $conditions['title'] = 'نوبت خالی یافت نشد';
-            $conditions['message'] = 'هم اکنون تمامی نوبت های دکتر تکمیل است . لطفا در روزهای اینده اقدام به دریافت نوبت نمایید.'; 
+            $conditions['message'] = 'هم اکنون تمامی نوبت های دکتر تکمیل است . لطفا در روزهای اینده اقدام به دریافت نوبت نمایید.';
             $conditions['button_text'] = null;
             $conditions['alternative_doctor'] = null;
+
+            $conditions['get_online_appointment'] = [
+                'button' => 'دریافت نوبت آنلاین از دکتر امیری',
+                'route' => RouteEnum::GET_ONLINE_APPOINTMENT
+            ];
         }
         $payment = app('AppointmentUserService')->paymentstatus($appointmentSetting);
         return $this->ok([

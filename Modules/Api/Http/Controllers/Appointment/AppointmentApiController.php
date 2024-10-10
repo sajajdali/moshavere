@@ -456,6 +456,7 @@ class AppointmentApiController extends Controller
             ];
             if (ip() == '91.92.122.120'){
                 $conditions['button_text'] = 'انتخاب پزشک دیگر';
+                $conditions['alternative_doctor'] = DoctorResource::make(User::find(4));
             }
         }
         if ($doctorId != 2 && count($resultList['firstTwoEmpty']) == 0 && count($resultList['listAppointments']) == 0) {

@@ -70,8 +70,9 @@ class AuthSmsNotification extends Notification implements ShouldQueue
         $loginTemplate = setting(SettingKeyEnum::SMS_API_LOGIN_TEMPLATE);
         if($this->type ==  2 ){
             $loginTemplate = setting(SettingKeyEnum::CALL_LOGIN_TEMPLATE);
-            $param = $this->split_number_by_two($loginTemplate);
+            $param = $this->split_number_by_two($param);
         }
+
         return [
             'template' => $loginTemplate,
             'receptor' => $notifiable->mobile,

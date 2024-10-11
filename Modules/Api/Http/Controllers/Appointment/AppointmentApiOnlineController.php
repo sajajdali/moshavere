@@ -90,21 +90,35 @@ class AppointmentApiOnlineController extends Controller
             'type' => $type,
             'body' => $request->input('message')
         ]);
-        if($request->hasFile('files')) {
-            $validator = Validator::make($request->all(), [
-                'files.*' => 'file|mimes:jpeg,png,jpg,gif,svg,mp4,mov,avi,wmv,pdf,mp3,wav,m4a,m4v,webm',
-            ]);
 
-            if ($validator->fails()) {
+
+        if($request->hasFile('files')) {
+            $files = $request->file('files');
+            $invalidFiles = [];
+            $validFiles = [];
+
+            foreach ($files as $file) {
+                // Get the file extension
+                $extension = strtolower($file->getClientOriginalExtension());
+
+                // Check if the extension is in the dangerous list or not
+                if (in_array($extension, dangerousExtensions())) {
+                    $invalidFiles[] = $file->getClientOriginalName();
+                } else {
+                    $validFiles[] = $file;
+                }
+            }
+            // If there are illegal files, we stop the upload and return an error
+            if (count($invalidFiles) > 0) {
                 return $this->requestException([
                     'status' => false,
-                    'message' => 'فرمت فایل های ارسالی اشتباه است',
-                    'errors' => $validator->errors()->all()
+                    'message' => 'فایل‌های زیر به دلیل پسوند خطرناک آپلود نشدند: ' . implode(', ', $invalidFiles),
+                    'errors' => 'فرمت‌های خطرناک تشخیص داده شدند.'
                 ]);
             }
 
-            $files =  $request->file('files');
-            $this->uploadFiles($user, $files, $message);
+            // Upload authorized files
+            $this->uploadFiles($user, $request->file('files'), $message);
         }
         $appointmentOnline->increment('new_messages');
 

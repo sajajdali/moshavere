@@ -45,6 +45,44 @@ function getValueAfterSlash($string) {
     }
 }
 
+function dangerousExtensions(): array
+{
+    return  [
+        'php',
+        'exe',
+        'sh',
+        'bat',
+        'cmd',
+        'js',
+        'py',
+        'pl',
+        'rb',
+        'jar',
+        'asp',
+        'aspx',
+        'jsp',
+        'htm',
+        'html',
+        'xml',
+        'dll',
+        'so',
+        'bin',
+        'cgi',
+        'pyc',
+        'wsf',
+        'vbs',
+        'vb',
+        'sql',
+        'cmd',
+        'ps1',
+        'xhtml',
+        'svgz',
+        'shtml',
+        'ini',
+        'htaccess'
+    ];
+}
+
 function disableUi(): bool
 {
     return env('DISABLE_TEMPLATE', false) === true;

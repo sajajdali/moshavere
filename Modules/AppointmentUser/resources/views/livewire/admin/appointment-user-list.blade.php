@@ -564,6 +564,11 @@
                 feedBackModal.show();
             }, 1000);
         });
+        Livewire.on('exelError', function() {
+            setTimeout(() => {
+                swal("توجه!", "تعداد داده ها زیاد است! لطفا با استفاده از جست و جو تعداد داده ها را محدود کنید", "warning");
+            }, 1000);
+        });
     });
 </script>
 @endpush

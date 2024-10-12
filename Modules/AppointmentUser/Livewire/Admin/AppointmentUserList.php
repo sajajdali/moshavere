@@ -68,7 +68,7 @@ class AppointmentUserList extends Component
         $this->resetPage();
     }
     #[Computed]
-    private function handleSearch()
+    private function handleSearch($isExported = false )
     {
         $permisstion_check = auth()->user();
         $query = AppointmentUser::query();
@@ -232,15 +232,19 @@ class AppointmentUserList extends Component
                 $q->where('agent_id', auth()->user()->id);
             });
         }
+        if($isExported) {
+            return $appointments =  $query->orderByDesc('id')->get();
+        }
         $appointments =  $query->orderByDesc('id')->paginate(100);
         return $appointments;
     }
     public function ExportData()
     {
         if ($this->handleSearch()->getCollection()->count() > 2000) {
+            $this->dispatch('exelError',true);
             return $this->addError('exelError', 'مقدار اطلاعات بیشتر از حد مجاز است، لطفا با استفاده از جست و جوی تاریخ، تعداد نوبت ها را محدود تر کنید');
         }
-        return  Excel::download(new AppointmentListExport($this->handleSearch()->getCollection()), 'appointment_lists.xlsx');
+        return  Excel::download(new AppointmentListExport($this->handleSearch(true)), 'appointment_lists.xlsx');
     }
     #[On('confirm_swal')]
     public function swal_confirm($action, $model)

@@ -567,6 +567,7 @@
         Livewire.on('exelError', function() {
             setTimeout(() => {
                 swal("توجه!", "تعداد داده ها زیاد است! لطفا با استفاده از جست و جو تعداد داده ها را محدود کنید", "warning");
+                $('html, body').animate({ scrollTop: 0 }, '50');
             }, 1000);
         });
     });

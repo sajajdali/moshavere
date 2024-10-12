@@ -240,11 +240,12 @@ class AppointmentUserList extends Component
     }
     public function ExportData()
     {
-        if ($this->handleSearch()->getCollection()->count() > 500) {
-            $this->dispatch('exelError',true);
-            return $this->addError('exelError', 'مقدار اطلاعات بیشتر از حد مجاز است، لطفا با استفاده از جست و جوی تاریخ، تعداد نوبت ها را محدود تر کنید');
+        $collection = $this->handleSearch(true) ;
+        if (count($collection) > 500) {
+            return $this->dispatch('exelError',true);
+             $this->addError('exelError', 'مقدار اطلاعات بیشتر از حد مجاز است، لطفا با استفاده از جست و جوی تاریخ، تعداد نوبت ها را محدود تر کنید');
         }
-        return  Excel::download(new AppointmentListExport($this->handleSearch(true)), 'appointment_lists.xlsx');
+        return  Excel::download(new AppointmentListExport($collection), 'appointment_lists.xlsx');
     }
     #[On('confirm_swal')]
     public function swal_confirm($action, $model)

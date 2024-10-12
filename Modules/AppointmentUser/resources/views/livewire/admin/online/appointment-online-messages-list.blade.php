@@ -211,7 +211,7 @@
                                 class="card-header bg-transparent border-0 d-flex justify-content-between align-items-center p-3">
                                 <div class="d-flex flex-column absoloute">
                                     <span class="text-muted">{{ $loop->count - $loop->index }}</span>
-                                    <a class="fw-bold ms-2 mt-2 h5 mb-0" href="{{ route('admin.appointment_user.message.detail', ['onlineAppId' => $message->online->id]) }}" >{{ $message->user->full_name }}</a>
+                                    <a target="blank" class="fw-bold ms-2 mt-2 h5 mb-0" href="{{ route('admin.appointment_user.message.detail', ['onlineAppId' => $message->online->id]) }}" >{{ $message->user->full_name }}</a>
                                 </div>
                                 <div class="text-end">
                                     <span

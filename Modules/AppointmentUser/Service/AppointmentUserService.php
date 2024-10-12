@@ -650,7 +650,7 @@ class AppointmentUserService
             $appointmentData->appointmentVia == AppointmentVia::SELF
         ) {
             $status = AppointmentUserStatusEnum::STATUS_MONITORING;
-            $deadLine = Carbon::now()->addHours($appointmentSetting->detail[AppointmentSetting::MONITORTING_APPOINTMENT]) ;
+            $deadLine = Carbon::now()->addHours((int) $appointmentSetting->detail[AppointmentSetting::MONITORTING_APPOINTMENT]) ;
         }
 
         // store appointment

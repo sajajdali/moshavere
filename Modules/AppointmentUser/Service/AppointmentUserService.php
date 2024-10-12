@@ -650,6 +650,7 @@ class AppointmentUserService
             $appointmentData->appointmentVia == AppointmentVia::SELF
         ) {
             $status = AppointmentUserStatusEnum::STATUS_MONITORING;
+            $deadLine = Carbon::now()->addHours($appointmentSetting->detail[AppointmentSetting::MONITORTING_APPOINTMENT]) ;
         }
 
         // store appointment
@@ -669,6 +670,9 @@ class AppointmentUserService
             'date_visit' => $visitDateTime->toDateTimeString(),
             'user_ip' => ip(),
         ];
+        if(isset($deadLine)) {
+            $appointmentUserModel['deadline_at'] =$deadLine ;
+        }
         if ($appointmentData->kind == AppointmentUserKindEnum::ONLINE) {
             $appointmentUserModel['start_time'] = null;
             $appointmentUserModel['end_time'] = null;

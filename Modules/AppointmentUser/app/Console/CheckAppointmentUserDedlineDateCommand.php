@@ -3,6 +3,7 @@
 namespace Modules\AppointmentUser\app\Console;
 
 use Illuminate\Console\Command;
+use Illuminate\Support\Facades\Log;
 use Modules\Setting\Enum\SettingKeyEnum;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Input\InputArgument;
@@ -46,6 +47,9 @@ class CheckAppointmentUserDedlineDateCommand extends Command
                 }
                 $appointment->delete();
             });
+            Log::info($appointmentsToDelete->count() . 'appointmentUser has been deleted') ;
+        }else{
+            Log::info('no appointment with deadline to delete') ;
         }
     }
 

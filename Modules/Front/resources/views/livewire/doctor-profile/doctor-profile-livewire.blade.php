@@ -23,7 +23,9 @@
                         <div
                             class="w-[calc(100%-70px-1.25rem)] flex flex-col sm:flex-row items-center justify-between gap-3">
                             <div class="space-y-3 text-center sm:text-right">
-                                <a class="text-lg font-bold" href="{{route('front.doctor.profile',['doctor_id' =>  $doc->id,'doctor_name' =>  str_replace(' ', '_', $doc->full_name)])}}">دکتر {{ $doc->full_name }}</a>
+                                <a class="text-lg font-bold"
+                                    href="{{ route('front.doctor.profile', ['doctor_id' => $doc->id, 'doctor_name' => str_replace(' ', '_', $doc->full_name)]) }}">دکتر
+                                    {{ $doc->full_name }}</a>
                                 <p class="bg-secondary-200 rounded-lg py-2 px-3 text-sm">
                                     {{ $doc->DocSpecialities() }}
                                 </p>
@@ -319,35 +321,33 @@
                         </p>
                     </header>
                     <main class="flex flex-col gap-3">
-                        @if (isset($fetchData['tel']) && isset($fetchData['navigate']) && isset($fetchData['address']))
-                            <div class="text-sm border-2 border-secondary-200 p-3 rounded-lg space-y-3">
-                                <div class="flex flex-col sm:flex-row items-center justify-between gap-3">
-                                    <p class="font-bold">{{ $doc->dr_display_address }}</p>
-                                    <div class="flex gap-3">
-                                        @isset($fetchData['tel'])
-                                            <div class="bg-secondary-100 text-black rounded-lg py-2 px-5 text-sm">
-                                                {{ $fetchData['tel'] }}
-                                            </div>
-                                        @endisset
-                                        @isset($fetchData['navigate'])
-                                            <a target="blank" href="{{ $fetchData['navigate'] }}"
-                                                class="bg-secondary-100 text-black rounded-lg py-2 px-5 text-sm">
-                                                مسیریابی
-                                            </a>
-                                        @endisset
-                                    </div>
+                        <div class="text-sm border-2 border-secondary-200 p-3 rounded-lg space-y-3">
+                            <div class="flex flex-col sm:flex-row items-center justify-between gap-3">
+                                <p class="font-bold">{{ $doc->dr_display_address }}</p>
+                                <div class="flex gap-3">
+                                    @isset($fetchData['tel'])
+                                        <div class="bg-secondary-100 text-black rounded-lg py-2 px-5 text-sm">
+                                            {{ $fetchData['tel'] }}
+                                        </div>
+                                    @endisset
+                                    @isset($fetchData['navigate'])
+                                        <a target="blank" href="{{ $fetchData['navigate'] }}"
+                                            class="bg-secondary-100 text-black rounded-lg py-2 px-5 text-sm">
+                                            مسیریابی
+                                        </a>
+                                    @endisset
                                 </div>
-                                @isset($fetchData['address'])
-                                    <div class="flex gap-3">
-                                        <svg class="w-5 h-5 mt-[2px]" xmlns="http://www.w3.org/2000/svg">
-                                            <use xlink:href="#sprite-location" />
-                                        </svg>
-                                        <p class="w-[calc(100%-2rem)]">{{ $fetchData['address'] }}
-                                        </p>
-                                    </div>
-                                @endisset
                             </div>
-                        @endif
+                            @isset($fetchData['address'])
+                                <div class="flex gap-3">
+                                    <svg class="w-5 h-5 mt-[2px]" xmlns="http://www.w3.org/2000/svg">
+                                        <use xlink:href="#sprite-location" />
+                                    </svg>
+                                    <p class="w-[calc(100%-2rem)]">{{ $fetchData['address'] }}
+                                    </p>
+                                </div>
+                            @endisset
+                        </div>
                         <button type="button" wire:click='reserveAppointment'
                             @if (!$fetchData['is_app_available']) disabled @endif class="btn__blue--round-full-between">
                             <p>دریافت نوبت دکتر {{ $doc->full_name }}</p>

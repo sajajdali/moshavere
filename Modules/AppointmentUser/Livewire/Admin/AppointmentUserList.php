@@ -240,7 +240,7 @@ class AppointmentUserList extends Component
     }
     public function ExportData()
     {
-        if ($this->handleSearch()->getCollection()->count() > 2000) {
+        if ($this->handleSearch()->getCollection()->count() > 500) {
             $this->dispatch('exelError',true);
             return $this->addError('exelError', 'مقدار اطلاعات بیشتر از حد مجاز است، لطفا با استفاده از جست و جوی تاریخ، تعداد نوبت ها را محدود تر کنید');
         }

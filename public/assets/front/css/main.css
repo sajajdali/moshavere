@@ -3614,3 +3614,26 @@ button:disabled,
     width: 35px;
     height: 35px;
 }
+/* Media Query for Mobile Devices */
+@media (max-width: 768px) {
+    .fixed-icons {
+        left: 20px;
+        right: auto;
+        top: auto;
+        bottom: 20px;
+        transform: none;
+        flex-direction: row;
+        gap: 10px;
+    }
+
+    .fixed-icons .icon-link {
+        width: 50px;
+        height: 50px;
+        border-radius: 50%;
+    }
+
+    .fixed-icons svg {
+        width: 25px;
+        height: 25px;
+    }
+}

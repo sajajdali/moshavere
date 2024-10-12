@@ -9,6 +9,8 @@ enum RouteEnum: string implements EnumHasDefaultInterface
     case APPOINTMENT = '/appointment/{id}';
     case TRANSACTION = '/transaction/show/{id}';
     case ONLINE_MESSAGE = '/support/history/{id}';
+    case GET_ONLINE_APPOINTMENT = '/get_appointment/online';
+    case GET_IN_PERSON_APPOINTMENT = '/get_appointment/in_person';
     case CHAT = '/chat/{id}';
 
 

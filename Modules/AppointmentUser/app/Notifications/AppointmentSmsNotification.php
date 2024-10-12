@@ -54,8 +54,8 @@ class AppointmentSmsNotification extends Notification implements ShouldQueue
             'template' => $this->template,
             'receptor' => $notifiable->user->mobile,
             'params' => [
-                $firstName,
-                $lastName,
+                $firstName ?? ' ',
+                $lastName ?? ' ',
                 $doctorName,
                 $serviceName,
                 $dateAppointment,

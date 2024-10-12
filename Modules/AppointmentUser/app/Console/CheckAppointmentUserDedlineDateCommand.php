@@ -9,6 +9,7 @@ use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Input\InputArgument;
 use Modules\AppointmentUser\app\Models\AppointmentUser;
 use Modules\AppointmentUser\app\Notifications\AppointmentSmsNotification;
+use Modules\AppointmentUser\Enum\AppointmentUserStatusEnum;
 
 class CheckAppointmentUserDedlineDateCommand extends Command
 {
@@ -41,15 +42,17 @@ class CheckAppointmentUserDedlineDateCommand extends Command
             ->get();
         if ($appointmentsToDelete->isNotEmpty()) {
             $appointmentsToDelete->each(function ($appointment) {
-                $smsTemplate = setting(SettingKeyEnum::SMS_APPOINTMENT_REMOVAL_WHEN_NON_PAYMENT);
-                if (isset($smsTemplate)) {
-                    $appointment->notify(new AppointmentSmsNotification($smsTemplate));
+                if ($appointment->status == AppointmentUserStatusEnum::STATUS_PENDING) {
+                    $smsTemplate = setting(SettingKeyEnum::SMS_APPOINTMENT_REMOVAL_WHEN_NON_PAYMENT);
+                    if (isset($smsTemplate)) {
+                        $appointment->notify(new AppointmentSmsNotification($smsTemplate));
+                    }
                 }
                 $appointment->delete();
             });
-            Log::info($appointmentsToDelete->count() . 'appointmentUser has been deleted') ;
-        }else{
-            Log::info('no appointment with deadline to delete') ;
+            Log::info($appointmentsToDelete->count() . 'appointmentUser has been deleted');
+        } else {
+            Log::info('no appointment with deadline to delete');
         }
     }
 

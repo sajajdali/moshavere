@@ -398,7 +398,7 @@
                                             <div class="d-flex flex-column">
                                                 <span>{{ $ap->doctor?->full_name ?? 'پزشک حذف شده' }}</span>
                                                 @if (
-                                                    $ap->setting->detail[\Modules\AppointmentSetting\app\Models\AppointmentSetting::OPERATORS][
+                                                    $ap->setting?->detail[\Modules\AppointmentSetting\app\Models\AppointmentSetting::OPERATORS][
                                                         \Modules\AppointmentSetting\app\Models\AppointmentSetting::STATUS
                                                     ]
                                                 )

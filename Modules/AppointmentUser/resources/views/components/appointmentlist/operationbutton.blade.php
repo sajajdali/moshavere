@@ -1,3 +1,11 @@
+@if ($ap->status == Modules\AppointmentUser\Enum\AppointmentUserStatusEnum::STATUS_WAIT_PAYMENT)
+<li>
+    <a wire:click='resendPaymentSms({{ $ap->id }})' href="#" data-label="ویرایش">
+        <i class="fa fa-envelope-o" aria-hidden="true"></i>
+        ارسال مجدد پیامک پرداخت
+    </a>
+</li>
+@endif
 @if ($ap->status == Modules\AppointmentUser\Enum\AppointmentUserStatusEnum::STATUS_PENDING)
     <li>
         <a wire:click='ApproveOnlineAppointment({{ $ap->id }})' href="#" data-label="ویرایش">

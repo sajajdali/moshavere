@@ -25,13 +25,13 @@ trait OprationButtonsTrait
         $app = AppointmentUser::find($id);
         $app->update(['type' =>  AppointmentUserTypeEnum::BETWEEN_PATIENTS]);
         Cache::forget('appointmentList.' . $app->setting->id);
-        $this->sendNotification($app,'وضعیت نوبت شما به بین مریض تغییر پیدا کرد');
+        $this->sendNotification($app, 'وضعیت نوبت شما به بین مریض تغییر پیدا کرد');
         return  $this->redirectToPage('نوبت به بین مریض تغییر پیدا کرد');
     }
     public function cancelAppointment($id, $sendSmsStatus)
     {
         $app = AppointmentUser::find($id);
-        $app->update(['status' =>  AppointmentUserStatusEnum::STATUS_CANCEL]);
+        $app->update(['status' =>  AppointmentUserStatusEnum::STATUS_CANCEL, 'deadline_at' => null]);
         if ($sendSmsStatus) {
             $smsTemplate = setting(SettingKeyEnum::SMS_APPOINTMENT_CANCEL);
             if (isset($smsTemplate)) {
@@ -40,7 +40,7 @@ trait OprationButtonsTrait
         }
 
         Cache::forget('appointmentList.' . $app->setting->id);
-        $this->sendNotification($app,'وضعیت نوبت شما به بین مریض تغییر پیدا کرد');
+        $this->sendNotification($app, 'وضعیت نوبت شما به بین مریض تغییر پیدا کرد');
         event(new CancelAppointmentEvent($app));
         return  $this->redirectToPage('نوبت با موفقیت کنسل شد');
     }
@@ -61,20 +61,20 @@ trait OprationButtonsTrait
         $app->update(['status' => AppointmentUserStatusEnum::STATUS_WAIT_PAYMENT, 'deadline_at' => $Appoointment_dedLine]);
         $app->notify(new AppointmentSmsNotification(setting(SettingKeyEnum::SMS_APPROVED_MONITORING_APPOINTMENT)));
         Cache::forget('appointmentList.' . $app->setting->id);
-        $this->sendNotification($app,'نوبت شما تایید شد');
+        $this->sendNotification($app, 'نوبت شما تایید شد');
         $this->redirectToPage('نوبت با موفقیت تایید شد');
     }
     public function disApprovemonitoringAppointment($id)
     {
         $app = AppointmentUser::find($id);
-        $app->update(['status' => AppointmentUserStatusEnum::STATUS_DISAPPROVED]);
+        $app->update(['status' => AppointmentUserStatusEnum::STATUS_DISAPPROVED, 'deadline_at' => null]);
         Cache::forget('appointmentList.' . $app->setting->id);
         $this->redirectToPage('نوبت با موفقیت عدم تایید شد');
     }
     public function disApprovemonitoringAppointmentWithSms($id)
     {
         $app = AppointmentUser::find($id);
-        $app->update(['status' => AppointmentUserStatusEnum::STATUS_DISAPPROVED]);
+        $app->update(['status' => AppointmentUserStatusEnum::STATUS_DISAPPROVED, 'deadline_at' => null]);
         $app->notify(new AppointmentSmsNotification(setting(SettingKeyEnum::SMS_DIS_APPROVED_MONITORING_APPOINTMENT)));
         Cache::forget('appointmentList.' . $app->setting->id);
         $this->redirectToPage('نوبت با موفقیت عدم تایید شد');
@@ -95,7 +95,7 @@ trait OprationButtonsTrait
         $onlineApp?->update(['status' => AppointmentOnlineStatusEnum::ACCEPTED, 'details' => $detail]);
         $app->update(['status' => AppointmentUserStatusEnum::STATUS_SUCCESSFUL]);
         Cache::forget('appointmentList.' . $app->setting->id);
-        $this->sendNotification($app,'نوبت شما تایید شد');
+        $this->sendNotification($app, 'نوبت شما تایید شد');
         $this->redirectToPage('نوبت با موفقیت تایید شد');
     }
     public function disApproveOnlineAppointment($id)
@@ -108,7 +108,7 @@ trait OprationButtonsTrait
     }
     public function disaprovedModal()
     {
-        $this->validate(['form.reason' => 'required'],[ 'form.reason.required' =>  'لطفا دلیل رد شدن را بنویسید']);
+        $this->validate(['form.reason' => 'required'], ['form.reason.required' =>  'لطفا دلیل رد شدن را بنویسید']);
         $app = AppointmentUser::find($this->fetchData['disapproveId']);
         $reson_for_disapproved = [
             AppointmentUser::DISAPPROVED_DESCRIPTION => $this->form['reason'],
@@ -143,7 +143,7 @@ trait OprationButtonsTrait
         $app = AppointmentUser::find($id);
         $date = verta($app->date_visit)->format('Y-m-d');
         Cache::forget('appointmentList.' . $app->setting->id);
-        $this->sendNotification($app,'ساعت نوبت شما تغییر کرده است');
+        $this->sendNotification($app, 'ساعت نوبت شما تغییر کرده است');
         return redirect()->route(
             'admin.appointment.add.specificday',
             [
@@ -154,7 +154,6 @@ trait OprationButtonsTrait
                 'tracking_code' => $app->tracking_code
             ]
         );
-
     }
     public function userAttenedToAppointment(AppointmentUser $appointmentUser)
     {
@@ -184,7 +183,7 @@ trait OprationButtonsTrait
     protected function sendfeedBackLink(AppointmentUser $appointmentUser)
     {
         $link_code = ShortLink::generateShortLinkCode();
-        $link_url = route('front.feedBack', ['appointmentUser_id' => $appointmentUser->id,'user_id'=> $appointmentUser->user->id]);
+        $link_url = route('front.feedBack', ['appointmentUser_id' => $appointmentUser->id, 'user_id' => $appointmentUser->user->id]);
         ShortLink::create([
             'link_code' => $link_code,
             'link_url'  => $link_url,
@@ -194,7 +193,6 @@ trait OprationButtonsTrait
         $smsTemplate = setting(SettingKeyEnum::SMS_FEEDBACK);
         if (isset($smsTemplate)) {
             $appointmentUser->notify(new AppointmentUserFeedbackSmsnotification(template: $smsTemplate, link_code: $link_code));
-
         }
         Cache::forget('appointmentList.' . $appointmentUser->id);
     }
@@ -252,7 +250,7 @@ trait OprationButtonsTrait
                 Cache::forget('appointmentList.' . $appointmentUser->id);
                 $this->redirectToPage('وضعیت نوبت به کاربر حضور پیدا نکرده تغییر کرد');
             }
-            $this->sendNotification($appointmentUser,'وجه پرداختی به جساب شما بازگشت داده شد');
+            $this->sendNotification($appointmentUser, 'وجه پرداختی به جساب شما بازگشت داده شد');
         } else {
             $this->redirectToPage('خطا');
         }
@@ -266,12 +264,16 @@ trait OprationButtonsTrait
                     title: "تغییر وضعیت نوبت",
                     excerpt: $notifMessage,
                     message: '',
-                    link: \App\Enum\RouteEnum::APPOINTMENT->getLink($appointmentUser->id) ,
+                    link: \App\Enum\RouteEnum::APPOINTMENT->getLink($appointmentUser->id),
                 ));
             } catch (\Throwable $th) {
                 //throw $th;
             }
-
         }
+    }
+    public function resendPaymentSms(AppointmentUser $appointmentUser)
+    {
+        $appointmentUser->notify(new AppointmentSmsNotification(setting(SettingKeyEnum::SMS_APPROVED_MONITORING_APPOINTMENT)));
+        $this->redirectToPage('پیامک پرداخت مجدد ارسال شد');
     }
 }

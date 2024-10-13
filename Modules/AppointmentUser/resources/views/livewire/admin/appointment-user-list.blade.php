@@ -9,6 +9,12 @@
         @endcan
     </div>
     @include('admin::layouts.components.alert')
+    @isset($msg)
+    <div class="col-md-12 alert alert-success fade show" role="alert">
+        <i class="fa fa-check-circle-o me-2" aria-hidden="true"></i>
+        {{ $msg }}
+    </div>
+    @endisset
     @error('exelError')
         <div class="col-md-12 alert alert-danger fade show" role="alert">
             <i class="fa fa-remove me-2" aria-hidden="true"></i>
@@ -320,16 +326,16 @@
                                 <th scope="col">#</th>
                                 <th scope="col">انتخاب</th>
                                 <th scope="col">نوع نوبت</th>
-                                <th scope="col">ثبت شده توسط</th>
                                 <th scope="col">نام کاربر</th>
                                 <th scope="col">شماره موبایل</th>
-                                <th scope="col">کد ملی</th>
                                 <th scope="col">نام پزشک</th>
-                                <th scope="col">بخش </th>
                                 <th scope="col">ساعت نوبت</th>
                                 <th scope="col">تاریخ نوبت</th>
-                                <th scope="col">تاریخ ثبت نوبت</th>
                                 <th scope="col">عملیات</th>
+                                <th scope="col">ثبت شده توسط</th>
+                                <th scope="col">بخش </th>
+                                <th scope="col">تاریخ ثبت نوبت</th>
+                                <th scope="col">کد ملی</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -370,20 +376,6 @@
                                             </td>
                                         <td>
                                             <div class="d-flex flex-column">
-                                                @if ($ap->agent)
-                                                    <span> {{ $ap->agent->fullName }}</span>
-                                                @else
-                                                    <span>خود کاربر</span>
-                                                @endif
-                                                @if ($ap->kind == \Modules\AppointmentUser\Enum\AppointmentUserKindEnum::ONLINE && $ap->hasAgent())
-                                                    <small class="badge bg-light rounded-pill">
-                                                        <span> {{ $ap->confirm_or_reject_by() }}</span>
-                                                    </small>
-                                                @endif
-                                            </div>
-                                        </td>
-                                        <td>
-                                            <div class="d-flex flex-column">
                                                 <span>
                                                     {{ $ap->user?->full_name ?? 'کاربر حذف شده' }}
                                                 </span>
@@ -393,7 +385,6 @@
                                             </div>
                                         </td>
                                         <td>{{ $ap->user?->mobile ?? '-----' }}</td>
-                                        <td>{{ $ap->user?->national_code ?? '---' }}</td>
                                         <td>
                                             <div class="d-flex flex-column">
                                                 <span>{{ $ap->doctor?->full_name ?? 'پزشک حذف شده' }}</span>
@@ -408,29 +399,15 @@
                                                 @endif
                                             </div>
                                         </td>
-                                        <td>{{ $ap->service?->title ?? 'سرویس حذف شده ' }}</td>
                                         <td>
                                             @if ($ap->kind == \Modules\AppointmentUser\Enum\AppointmentUserKindEnum::IN_PERSION)
                                                 {{ verta($ap->start_time)->format('H:i') }}
-                                                <strong>
-                                                    الی
-                                                </strong>
-                                                {{ verta($ap->end_time)->format('H:i') }}
                                             @else
                                                 -
                                             @endif
                                         </td>
                                         <td>{{ verta($ap->date_visit)->format('Y/m/d') }}</td>
-                                        <td>
-                                            <div class="d-flex flex-column align-item-center">
-                                                <span>
-                                                {{ verta($ap->created_at)->format('Y/m/d') }}
-                                                </span>
-                                                <span>
-                                                    {{ verta($ap->created_at)->format('H:i') }}
-                                                </span>
-                                            </div>
-                                        </td>
+
                                         <td>
                                             @canany(['update', 'delete'], $ap)
                                                 <div class="btn-group mt-2 mb-2">
@@ -453,6 +430,32 @@
                                                 </div>
                                             @endcan
                                         </td>
+                                        <td>
+                                            <div class="d-flex flex-column">
+                                                @if ($ap->agent)
+                                                    <span> {{ $ap->agent->fullName }}</span>
+                                                @else
+                                                    <span>خود کاربر</span>
+                                                @endif
+                                                @if ($ap->kind == \Modules\AppointmentUser\Enum\AppointmentUserKindEnum::ONLINE && $ap->hasAgent())
+                                                    <small class="badge bg-light rounded-pill">
+                                                        <span> {{ $ap->confirm_or_reject_by() }}</span>
+                                                    </small>
+                                                @endif
+                                            </div>
+                                        </td>
+                                        <td>{{ $ap->service?->title ?? 'سرویس حذف شده ' }}</td>
+                                        <td>
+                                            <div class="d-flex flex-column align-item-center">
+                                                <span>
+                                                {{ verta($ap->created_at)->format('Y/m/d') }}
+                                                </span>
+                                                <span>
+                                                    {{ verta($ap->created_at)->format('H:i') }}
+                                                </span>
+                                            </div>
+                                        </td>
+                                        <td>{{ $ap->user?->national_code ?? '---' }}</td>
                                     </tr>
                                 @endforeach
                             @else

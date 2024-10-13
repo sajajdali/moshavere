@@ -41,7 +41,7 @@ class AppointmentUserList extends Component
     public array $fetchData = [];
     public array $form = [];
     public bool $showcollaps = true;
-
+    public ?string $msg = null ;
     public function startSearch()
     {
         $this->showcollaps = true;
@@ -235,7 +235,7 @@ class AppointmentUserList extends Component
         if($isExported) {
             return $appointments =  $query->orderByDesc('id')->get();
         }
-        $appointments =  $query->orderByDesc('id')->paginate(100);
+        $appointments =  $query->orderByDesc('id')->paginate(10);
         return $appointments;
     }
     public function ExportData()
@@ -257,6 +257,7 @@ class AppointmentUserList extends Component
             'cancelWithOutSms' => $this->cancelAppointment($model, false),
             'delete' => $this->cancelAndDeleteApp($model),
             'refundPayment' => $this->refuntPaiedApp($model),
+            'resendPaymentSms' => $this->resendPaymentSms($model),
             default => '',
         };
     }
@@ -264,7 +265,9 @@ class AppointmentUserList extends Component
     //opdation button
     private function redirectToPage($msg)
     {
-        return redirect()->route('admin.appointment_user.list')->with('success', $msg);
+        $this->msg = $msg ;
+        $this->render();
+        // return redirect()->route('admin.appointment_user.list')->with('success', $msg);
     }
     //opdation button functions end
 

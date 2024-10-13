@@ -226,6 +226,7 @@ class SpecificDayAvailableAppointment extends Component
             'cancelWithSms'    => $this->cancelAppointment($model, true),
             'cancelWithOutSms' => $this->cancelAppointment($model, false),
             'delete'           => $this->cancelAndDeleteApp($model),
+            'resendPaymentSms' => $this->resendPaymentSms($model),
             default => '',
         };
     }

@@ -11,9 +11,11 @@
                 <div class="bg-white rounded-lg space-y-4 p-4">
                     <header class="flex flex-col sm:flex-row items-center justify-between gap-3">
                         <p class="text-lg font-semibold">اطلاعات تخصصی پزشک</p>
+                        @isset($doc->dr_rate)
                         <div class="bg-green text-white rounded-full py-2 px-5">
-                            89% رضایت مراجعین
+                            {{$doc->dr_rate}}% رضایت مراجعین
                         </div>
+                        @endisset
                     </header>
                     <main class="bg-secondary-100 rounded-lg p-4 flex flex-col sm:flex-row items-center gap-5">
                         <div

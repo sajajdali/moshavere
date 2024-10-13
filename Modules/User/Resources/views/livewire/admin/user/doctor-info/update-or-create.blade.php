@@ -136,6 +136,15 @@
                                                 در صفحه اصلی ، نمایش مدت زمان انتظار برای این پزشک</small>
                                         </div>
                                     </div>
+                                    <div class="col-md-12">
+                                        <div class="form-group">
+                                            <label for="doc_rate" class="form-label">درصد رضایت از پزشک</label>
+                                            <input wire:model='form.drRate' class="form-control"  id="doc_rate">
+                                            <small class="text-gray ms-2">
+                                                <i class="fa fa-info-circle" aria-hidden="true"></i>
+                                                در پروفایل پزشک</small>
+                                        </div>
+                                    </div>
 
                                     {{-- seperator --}}
                                     <div class="col-12 col-md-3 mt-5">

@@ -1,6 +1,7 @@
 <?php
 
 namespace Modules\User\Livewire\Admin\User\DoctorInfo;
+
 use Livewire\Component;
 use Modules\User\Entities\User;
 use Modules\Place\app\Models\Place;
@@ -58,6 +59,9 @@ class UpdateOrCreate extends Component
         }
         if (isset($this->form['order'])) {
             $this->user->dr_order = $this->form['order'];
+        }
+        if (isset($this->form['drRate'])) {
+            $this->user->dr_rate = $this->form['drRate'];
         }
         if (isset($this->form['showDocInEmergencyVisit']['status']) && $this->form['showDocInEmergencyVisit']['status']) {
             $this->user->dr_emergencyvisit_order    = $this->form['showDocInEmergencyVisit']['order'];
@@ -141,6 +145,9 @@ class UpdateOrCreate extends Component
             $this->form['banUser'] =   true;
         } else {
             $this->form['banUser'] =   false;
+        }
+        if ($this->user->dr_rate) {
+            $this->form['drRate'] = $this->user->dr_rate;
         }
         if (isset($this->user->dr_emergencyvisit_status)) {
             if ($this->user->dr_emergencyvisit_status == 0) {

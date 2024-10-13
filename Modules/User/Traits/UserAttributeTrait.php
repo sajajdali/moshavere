@@ -280,7 +280,13 @@ trait UserAttributeTrait
         $operator = UserMetaEnum::DR_WAITING_TIME;
         return Attribute::make(
             get: fn () => $this->getMeta($operator)?->meta_value,
-            set: fn ($value) => $this->metas()->create(['meta_key' => $operator, 'meta_value' => $value])
+            set: function ($value) use ($operator) {
+                // Update or create the meta value
+                $this->metas()->updateOrCreate(
+                    ['meta_key' => $operator],
+                    ['meta_value' => $value]
+                );
+            }
         );
     }
     public function drDisplayMobile(): Attribute
@@ -288,7 +294,13 @@ trait UserAttributeTrait
         $operator = UserMetaEnum::DR_WEBSITE_DISPLAY_MOBILE;
         return Attribute::make(
             get: fn () => $this->getMeta($operator)?->meta_value,
-            set: fn ($value) => $this->metas()->create(['meta_key' => $operator, 'meta_value' => $value])
+            set: function ($value) use ($operator) {
+                // Update or create the meta value
+                $this->metas()->updateOrCreate(
+                    ['meta_key' => $operator],
+                    ['meta_value' => $value]
+                );
+            }
         );
     }
     public function drDisplayNavigation(): Attribute
@@ -296,7 +308,13 @@ trait UserAttributeTrait
         $operator = UserMetaEnum::DR_WEBSITE_DISPLAY_NAVIGATION;
         return Attribute::make(
             get: fn () => $this->getMeta($operator)?->meta_value,
-            set: fn ($value) => $this->metas()->create(['meta_key' => $operator, 'meta_value' => $value])
+            set: function ($value) use ($operator) {
+                // Update or create the meta value
+                $this->metas()->updateOrCreate(
+                    ['meta_key' => $operator],
+                    ['meta_value' => $value]
+                );
+            }
         );
     }
     public function drDisplayAddress(): Attribute
@@ -304,7 +322,13 @@ trait UserAttributeTrait
         $operator = UserMetaEnum::DR_WEBSITE_DISPLAY_ADDRESS;
         return Attribute::make(
             get: fn () => $this->getMeta($operator)?->meta_value,
-            set: fn ($value) => $this->metas()->create(['meta_key' => $operator, 'meta_value' => $value])
+            set: function ($value) use ($operator) {
+                // Update or create the meta value
+                $this->metas()->updateOrCreate(
+                    ['meta_key' => $operator],
+                    ['meta_value' => $value]
+                );
+            }
         );
     }
     public function drDisplayExperince(): Attribute
@@ -312,7 +336,13 @@ trait UserAttributeTrait
         $operator = UserMetaEnum::DR_WEBSITE_DISPLAY_EXPERINCE;
         return Attribute::make(
             get: fn () => $this->getMeta($operator)?->meta_value,
-            set: fn ($value) => $this->metas()->create(['meta_key' => $operator, 'meta_value' => $value])
+            set: function ($value) use ($operator) {
+                // Update or create the meta value
+                $this->metas()->updateOrCreate(
+                    ['meta_key' => $operator],
+                    ['meta_value' => $value]
+                );
+            }
         );
     }
     public function drDisplayDiscription(): Attribute
@@ -320,7 +350,13 @@ trait UserAttributeTrait
         $operator = UserMetaEnum::DR_WEBSITE_DISPLAY_DESCRIPTION;
         return Attribute::make(
             get: fn () => $this->getMeta($operator)?->meta_value,
-            set: fn ($value) => $this->metas()->create(['meta_key' => $operator, 'meta_value' => $value])
+            set: function ($value) use ($operator) {
+                // Update or create the meta value
+                $this->metas()->updateOrCreate(
+                    ['meta_key' => $operator],
+                    ['meta_value' => $value]
+                );
+            }
         );
     }
     public function drRegistrationDescription(): Attribute
@@ -328,7 +364,13 @@ trait UserAttributeTrait
         $operator = UserMetaEnum::DR_REGISTRATION_DESCRIPTION;
         return Attribute::make(
             get: fn () => $this->getMeta($operator)?->meta_value,
-            set: fn ($value) => $this->metas()->create(['meta_key' => $operator, 'meta_value' => $value])
+            set: function ($value) use ($operator) {
+                // Update or create the meta value
+                $this->metas()->updateOrCreate(
+                    ['meta_key' => $operator],
+                    ['meta_value' => $value]
+                );
+            }
         );
     }
     public function favoriteDr(): Attribute
@@ -352,6 +394,19 @@ trait UserAttributeTrait
             set: fn ($value) => $this->metas()->create(['meta_key' => $operator, 'meta_value' => $value])
         );
     }
-
+    public function drRate(): Attribute
+    {
+        $operator = UserMetaEnum::DR_RATE;
+        return Attribute::make(
+            get: fn () => $this->getMeta($operator)?->meta_value,
+            set: function ($value) use ($operator) {
+                // Update or create the meta value
+                $this->metas()->updateOrCreate(
+                    ['meta_key' => $operator],
+                    ['meta_value' => $value]
+                );
+            }
+        );
+    }
 
 }

@@ -43,6 +43,7 @@ enum UserMetaEnum: int implements EnumHasNameInterface
     case DR_WEBSITE_DISPLAY_DESCRIPTION = 31;
     case DR_REGISTRATION_DESCRIPTION = 32;
     case DR_REGISTRATION_FROM = 33; // SELF or ADMIN
+    case DR_RATE = 34; // SELF or ADMIN
 
 
 
@@ -77,5 +78,5 @@ enum UserMetaEnum: int implements EnumHasNameInterface
         ];
         return $map[$oldKey] ?? null;
     }
-    
+
 }

@@ -78,6 +78,7 @@ enum AppointmentUserStatusEnum: int implements EnumHasApiResultInterface
             self::STATUS_NOT_ATTENDED->value,
             self::STATUS_DISAPPROVED->value,
             self::STATUS_ONILNE_CLOSED->value,
+            self::STATUS_MONITORING->value,
         ];
     }
 

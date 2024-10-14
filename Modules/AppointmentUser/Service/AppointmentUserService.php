@@ -483,7 +483,7 @@ class AppointmentUserService
         if (isset($detail['payment']) && isset($detail['payment']['inPerson']) && $detail['payment']['inPerson']['status']) {
             $inPersonStatusPayment = true;
             if (isset($detail['payment']['online']['notPayinStatus']) && $detail['payment']['online']['notPayinStatus'] == AppointmentSetting::DETAIL_PAYMENT_NOT_PAY_STATUS_DONT_SUBMIT) {
-                $deadLineDelete = Carbon::now()->addHours(4)->toDateTimeString();
+                $deadLineDelete = Carbon::now()->addMinutes(30)->toDateTimeString();
                 $inPersonForcePayment = true;
             }
             $inPersonPrice = $detail['payment']['inPerson']['price'];

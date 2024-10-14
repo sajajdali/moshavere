@@ -875,6 +875,6 @@ class AppointmentUserService
     private function getDeadlinePayment()
     {
         $hours = setting(SettingKeyEnum::APPOINTMENT_DEADLINE_VIA_ADMIN) == null ?   config('app.appointment_dedline') : setting(SettingKeyEnum::APPOINTMENT_DEADLINE_VIA_ADMIN);
-        return  (int) \now()->addHours((int)$hours);
+        return  \now()->addHours((int)$hours);
     }
 }

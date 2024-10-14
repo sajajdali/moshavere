@@ -626,18 +626,22 @@ class AppointmentUserService
                     $appointmentSetting->detail[AppointmentSetting::PAYMENT][AppointmentSetting::IN_PERSON][AppointmentSetting::STATUS] == true
                 ) {
                     $status = AppointmentUserStatusEnum::STATUS_WAIT_PAYMENT;
+                    $appointmentUserModel['deadline_at'] =  $this->getDeadlinePayment();
+
                 }
             } elseif ($appointmentData->kind == AppointmentUserKindEnum::ONLINE) {
                 if (
                     $appointmentSetting->detail[AppointmentSetting::PAYMENT][AppointmentSetting::ONLINE][AppointmentSetting::STATUS] == true
                 ) {
                     $status = AppointmentUserStatusEnum::STATUS_WAIT_PAYMENT;
+                    $appointmentUserModel['deadline_at'] =  $this->getDeadlinePayment();
                 }
             } elseif ($appointmentData->kind == AppointmentUserKindEnum::VOIP) {
                 if (
                     $appointmentSetting->detail[AppointmentSetting::PAYMENT][AppointmentSetting::VOIP][AppointmentSetting::STATUS] == true
                 ) {
                     $status = AppointmentUserStatusEnum::STATUS_WAIT_PAYMENT;
+                    $appointmentUserModel['deadline_at'] =  $this->getDeadlinePayment();
                 }
             }
         }
@@ -688,8 +692,7 @@ class AppointmentUserService
         // if set the appointment to be WAIT_FOR_PAYMENT
         if (isset($detail['wait_for_payment'])) {
             $appointmentUserModel['status'] = AppointmentUserStatusEnum::STATUS_WAIT_PAYMENT;
-            $hours =  setting(SettingKeyEnum::APPOINTMENT_DEADLINE_VIA_ADMIN) == null ?   config('app.appointment_dedline') : setting(SettingKeyEnum::APPOINTMENT_DEADLINE_VIA_ADMIN);
-            $appointmentUserModel['deadline_at'] =  \now()->addHours((int)$hours);
+            $appointmentUserModel['deadline_at'] =  $this->getDeadlinePayment();
         }
 
         //description for app
@@ -867,5 +870,11 @@ class AppointmentUserService
         ];
 
         //        $appointmentLists->where('start_time', '>', $dateAppointment)->where('end_time',);
+    }
+
+    private function getDeadlinePayment()
+    {
+        $hours = setting(SettingKeyEnum::APPOINTMENT_DEADLINE_VIA_ADMIN) == null ?   config('app.appointment_dedline') : setting(SettingKeyEnum::APPOINTMENT_DEADLINE_VIA_ADMIN);
+        return  (int) \now()->addHours((int)$hours);
     }
 }

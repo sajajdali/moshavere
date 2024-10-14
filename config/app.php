@@ -6,7 +6,7 @@ use Illuminate\Support\ServiceProvider;
 return [
     'admin_version' => env('ADMIN_VERSION', '0.0.1-alpha'),
     'front_version' => env('FRONT_VERSION', '0.0.1-alpha'),
-    'appointment_dedline' => '30',
+    'appointment_dedline' => '1',
     'recaptcha' => [
         'site_key' => env('GOOGLE_RECAPTCHA_SITE_KEY'),
         'secret_key' => env('GOOGLE_RECAPTCHA_SECRET'),

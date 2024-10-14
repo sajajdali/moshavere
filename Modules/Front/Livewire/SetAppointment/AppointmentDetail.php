@@ -268,7 +268,7 @@ class AppointmentDetail extends Component
             }
 
             $this->fetchData['success']  = 'پرداخت باموفقیت انجام شد و نوبت شما فعال شد ';
-            $this->fetchData['app']->transaction->update(['status' => TransactionStatusEnum::SUCCESSFUL]);
+            $this->fetchData['app']->transaction->update(['status' => TransactionStatusEnum::SUCCESSFUL,'deadline_at' => null]);
             $this->render();
         } catch (InvalidPaymentException $exception) {
             $this->fetchData['alert'] = 'خطا در انجام تراکنش';

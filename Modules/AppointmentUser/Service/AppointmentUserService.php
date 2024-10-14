@@ -626,22 +626,18 @@ class AppointmentUserService
                     $appointmentSetting->detail[AppointmentSetting::PAYMENT][AppointmentSetting::IN_PERSON][AppointmentSetting::STATUS] == true
                 ) {
                     $status = AppointmentUserStatusEnum::STATUS_WAIT_PAYMENT;
-                    $appointmentUserModel['deadline_at'] =  $this->getDeadlinePayment();
-
                 }
             } elseif ($appointmentData->kind == AppointmentUserKindEnum::ONLINE) {
                 if (
                     $appointmentSetting->detail[AppointmentSetting::PAYMENT][AppointmentSetting::ONLINE][AppointmentSetting::STATUS] == true
                 ) {
                     $status = AppointmentUserStatusEnum::STATUS_WAIT_PAYMENT;
-                    $appointmentUserModel['deadline_at'] =  $this->getDeadlinePayment();
                 }
             } elseif ($appointmentData->kind == AppointmentUserKindEnum::VOIP) {
                 if (
                     $appointmentSetting->detail[AppointmentSetting::PAYMENT][AppointmentSetting::VOIP][AppointmentSetting::STATUS] == true
                 ) {
                     $status = AppointmentUserStatusEnum::STATUS_WAIT_PAYMENT;
-                    $appointmentUserModel['deadline_at'] =  $this->getDeadlinePayment();
                 }
             }
         }
@@ -674,6 +670,9 @@ class AppointmentUserService
             'date_visit' => $visitDateTime->toDateTimeString(),
             'user_ip' => ip(),
         ];
+        if($status == AppointmentUserStatusEnum::STATUS_WAIT_PAYMENT) {
+            $appointmentUserModel['deadline_at'] =  $this->getDeadlinePayment();
+        }
         if ($appointmentData->kind == AppointmentUserKindEnum::ONLINE) {
             $appointmentUserModel['start_time'] = null;
             $appointmentUserModel['end_time'] = null;
@@ -694,7 +693,6 @@ class AppointmentUserService
             $appointmentUserModel['status'] = AppointmentUserStatusEnum::STATUS_WAIT_PAYMENT;
             $appointmentUserModel['deadline_at'] =  $this->getDeadlinePayment();
         }
-
         //description for app
         if ($appointmentData->description) {
             $detailDatabaseDB[AppointmentUser::DETAIL_DESCRIPTION] =  $appointmentData->description;
@@ -728,7 +726,6 @@ class AppointmentUserService
         ) {
             $needToPayment = true;
             $smsTemplate = setting(SettingKeyEnum::SMS_APPOINTMENT_WAITING_PAYMENT);
-            $appointmentUserModel['deadline_at'] = $paymentstatus['in_person']['deadline'];
             if ($paymentstatus['in_person']['force_payment']) {
                 $appointmentUserModel['status'] = AppointmentUserStatusEnum::STATUS_WAIT_PAYMENT;
             }
@@ -741,7 +738,6 @@ class AppointmentUserService
         if(isset($monitoring_deadline)) {
             $appointmentUserModel['deadline_at'] = $monitoring_deadline ;
         }
-
         // detailDatabase
 
         $detailDatabaseDB[AppointmentUser::DETAIL_FOR_HIMSELF] = $userModelAppointment->forHimself;
@@ -875,6 +871,6 @@ class AppointmentUserService
     private function getDeadlinePayment()
     {
         $hours = setting(SettingKeyEnum::APPOINTMENT_DEADLINE_VIA_ADMIN) == null ?   config('app.appointment_dedline') : setting(SettingKeyEnum::APPOINTMENT_DEADLINE_VIA_ADMIN);
-        return  \now()->addHours((int)$hours);
+        return   Carbon::now()->addHours((int)$hours)->toDateTimeString();
     }
 }

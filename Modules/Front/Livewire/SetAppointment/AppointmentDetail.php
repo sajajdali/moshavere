@@ -10,6 +10,7 @@ use Livewire\Attributes\Layout;
 use Livewire\Attributes\Locked;
 use Modules\Place\app\Models\Place;
 use Shetabit\Payment\Facade\Payment;
+use Illuminate\Support\Facades\Cache;
 use Modules\Front\Traits\Paymenttrait;
 use Modules\Setting\Enum\SettingKeyEnum;
 use Modules\Discount\app\Models\Discount;
@@ -94,7 +95,7 @@ class AppointmentDetail extends Component
                 $this->fetchData['app']->notify(new AppointmentSmsNotification($smsTemplate));
                 session()->flash('success', 'نوبت شما با موفقیت کنسل شد');
             }
-
+            Cache::forget('appointmentList.' . $this->fetchData['app']->setting->id);
             return redirect()->route('front.setAppointment.detail', ['tracking_code' => $this->fetchData['app']->tracking_code]);
         } else {
             abort(401);

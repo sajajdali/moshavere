@@ -384,7 +384,9 @@
                                                 @endif
                                             </div>
                                         </td>
-                                        <td>{{ $ap->user?->mobile ?? '-----' }}</td>
+                                        <td @if($ap->isAppForothers()) class="text-primary" data-bs-toggle="tooltip" data-bs-placement="top" title="نوبت برای شخص دیگری دریافت شده است و شماره شخص وارد نشده است!" @endif>
+                                            {{ $ap->user?->mobile ?? $ap->checkForRegisterForOthers() }}
+                                        </td>
                                         <td>
                                             <div class="d-flex flex-column">
                                                 <span>{{ $ap->doctor?->full_name ?? 'پزشک حذف شده' }}</span>

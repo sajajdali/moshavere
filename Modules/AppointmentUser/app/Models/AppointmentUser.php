@@ -187,10 +187,10 @@ class AppointmentUser extends Model
     }
     public function scopeDoctorPermittion($query)
     {
-        if(! auth()->user()->isAdmin() && auth()->user()->can('appointment_user.own') ) {
+        if (! auth()->user()->isAdmin() && auth()->user()->can('appointment_user.own')) {
             return $query->where('doctor_id', auth()->user()->id);
-        }else{ 
-            return ;
+        } else {
+            return;
         }
     }
 
@@ -225,10 +225,28 @@ class AppointmentUser extends Model
     {
         return $this->hasMany(AppointmentSegmentItem::class);
     }
-    public function getUnseenMessageBadge():int {
-        if($this->kind == AppointmentUserKindEnum::ONLINE) {
-            return $this->online->first()?->messages?->first()?->unReadedMessageCount() ?? 0 ;
+    public function getUnseenMessageBadge(): int
+    {
+        if ($this->kind == AppointmentUserKindEnum::ONLINE) {
+            return $this->online->first()?->messages?->first()?->unReadedMessageCount() ?? 0;
         }
-        return 0 ;
+        return 0;
+    }
+    public function isAppForothers(): bool
+    {
+        if (
+            $this->user->id != $this->agent->id &&
+            $this->agent->Hasrole('بیمار')
+        ) {
+            return true;
+        }
+        return false;
+    }
+    public function checkForRegisterForOthers()
+    {
+        // if appointment set for others and no mobile set for pation . 
+        if ($this->isAppForothers()) {
+            return $this->agent->mobile;
+        }
     }
 }

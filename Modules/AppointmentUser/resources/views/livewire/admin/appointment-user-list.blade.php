@@ -4,7 +4,7 @@
             <h1 class="page-title">لیست نوبت های ثبت شده</h1>
         </div>
         @can('appointment_user.addApp')
-            <a href="{{ route('admin.appointment_user.addApp') }}" class="btn btn-primary" aria-expanded="false"
+            <a href="{{ route('admin.appointment_user.addApp') }}" class=" mt-3 mt-md-0 btn btn-primary" aria-expanded="false"
                 aria-controls="customDate">افزودن نوبت</a>
         @endcan
     </div>

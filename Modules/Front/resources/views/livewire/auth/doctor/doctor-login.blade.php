@@ -24,7 +24,7 @@
                     @unless(disableUi())
                     <a href="{{route('front.registration.doctor')}}"
                         class="flex items-center gap-3 py-2 px-4 bg-secondary-100 rounded-lg border border-rose-200 hover:bg-secondary-200 hover:text-sky-800">
-                        <p class="text-sky-600">ثبت نام</p>
+                        <p class="text-sky-600">ثبت نام پزشک</p>
                     </a>
                     @endunless
                 </div>

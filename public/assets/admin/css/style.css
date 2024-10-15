@@ -92661,3 +92661,8 @@ textarea.form-control {
     width: 20% !important;
   }
 }
+@media (max-width: 576px) {
+    .pagination li:not(.active):not(.disabled):nth-child(n+4):nth-last-child(n+4) {
+        display: none;
+    }
+}

@@ -79,8 +79,8 @@
                                         <input type="checkbox" wire:model='form.doctor.{{ $doctorList->id }}'
                                             data-id="{{ $doctorList->id }}" data-for="doctor" {{-- @if (array_key_exists($doctorList->id, $form['doctor']) && $form['doctor'][$doctorList->id] == 'true') checked @endif --}}
                                             data-checkboxes="mygroup" class="custom-control-input"
-                                            id="checkbox-{{ $key }}">
-                                        <label for="checkbox-{{ $key }}"
+                                            id="checkbox-{{ $doctorList->id }}">
+                                        <label for="checkbox-{{ $doctorList->id }}"
                                             class="custom-control-label">{{ $doctorList->full_name }}</label>
                                     </div>
                                 </div>

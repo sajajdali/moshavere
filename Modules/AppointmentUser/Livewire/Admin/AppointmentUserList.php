@@ -8,6 +8,7 @@ use Livewire\Attributes\Url;
 use Livewire\WithPagination;
 use Modules\User\Entities\User;
 use Livewire\Attributes\Computed;
+use Spatie\Permission\Models\Role;
 use Modules\User\Enum\UserMetaEnum;
 use Maatwebsite\Excel\Facades\Excel;
 use Hekmatinasser\Verta\Facades\Verta;
@@ -41,7 +42,7 @@ class AppointmentUserList extends Component
     public array $fetchData = [];
     public array $form = [];
     public bool $showcollaps = true;
-    public ?string $msg = null ;
+    public ?string $msg = null;
     public function startSearch()
     {
         $this->showcollaps = true;
@@ -68,7 +69,7 @@ class AppointmentUserList extends Component
         $this->resetPage();
     }
     #[Computed]
-    private function handleSearch($isExported = false )
+    private function handleSearch($isExported = false)
     {
         $permisstion_check = auth()->user();
         $query = AppointmentUser::query();
@@ -198,7 +199,14 @@ class AppointmentUserList extends Component
             'setterAppointment' => [
                 'condition' => $this->search['setterAppointment'],
                 'callback' => function ($query) {
-                    return $query->whereJsonContains('details->appointment_via', $this->search['setterAppointment']);
+                    $setertAppRole = Role::find($this->search['setterAppointment']);
+                    if ($setertAppRole) {
+                        return $query->whereHas('agent', function ($qq) use ($setertAppRole) {
+                            $qq->whereHas('roles', function ($qqq) use ($setertAppRole) {
+                                return $qqq->where('id', $setertAppRole->id);
+                            });
+                        });
+                    }
                 },
             ],
             'section_status' => [
@@ -232,7 +240,7 @@ class AppointmentUserList extends Component
                 $q->where('agent_id', auth()->user()->id);
             });
         }
-        if($isExported) {
+        if ($isExported) {
             return $appointments =  $query->orderByDesc('id')->get();
         }
         $appointments =  $query->orderByDesc('id')->paginate(10);
@@ -240,10 +248,10 @@ class AppointmentUserList extends Component
     }
     public function ExportData()
     {
-        $collection = $this->handleSearch(true) ;
+        $collection = $this->handleSearch(true);
         if (count($collection) > 500) {
-            return $this->dispatch('exelError',true);
-             $this->addError('exelError', 'مقدار اطلاعات بیشتر از حد مجاز است، لطفا با استفاده از جست و جوی تاریخ، تعداد نوبت ها را محدود تر کنید');
+            return $this->dispatch('exelError', true);
+            $this->addError('exelError', 'مقدار اطلاعات بیشتر از حد مجاز است، لطفا با استفاده از جست و جوی تاریخ، تعداد نوبت ها را محدود تر کنید');
         }
         return  Excel::download(new AppointmentListExport($collection), 'appointment_lists.xlsx');
     }
@@ -265,7 +273,7 @@ class AppointmentUserList extends Component
     //opdation button
     private function redirectToPage($msg)
     {
-        $this->msg = $msg ;
+        $this->msg = $msg;
         $this->render();
         // return redirect()->route('admin.appointment_user.list')->with('success', $msg);
     }
@@ -282,8 +290,7 @@ class AppointmentUserList extends Component
     }
     public function mount()
     {
-        // TODO::pass roles that can set appointmet in appointmentSetter property ;
-        $this->fetchData['appointmentSetter'] = null;
+        $this->fetchData['appointmentSetter'] = Role::all();
         $this->fetchData['Services'] = Service::all();
         $this->fetchData['doctors'] = User::doctors();
 

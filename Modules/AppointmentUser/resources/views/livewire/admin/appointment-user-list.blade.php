@@ -10,10 +10,10 @@
     </div>
     @include('admin::layouts.components.alert')
     @isset($msg)
-    <div class="col-md-12 alert alert-success fade show" role="alert">
-        <i class="fa fa-check-circle-o me-2" aria-hidden="true"></i>
-        {{ $msg }}
-    </div>
+        <div class="col-md-12 alert alert-success fade show" role="alert">
+            <i class="fa fa-check-circle-o me-2" aria-hidden="true"></i>
+            {{ $msg }}
+        </div>
     @endisset
     @error('exelError')
         <div class="col-md-12 alert alert-danger fade show" role="alert">
@@ -112,9 +112,11 @@
 
                                 </div>
                                 <div class="col-md-12">
-                                    <label for="search-UserMobile" class="form-label"><strong>کد ملی</strong></label>
+                                    <label for="search-UserMobile" class="form-label"><strong>کد
+                                            ملی</strong></label>
                                     <input class="form-control" id="search-UserMobile"
-                                        wire:model="search.national_code" placeholder="کد ملی کاربر" type="text">
+                                        wire:model="search.national_code" placeholder="کد ملی کاربر"
+                                        type="text">
 
                                 </div>
                             </div>
@@ -241,17 +243,18 @@
                             <div class="col-12 col-md-8">
                                 <hr class="my-4">
                             </div>
-                            <div class="collapse row" id="settAppointmentCollaps">
+                            <div class="collapse row @if(isset($search['setterAppointment'])) show @endif" id="settAppointmentCollaps">
                                 <div class="col-md-12">
                                     <div class="form-group">
                                         <label class="form-label"><strong>ثبت کننده را انتخاب کنید</strong></label>
                                         <select wire:model='search.setterAppointment'
                                             class="form-control select2-show-search form-select"
+                                            data-id="setterAppointment"
                                             data-placeholder="انتخاب کنید..">
                                             <option label="انتخاب کنید.."></option>
                                             @if (isset($fetchData['appointmentSetter']))
-                                                @foreach ($fetchData['appointmentSetter'] as $key => $user)
-                                                    <option value="{{ $user->id }}">{{ $user->fullName }}
+                                                @foreach ($fetchData['appointmentSetter'] as $key => $role)
+                                                    <option value="{{ $role->id }}">{{ $role->name }}
                                                     </option>
                                                 @endforeach
                                             @endif
@@ -297,18 +300,25 @@
                             <div class="col-12 col-md-9">
                                 <hr class="my-4">
                             </div>
-                            <div class="collapse row" id="doctorSectionFillter">
+                            <div class="collapse row @if(isset($search['Doc_id'])) show @endif" id="doctorSectionFillter">
                                 <div class="row mb-4 ps-5">
-                                    <select class="form-control" id="search-name" wire:model="search.Doc_id"
-                                        placeholder="انتخاب کنید" type="text">
-                                        <option value="">انتخاب کنید...</option>
-                                        @if (isset($fetchData['doctors']))
-                                            @foreach ($fetchData['doctors'] as $doctor)
-                                                <option value="{{ $doctor->id }}">{{ $doctor->fullName }}
-                                                </option>
-                                            @endforeach
-                                        @endif
-                                    </select>
+                                    <div class="col-12">
+                                        <div class="form-group">
+                                            <label class="form-label"><strong>پزشک</strong></label>
+                                            <select wire:model='search.Doc_id' wire:igonre.self
+                                                class="form-control select2-show-search form-select"
+                                                data-id="Doc_id" data-placeholder="انتخاب کنید..">
+                                                <option label="انتخاب کنید.."></option>
+                                                @if (isset($fetchData['doctors']))
+                                                    @foreach ($fetchData['doctors'] as $doctor)
+                                                        <option value="{{ $doctor->id }}">
+                                                            {{ $doctor->fullName }}
+                                                        </option>
+                                                    @endforeach
+                                                @endif
+                                            </select>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -361,19 +371,19 @@
                                                 @endcan
                                             </div>
                                         </td>
-                                            <td class="{{ $ap->type->getclass() }} d-flex flex-column">
-                                                {!! $ap->kind->getIcon() !!}
-                                                <a
-                                                    @if ($ap->kind == \Modules\AppointmentUser\Enum\AppointmentUserKindEnum::ONLINE &&  $ap->online->isNotEmpty()) href="{{ route('admin.appointment_user.message.detail', ['onlineAppId' => $ap->online->first()?->id]) }}" @else href="" @endif>
-                                                    <span
-                                                        class="badge badge-sm {{ $ap->kind->getbadgeColor() }} rounded-pill">
-                                                        {{ $ap->kind->getName() }}
-                                                        @if ($ap->kind == \Modules\AppointmentUser\Enum\AppointmentUserKindEnum::ONLINE)
-                                                            {{ $ap->online->first()?->messages?->first()?->unReadedMessageCount() ?? 0 }}
-                                                        @endif
-                                                    </span>
-                                                </a>
-                                            </td>
+                                        <td class="{{ $ap->type->getclass() }} d-flex flex-column">
+                                            {!! $ap->kind->getIcon() !!}
+                                            <a
+                                                @if ($ap->kind == \Modules\AppointmentUser\Enum\AppointmentUserKindEnum::ONLINE && $ap->online->isNotEmpty()) href="{{ route('admin.appointment_user.message.detail', ['onlineAppId' => $ap->online->first()?->id]) }}" @else href="" @endif>
+                                                <span
+                                                    class="badge badge-sm {{ $ap->kind->getbadgeColor() }} rounded-pill">
+                                                    {{ $ap->kind->getName() }}
+                                                    @if ($ap->kind == \Modules\AppointmentUser\Enum\AppointmentUserKindEnum::ONLINE)
+                                                        {{ $ap->online->first()?->messages?->first()?->unReadedMessageCount() ?? 0 }}
+                                                    @endif
+                                                </span>
+                                            </a>
+                                        </td>
                                         <td>
                                             <div class="d-flex flex-column">
                                                 <span>
@@ -384,7 +394,8 @@
                                                 @endif
                                             </div>
                                         </td>
-                                        <td @if($ap->isAppForothers()) class="text-primary" data-bs-toggle="tooltip" data-bs-placement="top" title="نوبت برای شخص دیگری دریافت شده است و شماره شخص وارد نشده است!" @endif>
+                                        <td
+                                            @if ($ap->isAppForothers()) class="text-primary" data-bs-toggle="tooltip" data-bs-placement="top" title="نوبت برای شخص دیگری دریافت شده است و شماره شخص وارد نشده است!" @endif>
                                             {{ $ap->user?->mobile ?? $ap->checkForRegisterForOthers() }}
                                         </td>
                                         <td>
@@ -450,7 +461,7 @@
                                         <td>
                                             <div class="d-flex flex-column align-item-center">
                                                 <span>
-                                                {{ verta($ap->created_at)->format('Y/m/d') }}
+                                                    {{ verta($ap->created_at)->format('Y/m/d') }}
                                                 </span>
                                                 <span>
                                                     {{ verta($ap->created_at)->format('H:i') }}
@@ -509,6 +520,12 @@
                 }
             });
             $('.select2-show-search').select2();
+            $('body').on('change', '.select2-show-search', function() {
+                var modelName = $(this).data('id');
+                console.log('search.' + modelName);
+
+                @this.set('search.' + modelName, $(this).val());
+            });
             $('#search-appointment_date').persianDatepicker({
                 initialValue: false,
                 format: 'L',
@@ -571,8 +588,12 @@
         });
         Livewire.on('exelError', function() {
             setTimeout(() => {
-                swal("توجه!", "تعداد داده ها زیاد است! لطفا با استفاده از جست و جو تعداد داده ها را محدود کنید", "warning");
-                $('html, body').animate({ scrollTop: 0 }, '50');
+                swal("توجه!",
+                    "تعداد داده ها زیاد است! لطفا با استفاده از جست و جو تعداد داده ها را محدود کنید",
+                    "warning");
+                $('html, body').animate({
+                    scrollTop: 0
+                }, '50');
             }, 1000);
         });
     });

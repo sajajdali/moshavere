@@ -49,6 +49,7 @@ class CheckAppointmentUserDedlineDateCommand extends Command
                     }
                 }
                 $appointment->delete();
+                Log::info($appointment->id . 'has been deleted');
             });
             Log::info($appointmentsToDelete->count() . 'appointmentUser has been deleted');
         } else {

@@ -99,7 +99,8 @@ class PaymentController extends Controller
                 ->transactionId($appointmentUser->transaction->detail['transactionId'])
                 ->verify();
             $appointmentUser->update([
-                'status' => AppointmentUserStatusEnum::STATUS_SUCCESSFUL
+                'status' => AppointmentUserStatusEnum::STATUS_SUCCESSFUL,
+                'deadline_at' => null
             ]);
             $smsTemplate = setting(SettingKeyEnum::SMS_APPOINTMENT_AFTER_PAYMENT);
             if (isset($smsTemplate)) {

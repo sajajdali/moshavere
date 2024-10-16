@@ -650,7 +650,6 @@ class AppointmentUserService
             $appointmentData->appointmentVia == AppointmentVia::SELF
         ) {
             $status = AppointmentUserStatusEnum::STATUS_MONITORING;
-            $monitoring_deadline = Carbon::now()->addHours((int) $appointmentSetting->detail[AppointmentSetting::MONITORTING_APPOINTMENT]) ;
         }
 
         // store appointment
@@ -734,10 +733,7 @@ class AppointmentUserService
                 AppointmentUser::DETAIL_PAYMENT_PRICE => $paymentstatus['in_person']['price'],
             ];
         }
-        // insert dead_line for monioring app
-        if(isset($monitoring_deadline)) {
-            $appointmentUserModel['deadline_at'] = $monitoring_deadline ;
-        }
+
         // detailDatabase
 
         $detailDatabaseDB[AppointmentUser::DETAIL_FOR_HIMSELF] = $userModelAppointment->forHimself;

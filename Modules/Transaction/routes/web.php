@@ -1,7 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-use Modules\Transaction\Http\Controllers\TransactionController;
+use Modules\Transaction\Livewire\TransactionLivewire;
 
 /*
 |--------------------------------------------------------------------------
@@ -14,6 +14,7 @@ use Modules\Transaction\Http\Controllers\TransactionController;
 |
 */
 
-Route::group([], function () {
-    Route::resource('transaction', TransactionController::class)->names('transaction');
-});
+Route::prefix('admin')
+    ->middleware(['web', 'admin','can:Transaction'])->as('admin.')->group(function () {
+        Route::get('/trnasction', TransactionLivewire::class)->name('trnasction');
+    });

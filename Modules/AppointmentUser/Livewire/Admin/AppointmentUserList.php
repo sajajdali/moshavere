@@ -84,6 +84,13 @@ class AppointmentUserList extends Component
                     }
                 },
             ],
+            'search.appointment_id' => [
+                'condition' => isset($this->search['appointment_id']),
+                'callback' => function ($query) {
+                    return $query->whereId( $this->search['appointment_id']);
+                },
+
+            ],
             'user_id_search' => [
                 'condition' => $this->search['user_id'],
                 'callback' => function ($query) {

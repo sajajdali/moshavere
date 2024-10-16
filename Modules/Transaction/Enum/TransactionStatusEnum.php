@@ -50,6 +50,28 @@ enum TransactionStatusEnum : int implements EnumHasNameInterface
             'body' => $this->getName()
         ];
     }
+    public function badgeClass() {
+        return match($this)
+        {
+            self::ALL => '#7143BD' ,
+            self::SUCCESSFUL => 'bg-success' ,
+            self::REJECTED => 'bg-danger' ,
+            self::PENDING => 'bg-primary' ,
+            self::INACTIVITY_PAYMENT => 'bg-secondary' ,
+            default => "#7143BD",
+        } ;
+    }
+    public function rowClassColor() {
+        return match($this)
+        {
+            self::ALL => '#7143BD' ,
+            self::SUCCESSFUL => 'table-success' ,
+            self::REJECTED => 'table-danger' ,
+            self::PENDING => 'table-primary' ,
+            self::INACTIVITY_PAYMENT => 'table-secondary' ,
+            default => "#7143BD",
+        } ;
+    }
 
     public static function all()
     {

@@ -137,10 +137,18 @@
                             @if (isset($search['appointment_date']) ||
                                     isset($search['appointment_set_date']) ||
                                     isset($search['kind']) ||
+                                    isset($search['appointment_id']) ||
                                     isset($search['appointment_star_date']) ||
                                     isset($search['appointment_operatorId']) ||
                                     isset($search['appointment_end_date'])) ) show @endif"
                                 id="appointmentCollapsSearch" wire:ignore.self>
+                                <div class="col-md-6">
+                                    <label for="search-appointment_id" class="form-label"><strong>ایدی</strong></label>
+                                    <input class="form-control" id="search-appointment_id"
+                                        wire:model="search.appointment_id"
+                                        placeholder="آیدی نوبت" type="text">
+
+                                </div>
                                 <div class="col-md-6">
                                     <label for="search-kind" class="form-label datePicker"><strong>نوع
                                             نوبت</strong></label>

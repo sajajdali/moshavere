@@ -50,8 +50,18 @@ return [
                         'has_child' => false,
                         'children' => null,
                     ],
-                ],
+                ]
+            ],[
+                'title' => 'تراکنش ها',
+                'gate' => 'Transction',
+                'policy_class' => null,
+                'icon' => 'fe fe-dollar-sign',
+                'route' => 'admin.trnasction',
+                'has_badge' => false,
+                'has_child' => false,
+                'children' => null
             ],
+
         ],
     ],
 

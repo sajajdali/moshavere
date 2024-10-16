@@ -64,4 +64,7 @@ class Transaction extends Model
        return  $this->where('status', TransactionStatusEnum::SUCCESSFUL)
             ->whereDate('created_at', now()->today());
     }
+    public function appid() {
+        return $this->transactionable_id ; 
+    }
 }

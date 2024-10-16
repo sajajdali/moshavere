@@ -78,7 +78,7 @@
 
 
                 @if (isset($doc->dr_display_discription))
-                    <div class="bg-white rounded-lg px-4 divide-y divide-secondary-200">
+                    <div class="warning_badge">
                         <div class="py-4 flex items-center gap-3">
                             <svg class="w-5 h-5 text-secondary-300" xmlns="http://www.w3.org/2000/svg">
                                 <use xlink:href="#sprite-question" />

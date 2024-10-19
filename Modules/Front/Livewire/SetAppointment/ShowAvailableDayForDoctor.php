@@ -109,6 +109,7 @@ class ShowAvailableDayForDoctor extends Component
 
         $result = [];
         $maxDay = $this->fetchData['maxShowDay'];
+        $maxDayActiveDay = 0;
         $DaysDisplayed = 0;
 
         // select the last active day
@@ -121,12 +122,26 @@ class ShowAvailableDayForDoctor extends Component
             foreach ($monthWithAppointment as $month => $appointments) {
 
                 foreach ($appointments as $day => $appointment) {
-
+                    if ((Carbon::parse($appointment['day_number_gmt'])->lt(now()))) {
+                        continue;
+                    }
                     if ($day < $isDay && $month < $isMonth && $yeay < $isYear) {
                         continue;
                     }
-                    if ($appointment['empty_appoints'] <= 0 || $appointment['status'] == false ||   $appointment['user_status'] == false) {
-                        continue;
+                    if (setting(SettingKeyEnum::APPOINTMENT_SHOW_FALSE_STATUS_DAYS) && setting(SettingKeyEnum::APPOINTMENT_SHOW_FALSE_STATUS_DAYS) != false) {
+                        if ($appointment['status'] == false  &&  empty($appointment['times'])) {
+                            continue;
+                        }
+                        if ($maxDayActiveDay > $maxDay) {
+                            break 3;
+                        }
+                        if ($appointment['empty_appoints'] <= 0 || $appointment['status'] == false ||   $appointment['user_status'] == false) {
+                            $maxDayActiveDay++;
+                        }
+                    } else {
+                        if ($appointment['empty_appoints'] <= 0 || $appointment['status'] == false ||   $appointment['user_status'] == false) {
+                            continue;
+                        }
                     }
                     $dayNumber = $appointment['day_number_gmt'];
                     // check if user can access this date "max_day_active" from "setting"
@@ -135,7 +150,7 @@ class ShowAvailableDayForDoctor extends Component
                     if ($date_to_check->gt($last_activeDay)) {
                         break 3;
                     }
-                    if ($DaysDisplayed > $maxDay) {
+                    if ($DaysDisplayed > $maxDayActiveDay) {
                         break 3;
                     }
                     $DaysDisplayed++;
@@ -160,14 +175,14 @@ class ShowAvailableDayForDoctor extends Component
                         }
                     }
                     // delete the day if all the status are false
-                    $checkForFalse = collect($result[$dayNumber]);
-                    $isStatusFalse = $checkForFalse->every(function ($appointment) {
-                        return $appointment['status'] == false;
-                    });
-                    if ($isStatusFalse) {
-                        unset($result[$dayNumber]);
-                        $DaysDisplayed = $DaysDisplayed - 1;
-                    }
+                    // $checkForFalse = collect($result[$dayNumber]);
+                    // $isStatusFalse = $checkForFalse->every(function ($appointment) {
+                    //     return $appointment['status'] == false;
+                    // });
+                    // if ($isStatusFalse) {
+                    //     unset($result[$dayNumber]);
+                    //     $DaysDisplayed = $DaysDisplayed - 1;
+                    // }
                 }
             }
         }
@@ -251,7 +266,7 @@ class ShowAvailableDayForDoctor extends Component
         if (! AppointmentSetting::activeSetting()
             ->where('user_id', $this->fetchData['doc']->id)
             ->exists()) {
-            return redirect()->route('front.doctor.profile', ['doctor_id' => $this->fetchData['doc']->id, 'doctor_name' => str_replace(' ', '_',$this->fetchData['doc']->full_name)]);
+            return redirect()->route('front.doctor.profile', ['doctor_id' => $this->fetchData['doc']->id, 'doctor_name' => str_replace(' ', '_', $this->fetchData['doc']->full_name)]);
         }
         $this->getAvailableDay();
         $this->fetchData['isAppointmentActive'] = $this->fetchData['doc']->isDoctorActive();

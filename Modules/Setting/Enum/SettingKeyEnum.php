@@ -37,6 +37,7 @@ enum SettingKeyEnum: int implements EnumHasNameInterface, SettingTypeInterface, 
     case SITE_SECEND_SECTION_DESCRIPTION = 22;
     case APPOINTMENT_DETAIL_PAYMENT_DESCRIPTION_STATUS = 400;
     case APPOINTMENT_DETAIL_PAYMENT_DESCRIPTION_TEXT = 401;
+    case APPOINTMENT_SHOW_FALSE_STATUS_DAYS = 402;
 
         // ABOUT US PAGE
     case ABOUT_US_FIRST_SECTION_TITLE = 23;
@@ -138,6 +139,7 @@ enum SettingKeyEnum: int implements EnumHasNameInterface, SettingTypeInterface, 
             self::SITE_SECEND_SECTION_DESCRIPTION    => 'توضیح بخش دوم در صفحه ی اصلی)',
             self::APPOINTMENT_DETAIL_PAYMENT_DESCRIPTION_STATUS    => ' وضعیت توضیحات در صفحه ی جزئیات نوبت که مربوط به پرداخت میباشد',
             self::APPOINTMENT_DETAIL_PAYMENT_DESCRIPTION_TEXT    => 'متن توضیحات در صفحه ی جزئیات نوبت که مربوط به پرداخت میباشد ',
+            self::APPOINTMENT_SHOW_FALSE_STATUS_DAYS    => 'در قسمت دریافت نوبت ، روز هایی که تمامی نوبت آنها پر هست به کاربر نمایش دهد',
 
             // SMS
             self::SMS_API_TOKEN => 'توکن API پیامک',
@@ -257,6 +259,7 @@ enum SettingKeyEnum: int implements EnumHasNameInterface, SettingTypeInterface, 
             self::DEFAULT_EXERCISE_STATUS => SettingTypeEnum::SELECT,
             self::PAYMEN_ACTIVE_DRIVER => SettingTypeEnum::SELECT,
             self::APPOINTMENT_MORE_THAT_ONE_PER_DAY => SettingTypeEnum::CHECK,
+            self::APPOINTMENT_SHOW_FALSE_STATUS_DAYS => SettingTypeEnum::CHECK,
             self::APPOINTMENT_DETAIL_PAYMENT_DESCRIPTION_STATUS => SettingTypeEnum::CHECK,
             self::ONILNE_SEND_ATUOMATIC_MESSAGE_STATUS => SettingTypeEnum::CHECK,
             self::APPOINTMENT_SET_APPOINTMENT_WITH_DOCUMENT_NUMBER => SettingTypeEnum::CHECK,

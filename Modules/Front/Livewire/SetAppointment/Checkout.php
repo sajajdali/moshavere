@@ -17,10 +17,11 @@ use Modules\AppointmentUser\Enum\AppointmentVia;
 use Modules\AppointmentUser\Enum\model\UserModel;
 use Modules\AppointmentUser\app\Models\AppointmentUser;
 use Modules\AppointmentUser\Enum\model\AppointmentModel;
+use Modules\AppointmentUser\Enum\AppointmentUserKindEnum;
 use Modules\AppointmentUser\Enum\AppointmentUserTypeEnum;
+use Modules\AppointmentUser\Enum\AppointmentUserStatusEnum;
 use Modules\AppointmentUser\Enum\model\UserModelAppointment;
 use Modules\AppointmentSetting\app\Models\AppointmentSetting;
-use Modules\AppointmentUser\Enum\AppointmentUserKindEnum;
 
 #[Layout('front::layouts.app')]
 #[Title('ثبت نوبت')]
@@ -119,7 +120,15 @@ class Checkout extends Component
         $user_selected_date = Carbon::createFromTimestamp($this->fetchData['app_start_time'])->toDateString();
 
         // Check if user has an appointment on the selected date
-        $existingAppointment = $this->user->appointments()->whereDate('date_visit', $user_selected_date)->exists();
+        $existingAppointment = $this->user->appointments()->whereDate('date_visit', $user_selected_date)->whereIn('status',[
+            AppointmentUserStatusEnum::STATUS_PENDING ,
+            AppointmentUserStatusEnum::STATUS_SUCCESSFUL ,
+            AppointmentUserStatusEnum::STATUS_WAIT_PAYMENT ,
+            AppointmentUserStatusEnum::STATUS_ATTENDED ,
+            AppointmentUserStatusEnum::STATUS_NOT_ATTENDED ,
+            AppointmentUserStatusEnum::STATUS_MONITORING ,
+            AppointmentUserStatusEnum::STATUS_ONILNE_CLOSED ,
+        ])->exists();
         if ($existingAppointment) {
             $this->err = 'شما یک نوبت فعال در این روز دارید!';
             return false;

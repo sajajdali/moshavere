@@ -23,10 +23,11 @@ class DoctorLogin extends Component
         ]);
 
         if (Auth::attempt(['mobile' => $this->form['mobile'], 'password' => $this->form['password']])) {
-            // Authentication passed
+            // Authentication passed, regenerate session token
+            session()->regenerate();
             $user = Auth::user();
             if (isset($user->ban_user) && $user->ban_user == true) {
-               return  $this->fetchData['alert'] = 'پروفایل شما هنوز تایید نشده است!';
+                return  $this->fetchData['alert'] = 'پروفایل شما هنوز تایید نشده است!';
             }
             return redirect()->route('admin.dashboard')->with('success', 'خوش آمدید');
         } else {
@@ -36,7 +37,7 @@ class DoctorLogin extends Component
 
     public function mount()
     {
-        if (!Auth::guest() && Auth::user()->isAdmin()){
+        if (!Auth::guest() && Auth::user()->isAdmin()) {
             return redirect()->route('admin.dashboard')->with('success', 'شما داخل پنل مدیریت هستید');
         }
     }

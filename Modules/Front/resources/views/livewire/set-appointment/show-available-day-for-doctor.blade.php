@@ -13,7 +13,8 @@
                         <img src="{{ $fetchData['doc']->avatar }}" alt="doctor-image-name" />
                     </div>
                     <div class="w-[calc(100%-70px-1.25rem)] space-y-3">
-                        <a href="{{route('front.doctor.profile',['doctor_id' => $fetchData['doc']->id , 'doctor_name' =>  str_replace(' ', '_', $fetchData['doc']->full_name)])}}" class="font-bold">دکتر {{ $fetchData['doc']->full_name }}</a>
+                        <a href="{{ route('front.doctor.profile', ['doctor_id' => $fetchData['doc']->id, 'doctor_name' => str_replace(' ', '_', $fetchData['doc']->full_name)]) }}"
+                            class="font-bold">دکتر {{ $fetchData['doc']->full_name }}</a>
                         <p class="bg-secondary-200 rounded-lg py-2 px-3 text-sm">
                             {{ $fetchData['doc']->DocSpecialities() }}
                         </p>
@@ -31,7 +32,10 @@
                     </div>
                 </div>
             </div>
-            @if (isset($fetchData['firstTreeAvailableAppointment']) && !empty($fetchData['firstTreeAvailableAppointment']) && $fetchData['isAppointmentActive'])
+            @if (isset($fetchData['firstTreeAvailableAppointment']) &&
+                    !empty($fetchData['firstTreeAvailableAppointment']) &&
+                    $fetchData['isAppointmentActive']
+            )
                 <div class="appointment__modal-left" wire:loading.class='opacity-75'>
                     <div class="flex justify-between mb-4 align-center">
                         <p class="font-semibold">نوبت مورد نظر را انتخاب کنید</p>
@@ -58,21 +62,30 @@
                                     @break
                                 @endforeach
                             @endonce
+                            @php
+                                $allFalse = collect($appointmentsWithDaysIndex)->every(
+                                    fn($item) => $item['status'] === false,
+                                );
+                            @endphp
                             <label for="appointment-{{ $date }}"
-                                class="accordion__container accordion_appointment__container">
+                                class="accordion__container accordion_appointment__container @if ($allFalse) bg-rose-200 remove_open @endif">
                                 <div class="accordion_select__button">
                                     <div class="accordion_select__text">
-                                        <input type="radio" name="appointment"
-                                            id="appointment-{{ $date }}" />
-                                        @foreach ($appointmentsWithDaysIndex as $key => $value)
-                                            @if ($value['status'] !== false)
-                                                <p class="font-bold text-sm">
-                                                    {{ $value['day_name'] }}
-                                                    {{ $value['date_of_month'] }}
-                                                </p>
-                                            @break
-                                        @endif
-                                    @endforeach
+                                        @if ($allFalse)
+                                            <p class="font-bold text-sm">
+                                                {{ verta($date)->format('%d %b %Y') }} - پر شده
+                                            </p>
+                                        @else
+                                            @foreach ($appointmentsWithDaysIndex as $key => $value)
+                                                @if ($value['status'] !== false)
+                                                    <p class="font-bold text-sm">
+                                                        {{ $value['day_name'] }}
+                                                        {{ $value['date_of_month'] }}
+                                                    </p>
+                                                @break
+                                            @endif
+                                        @endforeach
+                                    @endif
                                 </div>
                                 <div class="accordion_select__icon">
                                     <svg class="w-7 h-7" xmlns="http://www.w3.org/2000/svg">
@@ -136,21 +149,26 @@
                         <p class="font-bold">نمایش بیشتر</p>
                     </button>
                 @endif
-                @elseif($fetchData['isAppointmentActive'] == false)
+            @elseif($fetchData['isAppointmentActive'] == false)
                 <div class="relative bg-sky-200 border border-sky-200 text-gray-600 px-4 py-3 rounded-lg mt-3"
-                role="alert">
-                <strong class="font-bold">نکته!</strong>
-                <span class="block sm:inline">نوبت دهی پزشک انتخابی محدود شده است!</span>
-            </div>
-                @else
+                    role="alert">
+                    <strong class="font-bold">نکته!</strong>
+                    <span class="block sm:inline">نوبت دهی پزشک انتخابی محدود شده است!</span>
+                </div>
+            @else
                 <div class="relative bg-sky-200 border border-sky-200 text-gray-600 px-4 py-3 rounded-lg mt-3"
-                role="alert">
-                <strong class="font-bold">نکته!</strong>
-                <span class="block sm:inline">تمامی نوبت های مربوط به این پزشک پر میباشد لطفا در یک روز دیگر امتحان کنید!</span>
-            </div>
-            @endif
+                    role="alert">
+                    <strong class="font-bold">نکته!</strong>
+                    <span class="block sm:inline">تمامی نوبت های مربوط به این پزشک پر میباشد لطفا در یک روز دیگر
+                        امتحان
+                        کنید!</span>
+                </div>
+    @endif
 </div>
-@if (isset($fetchData['firstTreeAvailableAppointment']) && !empty($fetchData['firstTreeAvailableAppointment']) && $fetchData['isAppointmentActive'])
+@if (isset($fetchData['firstTreeAvailableAppointment']) &&
+        !empty($fetchData['firstTreeAvailableAppointment']) &&
+        $fetchData['isAppointmentActive']
+)
     <button type="button" class="btn__blue--round-full mt-4" id="nextstep_btn"
         wire:click='TimeForReservesation'>
         <span>مرحله بعد</span>

@@ -8,6 +8,7 @@ use Livewire\Attributes\Title;
 use Livewire\Attributes\Computed;
 use Modules\User\Enum\UserMetaEnum;
 use Hekmatinasser\Verta\Facades\Verta;
+use Illuminate\Support\Facades\Validator;
 use Modules\AppointmentUser\Traits\OprationButtonsTrait;
 use Modules\AppointmentUser\Enum\AppointmentOnlineStatusEnum;
 use Modules\AppointmentUser\app\Models\AppointmentOnlineMessage;
@@ -31,7 +32,7 @@ class AppointmentOnlineMessagesList extends Component
     ];
     public array $form = [];
     public array $fetchData = [
-        'showCaceledApp' => true ,
+        'showCaceledApp' => true,
     ];
     public function startSearch()
     {
@@ -111,9 +112,13 @@ class AppointmentOnlineMessagesList extends Component
                     $q->where('status', AppointmentOnlineStatusEnum::tryFrom($this->search['AppointmentStatus']));
                 });
             })->when(isset($this->search['appointment_date']), function ($q) {
-                return $q->whereHas('online', function ($qq) {
-                    return $qq->whereDate('date_visit', Verta::parse($this->search['appointment_date'])->toCarbon());
-                });
+         $date = $this->search['appointment_date'];
+                $validate  = Validator::make(['appointment_date' => $date], [
+                    'appointment_date' => 'date',
+                ]);
+                if ($validate->fails()) {
+                    $this->addError('msgerror', 'فرمت تاریخ وارد شده صحیح نیست');
+                }
             })->when(isset($this->search['appointment_messages']), function ($q) {
                 return $q->where('body', 'LIKE', "%{$this->search['appointment_messages']}%");
             })

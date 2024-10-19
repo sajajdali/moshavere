@@ -20,6 +20,12 @@
 
     </div>
     <!-- PAGE-HEADER END -->
+    @error('msgerror')
+    <div class="col-md-12 alert alert-danger fade show" role="alert">
+        <i class="fa fa-remove me-2" aria-hidden="true"></i>
+        {{$message}}
+    </div>
+    @enderror
 
     @include('admin::layouts.components.alert')
 

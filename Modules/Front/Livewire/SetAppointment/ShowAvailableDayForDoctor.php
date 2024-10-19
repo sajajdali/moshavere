@@ -121,7 +121,11 @@ class ShowAvailableDayForDoctor extends Component
             foreach ($monthWithAppointment as $month => $appointments) {
 
                 foreach ($appointments as $day => $appointment) {
-                    if ((Carbon::parse($appointment['day_number_gmt'])->lt(now()))) {
+                    if ((Carbon::parse($appointment['day_number_gmt'])->setTime(00,00,00)->lt(Carbon::now()->addDays($mainDaActive)->setTime(00,00,00)))) {
+                        // check min day active
+                        continue;
+                    }
+                    if ((Carbon::parse($appointment['day_number_gmt'])->lt(Carbon::now()->today()))) {
                         continue;
                     }
                     if ($day < $isDay && $month < $isMonth && $yeay < $isYear) {

@@ -43,30 +43,32 @@
                     <div class="select-appointment__container">
                         <div class="flex flex-col gap-3" wire:key='{{ uniqId() . '44' }}' wire:ignore.self>
                             @foreach ($fetchData['firstTreeAvailableAppointment'] as $date => $appointmentsWithDaysIndex)
-                                @once
-                                    @foreach ($appointmentsWithDaysIndex as $eachTime => $appointmentDetail)
-                                        @if ($appointmentDetail['status'] == false)
-                                            @continue
-                                        @endif
-                                        <label for="appointment-{{ $eachTime }}"
-                                            class="border-2 accordion_appointment__container border-secondary-200 rounded-lg flex items-center gap-4 py-3 px-4">
-                                            <input type="radio" class="scroll_down" name="appointment"
-                                                id="appointment-{{ $eachTime }}" wire:model='form.time'
-                                                value="{{ $appointmentDetail['time_stamp'] . ',' . $appointmentDetail['until'] }}" />
-                                            <div class="w-[calc(100%-2rem)] space-y-2 text-sm">
-                                                <p>نزدیک‌ترین نوبت خالی</p>
-                                                <p class="font-bold">{{ $appointmentDetail['date_of_month'] }} - ساعت
-                                                    {{ $appointmentDetail['from'] }}</p>
-                                            </div>
-                                        </label>
-                                    @break
-                                @endforeach
-                            @endonce
-                            @php
-                                $allFalse = collect($appointmentsWithDaysIndex)->every(
-                                    fn($item) => $item['status'] === false,
-                                );
-                            @endphp
+                                @php
+                                    $allFalse = collect($appointmentsWithDaysIndex)->every(
+                                        fn($item) => $item['status'] === false,
+                                    );
+                                @endphp
+                                @if (!$allFalse)
+                                    @once
+                                        @foreach ($appointmentsWithDaysIndex as $eachTime => $appointmentDetail)
+                                            @if ($appointmentDetail['status'] == false)
+                                                @continue
+                                            @endif
+                                            <label for="appointment-{{ $eachTime }}"
+                                                class="border-2 accordion_appointment__container border-secondary-200 rounded-lg flex items-center gap-4 py-3 px-4">
+                                                <input type="radio" class="scroll_down" name="appointment"
+                                                    id="appointment-{{ $eachTime }}" wire:model='form.time'
+                                                    value="{{ $appointmentDetail['time_stamp'] . ',' . $appointmentDetail['until'] }}" />
+                                                <div class="w-[calc(100%-2rem)] space-y-2 text-sm">
+                                                    <p>نزدیک‌ترین نوبت خالی</p>
+                                                    <p class="font-bold">{{ $appointmentDetail['date_of_month'] }} - ساعت
+                                                        {{ $appointmentDetail['from'] }}</p>
+                                                </div>
+                                            </label>
+                                        @break
+                                        @endforeach
+                                    @endonce
+                                @endif
                             <label for="appointment-{{ $date }}"
                                 class="accordion__container accordion_appointment__container @if ($allFalse) bg-rose-200 remove_open @endif">
                                 <div class="accordion_select__button">

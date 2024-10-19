@@ -109,7 +109,6 @@ class ShowAvailableDayForDoctor extends Component
 
         $result = [];
         $maxDay = $this->fetchData['maxShowDay'];
-        $maxDayActiveDay = 0;
         $DaysDisplayed = 0;
 
         // select the last active day
@@ -132,12 +131,6 @@ class ShowAvailableDayForDoctor extends Component
                         if ($appointment['status'] == false  &&  empty($appointment['times'])) {
                             continue;
                         }
-                        if ($maxDayActiveDay > $maxDay) {
-                            break 3;
-                        }
-                        if ($appointment['empty_appoints'] <= 0 || $appointment['status'] == false ||   $appointment['user_status'] == false) {
-                            $maxDayActiveDay++;
-                        }
                     } else {
                         if ($appointment['empty_appoints'] <= 0 || $appointment['status'] == false ||   $appointment['user_status'] == false) {
                             continue;
@@ -150,8 +143,8 @@ class ShowAvailableDayForDoctor extends Component
                     if ($date_to_check->gt($last_activeDay)) {
                         break 3;
                     }
-                    if ($DaysDisplayed > $maxDayActiveDay) {
-                        break 3;
+                    if($DaysDisplayed > $maxDay) {
+                        break 3 ;
                     }
                     $DaysDisplayed++;
                     foreach ($appointment['times'] as $increment =>  $time) {

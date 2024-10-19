@@ -293,11 +293,6 @@
             $(document).on('click', '.accordion__button', function() {
                 var $button = $(this);
                 var $item = $button.closest('.accordion__container--2');
-
-                // Toggle the 'open' class for the clicked accordion
-                $item.toggleClass('open');
-
-                // Close all nested accordions if this one is closed
                 if (!$item.hasClass('open')) {
                     $item.find('.accordion__container--2.open').removeClass('open');
                 }

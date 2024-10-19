@@ -101,7 +101,8 @@
                                         <th scope="col">#</th>
                                         <th scope="col">نام</th>
                                         <th scope="col">نوبت</th>
-                                        <th scope="col">زمان پرداخت</th>
+                                        <th scope="col">زمان ایجاد تراکنش</th>
+                                        <th scope="col">زمان ارجاع به بانک</th>
                                         <th scope="col">وضعیت</th>
                                         <th scope="col">عملیات</th>
                                     </tr>
@@ -121,7 +122,8 @@
                                                         {{ $transaction->appid() }}
                                                     </a>
                                                 </td>
-                                                <td>{{ verta($transaction->updated_at)->format('Y/m/d ساعت H:i') }}</td>
+                                                <td>{{ verta($transaction->created_at)->format('%d %b، ساعت H:i') }}</td>
+                                                <td>{{ verta($transaction->updated_at)->format('%d %b، ساعت H:i') }}</td>
                                                 <td>
                                                     <span class=" badge {{$transaction->status->badgeClass()}}">
                                                         {{ $transaction->status->getName() }}</td>

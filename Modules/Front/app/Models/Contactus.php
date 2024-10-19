@@ -52,4 +52,12 @@ class Contactus extends Model
         }
         return $this->name ;
     }
+    public function mobileNumber():string {
+        if($this->mobile) {
+            return $this->mobile ;
+        }elseif($this->user) {
+            return $this->user->mobile ;
+        }
+        return '';
+    }
 }

@@ -154,52 +154,52 @@ class AppointmentUserList extends Component
             'appointment_date' => [
                 'condition' => $this->search['appointment_date'],
                 'callback' => function ($query) {
-                    $date = $this->search['appointment_date'];
-                    $validate  = Validator::make(['appointment_date' => $date], [
-                        'appointment_date' => 'date',
-                    ]);
-                    if ($validate->fails()) {
-                       return  $this->addError('exelError', 'فرمت تاریخ وارد شده صحیح نیست');
-                    }
+                    // $date = $this->search['appointment_date'];
+                    // $validate  = Validator::make(['appointment_date' => $date], [
+                    //     'appointment_date' => 'date',
+                    // ]);
+                    // if ($validate->fails()) {
+                    //    return  $this->addError('exelError', 'فرمت تاریخ وارد شده صحیح نیست');
+                    // }
                     return $query->whereDate('date_visit', Verta::parse($this->search['appointment_date'])->toCarbon());
                 },
             ],
             'appointment_set_date' => [
                 'condition' => $this->search['appointment_set_date'],
                 'callback' => function ($query) {
-                    $date = $this->search['appointment_set_date'];
-                    $validate  = Validator::make(['appointment_set_date' => $date], [
-                        'appointment_set_date' => 'date',
-                    ]);
-                    if ($validate->fails()) {
-                        return $this->addError('exelError', 'فرمت تاریخ وارد شده صحیح نیست');
-                    }
+                    // $date = $this->search['appointment_set_date'];
+                    // $validate  = Validator::make(['appointment_set_date' => $date], [
+                    //     'appointment_set_date' => 'date',
+                    // ]);
+                    // if ($validate->fails()) {
+                    //     return $this->addError('exelError', 'فرمت تاریخ وارد شده صحیح نیست');
+                    // }
                     return $query->whereDate('created_at', Verta::parse($this->search['appointment_set_date'])->toCarbon());
                 },
             ],
             'appointment_end_date' => [
                 'condition' => $this->search['appointment_end_date'],
                 'callback' => function ($query) {
-                    $date = $this->search['appointment_end_date'];
-                    $validate  = Validator::make(['appointment_end_date' => $date], [
-                        'appointment_end_date' => 'date',
-                    ]);
-                    if ($validate->fails()) {
-                        return  $this->addError('exelError', 'فرمت تاریخ وارد شده صحیح نیست');
-                    }
+                    // $date = $this->search['appointment_end_date'];
+                    // $validate  = Validator::make(['appointment_end_date' => $date], [
+                    //     'appointment_end_date' => 'date',
+                    // ]);
+                    // if ($validate->fails()) {
+                    //     return  $this->addError('exelError', 'فرمت تاریخ وارد شده صحیح نیست');
+                    // }
                     return $query->whereDate('date_visit', '<=', Verta::parse($this->search['appointment_end_date'])->toCarbon());
                 },
             ],
             'appointment_star_date' => [
                 'condition' => $this->search['appointment_star_date'],
                 'callback' => function ($query) {
-                    $date = $this->search['appointment_star_date'];
-                    $validate  = Validator::make(['appointment_star_date' => $date], [
-                        'appointment_star_date' => 'date',
-                    ]);
-                    if ($validate->fails()) {
-                        return $this->addError('exelError', 'فرمت تاریخ وارد شده صحیح نیست');
-                    }
+                    // $date = $this->search['appointment_star_date'];
+                    // $validate  = Validator::make(['appointment_star_date' => $date], [
+                    //     'appointment_star_date' => 'date',
+                    // ]);
+                    // if ($validate->fails()) {
+                    //     return $this->addError('exelError', 'فرمت تاریخ وارد شده صحیح نیست');
+                    // }
                     return $query->whereDate('date_visit', '>=', Verta::parse($this->search['appointment_star_date'])->toCarbon());
                 },
             ],

@@ -64,6 +64,7 @@
                                     <tr class="table-primary">
                                         <th scope="col">#</th>
                                         <th scope="col">نام کاربر</th>
+                                        <th scope="col">شماره</th>
                                         <th scope="col">درخواست</th>
                                         <th scope="col">عملیات</th>
                                     </tr>
@@ -74,6 +75,7 @@
                                             <tr class="text-center">
                                                 <td>{{ $contact->id }}</td>
                                                 <td>{{ $contact->getUserName() }}
+                                                <td>{{ $contact->mobileNumber() }}
                                                 <td>
                                                     <a data-bs-toggle="modal" data-bs-target="#contactModal"
                                                         class="text-primary" href="#"

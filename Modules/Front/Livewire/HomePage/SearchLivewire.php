@@ -205,20 +205,20 @@ class SearchLivewire extends Component
     public function applyFilter($name, $category)
     {
         $this->filter[$category] = $name;
-        $this->render();
+        $this->searchIn();
     }
     public function removeFilter($item)
     {
         if ($item === 'all') {
             $this->dispatch('removeFilterAll', true);
-            return $this->filter = [];
+            $this->filter = [];
         }
         if (!empty($this->filter) &&  in_array($item, $this->filter)) {
             $index = array_search($item, $this->filter);
             $this->dispatch('removeFilter', $index);
             unset($this->filter[$index]);
-            $this->render();
         }
+        $this->searchIn();
     }
 
     // set  buttons appointment

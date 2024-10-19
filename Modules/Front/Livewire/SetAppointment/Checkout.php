@@ -15,7 +15,6 @@ use Modules\Service\app\Models\Service;
 use Modules\Setting\Enum\SettingKeyEnum;
 use Modules\AppointmentUser\Enum\AppointmentVia;
 use Modules\AppointmentUser\Enum\model\UserModel;
-use Modules\AppointmentUser\app\Models\AppointmentUser;
 use Modules\AppointmentUser\Enum\model\AppointmentModel;
 use Modules\AppointmentUser\Enum\AppointmentUserKindEnum;
 use Modules\AppointmentUser\Enum\AppointmentUserTypeEnum;
@@ -68,7 +67,7 @@ class Checkout extends Component
                 'form.otherApp.last_name' => 'required|string|max:225',
                 'form.otherApp.gender' => 'required|string|max:225',
                 'form.otherApp.national_code' => 'required_if:form.otherApp.withOutNational_code,false|max:225',
-                'form.otherApp.mobile'        => 'required_if:form.otherApp.withOutMobile,false|digits:11',
+                'form.otherApp.mobile'        => 'required|digits:11',
                 'form.otherApp.insurence'      => 'nullable|string|max:225',
 
             ];
@@ -104,7 +103,13 @@ class Checkout extends Component
             'mobile' => $mobile,
             'password' => $pass,
         ];
-        $user = User::create($userModel);
+        if (User::where('mobile', 'LIKE', "%{$mobile}%")->exists()) {
+            $user = User::where('mobile', 'LIKE', "%{$mobile}%")->first();
+        } else {
+            $user = User::create($userModel);
+        }
+        $user->first_name = $this->form['otherApp']['first_name'];
+        $user->last_name = $this->form['otherApp']['last_name'];
         $user->document_number = User::generateDocumentNumber();
         if (isset($national_code)) {
             $user->national_code = $national_code;
@@ -120,14 +125,14 @@ class Checkout extends Component
         $user_selected_date = Carbon::createFromTimestamp($this->fetchData['app_start_time'])->toDateString();
 
         // Check if user has an appointment on the selected date
-        $existingAppointment = $this->user->appointments()->whereDate('date_visit', $user_selected_date)->whereIn('status',[
-            AppointmentUserStatusEnum::STATUS_PENDING ,
-            AppointmentUserStatusEnum::STATUS_SUCCESSFUL ,
-            AppointmentUserStatusEnum::STATUS_WAIT_PAYMENT ,
-            AppointmentUserStatusEnum::STATUS_ATTENDED ,
-            AppointmentUserStatusEnum::STATUS_NOT_ATTENDED ,
-            AppointmentUserStatusEnum::STATUS_MONITORING ,
-            AppointmentUserStatusEnum::STATUS_ONILNE_CLOSED ,
+        $existingAppointment = $this->user->appointments()->whereDate('date_visit', $user_selected_date)->whereIn('status', [
+            AppointmentUserStatusEnum::STATUS_PENDING,
+            AppointmentUserStatusEnum::STATUS_SUCCESSFUL,
+            AppointmentUserStatusEnum::STATUS_WAIT_PAYMENT,
+            AppointmentUserStatusEnum::STATUS_ATTENDED,
+            AppointmentUserStatusEnum::STATUS_NOT_ATTENDED,
+            AppointmentUserStatusEnum::STATUS_MONITORING,
+            AppointmentUserStatusEnum::STATUS_ONILNE_CLOSED,
         ])->exists();
         if ($existingAppointment) {
             $this->err = 'شما یک نوبت فعال در این روز دارید!';
@@ -213,7 +218,6 @@ class Checkout extends Component
             return redirect()->route('front.setAppointment.days', ['doctor_id' => $doc, 'place_id' => $place, 'service_id' => $service])->with('error', 'لطفا مجدد تاریخ را انتخاب کنید!');
         }
         $this->fetchData['date_for_blade'] = Carbon::createFromTimestamp($this->fetchData['app_start_time'], 'Asia/Tehran');
-
         if ($this->fetchData['date_for_blade']->lt(\now())) {
             return abort(404);
         }

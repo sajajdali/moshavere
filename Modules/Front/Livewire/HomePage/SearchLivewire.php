@@ -64,21 +64,29 @@ class SearchLivewire extends Component
         } else {
             $result = [];
             if ($sanitizedInput == 'پزشکان') {
-                $doctors = User::doctors_query()->whereHas('metas', function ($q) {
-                    $q->where('meta_key', UserMetaEnum::ACTIVE_APPOINTMENT)
-                        ->where(function ($qqq) {
-                            $qqq->where('meta_value', true);
+                $doctors = User::doctors_query()
+                    ->select('users.*', 'doctor_order_metas.meta_value as doctor_order_value') // Select the meta_value explicitly
+                    ->whereHas('metas', function ($q) {
+                        $q->where('meta_key', UserMetaEnum::ACTIVE_APPOINTMENT)
+                            ->where('meta_value', true);
+                    })
+                    ->when(isset($this->filter['speciality']), function ($query) {
+                        $query->whereHas('specialities', function ($qq) {
+                            $qq->where('title', 'LIKE', "%{$this->filter['speciality']}%");
                         });
-                })->when(isset($this->filter['speciality']), function ($query) {
-                    $query->whereHas('specialities', function ($qq) {
-                        $qq->where('title', 'LIKE', "%{$this->filter['speciality']}%");
-                    });
-                })->when(isset($this->filter['service']), function ($query) {
-                    $query->whereHas('service', function ($q) {
-                        $q->where('title', 'Like', "%{$this->filter['service']}%");
-                    });
-                })
+                    })
+                    ->when(isset($this->filter['service']), function ($query) {
+                        $query->whereHas('service', function ($q) {
+                            $q->where('title', 'LIKE', "%{$this->filter['service']}%");
+                        });
+                    })
+                    ->leftJoin('user_metas as doctor_order_metas', function ($join) {
+                        $join->on('users.id', '=', 'doctor_order_metas.user_id')
+                            ->where('doctor_order_metas.meta_key', UserMetaEnum::DOCTOR_ORDER);
+                    })
+                    ->orderByRaw('ISNULL(doctor_order_value), doctor_order_value ASC') // or DESC
                     ->get();
+
                 if ($doctors->isNotEmpty()) {
                     $result['doctors'] = $doctors;
                 }

@@ -152,7 +152,11 @@ class ShowAvailableDayForDoctor extends Component
                     }
                     $DaysDisplayed++;
                     foreach ($appointment['times'] as $increment =>  $time) {
-                        if ($time['status']) {
+                        $checkIfTimePass = false ;
+                        if($time['status']){
+                            $checkIfTimePass = Carbon::CreateFromTimeStamp($time['timestamp'],'Asia/Tehran')->isFuture();
+                        }
+                        if ($time['status'] && $checkIfTimePass) {
                             $result[$dayNumber][] = [
                                 'status' => true,
                                 'day_of_week_name' =>  verta()->formatDifference(),
@@ -282,7 +286,6 @@ class ShowAvailableDayForDoctor extends Component
             }
         }
     }
-
     public function booted()
     {
         // clear alert mesage

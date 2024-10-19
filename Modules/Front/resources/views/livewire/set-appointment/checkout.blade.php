@@ -91,7 +91,7 @@
                                         </label>
                                     </div>
                                     <input type="text" id="national_code" wire:model='form.otherApp.national_code'
-                                        class="w-full border  @error('form.otherApp.national_code')   border-rose-500 @else border-secondary-300  @enderror rounded-lg bg-primary-tint-100 py-2 px-3"
+                                        class="w-full border   @error('form.otherApp.national_code')   border-rose-500 @else border-secondary-300  @enderror rounded-lg bg-primary-tint-100 py-2 px-3"
                                         placeholder="کد ملی شما" />
                                     <p class="text-[10px] text-red"></p>
                                     @error('form.otherApp.national_code')
@@ -100,18 +100,12 @@
                                 </div>
                                 <div class="space-y-2">
                                     <div class="flex items-center justify-between">
-                                        <label for="phonenumber" class="block text-sm font-medium text-slate-700">شماره
+                                        <label for="phonenumber" class="block after:content-['*'] text-sm font-medium text-slate-700">شماره
                                             تلفن</label>
-                                        <label for="patientPhone" class="flex items-center gap-2">
-                                            <input type="checkbox" name="patientPhone" id="patientPhone"
-                                                wire:model='form.otherApp.withOutMobile' />
-                                            <p class="text-[10px]">بیمار موبایل ندارد</p>
-                                        </label>
                                     </div>
                                     <input type="text" id="phonenumber" wire:model='form.otherApp.mobile'
                                         class="w-full border @error('form.otherApp.mobile')  border-rose-500 @else border-secondary-300 @enderror    rounded-lg bg-primary-tint-100 py-2 px-3"
                                         placeholder="شماره موبایل" />
-                                    <p class="text-[10px] text-red"></p>
                                     @error('form.otherApp.mobile')
                                         <p class="text-sm text-red">{{ $message }}</p>
                                     @enderror

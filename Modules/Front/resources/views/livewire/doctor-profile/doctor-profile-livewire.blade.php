@@ -217,16 +217,7 @@
                                                     ن</div>
                                                 <div class="w-[calc(100%-65px-0.75rem)] space-y-2">
                                                     <p>{{ $fetchData['comments'][$i]->user->full_name }}</p>
-                                                    <div class="flex items-center gap-3 text-sm text-secondary-400">
-                                                        <div
-                                                            class="hidden sm:block py-1 px-3 bg-secondary-100 rounded-full">
-                                                            <p>{{ verta($fetchData['comments'][$i]->created_at)->formatDifference() }}
-                                                            </p>
-                                                        </div>
-                                                        <div class="w-[1px] h-3 bg-secondary-400"></div>
-                                                        <p>{{ $fetchData['comments'][$i]->doctor->dr_display_address }}
-                                                        </p>
-                                                    </div>
+                                                  
                                                 </div>
                                             </div>
                                             <div

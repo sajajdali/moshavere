@@ -382,15 +382,4 @@ class User extends Authenticatable
         ])->whereHas('messages')
         ->first()?->messages?->first()->unReadedMessageCount() ?? 0;
     }
-    public function onlineApppIdForBadgeList() :int {
-        return  AppointmentOnline::where('user_id',$this->id)
-        ->whereIn('status',
-        [
-            AppointmentOnlineStatusEnum::ACCEPTED,
-            AppointmentOnlineStatusEnum::REPLY_BY_USER,
-            AppointmentOnlineStatusEnum::ANSWER_BY_DOCTOR,
-            AppointmentOnlineStatusEnum::REACTIVATED,
-        ])->whereHas('messages')
-        ->first()?->id ?? 0;
-    }
 }

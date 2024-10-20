@@ -235,8 +235,8 @@ class AppointmentUser extends Model
     public function isAppForothers(): bool
     {
         if (
-            $this->user->id != $this->agent->id &&
-            $this->agent->Hasrole('بیمار')
+            $this->user?->id != $this->agent?->id &&
+            $this->agent?->Hasrole('بیمار')
         ) {
             return true;
         }
@@ -244,7 +244,7 @@ class AppointmentUser extends Model
     }
     public function checkForRegisterForOthers()
     {
-        // if appointment set for others and no mobile set for pation . 
+        // if appointment set for others and no mobile set for pation .
         if ($this->isAppForothers()) {
             return $this->agent->mobile;
         }

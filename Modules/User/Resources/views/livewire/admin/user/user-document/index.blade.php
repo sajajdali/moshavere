@@ -90,15 +90,16 @@
                                                         </div>
                                                     </td>
                                                     <td>
+
                                                         {{ $appointment->kind->getName() }}
                                                         @if ($appointment->getUnseenMessageBadge() > 0)
                                                         <a class="bg-red text-white p-2 rounded-pill small"
-                                                            href="{{ route('admin.appointment_user.message.detail', ['onlineAppId' => $user->onlineApppIdForBadgeList()]) }}">
+                                                            href="{{ route('admin.appointment_user.message.detail', ['onlineAppId' => $appointment->online->first()->id]) }}">
                                                             {{ $appointment->getUnseenMessageBadge() }} پیام
                                                             جدید
                                                         </a>
                                                         @else
-                                                        <a class="bg-warning text-dark p-2 rounded-pill small"  href="{{ route('admin.appointment_user.message.detail', ['onlineAppId' => $user->onlineApppIdForBadgeList()]) }}"> مشاهده چت</a>
+                                                        <a class="bg-warning text-dark p-2 rounded-pill small"  href="{{ route('admin.appointment_user.message.detail', ['onlineAppId' => $appointment->online->first()->id]) }}"> مشاهده چت</a>
                                                     @endif
                                                     </td>
                                                     <td>{{ verta($appointment->date_visit)->format('Y-m-d') }}</td>

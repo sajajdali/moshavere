@@ -112,13 +112,13 @@ class AppointmentOnlineMessagesList extends Component
                     $q->where('status', AppointmentOnlineStatusEnum::tryFrom($this->search['AppointmentStatus']));
                 });
             })->when(isset($this->search['appointment_date']), function ($q) {
-                //  $date = $this->search['appointment_date'];
-                // $validate  = Validator::make(['appointment_date' => $date], [
-                //     'appointment_date' => 'date',
-                // ]);
-                // if ($validate->fails()) {
-                //     $this->addError('msgerror', 'فرمت تاریخ وارد شده صحیح نیست');
-                // }
+                try {
+                   $appointmentDate =  Verta::parse($this->search['appointment_date'])->toCarbon();
+                } catch (\Throwable $th) {
+                  $this->addError('msgerror', 'فرمت تاریخ وارد شده صحیح نیست');
+                  return;
+                }
+                return  $q->whereDate('created_at',$appointmentDate);
             })->when(isset($this->search['appointment_messages']), function ($q) {
                 return $q->where('body', 'LIKE', "%{$this->search['appointment_messages']}%");
             })

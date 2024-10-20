@@ -240,7 +240,8 @@ class AppointmentDetail extends Component
             $receipt = Payment::amount($amount)
                 ->transactionId($this->fetchData['app']->transaction->detail['transactionId'])->verify();
             $this->fetchData['app']->update([
-                'status' => AppointmentUserStatusEnum::STATUS_SUCCESSFUL
+                'status' => AppointmentUserStatusEnum::STATUS_SUCCESSFUL, 
+                'deadline_at' => null
             ]);
             $smsTemplate = setting(SettingKeyEnum::SMS_APPOINTMENT_AFTER_PAYMENT);
             if (isset($smsTemplate)) {
@@ -275,7 +276,7 @@ class AppointmentDetail extends Component
             }
 
             $this->fetchData['success']  = 'پرداخت باموفقیت انجام شد و نوبت شما فعال شد ';
-            $this->fetchData['app']->transaction->update(['status' => TransactionStatusEnum::SUCCESSFUL, 'deadline_at' => null]);
+            $this->fetchData['app']->transaction->update(['status' => TransactionStatusEnum::SUCCESSFUL]);
             $this->render();
         } catch (InvalidPaymentException $exception) {
             $this->fetchData['alert'] = 'خطا در انجام تراکنش';

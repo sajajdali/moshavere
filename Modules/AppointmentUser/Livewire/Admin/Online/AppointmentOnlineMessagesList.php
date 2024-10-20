@@ -118,7 +118,9 @@ class AppointmentOnlineMessagesList extends Component
                   $this->addError('msgerror', 'فرمت تاریخ وارد شده صحیح نیست');
                   return;
                 }
-                return  $q->whereDate('created_at',$appointmentDate);
+                return $q->whereHas('online',function($qq) use($appointmentDate){
+                    $qq->whereDate('created_at',$appointmentDate) ;
+                });
             })->when(isset($this->search['appointment_messages']), function ($q) {
                 return $q->where('body', 'LIKE', "%{$this->search['appointment_messages']}%");
             })

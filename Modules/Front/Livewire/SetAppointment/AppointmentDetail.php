@@ -108,12 +108,18 @@ class AppointmentDetail extends Component
         $this->fetchData['stauts']['color']   = $this->fetchData['app']->status->getBadgeColor();
         $this->fetchData['stauts']['enum']    = $this->fetchData['app']->status;
         $this->fetchData['stauts']['payment'] = $this->fetchData['app']->status == AppointmentUserStatusEnum::STATUS_WAIT_PAYMENT;
-        if ($this->fetchData['stauts']['payment']) {
+        if ($this->fetchData['stauts']['payment'] && $this->fetchData['app']->setting()->exists()) {
             if ($this->fetchData['app']->kind == AppointmentUserKindEnum::IN_PERSION) {
                 $this->fetchData['stauts']['price'] = $this->fetchData['app']->setting->detail[AppointmentSetting::PAYMENT][AppointmentSetting::IN_PERSON][AppointmentSetting::PRICE];
             } elseif ($this->fetchData['app']->kind == AppointmentUserKindEnum::ONLINE) {
                 $this->fetchData['stauts']['price'] = $this->fetchData['app']->setting->detail[AppointmentSetting::PAYMENT][AppointmentSetting::ONLINE][AppointmentSetting::PRICE];
             }
+            if (setting(SettingKeyEnum::PAYMENT_RULES_AND_CONDITION_STATUS)) {
+                $this->fetchData['payment']['termAndCondition'] = setting(SettingKeyEnum::PAYMENT_RULES_AND_CONDITION_DESCRIPTION);
+            }
+        } elseif ($this->fetchData['stauts']['payment']) {
+            // appointmentSetting has been deleted
+            $this->fetchData['stauts']['price'] = $this->fetchData['app']->details[AppointmentUser::DETAIL_PAYMENT][AppointmentUser::DETAIL_PAYMENT_PRICE]['int'];
             if (setting(SettingKeyEnum::PAYMENT_RULES_AND_CONDITION_STATUS)) {
                 $this->fetchData['payment']['termAndCondition'] = setting(SettingKeyEnum::PAYMENT_RULES_AND_CONDITION_DESCRIPTION);
             }
@@ -269,7 +275,7 @@ class AppointmentDetail extends Component
             }
 
             $this->fetchData['success']  = 'پرداخت باموفقیت انجام شد و نوبت شما فعال شد ';
-            $this->fetchData['app']->transaction->update(['status' => TransactionStatusEnum::SUCCESSFUL,'deadline_at' => null]);
+            $this->fetchData['app']->transaction->update(['status' => TransactionStatusEnum::SUCCESSFUL, 'deadline_at' => null]);
             $this->render();
         } catch (InvalidPaymentException $exception) {
             $this->fetchData['alert'] = 'خطا در انجام تراکنش';

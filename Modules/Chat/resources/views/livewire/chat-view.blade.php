@@ -11,11 +11,11 @@
                 </button>
             @else
                 <button class="btn btn-warning me-2" type="button"
-                    wire:click="showFilteredChat({{ \Modules\Chat\Enum\ChatStatusEnum::CLOSED }})">
+                    wire:click='showFilteredChat("closed")'>
                     نمایش چت های بسته شده
                 </button>
                 <button class="btn btn-info me-2" type="button"
-                    wire:click="showFilteredChat({{ \Modules\Chat\Enum\ChatStatusEnum::USER_SEND_QUESTION }})">
+                    wire:click='showFilteredChat("userAwnswered")'>
                     چت های پاسخ کاربر
                 </button>
             @endif
@@ -155,7 +155,7 @@
                                     <div class="content-inner" id="lightgallery" wire:key='{{ time() }}'>
                                         @foreach ($this->chatList as $date => $chatItems)
                                             <label class="main-chat-time"><span>پیام های
-                                                    {{ \Carbon\Carbon::parse($date)->diffForHumans() }}</span></label>
+                                                    {{ verta(\Carbon\Carbon::parse($date)->toDatestring())->format('%d %b') }}</span></label>
                                             @foreach ($chatItems as $chatMessage)
                                                 @if ($chatMessage->type->is(\Modules\Chat\Enum\ChatDetailTypeEnum::MESSAGE))
                                                     <div class="media flex-row-reverse chat-right">

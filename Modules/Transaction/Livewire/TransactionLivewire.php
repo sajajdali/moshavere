@@ -28,6 +28,12 @@ class TransactionLivewire extends Component
     {
         $query =  Transaction::query();
         $searchCriteria = [
+            'remove_0_transaction' => [
+                'condition' => true,
+                'callback' => function ($query) {
+                    return $query->where('cost','!=' , 0);
+                },
+            ],
             'idSearch' => [
                 'condition' => isset($this->search['id']),
                 'callback' => function ($query) {

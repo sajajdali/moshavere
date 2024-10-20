@@ -317,7 +317,11 @@ class ChatView extends Component
 
         // Apply status filter if set
         if ($this->filterStatus) {
-            $chats->where('status', $this->filterStatus);
+            if($this->filterStatus == 'closed') {
+                $chats->where('status', chatStatusEnum::CLOSED);
+            }elseif($this->filterStatus == 'userAwnswered') {
+                $chats->whereIn('status',[ chatStatusEnum::JUST_CREATED,chatStatusEnum::USER_SEND_QUESTION]);
+            }
         } else {
             $chats->where('status', '!=', ChatStatusEnum::CLOSED);
         }

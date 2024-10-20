@@ -186,7 +186,7 @@
                                                                 </h6>
                                                             </a>
                                                             @if($user->onlineAppointmentNewMessageCount() > 0 )
-                                                            <a href="{{route('admin.appointment_user.message.detail',['onlineAppId' => $user->onlineApppIdForBadgeList()])}}" class="bg-red text-white p-2 rounded-pill small">
+                                                            <a href="{{route('admin.appointment_user.message.detail',['onlineAppId' => $user->onlineAppIdforRoute()->id])}}" class="bg-red text-white p-2 rounded-pill small">
                                                                 {{$user->onlineAppointmentNewMessageCount()}} پیام جدید
                                                             </a>
                                                             @endif

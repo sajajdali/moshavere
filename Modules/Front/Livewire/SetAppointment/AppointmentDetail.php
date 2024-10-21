@@ -240,7 +240,7 @@ class AppointmentDetail extends Component
             $receipt = Payment::amount($amount)
                 ->transactionId($this->fetchData['app']->transaction->detail['transactionId'])->verify();
             $this->fetchData['app']->update([
-                'status' => AppointmentUserStatusEnum::STATUS_SUCCESSFUL ,
+                'status' => AppointmentUserStatusEnum::STATUS_SUCCESSFUL, 
                 'deadline_at' => null
             ]);
             $smsTemplate = setting(SettingKeyEnum::SMS_APPOINTMENT_AFTER_PAYMENT);

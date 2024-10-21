@@ -5,7 +5,7 @@ return [
     'permission' => [
         [
             'gate' => [
-                'appointment_user.own' => 'تمامی نوبت هایی که خودش ثبت کرده',
+                'appointment_user.own' => 'تمامی نوبت هایی خود ',
                 'appointment_user' => 'تمامی نوبت ها',
             ],
             'type' => 'light',

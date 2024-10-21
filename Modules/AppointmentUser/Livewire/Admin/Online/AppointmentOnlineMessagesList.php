@@ -52,9 +52,15 @@ class AppointmentOnlineMessagesList extends Component
     #[Computed]
     public function handleSearch()
     {
+        $logedInUser = auth()->user();
         // $query = AppointmentOnlineMessage::where('type',1)
-        $query = AppointmentOnlineMessage::query()
-            ->when(isset($this->fetchData['showCaceledApp']) && $this->fetchData['showCaceledApp'] == true, function ($q) {
+        $query = AppointmentOnlineMessage::query()->when(! $logedInUser->isAdmin() && $logedInUser->can('appointment_user.own'),function($q) use($logedInUser){
+             $q->whereHas('online',function($qq) use($logedInUser){
+                 $qq->whereHas('appointmentUser',function($qqq)  use($logedInUser){
+                    return  $qqq->where('doctor_id',$logedInUser->id)->orWhere('agent_id',$logedInUser->id);
+                }) ;
+            });
+        })->when(isset($this->fetchData['showCaceledApp']) && $this->fetchData['showCaceledApp'] == true, function ($q) {
                 $q->whereHas('online', function ($qq) {
                     $qq->whereIn('status', [
                         AppointmentOnlineStatusEnum::PENDING,
@@ -112,13 +118,15 @@ class AppointmentOnlineMessagesList extends Component
                     $q->where('status', AppointmentOnlineStatusEnum::tryFrom($this->search['AppointmentStatus']));
                 });
             })->when(isset($this->search['appointment_date']), function ($q) {
-                //  $date = $this->search['appointment_date'];
-                // $validate  = Validator::make(['appointment_date' => $date], [
-                //     'appointment_date' => 'date',
-                // ]);
-                // if ($validate->fails()) {
-                //     $this->addError('msgerror', 'فرمت تاریخ وارد شده صحیح نیست');
-                // }
+                try {
+                   $appointmentDate =  Verta::parse($this->search['appointment_date'])->toCarbon();
+                } catch (\Throwable $th) {
+                  $this->addError('msgerror', 'فرمت تاریخ وارد شده صحیح نیست');
+                  return;
+                }
+                return $q->whereHas('online',function($qq) use($appointmentDate){
+                    $qq->whereDate('created_at',$appointmentDate) ;
+                });
             })->when(isset($this->search['appointment_messages']), function ($q) {
                 return $q->where('body', 'LIKE', "%{$this->search['appointment_messages']}%");
             })

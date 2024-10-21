@@ -193,7 +193,7 @@ class User extends Authenticatable
 
     public function isAdmin()
     {
-        return $this->roles()->where('id' , 1)->count() > 0;
+        return $this->roles()->where('id', 1)->count() > 0;
     }
     public static function doctors()
     {
@@ -273,7 +273,7 @@ class User extends Authenticatable
                 ->where(function ($qqq) {
                     $qqq->where('meta_value', true);
                 });
-         });
+        });
     }
 
     public function scopeIntroductionDoctors($query)
@@ -291,23 +291,23 @@ class User extends Authenticatable
                 ->where(function ($qqq) {
                     $qqq->where('meta_value', true);
                 });
-         });
+        });
     }
 
     public function scopeNewestDocs()
     {
         return $this->doctors_query()
-        ->whereHas('metas', function ($q) {
-            $q->where('meta_key', UserMetaEnum::BAN_USER)
-                ->where(function ($qqq) {
-                    $qqq->where('meta_value', false)->orWhereNull('meta_value');
-                });
-        })->whereHas('metas', function ($q) {
-            $q->where('meta_key', UserMetaEnum::ACTIVE_APPOINTMENT)
-                ->where(function ($qqq) {
-                    $qqq->where('meta_value', true);
-                });
-         });
+            ->whereHas('metas', function ($q) {
+                $q->where('meta_key', UserMetaEnum::BAN_USER)
+                    ->where(function ($qqq) {
+                        $qqq->where('meta_value', false)->orWhereNull('meta_value');
+                    });
+            })->whereHas('metas', function ($q) {
+                $q->where('meta_key', UserMetaEnum::ACTIVE_APPOINTMENT)
+                    ->where(function ($qqq) {
+                        $qqq->where('meta_value', true);
+                    });
+            });
     }
     public function getUserBadge()
     {
@@ -341,8 +341,8 @@ class User extends Authenticatable
         if (isset($this->ban_user) && $this->ban_user == true) {
             return   false;
         }
-        if(isset($this->active_appointment) && $this->active_appointment != true ) {
-            return false ;
+        if (isset($this->active_appointment) && $this->active_appointment != true) {
+            return false;
         }
         if (!$this->services()->exists()) {
             return  false;
@@ -371,26 +371,39 @@ class User extends Authenticatable
     {
         return $this->places()->where('active', ActiveEnum::ACTIVE)->get();
     }
-    public function onlineAppointmentNewMessageCount():int {
-        return  AppointmentOnline::where('user_id',$this->id)
-        ->whereIn('status',
-        [
-            AppointmentOnlineStatusEnum::ACCEPTED,
-            AppointmentOnlineStatusEnum::REPLY_BY_USER,
-            AppointmentOnlineStatusEnum::ANSWER_BY_DOCTOR,
-            AppointmentOnlineStatusEnum::REACTIVATED,
-        ])->whereHas('messages')
-        ->first()?->messages?->first()->unReadedMessageCount() ?? 0;
+    public function onlineAppointmentNewMessageCount(): int
+    {
+        return $this->appointmentOnlineMessage()?->unReadedMessageCount() ?? 0;
     }
-    public function onlineApppIdForBadgeList() :int {
-        return  AppointmentOnline::where('user_id',$this->id)
-        ->whereIn('status',
-        [
-            AppointmentOnlineStatusEnum::ACCEPTED,
-            AppointmentOnlineStatusEnum::REPLY_BY_USER,
-            AppointmentOnlineStatusEnum::ANSWER_BY_DOCTOR,
-            AppointmentOnlineStatusEnum::REACTIVATED,
-        ])->whereHas('messages')
-        ->first()?->id ?? 0;
+    public function unReadedMessageCount($query)
+    {
+        $query->where('seen', \Modules\AppointmentUser\Enum\AppointmentOnlineMessageSeenEnum::UNSEEN);
+    }
+    public function appointmentOnlineMessage()
+    {
+        return AppointmentOnline::where('user_id', $this->id)
+            ->whereIn(
+                'status',
+                [
+                    AppointmentOnlineStatusEnum::ACCEPTED,
+                    AppointmentOnlineStatusEnum::REPLY_BY_USER,
+                    AppointmentOnlineStatusEnum::ANSWER_BY_DOCTOR,
+                    AppointmentOnlineStatusEnum::REACTIVATED,
+                ]
+            )->whereHas('messages')
+            ->first()?->messages?->first();
+    }
+    public function onlineAppIdforRoute()
+    {
+        return AppointmentOnline::where('user_id', $this->id)
+            ->whereIn(
+                'status',
+                [
+                    AppointmentOnlineStatusEnum::ACCEPTED,
+                    AppointmentOnlineStatusEnum::REPLY_BY_USER,
+                    AppointmentOnlineStatusEnum::ANSWER_BY_DOCTOR,
+                    AppointmentOnlineStatusEnum::REACTIVATED,
+                ]
+            )->whereHas('messages')?->first();
     }
 }

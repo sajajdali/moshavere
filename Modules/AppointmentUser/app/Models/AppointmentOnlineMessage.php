@@ -33,9 +33,18 @@ class AppointmentOnlineMessage extends Model
     }
     public static function badgeCount()
     {
-        $appointments = AppointmentOnline::whereIn('status', [
-            AppointmentOnlineStatusEnum::REPLY_BY_USER
-        ])->count();
+        $logedInUser = auth()->user();
+        if (! $logedInUser->isAdmin() && $logedInUser->can('appointment_user.own')) {
+            $appointments = AppointmentOnline::whereHas('appointmentUser', function ($qq) {
+                return $qq->where('doctor_id', auth()->user()->id)->orWhere('agent_id', auth()->user()->id);
+            })->whereIn('status', [
+                AppointmentOnlineStatusEnum::REPLY_BY_USER
+            ])->count();
+        } else {
+            $appointments = AppointmentOnline::whereIn('status', [
+                AppointmentOnlineStatusEnum::REPLY_BY_USER
+            ])->count();
+        }
 
         return $appointments;
     }
@@ -81,9 +90,18 @@ class AppointmentOnlineMessage extends Model
     }
     public static function totalUnreaedMessage(): int
     {
-        $appointments = AppointmentOnline::whereIn('status', [
-            AppointmentOnlineStatusEnum::REPLY_BY_USER
-        ])->count();
+        $logedInUser = auth()->user();
+        if (! $logedInUser->isAdmin() && $logedInUser->can('appointment_user.own')) {
+            $appointments = AppointmentOnline::whereHas('appointmentUser', function ($qq) {
+                return $qq->where('doctor_id', auth()->user()->id)->orWhere('agent_id', auth()->user()->id);
+            })->whereIn('status', [
+                AppointmentOnlineStatusEnum::REPLY_BY_USER
+            ])->count();
+        } else {
+            $appointments = AppointmentOnline::whereIn('status', [
+                AppointmentOnlineStatusEnum::REPLY_BY_USER
+            ])->count();
+        }
         return $appointments;
     }
 }

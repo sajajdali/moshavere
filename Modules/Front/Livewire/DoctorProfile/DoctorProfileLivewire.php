@@ -351,7 +351,7 @@ class DoctorProfileLivewire extends Component
             $this->fetchData['iteratorStop'] = true;
         }
         if (auth()->check()) {
-            if (isset(auth()->user()->favorite_dr) &&  in_array($this->doc->id, json_decode(auth()->user()->favorite_dr, true))) {
+            if (isset(auth()->user()->favorite_dr) &&  in_array($this->doc->id, auth()->user()->favorite_dr)) {
                 $this->fetchData['isFavarite'] = true;
             }
         }
@@ -370,6 +370,7 @@ class DoctorProfileLivewire extends Component
         $this->routeHasServiceOrPlace();
         // bread crumb
         $this->fetchData['site_title'] = Setting(SettingKeyEnum::SITE_TITLE);
+        $this->fetchData['gallery'] = json_decode($this->doc->dr_gallery ,true) ;
     }
     public function render()
     {

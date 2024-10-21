@@ -2343,9 +2343,15 @@ button:disabled,
 .h-full {
   height: 100%;
 }
+.h-40 {
+  height: 10rem;
+}
 .max-h-min {
   max-height: -moz-min-content;
   max-height: min-content;
+}
+.max-h-40 {
+  max-height: 10rem;
 }
 .\!w-fit {
   width: -moz-fit-content !important;
@@ -2507,6 +2513,12 @@ button:disabled,
 .grid-cols-2 {
   grid-template-columns: repeat(2, minmax(0, 1fr));
 }
+.grid-cols-3 {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+.grid-cols-5 {
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+}
 .flex-row {
   flex-direction: row;
 }
@@ -2620,6 +2632,9 @@ button:disabled,
 }
 .self-stretch {
   align-self: stretch;
+}
+.overflow-auto {
+  overflow: auto;
 }
 .overflow-hidden {
   overflow: hidden;
@@ -2859,6 +2874,10 @@ button:disabled,
   --tw-bg-opacity: 1;
   background-color: rgb(251 113 133 / var(--tw-bg-opacity));
 }
+.bg-rose-500 {
+  --tw-bg-opacity: 1;
+  background-color: rgb(244 63 94 / var(--tw-bg-opacity));
+}
 .bg-secondary-100 {
   --tw-bg-opacity: 1;
   background-color: rgb(238 242 246 / var(--tw-bg-opacity));
@@ -2879,20 +2898,12 @@ button:disabled,
   --tw-bg-opacity: 1;
   background-color: rgb(186 230 253 / var(--tw-bg-opacity));
 }
-.bg-sky-500 {
-  --tw-bg-opacity: 1;
-  background-color: rgb(14 165 233 / var(--tw-bg-opacity));
-}
 .bg-white {
   --tw-bg-opacity: 1;
   background-color: rgb(255 255 255 / var(--tw-bg-opacity));
 }
 .bg-yellow\/20 {
   background-color: rgb(255 198 59 / 0.2);
-}
-.bg-rose-500 {
-  --tw-bg-opacity: 1;
-  background-color: rgb(244 63 94 / var(--tw-bg-opacity));
 }
 .bg-opacity-50 {
   --tw-bg-opacity: 0.5;
@@ -3326,6 +3337,10 @@ button:disabled,
   --tw-bg-opacity: 1;
   background-color: rgb(139 179 255 / var(--tw-bg-opacity));
 }
+.hover\:bg-rose-700:hover {
+  --tw-bg-opacity: 1;
+  background-color: rgb(190 18 60 / var(--tw-bg-opacity));
+}
 .hover\:bg-secondary-200:hover {
   --tw-bg-opacity: 1;
   background-color: rgb(213 221 229 / var(--tw-bg-opacity));
@@ -3337,14 +3352,6 @@ button:disabled,
 .hover\:bg-sky-400:hover {
   --tw-bg-opacity: 1;
   background-color: rgb(56 189 248 / var(--tw-bg-opacity));
-}
-.hover\:bg-sky-700:hover {
-  --tw-bg-opacity: 1;
-  background-color: rgb(3 105 161 / var(--tw-bg-opacity));
-}
-.hover\:bg-rose-700:hover {
-  --tw-bg-opacity: 1;
-  background-color: rgb(190 18 60 / var(--tw-bg-opacity));
 }
 .hover\:text-black:hover {
   --tw-text-opacity: 1;
@@ -3545,6 +3552,10 @@ button:disabled,
 }
 @media (min-width: 1024px) {
 
+  .lg\:grid-cols-3 {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
   .lg\:grid-cols-4 {
     grid-template-columns: repeat(4, minmax(0, 1fr));
   }
@@ -3565,75 +3576,4 @@ button:disabled,
     --tw-text-opacity: 1;
     color: rgb(75 85 99 / var(--tw-text-opacity));
   }
-}
-.fixed-icons {
-    position: fixed;
-    left: 20px;
-    top: 50%;
-    transform: translateY(-50%);
-    display: flex;
-    flex-direction: column;
-    gap: 20px;
-    z-index: 500;
-}
-
-.fixed-icons .icon-link {
-    width: 60px;
-    height: 60px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border-radius: 15px; /* Rounded square shape for app-like icons */
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-    transition: transform 0.3s ease, background-color 0.3s ease;
-}
-
-.fixed-icons .icon-link:hover {
-    transform: scale(1.1);
-}
-
-/* WhatsApp Icon */
-.fixed-icons .whatsapp {
-    background-color: #25D366; /* WhatsApp green */
-}
-
-.fixed-icons .whatsapp svg {
-    fill: #ffffff; /* White icon inside the green background */
-}
-
-/* Instagram Icon */
-.fixed-icons .instagram {
-    background: radial-gradient(circle at 30% 30%, #f09433, #e6683c, #dc2743, #cc2366, #bc1888); /* Instagram gradient */
-}
-
-.fixed-icons .instagram svg {
-    fill: #ffffff; /* White icon inside the Instagram gradient */
-}
-
-.fixed-icons svg {
-    width: 35px;
-    height: 35px;
-}
-/* Media Query for Mobile Devices */
-@media (max-width: 768px) {
-    .fixed-icons {
-        left: 20px;
-        right: auto;
-        top: auto;
-        bottom: 20px;
-        transform: none;
-        flex-direction: row;
-        gap: 10px;
-    }
-
-    .fixed-icons .icon-link {
-        width: 50px;
-        height: 50px;
-        border-radius: 50%;
-    }
-
-    .fixed-icons svg {
-        width: 25px;
-        height: 25px;
-    }
 }

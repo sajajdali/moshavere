@@ -12,9 +12,9 @@
                     <header class="flex flex-col sm:flex-row items-center justify-between gap-3">
                         <p class="text-lg font-semibold">اطلاعات تخصصی پزشک</p>
                         @isset($doc->dr_rate)
-                        <div class="bg-green text-white rounded-full py-2 px-5">
-                            {{$doc->dr_rate}}% رضایت مراجعین
-                        </div>
+                            <div class="bg-green text-white rounded-full py-2 px-5">
+                                {{ $doc->dr_rate }}% رضایت مراجعین
+                            </div>
                         @endisset
                     </header>
                     <main class="bg-secondary-100 rounded-lg p-4 flex flex-col sm:flex-row items-center gap-5">
@@ -390,6 +390,24 @@
                         </div>
                     </div>
                 </div>
+                @isset($fetchData['gallery'])
+                    <div class="bg-white p-4 flex flex-col gap-4 ">
+                        <p class="font-bold">
+                            گالری پزشک
+                        </p>
+                        <div
+                            class="border-2 border-secondary-200 rounded-lg grid grid-cols-5 gap-4 p-4 overflow-auto  max-h-40">
+                            @foreach ($fetchData['gallery'] as $gallery)
+                                <a href="{{$gallery}}"
+                                    data-fancybox="gallery-a" data-caption="Gallery A #1">
+                                    <img
+                                        src="{{$gallery}}" />
+                                </a>
+                            @endforeach
+                        </div>
+                    </div>
+                @endisset
+
             </section>
         </section>
     </main>

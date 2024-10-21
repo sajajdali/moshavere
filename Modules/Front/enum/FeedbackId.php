@@ -11,9 +11,9 @@ enum FeedbackId: int
     public function getQuestion(): string
     {
         return match ($this) {
-            self::QUESTION_1 => 'نظر شما راجع به سیستم نوبت دهی چیست ؟',
-            self::QUESTION_2 => 'نظر شما راجع برخورد پزشک چیست ؟',
-            self::QUESTION_3 => 'نظر شما راجع برخورد ماما با شما چیست ؟',
+            self::QUESTION_1 => 'نظر شما در مورد برخورد پزشک چیست ؟',
+            self::QUESTION_2 => 'چقدر احتمال دارد این پزشک را به آشنایان خود معرفی کنید ؟',
+            self::QUESTION_3 => 'نظر شما در مورد سیستم نوبت دهی چیست ؟',
             default => '' ,
         };
     }
@@ -28,10 +28,10 @@ enum FeedbackId: int
                 'ضعیف',
             ],
             self::QUESTION_2 =>  [
-             'خیلی عالی ',
-                ' عالی ',
-                'خوب',
-                'ضعیف',
+             'خیلی زیاد ',
+                ' زیاد ',
+                'متوسط',
+                'معرفی نمیکنم',
             ],
             self::QUESTION_3 =>  [
              'خیلی عالی ',

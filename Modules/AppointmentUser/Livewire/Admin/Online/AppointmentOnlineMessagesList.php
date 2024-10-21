@@ -52,9 +52,15 @@ class AppointmentOnlineMessagesList extends Component
     #[Computed]
     public function handleSearch()
     {
+        $logedInUser = auth()->user();
         // $query = AppointmentOnlineMessage::where('type',1)
-        $query = AppointmentOnlineMessage::query()
-            ->when(isset($this->fetchData['showCaceledApp']) && $this->fetchData['showCaceledApp'] == true, function ($q) {
+        $query = AppointmentOnlineMessage::query()->when(! $logedInUser->isAdmin() && $logedInUser->can('appointment_user.own'),function($q) use($logedInUser){
+             $q->whereHas('online',function($qq) use($logedInUser){
+                 $qq->whereHas('appointmentUser',function($qqq)  use($logedInUser){
+                    return  $qqq->where('doctor_id',$logedInUser->id)->orWhere('agent_id',$logedInUser->id);
+                }) ;
+            });
+        })->when(isset($this->fetchData['showCaceledApp']) && $this->fetchData['showCaceledApp'] == true, function ($q) {
                 $q->whereHas('online', function ($qq) {
                     $qq->whereIn('status', [
                         AppointmentOnlineStatusEnum::PENDING,

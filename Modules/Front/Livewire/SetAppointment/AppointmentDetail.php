@@ -235,52 +235,54 @@ class AppointmentDetail extends Component
             $this->fetchData['app']->transaction->update(['status' => TransactionStatusEnum::REJECTED]);
             return;
         }
-        try {
-            $amount = $this->fetchData['app']->details[AppointmentUser::DETAIL_PAYMENT][AppointmentUser::DETAIL_PAYMENT_PRICE]['int'];
-            $receipt = Payment::amount($amount)
-                ->transactionId($this->fetchData['app']->transaction->detail['transactionId'])->verify();
-            $this->fetchData['app']->update([
-                'status' => AppointmentUserStatusEnum::STATUS_SUCCESSFUL, 
-                'deadline_at' => null
-            ]);
-            $smsTemplate = setting(SettingKeyEnum::SMS_APPOINTMENT_AFTER_PAYMENT);
-            if (isset($smsTemplate)) {
-                $this->fetchData['app']->notify(new AppointmentSmsNotification($smsTemplate));
-            }
-            // sms to operator and doctor
-            if (isset($appointmentUser->operator)) {
-                $smsToOperator = setting(SettingKeyEnum::SMS_APPOINTMENT_TO_OPERATOR);
-                if (isset($smsToOperator)) {
-                    $this->fetchData['app']->notify(new AppointmentDocAndOperatorNotification($smsToOperator, $$this->fetchData['app']->operator->mobile));
+        if ($this->fetchData['app']->status == AppointmentUserStatusEnum::STATUS_WAIT_PAYMENT) {
+            try {
+                $amount = $this->fetchData['app']->details[AppointmentUser::DETAIL_PAYMENT][AppointmentUser::DETAIL_PAYMENT_PRICE]['int'];
+                $receipt = Payment::amount($amount)
+                    ->transactionId($this->fetchData['app']->transaction->detail['transactionId'])->verify();
+                $this->fetchData['app']->update([
+                    'status' => AppointmentUserStatusEnum::STATUS_SUCCESSFUL,
+                    'deadline_at' => null
+                ]);
+                $smsTemplate = setting(SettingKeyEnum::SMS_APPOINTMENT_AFTER_PAYMENT);
+                if (isset($smsTemplate)) {
+                    $this->fetchData['app']->notify(new AppointmentSmsNotification($smsTemplate));
                 }
-            }
-            if (isset($appointmentUser->doctor)) {
-                $smsToDoctor = setting(SettingKeyEnum::SMS_APPOINTMENT_TO_DOCTOR);
-                if (isset($smsToDoctor)) {
-                    $this->fetchData['app']->notify(new AppointmentDocAndOperatorNotification($smsToDoctor, $$this->fetchData['app']->doctor->mobile));
+                // sms to operator and doctor
+                if (isset($appointmentUser->operator)) {
+                    $smsToOperator = setting(SettingKeyEnum::SMS_APPOINTMENT_TO_OPERATOR);
+                    if (isset($smsToOperator)) {
+                        $this->fetchData['app']->notify(new AppointmentDocAndOperatorNotification($smsToOperator, $$this->fetchData['app']->operator->mobile));
+                    }
                 }
-            }
-            // if appointment is online
-            if ($this->fetchData['app']->kind == AppointmentUserKindEnum::ONLINE) {
-                $this->fetchData['app']->online->first()->update(['status' => \Modules\AppointmentUser\Enum\AppointmentOnlineStatusEnum::ACCEPTED]);
-                // send online first message
-                if (setting(SettingKeyEnum::ONILNE_SEND_ATUOMATIC_MESSAGE_STATUS)) {
-                    $this->fetchData['app']->online->last()->messages()->create([
-                        'user_id' => $$this->fetchData['app']->online->last()->user_id,
-                        'answer_by' => 1,
-                        'type' => AppointmentOnlineMessageTypeEnum::ANSWER,
-                        'seen' => AppointmentOnlineMessageSeenEnum::UNSEEN,
-                        'body' => setting(SettingKeyEnum::ONILNE_SEND_ATUOMATIC_MESSAGE_MESSAGE) ?? 'سلام لطفا سوال خود را مطرح کنید',
-                    ]);
+                if (isset($appointmentUser->doctor)) {
+                    $smsToDoctor = setting(SettingKeyEnum::SMS_APPOINTMENT_TO_DOCTOR);
+                    if (isset($smsToDoctor)) {
+                        $this->fetchData['app']->notify(new AppointmentDocAndOperatorNotification($smsToDoctor, $$this->fetchData['app']->doctor->mobile));
+                    }
                 }
-            }
+                // if appointment is online
+                if ($this->fetchData['app']->kind == AppointmentUserKindEnum::ONLINE) {
+                    $this->fetchData['app']->online->first()->update(['status' => \Modules\AppointmentUser\Enum\AppointmentOnlineStatusEnum::ACCEPTED]);
+                    // send online first message
+                    if (setting(SettingKeyEnum::ONILNE_SEND_ATUOMATIC_MESSAGE_STATUS)) {
+                        $this->fetchData['app']->online->last()->messages()->create([
+                            'user_id' => $$this->fetchData['app']->online->last()->user_id,
+                            'answer_by' => 1,
+                            'type' => AppointmentOnlineMessageTypeEnum::ANSWER,
+                            'seen' => AppointmentOnlineMessageSeenEnum::UNSEEN,
+                            'body' => setting(SettingKeyEnum::ONILNE_SEND_ATUOMATIC_MESSAGE_MESSAGE) ?? 'سلام لطفا سوال خود را مطرح کنید',
+                        ]);
+                    }
+                }
 
-            $this->fetchData['success']  = 'پرداخت باموفقیت انجام شد و نوبت شما فعال شد ';
-            $this->fetchData['app']->transaction->update(['status' => TransactionStatusEnum::SUCCESSFUL]);
-            $this->render();
-        } catch (InvalidPaymentException $exception) {
-            $this->fetchData['alert'] = 'خطا در انجام تراکنش';
-            $this->fetchData['app']->transaction->update(['status' => TransactionStatusEnum::REJECTED]);
+                $this->fetchData['success']  = 'پرداخت باموفقیت انجام شد و نوبت شما فعال شد ';
+                $this->fetchData['app']->transaction->update(['status' => TransactionStatusEnum::SUCCESSFUL]);
+                $this->render();
+            } catch (InvalidPaymentException $exception) {
+                $this->fetchData['alert'] = 'خطا در انجام تراکنش';
+                $this->fetchData['app']->transaction->update(['status' => TransactionStatusEnum::REJECTED]);
+            }
         }
     }
     public function mount()

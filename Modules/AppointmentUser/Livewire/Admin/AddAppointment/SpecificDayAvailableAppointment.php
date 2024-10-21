@@ -241,14 +241,14 @@ class SpecificDayAvailableAppointment extends Component
     // when tracking_code is exist in url
     public function changeAppointmentDate($from, $until)
     {
+        $fromArray = explode(':',$from) ;
         // Update the date
         $updateData = [
-            'date_visit' => $this->fetchData['selectedDate']->todatetimestring(),
+            'date_visit' => $this->fetchData['selectedDate']->setTime($fromArray[0],$fromArray[1],$fromArray[2])->todatetimestring(),
             'start_time' => $from,
             'end_time' => $until,
             'status' => AppointmentUserStatusEnum::STATUS_SUCCESSFUL,
         ];
-
         // Check if the type needs to be updated
         if ($this->edited['old_app']->type == AppointmentUserTypeEnum::BETWEEN_PATIENTS) {
             $updateData['type'] = AppointmentUserTypeEnum::MAIN__APPOINTMENT;

@@ -38,7 +38,7 @@ class CheckAppointmentUserDedlineDateCommand extends Command
     {
 
         $appointmentsToDelete = AppointmentUser::whereNotNull('deadline_at')
-            ->whereDate('deadline_at', '<', \now())
+            ->where('deadline_at', '<', \now())
             ->get();
         if ($appointmentsToDelete->isNotEmpty()) {
             $appointmentsToDelete->each(function ($appointment) {

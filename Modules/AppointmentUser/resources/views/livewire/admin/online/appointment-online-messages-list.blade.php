@@ -101,6 +101,13 @@
                                                     type="text">
 
                                             </div>
+                                            <div class="col-12">
+                                                <label for="search-UserMobile" class="form-label"><strong>کد ملی</strong></label>
+                                                <input class="form-control" id="search-UserMobile"
+                                                    wire:model="search.nationalCode" placeholder="کد ملی بیمار"
+                                                    type="text">
+
+                                            </div>
                                         </div>
                                     </div>
                                     <div class="row my-5">

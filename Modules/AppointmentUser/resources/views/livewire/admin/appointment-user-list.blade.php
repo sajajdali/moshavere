@@ -21,7 +21,7 @@
             {{ $message }}
         </div>
     @enderror
-    <div class="row row-sm" wire:key='{{ \uniqid() }}'>
+    <div class="row row-sm" wire:key='{{ \uniqid() }}'  wire:loading.class="op-0-3">
         <div class="col-lg-12">
             <div class="card custom-card">
                 <div class="card-header d-flex justify-content-between border-bottom">
@@ -337,8 +337,7 @@
                     </form>
                 </div>
                 <div class="table-responsive mb-3">
-                    <table class="table text-nowrap text-md-nowrap table-bordered text-center"
-                        wire:loading.class="op-0-3">
+                    <table class="table text-nowrap text-md-nowrap table-bordered text-center">
                         <thead>
                             <tr>
                                 <th scope="col">#</th>

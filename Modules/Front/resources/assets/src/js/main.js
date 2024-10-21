@@ -1,5 +1,7 @@
 import Swiper, { Navigation, Pagination } from 'swiper';
 import Swal from 'sweetalert2';
+import { Fancybox } from "@fancyapps/ui";
+import "@fancyapps/ui/dist/fancybox.css";
 import 'swiper/css';
 import 'swiper/css/navigation';
 import 'swiper/css/pagination';

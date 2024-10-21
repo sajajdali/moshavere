@@ -399,7 +399,7 @@
                         </div>
                     </div>
                 </div>
-                @isset($fetchData['gallery'])
+                @if(isset($fetchData['gallery']) && ! empty($fetchData['gallery']) )
                     <div class="bg-white p-4 flex flex-col gap-4 ">
                         <p class="font-bold">
                             گالری پزشک
@@ -415,8 +415,7 @@
                             @endforeach
                         </div>
                     </div>
-                @endisset
-
+                @endif
             </section>
         </section>
     </main>

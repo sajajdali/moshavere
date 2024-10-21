@@ -27,8 +27,8 @@ class PaymentController extends Controller
     private $transactionId;
     public function createPaymentLink(AppointmentUser $appointmentUser)
     {
-        if ($appointmentUser->status == AppointmentUserStatusEnum::STATUS_SUCCESSFUL){
-            return redirect()->to(route('front.setAppointment.detail', ['tracking_code' => $appointmentUser->tracking_code , 'msg' => 'پرداخت شما با موفقیت انجام شده است']));
+        if ($appointmentUser->status == AppointmentUserStatusEnum::STATUS_SUCCESSFUL) {
+            return redirect()->to(route('front.setAppointment.detail', ['tracking_code' => $appointmentUser->tracking_code, 'msg' => 'پرداخت شما با موفقیت انجام شده است']));
         }
         $amount = $appointmentUser->details[AppointmentUser::DETAIL_PAYMENT][AppointmentUser::DETAIL_PAYMENT_PRICE]['int'];
         $user = $appointmentUser->user;
@@ -93,40 +93,42 @@ class PaymentController extends Controller
     }
     public function callback(AppointmentUser $appointmentUser, Request $request)
     {
-        try {
-            $amount = $appointmentUser->details[AppointmentUser::DETAIL_PAYMENT][AppointmentUser::DETAIL_PAYMENT_PRICE]['int'];
-            $receipt = Payment::amount($amount)
-                ->transactionId($appointmentUser->transaction->detail['transactionId'])
-                ->verify();
-            $appointmentUser->update([
-                'status' => AppointmentUserStatusEnum::STATUS_SUCCESSFUL
-            ]);
-            $smsTemplate = setting(SettingKeyEnum::SMS_APPOINTMENT_AFTER_PAYMENT);
-            if (isset($smsTemplate)) {
-                $appointmentUser->notify(new AppointmentSmsNotification($smsTemplate));
-            }
-            $appointmentUser->transaction->update(['status' => TransactionStatusEnum::SUCCESSFUL]);
-
-            // if appointment is online
-            if ($appointmentUser->kind == AppointmentUserKindEnum::ONLINE) {
-                $appointmentUser->online->first()->update(['status' => \Modules\AppointmentUser\Enum\AppointmentOnlineStatusEnum::ACCEPTED]);
-                // send online first message
-                if (setting(SettingKeyEnum::ONILNE_SEND_ATUOMATIC_MESSAGE_STATUS)) {
-                    $appointmentUser->online->last()->messages()->create([
-                        'user_id' => $appointmentUser->online->last()->user_id,
-                        'answer_by' => 1,
-                        'type' => AppointmentOnlineMessageTypeEnum::ANSWER,
-                        'seen' => AppointmentOnlineMessageSeenEnum::UNSEEN,
-                        'body' => setting(SettingKeyEnum::ONILNE_SEND_ATUOMATIC_MESSAGE_MESSAGE) ?? 'سلام لطفا سوال خود را مطرح کنید',
-                    ]);
+        if ($appointmentUser->status == AppointmentUserStatusEnum::STATUS_WAIT_PAYMENT) {
+            try {
+                $amount = $appointmentUser->details[AppointmentUser::DETAIL_PAYMENT][AppointmentUser::DETAIL_PAYMENT_PRICE]['int'];
+                $receipt = Payment::amount($amount)
+                    ->transactionId($appointmentUser->transaction->detail['transactionId'])
+                    ->verify();
+                $appointmentUser->update([
+                    'status' => AppointmentUserStatusEnum::STATUS_SUCCESSFUL
+                ]);
+                $smsTemplate = setting(SettingKeyEnum::SMS_APPOINTMENT_AFTER_PAYMENT);
+                if (isset($smsTemplate)) {
+                    $appointmentUser->notify(new AppointmentSmsNotification($smsTemplate));
                 }
-            }
+                $appointmentUser->transaction->update(['status' => TransactionStatusEnum::SUCCESSFUL]);
 
-            return redirect()->route('front.setAppointment.detail', ['tracking_code' => $appointmentUser->tracking_code, 'msg' => 'پرداخت با موفقیت انجام شد']);
-        } catch (InvalidPaymentException $exception) {
-            $appointmentUser->transaction->update(['status' => TransactionStatusEnum::REJECTED]);
-            session()->flash('error', 'خطا در انجام تراکنش');
-            return redirect()->route('front.setAppointment.detail', ['tracking_code' => $appointmentUser->tracking_code, 'msg' => 'خطا در انجام تراکنش']);
+                // if appointment is online
+                if ($appointmentUser->kind == AppointmentUserKindEnum::ONLINE) {
+                    $appointmentUser->online->first()->update(['status' => \Modules\AppointmentUser\Enum\AppointmentOnlineStatusEnum::ACCEPTED]);
+                    // send online first message
+                    if (setting(SettingKeyEnum::ONILNE_SEND_ATUOMATIC_MESSAGE_STATUS)) {
+                        $appointmentUser->online->last()->messages()->create([
+                            'user_id' => $appointmentUser->online->last()->user_id,
+                            'answer_by' => 1,
+                            'type' => AppointmentOnlineMessageTypeEnum::ANSWER,
+                            'seen' => AppointmentOnlineMessageSeenEnum::UNSEEN,
+                            'body' => setting(SettingKeyEnum::ONILNE_SEND_ATUOMATIC_MESSAGE_MESSAGE) ?? 'سلام لطفا سوال خود را مطرح کنید',
+                        ]);
+                    }
+                }
+
+                return redirect()->route('front.setAppointment.detail', ['tracking_code' => $appointmentUser->tracking_code, 'msg' => 'پرداخت با موفقیت انجام شد']);
+            } catch (InvalidPaymentException $exception) {
+                $appointmentUser->transaction->update(['status' => TransactionStatusEnum::REJECTED]);
+                session()->flash('error', 'خطا در انجام تراکنش');
+                return redirect()->route('front.setAppointment.detail', ['tracking_code' => $appointmentUser->tracking_code, 'msg' => 'خطا در انجام تراکنش']);
+            }
         }
     }
 }

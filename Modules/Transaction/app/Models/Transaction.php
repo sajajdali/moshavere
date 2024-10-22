@@ -67,4 +67,10 @@ class Transaction extends Model
     public function appid() {
         return $this->transactionable_id ; 
     }
+    public function getCartHash():string {
+        if(isset($this->detail['card_hash'])) {
+            return $this->detail['card_hash'] ; 
+        }
+        return '-' ; 
+    }
 }

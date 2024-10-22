@@ -390,18 +390,24 @@
                         </div>
                     </div>
                 </div>
-                @if(isset($fetchData['gallery']) && ! empty($fetchData['gallery']) )
+                @if (isset($fetchData['gallery']) && !empty($fetchData['gallery']))
                     <div class="bg-white p-4 flex flex-col gap-4 ">
+                        @if (setting(\Modules\Setting\Enum\SettingKeyEnum::APPOINTMENT_GALLERY_TITLE))
                         <p class="font-bold">
-                            گالری پزشک
+                            {{ setting(\Modules\Setting\Enum\SettingKeyEnum::APPOINTMENT_GALLERY_TITLE) }}
+                            
+                        </p>
+                        @endif
+                        @if (setting(\Modules\Setting\Enum\SettingKeyEnum::APPOINTMENT_GALLERY_BODY))
+                            {{ setting(\Modules\Setting\Enum\SettingKeyEnum::APPOINTMENT_GALLERY_BODY) }}
+                        @endif
+                        <p>
                         </p>
                         <div
-                            class="border-2 border-secondary-200 rounded-lg grid grid-cols-5 gap-4 p-4 overflow-auto  max-h-40">
+                            class="border-2 border-secondary-100 rounded-lg grid grid-cols-4 gap-12 p-4 overflow-auto  max-h-40">
                             @foreach ($fetchData['gallery'] as $gallery)
-                                <a href="{{$gallery}}"
-                                    data-fancybox="gallery-a" data-caption="Gallery A #1">
-                                    <img
-                                        src="{{$gallery}}" />
+                                <a href="{{ $gallery }}" data-fancybox="gallery-a" data-caption="Gallery A #1">
+                                    <img class="min-h-28 min-w-28 rounded-lg" src="{{ $gallery }}" />
                                 </a>
                             @endforeach
                         </div>

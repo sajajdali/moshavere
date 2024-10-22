@@ -38,6 +38,8 @@ enum SettingKeyEnum: int implements EnumHasNameInterface, SettingTypeInterface, 
     case APPOINTMENT_DETAIL_PAYMENT_DESCRIPTION_STATUS = 400;
     case APPOINTMENT_DETAIL_PAYMENT_DESCRIPTION_TEXT = 401;
     case APPOINTMENT_SHOW_FALSE_STATUS_DAYS = 402;
+    case APPOINTMENT_GALLERY_TITLE = 403;
+    case APPOINTMENT_GALLERY_BODY = 404;
 
         // ABOUT US PAGE
     case ABOUT_US_FIRST_SECTION_TITLE = 23;
@@ -140,6 +142,8 @@ enum SettingKeyEnum: int implements EnumHasNameInterface, SettingTypeInterface, 
             self::APPOINTMENT_DETAIL_PAYMENT_DESCRIPTION_STATUS    => ' وضعیت توضیحات در صفحه ی جزئیات نوبت که مربوط به پرداخت میباشد',
             self::APPOINTMENT_DETAIL_PAYMENT_DESCRIPTION_TEXT    => 'متن توضیحات در صفحه ی جزئیات نوبت که مربوط به پرداخت میباشد ',
             self::APPOINTMENT_SHOW_FALSE_STATUS_DAYS    => 'در قسمت دریافت نوبت ، روز هایی که تمامی نوبت آنها پر هست به کاربر نمایش دهد',
+            self::APPOINTMENT_GALLERY_TITLE    => 'تیتر نمایش گالری پزشک',
+            self::APPOINTMENT_GALLERY_BODY    => 'متن نمایش گالری پزشک',
 
             // SMS
             self::SMS_API_TOKEN => 'توکن API پیامک',
@@ -294,6 +298,7 @@ enum SettingKeyEnum: int implements EnumHasNameInterface, SettingTypeInterface, 
             self::ABOUT_US_THIRD_SECTION_DESCRIPTION => SettingTypeEnum::TEXTAREA,
             self::ABOUT_US_FOURTH_SECTION_DESCRIPTION => SettingTypeEnum::TEXTAREA,
             self::APP_FULL_APPOINTMENT_BODY => SettingTypeEnum::TEXTAREA,
+            self::APPOINTMENT_GALLERY_BODY => SettingTypeEnum::TEXTAREA,
             default => SettingTypeEnum::TEXT
         };
     }

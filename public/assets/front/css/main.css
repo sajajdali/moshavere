@@ -2343,15 +2343,24 @@ button:disabled,
 .h-full {
   height: 100%;
 }
-.h-40 {
-  height: 10rem;
+.max-h-40 {
+  max-height: 10rem;
 }
 .max-h-min {
   max-height: -moz-min-content;
   max-height: min-content;
 }
-.max-h-40 {
-  max-height: 10rem;
+.min-h-4 {
+  min-height: 1rem;
+}
+.min-h-10 {
+  min-height: 2.5rem;
+}
+.min-h-16 {
+  min-height: 4rem;
+}
+.min-h-28 {
+  min-height: 7rem;
 }
 .\!w-fit {
   width: -moz-fit-content !important;
@@ -2451,6 +2460,9 @@ button:disabled,
   min-width: -moz-fit-content;
   min-width: fit-content;
 }
+.min-w-28 {
+  min-width: 7rem;
+}
 .max-w-3xl {
   max-width: 48rem;
 }
@@ -2513,11 +2525,14 @@ button:disabled,
 .grid-cols-2 {
   grid-template-columns: repeat(2, minmax(0, 1fr));
 }
+.grid-cols-5 {
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+}
 .grid-cols-3 {
   grid-template-columns: repeat(3, minmax(0, 1fr));
 }
-.grid-cols-5 {
-  grid-template-columns: repeat(5, minmax(0, 1fr));
+.grid-cols-4 {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
 }
 .flex-row {
   flex-direction: row;
@@ -2575,6 +2590,9 @@ button:disabled,
 }
 .gap-8 {
   gap: 2rem;
+}
+.gap-20 {
+  gap: 5rem;
 }
 .space-y-1 > :not([hidden]) ~ :not([hidden]) {
   --tw-space-y-reverse: 0;

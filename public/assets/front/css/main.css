@@ -3595,3 +3595,74 @@ button:disabled,
     color: rgb(75 85 99 / var(--tw-text-opacity));
   }
 }
+.fixed-icons {
+    position: fixed;
+    left: 20px;
+    top: 50%;
+    transform: translateY(-50%);
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    z-index: 500;
+}
+
+.fixed-icons .icon-link {
+    width: 60px;
+    height: 60px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 15px; /* Rounded square shape for app-like icons */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    transition: transform 0.3s ease, background-color 0.3s ease;
+}
+
+.fixed-icons .icon-link:hover {
+    transform: scale(1.1);
+}
+
+/* WhatsApp Icon */
+.fixed-icons .whatsapp {
+    background-color: #25D366; /* WhatsApp green */
+}
+
+.fixed-icons .whatsapp svg {
+    fill: #ffffff; /* White icon inside the green background */
+}
+
+/* Instagram Icon */
+.fixed-icons .instagram {
+    background: radial-gradient(circle at 30% 30%, #f09433, #e6683c, #dc2743, #cc2366, #bc1888); /* Instagram gradient */
+}
+
+.fixed-icons .instagram svg {
+    fill: #ffffff; /* White icon inside the Instagram gradient */
+}
+
+.fixed-icons svg {
+    width: 35px;
+    height: 35px;
+}
+/* Media Query for Mobile Devices */
+@media (max-width: 768px) {
+    .fixed-icons {
+        left: 20px;
+        right: auto;
+        top: auto;
+        bottom: 20px;
+        transform: none;
+        flex-direction: row;
+        gap: 10px;
+    }
+
+    .fixed-icons .icon-link {
+        width: 50px;
+        height: 50px;
+        border-radius: 50%;
+    }
+
+    .fixed-icons svg {
+        width: 25px;
+        height: 25px;
+    }
+}

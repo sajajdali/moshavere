@@ -106,8 +106,13 @@ class PaymentController extends Controller
                 if (isset($smsTemplate)) {
                     $appointmentUser->notify(new AppointmentSmsNotification($smsTemplate));
                 }
-                $appointmentUser->transaction->update(['status' => TransactionStatusEnum::SUCCESSFUL]);
-
+                $tDetail =  $appointmentUser->transaction->detail;
+                $respondDetaul = $receipt->getDetails();
+                $newTdetail = array_merge($tDetail, [
+                    'card_hash' => $respondDetaul['card_hash'],
+                    'ref_id' => $respondDetaul['ref_id'],
+                ]);
+                $appointmentUser->transaction->update(['status' => TransactionStatusEnum::SUCCESSFUL, 'detail' => $newTdetail]);
                 // if appointment is online
                 if ($appointmentUser->kind == AppointmentUserKindEnum::ONLINE) {
                     $appointmentUser->online->first()->update(['status' => \Modules\AppointmentUser\Enum\AppointmentOnlineStatusEnum::ACCEPTED]);
@@ -122,7 +127,6 @@ class PaymentController extends Controller
                         ]);
                     }
                 }
-
                 return redirect()->route('front.setAppointment.detail', ['tracking_code' => $appointmentUser->tracking_code, 'msg' => 'پرداخت با موفقیت انجام شد']);
             } catch (InvalidPaymentException $exception) {
                 $appointmentUser->transaction->update(['status' => TransactionStatusEnum::REJECTED]);

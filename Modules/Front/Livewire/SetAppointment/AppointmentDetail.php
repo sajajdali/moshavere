@@ -267,7 +267,7 @@ class AppointmentDetail extends Component
                     // send online first message
                     if (setting(SettingKeyEnum::ONILNE_SEND_ATUOMATIC_MESSAGE_STATUS)) {
                         $this->fetchData['app']->online->last()->messages()->create([
-                            'user_id' => $$this->fetchData['app']->online->last()->user_id,
+                            'user_id' => $this->fetchData['app']->online->last()->user_id,
                             'answer_by' => 1,
                             'type' => AppointmentOnlineMessageTypeEnum::ANSWER,
                             'seen' => AppointmentOnlineMessageSeenEnum::UNSEEN,
@@ -277,7 +277,13 @@ class AppointmentDetail extends Component
                 }
 
                 $this->fetchData['success']  = 'پرداخت باموفقیت انجام شد و نوبت شما فعال شد ';
-                $this->fetchData['app']->transaction->update(['status' => TransactionStatusEnum::SUCCESSFUL]);
+                $tDetail =  $this->fetchData['app']->transaction->detail;
+                $respondDetaul = $receipt->getDetails();
+                $newTdetail = array_merge($tDetail, [
+                    'card_hash' => $respondDetaul['card_hash'],
+                    'ref_id' => $respondDetaul['ref_id'],
+                ]);
+                $this->fetchData['app']->transaction->update(['status' => TransactionStatusEnum::SUCCESSFUL, 'detail' => $newTdetail]);
                 $this->render();
             } catch (InvalidPaymentException $exception) {
                 $this->fetchData['alert'] = 'خطا در انجام تراکنش';

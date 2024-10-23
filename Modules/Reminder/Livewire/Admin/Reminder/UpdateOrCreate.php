@@ -166,6 +166,7 @@ class UpdateOrCreate extends Component
         $this->form['sendDate'] == 'sameDay' ?  $this->form['send_at_specific_date'] =  $this->fetchData['reminder']->send_day : '';
         $this->form['send_at_specific_date'] = $this->fetchData['reminder']->send_day;
         $this->form['timeSend'] = $this->fetchData['reminder']->send_time;
+        $this->form['active'] =   $this->fetchData['reminder']->active == ActiveEnum::ACTIVE ? true : false  ;
     }
     public function booted()
     {

@@ -3,11 +3,13 @@
 namespace Modules\AppointmentUser\app\Console;
 
 use Illuminate\Console\Command;
+use Illuminate\Support\Facades\Log;
 use Modules\Reminder\Enum\ReminderStatusEnum;
 use Modules\Reminder\Enum\ReminderParametersEnum;
 use Modules\Reminder\app\Models\AppointmentReminder;
 use Modules\User\Notifications\UserMessageNotification;
 use Modules\AppointmentUser\app\Notifications\AppointmentSmsReminder;
+use Modules\AppointmentUser\Enum\AppointmentUserKindEnum;
 
 class SendReminderscommand extends Command
 {
@@ -34,13 +36,17 @@ class SendReminderscommand extends Command
      */
     public function handle()
     {
+        Log::info('sendReminder connsole has been called');
         // sms reminder
         AppointmentReminder::where('type', '1')
             ->where('send_at', '<', \now()->subhours(4))
             ->delete();
         $reminders =  AppointmentReminder::where('type', '1')
-            ->where('send_at', '<', now())
+            ->whereHas('appointmentUser', function ($q) {
+                return $q->where('kind', AppointmentUserKindEnum::IN_PERSION);
+            })->where('send_at', '<', now())
             ->get();
+        Log::info($reminders->count() . ' reminders exists to send');
         if (isset($reminders) && $reminders->isNotEmpty()) {
             foreach ($reminders as $reminder) {
                 if ($reminder->reminder->status == ReminderStatusEnum::SMS && $reminder->reminder->active) {
@@ -62,7 +68,9 @@ class SendReminderscommand extends Command
             ->where('send_at', '<', \now()->subhours(4))
             ->delete();
         $notifReminders =  AppointmentReminder::where('type', '2')
-            ->where('send_at', '<', now())
+            ->whereHas('appointmentUser', function ($q) {
+                return $q->where('kind', AppointmentUserKindEnum::IN_PERSION);
+            })->where('send_at', '<', now())
             ->get();
         if (isset($notifReminders) && $notifReminders->isNotEmpty()) {
             foreach ($notifReminders as $notifReminder) {
@@ -75,7 +83,7 @@ class SendReminderscommand extends Command
                         }
                     }
                     if (isset($sendParameter)) {
-                        $assignEachParameter =  $this->findPrameterEnum($sendParameter,$notifReminder);
+                        $assignEachParameter =  $this->findPrameterEnum($sendParameter, $notifReminder);
                     }
                     $edited_param = $this->changeSmsParameters($assignEachParameter);
                     $message = $this->replaceParam($notifReminder->reminder->body, $edited_param);
@@ -94,7 +102,7 @@ class SendReminderscommand extends Command
             }
         }
     }
-    private function findPrameterEnum($sendParameter,$notifReminder)
+    private function findPrameterEnum($sendParameter, $notifReminder)
     {
         foreach ($sendParameter as $key => $eachPram) {
             $assignEachParameter[] =  match ($eachPram) {

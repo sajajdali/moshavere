@@ -2350,15 +2350,6 @@ button:disabled,
   max-height: -moz-min-content;
   max-height: min-content;
 }
-.min-h-4 {
-  min-height: 1rem;
-}
-.min-h-10 {
-  min-height: 2.5rem;
-}
-.min-h-16 {
-  min-height: 4rem;
-}
 .min-h-28 {
   min-height: 7rem;
 }
@@ -2456,12 +2447,12 @@ button:disabled,
 .w-full {
   width: 100%;
 }
+.min-w-28 {
+  min-width: 7rem;
+}
 .min-w-fit {
   min-width: -moz-fit-content;
   min-width: fit-content;
-}
-.min-w-28 {
-  min-width: 7rem;
 }
 .max-w-3xl {
   max-width: 48rem;
@@ -2525,12 +2516,6 @@ button:disabled,
 .grid-cols-2 {
   grid-template-columns: repeat(2, minmax(0, 1fr));
 }
-.grid-cols-5 {
-  grid-template-columns: repeat(5, minmax(0, 1fr));
-}
-.grid-cols-3 {
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-}
 .grid-cols-4 {
   grid-template-columns: repeat(4, minmax(0, 1fr));
 }
@@ -2590,9 +2575,6 @@ button:disabled,
 }
 .gap-8 {
   gap: 2rem;
-}
-.gap-20 {
-  gap: 5rem;
 }
 .space-y-1 > :not([hidden]) ~ :not([hidden]) {
   --tw-space-y-reverse: 0;
@@ -2923,6 +2905,18 @@ button:disabled,
 .bg-yellow\/20 {
   background-color: rgb(255 198 59 / 0.2);
 }
+.bg-lime-400 {
+  --tw-bg-opacity: 1;
+  background-color: rgb(163 230 53 / var(--tw-bg-opacity));
+}
+.bg-emerald-400 {
+  --tw-bg-opacity: 1;
+  background-color: rgb(52 211 153 / var(--tw-bg-opacity));
+}
+.bg-emerald-500 {
+  --tw-bg-opacity: 1;
+  background-color: rgb(16 185 129 / var(--tw-bg-opacity));
+}
 .bg-opacity-50 {
   --tw-bg-opacity: 0.5;
 }
@@ -3251,6 +3245,11 @@ button:disabled,
   --tw-shadow-colored: 0 10px 15px -3px var(--tw-shadow-color), 0 4px 6px -4px var(--tw-shadow-color);
   box-shadow: var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow);
 }
+.shadow-md {
+  --tw-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+  --tw-shadow-colored: 0 4px 6px -1px var(--tw-shadow-color), 0 2px 4px -2px var(--tw-shadow-color);
+  box-shadow: var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow);
+}
 .outline-none {
   outline: 2px solid transparent;
   outline-offset: 2px;
@@ -3278,10 +3277,23 @@ button:disabled,
 .filter {
   filter: var(--tw-blur) var(--tw-brightness) var(--tw-contrast) var(--tw-grayscale) var(--tw-hue-rotate) var(--tw-invert) var(--tw-saturate) var(--tw-sepia) var(--tw-drop-shadow);
 }
+.transition {
+  transition-property: color, background-color, border-color, text-decoration-color, fill, stroke, opacity, box-shadow, transform, filter, -webkit-backdrop-filter;
+  transition-property: color, background-color, border-color, text-decoration-color, fill, stroke, opacity, box-shadow, transform, filter, backdrop-filter;
+  transition-property: color, background-color, border-color, text-decoration-color, fill, stroke, opacity, box-shadow, transform, filter, backdrop-filter, -webkit-backdrop-filter;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  transition-duration: 150ms;
+}
 .transition-colors {
   transition-property: color, background-color, border-color, text-decoration-color, fill, stroke;
   transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
   transition-duration: 150ms;
+}
+.duration-300 {
+  transition-duration: 300ms;
+}
+.ease-in-out {
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
 }
 .container {
   padding-left: 1.25rem;
@@ -3339,6 +3351,10 @@ button:disabled,
   --tw-content: '*';
   content: var(--tw-content);
 }
+.hover\:bg-blue-600:hover {
+  --tw-bg-opacity: 1;
+  background-color: rgb(37 99 235 / var(--tw-bg-opacity));
+}
 .hover\:bg-blue-700:hover {
   --tw-bg-opacity: 1;
   background-color: rgb(29 78 216 / var(--tw-bg-opacity));
@@ -3370,6 +3386,14 @@ button:disabled,
 .hover\:bg-sky-400:hover {
   --tw-bg-opacity: 1;
   background-color: rgb(56 189 248 / var(--tw-bg-opacity));
+}
+.hover\:bg-lime-600:hover {
+  --tw-bg-opacity: 1;
+  background-color: rgb(101 163 13 / var(--tw-bg-opacity));
+}
+.hover\:bg-lime-700:hover {
+  --tw-bg-opacity: 1;
+  background-color: rgb(77 124 15 / var(--tw-bg-opacity));
 }
 .hover\:text-black:hover {
   --tw-text-opacity: 1;
@@ -3594,4 +3618,75 @@ button:disabled,
     --tw-text-opacity: 1;
     color: rgb(75 85 99 / var(--tw-text-opacity));
   }
+}
+.fixed-icons {
+    position: fixed;
+    left: 20px;
+    top: 50%;
+    transform: translateY(-50%);
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    z-index: 500;
+}
+
+.fixed-icons .icon-link {
+    width: 60px;
+    height: 60px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 15px; /* Rounded square shape for app-like icons */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    transition: transform 0.3s ease, background-color 0.3s ease;
+}
+
+.fixed-icons .icon-link:hover {
+    transform: scale(1.1);
+}
+
+/* WhatsApp Icon */
+.fixed-icons .whatsapp {
+    background-color: #25D366; /* WhatsApp green */
+}
+
+.fixed-icons .whatsapp svg {
+    fill: #ffffff; /* White icon inside the green background */
+}
+
+/* Instagram Icon */
+.fixed-icons .instagram {
+    background: radial-gradient(circle at 30% 30%, #f09433, #e6683c, #dc2743, #cc2366, #bc1888); /* Instagram gradient */
+}
+
+.fixed-icons .instagram svg {
+    fill: #ffffff; /* White icon inside the Instagram gradient */
+}
+
+.fixed-icons svg {
+    width: 35px;
+    height: 35px;
+}
+/* Media Query for Mobile Devices */
+@media (max-width: 768px) {
+    .fixed-icons {
+        left: 20px;
+        right: auto;
+        top: auto;
+        bottom: 20px;
+        transform: none;
+        flex-direction: row;
+        gap: 10px;
+    }
+
+    .fixed-icons .icon-link {
+        width: 50px;
+        height: 50px;
+        border-radius: 50%;
+    }
+
+    .fixed-icons svg {
+        width: 25px;
+        height: 25px;
+    }
 }

@@ -265,7 +265,7 @@
                 </div>
                 <div class="col-md-12 mt-3">
                     <div class="main-toggle-group d-flex align-items-center ms-0">
-                        <div class="toggle toggle-lg toggle-primary my-1 customCheckbox on" wire:ignore.self
+                        <div class="toggle toggle-lg toggle-primary my-1 customCheckbox @if( isset($form['active']) && $form['active'] == true) on @else off @endif"
                             data-id="visitType.inPerson">
                             <span></span>
                         </div>

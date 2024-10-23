@@ -186,6 +186,11 @@
                                 <span>بازگشت به اپلیکیشن</span>
                             </a>
                         @endisset
+                        @if(! disableUi() &&  $fetchData['app']->isOnline() && $fetchData['app']->isAppActive())
+                        <button class="bg-emerald-500 hover:bg-lime-700 text-white font-bold py-2 px-4 rounded-lg shadow-md transition duration-300 ease-in-out">
+                          ورود به چت
+                        </button>
+                        @endif
                     </h3>
                     <div class="border-card space-y-4">
                         <div class="flex flex-col md:flex-row items-stretch md:items-start justify-between gap-4">

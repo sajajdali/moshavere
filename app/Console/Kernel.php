@@ -47,7 +47,7 @@ class Kernel extends ConsoleKernel
     {
         // $schedule->command('inspire')->hourly();
         $schedule->command('appointment:check-deadLine')->hourly();
-        $schedule->command('appointment:appointment:sendReminders')->everyFiveMinutes();
+        $schedule->command('appointment:sendReminders')->everyFiveMinutes();
         $schedule->command('appointmentSetting:renew-cache')->daily();
     }
 

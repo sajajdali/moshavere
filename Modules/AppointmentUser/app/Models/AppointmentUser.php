@@ -249,4 +249,16 @@ class AppointmentUser extends Model
             return $this->agent->mobile;
         }
     }
+    public function isOnline():bool   {
+        if($this->kind == AppointmentUserKindEnum::ONLINE ) {
+            return  true ;
+        }
+        return false ;
+    }
+    public function isAppActive():bool {
+        if($this->status == AppointmentUserStatusEnum::STATUS_SUCCESSFUL){
+            return true ;
+        }
+        return  false ;
+    }
 }

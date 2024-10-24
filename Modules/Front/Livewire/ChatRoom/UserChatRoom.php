@@ -1,18 +1,17 @@
 <?php
 
-namespace Modules\AppointmentUser\Livewire\Admin\Online;
+namespace Modules\Front\Livewire\ChatRoom;
 
 use App\Enum\RouteEnum;
 use Livewire\Component;
 use App\Models\ShortLink;
-use Livewire\Attributes\On;
 use Livewire\Attributes\Url;
-use Livewire\Attributes\Computed;
-use Illuminate\Support\Facades\Cache;
-use Illuminate\Support\Facades\Storage;
 use Livewire\WithFileUploads;
+use Livewire\Attributes\Title;
+use Livewire\Attributes\Layout;
+use Livewire\Attributes\Computed;
+use Illuminate\Support\Facades\Storage;
 use Modules\Setting\Enum\SettingKeyEnum;
-use Modules\AppointmentUser\app\Models\AppointmentUser;
 use Modules\User\app\Notifications\UserSmsNotification;
 use Modules\AppointmentUser\app\Models\AppointmentOnline;
 use Modules\AppointmentUser\Enum\AppointmentUserStatusEnum;
@@ -21,9 +20,10 @@ use Modules\AppointmentUser\app\Models\AppointmentOnlineMessage;
 use Modules\AppointmentUser\Enum\AppointmentOnlineMessageSeenEnum;
 use Modules\AppointmentUser\Enum\AppointmentOnlineMessageTypeEnum;
 use Modules\AppointmentUser\app\Models\AppointmentOnlineMessageFile;
-use Modules\AppointmentUser\app\Notifications\AppointmentUserFeedbackSmsnotification;
 
-class MessageDetail extends Component
+#[Layout('front::layouts.chatromLayout')]
+#[Title('نوبت آنلاین')]
+class UserChatRoom extends Component
 {
     use WithFileUploads;
     #[Url]
@@ -31,6 +31,7 @@ class MessageDetail extends Component
     public array $form = [];
     public array $fetchData = [];
     public ?string $msg = null ;
+
     public function runSearch()
     {
         $this->getMessages();
@@ -85,7 +86,7 @@ class MessageDetail extends Component
             'appointment_online_id' =>  $this->fetchData['appOnline']->id,
             'user_id'               =>  $this->fetchData['user']->id,
             'answer_by'             =>  auth()->user()->id,
-            'type'                  =>  AppointmentOnlineMessageTypeEnum::ANSWER,
+            'type'                  =>  AppointmentOnlineMessageTypeEnum::QUESTION,
             'seen'                  =>  AppointmentOnlineMessageSeenEnum::UNSEEN,
             'body'                  =>  isset($this->form['typedMessage']) ? $this->form['typedMessage'] : '',
         ];
@@ -155,12 +156,7 @@ class MessageDetail extends Component
                     'link_code' => ShortLink::generateShortLinkCode(),
                     'link_url'  => $messageLink,
                 ]);
-                $charoomLink = route('front.user.chatroom',['onlineAppId' => $this->fetchData['appOnline']->id]);
-                $chatRoomLink =  $this->fetchData['appOnline']->shortLink()->create([
-                    'link_code' => ShortLink::generateShortLinkCode(),
-                    'link_url'  => $charoomLink,
-                ]);
-                $this->fetchData['user']->notify(new UserSmsNotification($template, url('/s/' . $shortLink->link_code),url('/s/' . $chatRoomLink->link_code)));
+                $this->fetchData['user']->notify(new UserSmsNotification($template, url('/s/' . $shortLink->link_code)));
             }
             unset($this->form['sendSms']);
         }
@@ -182,6 +178,24 @@ class MessageDetail extends Component
             'form.typedMessage.required_without_all' => 'لطفا پیام را وارد کنید',
         ];
     }
+
+    public function cancelAppointment()
+    {
+        $this->fetchData['appOnline']->update(['status' => AppointmentOnlineStatusEnum::CANCEL]);
+        $this->fetchData['appOnline']->appointmentUser()->update(['status' => AppointmentUserStatusEnum::STATUS_CANCEL]);
+        return redirect()->route('admin.appointment_user.message.detail', ['onlineAppId' => $this->fetchData['appOnline']->id])->with('success', 'نوبت با موفقیت کنسل شد');
+    }
+
+    public function updateComponent() {
+        $this->render();
+    }
+
+    public function updated($properyty) {
+        if($properyty == 'form.capturedPic'){
+            $this->dispatch('picUploade',true);
+        }
+    }
+
     #[Computed]
     public function getMessagesBodys()
     {
@@ -195,79 +209,14 @@ class MessageDetail extends Component
         }
         return $temp;
     }
-    public function ignoreDisaproveModal()
-    {
-        if (isset($this->form['reason'])) {
-            unset($this->form['reason']);
-        }
-    }
-    public function approvedAppointment()
-    {
-        $this->fetchData['appOnline']->appointmentUser()->update(['status' => AppointmentOnlineStatusEnum::ACCEPTED]);
-        $this->fetchData['appOnline']->update(['status' => AppointmentOnlineStatusEnum::ACCEPTED]);
-        return redirect()->route('admin.appointment_user.message.detail', $this->fetchData['appOnline']->id);
-    }
-    public function disaprovedModal()
-    {
 
-        if (isset($this->form['reason'])) {
-            $detail =  $this->fetchData['appOnline']->appointmentUser->details;
-            if (isset($detail)) {
-                $detail = array_merge($detail, [AppointmentUser::DISAPPROVED_DESCRIPTION => $this->form['reason']]);
-            } else {
-                $detail = [AppointmentUser::DISAPPROVED_DESCRIPTION => $this->form['reason']];
-            }
-        }
-        $this->fetchData['appOnline']->appointmentUser()->update(['status' => AppointmentUserStatusEnum::STATUS_CANCEL]);
-        $this->fetchData['appOnline']->update(['status' => AppointmentOnlineStatusEnum::REJECT]);
-
-        return redirect()->route('admin.appointment_user.message.detail', $this->fetchData['appOnline']->id);
-    }
-
-    public function cancelAppointment()
-    {
-        $this->fetchData['appOnline']->update(['status' => AppointmentOnlineStatusEnum::CANCEL]);
-        $this->fetchData['appOnline']->appointmentUser()->update(['status' => AppointmentUserStatusEnum::STATUS_CANCEL]);
-        return redirect()->route('admin.appointment_user.message.detail', ['onlineAppId' => $this->fetchData['appOnline']->id])->with('success', 'نوبت با موفقیت کنسل شد');
-    }
-    public function closeApp()
-    {
-
-        $appointmentUser = $this->fetchData['appOnline']->appointmentUser;
-        $link_code = ShortLink::generateShortLinkCode();
-        $link_url = route('front.feedBack', ['appointmentUser_id' => $appointmentUser->id, 'user_id' => $appointmentUser->user->id]);
-        ShortLink::create([
-            'link_code' => $link_code,
-            'link_url'  => $link_url,
-            'shortlinkable_type'  => 'feedBack',
-            'shortlinkable_id'  => $appointmentUser->id,
-        ]);
-        $smsTemplate = setting(SettingKeyEnum::SMS_FEEDBACK);
-        if (isset($smsTemplate)) {
-            $appointmentUser->notify(new AppointmentUserFeedbackSmsnotification($smsTemplate, $link_code));
-        }
-        Cache::forget('appointmentList.' . $appointmentUser->id);
-
-        $this->fetchData['appOnline']->update(['status' => AppointmentOnlineStatusEnum::COMPLETED_BY_DOCTOR]);
-        $this->fetchData['appOnline']->appointmentUser()->update(['status' => AppointmentUserStatusEnum::STATUS_ONILNE_CLOSED]);
-        return redirect()->route('admin.appointment_user.message.detail', ['onlineAppId' => $this->fetchData['appOnline']->id])->with('success', 'وضعیت نوبت به تمام شده ، تغییر پیدا کرد');
-    }
-    public function updateComponent() {
-        $this->render();
-    }
-    public function updated($properyty) {
-        if($properyty == 'form.capturedPic'){
-            $this->dispatch('picUploade',true);
-        }
-    }
-    public function reactivateChat() {
-        $this->fetchData['appOnline']->update(['status' => AppointmentOnlineStatusEnum::REACTIVATED]);
-        $this->msg = 'چت با موفقیت فعال شد';
-        return $this->render();
-    }
     public function mount()
     {
         $this->fetchData['appOnline'] = AppointmentOnline::find(request()->route('onlineAppId'));
+        if($this->fetchData['appOnline']?->user->id != auth()->user()->id ){
+            return abort(404);
+        }
+        // $this->fetchData['appOnline'] = AppointmentOnline::first();
         $this->fetchData['messages']  = $this->fetchData['appOnline']->messages;
         $this->fetchData['appOnline']->messages()
             ->where('type', AppointmentOnlineMessageTypeEnum::QUESTION)
@@ -275,8 +224,9 @@ class MessageDetail extends Component
             ->update(['seen' => AppointmentOnlineMessageSeenEnum::SEEN]);
         $this->fetchData['user']      =  $this->fetchData['appOnline']->user;
     }
+
     public function render()
     {
-        return view('appointmentuser::livewire.admin.online.message-detail');
+        return view('front::livewire.chat-room.user-chat-room');
     }
 }

@@ -12,9 +12,7 @@ class UserSmsNotification extends Notification implements ShouldQueue
 {
     use Queueable;
 
-    public function __construct(private string $template,public string $link)
-    {
-    }
+    public function __construct(private string $template, public string $link, public ?string $chatRoomLink = '') {}
 
     /**
      * Create a new notification instance.
@@ -42,15 +40,17 @@ class UserSmsNotification extends Notification implements ShouldQueue
      */
     public function toArray(mixed $notifiable): array
     {
-
-
+        $params = [
+            $notifiable->full_name,
+            $this->link,
+        ];
+        if (isset($this->chatRoomLink) && ! empty($this->chatRoomLink)) {
+            $params[] = $this->chatRoomLink;
+        }
         return [
             'template' => $this->template,
             'receptor' => $notifiable->mobile,
-            'params' => [
-                $notifiable->full_name,
-                $this->link ,
-            ],
+            'params' => $params
         ];
     }
 }

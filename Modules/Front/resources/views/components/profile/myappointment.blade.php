@@ -46,10 +46,10 @@
                                     </p>
                                 </div>
                                 <div class="flex flex-col items-end gap-4">
-                                    @if($appointmentUser->isOnline())
-                                    <button class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded-lg shadow-md transition duration-300 ease-in-out">
+                                    @if($appointmentUser->isOnline() )
+                                    <a href="{{route('front.user.chatroom',['onlineAppId' => $appointmentUser->online->first()->id ])}}" class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded-lg shadow-md transition duration-300 ease-in-out">
                                         ورود به چت
-                                    </button>
+                                    </a>
                                     @endif
                                     <p class="text-secondary-400 text-sm">شماره نظام پزشکی:
                                         {{ $appointmentUser->doctor->dr_licence_number }}</p>

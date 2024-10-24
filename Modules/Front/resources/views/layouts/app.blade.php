@@ -24,8 +24,8 @@
     <title>{{ setting(Modules\Setting\Enum\SettingKeyEnum::SITE_TITLE) }} @isset($title)
             | {{ $title }}
         @endisset </title>
-    @include('front::layouts.components.styles')
-    @stack('styles')
+        @include('front::layouts.components.styles')
+        @stack('styles')
     @livewireStyles
 </head>
 

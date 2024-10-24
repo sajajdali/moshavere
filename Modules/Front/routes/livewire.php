@@ -5,6 +5,7 @@ use Modules\Front\Livewire\Auth\User\Login;
 use Modules\Front\Livewire\Payment\Invoice;
 use Modules\Front\Livewire\Auth\User\Logout;
 use Modules\Front\Livewire\FeedBack\Questions;
+use Modules\Front\Livewire\ChatRoom\UserChatRoom;
 use Modules\Front\Livewire\Auth\User\Registration;
 use Modules\Front\Livewire\AboutUs\AboutUsLiveWire;
 use Modules\Front\Livewire\Auth\Doctor\DoctorLogin;
@@ -52,4 +53,5 @@ Route::middleware(['web', 'auth'])->name('front.')->group(function () {
     Route::get('/logout', Logout::class)->name('logout');
     Route::get('/registration', Registration::class)->middleware('throttle:20,1')->name('user.registration');
     Route::get('/profile', UserProfileLivewire::class)->middleware('throttle:20,1')->name('user.profile');
+    Route::get('/chatroom/{onlineAppId}', UserChatRoom::class)->middleware('throttle:20,1')->name('user.chatroom');
 });

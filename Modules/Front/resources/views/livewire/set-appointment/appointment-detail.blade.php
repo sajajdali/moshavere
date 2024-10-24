@@ -187,9 +187,9 @@
                             </a>
                         @endisset
                         @if(! disableUi() &&  $fetchData['app']->isOnline() && $fetchData['app']->isAppActive())
-                        <button class="bg-emerald-500 hover:bg-lime-700 text-white font-bold py-2 px-4 rounded-lg shadow-md transition duration-300 ease-in-out">
+                        <a href="{{route('front.user.chatroom',['onlineAppId' => $fetchData['app']->online->first()->id])}}" class="bg-emerald-500 hover:bg-lime-700 text-white font-bold py-2 px-4 rounded-lg shadow-md transition duration-300 ease-in-out">
                           ورود به چت
-                        </button>
+                        </a>
                         @endif
                     </h3>
                     <div class="border-card space-y-4">

@@ -1,4 +1,11 @@
 <div>
+    <div wire:loading>
+        <div class="loading-overlay d-flex align-items-center justify-content-center">
+            <div class="spinner-border text-primary" role="status">
+                <span class="sr-only">Loading...</span>
+            </div>
+        </div>
+    </div>
     <div class="page-header">
         <div>
             <h1 class="page-title">لیست نوبت های ثبت شده</h1>
@@ -9,19 +16,19 @@
         @endcan
     </div>
     @include('admin::layouts.components.alert')
-    @isset($msg)
+    @if (isset($msg) && !empty($msg))
         <div class="col-md-12 alert alert-success fade show" role="alert">
             <i class="fa fa-check-circle-o me-2" aria-hidden="true"></i>
             {{ $msg }}
         </div>
-    @endisset
+    @endif
     @error('exelError')
         <div class="col-md-12 alert alert-danger fade show" role="alert">
             <i class="fa fa-remove me-2" aria-hidden="true"></i>
             {{ $message }}
         </div>
     @enderror
-    <div class="row row-sm" wire:key='{{ \uniqid() }}'  wire:loading.class="op-0-3">
+    <div class="row row-sm" wire:key='{{ \uniqid() }}' wire:loading.class="op-0-3">
         <div class="col-lg-12">
             <div class="card custom-card">
                 <div class="card-header d-flex justify-content-between border-bottom">
@@ -143,10 +150,11 @@
                                     isset($search['appointment_end_date'])) ) show @endif"
                                 id="appointmentCollapsSearch" wire:ignore.self>
                                 <div class="col-md-6">
-                                    <label for="search-appointment_id" class="form-label"><strong>ایدی</strong></label>
+                                    <label for="search-appointment_id"
+                                        class="form-label"><strong>ایدی</strong></label>
                                     <input class="form-control" id="search-appointment_id"
-                                        wire:model="search.appointment_id"
-                                        placeholder="آیدی نوبت" type="text">
+                                        wire:model="search.appointment_id" placeholder="آیدی نوبت"
+                                        type="text">
 
                                 </div>
                                 <div class="col-md-6">
@@ -251,14 +259,14 @@
                             <div class="col-12 col-md-8">
                                 <hr class="my-4">
                             </div>
-                            <div class="collapse row @if(isset($search['setterAppointment'])) show @endif" id="settAppointmentCollaps">
+                            <div class="collapse row @if (isset($search['setterAppointment'])) show @endif"
+                                id="settAppointmentCollaps">
                                 <div class="col-md-12">
                                     <div class="form-group">
                                         <label class="form-label"><strong>ثبت کننده را انتخاب کنید</strong></label>
                                         <select wire:model='search.setterAppointment'
                                             class="form-control select2-show-search form-select"
-                                            data-id="setterAppointment"
-                                            data-placeholder="انتخاب کنید..">
+                                            data-id="setterAppointment" data-placeholder="انتخاب کنید..">
                                             <option label="انتخاب کنید.."></option>
                                             @if (isset($fetchData['appointmentSetter']))
                                                 @foreach ($fetchData['appointmentSetter'] as $key => $role)
@@ -308,7 +316,8 @@
                             <div class="col-12 col-md-9">
                                 <hr class="my-4">
                             </div>
-                            <div class="collapse row @if(isset($search['Doc_id'])) show @endif" id="doctorSectionFillter">
+                            <div class="collapse row @if (isset($search['Doc_id'])) show @endif"
+                                id="doctorSectionFillter">
                                 <div class="row mb-4 ps-5">
                                     <div class="col-12">
                                         <div class="form-group">
@@ -592,6 +601,13 @@
                 });
                 feedBackModal.show();
             }, 1000);
+        });
+        Livewire.on('dateFormatWrong', function() {
+            setTimeout(() => {
+                $('html, body').animate({
+                    scrollTop: 0
+                }, 100);
+            }, 50);
         });
         Livewire.on('exelError', function() {
             setTimeout(() => {

@@ -203,7 +203,6 @@ class ShowAvailableDayForDoctor extends Component
         if (!isset($appointmentSetting)) {
             $appointmentSetting = AppointmentSetting::activeSetting()->where('user_id', $this->fetchData['doc']->id)->first();
         }
-        Cache::forget('appointmentList.' . $appointmentSetting->id);
         if (isset($this->fetchData['segment_time'])) {
             // if segment exists , genereate list of appointment
             $details = [];

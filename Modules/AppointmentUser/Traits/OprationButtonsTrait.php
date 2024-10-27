@@ -5,6 +5,7 @@ namespace Modules\AppointmentUser\Traits;
 use App\Models\ShortLink;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Cache;
+use Modules\AppointmentUser\App\Jobs\GenerateAppointmentCache;
 use Modules\Setting\Enum\SettingKeyEnum;
 use Modules\AppointmentUser\app\Models\AppointmentUser;
 use Modules\AppointmentUser\app\Models\AppointmentOnline;
@@ -24,7 +25,8 @@ trait OprationButtonsTrait
     {
         $app = AppointmentUser::find($id);
         $app->update(['type' =>  AppointmentUserTypeEnum::BETWEEN_PATIENTS]);
-        Cache::forget('appointmentList.' . $app->setting->id);
+        GenerateAppointmentCache::dispatch($app->setting);
+
         $this->sendNotification($app, 'وضعیت نوبت شما به بین مریض تغییر پیدا کرد');
         return  $this->redirectToPage('نوبت به بین مریض تغییر پیدا کرد');
     }
@@ -39,7 +41,7 @@ trait OprationButtonsTrait
             }
         }
 
-        Cache::forget('appointmentList.' . $app->setting->id);
+        GenerateAppointmentCache::dispatch($app->setting);
         $this->sendNotification($app, 'وضعیت نوبت شما به بین مریض تغییر پیدا کرد');
         event(new CancelAppointmentEvent($app));
         return  $this->redirectToPage('نوبت با موفقیت کنسل شد');
@@ -50,7 +52,7 @@ trait OprationButtonsTrait
 
         $app = AppointmentUser::find($id);
         $app->delete();
-        Cache::forget('appointmentList.' . $app->setting->id);
+        GenerateAppointmentCache::dispatch($app->setting);
         $this->redirectToPage('نوبت با موفقیت حذف شد');
     }
     public function ApprovemonitoringAppointment($id)
@@ -60,7 +62,7 @@ trait OprationButtonsTrait
         $Appoointment_dedLine = now()->addHours((int)$deadLine_Time);
         $app->update(['status' => AppointmentUserStatusEnum::STATUS_WAIT_PAYMENT, 'deadline_at' => $Appoointment_dedLine]);
         $app->notify(new AppointmentSmsNotification(setting(SettingKeyEnum::SMS_APPROVED_MONITORING_APPOINTMENT)));
-        Cache::forget('appointmentList.' . $app->setting->id);
+        GenerateAppointmentCache::dispatch($app->setting);
         $this->sendNotification($app, 'نوبت شما تایید شد');
         $this->redirectToPage('نوبت با موفقیت تایید شد');
     }
@@ -68,7 +70,7 @@ trait OprationButtonsTrait
     {
         $app = AppointmentUser::find($id);
         $app->update(['status' => AppointmentUserStatusEnum::STATUS_DISAPPROVED, 'deadline_at' => null]);
-        Cache::forget('appointmentList.' . $app->setting->id);
+        GenerateAppointmentCache::dispatch($app->setting);
         $this->redirectToPage('نوبت با موفقیت عدم تایید شد');
     }
     public function disApprovemonitoringAppointmentWithSms($id)
@@ -76,7 +78,7 @@ trait OprationButtonsTrait
         $app = AppointmentUser::find($id);
         $app->update(['status' => AppointmentUserStatusEnum::STATUS_DISAPPROVED, 'deadline_at' => null]);
         $app->notify(new AppointmentSmsNotification(setting(SettingKeyEnum::SMS_DIS_APPROVED_MONITORING_APPOINTMENT)));
-        Cache::forget('appointmentList.' . $app->setting->id);
+        GenerateAppointmentCache::dispatch($app->setting);
         $this->redirectToPage('نوبت با موفقیت عدم تایید شد');
     }
     public function ApproveOnlineAppointment($id)
@@ -94,7 +96,7 @@ trait OprationButtonsTrait
         }
         $onlineApp?->update(['status' => AppointmentOnlineStatusEnum::ACCEPTED, 'details' => $detail]);
         $app->update(['status' => AppointmentUserStatusEnum::STATUS_SUCCESSFUL]);
-        Cache::forget('appointmentList.' . $app->setting->id);
+        GenerateAppointmentCache::dispatch($app->setting);
         $this->sendNotification($app, 'نوبت شما تایید شد');
         $this->redirectToPage('نوبت با موفقیت تایید شد');
     }
@@ -104,7 +106,7 @@ trait OprationButtonsTrait
         $this->fetchData['disapproveId'] = $id;
         $this->dispatch('lunchModal', true);
 
-        Cache::forget('appointmentList.' . $appointmentUser->setting->id);
+        GenerateAppointmentCache::dispatch($appointmentUser->setting);
     }
     public function disaprovedModal()
     {
@@ -130,7 +132,7 @@ trait OprationButtonsTrait
         } catch (\Exception $th) {
             return redirect()->route('admin.appointment_user.list')->with('error', 'خطا در به روز رسانی');
         }
-        Cache::forget('appointmentList.' . $app->setting->id);
+        GenerateAppointmentCache::dispatch($app->setting);
         $this->redirectToPage('وضعیت نوبت به عدم تایید ، تغییر پیدا کرد');
     }
     public function ignoreDisaproveModal()
@@ -142,7 +144,8 @@ trait OprationButtonsTrait
     {
         $app = AppointmentUser::find($id);
         $date = verta($app->date_visit)->format('Y-m-d');
-        Cache::forget('appointmentList.' . $app->setting->id);
+        GenerateAppointmentCache::dispatch($app->setting);
+
         $this->sendNotification($app, 'ساعت نوبت شما تغییر کرده است');
         return redirect()->route(
             'admin.appointment.add.specificday',
@@ -159,13 +162,13 @@ trait OprationButtonsTrait
     {
         $this->sendfeedBackLink($appointmentUser);
         $this->changeAttendedStatus($appointmentUser, true);
-        Cache::forget('appointmentList.' . $appointmentUser->setting->id);
+        GenerateAppointmentCache::dispatch($appointmentUser->setting);
         $this->redirectToPage('وضعیت نوبت به کاربر حضور پیدا کرده تغییر کرد');
     }
     public function userNotAttenedToAppointment(AppointmentUser $appointmentUser)
     {
         $this->changeAttendedStatus($appointmentUser, false);
-        Cache::forget('appointmentList.' . $app->setting->id);
+        GenerateAppointmentCache::dispatch($appointmentUser->setting);
         $this->redirectToPage('وضعیت نوبت به کاربر حضور پیدا نکرده تغییر کرد');
     }
     protected function changeAttendedStatus(AppointmentUser $appointmentUser, $status)
@@ -177,7 +180,7 @@ trait OprationButtonsTrait
         } else {
             $new_details = $user_attended;
         }
-        Cache::forget('appointmentList.' . $appointmentUser->setting->id);
+        GenerateAppointmentCache::dispatch($appointmentUser->setting);
         $appointmentUser->update(['details' => $new_details]);
     }
     protected function sendfeedBackLink(AppointmentUser $appointmentUser)
@@ -194,7 +197,7 @@ trait OprationButtonsTrait
         if (isset($smsTemplate)) {
             $appointmentUser->notify(new AppointmentUserFeedbackSmsnotification(template: $smsTemplate, link_code: $link_code));
         }
-        Cache::forget('appointmentList.' . $appointmentUser->id);
+        GenerateAppointmentCache::dispatch($appointmentUser->id);
     }
     // TODO :: refund
     protected function refuntPaiedApp($model)
@@ -247,7 +250,7 @@ trait OprationButtonsTrait
                 if ($smsTemplate) {
                     $appointmentUser->notify(new AppointmentSmsNotification($smsTemplate));
                 }
-                Cache::forget('appointmentList.' . $appointmentUser->id);
+                GenerateAppointmentCache::dispatch($appointmentUser->setting);
                 $this->redirectToPage('وضعیت نوبت به کاربر حضور پیدا نکرده تغییر کرد');
             }
             $this->sendNotification($appointmentUser, 'وجه پرداختی به جساب شما بازگشت داده شد');

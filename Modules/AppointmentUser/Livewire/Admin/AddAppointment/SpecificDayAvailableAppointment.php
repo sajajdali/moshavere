@@ -5,6 +5,7 @@ namespace Modules\AppointmentUser\Livewire\Admin\AddAppointment;
 use Carbon\Carbon;
 use Livewire\Component;
 use Livewire\Attributes\On;
+use Modules\AppointmentUser\App\Jobs\GenerateAppointmentCache;
 use Modules\User\Entities\User;
 use Livewire\Attributes\Computed;
 use Illuminate\Support\Facades\Cache;
@@ -191,7 +192,9 @@ class SpecificDayAvailableAppointment extends Component
         $appUser->update([
             'type' => AppointmentUserTypeEnum::BETWEEN_PATIENTS,
         ]);
-        Cache::forget('appointmentList.' . $this->fetchData['appId']);
+        $appointmentSetting = AppointmentSetting::find($this->fetchData['appId']);
+        GenerateAppointmentCache::dispatch($appointmentSetting);
+
         return redirect()->route(
             'admin.appointment.add.specificday',
             [

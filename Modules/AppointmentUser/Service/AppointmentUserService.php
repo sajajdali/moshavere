@@ -8,6 +8,7 @@ use App\Enum\RouteEnum;
 use App\Models\ShortLink;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Cache;
+use Modules\AppointmentUser\App\Jobs\GenerateAppointmentCache;
 use Modules\Service\app\Models\Service;
 use Modules\Setting\Enum\SettingKeyEnum;
 use Modules\Api\Transformers\UserResource;
@@ -848,11 +849,8 @@ class AppointmentUserService
         }
         event(new StoreAppointmentEvent($appointmentUser));
 
-        Cache::forget('appointmentList.' . $appointmentSetting->id);
-        Cache::rememberForever('appointmentList.' . $appointmentSetting->id, function () use ($appointmentSetting) {
-            $appointmentSetting->update(['updated_log_at' => \now()]);
-            return app('AppointmentUserService')->listAppointments($appointmentSetting);
-        });
+        GenerateAppointmentCache::dispatch($appointmentSetting);
+
         $trackingUrl = route('front.setAppointment.detail', ['tracking_code' => $appointmentUser->tracking_code]);
         return [
             'status' => true,

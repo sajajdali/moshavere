@@ -7,6 +7,7 @@ use Livewire\Component;
 use Livewire\Attributes\Title;
 use Livewire\Attributes\Layout;
 use Livewire\Attributes\Locked;
+use Modules\AppointmentUser\App\Jobs\GenerateAppointmentCache;
 use Modules\User\Entities\User;
 use Modules\Place\app\Models\Place;
 use Illuminate\Support\Facades\Cache;
@@ -205,7 +206,9 @@ class Checkout extends Component
 
         $storeAppointment = app('AppointmentUserService')->storeAppointment($this->fetchData['appSetting'], $userModelAppointment, $appointmentModel, $detail);
         if ($storeAppointment['status']) {
-            Cache::forget('appointmentList.' . $this->fetchData['appSetting']->id);
+            $appointmentSetting = AppointmentSetting::find($this->fetchData['appSetting']->id);
+            GenerateAppointmentCache::dispatch($appointmentSetting);
+
             return redirect()->route('front.setAppointment.detail', ['tracking_code' => $storeAppointment['detail']['tracking_code']]);
         } else {
             $this->err = $storeAppointment['message'];

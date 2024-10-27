@@ -11,6 +11,7 @@ use Livewire\Attributes\Computed;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Storage;
 use Livewire\WithFileUploads;
+use Modules\AppointmentUser\App\Jobs\GenerateAppointmentCache;
 use Modules\Setting\Enum\SettingKeyEnum;
 use Modules\AppointmentUser\app\Models\AppointmentUser;
 use Modules\User\app\Notifications\UserSmsNotification;
@@ -246,7 +247,7 @@ class MessageDetail extends Component
         if (isset($smsTemplate)) {
             $appointmentUser->notify(new AppointmentUserFeedbackSmsnotification($smsTemplate, $link_code));
         }
-        Cache::forget('appointmentList.' . $appointmentUser->id);
+        GenerateAppointmentCache::dispatch($appointmentUser->setting);
 
         $this->fetchData['appOnline']->update(['status' => AppointmentOnlineStatusEnum::COMPLETED_BY_DOCTOR]);
         $this->fetchData['appOnline']->appointmentUser()->update(['status' => AppointmentUserStatusEnum::STATUS_ONILNE_CLOSED]);

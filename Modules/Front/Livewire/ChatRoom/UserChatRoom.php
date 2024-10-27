@@ -85,7 +85,7 @@ class UserChatRoom extends Component
         $model = [
             'appointment_online_id' =>  $this->fetchData['appOnline']->id,
             'user_id'               =>  $this->fetchData['user']->id,
-            'answer_by'             =>  auth()->user()->id,
+            'answer_by'             =>  null,
             'type'                  =>  AppointmentOnlineMessageTypeEnum::QUESTION,
             'seen'                  =>  AppointmentOnlineMessageSeenEnum::UNSEEN,
             'body'                  =>  isset($this->form['typedMessage']) ? $this->form['typedMessage'] : '',
@@ -109,7 +109,7 @@ class UserChatRoom extends Component
 
             $fileModel = [
                 'user_id' => $this->fetchData['user']->id,
-                'answer_by' => auth()->user()->id,
+                'answer_by' => null,
                 'fk_id' => $AOM->id,
                 'original_name' => $fileName,
                 'server_name' => $fileName,
@@ -131,7 +131,7 @@ class UserChatRoom extends Component
             $fileDisk = 'public';
             $fileModel = [
                 'user_id' => $this->fetchData['user']->id,       // Set the user ID
-                'answer_by' => auth()->user()->id,              // Authenticated user (answerer)
+                'answer_by' => null,              // Authenticated user (answerer)
                 'fk_id' => $AOM->id,                            // Foreign key to appointment/message
                 'original_name' => $fileName,                   // Original file name
                 'server_name' => $fileName,                     // Name used in storage (same in this case)
@@ -144,32 +144,10 @@ class UserChatRoom extends Component
             AppointmentOnlineMessageFile::create($fileModel);
             unset($this->form['capturedPic']);
         }
-        $notificationMessage =  isset($this->form['typedMessage']) ? substr($this->form['typedMessage'], 0, 50) : 'یک پیام جدید دارید';
         unset($this->form['typedMessage']);
         $this->addError('success', 'پیام با موفقیت ارسال شد');
         $this->fetchData['messages'] = $this->fetchData['appOnline']->messages;
-        if (isset($this->form['sendSms']) && $this->form['sendSms'] == true) {
-            $template = setting(SettingKeyEnum::SMS_FOR_SEND_MESSAGE_IN_CHATS);
-            if (isset($template)) {
-                $messageLink = 'https://webapp.mata-app.com' . (\App\Enum\RouteEnum::ONLINE_MESSAGE->getLink($this->fetchData['appOnline']->id));
-                $shortLink =  $this->fetchData['appOnline']->shortLink()->create([
-                    'link_code' => ShortLink::generateShortLinkCode(),
-                    'link_url'  => $messageLink,
-                ]);
-                $this->fetchData['user']->notify(new UserSmsNotification($template, url('/s/' . $shortLink->link_code)));
-            }
-            unset($this->form['sendSms']);
-        }
-        try {
-            $this->fetchData['user']->notify(new \Modules\User\Notifications\UserMessageNotification(
-                title: "پیام جدید برای نوبت آنلاین!",
-                excerpt: $notificationMessage,
-                message: '',
-                link: \App\Enum\RouteEnum::CHAT->getLink($this->fetchData['appOnline']->id),
-            ));
-        } catch (\Throwable $th) {
-        }
-        $this->fetchData['appOnline']->update(['status' => AppointmentOnlineStatusEnum::ANSWER_BY_DOCTOR]) ;
+        $this->fetchData['appOnline']->update(['status' => AppointmentOnlineStatusEnum::REPLY_BY_USER]) ;
         $this->dispatch('sendMessage', true);
     }
     public function messages()
@@ -213,9 +191,9 @@ class UserChatRoom extends Component
     public function mount()
     {
         $this->fetchData['appOnline'] = AppointmentOnline::find(request()->route('onlineAppId'));
-        if($this->fetchData['appOnline']?->user->id != auth()->user()->id ){
-            return abort(404);
-        }
+        // if($this->fetchData['appOnline']?->user->id != auth()->user()->id ){
+        //     return abort(404);
+        // }
         // $this->fetchData['appOnline'] = AppointmentOnline::first();
         $this->fetchData['messages']  = $this->fetchData['appOnline']->messages;
         $this->fetchData['appOnline']->messages()

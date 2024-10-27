@@ -11,6 +11,12 @@ a.btn__blue--round-full-between {
   @apply flex items-center justify-between gap-3 py-2 px-4 bg-primary-main border-2 border-primary-main text-white rounded-full hover:bg-primary-tint-300 transition-colors;
 }
 
+button.btn__green--round-full-between,
+input[type="button"].btn__green--round-full-between,
+a.btn__green--round-full-between {
+  @apply flex items-center justify-between gap-3 py-2 px-4 bg-teal-600 border-2 border-teal-400 text-white rounded-full hover:bg-teal-800 transition-colors;
+}
+
 button.btn__blue,
 input[type="button"].btn__blue,
 a.btn__blue {

@@ -238,8 +238,8 @@
                                         @endforeach
                                     @endforeach
                                 @else
-                                    <div class="col-md-12 alert alert-warning fade show" role="alert">
-                                        پیامی یافت نشد
+                                    <div class="col-md-12 alert alert-primary fade show" role="alert">
+                                        لطفا پیام خود را بنویسید تا در اولین فرصت به آن پاسخ داده شود.
                                     </div>
                                 @endif
                             </div>
@@ -284,7 +284,7 @@
                                     <input type="file" accept="image/*" capture="environment" id="cameraInput"
                                         wire:model='form.capturedPic' style="display:none;" />
                                 </div>
-                                <textarea rows="3" class="form-control ms-1 mt-2 @error('form.typedMessage') is-invalid @enderror"
+                                <textarea  rows="3" class="form-control ms-1 mt-2 @error('form.typedMessage') is-invalid @enderror"
                                     wire:model='form.typedMessage'
                                     placeholder="@error('form.typedMessage') {{ $message }} @else متن خود را یادداشت کنید @enderror"></textarea>
                                 <div class="d-flex flex-column align-items-center mt-5 ms-1 ms-sm-3">

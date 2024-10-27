@@ -352,11 +352,25 @@
                         </div>
                         <button type="button" wire:click='reserveAppointment'
                             @if (!$fetchData['is_app_available']) disabled @endif class="btn__blue--round-full-between">
+                            @if ($doc->hasOnlineApp())
+                            <p>دریافت نوبت حضوری دکتر {{ $doc->full_name }}</p>
+                            @else
                             <p>دریافت نوبت دکتر {{ $doc->full_name }}</p>
+                            @endif
                             <svg class="w-6 h-6" xmlns="http://www.w3.org/2000/svg">
                                 <use xlink:href="#sprite-arrow-left-circle" />
                             </svg>
                         </button>
+                        @if ($doc->hasOnlineApp())
+                            <button type="button" wire:click='reserveAppointment("online")'
+                                @if (!$fetchData['is_app_available']) disabled @endif
+                                class="btn__green--round-full-between">
+                                <p>دریافت نوبت آنلاین (گفت و گو محور) {{ $doc->full_name }}</p>
+                                <svg class="w-6 h-6" xmlns="http://www.w3.org/2000/svg">
+                                    <use xlink:href="#sprite-arrow-left-circle" />
+                                </svg>
+                            </button>
+                        @endif
                         @if (!$fetchData['is_app_available'])
                             <div class="error_badge">
                                 <svg class="w-6 h-6" xmlns="http://www.w3.org/2000/svg">
@@ -402,10 +416,10 @@
                 @if (isset($fetchData['gallery']) && !empty($fetchData['gallery']))
                     <div class="bg-white p-4 flex flex-col gap-4 ">
                         @if (setting(\Modules\Setting\Enum\SettingKeyEnum::APPOINTMENT_GALLERY_TITLE))
-                        <p class="font-bold">
-                            {{ setting(\Modules\Setting\Enum\SettingKeyEnum::APPOINTMENT_GALLERY_TITLE) }}
-                            
-                        </p>
+                            <p class="font-bold">
+                                {{ setting(\Modules\Setting\Enum\SettingKeyEnum::APPOINTMENT_GALLERY_TITLE) }}
+
+                            </p>
                         @endif
                         @if (setting(\Modules\Setting\Enum\SettingKeyEnum::APPOINTMENT_GALLERY_BODY))
                             {{ setting(\Modules\Setting\Enum\SettingKeyEnum::APPOINTMENT_GALLERY_BODY) }}

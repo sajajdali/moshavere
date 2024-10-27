@@ -116,6 +116,7 @@ class AppointmentUserService
         // Fetch appointments for the week
         $doctorId = $appointmentSetting->user->id;
         $appointments = AppointmentUser::where('doctor_id', $doctorId)
+            ->where('kind' , AppointmentUserKindEnum::IN_PERSION)
             ->whereBetween('date_visit', [$startDate, $endDate])
             ->orderBy('start_time')
             ->get();

@@ -1,6 +1,6 @@
 <?php
 
-namespace Modules\AppointmentUser\App\Jobs;
+namespace Modules\AppointmentUser\app\Jobs;
 use Carbon\Carbon;
 use Illuminate\Bus\Queueable;
 use Illuminate\Support\Facades\Log;

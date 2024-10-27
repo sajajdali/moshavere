@@ -5,7 +5,7 @@ namespace Modules\Front\Livewire\SetAppointment;
 use Livewire\Component;
 use App\Enum\ActiveEnum;
 use Livewire\Attributes\Title;
-use Modules\AppointmentUser\App\Jobs\GenerateAppointmentCache;
+use Modules\AppointmentUser\app\Jobs\GenerateAppointmentCache;
 use Shetabit\Multipay\Invoice;
 use Livewire\Attributes\Layout;
 use Livewire\Attributes\Locked;

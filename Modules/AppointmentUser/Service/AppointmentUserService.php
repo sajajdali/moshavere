@@ -8,7 +8,7 @@ use App\Enum\RouteEnum;
 use App\Models\ShortLink;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Cache;
-use Modules\AppointmentUser\App\Jobs\GenerateAppointmentCache;
+use Modules\AppointmentUser\app\Jobs\GenerateAppointmentCache;
 use Modules\Service\app\Models\Service;
 use Modules\Setting\Enum\SettingKeyEnum;
 use Modules\Api\Transformers\UserResource;

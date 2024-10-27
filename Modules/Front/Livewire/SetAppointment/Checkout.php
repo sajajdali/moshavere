@@ -7,7 +7,7 @@ use Livewire\Component;
 use Livewire\Attributes\Title;
 use Livewire\Attributes\Layout;
 use Livewire\Attributes\Locked;
-use Modules\AppointmentUser\App\Jobs\GenerateAppointmentCache;
+use Modules\AppointmentUser\app\Jobs\GenerateAppointmentCache;
 use Modules\User\Entities\User;
 use Modules\Place\app\Models\Place;
 use Illuminate\Support\Facades\Cache;
@@ -124,24 +124,24 @@ class Checkout extends Component
             return true;
         }
         $user_selected_date = Carbon::createFromTimestamp($this->fetchData['app_start_time'])->toDateString();
-        if( $this->fetchData['isOnline']) {
-            $kind = AppointmentUserKindEnum::ONLINE ;
-        }else{
-            $kind = AppointmentUserKindEnum::IN_PERSION ;
+        if ($this->fetchData['isOnline']) {
+            $kind = AppointmentUserKindEnum::ONLINE;
+        } else {
+            $kind = AppointmentUserKindEnum::IN_PERSION;
         }
         // Check if user has an appointment on the selected date
         $existingAppointment = $this->user->appointments()
-        ->whereDate('date_visit', $user_selected_date)
-        ->where('kind',$kind)
-        ->whereIn('status', [
-            AppointmentUserStatusEnum::STATUS_PENDING,
-            AppointmentUserStatusEnum::STATUS_SUCCESSFUL,
-            AppointmentUserStatusEnum::STATUS_WAIT_PAYMENT,
-            AppointmentUserStatusEnum::STATUS_ATTENDED,
-            AppointmentUserStatusEnum::STATUS_NOT_ATTENDED,
-            AppointmentUserStatusEnum::STATUS_MONITORING,
-            AppointmentUserStatusEnum::STATUS_ONILNE_CLOSED,
-        ])->exists();
+            ->whereDate('date_visit', $user_selected_date)
+            ->where('kind', $kind)
+            ->whereIn('status', [
+                AppointmentUserStatusEnum::STATUS_PENDING,
+                AppointmentUserStatusEnum::STATUS_SUCCESSFUL,
+                AppointmentUserStatusEnum::STATUS_WAIT_PAYMENT,
+                AppointmentUserStatusEnum::STATUS_ATTENDED,
+                AppointmentUserStatusEnum::STATUS_NOT_ATTENDED,
+                AppointmentUserStatusEnum::STATUS_MONITORING,
+                AppointmentUserStatusEnum::STATUS_ONILNE_CLOSED,
+            ])->exists();
         if ($existingAppointment) {
             $this->err = 'شما یک نوبت فعال در این روز دارید!';
             return false;
@@ -171,10 +171,10 @@ class Checkout extends Component
         } else {
             $oprator = null;
         }
-        if( $this->fetchData['isOnline']) {
-            $kind = AppointmentUserKindEnum::ONLINE ;
-        }else{
-            $kind = AppointmentUserKindEnum::IN_PERSION ;
+        if ($this->fetchData['isOnline']) {
+            $kind = AppointmentUserKindEnum::ONLINE;
+        } else {
+            $kind = AppointmentUserKindEnum::IN_PERSION;
         }
         // appointment model
         $appointmentModel = new AppointmentModel(
@@ -222,7 +222,7 @@ class Checkout extends Component
         $this->fetchData['app_start_time']  =  request()->input('start_time');
         $this->fetchData['app_end_time']    =  request()->input('end_time');
         $isOnlineRoute       =  request()->input('isOnline');
-        $this->fetchData['isOnline'] = (bool)$isOnlineRoute ;
+        $this->fetchData['isOnline'] = (bool)$isOnlineRoute;
         $doc =  request()->input('doctor_id');
         $place =  request()->input('place_id');
         $service =  request()->input('service_id');

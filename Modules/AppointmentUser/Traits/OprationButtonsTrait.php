@@ -5,7 +5,7 @@ namespace Modules\AppointmentUser\Traits;
 use App\Models\ShortLink;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Cache;
-use Modules\AppointmentUser\App\Jobs\GenerateAppointmentCache;
+use Modules\AppointmentUser\app\Jobs\GenerateAppointmentCache;
 use Modules\Setting\Enum\SettingKeyEnum;
 use Modules\AppointmentUser\app\Models\AppointmentUser;
 use Modules\AppointmentUser\app\Models\AppointmentOnline;

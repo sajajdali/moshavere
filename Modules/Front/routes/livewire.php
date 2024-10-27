@@ -17,6 +17,7 @@ use Modules\Front\Livewire\Profile\UserProfileLivewire;
 use Modules\Front\Livewire\Auth\Doctor\DoctorRegistration;
 use Modules\Front\Livewire\SetAppointment\AppointmentDetail;
 use Modules\Front\Livewire\DoctorProfile\DoctorProfileLivewire;
+use Modules\Front\Livewire\SetAppointment\OnlineAppointmentdescription;
 use Modules\Front\Livewire\SetAppointment\ShowAvailableDayForDoctor;
 
 /*
@@ -41,6 +42,7 @@ Route::middleware(['web'])->group( function () {
     Route::get('/aboutus', AboutUsLiveWire::class)->name('front.aboutUs');
     Route::get('/contact-us', ContactUsLivewire::class)->name('front.contactUs');
     Route::get('/appointment/days', ShowAvailableDayForDoctor::class)->name('front.setAppointment.days');
+    Route::get('/appointment/online', OnlineAppointmentdescription::class)->name('front.setAppointment.online.description');
     Route::get('/appointment/checkout', Checkout::class)->name('setAppointment.checkout');
     Route::get('/appointment/detail/{tracking_code}', AppointmentDetail::class)->name('front.setAppointment.detail');
     Route::get('/doctor/profile/{doctor_id}/{doctor_name}', DoctorProfileLivewire::class)->name('front.doctor.profile');

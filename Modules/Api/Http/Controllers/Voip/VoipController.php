@@ -6,6 +6,7 @@ use Hekmatinasser\Verta\Verta;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
 use Illuminate\Support\Facades\Cache;
+use Modules\Api\Http\Controllers\Appointment\AppointmentApiController;
 use Modules\Api\Trait\ApiHandlerTrait;
 use Modules\AppointmentSetting\app\Models\AppointmentSetting;
 
@@ -51,7 +52,7 @@ class VoipController extends Controller
                     if (count($appointment['times'])) {
                         foreach ($appointment['times'] as $time) {
                             if ($time['status']) {
-                                $result['day' . $dayCount]['times'][] = ['time_stamp' => $time['timestamp']];
+                                $result['day' . $dayCount]['times'][] = ['timestamp' => $time['timestamp']];
                             }
                         }
                     }
@@ -66,7 +67,15 @@ class VoipController extends Controller
         $doctorId = $request->get('doctor_id');
         $placesId = $request->get('places_id');
         $servicesId = $request->get('services_id');
-        $appointmentSetting = AppointmentSetting::where('user_id', $doctorId);
+
+        $appointmentApiController = new AppointmentApiController();
+        $findAlterNateDoctor = $appointmentApiController->findAlterNateDoctor();
+
+
+        if ($findAlterNateDoctor == null){
+            return null;
+        }
+        $appointmentSetting = AppointmentSetting::where('user_id', $findAlterNateDoctor->id);
 
         if ($placesId) {
             $appointmentSetting->where('place_id', $placesId);
@@ -86,6 +95,8 @@ class VoipController extends Controller
                 'message' => 'هیچ اطلاعاتی یاف تشد'
             ]);
         }
+
+
         if (env('APPOINTMENT_SANDBOX')) {
             Cache::forget('appointmentList.' . $appointmentSetting->id);
         }
@@ -94,7 +105,11 @@ class VoipController extends Controller
             return app('AppointmentUserService')->listAppointments($appointmentSetting);
         });
         return $this->ok(
-            $this->getListEmptyAppointment($listDays)
+            [
+                'doctor_selected' => $findAlterNateDoctor->id,
+                'appointment_setting_id' => $appointmentSetting->id,
+                'empty_times' => $this->getListEmptyAppointment($listDays),
+            ]
         );
     }
 }

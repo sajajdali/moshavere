@@ -123,9 +123,16 @@ class Checkout extends Component
             return true;
         }
         $user_selected_date = Carbon::createFromTimestamp($this->fetchData['app_start_time'])->toDateString();
-
+        if( $this->fetchData['isOnline']) {
+            $kind = AppointmentUserKindEnum::ONLINE ;
+        }else{
+            $kind = AppointmentUserKindEnum::IN_PERSION ;
+        }
         // Check if user has an appointment on the selected date
-        $existingAppointment = $this->user->appointments()->whereDate('date_visit', $user_selected_date)->whereIn('status', [
+        $existingAppointment = $this->user->appointments()
+        ->whereDate('date_visit', $user_selected_date)
+        ->where('kind',$kind)
+        ->whereIn('status', [
             AppointmentUserStatusEnum::STATUS_PENDING,
             AppointmentUserStatusEnum::STATUS_SUCCESSFUL,
             AppointmentUserStatusEnum::STATUS_WAIT_PAYMENT,
@@ -163,7 +170,11 @@ class Checkout extends Component
         } else {
             $oprator = null;
         }
-
+        if( $this->fetchData['isOnline']) {
+            $kind = AppointmentUserKindEnum::ONLINE ;
+        }else{
+            $kind = AppointmentUserKindEnum::IN_PERSION ;
+        }
         // appointment model
         $appointmentModel = new AppointmentModel(
             timestamp: $this->fetchData['app_start_time'],
@@ -172,7 +183,7 @@ class Checkout extends Component
             serviceId: $this->fetchData['appSetting']->service?->id ?? $this->fetchData['service']->id,
             placeId: $this->fetchData['appSetting']->place?->id ?? $this->fetchData['places']->id,
             agentId: auth()->user()->id,
-            kind: AppointmentUserKindEnum::IN_PERSION,
+            kind: $kind,
             smsToDoctor: false,
             description: isset($this->form['description']) ? $this->form['description'] : '',
             type: AppointmentUserTypeEnum::MAIN__APPOINTMENT,
@@ -205,8 +216,10 @@ class Checkout extends Component
     {
 
         // get app time from route
-        $this->fetchData['app_start_time'] = request()->input('start_time');
-        $this->fetchData['app_end_time'] =  request()->input('end_time');
+        $this->fetchData['app_start_time']  =  request()->input('start_time');
+        $this->fetchData['app_end_time']    =  request()->input('end_time');
+        $isOnlineRoute       =  request()->input('isOnline');
+        $this->fetchData['isOnline'] = (bool)$isOnlineRoute ;
         $doc =  request()->input('doctor_id');
         $place =  request()->input('place_id');
         $service =  request()->input('service_id');

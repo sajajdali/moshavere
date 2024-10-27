@@ -26,11 +26,13 @@ class DoctorProfileLivewire extends Component
         'comment' => ['rate' => 5]
     ];
 
-    public function reserveAppointment()
+    #[Locked]
+    public string $appointmentType;
+    public function reserveAppointment($type = 'IN_PERSON')
     {
+        $this->appointmentType = $type ;
         // check if doctor was not banned
         if ($this->isDocAvaiable()) {
-
             // check for palce count
             if ($this->doc->activePlaces()->count() > 1) {
                 // check if place has selected in route
@@ -54,11 +56,11 @@ class DoctorProfileLivewire extends Component
 
                 // check for service count
                 if ($this->doc->activeServices()->count() <= 1) {
-                    return  $this->redirectToAppointmentDays(
-                        $this->doc->id,
-                        $place->id,
-                        $this->doc->activeServices()->first()->id
-                    );
+                        return  $this->redirectToAppointmentDays(
+                            $this->doc->id,
+                            $place->id,
+                            $this->doc->activeServices()->first()->id
+                        );
                 }
                 $this->fetchData['services'] = $this->doc->activeServices();
                 $this->fetchData['modalStep'] = 2;
@@ -66,13 +68,15 @@ class DoctorProfileLivewire extends Component
             }
 
             // if less than ONE service exist , redirect to appointment days list
-            $this->redirectToAppointmentDays(
-                $this->doc->id,
-                $this->doc->places()->first()->id,
-                $this->doc->services()->first()->id
-            );
+                $this->redirectToAppointmentDays(
+                    $this->doc->id,
+                    $this->doc->places()->first()->id,
+                    $this->doc->services()->first()->id
+                );
+
         }
     }
+    public function reserveOnlineAppointment() {}
     public function lunchModal()
     {
         return $this->dispatch('lucnhModal', true);
@@ -88,8 +92,13 @@ class DoctorProfileLivewire extends Component
         if (!empty($segment)) {
             $param['segment'] = $segment;
         }
+        if($this->appointmentType == 'IN_PERSON') {
+            $route = 'front.setAppointment.days';
+        }else{
+            $route = 'front.setAppointment.online.description' ;
+        }
         return redirect()->route(
-            'front.setAppointment.days',
+            $route,
             $param
         );
     }
@@ -191,7 +200,7 @@ class DoctorProfileLivewire extends Component
     {
         if (! $this->doc->isDoctorActive()) {
             // if doc is de active , prevent modal from opening
-            return  ;
+            return;
         }
         if (request()->has('service_id')) {
             $santetizeService = htmlspecialchars(request()->input('service_id'), ENT_QUOTES, 'UTF-8');
@@ -370,7 +379,7 @@ class DoctorProfileLivewire extends Component
         $this->routeHasServiceOrPlace();
         // bread crumb
         $this->fetchData['site_title'] = Setting(SettingKeyEnum::SITE_TITLE);
-        $this->fetchData['gallery'] = json_decode($this->doc->dr_gallery ,true) ;
+        $this->fetchData['gallery'] = json_decode($this->doc->dr_gallery, true);
     }
     public function render()
     {

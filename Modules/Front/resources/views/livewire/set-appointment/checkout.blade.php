@@ -187,7 +187,9 @@
                                     </svg>
                                     <p>تاریخ نوبت</p>
                                 </div>
-                                <p>{{ verta($fetchData['date_for_blade'])->format('%d %B، %Y') }}</p>
+                                <p>
+                                    {{ verta($fetchData['date_for_blade'])->format('%d %B، %Y') }}
+                                </p>
                             </div>
                             <div class="border border-secondary-200 rounded-lg p-4 flex items-center justify-between">
                                 <div class="flex items-center gap-3">
@@ -196,7 +198,11 @@
                                     </svg>
                                     <p>زمان نوبت</p>
                                 </div>
-                                <p>{{ verta($fetchData['date_for_blade'])->format('H:i') }}</p>
+                            @if( isset($fetchData['isOnline']) && $fetchData['isOnline'] == true )
+                                    <p>نوبت آنلاین</p>
+                                @else
+                                    <p>{{ verta($fetchData['date_for_blade'])->format('H:i') }}</p>
+                                @endif
                             </div>
                             @if ($fetchData['appSetting'][\Modules\AppointmentSetting\app\Models\AppointmentSetting::PAYMENT])
                                 <div

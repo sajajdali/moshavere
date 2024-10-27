@@ -224,14 +224,16 @@ class AppointmentUserService
                         ->whereDate('end_at', '>=', $currentDate);
 
                     if ($serviceId) {
-                        $absence->where('service_id', $serviceId);
+                        $absence->where(function($q)use($serviceId){
+                            return $q->where('service_id', $serviceId)->orWhereNull('service_id') ;
+                        });
                     }
                     if ($placeId) {
-                        $absence->where('place_id', $placeId);
+                        $absence->where(function($q) use($placeId){
+                           return  $q->where('place_id', $placeId)->orWhereNull('place_id');
+                        });
                     }
                     $absence = $absence->get();
-
-
                     if ($absence->isNotempty()) {
                         $dayOutput['absence'] = true;
                         $dayOutput['status'] = false;

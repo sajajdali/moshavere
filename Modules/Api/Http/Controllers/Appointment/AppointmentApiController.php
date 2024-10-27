@@ -496,7 +496,7 @@ class AppointmentApiController extends Controller
             'appointment_user' => AppointmentUserResource::make($appointmentUser),
         ]);
     }
-    private function findAlterNateDoctor()
+    public function findAlterNateDoctor()
     {
         $pegah = User::find(5);
         $pegah_setting =   $pegah->appointmentSettings->first();

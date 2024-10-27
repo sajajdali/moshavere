@@ -406,4 +406,9 @@ class User extends Authenticatable
                 ]
             )->whereHas('messages')?->first();
     }
+    public function hasOnlineApp() {
+        return $this->appointmentSettings()
+        ->whereJsonContains('detail', [AppointmentSetting::VISIT_TYPE_ONLINE => true])
+            ->exists();
+    }
 }

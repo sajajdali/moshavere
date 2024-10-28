@@ -5,15 +5,16 @@ namespace Modules\AppointmentUser\Traits;
 use App\Models\ShortLink;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Cache;
-use Modules\AppointmentUser\app\Jobs\GenerateAppointmentCache;
 use Modules\Setting\Enum\SettingKeyEnum;
 use Modules\AppointmentUser\app\Models\AppointmentUser;
 use Modules\AppointmentUser\app\Models\AppointmentOnline;
+use Modules\AppointmentUser\Enum\AppointmentUserKindEnum;
 use Modules\AppointmentUser\Enum\AppointmentUserTypeEnum;
 use Modules\AppointmentUser\Enum\AppointmentUserStatusEnum;
 use Modules\AppointmentSetting\app\Models\AppointmentSetting;
 use Modules\AppointmentUser\Enum\AppointmentOnlineStatusEnum;
 use Modules\AppointmentUser\app\Events\CancelAppointmentEvent;
+use Modules\AppointmentUser\app\Jobs\GenerateAppointmentCache;
 use Modules\AppointmentUser\app\Notifications\AppointmentSmsNotification;
 use Modules\AppointmentUser\app\Notifications\AppointmentUserFeedbackSmsnotification;
 
@@ -40,7 +41,11 @@ trait OprationButtonsTrait
                 $app->notify(new AppointmentSmsNotification($smsTemplate));
             }
         }
-
+        if ($app->kind == AppointmentUserKindEnum::ONLINE) {
+            $app->online()->update([
+                'status' => AppointmentOnlineStatusEnum::CANCEL,
+            ]);
+        }
         GenerateAppointmentCache::dispatch($app->setting);
         $this->sendNotification($app, 'وضعیت نوبت شما به بین مریض تغییر پیدا کرد');
         event(new CancelAppointmentEvent($app));

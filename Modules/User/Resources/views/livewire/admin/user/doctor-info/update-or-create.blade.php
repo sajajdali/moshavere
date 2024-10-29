@@ -302,6 +302,16 @@
                                     <div class="col-md-12">
                                         <div class="d-flex flex-wrap align-items-center">
                                             <div class="material-switch">
+                                                <input wire:model='form.drStoreAppSms' id="drStoreAppSms" name="drStoreAppSms"
+                                                    type="checkbox" />
+                                                <label for="drStoreAppSms" class="label-danger"></label>
+                                            </div>
+                                            <p class="card-sub-title">عدم ارسال پیامک به پزشک بعد از دریافت نوبت</p>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-12">
+                                        <div class="d-flex flex-wrap align-items-center">
+                                            <div class="material-switch">
                                                 <input wire:model='form.banUser' id="banUser" name="siwtch04"
                                                     type="checkbox" />
                                                 <label for="banUser" class="label-danger"></label>

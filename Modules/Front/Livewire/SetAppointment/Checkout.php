@@ -176,6 +176,10 @@ class Checkout extends Component
         } else {
             $kind = AppointmentUserKindEnum::IN_PERSION;
         }
+        $smsToDoctor = true ;
+        if(isset($this->fetchData['appSetting']->doctor->drStoreAppSms) && $this->fetchData['appSetting']->doctor->drStoreAppSms == true ) {
+            $smsToDoctor = false ;
+        }
         // appointment model
         $appointmentModel = new AppointmentModel(
             timestamp: $this->fetchData['app_start_time'],
@@ -185,7 +189,7 @@ class Checkout extends Component
             placeId: $this->fetchData['appSetting']->place?->id ?? $this->fetchData['places']->id,
             agentId: auth()->user()->id,
             kind: $kind,
-            smsToDoctor: false,
+            smsToDoctor: $smsToDoctor,
             description: isset($this->form['description']) ? $this->form['description'] : '',
             type: AppointmentUserTypeEnum::MAIN__APPOINTMENT,
             endTime: Carbon::createFromTimestamp($this->fetchData['app_end_time'], 'Asia/Tehran')->toTimeString(),

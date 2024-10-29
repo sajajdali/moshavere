@@ -20,6 +20,7 @@ use Modules\AppointmentUser\Enum\AppointmentOnlineStatusEnum;
 use Modules\AppointmentUser\Enum\AppointmentOnlineMessageSeenEnum;
 use Modules\AppointmentUser\Enum\AppointmentOnlineMessageTypeEnum;
 use Modules\AppointmentUser\app\Notifications\AppointmentSmsNotification;
+use Modules\AppointmentUser\App\Notifications\AppointmentDocAndOperatorNotification;
 
 class PaymentController extends Controller
 {
@@ -125,6 +126,16 @@ class PaymentController extends Controller
                             'seen' => AppointmentOnlineMessageSeenEnum::UNSEEN,
                             'body' => setting(SettingKeyEnum::ONILNE_SEND_ATUOMATIC_MESSAGE_MESSAGE) ?? 'سلام لطفا سوال خود را مطرح کنید',
                         ]);
+                    }
+                }
+                if (isset($appointmentUser->doctor)) {
+                    if( isset($appointmentUser->doctor->drStoreAppSms) && $appointmentUser->doctor->drStoreAppSms != true ) {
+                        $smsToDoctor = setting(SettingKeyEnum::SMS_APPOINTMENT_TO_DOCTOR);
+                    }elseif(! isset($appointmentUser->doctor->drStoreAppSms)){
+                        $smsToDoctor = setting(SettingKeyEnum::SMS_APPOINTMENT_TO_DOCTOR);
+                    }
+                    if (isset($smsToDoctor)) {
+                        $appointmentUser->notify(new AppointmentDocAndOperatorNotification($smsToDoctor, $appointmentUser->doctor->mobile));
                     }
                 }
                 return redirect()->route('front.setAppointment.detail', ['tracking_code' => $appointmentUser->tracking_code, 'msg' => 'پرداخت با موفقیت انجام شد']);

@@ -253,13 +253,17 @@ class AppointmentDetail extends Component
                 if (isset($appointmentUser->operator)) {
                     $smsToOperator = setting(SettingKeyEnum::SMS_APPOINTMENT_TO_OPERATOR);
                     if (isset($smsToOperator)) {
-                        $this->fetchData['app']->notify(new AppointmentDocAndOperatorNotification($smsToOperator, $$this->fetchData['app']->operator->mobile));
+                        $this->fetchData['app']->notify(new AppointmentDocAndOperatorNotification($smsToOperator, $this->fetchData['app']->operator->mobile));
                     }
                 }
-                if (isset($appointmentUser->doctor)) {
-                    $smsToDoctor = setting(SettingKeyEnum::SMS_APPOINTMENT_TO_DOCTOR);
+                if (isset($this->fetchData['app']->doctor)) {
+                    if( isset($this->fetchData['app']->doctor->drStoreAppSms) && $this->fetchData['app']->doctor->drStoreAppSms != true ) {
+                        $smsToDoctor = setting(SettingKeyEnum::SMS_APPOINTMENT_TO_DOCTOR);
+                    }elseif(! isset($this->fetchData['app']->doctor->drStoreAppSms)){
+                        $smsToDoctor = setting(SettingKeyEnum::SMS_APPOINTMENT_TO_DOCTOR);
+                    }
                     if (isset($smsToDoctor)) {
-                        $this->fetchData['app']->notify(new AppointmentDocAndOperatorNotification($smsToDoctor, $$this->fetchData['app']->doctor->mobile));
+                        $this->fetchData['app']->notify(new AppointmentDocAndOperatorNotification($smsToDoctor, $this->fetchData['app']->doctor->mobile));
                     }
                 }
                 // if appointment is online

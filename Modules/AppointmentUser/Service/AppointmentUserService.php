@@ -116,7 +116,7 @@ class AppointmentUserService
         // Fetch appointments for the week
         $doctorId = $appointmentSetting->user->id;
         $appointments = AppointmentUser::where('doctor_id', $doctorId)
-            ->where('kind' , AppointmentUserKindEnum::IN_PERSION)
+            ->where('kind', AppointmentUserKindEnum::IN_PERSION)
             ->whereBetween('date_visit', [$startDate, $endDate])
             ->orderBy('start_time')
             ->get();
@@ -226,13 +226,13 @@ class AppointmentUserService
                         ->whereDate('end_at', '>=', $currentDate);
 
                     if ($serviceId) {
-                        $absence->where(function($q)use($serviceId){
-                            return $q->where('service_id', $serviceId)->orWhereNull('service_id') ;
+                        $absence->where(function ($q) use ($serviceId) {
+                            return $q->where('service_id', $serviceId)->orWhereNull('service_id');
                         });
                     }
                     if ($placeId) {
-                        $absence->where(function($q) use($placeId){
-                           return  $q->where('place_id', $placeId)->orWhereNull('place_id');
+                        $absence->where(function ($q) use ($placeId) {
+                            return  $q->where('place_id', $placeId)->orWhereNull('place_id');
                         });
                     }
                     $absence = $absence->get();
@@ -654,7 +654,7 @@ class AppointmentUserService
             $appointmentData->appointmentVia == AppointmentVia::SELF
         ) {
             $status = AppointmentUserStatusEnum::STATUS_MONITORING;
-            $monitoring_deadline = Carbon::now()->addHours((int) $appointmentSetting->detail[AppointmentSetting::MONITORTING_APPOINTMENT]) ;
+            $monitoring_deadline = Carbon::now()->addHours((int) $appointmentSetting->detail[AppointmentSetting::MONITORTING_APPOINTMENT]);
         }
 
         // store appointment
@@ -674,7 +674,7 @@ class AppointmentUserService
             'date_visit' => $visitDateTime->toDateTimeString(),
             'user_ip' => ip(),
         ];
-        if($status == AppointmentUserStatusEnum::STATUS_WAIT_PAYMENT) {
+        if ($status == AppointmentUserStatusEnum::STATUS_WAIT_PAYMENT) {
             $appointmentUserModel['deadline_at'] =  $this->getDeadlinePayment();
         }
         if ($appointmentData->kind == AppointmentUserKindEnum::ONLINE) {
@@ -739,8 +739,8 @@ class AppointmentUserService
             ];
         }
         // insert dead_line for monioring app
-        if(isset($monitoring_deadline)) {
-            $appointmentUserModel['deadline_at'] = $monitoring_deadline ;
+        if (isset($monitoring_deadline)) {
+            $appointmentUserModel['deadline_at'] = $monitoring_deadline;
         }
         // detailDatabase
 
@@ -824,7 +824,8 @@ class AppointmentUserService
                     $appointmentUser->notify(new AppointmentDocAndOperatorNotification($smsToOperator, $appointmentUser->operator->mobile));
                 }
             }
-            if (isset($appointmentUser->doctor)) {
+            if ( $appointmentUser->status == AppointmentUserStatusEnum::STATUS_SUCCESSFUL && isset($appointmentUser->doctor)  && isset($appointmentData->smsToDoctor) && $appointmentData->smsToDoctor == true) {
+                // check if sms to doctor is active
                 $smsToDoctor = setting(SettingKeyEnum::SMS_APPOINTMENT_TO_DOCTOR);
                 if (isset($smsToDoctor)) {
                     $appointmentUser->notify(new AppointmentDocAndOperatorNotification($smsToDoctor, $appointmentUser->doctor->mobile));

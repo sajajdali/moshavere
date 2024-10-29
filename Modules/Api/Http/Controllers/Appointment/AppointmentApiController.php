@@ -279,6 +279,10 @@ class AppointmentApiController extends Controller
         if ($serviceId == 3 && $request->has('question')) {
             $serviceId = $request->input('question');
         }
+        $smsTodoctor = false ;
+        if(isset($appointmentSetting->doctor->drStoreAppSms) && $appointmentSetting->doctor->drStoreAppSms != true ) {
+            $smsTodoctor = true ;
+        }
         // appointment model
         $appointmentModel = new AppointmentModel(
             timestamp: $request->input('timestamp') ?? null,
@@ -286,7 +290,8 @@ class AppointmentApiController extends Controller
             sendSmsToUser: true,
             serviceId: $serviceId,
             placeId: $request->input('place_id') ?? $appointmentSetting->user->activePlaces()->first()?->id,
-            kind: $kind
+            kind: $kind,
+            smsToDoctor : $smsTodoctor
         );
         $detail = [];
         if ($request->input('question')) {

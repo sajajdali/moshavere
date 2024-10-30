@@ -98,6 +98,27 @@
                     </div>
                 @endif
             </div>
+            <div   class="row mt-4 @if (isset($form['visitType']['online']) && $form['visitType']['online'])  d-block @else d-none  @endif">
+                <hr>
+                <div class="d-flex align-items-center">
+                    <div class="main-toggle-group d-sm-flex align-items-center ms-0">
+                        <div class="toggle toggle-lg toggle-primary my-1  customCheckbox
+                            @if (isset($form['accessibility']['disable_online']['status']) && $form['accessibility']['disable_online']['status'] == true) on
+                                @else
+                                off @endif"
+                             data-id="accessibility.disable_online.status" id="accessibilityOnline_voice" wire:ignore.self>
+                            <span></span>
+                        </div>
+                    </div>
+                    <span class="ms-2">غیر فعال سازی موقت نوبت دهی آنلاین</span>
+                </div>
+                @if (isset($form['accessibility']['disable_online']['status']) && $form['accessibility']['disable_online']['status'] == true)
+                    <br>
+                    <div class="d-flex align-items-center">
+                        <textarea rows="3" class="form-control mt-5 ms-1 " wire:model="form.accessibility.disable_online.message" placeholder=" متن پیغام نمایشی در صورتی غیر فعال بودن "></textarea>
+                    </div>
+                @endif
+            </div>
         </div>
     </div>
     {{-- manage day of the week  --}}

@@ -360,6 +360,22 @@ class AppointmentApiController extends Controller
 
         if ($kind == AppointmentUserKindEnum::ONLINE->value) {
             $payment = app('AppointmentUserService')->paymentstatus($appointmentSetting);
+            if(isset($appointmentSetting->detail[AppointmentSetting::TEMPORARY_DEACTIVATION_ONLINE]) &&
+                isset($appointmentSetting->detail[AppointmentSetting::TEMPORARY_DEACTIVATION_ONLINE]['status']) &&
+                $appointmentSetting->detail[AppointmentSetting::TEMPORARY_DEACTIVATION_ONLINE]['status'] == true
+            ){
+                $conditions['title'] = 'امکان دریافت نوبت آنلاین فراهم نیست';
+                $conditions['message'] = $appointmentSetting->detail[AppointmentSetting::TEMPORARY_DEACTIVATION_ONLINE]['message'] ?? 'هم اکنون امکان دریافت نوبت آنلاین فراهم نیست';
+                return $this->ok([
+                    'status' => true,
+                    'payment' => null,
+                    'appointment_setting_id' => $appointmentSetting->id,
+                    'first_two_empty' => null,
+                    'get_list_empty_appointment' => null,
+                    'conditions' => $conditions,
+                    'messages' => null
+                ]);
+            }
             return $this->ok([
                 'status' => true,
                 'payment' =>  !$payment['online']['status'] ? null : $payment['online'],

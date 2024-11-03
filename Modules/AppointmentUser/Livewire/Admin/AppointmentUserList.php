@@ -207,7 +207,7 @@ class AppointmentUserList extends Component
                 },
             ],
             'AppointmentStatus' => [
-                'condition' => isset($this->search['AppointmentStatus']),
+                'condition' => isset($this->search['AppointmentStatus']) && $this->search['AppointmentStatus'] != null ,
                 'callback' => function ($query) {
                     return $query->where('status', AppointmentUserStatusEnum::tryFrom($this->search['AppointmentStatus']));
                 },

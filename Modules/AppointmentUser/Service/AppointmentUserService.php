@@ -8,6 +8,7 @@ use App\Enum\RouteEnum;
 use App\Models\ShortLink;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Cache;
+use Modules\AppointmentUser\app\Jobs\GenerateAppointmentCache;
 use Modules\Service\app\Models\Service;
 use Modules\Setting\Enum\SettingKeyEnum;
 use Modules\Api\Transformers\UserResource;
@@ -115,6 +116,7 @@ class AppointmentUserService
         // Fetch appointments for the week
         $doctorId = $appointmentSetting->user->id;
         $appointments = AppointmentUser::where('doctor_id', $doctorId)
+            ->where('kind', AppointmentUserKindEnum::IN_PERSION)
             ->whereBetween('date_visit', [$startDate, $endDate])
             ->orderBy('start_time')
             ->get();
@@ -224,13 +226,13 @@ class AppointmentUserService
                         ->whereDate('end_at', '>=', $currentDate);
 
                     if ($serviceId) {
-                        $absence->where(function($q)use($serviceId){
-                            return $q->where('service_id', $serviceId)->orWhereNull('service_id') ;
+                        $absence->where(function ($q) use ($serviceId) {
+                            return $q->where('service_id', $serviceId)->orWhereNull('service_id');
                         });
                     }
                     if ($placeId) {
-                        $absence->where(function($q) use($placeId){
-                           return  $q->where('place_id', $placeId)->orWhereNull('place_id');
+                        $absence->where(function ($q) use ($placeId) {
+                            return  $q->where('place_id', $placeId)->orWhereNull('place_id');
                         });
                     }
                     $absence = $absence->get();
@@ -671,7 +673,7 @@ class AppointmentUserService
             'date_visit' => $visitDateTime->toDateTimeString(),
             'user_ip' => ip(),
         ];
-        if($status == AppointmentUserStatusEnum::STATUS_WAIT_PAYMENT) {
+        if ($status == AppointmentUserStatusEnum::STATUS_WAIT_PAYMENT) {
             $appointmentUserModel['deadline_at'] =  $this->getDeadlinePayment();
         }
         if ($appointmentData->kind == AppointmentUserKindEnum::ONLINE) {
@@ -818,7 +820,8 @@ class AppointmentUserService
                     $appointmentUser->notify(new AppointmentDocAndOperatorNotification($smsToOperator, $appointmentUser->operator->mobile));
                 }
             }
-            if (isset($appointmentUser->doctor)) {
+            if ( $appointmentUser->status == AppointmentUserStatusEnum::STATUS_SUCCESSFUL && isset($appointmentUser->doctor)  && isset($appointmentData->smsToDoctor) && $appointmentData->smsToDoctor == true) {
+                // check if sms to doctor is active
                 $smsToDoctor = setting(SettingKeyEnum::SMS_APPOINTMENT_TO_DOCTOR);
                 if (isset($smsToDoctor)) {
                     $appointmentUser->notify(new AppointmentDocAndOperatorNotification($smsToDoctor, $appointmentUser->doctor->mobile));
@@ -844,11 +847,8 @@ class AppointmentUserService
         }
         event(new StoreAppointmentEvent($appointmentUser));
 
-        Cache::forget('appointmentList.' . $appointmentSetting->id);
-        Cache::rememberForever('appointmentList.' . $appointmentSetting->id, function () use ($appointmentSetting) {
-            $appointmentSetting->update(['updated_log_at' => \now()]);
-            return app('AppointmentUserService')->listAppointments($appointmentSetting);
-        });
+        GenerateAppointmentCache::dispatch($appointmentSetting);
+
         $trackingUrl = route('front.setAppointment.detail', ['tracking_code' => $appointmentUser->tracking_code]);
         return [
             'status' => true,

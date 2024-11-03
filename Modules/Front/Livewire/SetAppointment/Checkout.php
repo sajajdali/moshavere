@@ -7,6 +7,7 @@ use Livewire\Component;
 use Livewire\Attributes\Title;
 use Livewire\Attributes\Layout;
 use Livewire\Attributes\Locked;
+use Modules\AppointmentUser\app\Jobs\GenerateAppointmentCache;
 use Modules\User\Entities\User;
 use Modules\Place\app\Models\Place;
 use Illuminate\Support\Facades\Cache;
@@ -123,24 +124,24 @@ class Checkout extends Component
             return true;
         }
         $user_selected_date = Carbon::createFromTimestamp($this->fetchData['app_start_time'])->toDateString();
-        if( $this->fetchData['isOnline']) {
-            $kind = AppointmentUserKindEnum::ONLINE ;
-        }else{
-            $kind = AppointmentUserKindEnum::IN_PERSION ;
+        if ($this->fetchData['isOnline']) {
+            $kind = AppointmentUserKindEnum::ONLINE;
+        } else {
+            $kind = AppointmentUserKindEnum::IN_PERSION;
         }
         // Check if user has an appointment on the selected date
         $existingAppointment = $this->user->appointments()
-        ->whereDate('date_visit', $user_selected_date)
-        ->where('kind',$kind)
-        ->whereIn('status', [
-            AppointmentUserStatusEnum::STATUS_PENDING,
-            AppointmentUserStatusEnum::STATUS_SUCCESSFUL,
-            AppointmentUserStatusEnum::STATUS_WAIT_PAYMENT,
-            AppointmentUserStatusEnum::STATUS_ATTENDED,
-            AppointmentUserStatusEnum::STATUS_NOT_ATTENDED,
-            AppointmentUserStatusEnum::STATUS_MONITORING,
-            AppointmentUserStatusEnum::STATUS_ONILNE_CLOSED,
-        ])->exists();
+            ->whereDate('date_visit', $user_selected_date)
+            ->where('kind', $kind)
+            ->whereIn('status', [
+                AppointmentUserStatusEnum::STATUS_PENDING,
+                AppointmentUserStatusEnum::STATUS_SUCCESSFUL,
+                AppointmentUserStatusEnum::STATUS_WAIT_PAYMENT,
+                AppointmentUserStatusEnum::STATUS_ATTENDED,
+                AppointmentUserStatusEnum::STATUS_NOT_ATTENDED,
+                AppointmentUserStatusEnum::STATUS_MONITORING,
+                AppointmentUserStatusEnum::STATUS_ONILNE_CLOSED,
+            ])->exists();
         if ($existingAppointment) {
             $this->err = 'شما یک نوبت فعال در این روز دارید!';
             return false;
@@ -170,10 +171,14 @@ class Checkout extends Component
         } else {
             $oprator = null;
         }
-        if( $this->fetchData['isOnline']) {
-            $kind = AppointmentUserKindEnum::ONLINE ;
-        }else{
-            $kind = AppointmentUserKindEnum::IN_PERSION ;
+        if ($this->fetchData['isOnline']) {
+            $kind = AppointmentUserKindEnum::ONLINE;
+        } else {
+            $kind = AppointmentUserKindEnum::IN_PERSION;
+        }
+        $smsToDoctor = true ;
+        if(isset($this->fetchData['appSetting']->doctor->drStoreAppSms) && $this->fetchData['appSetting']->doctor->drStoreAppSms == true ) {
+            $smsToDoctor = false ;
         }
         // appointment model
         $appointmentModel = new AppointmentModel(
@@ -184,7 +189,7 @@ class Checkout extends Component
             placeId: $this->fetchData['appSetting']->place?->id ?? $this->fetchData['places']->id,
             agentId: auth()->user()->id,
             kind: $kind,
-            smsToDoctor: false,
+            smsToDoctor: $smsToDoctor,
             description: isset($this->form['description']) ? $this->form['description'] : '',
             type: AppointmentUserTypeEnum::MAIN__APPOINTMENT,
             endTime: Carbon::createFromTimestamp($this->fetchData['app_end_time'], 'Asia/Tehran')->toTimeString(),
@@ -205,7 +210,9 @@ class Checkout extends Component
 
         $storeAppointment = app('AppointmentUserService')->storeAppointment($this->fetchData['appSetting'], $userModelAppointment, $appointmentModel, $detail);
         if ($storeAppointment['status']) {
-            Cache::forget('appointmentList.' . $this->fetchData['appSetting']->id);
+            $appointmentSetting = AppointmentSetting::find($this->fetchData['appSetting']->id);
+            GenerateAppointmentCache::dispatch($appointmentSetting);
+
             return redirect()->route('front.setAppointment.detail', ['tracking_code' => $storeAppointment['detail']['tracking_code']]);
         } else {
             $this->err = $storeAppointment['message'];
@@ -219,7 +226,7 @@ class Checkout extends Component
         $this->fetchData['app_start_time']  =  request()->input('start_time');
         $this->fetchData['app_end_time']    =  request()->input('end_time');
         $isOnlineRoute       =  request()->input('isOnline');
-        $this->fetchData['isOnline'] = (bool)$isOnlineRoute ;
+        $this->fetchData['isOnline'] = (bool)$isOnlineRoute;
         $doc =  request()->input('doctor_id');
         $place =  request()->input('place_id');
         $service =  request()->input('service_id');

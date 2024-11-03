@@ -239,19 +239,19 @@
                                             <input class="form-check-input" checked type="radio"
                                                 wire:model='form.kind'
                                                 value="{{ Modules\AppointmentUser\Enum\AppointmentUserKindEnum::IN_PERSION }}"
-                                                name="appointmentKind" id="appKind1">
-                                            <label class="form-check-label" for="appKind1">
+                                                name="appointmentKind1" id="appointmentInperson">
+                                            <label class="form-check-label" for="appointmentInperson">
                                                 نوبت حضوری
                                             </label>
                                         </div>
                                     </div>
                                     <div class="col-6">
                                         <div class="form-check">
-                                            <input class="form-check-input" type="radio" name="appointmentKind"
+                                            <input class="form-check-input" type="radio" name="appointmentKind1"
                                                 wire:model='form.kind'
                                                 value="{{ Modules\AppointmentUser\Enum\AppointmentUserKindEnum::ONLINE }}"
-                                                id="appKind2">
-                                            <label class="form-check-label" for="appKind2">
+                                                id="appointmnetOnline">
+                                            <label class="form-check-label" for="appointmnetOnline">
                                                 نوبت آنلاین
                                             </label>
                                         </div>

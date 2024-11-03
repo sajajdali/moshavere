@@ -44,8 +44,9 @@ enum UserMetaEnum: int implements EnumHasNameInterface
     case DR_REGISTRATION_DESCRIPTION = 32;
     case DR_REGISTRATION_FROM = 33; // SELF or ADMIN
     case DR_RATE = 34; // SELF or ADMIN
+    case DR_SPECIAL_TEXT_AFTER_ONLINE_APPOINTMENT = 35; //for mata
 
-
+    case DR_STORE_APP_SMS = 36;
 
 
     public static function keys(): array

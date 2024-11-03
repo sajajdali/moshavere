@@ -14,6 +14,7 @@
 // appointment
 Route::prefix('voip')->group(function () {
     Route::get('list_days' , [\Modules\Api\Http\Controllers\Voip\VoipController::class , 'listDays'] )->name('api.voip.list_days');
+    Route::get('appointment/store' , [\Modules\Api\Http\Controllers\Voip\VoipController::class , 'storeAppointment'] )->name('api.voip.storeAppointment');
 });
 // appointment
 

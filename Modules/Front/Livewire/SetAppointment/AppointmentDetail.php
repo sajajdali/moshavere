@@ -5,6 +5,7 @@ namespace Modules\Front\Livewire\SetAppointment;
 use Livewire\Component;
 use App\Enum\ActiveEnum;
 use Livewire\Attributes\Title;
+use Modules\AppointmentUser\app\Jobs\GenerateAppointmentCache;
 use Shetabit\Multipay\Invoice;
 use Livewire\Attributes\Layout;
 use Livewire\Attributes\Locked;
@@ -95,7 +96,7 @@ class AppointmentDetail extends Component
                 $this->fetchData['app']->notify(new AppointmentSmsNotification($smsTemplate));
                 session()->flash('success', 'نوبت شما با موفقیت کنسل شد');
             }
-            Cache::forget('appointmentList.' . $this->fetchData['app']->setting->id);
+            GenerateAppointmentCache::dispatch($this->fetchData['app']->setting);
             return redirect()->route('front.setAppointment.detail', ['tracking_code' => $this->fetchData['app']->tracking_code]);
         } else {
             abort(401);
@@ -252,13 +253,17 @@ class AppointmentDetail extends Component
                 if (isset($appointmentUser->operator)) {
                     $smsToOperator = setting(SettingKeyEnum::SMS_APPOINTMENT_TO_OPERATOR);
                     if (isset($smsToOperator)) {
-                        $this->fetchData['app']->notify(new AppointmentDocAndOperatorNotification($smsToOperator, $$this->fetchData['app']->operator->mobile));
+                        $this->fetchData['app']->notify(new AppointmentDocAndOperatorNotification($smsToOperator, $this->fetchData['app']->operator->mobile));
                     }
                 }
-                if (isset($appointmentUser->doctor)) {
-                    $smsToDoctor = setting(SettingKeyEnum::SMS_APPOINTMENT_TO_DOCTOR);
+                if (isset($this->fetchData['app']->doctor)) {
+                    if( isset($this->fetchData['app']->doctor->drStoreAppSms) && $this->fetchData['app']->doctor->drStoreAppSms != true ) {
+                        $smsToDoctor = setting(SettingKeyEnum::SMS_APPOINTMENT_TO_DOCTOR);
+                    }elseif(! isset($this->fetchData['app']->doctor->drStoreAppSms)){
+                        $smsToDoctor = setting(SettingKeyEnum::SMS_APPOINTMENT_TO_DOCTOR);
+                    }
                     if (isset($smsToDoctor)) {
-                        $this->fetchData['app']->notify(new AppointmentDocAndOperatorNotification($smsToDoctor, $$this->fetchData['app']->doctor->mobile));
+                        $this->fetchData['app']->notify(new AppointmentDocAndOperatorNotification($smsToDoctor, $this->fetchData['app']->doctor->mobile));
                     }
                 }
                 // if appointment is online

@@ -87,7 +87,11 @@ class UpdateOrCreate extends Component
         if (isset($this->form['drBanner'])) {
             $this->user->dr_banner = $this->form['drBanner'];
         }
-
+        if (isset($this->form['drStoreAppSms'])) {
+            $this->user->drStoreAppSms = $this->form['drStoreAppSms'];
+        }else{
+            $this->user->drStoreAppSms = false;
+        }
         $this->user->ban_user = $this->form['banUser'];
         Cache::forget('emergency_doctors');
         Cache::forget('Introduction_doctors');

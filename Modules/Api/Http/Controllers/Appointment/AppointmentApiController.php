@@ -279,6 +279,10 @@ class AppointmentApiController extends Controller
         if ($serviceId == 3 && $request->has('question')) {
             $serviceId = $request->input('question');
         }
+        $smsTodoctor = false ;
+        if(isset($appointmentSetting->doctor->drStoreAppSms) && $appointmentSetting->doctor->drStoreAppSms != true ) {
+            $smsTodoctor = true ;
+        }
         // appointment model
         $appointmentModel = new AppointmentModel(
             timestamp: $request->input('timestamp') ?? null,
@@ -286,7 +290,8 @@ class AppointmentApiController extends Controller
             sendSmsToUser: true,
             serviceId: $serviceId,
             placeId: $request->input('place_id') ?? $appointmentSetting->user->activePlaces()->first()?->id,
-            kind: $kind
+            kind: $kind,
+            smsToDoctor : $smsTodoctor
         );
         $detail = [];
         if ($request->input('question')) {
@@ -355,6 +360,22 @@ class AppointmentApiController extends Controller
 
         if ($kind == AppointmentUserKindEnum::ONLINE->value) {
             $payment = app('AppointmentUserService')->paymentstatus($appointmentSetting);
+            if(isset($appointmentSetting->detail[AppointmentSetting::TEMPORARY_DEACTIVATION_ONLINE]) &&
+                isset($appointmentSetting->detail[AppointmentSetting::TEMPORARY_DEACTIVATION_ONLINE]['status']) &&
+                $appointmentSetting->detail[AppointmentSetting::TEMPORARY_DEACTIVATION_ONLINE]['status'] == true
+            ){
+                $conditions['title'] = 'امکان دریافت نوبت آنلاین فراهم نیست';
+                $conditions['message'] = $appointmentSetting->detail[AppointmentSetting::TEMPORARY_DEACTIVATION_ONLINE]['message'] ?? 'هم اکنون امکان دریافت نوبت آنلاین فراهم نیست';
+                return $this->ok([
+                    'status' => true,
+                    'payment' => null,
+                    'appointment_setting_id' => $appointmentSetting->id,
+                    'first_two_empty' => null,
+                    'get_list_empty_appointment' => null,
+                    'conditions' => $conditions,
+                    'messages' => null
+                ]);
+            }
             return $this->ok([
                 'status' => true,
                 'payment' =>  !$payment['online']['status'] ? null : $payment['online'],

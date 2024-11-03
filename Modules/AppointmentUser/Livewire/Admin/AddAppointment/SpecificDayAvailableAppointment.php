@@ -5,6 +5,7 @@ namespace Modules\AppointmentUser\Livewire\Admin\AddAppointment;
 use Carbon\Carbon;
 use Livewire\Component;
 use Livewire\Attributes\On;
+use Modules\AppointmentUser\app\Jobs\GenerateAppointmentCache;
 use Modules\User\Entities\User;
 use Livewire\Attributes\Computed;
 use Illuminate\Support\Facades\Cache;
@@ -191,7 +192,9 @@ class SpecificDayAvailableAppointment extends Component
         $appUser->update([
             'type' => AppointmentUserTypeEnum::BETWEEN_PATIENTS,
         ]);
-        Cache::forget('appointmentList.' . $this->fetchData['appId']);
+        $appointmentSetting = AppointmentSetting::find($this->fetchData['appId']);
+        GenerateAppointmentCache::dispatch($appointmentSetting);
+
         return redirect()->route(
             'admin.appointment.add.specificday',
             [
@@ -241,10 +244,10 @@ class SpecificDayAvailableAppointment extends Component
     // when tracking_code is exist in url
     public function changeAppointmentDate($from, $until)
     {
-        $fromArray = explode(':',$from) ;
+        $fromArray = explode(':', $from);
         // Update the date
         $updateData = [
-            'date_visit' => $this->fetchData['selectedDate']->setTime($fromArray[0],$fromArray[1],$fromArray[2])->todatetimestring(),
+            'date_visit' => $this->fetchData['selectedDate']->setTime($fromArray[0], $fromArray[1], $fromArray[2])->todatetimestring(),
             'start_time' => $from,
             'end_time' => $until,
             'status' => AppointmentUserStatusEnum::STATUS_SUCCESSFUL,
@@ -294,14 +297,14 @@ class SpecificDayAvailableAppointment extends Component
         }
         // create inital list aof appointment
         $this->fetchData['RawlistOfAppointment']  = Cache::rememberForever('appointmentList.' . $app->id, function () use ($app) {
-             $app->update(['updated_log_at' => \now()]);
+            $app->update(['updated_log_at' => \now()]);
             return app('AppointmentUserService')->listAppointments($app);
         });
         $this->fetchData['listOfAppointment'] = $this->listOfAppointment($this->fetchData['RawlistOfAppointment']);
 
         // check if selected date not exist in the log
         if ($this->fetchData['selectedDate']->gt(\now()->addDays(60))) {
-            $this->form['changeDate'] = verta($this->fetchData['selectedDate'])->format('Y-m-d') ;
+            $this->form['changeDate'] = verta($this->fetchData['selectedDate'])->format('Y-m-d');
             $this->loadDifferentDayDetail();
         }
 

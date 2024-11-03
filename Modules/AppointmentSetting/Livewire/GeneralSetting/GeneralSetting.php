@@ -45,6 +45,10 @@ class GeneralSetting extends Component
                 'status' => false,
                 'message' => null
             ],
+            'disable_online' => [
+                'status' => false,
+                'message' => null
+            ],
             'online' => [
                 'can_send_voice' => true
             ]
@@ -344,6 +348,16 @@ class GeneralSetting extends Component
             $detail[AppointmentSetting::DONT_SHOW_TIMES][AppointmentSetting::DONT_SHOW_TIMES_MESSAGE] = null;
         }
 
+        // Temporary deactivation online
+        $detail[AppointmentSetting::TEMPORARY_DEACTIVATION_ONLINE] = [
+            AppointmentSetting::TEMPORARY_DEACTIVATION_ONLINE_STATUS  => $this->form['accessibility']['disable_online']['status'] == 'on' ,
+            AppointmentSetting::TEMPORARY_DEACTIVATION_ONLINE_MESSAGE => $this->form['accessibility']['disable_online']['message'] ?? null,
+        ];
+
+        if (!$detail[AppointmentSetting::TEMPORARY_DEACTIVATION_ONLINE][AppointmentSetting::TEMPORARY_DEACTIVATION_ONLINE_STATUS]){
+            $detail[AppointmentSetting::TEMPORARY_DEACTIVATION_ONLINE][AppointmentSetting::TEMPORARY_DEACTIVATION_ONLINE_MESSAGE] = null;
+        }
+
 
         $updateOrCreateModel = [
             'user_id'               =>  $this->user->id,
@@ -516,6 +530,12 @@ class GeneralSetting extends Component
         if (isset($apSet->detail[AppointmentSetting::DONT_SHOW_TIMES])){
             $this->form['accessibility']['dont_show_times']['status'] = isset($apSet->detail[AppointmentSetting::DONT_SHOW_TIMES][AppointmentSetting::STATUS]) && $apSet->detail[AppointmentSetting::DONT_SHOW_TIMES][AppointmentSetting::STATUS] == 'on';
             $this->form['accessibility']['dont_show_times']['message'] = $apSet->detail[AppointmentSetting::DONT_SHOW_TIMES][AppointmentSetting::DONT_SHOW_TIMES_MESSAGE] ?? null;
+        }
+
+        //Temporary deactivation
+        if (isset($apSet->detail[AppointmentSetting::TEMPORARY_DEACTIVATION_ONLINE])){
+            $this->form['accessibility']['disable_online']['status'] = isset($apSet->detail[AppointmentSetting::TEMPORARY_DEACTIVATION_ONLINE][AppointmentSetting::STATUS]) && $apSet->detail[AppointmentSetting::TEMPORARY_DEACTIVATION_ONLINE][AppointmentSetting::STATUS] == 'on';
+            $this->form['accessibility']['disable_online']['message'] = $apSet->detail[AppointmentSetting::TEMPORARY_DEACTIVATION_ONLINE][AppointmentSetting::TEMPORARY_DEACTIVATION_ONLINE_MESSAGE] ?? null;
         }
 
 

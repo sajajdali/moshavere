@@ -408,5 +408,19 @@ trait UserAttributeTrait
             }
         );
     }
+    public function drStoreAppSms(): Attribute
+    {
+        $operator = UserMetaEnum::DR_STORE_APP_SMS;
+        return Attribute::make(
+            get: fn () => $this->getMeta($operator)?->meta_value,
+            set: function ($value) use ($operator) {
+                // Update or create the meta value
+                $this->metas()->updateOrCreate(
+                    ['meta_key' => $operator],
+                    ['meta_value' => $value]
+                );
+            }
+        );
+    }
 
 }

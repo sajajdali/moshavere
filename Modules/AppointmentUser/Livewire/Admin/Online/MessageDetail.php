@@ -11,6 +11,7 @@ use Livewire\Attributes\Computed;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Storage;
 use Livewire\WithFileUploads;
+use Modules\AppointmentUser\app\Jobs\GenerateAppointmentCache;
 use Modules\Setting\Enum\SettingKeyEnum;
 use Modules\AppointmentUser\app\Models\AppointmentUser;
 use Modules\User\app\Notifications\UserSmsNotification;
@@ -30,7 +31,7 @@ class MessageDetail extends Component
     public $search;
     public array $form = [];
     public array $fetchData = [];
-    public ?string $msg = null ;
+    public ?string $msg = null;
     public function runSearch()
     {
         $this->getMessages();
@@ -121,8 +122,7 @@ class MessageDetail extends Component
             AppointmentOnlineMessageFile::create(attributes: $fileModel);
             unset($this->form['file']);
         }
-        if (isset($this->form['capturedPic']))
-        {
+        if (isset($this->form['capturedPic'])) {
             $filePath = $this->form['capturedPic']->store('public/uploads');
             $fileName = basename($filePath);
             $extension = pathinfo($fileName, PATHINFO_EXTENSION);
@@ -155,12 +155,12 @@ class MessageDetail extends Component
                     'link_code' => ShortLink::generateShortLinkCode(),
                     'link_url'  => $messageLink,
                 ]);
-                $charoomLink = route('front.user.chatroom',['onlineAppId' => $this->fetchData['appOnline']->id]);
+                $charoomLink = route('front.user.chatroom', ['onlineAppId' => $this->fetchData['appOnline']->id]);
                 $chatRoomLink =  $this->fetchData['appOnline']->shortLink()->create([
                     'link_code' => ShortLink::generateShortLinkCode(),
                     'link_url'  => $charoomLink,
                 ]);
-                $this->fetchData['user']->notify(new UserSmsNotification($template, url('/s/' . $shortLink->link_code),url('/s/' . $chatRoomLink->link_code)));
+                $this->fetchData['user']->notify(new UserSmsNotification($template, url('/s/' . $shortLink->link_code), url('/s/' . $chatRoomLink->link_code)));
             }
             unset($this->form['sendSms']);
         }
@@ -173,7 +173,7 @@ class MessageDetail extends Component
             ));
         } catch (\Throwable $th) {
         }
-        $this->fetchData['appOnline']->update(['status' => AppointmentOnlineStatusEnum::ANSWER_BY_DOCTOR]) ;
+        $this->fetchData['appOnline']->update(['status' => AppointmentOnlineStatusEnum::ANSWER_BY_DOCTOR]);
         $this->dispatch('sendMessage', true);
     }
     public function messages()
@@ -246,21 +246,24 @@ class MessageDetail extends Component
         if (isset($smsTemplate)) {
             $appointmentUser->notify(new AppointmentUserFeedbackSmsnotification($smsTemplate, $link_code));
         }
-        Cache::forget('appointmentList.' . $appointmentUser->id);
+        GenerateAppointmentCache::dispatch($appointmentUser->setting);
 
         $this->fetchData['appOnline']->update(['status' => AppointmentOnlineStatusEnum::COMPLETED_BY_DOCTOR]);
         $this->fetchData['appOnline']->appointmentUser()->update(['status' => AppointmentUserStatusEnum::STATUS_ONILNE_CLOSED]);
         return redirect()->route('admin.appointment_user.message.detail', ['onlineAppId' => $this->fetchData['appOnline']->id])->with('success', 'وضعیت نوبت به تمام شده ، تغییر پیدا کرد');
     }
-    public function updateComponent() {
+    public function updateComponent()
+    {
         $this->render();
     }
-    public function updated($properyty) {
-        if($properyty == 'form.capturedPic'){
-            $this->dispatch('picUploade',true);
+    public function updated($properyty)
+    {
+        if ($properyty == 'form.capturedPic') {
+            $this->dispatch('picUploade', true);
         }
     }
-    public function reactivateChat() {
+    public function reactivateChat()
+    {
         $this->fetchData['appOnline']->update(['status' => AppointmentOnlineStatusEnum::REACTIVATED]);
         $this->msg = 'چت با موفقیت فعال شد';
         return $this->render();

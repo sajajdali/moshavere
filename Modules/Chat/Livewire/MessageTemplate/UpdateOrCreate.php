@@ -6,7 +6,7 @@ use Livewire\Component;
 use App\Enum\ActiveEnum;
 use Livewire\Attributes\Url;
 use Livewire\WithPagination;
-use Modules\Chat\App\Models\MessageTemplate;
+use Modules\Chat\app\Models\MessageTemplate;
 
 class UpdateOrCreate extends Component
 {

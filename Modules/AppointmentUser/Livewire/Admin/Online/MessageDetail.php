@@ -12,7 +12,7 @@ use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Storage;
 use Livewire\WithFileUploads;
 use Modules\AppointmentUser\app\Jobs\GenerateAppointmentCache;
-use Modules\Chat\App\Models\MessageTemplate;
+use Modules\Chat\app\Models\MessageTemplate;
 use Modules\Setting\Enum\SettingKeyEnum;
 use Modules\AppointmentUser\app\Models\AppointmentUser;
 use Modules\User\app\Notifications\UserSmsNotification;

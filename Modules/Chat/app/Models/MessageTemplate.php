@@ -1,6 +1,6 @@
 <?php
 
-namespace Modules\Chat\App\Models;
+namespace Modules\Chat\app\Models;
 
 use App\Enum\ActiveEnum;
 use Illuminate\Database\Eloquent\Model;

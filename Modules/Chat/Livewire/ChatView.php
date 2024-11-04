@@ -20,7 +20,7 @@ use Modules\Chat\app\Models\ChatDetail;
 use Modules\Setting\Enum\SettingKeyEnum;
 use Modules\Chat\Enum\ChatDetailTypeEnum;
 use Modules\Chat\app\Models\ChatDetailsFile;
-use Modules\Chat\App\Models\MessageTemplate;
+use Modules\Chat\app\Models\MessageTemplate;
 use Modules\Chat\app\Events\AdminAnswerChatEvent;
 use Modules\User\app\Notifications\UserSmsNotification;
 use Modules\Api\app\Resources\Api\Chat\ChatDetailResource;

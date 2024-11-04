@@ -20,6 +20,7 @@ use Modules\Chat\app\Models\ChatDetail;
 use Modules\Setting\Enum\SettingKeyEnum;
 use Modules\Chat\Enum\ChatDetailTypeEnum;
 use Modules\Chat\app\Models\ChatDetailsFile;
+use Modules\Chat\App\Models\MessageTemplate;
 use Modules\Chat\app\Events\AdminAnswerChatEvent;
 use Modules\User\app\Notifications\UserSmsNotification;
 use Modules\Api\app\Resources\Api\Chat\ChatDetailResource;
@@ -30,7 +31,7 @@ class ChatView extends Component
 
     #[Url]
     public int $chatId = 0;
-
+public array $fetchData =[];
     public $chatMessage = '';
     public $searchTerm = ''; // Property to hold the search term
 
@@ -291,6 +292,13 @@ class ChatView extends Component
     public function runSearch()
     {
         $this->render();
+    }
+    public function booted()
+    {
+        $this->dispatch('loadJs', true);
+    }
+    public function mount() {
+        $this->fetchData['messageTemplate']      =  MessageTemplate::all();
     }
     public function render()
     {

@@ -10,12 +10,10 @@
                     حذف فیلترها ->
                 </button>
             @else
-                <button class="btn btn-warning me-2" type="button"
-                    wire:click='showFilteredChat("closed")'>
+                <button class="btn btn-warning me-2" type="button" wire:click='showFilteredChat("closed")'>
                     نمایش چت های بسته شده
                 </button>
-                <button class="btn btn-info me-2" type="button"
-                    wire:click='showFilteredChat("userAwnswered")'>
+                <button class="btn btn-info me-2" type="button" wire:click='showFilteredChat("userAwnswered")'>
                     چت های پاسخ کاربر
                 </button>
             @endif
@@ -249,7 +247,24 @@
         </button>
         <input type="file" accept="image/*" capture="environment" id="cameraInput" wire:model='form.capturedPic'
             style="display:none;" />
-        <textarea rows="3" class="form-control mt-5" placeholder="متن پیام شما..." wire:model="chatMessage"></textarea>
+        <div class="w-100 mt-5">
+            @if (isset($fetchData['messageTemplate']))
+                <div class="col-12 mt-5">
+                    <div class="form-group">
+                        <select wire:igonre.self class="form-control select2-show-search form-select"
+                            data-placeholder="متن های اماده...">
+                            <option label="متن ثابت.."></option>
+                            @foreach ($fetchData['messageTemplate'] as $msgTemp)
+                                <option value="{{ $msgTemp->body }}">
+                                    {{ $msgTemp->title }}
+                                </option>
+                            @endforeach
+                        </select>
+                    </div>
+                </div>
+            @endif
+            <textarea rows="3" class="form-control mt-5" placeholder="متن پیام شما..." wire:model="chatMessage"></textarea>
+        </div>
         {{-- send File modal --}}
         <div class="mt-5">
             <button type="button" wire:click="sendMessage" wire:loading.class="btn btn-light btn-loading"
@@ -270,8 +285,8 @@
     @endif
 </div>
 <div class="row mt-5  pt-1 pt-sm-3">
-    <div class="col-12">
-        <span class="rounded-pill ms-1 mt-1 d-flex align-item-center">
+    <div class="col-12 mt-5">
+        <span class="rounded-pill ms-1 mt-1 d-flex align-item-center mt-5">
             <div class="material-switch">
                 <input wire:model='form.sendSms' id="sendSms" name="siwtch04" type="checkbox" />
                 <label for="sendSms" class="label-info"></label>
@@ -313,7 +328,7 @@
     <script src="{{ admin_asset('plugins/tabs/tab-content.js') }}"></script>
     <script src="{{ admin_asset('js/chat.js') }}"></script>
     <script src="{{ admin_asset('plugins/sweet-alert/sweetalert.min.js') }}"></script>
-
+    <script src="{{ admin_asset('plugins/select2/select2.full.min.js') }}"></script>
     <!-- Include Fancybox CSS -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/fancybox/3.5.7/jquery.fancybox.min.css" />
     <!-- Include Fancybox JS -->
@@ -382,6 +397,21 @@
         });
         $('body').on('change', '#searchInput', function() {
             @this.runSearch();
+        });
+
+        function js() {
+            $('.select2-show-search').select2();
+            $('body').on('change', '.select2-show-search', function() {
+                var modelName = $(this).val();
+                // $('#sendMessageBox').val(modelName);
+                @this.set('chatMessage', modelName);
+            });
+        }
+        js();
+        Livewire.on('loadJs', function() {
+            setTimeout(() => {
+                js();
+            }, 500);
         });
     </script>
 @endpush

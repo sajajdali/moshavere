@@ -2,6 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 use Modules\Chat\Http\Controllers\ChatController;
+use Modules\Chat\Livewire\MessageTemplate\UpdateOrCreate;
 
 /*
 |--------------------------------------------------------------------------
@@ -16,4 +17,5 @@ use Modules\Chat\Http\Controllers\ChatController;
 
 Route::group([], function () {
     Route::get('chat', \Modules\Chat\Livewire\ChatView::class)->name('chat')->can('viewAny', \Modules\Chat\app\Models\Chat::class);
+    Route::get('message/template', UpdateOrCreate::class)->name('messagetemplate.create')->can('messageTemplate.create');
 });

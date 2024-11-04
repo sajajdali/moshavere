@@ -12,6 +12,7 @@ use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Storage;
 use Livewire\WithFileUploads;
 use Modules\AppointmentUser\app\Jobs\GenerateAppointmentCache;
+use Modules\Chat\App\Models\MessageTemplate;
 use Modules\Setting\Enum\SettingKeyEnum;
 use Modules\AppointmentUser\app\Models\AppointmentUser;
 use Modules\User\app\Notifications\UserSmsNotification;
@@ -277,6 +278,11 @@ class MessageDetail extends Component
             ->where('seen', AppointmentOnlineMessageSeenEnum::UNSEEN)
             ->update(['seen' => AppointmentOnlineMessageSeenEnum::SEEN]);
         $this->fetchData['user']      =  $this->fetchData['appOnline']->user;
+        $this->fetchData['messageTemplate']      =  MessageTemplate::all();
+    }
+    public function booted()
+    {
+        $this->dispatch('loadJs', true);
     }
     public function render()
     {

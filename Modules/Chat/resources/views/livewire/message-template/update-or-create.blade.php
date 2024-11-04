@@ -228,6 +228,8 @@
 </div>
 @push('scripts')
     <script src="{{ admin_asset('plugins/select2/select2.full.min.js') }}"></script>
+    <script src="{{ admin_asset('plugins/sweet-alert/sweetalert.min.js') }}"></script>
+    <script src="{{ admin_asset('plugins/sweet-alert/admin.sweetalert.js') }}"></script>
     <script>
         $(document).ready(function() {
             Livewire.on('editMode', function() {

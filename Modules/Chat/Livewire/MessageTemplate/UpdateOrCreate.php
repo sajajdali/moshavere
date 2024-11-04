@@ -4,6 +4,7 @@ namespace Modules\Chat\Livewire\MessageTemplate;
 
 use Livewire\Component;
 use App\Enum\ActiveEnum;
+use Livewire\Attributes\On;
 use Livewire\Attributes\Url;
 use Livewire\WithPagination;
 use Modules\Chat\app\Models\MessageTemplate;
@@ -79,6 +80,13 @@ class UpdateOrCreate extends Component
             'active' => true,
         ];
     }
+    #[On('delete')]
+    public function newMessage(MessageTemplate $model): void
+    {
+        $model->delete();
+        $this->msg = 'متن با موفقیت حذف شد';
+    }
+
     public function render()
     {
         $tempMessages = MessageTemplate::query()

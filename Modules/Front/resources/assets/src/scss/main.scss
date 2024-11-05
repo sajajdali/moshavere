@@ -189,3 +189,18 @@ $font: 'iranSans', sans-serif;
         height: 25px;
     }
 }
+@media (min-width: 1024px) {
+    .main-slider-with-logo {
+        background-image: url("https://pezeshkam.com//storage/logo/TG6lA1S89XkTUL7kWE0hn3BIfnjg3SeaZAmgpiRb.png");
+        background-repeat: no-repeat;
+        background-position: right 100px; /* Set both x and y positions here */
+        background-size: 300px;
+    }
+}
+
+/* Hide logo on screens smaller than 1024px */
+@media (max-width: 1023px) {
+    .main-slider-with-logo {
+        background-image: none;
+    }
+}

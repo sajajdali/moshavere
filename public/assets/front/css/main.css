@@ -2427,6 +2427,9 @@ button:disabled,
 .w-6 {
   width: 1.5rem;
 }
+.w-60 {
+  width: 15rem;
+}
 .w-7 {
   width: 1.75rem;
 }
@@ -2483,18 +2486,6 @@ button:disabled,
 }
 .w-full {
   width: 100%;
-}
-.w-12 {
-  width: 3rem;
-}
-.w-20 {
-  width: 5rem;
-}
-.w-40 {
-  width: 10rem;
-}
-.w-60 {
-  width: 15rem;
 }
 .min-w-28 {
   min-width: 7rem;
@@ -2672,15 +2663,6 @@ button:disabled,
   --tw-space-y-reverse: 0;
   margin-top: calc(2rem * calc(1 - var(--tw-space-y-reverse)));
   margin-bottom: calc(2rem * var(--tw-space-y-reverse));
-}
-.divide-y > :not([hidden]) ~ :not([hidden]) {
-  --tw-divide-y-reverse: 0;
-  border-top-width: calc(1px * calc(1 - var(--tw-divide-y-reverse)));
-  border-bottom-width: calc(1px * var(--tw-divide-y-reverse));
-}
-.divide-secondary-200 > :not([hidden]) ~ :not([hidden]) {
-  --tw-divide-opacity: 1;
-  border-color: rgb(213 221 229 / var(--tw-divide-opacity));
 }
 .self-stretch {
   align-self: stretch;
@@ -3079,10 +3061,6 @@ button:disabled,
   padding-top: 2rem;
   padding-bottom: 2rem;
 }
-.px-10 {
-  padding-left: 2.5rem;
-  padding-right: 2.5rem;
-}
 .pb-0 {
   padding-bottom: 0px;
 }
@@ -3197,9 +3175,6 @@ button:disabled,
 }
 .leading-\[2\.5rem\] {
   line-height: 2.5rem;
-}
-.leading-3 {
-  line-height: .75rem;
 }
 .text-black {
   --tw-text-opacity: 1;
@@ -3470,6 +3445,20 @@ button:disabled,
   .fixed-icons svg {
     width: 25px;
     height: 25px;
+  }
+}
+@media (min-width: 1024px) {
+  .main-slider-with-logo {
+    background-image: url("https://pezeshkam.com//storage/logo/TG6lA1S89XkTUL7kWE0hn3BIfnjg3SeaZAmgpiRb.png");
+    background-repeat: no-repeat;
+    background-position: right 100px; /* Set both x and y positions here */
+    background-size: 300px;
+  }
+}
+/* Hide logo on screens smaller than 1024px */
+@media (max-width: 1023px) {
+  .main-slider-with-logo {
+    background-image: none;
   }
 }
 .after\:ml-0::after {

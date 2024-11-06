@@ -42,8 +42,7 @@
                                     نوبت بدون پاسخ
                                 </span>
                             </div>
-                            {{-- TODO::unComment --}}
-                            {{-- @if (!auth()->user()->isAdmin()) --}}
+                            @if (auth()->user()->isMama())
                             <div class="d-flex justify-content-around">
                                 <button wire:click='showStatus("all")' disabled
                                     class="btn    @if ($show == 'all') btn-success   @else btn-info @endif">نمایش
@@ -55,7 +54,7 @@
                                     class="btn    @if ($show == 'empty') btn-success @else btn-info @endif">نوبت
                                     های خالی</button>
                             </div>
-                            {{-- @endif --}}
+                            @endif
                             <div class="flex-column flex-sm-row">
                                 <button class="btn btn-warning me-2" type="button" wire:click='showalltheMessages'>
                                     نمایش نوبت های تمام شده

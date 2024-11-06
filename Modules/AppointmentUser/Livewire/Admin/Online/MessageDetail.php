@@ -92,6 +92,7 @@ class MessageDetail extends Component
             'body'                  =>  isset($this->form['typedMessage']) ? $this->form['typedMessage'] : '',
         ];
         $AOM =  AppointmentOnlineMessage::create($model);
+        $AOM->online->update(['agent_id' => auth()->user()->id]);
         if (isset($this->form['file'])) {
             $url = $this->form['file'];
             // Parse the URL

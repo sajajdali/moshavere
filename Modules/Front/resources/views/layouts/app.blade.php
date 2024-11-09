@@ -13,8 +13,10 @@
     <meta name="keywords" content="{{ setting(Modules\Setting\Enum\SettingKeyEnum::SITE_TITLE) }}">
     <!-- Favicon -->
     <link rel="apple-touch-icon" sizes="76x76" href="{{ front_asset('/assets/images/favicon/apple-touch-icon.png') }}">
-     <link rel="icon" type="image/png" sizes="32x32" href="{{ front_asset('/assets/images/favicon/favicon-32x32.png') }}">
-    <link rel="icon" type="image/png" sizes="16x16" href="{{ front_asset('/assets/images/favicon/favicon-16x16.png') }}">
+    <link rel="icon" type="image/png" sizes="32x32"
+        href="{{ front_asset('/assets/images/favicon/favicon-32x32.png') }}">
+    <link rel="icon" type="image/png" sizes="16x16"
+        href="{{ front_asset('/assets/images/favicon/favicon-16x16.png') }}">
     <link rel="manifest" href="{{ front_asset('/assets/images/favicon/site.webmanifest') }}">
     <meta name="msapplication-TileColor" content="#ffffff">
     <meta name="theme-color" content="#ffffff">
@@ -22,12 +24,55 @@
     <title>{{ setting(Modules\Setting\Enum\SettingKeyEnum::SITE_TITLE) }} @isset($title)
             | {{ $title }}
         @endisset </title>
-        @include('front::layouts.components.styles')
-        @stack('styles')
+    @include('front::layouts.components.styles')
+    @stack('styles')
     @livewireStyles
+
+    <script>
+        window.dataLayer = window.dataLayer || [];
+
+        function gtag() {
+            dataLayer.push(arguments);
+        }
+        gtag("consent", "default", {
+            ad_storage: "granted",
+            ad_user_data: "granted",
+            ad_personalization: "granted",
+            analytics_storage: "granted",
+            functionality_storage: "granted",
+            personalization_storage: "granted",
+            security_storage: "granted",
+            wait_for_update: 2000,
+        });
+        gtag("set", "ads_data_redaction", true);
+        gtag("set", "url_passthrough", true);
+    </script>
+    <!-- Google Tag Manager -->
+    <script>
+        (function(w, d, s, l, i) {
+            w[l] = w[l] || [];
+            w[l].push({
+                'gtm.start': new Date().getTime(),
+                event: 'gtm.js'
+            });
+            var f = d.getElementsByTagName(s)[0],
+                j = d.createElement(s),
+                dl = l != 'dataLayer' ? '&l=' + l : '';
+            j.async = true;
+            j.src =
+                'https://www.googletagmanager.com/gtm.js?id=' + i + dl;
+            f.parentNode.insertBefore(j, f);
+        })(window, document, 'script', 'dataLayer', 'GTM-PGHHCTPG');
+    </script>
+    <!-- End Google Tag Manager -->
 </head>
 
 <body class="rtl app sidebar-mini">
+
+    <!-- Google Tag Manager (noscript) -->
+    <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-PGHHCTPG" height="0" width="0"
+            style="display:none;visibility:hidden"></iframe></noscript>
+    <!-- End Google Tag Manager (noscript) -->
     @include('front::layouts.components.app-header')
     <!-- Icons Fixed on Left Side -->
     @if (!disableUi())

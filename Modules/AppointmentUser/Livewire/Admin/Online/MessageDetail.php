@@ -205,7 +205,10 @@ class MessageDetail extends Component
     }
     public function approvedAppointment()
     {
-        $this->fetchData['appOnline']->appointmentUser()->update(['status' => AppointmentOnlineStatusEnum::ACCEPTED]);
+        $this->fetchData['appOnline']->appointmentUser()->update([
+            'status' => AppointmentUserStatusEnum::STATUS_SUCCESSFUL,
+            'deadline_at' => null
+        ]);
         $this->fetchData['appOnline']->update(['status' => AppointmentOnlineStatusEnum::ACCEPTED]);
         return redirect()->route('admin.appointment_user.message.detail', $this->fetchData['appOnline']->id);
     }

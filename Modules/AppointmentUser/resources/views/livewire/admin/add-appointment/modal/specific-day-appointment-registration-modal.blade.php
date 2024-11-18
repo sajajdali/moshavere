@@ -27,12 +27,12 @@
                             <hr style="opacity: 0.5">
                         </div>
 
-                        @if(setting( \Modules\Setting\Enum\SettingKeyEnum::APPOINTMENT_SET_APPOINTMENT_WITH_DOCUMENT_NUMBER))
+                        @if (setting(\Modules\Setting\Enum\SettingKeyEnum::APPOINTMENT_SET_APPOINTMENT_WITH_DOCUMENT_NUMBER))
                             <div class="row mb-4">
                                 <label for="parvande" class=" col-form-label">ثبت نوبت با شماره پرونده </label>
                                 <input type="text"
-                                    class="form-control @error('form.document_number') is-invalid @enderror" id="parvande"
-                                    wire:loading.attr="disabled" wire:model='form.document_number'>
+                                    class="form-control @error('form.document_number') is-invalid @enderror"
+                                    id="parvande" wire:loading.attr="disabled" wire:model='form.document_number'>
                                 @error('form.document_number')
                                     <span class="text-danger">{{ $message }}</span>
                                 @enderror
@@ -100,26 +100,32 @@
                             <div class="col-md-8">
                                 <hr>
                             </div>
-                            <div class="collapse @if (!isset($form['time']['from'])) show @endif  @error('form.time.from') show  @enderror row"
+                            <div class="collapse @if (!isset($form['time']['from'])) show @endif  @if ($errors->has('form.time.until') || $errors->has('form.time.from')) show @endif row"
                                 id="timingCollaps">
                                 <div class="col-md-6">
                                     <div class="mb-3">
-                                        <input type="time" class="form-control" id="firs_name_addApp"
+                                        <input type="time" class="form-control @error('form.time.from') is-invalid @enderror " id="firs_name_addApp"
                                             wire:model='form.time.from' placeholder="ساعت شروع">
                                     </div>
+                                    @error('form.time.from')
+                                        <div class="col-12 mt-2">
+                                            <span class="text-danger">{{ $message }}</span>
+                                        </div>
+                                    @enderror
                                 </div>
                                 <div class="col-md-6">
                                     <div class="mb-3">
-                                        <input type="time" class="form-control" id="last_name_addApp"
+                                        <input type="time" class="form-control  @error('form.time.until') is-invalid @enderror" id="last_name_addApp"
                                             wire:model='form.time.until' placeholder="ساعت پایان">
                                     </div>
+                                    @error('form.time.until')
+                                        <div class="col-12 mt-2">
+                                            <span class="text-danger">{{ $message }}</span>
+                                        </div>
+                                    @enderror
                                 </div>
                             </div>
-                            @error('form.time.from')
-                                <div class="col-12 mt-2">
-                                    <span class="text-danger">{{ $message }}</span>
-                                </div>
-                            @enderror
+
                         </div>
                         <div class="row my-5">
                             <div class="col-md-4">

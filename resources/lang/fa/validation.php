@@ -214,6 +214,7 @@ return [
         "form.province" => "استان/شهر",
         "form.otherApp.mobile" => "شماره موبایل ",
         "form.body" => "متن ",
+        "form.time.until" => "زمان پایان ",
     ],
 
 ];

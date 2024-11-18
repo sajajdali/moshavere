@@ -7,6 +7,7 @@ use App\Enum\ActiveEnum;
 use Livewire\Attributes\On;
 use Livewire\Attributes\Url;
 use Livewire\WithPagination;
+use Modules\User\Entities\User;
 use Modules\Chat\app\Models\MessageTemplate;
 
 class UpdateOrCreate extends Component
@@ -24,19 +25,44 @@ class UpdateOrCreate extends Component
     #[Url]
     public array $search =  [];
 
+    public function removeFiles()
+    {
+        if (isset($this->form['file'])) {
+            unset($this->form['file']);
+        }
+        if (isset($this->form['voice'])) {
+            unset($this->form['voice']);
+        }
+    }
     public function createOrUpdateMessageTemplate()
     {
+
         $this->validate([
             'form.title'    => 'required|string|max:5000',
-            'form.body'     => 'required|string|max:5000',
+            'form.body'     => 'nullable|string|max:5000',
+            'form.voice'    => 'nullable|string',
+            'form.file'     => 'nullable|string',
+            'form.limitToDoctor'     => 'required',
         ]);
-
         $model = [
             'title'       => $this->form['title'],
-            'body'        => $this->form['body'],
             'priority'    => $this->form['priority'],
             'active'      => $this->form['active'] == true ? ActiveEnum::ACTIVE : ActiveEnum::DEACTIVE,
         ];
+        if (isset($this->form['body'])) {
+            $model['body'] = $this->form['body'];
+        }
+        $model['detail']['doc'] = $this->form['limitToDoctor'];
+        if (isset($this->form['voice'])) {
+            $model['detail']['voice'] = $this->form['voice'];
+        } else {
+            $model['detail']['voice'] = null;
+        }
+        if (isset($this->form['file'])) {
+            $model['detail']['file'] = $this->form['file'];
+        } else {
+            $model['detail']['file'] = null;
+        }
         if ($this->isEdited) {
             $this->MessageTemplate->update($model);
             $this->msg = 'با موفقیت ویرایش شد';
@@ -49,6 +75,7 @@ class UpdateOrCreate extends Component
             'active' => true,
             'priority' =>  MessageTemplate::maxPriority(),
         ];
+        $this->dispatch('editMode', true);
     }
     public function editTemp(MessageTemplate $MessageTemplate)
     {
@@ -58,13 +85,17 @@ class UpdateOrCreate extends Component
         $this->form['body']     = $MessageTemplate->body;
         $this->form['priority'] = $MessageTemplate->priority;
         $this->form['active']   = $MessageTemplate->active == ActiveEnum::ACTIVE ? true : false;
+        if (isset($MessageTemplate['detail']['doc'])) {
+            $this->form['limitToDoctor'] =     $MessageTemplate['detail']['doc'];
+        }
+        if (isset($MessageTemplate->detail)) {
+            isset($MessageTemplate->detail['file']) ?  $this->form['file'] = $MessageTemplate->detail['file'] : '';
+            isset($MessageTemplate->detail['voice']) ?  $this->form['voice'] = $MessageTemplate->detail['voice'] : '';
+        }
 
         $this->dispatch('editMode', true);
     }
-    public function mount()
-    {
-        $this->form['priority'] = MessageTemplate::maxPriority();
-    }
+
     public function startSearch()
     {
         return $this->render();
@@ -87,6 +118,15 @@ class UpdateOrCreate extends Component
         $this->msg = 'متن با موفقیت حذف شد';
     }
 
+    public function mount()
+    {
+        $this->form['priority'] = MessageTemplate::maxPriority();
+        $this->fetchData['doctors'] = User::doctors();
+    }
+    public function boot()
+    {
+        return $this->dispatch('loadJs', true);
+    }
     public function render()
     {
         $tempMessages = MessageTemplate::query()

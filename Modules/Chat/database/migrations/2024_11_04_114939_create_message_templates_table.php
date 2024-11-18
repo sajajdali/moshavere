@@ -14,8 +14,9 @@ return new class extends Migration
         Schema::create('message_templates', function (Blueprint $table) {
             $table->id();
             $table->text('title');
-            $table->text('body');
+            $table->text('body')->nullable();
             $table->tinyInteger('active')->default(1);
+            $table->json('detial')->nullable();
             $table->tinyInteger('priority')->default(1);
             $table->timestamps();
         });

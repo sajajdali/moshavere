@@ -22,7 +22,7 @@
                     <h5>افزودن پیام جدید</h5>
                 </a>
             </div>
-            <div class="card-body collapse" id="createTempColl">
+            <div class="card-body collapse" id="createTempColl" wire:ignore.self>
                 <div class="row mb-5">
                     <div class="col-md-12">
                         <label for="tempMessageText" class="form-label ms-3 mb-2">عنوان پیام</label>
@@ -46,6 +46,83 @@
                                 <i class="fa fa-exclamation-triangle ms-1 mt-1" aria-hidden="true"></i>
                                 {{ $message }}
                             </div>
+                        @enderror
+                    </div>
+                </div>
+                <div class="row mb-3">
+                    @if (isset($form['file']) || isset($form['voice']))
+                        <div class="col-2">
+                            <a class="text-primary" wire:click='removeFiles'>
+                                حذف فایل ها
+                            </a>
+                        </div>
+                        <div class="col-10">
+                            <hr class="w-75">
+                        </div>
+                    @else
+                        <div class="col-12">
+                            <hr>
+                        </div>
+                    @endif
+                </div>
+                <div class="row mb-5">
+                    <div class="mb-3 col-md-6 d-flex align-items-center">
+                        <label for="messagetemplatebody" class="form-label mb-2">اضافه کردن ویس به پیام آماده</label>
+                        <button type="button"
+                            class="btn @if (isset($form['voice'])) btn-success @else btn-secondary @endif ms-5 w-25"
+                            data-bs-toggle="modal" data-bs-target="#soundRecorderModal">
+                            @if (isset($this->form['voice']))
+                                <i class="fa fa-check fa-2x mt-1" aria-hidden="true"></i>
+                            @else
+                                <i class="fa fa-microphone fa-2x mt-1" aria-hidden="true"></i>
+                            @endif
+                        </button>
+                        @error('form.voice')
+                            <div class="text-danger mt-2">
+                                <i class="fa fa-exclamation-triangle ms-1 mt-1" aria-hidden="true"></i>
+                                {{ $message }}
+                            </div>
+                        @enderror
+                    </div>
+                    <div class="mb-3 col-md-6  d-flex align-items-center">
+                        <label for="messagetemplatebody" class="form-label mb-2">اضافه کردن تصویر به پیام آماده</label>
+                        <button data-bs-target="#file-selector-modal" data-bs-toggle="modal"
+                            class="btn  @if (isset($form['file'])) btn-success @else btn-light @endif mx-3 d-flex justify-content-center p-1 py-2  w-25"
+                            href="javascript:void(0)">
+                            @if (isset($form['file']))
+                                <i class="fa fa-check fa-2x mt-1" aria-hidden="true"></i>
+                            @else
+                                <i class="fa fa-file fa-2x mt-1" aria-hidden="true"></i>
+                            @endif
+                        </button>
+                        @error('form.body')
+                            <div class="text-danger mt-2">
+                                <i class="fa fa-exclamation-triangle ms-1 mt-1" aria-hidden="true"></i>
+                                {{ $message }}
+                            </div>
+                        @enderror
+                    </div>
+                </div>
+                <div class="col-md-12 mb-5">
+                    <div class="form-group">
+                        <label class="form-label">محدودییت نمایش این پیام برای دکتر</label>
+                        <select wire:model='form.limitToDoctor' wire:igonre.self multiple
+                            class="form-control select2-show-search form-select" data-id="Doc_id"
+                            data-placeholder="انتخاب کنید..">
+                            <option label="انتخاب کنید.."></option>
+                            <option @if( isset($form['limitToDoctor']) && in_array(null,$form['limitToDoctor'])) selected @endif value="null">نمایش برای تمام پزشکان</option>
+                            @if (isset($fetchData['doctors']))
+                                @foreach ($fetchData['doctors'] as $doctor)
+                                    <option @if(  isset($form['limitToDoctor']) && in_array($doctor->id,$form['limitToDoctor'])) selected @endif  value="{{ $doctor->id }}">
+                                        {{ $doctor->fullName }}
+                                    </option>
+                                @endforeach
+                            @endif
+                        </select>
+                        @error('form.limitToDoctor')
+                            <span class="text-danger">
+                                لطفا یک گزینه را انتخاب کنید
+                            </span>
                         @enderror
                     </div>
                 </div>
@@ -101,7 +178,7 @@
                         data-bs-target="#advanceSearch" aria-expanded="false" aria-controls="advanceSearch">
                         جست و جوی پیشرفته
                     </button>
-                    @if (isset($search) && ! empty($search))
+                    @if (isset($search) && !empty($search))
                         <button class="btn btn-secondary ms-2" type="button" wire:click="resetProperties"
                             data-bs-toggle="collapse" data-bs-target="#advanceSearch" aria-expanded="false"
                             aria-controls="advanceSearch" wire:loading.class="bg-gray btn-loading disabled">نمایش
@@ -156,6 +233,8 @@
                                 <th scope="col">#</th>
                                 <th scope="col">عنوان</th>
                                 <th scope="col">متن</th>
+                                <th scope="col">دارای ویس</th>
+                                <th scope="col">دارای فایل</th>
                                 <th scope="col">وضعیت</th>
                                 <th scope="col">ترتیب نمایش</th>
                                 <th scope="col">عملیات</th>
@@ -171,6 +250,27 @@
                                             <span data-bs-toggle="tooltip" data-bs-placement="top"
                                                 title="{{ $tempMessage->body }}">
                                                 {{ substr($tempMessage->body, 0, 50) }} ...
+                                            </span>
+                                        </td>
+                                        <td>
+                                            <span class="{{ $tempMessage->hasVoiceBadge() }}">
+                                                @if ($tempMessage->hasVoice())
+                                                    <i class="fa fa-check" aria-hidden="true"></i>
+                                                @else
+                                                    <i class="fa fa-times" aria-hidden="true"></i>
+                                                @endif
+                                            </span>
+                                        </td>
+                                        <td>
+                                            <span
+                                                class="badge @if ($tempMessage->hasFile()) bg-success
+                                                @else
+                                                bg-danger @endif">
+                                                @if ($tempMessage->hasFile())
+                                                    <i class="fa fa-check" aria-hidden="true"></i>
+                                                @else
+                                                    <i class="fa fa-times" aria-hidden="true"></i>
+                                                @endif
                                             </span>
                                         </td>
                                         <td>{!! $tempMessage->active->getBadge() !!}</td>
@@ -224,12 +324,16 @@
             </div>
         </div>
     </div>
-
+    <livewire:admin::file-manager-modal />
+    <livewire:appointmentuser::admin.online.sound-recorder />
 </div>
 @push('scripts')
+    <script src="{{ admin_asset('js/sound/recorder.js') }}"></script>
+    <script src="{{ admin_asset('js/sound/Fr.voice.js') }}"></script>
+    <script src="{{ admin_asset('js/sound/app.js') }}"></script>
     <script src="{{ admin_asset('plugins/select2/select2.full.min.js') }}"></script>
-    <script src="{{ admin_asset('plugins/sweet-alert/sweetalert.min.js') }}"></script>
-    <script src="{{ admin_asset('plugins/sweet-alert/admin.sweetalert.js') }}"></script>
+    <script src="{{ admin_asset('plugins/sweet-alert/sweetalert.min.js') }}"></script> --}}
+
     <script>
         $(document).ready(function() {
             Livewire.on('editMode', function() {
@@ -239,6 +343,58 @@
                         show: true
                     })
                 }, 100);
+            });
+            Livewire.on('fileHasUpload', function() {
+                var myModalEl = document.getElementById('soundRecorderModal');
+                var modalsound = bootstrap.Modal.getInstance(myModalEl);
+                modalsound.hide();
+            });
+            Livewire.on('select_file', (param) => {
+                @this.set('form.file', param.url);
+                $('#file-selector-modal').modal('hide');
+            });
+            $(document).on("click", "#save:not(.disabled)", function() {
+                function upload(blob) {
+                    var formData = new FormData();
+                    formData.append('file', blob);
+                    $.ajaxSetup({
+                        headers: {
+                            'X-CSRF-TOKEN': "{{ csrf_token() }}"
+                        }
+                    });
+                    $.ajax({
+                        url: "/admin/appointment_user/storevoice",
+                        type: 'POST',
+                        data: formData,
+                        contentType: false,
+                        processData: false,
+                        success: function(url) {
+                            @this.set('form.voice', url)
+                            @this.dispatch('fileHasUpload');
+                            $("#audio").attr("src", url);
+                            $("#secound_loading").removeClass('d-block').addClass('d-none');
+                        }
+                    });
+                }
+                if ($(this).parent().data("type") === "mp3") {
+                    Fr.voice.exportMP3(upload, "blob");
+                } else {
+                    $("#secound_loading").removeClass('d-none').addClass('d-block');
+                    Fr.voice.export(upload, "blob");
+                }
+            });
+
+            function js() {
+                $('.select2-show-search').select2();
+                $('body').on('change', '.select2-show-search', function() {
+                    @this.set('form.limitToDoctor',$(this).val());
+                });
+            }
+            js();
+            Livewire.on('loadJs', function() {
+                setTimeout(() => {
+                    js();
+                }, 500);
             });
         });
     </script>

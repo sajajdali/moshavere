@@ -43,17 +43,17 @@
                                 </span>
                             </div>
                             @if (auth()->user()->isMama())
-                            <div class="d-flex justify-content-around">
-                                <button wire:click='showStatus("all")' disabled
-                                    class="btn    @if ($show == 'all') btn-success   @else btn-info @endif">نمایش
-                                    همه</button>
-                                <button wire:click='showStatus("mine")' disabled
-                                    class="btn    @if ($show == 'mine') btn-success  @else btn-info @endif mx-2">نوبت
-                                    های من</button>
-                                <button wire:click='showStatus("empty")' disabled
-                                    class="btn    @if ($show == 'empty') btn-success @else btn-info @endif">نوبت
-                                    های خالی</button>
-                            </div>
+                                <div class="d-flex justify-content-around">
+                                    <button wire:click='showStatus("all")' disabled
+                                        class="btn    @if ($show == 'all') btn-success   @else btn-info @endif">نمایش
+                                        همه</button>
+                                    <button wire:click='showStatus("mine")' disabled
+                                        class="btn    @if ($show == 'mine') btn-success  @else btn-info @endif mx-2">نوبت
+                                        های من</button>
+                                    <button wire:click='showStatus("empty")' disabled
+                                        class="btn    @if ($show == 'empty') btn-success @else btn-info @endif">نوبت
+                                        های خالی</button>
+                                </div>
                             @endif
                             <div class="flex-column flex-sm-row">
                                 <button class="btn btn-warning me-2" type="button" wire:click='showalltheMessages'>
@@ -295,7 +295,6 @@
                             </div>
                         </div>
                     @endforeach
-
                 </div>
                 <div class="d-flex justify-content-center mb-5">
                     {{ $this->handleSearch()->links() }}

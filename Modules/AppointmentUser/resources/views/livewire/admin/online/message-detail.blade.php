@@ -303,7 +303,7 @@
                             </div>
                         </div>
                         <div class="main-chat-footer d-flex justify-content-center pt-5"
-                            style="padding-top :40px !important;">
+                            style="padding-top :60px !important;">
                             @if ($this->fetchData['appOnline']->status == Modules\AppointmentUser\Enum\AppointmentOnlineStatusEnum::PENDING)
                                 <button type="button" class="btn btn-success ms-2" wire:click='approvedAppointment'
                                     wire:loading.class='btn-loading btn-gray' wire:target='approvedAppointment'> تایید
@@ -335,7 +335,11 @@
                                 <div class="d-flex flex-column align-items-center mt-5">
                                     <button type="button" class="btn btn-secondary " data-bs-toggle="modal"
                                         data-bs-target="#soundRecorderModal">
-                                        <i class="fa fa-microphone fa-xl" aria-hidden="true"></i>
+                                        @if (isset($this->form['voice']))
+                                            <i class="fa fa-check" aria-hidden="true"></i>
+                                        @else
+                                            <i class="fa fa-microphone fa-xl" aria-hidden="true"></i>
+                                        @endif
                                     </button>
                                     <!-- Camera Button -->
                                     <button
@@ -355,7 +359,8 @@
                                         <div class="col-12 mt-5">
                                             <div class="form-group">
                                                 <select wire:igonre.self
-                                                    class="form-control select2-show-search form-select" data-placeholder="متن های اماده...">
+                                                    class="form-control select2-show-search form-select"
+                                                    data-placeholder="متن های اماده...">
                                                     <option label="متن ثابت.."></option>
                                                     @foreach ($fetchData['messageTemplate'] as $msgTemp)
                                                         <option value="{{ $msgTemp->id }}">
@@ -366,8 +371,8 @@
                                             </div>
                                         </div>
                                     @endif
-                                    <textarea rows="3" class="form-control mt-1 ms-1 @error('form.typedMessage') is-invalid @enderror" id="sendMessageBox"
-                                        wire:model='form.typedMessage'
+                                    <textarea rows="3" class="form-control mt-1 ms-1 @error('form.typedMessage') is-invalid @enderror"
+                                        id="sendMessageBox" wire:model='form.typedMessage'
                                         placeholder="@error('form.typedMessage') {{ $message }} @else متن خود را یادداشت کنید @enderror"></textarea>
                                 </div>
                                 <div class="d-flex flex-column align-items-center mt-5">
@@ -406,7 +411,6 @@
             </div>
         </div>
     </div>
-
     @include('appointmentuser::components.appointmentlist.disapprovemodal')
     <livewire:admin::file-manager-modal />
     <livewire:appointmentuser::admin.online.sound-recorder />
@@ -511,7 +515,7 @@
                 $('.select2-show-search').select2();
                 $('body').on('change', '.select2-show-search', function() {
                     var modelName = $(this).val();
-                    @this.templateMessageSelect(modelName)
+                    @this.templateMessageSelect(modelName);
                     // @this.set('form.typedMessage',modelName);
                 });
             }

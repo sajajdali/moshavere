@@ -47,7 +47,7 @@ class MessageTemplate extends Model
     }
     public function scopeDoctorMessage($query, $doctorId)
     {
-        return $query->where(function ($query) use ($doctorId) {
+        return $query->where('active',ActiveEnum::ACTIVE)->where(function ($query) use ($doctorId) {
             $query->where(function ($query) {
                 // Case 1: `doc` contains the string 'null'
                 $query->whereJsonContains('detail->doc', 'null');

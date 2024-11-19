@@ -19,7 +19,13 @@
             <div class="card-header border-bottom">
                 <a data-bs-toggle="collapse" href="#createTempColl" role="button" aria-expanded="false"
                     aria-controls="createTempColl">
-                    <h5>افزودن پیام جدید</h5>
+                    <h5>
+                    @if ($isEdited)
+                    ویرایش پیام {{$MessageTemplate->title}}
+                        @else
+                        افزودن پیام جدید
+                    @endif
+                </h5>
                 </a>
             </div>
             <div class="card-body collapse" id="createTempColl" wire:ignore.self>
@@ -51,13 +57,15 @@
                 </div>
                 <div class="row mb-3">
                     @if (isset($form['file']) || isset($form['voice']))
-                        <div class="col-2">
+                        <div class="col-5 co-sm-2">
                             <a class="text-primary" wire:click='removeFiles'>
-                                حذف فایل ها
+                                <strong>
+                                    حذف فایل ها
+                                </strong>
                             </a>
                         </div>
-                        <div class="col-10">
-                            <hr class="w-75">
+                        <div class="col-7 col-sm-10">
+                            <hr class="w-75 text-primary">
                         </div>
                     @else
                         <div class="col-12">
@@ -138,7 +146,7 @@
                     @enderror
                 </div>
                 <div class="row">
-                    <div class="col-9">
+                    <div class="col-12 col-sm-9">
                         <div class="d-flex flex-wrap align-items-center">
                             <div class="material-switch ms-5">
                                 <input wire:model='form.active' id="active" name="siwtch04" type="checkbox"
@@ -148,8 +156,8 @@
                             <p class="card-sub-title ms-3">فعال بودن</p>
                         </div>
                     </div>
-                    <div class="col-3 d-flex justify-content-center">
-                        <button wire:loading.class='btn-loading'
+                    <div class="col-12 col-sm-3 d-flex justify-content-end mt-5 my-sm-0">
+                        <button wire:loading.class='btn-loading w-auto'
                             class="btn @if ($isEdited) btn-primary @else btn-success @endif"
                             wire:click='createOrUpdateMessageTemplate'>
                             @if ($isEdited)
@@ -159,7 +167,7 @@
                             @endif
                         </button>
                         @if ($isEdited)
-                            <button class="btn btn-secondary ms-1" wire:click='ignoreSearch'>
+                            <button class="btn btn-secondary ms-1 w-auto" wire:click='ignoreSearch'>
                                 بیخیال
                             </button>
                         @endif
@@ -343,7 +351,8 @@
                     var myCollapse = document.getElementById('createTempColl')
                     var bsCollapse = new bootstrap.Collapse(myCollapse, {
                         show: true
-                    })
+                    });
+                    $('html, body').animate({ scrollTop: 0 }, 800); // Animate scroll to top
                 }, 100);
             });
             Livewire.on('fileHasUpload', function() {

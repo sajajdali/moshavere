@@ -38,20 +38,20 @@ class MessageDetail extends Component
         $this->getMessages();
     }
     #[On('fileHasUpload')]
-    public function storeRecordedVoice()
+    public function storeRecordedVoice($dontSendNotification = true)
     {
         if (isset($this->form['voice'])) {
             $fileUrl = Storage::url($this->form['voice']);
             $extension = pathinfo($fileUrl, PATHINFO_EXTENSION);
             $model = [
-                'appointment_online_id' =>  $this->fetchData['appOnline']->id,
-                'user_id'               =>  $this->fetchData['user']->id,
-                'answer_by'             =>  auth()->user()->id,
-                'type'                  =>  AppointmentOnlineMessageTypeEnum::ANSWER,
-                'seen'                  =>  AppointmentOnlineMessageSeenEnum::UNSEEN,
-                'body'                  =>  isset($this->form['typedMessage']) ? $this->form['typedMessage'] : '',
+                'appointment_online_id' => $this->fetchData['appOnline']->id,
+                'user_id' => $this->fetchData['user']->id,
+                'answer_by' => auth()->user()->id,
+                'type' => AppointmentOnlineMessageTypeEnum::ANSWER,
+                'seen' => AppointmentOnlineMessageSeenEnum::UNSEEN,
+                'body' => isset($this->form['typedMessage']) ? $this->form['typedMessage'] : '',
             ];
-            $AOM =  AppointmentOnlineMessage::create($model);
+            $AOM = AppointmentOnlineMessage::create($model);
             $fileModel = [
                 'user_id' => $this->fetchData['user']->id,
                 'answer_by' => auth()->user()->id,
@@ -65,9 +65,11 @@ class MessageDetail extends Component
                 'size' => 10,
             ];
             AppointmentOnlineMessageFile::create($fileModel);
-            $this->addError('success', 'ویس با موفقیت ارسال شد');
-            $this->fetchData['messages'] = $this->fetchData['appOnline']->messages;
-            $this->dispatch('sendMessage', true);
+            if ($dontSendNotification) {
+                $this->addError('success', 'ویس با موفقیت ارسال شد');
+                $this->fetchData['messages'] = $this->fetchData['appOnline']->messages;
+                $this->dispatch('sendMessage', true);
+            }
         }
     }
 
@@ -81,8 +83,15 @@ class MessageDetail extends Component
     public function sendMessage()
     {
         $this->validate([
-            'form.typedMessage' => 'required_without_all:form.file,form.capturedPic',
+            'form.typedMessage' => 'required_without_all:form.file,form.capturedPic,form.voice',
         ]);
+        if (isset($this->form['voice'])) {
+            if (! isset($this->form['file']) && ! isset($this->form['typedMessage'])) {
+                $this->storeRecordedVoice();
+            } else {
+                $this->storeRecordedVoice(true);
+            }
+        }
         $model = [
             'appointment_online_id' =>  $this->fetchData['appOnline']->id,
             'user_id'               =>  $this->fetchData['user']->id,

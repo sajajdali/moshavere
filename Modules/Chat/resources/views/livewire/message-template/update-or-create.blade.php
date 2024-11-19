@@ -236,6 +236,7 @@
                                 <th scope="col">دارای ویس</th>
                                 <th scope="col">دارای فایل</th>
                                 <th scope="col">وضعیت</th>
+                                <th scope="col">محدودیت نمایش برای</th>
                                 <th scope="col">ترتیب نمایش</th>
                                 <th scope="col">عملیات</th>
                             </tr>
@@ -274,6 +275,7 @@
                                             </span>
                                         </td>
                                         <td>{!! $tempMessage->active->getBadge() !!}</td>
+                                        <td>{!! $tempMessage->doctorsLimnits() !!}</td>
                                         <td>{{ $tempMessage->priority }}</td>
                                         <td>
                                             @canany(['edit', 'delete'], $tempMessage)

@@ -273,6 +273,22 @@ class MessageDetail extends Component
         $this->msg = 'چت با موفقیت فعال شد';
         return $this->render();
     }
+
+    public function templateMessageSelect(MessageTemplate $messageTemplate)
+    {
+        // called when template message selected
+        if (isset($messageTemplate->body) && $messageTemplate->body != null) {
+            $this->form['typedMessage'] = $messageTemplate->body;
+        }
+        if (isset($messageTemplate->detail) && $messageTemplate->detail != null) {
+            if (isset($messageTemplate->detail['file']) && $messageTemplate->detail['file'] != null) {
+                $this->form['file'] = $messageTemplate->detail['file'];
+            }
+            if (isset($messageTemplate->detail['voice']) && $messageTemplate->detail['voice'] != null) {
+                $this->form['voice'] = $messageTemplate->detail['voice'];
+            }
+        }
+    }
     public function mount()
     {
         $this->fetchData['appOnline'] = AppointmentOnline::find(request()->route('onlineAppId'));
@@ -282,7 +298,7 @@ class MessageDetail extends Component
             ->where('seen', AppointmentOnlineMessageSeenEnum::UNSEEN)
             ->update(['seen' => AppointmentOnlineMessageSeenEnum::SEEN]);
         $this->fetchData['user']      =  $this->fetchData['appOnline']->user;
-        $this->fetchData['messageTemplate']      =  MessageTemplate::all();
+        $this->fetchData['messageTemplate']      =  MessageTemplate::doctorMessage($this->fetchData['appOnline']->doctor->id)->get();
     }
     public function booted()
     {

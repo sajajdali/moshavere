@@ -358,7 +358,7 @@
                                                     class="form-control select2-show-search form-select" data-placeholder="متن های اماده...">
                                                     <option label="متن ثابت.."></option>
                                                     @foreach ($fetchData['messageTemplate'] as $msgTemp)
-                                                        <option value="{{ $msgTemp->body }}">
+                                                        <option value="{{ $msgTemp->id }}">
                                                             {{ $msgTemp->title }}
                                                         </option>
                                                     @endforeach
@@ -511,8 +511,8 @@
                 $('.select2-show-search').select2();
                 $('body').on('change', '.select2-show-search', function() {
                     var modelName = $(this).val();
-                    // $('#sendMessageBox').val(modelName);
-                    @this.set('form.typedMessage',modelName);
+                    @this.templateMessageSelect(modelName)
+                    // @this.set('form.typedMessage',modelName);
                 });
             }
             js();

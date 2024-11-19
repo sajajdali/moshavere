@@ -76,7 +76,7 @@
                                                     {{ verta(\Carbon\Carbon::parse($date)->toDatestring())->format('%d %b') }}</span></label>
                                             @foreach ($chatItems as $chatMessage)
                                                 <div
-                                                    class="media flex-row-reverse chat-right  @if ($chatMessage->type->is(\Modules\Chat\Enum\ChatDetailTypeEnum::MESSAGE)) @else chat-left @endif">
+                                                    class="media  @if ($chatMessage->type->is(\Modules\Chat\Enum\ChatDetailTypeEnum::MESSAGE)) flex-row-reverse chat-right @else chat-left @endif">
                                                     <div class="main-img-user online">
                                                         <img alt="avatar" src="{{ $chatMessage->user?->avatar }}">
                                                     </div>

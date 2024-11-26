@@ -1,6 +1,11 @@
 <div class="@error('form.specialDaytimeValues.*') border border-danger @enderror">
     <div class="card-header border-bottom d-flex justify-content-between">
-        <h3> تغییر ساعت حضور برای<span class="text-primary"> یک روز خاص </span></h3>
+        <h3> 
+            <i class="fa fa-calendar-plus-o me-2 d-none d-sm-inline" aria-hidden="true"></i>
+            <span>
+                تغییر ساعت حضور برای<span class="text-primary"> یک روز خاص </span>
+            </span>
+        </h3>
         <div class="main-toggle-group d-sm-flex align-items-center ms-0">
             <div class="toggle toggle-lg toggle-primary my-1  customCheckbox @if (isset($form['specialDaytimeValues']) && count($form['specialDaytimeValues']) >= 1) on  @else off @endif"
                 data-id="specialDayTimeSetting" wire:ignore.self data-bs-toggle="collapse" href="#specialDayTimeSetting"

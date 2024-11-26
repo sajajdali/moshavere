@@ -215,6 +215,7 @@ return [
         "form.otherApp.mobile" => "شماره موبایل ",
         "form.body" => "متن ",
         "form.time.until" => "زمان پایان ",
+        'form.onlinevisit.time' => 'زمان پایان نوبت آنلاین'
     ],
 
 ];

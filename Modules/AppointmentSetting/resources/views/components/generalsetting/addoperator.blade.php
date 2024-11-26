@@ -1,6 +1,11 @@
 <div>
-    <div class="card-header border-bottom d-flex justify-content-between">
-        <h3> اضافه کردن اپراتور برای این بخش </h3>
+    <div class="card-header border-bottom d-flex justify-content-between">      
+        <h3 class="d-flex align-item-center">
+            <i class="fa fa-user-plus me-2 d-none d-sm-inline" aria-hidden="true"></i>
+            <span>
+                اضافه کردن اپراتور برای این بخش
+            </span>
+        </h3>
         <div class="main-toggle-group d-sm-flex align-items-center ms-0">
             <div class="toggle toggle-lg toggle-primary my-1 customCheckbox @if (!empty($form['operators'])) ) on @else off @endif"
                 data-id="operators.status" wire:ignore.self data-bs-toggle="collapse" href="#addOpratorCollaps"

@@ -1,4 +1,4 @@
-<div class="card-header">
+<div class="card-header pb-0">
     <h3 class="d-flex align-items-center">
         <i class="fa fa-clock-o me-2 d-none d-sm-inline" aria-hidden="true"></i>
         <span>
@@ -6,9 +6,9 @@
         </span>
     </h3>
 </div>
-<div class="card-body ">
+<div class="card-body pt-0">
     @if (isset($form['visitType']['online']) && $form['visitType']['online'] == true)
-        <div class="row mb-5">
+        <div class="row my-4">
             <div class="col-sm-3 text-secondary">
                 <h4>
                     <i class="fa fa-user fa-xl" aria-hidden="true"></i>

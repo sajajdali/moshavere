@@ -1,6 +1,6 @@
 <div>
     <div wire:loading>
-        <div class="loading-overlay d-flex align-items-center justify-content-center">
+        <div class="loading-overlay d-flex align-item-center justify-content-center">
             <div class="spinner-border text-primary" role="status">
                 <span class="sr-only">Loading...</span>
             </div>
@@ -37,7 +37,7 @@
     <div class="card shadow-sm custom-card-Setting @error('form.minDayAvaialbe') border border-danger @enderror">
         <div class="card-body ">
             {{-- section --}}
-            <h3 class="d-flex align-items-center">
+            <h3 class="d-flex align-item-center">
                 <i class="fa fa-hourglass-start me-2 d-none d-sm-inline " aria-hidden="true"></i>
                <span> <span class="text-primary">حداقل</span> زمان دریافت نوبت</span>
             </h3>
@@ -76,7 +76,7 @@
     <div class="card shadow-sm custom-card-Setting @error('form.maxDayAvaialbe') border border-danger @enderror">
         <div class="card-body ">
             {{-- section --}}
-            <h3 class="d-flex align-items-center">
+            <h3 class="d-flex align-item-center">
                 <i class="fa fa-hourglass-end me-2 d-none d-sm-inline" aria-hidden="true"></i>
               <span>
                 <span class="text-primary">حداکثر</span> زمان دریافت نوبت
@@ -117,13 +117,13 @@
     <div
         class="card shadow-sm custom-card-Setting  @error('form.maxAvailabeAppointment.*') border border-danger @enderror">
         <div class="card-header border-bottom d-flex justify-content-between">
-            <h3 class="d-flex align-items-center">
+            <h3 class="d-flex align-item-center">
                 <i class="fa fa-bar-chart me-2 d-none d-sm-inline" aria-hidden="true"></i>
                 <span>
                     امکان دریافت حداکثر <span class="text-primary">دریافت نوبت</span>
                 </span>
             </h3>
-            <div class="main-toggle-group d-sm-flex align-items-center ms-0">
+            <div class="main-toggle-group d-sm-flex align-item-center ms-0">
                 <div class="toggle toggle-lg toggle-primary my-1 @if (isset($form['maxAvailabeAppointment']['eachDay']) || isset($form['maxAvailabeAppointment']['ForSecretery'])) on @else off @endif customCheckbox"
                     data-id="maxAvailabeAppointment.status" wire:ignore.self data-bs-toggle="collapse"
                     href="#maximumAppointmentCanBePerchased" role="button" aria-expanded="false"
@@ -154,7 +154,7 @@
                                 <span class="input-group-text" id="basic-addon3">عدد</span>
                             </div>
                         </div>
-                        <span class="text-muted d-flex align-items-center ms-1 mt-1 mb-2"><i
+                        <span class="text-muted d-flex align-item-center ms-1 mt-1 mb-2"><i
                                 class="fa fa-exclamation-circle fa-lg text-light me-1" aria-hidden="true"></i>کاربران
                             در
                             هر روز بتواند چند نوبت دریافت بکند</span>
@@ -170,7 +170,7 @@
                                 <span class="input-group-text" id="basic-addon3">عدد</span>
                             </div>
                         </div>
-                        <span class="text-muted d-flex align-items-center ms-1 mt-1 mb-2"><i
+                        <span class="text-muted d-flex align-item-center ms-1 mt-1 mb-2"><i
                                 class="fa fa-exclamation-circle fa-lg text-light me-1" aria-hidden="true"></i>منشی
                             بتواند حداکثر در هر روز چند نوبت ثبت بکند</span>
                     </div>
@@ -181,13 +181,13 @@
     {{-- cancel time  --}}
     <div class="card shadow-sm custom-card-Setting @error('form.cancel.day') border border-danger @enderror">
         <div class="card-header border-bottom d-flex justify-content-between">
-            <h3 class="d-flex align-items-center">
+            <h3 class="d-flex align-item-center">
                 <i class="fa fa-times me-2 d-none d-sm-inline" aria-hidden="true"></i>
                 <span>
                     امکان <span class="text-primary">کنسل</span> کردن نوبت 
                 </span>
             </h3>
-            <div class="main-toggle-group d-sm-flex align-items-center ms-0">
+            <div class="main-toggle-group d-sm-flex align-item-center ms-0">
                 <div class="toggle toggle-lg toggle-primary my-1  customCheckbox @if (isset($form['cancel']['day'])) on  @else off @endif"
                     data-id="cancel.status" wire:ignore.self data-bs-toggle="collapse" href="#cancelCollapseSett"
                     role="button" aria-expanded="false" aria-controls="cancelCollapseSett">
@@ -238,8 +238,13 @@
     <div
         class="card shadow-sm custom-card-Setting  @error('form.endAppointment.date') border border-danger @enderror">
         <div class="card-header border-bottom d-flex justify-content-between">
-            <h3> تعیین پایان تاریخ نوبت دهی </h3>
-            <div class="main-toggle-group d-sm-flex align-items-center ms-0">
+            <h3 class="d-flex align-item-center">
+                <i class="fa fa-calendar-times-o me-2 d-none d-sm-inline" aria-hidden="true"></i>
+                <span>
+                    تعیین پایان تاریخ نوبت دهی
+                </span>
+            </h3>
+            <div class="main-toggle-group d-sm-flex align-item-center ms-0">
                 <div class="toggle toggle-lg toggle-primary my-1 customCheckbox @if (isset($form['endAppointment']['date'])) on @else off @endif"
                     data-id="endAppointment.status" wire:ignore.self data-bs-toggle="collapse"
                     href="#EndDateTimeCollaps" role="button" aria-expanded="false"
@@ -280,8 +285,13 @@
     {{-- payment  --}}
     <div class="card shadow-sm custom-card-Setting @error('form.payment.*') border border-danger @enderror">
         <div class="card-header border-bottom d-flex justify-content-between">
-            <h3>پرداخت آنلاین</h3>
-            <div class="main-toggle-group d-sm-flex align-items-center ms-0">
+            <h3 class="d-flex align-item-center">
+                <i class="fa fa-credit-card-alt me-2 d-none d-sm-inline" aria-hidden="true"></i>
+                <span>
+                    پرداخت آنلاین
+                </span>
+            </h3>
+            <div class="main-toggle-group d-sm-flex align-item-center ms-0">
                 <div class="toggle toggle-lg toggle-primary my-1  customCheckbox
                 @if (isset($form['payment']['status']) && $form['payment']['status'] != false) on  @else off @endif"
                     data-id="payment.status" wire:ignore.self data-bs-toggle="collapse" href="#paymentCollaps"
@@ -300,8 +310,8 @@
             @enderror
             <div class="row">
                 <div class="col-md-4">
-                    <div class="d-flex align-items-center">
-                        <div class="main-toggle-group d-sm-flex align-items-center ms-0">
+                    <div class="d-flex align-item-center">
+                        <div class="main-toggle-group d-sm-flex align-item-center ms-0">
                             <div class="toggle toggle-lg toggle-primary my-1  customCheckbox
                             @if (isset($form['payment']['inPerson']['status']) && $form['payment']['inPerson']['status'] == true) on
                                 @else
@@ -314,8 +324,8 @@
                     </div>
                 </div>
                 <div class="col-md-4">
-                    <div class="d-flex align-items-center">
-                        <div class="main-toggle-group d-sm-flex align-items-center ms-0">
+                    <div class="d-flex align-item-center">
+                        <div class="main-toggle-group d-sm-flex align-item-center ms-0">
                             <div class="toggle toggle-lg toggle-primary my-1  customCheckbox
                             @if (isset($form['payment']['online']['status']) && $form['payment']['online']['status'] == true) on
                                 @else
@@ -328,8 +338,8 @@
                     </div>
                 </div>
                 <div class="col-md-4">
-                    <div class="d-flex align-items-center">
-                        <div class="main-toggle-group d-sm-flex align-items-center ms-0">
+                    <div class="d-flex align-item-center">
+                        <div class="main-toggle-group d-sm-flex align-item-center ms-0">
                             <div class="toggle toggle-lg toggle-primary my-1 customCheckbox
                             @if (isset($form['payment']['voip']['status']) && $form['payment']['voip']['status'] == true) on
                                 @else
@@ -414,8 +424,13 @@
     {{-- interference  --}}
     <div class="card">
         <div class="card-header border-bottom d-flex justify-content-between">
-            <h3> عدم کنترل تداخل نوبت ها </h3>
-            <div class="main-toggle-group d-sm-flex align-items-center ms-0">
+            <h3 class="d-flex align-item-center">
+                <i class="fa fa-paperclip me-2 d-none d-sm-inline" aria-hidden="true"></i>
+                <span>
+                    عدم کنترل تداخل نوبت ها
+                </span>
+            </h3>
+            <div class="main-toggle-group d-sm-flex align-item-center ms-0">
                 <div class="toggle toggle-lg toggle-primary my-1 customCheckbox @if (isset($form['interface']['status']) && $form['interface']['status'] == 'true') on @else off @endif"
                     data-id="interference.status" wire:ignore.self data-bs-toggle="collapse"
                     href="#checkForOtherAppointment" role="button" aria-expanded="false"
@@ -437,8 +452,13 @@
     {{-- MONITORING  --}}
     <div class="card shadow-sm custom-card-Setting @error('form.monitoring.hour') border border-danger @enderror">
         <div class="card-header border-bottom d-flex justify-content-between">
-            <h3><span class="text-primary">پایش</span> نوبت </h3>
-            <div class="main-toggle-group d-sm-flex align-items-center ms-0">
+            <h3 class="d-flex align-item-center">
+                <i class="fa fa-check-square me-2 d-none d-sm-inline" aria-hidden="true"></i>
+                <span>
+                    <span class="text-primary">پایش</span> نوبت 
+                </span>
+            </h3>
+            <div class="main-toggle-group d-sm-flex align-item-center ms-0">
                 <div class="toggle toggle-lg toggle-primary my-1  customCheckbox @if (isset($form['monitoring']['hour'])) on  @else off @endif"
                     data-id="monitoring.status" wire:ignore.self data-bs-toggle="collapse"
                     href="#monitoringStatusDiv" role="button" aria-expanded="false"
@@ -494,8 +514,13 @@
     {{-- start Date time  --}}
     <div class="card shadow-sm custom-card-Setting @if ($errors->has('form.startAppointment.date') || $errors->has('form.startAppointment.time')) border border-danger @endif">
         <div class="card-header border-bottom d-flex justify-content-between">
-            <h3> تعیین تاریخ شروع نوبت دهی </h3>
-            <div class="main-toggle-group d-sm-flex align-items-center ms-0">
+            <h3 class="d-flex align-item-center">
+                <i class="fa fa-calendar-check-o me-2 d-none d-sm-inline" aria-hidden="true"></i>
+                <span>
+                    تعیین تاریخ شروع نوبت دهی
+                </span>
+            </h3>
+            <div class="main-toggle-group d-sm-flex align-item-center ms-0">
                 <div class="toggle toggle-lg toggle-primary my-1 customCheckbox @if (isset($form['startAppointment']['date'])) on @else off @endif"
                     data-id="startAppointment.status" wire:ignore.self data-bs-toggle="collapse"
                     href="#startTimecollaps" role="button" aria-expanded="false" aria-controls="startTimecollaps">
@@ -545,8 +570,6 @@
         </div>
     </div>
 
-
-
     {{-- add operator  --}}
     <div class="card shadow-sm custom-card-Setting @error('form.operators.*') border border-danger @enderror">
         @include('appointmentsetting::components.generalsetting.addoperator')
@@ -559,7 +582,7 @@
         <div class="card-body " wire:ignore.self>
             {{-- section --}}
             <div class="row">
-                <div class="selectgroup selectgroup-pills d-flex align-items-center">
+                <div class="selectgroup selectgroup-pills d-flex align-item-center">
                     <label class="colorinput">
                         <input name="color" type="checkbox" value="azure" class="colorinput-input"
                             wire:model='form.avtive' />

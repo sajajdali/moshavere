@@ -242,6 +242,9 @@ class GeneralSetting extends Component
             if (isset($this->form['maxAvailabeAppointment']['ForSecretery'])) {
                 unset($this->form['maxAvailabeAppointment']['ForSecretery']);
             }
+            if (isset($this->form['maxAvailabeAppointmentOnline'])) {
+                unset($this->form['maxAvailabeAppointmentOnline']);
+            }
         }
         if (isset($this->form['monitoring']['status'])  && $this->form['monitoring']['status'] == false) {
             if (isset($this->form['monitoring']['hour'])) {
@@ -557,6 +560,13 @@ class GeneralSetting extends Component
         if (isset($apSet->detail[AppointmentSetting::MAX_AVAILABLE_APPOINTMENT_FOR_SECRETERY])) {
             $this->form['maxAvailabeAppointment']['ForSecretery'] = $apSet->detail[AppointmentSetting::MAX_AVAILABLE_APPOINTMENT_FOR_SECRETERY];
         }
+        if (isset($apSet->detail[AppointmentSetting::MAX_ACTIVE_APP_FOR_ONLINE_APP])) {
+            $this->form['maxAvailabeAppointmentOnline']  = $apSet->detail[AppointmentSetting::MAX_ACTIVE_APP_FOR_ONLINE_APP];
+            $this->form['maxAvailabeAppointment']['eachDay'] = true ; 
+        }
+        if (isset($apSet->detail[AppointmentSetting::MAX_ACTIVE_TIME_ONLINE_APPOINTMENT])) {
+            $this->form['onlinevisit']['time'] =   $apSet->detail[AppointmentSetting::MAX_ACTIVE_TIME_ONLINE_APPOINTMENT];
+        }
         if (isset($apSet->detail[AppointmentSetting::OPERATORS])) {
             if ($apSet->detail[AppointmentSetting::OPERATORS][AppointmentSetting::STATUS] == true) {
                 $this->form['operators']['status'] = true;
@@ -633,9 +643,9 @@ class GeneralSetting extends Component
                 $this->fillTheForm();
             }
         }
-        // if ($check_Setting_exist) {
-        //     return redirect()->route('admin.appointment.specialsection', ['user' => $this->fetchData['user']]);
-        // }
+        if ($check_Setting_exist) {
+            return redirect()->route('admin.appointment.specialsection', ['user' => $this->fetchData['user']]);
+        }
         if (AppointmentSegment::exists()) {
             $this->fetchData['segments'] = AppointmentSegment::all();
         }

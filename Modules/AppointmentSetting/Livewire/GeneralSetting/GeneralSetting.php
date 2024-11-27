@@ -210,10 +210,16 @@ class GeneralSetting extends Component
             'form.payment.voip.price'             => 'required_if:form.payment.voip.status,true',
             'form.operators.ids'                  => 'required_if:form.operators.status,true',
         ];
-        $validateSpecialDate = $this->validateSpecialdate();
-        if (isset($this->form['visitType']['online']) && $this->form['visitType']['online'] == true) {
-            $rules['form.onlinevisit.time'] = 'required' ;
+        if (isset($this->form['maxAvailabeAppointment']['status']) && $this->form['maxAvailabeAppointment']['status'] == true) {
+            if (isset($this->form['visitType']['online']) && $this->form['visitType']['online'] == true) {
+                if (! isset($this->form['maxAvailabeAppointmentOnline']) || (isset($this->form['maxAvailabeAppointmentOnline']) && $this->form['maxAvailabeAppointmentOnline'] == null)) {
+                    $rules['form.maxAvailabeAppointment.eachDay'] = 'required';
+                }
+            } else {
+                $rules['form.maxAvailabeAppointment.eachDay'] = 'required';
+            }
         }
+        $validateSpecialDate = $this->validateSpecialdate();
         return array_merge($dayRules,  $rules, $validateSpecialDate);
     }
     private function checkForUnsetTheCheckBoxes()
@@ -336,9 +342,14 @@ class GeneralSetting extends Component
         ];
 
         if (isset($this->form['visitType']['online']) && $this->form['visitType']['online']) {
-            $detail[AppointmentSetting::ONLINE_CAN_SEND_VOICE] = isset($this->form['accessibility']['online']['can_send_voice']) && $this->form['accessibility']['online']['can_send_voice'];
+            // online appointment conditions
+            $detail[AppointmentSetting::ONLINE_CAN_SEND_VOICE]              = isset($this->form['accessibility']['online']['can_send_voice']) && $this->form['accessibility']['online']['can_send_voice'];
+            $detail[AppointmentSetting::MAX_ACTIVE_TIME_ONLINE_APPOINTMENT] = isset($this->form['onlinevisit']['time']) ? $this->form['onlinevisit']['time'] : null;
+            $detail[AppointmentSetting::MAX_ACTIVE_APP_FOR_ONLINE_APP]      = isset($this->form['maxAvailabeAppointmentOnline']) ? $this->form['maxAvailabeAppointmentOnline'] : null;
         } else {
             unset($detail[AppointmentSetting::ONLINE_CAN_SEND_VOICE]);
+            $detail[AppointmentSetting::MAX_ACTIVE_TIME_ONLINE_APPOINTMENT] =  null;
+            $detail[AppointmentSetting::MAX_ACTIVE_APP_FOR_ONLINE_APP]      =  null;
         }
 
         $detail[AppointmentSetting::DONT_SHOW_TIMES] = [
@@ -590,7 +601,6 @@ class GeneralSetting extends Component
         }
         // dd($this->form['specialDaytimeValues'],$this->form['specialTimeCounter']);
     }
-
     public function mount()
     {
         $this->fetchData['user']            =  request()->route('user');

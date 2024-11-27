@@ -39,7 +39,7 @@
             {{-- section --}}
             <h3 class="d-flex align-item-center">
                 <i class="fa fa-hourglass-start me-2 d-none d-sm-inline " aria-hidden="true"></i>
-               <span> <span class="text-primary">حداقل</span> زمان دریافت نوبت</span>
+                <span> <span class="text-primary">حداقل</span> زمان دریافت نوبت</span>
             </h3>
             <hr style="opacity: 0.5">
             {{-- TODO::alert Message --}}
@@ -51,12 +51,12 @@
             @enderror
             <div class="row">
                 <div class="col-md-5 pt-2">
-                    <label class="text-primary" for="basic-url"> زمان دریافت نوبت</label>
+                    <label class="text-primary" for="nearestAvailableTime"> زمان دریافت نوبت</label>
                 </div>
                 <div class="col-md-7">
                     <div class="input-group mb-3">
                         <input type="number" class="form-control  @error('form.minDayAvaialbe') is-invalid @enderror "
-                            id="basic-url" aria-describedby="basic-addon3" wire:model='form.minDayAvaialbe'>
+                            id="nearestAvailableTime" aria-describedby="basic-addon3" wire:model='form.minDayAvaialbe'>
                         <div class="input-group-prepend">
                             <span class="input-group-text" id="basic-addon3">روز</span>
                         </div>
@@ -78,9 +78,9 @@
             {{-- section --}}
             <h3 class="d-flex align-item-center">
                 <i class="fa fa-hourglass-end me-2 d-none d-sm-inline" aria-hidden="true"></i>
-              <span>
-                <span class="text-primary">حداکثر</span> زمان دریافت نوبت
-              </span>
+                <span>
+                    <span class="text-primary">حداکثر</span> زمان دریافت نوبت
+                </span>
             </h3>
             <hr style="opacity: 0.5">
             @error('form.maxDayAvaialbe')
@@ -91,13 +91,13 @@
             @enderror
             <div class="row">
                 <div class="col-md-5 pt-2">
-                    <label class="text-primary" for="basic-url"> بیمار حداکثر برای چند روز فعال بعد بتواند نوبت دریافت
+                    <label class="text-primary" for="maxDaysAvailableApp"> بیمار حداکثر برای چند روز فعال بعد بتواند نوبت دریافت
                         کند</label>
                 </div>
                 <div class="col-md-7">
                     <div class="input-group mb-3">
                         <input type="number" class="form-control  @error('form.maxDayAvaialbe') is-invalid @enderror"
-                            id="basic-url" aria-describedby="basic-addon3" wire:model='form.maxDayAvaialbe'>
+                            id="maxDaysAvailableApp" aria-describedby="basic-addon3" wire:model='form.maxDayAvaialbe'>
                         <div class="input-group-prepend">
                             <span class="input-group-text" id="basic-addon3">روز آینده</span>
                         </div>
@@ -120,7 +120,7 @@
             <h3 class="d-flex align-item-center">
                 <i class="fa fa-bar-chart me-2 d-none d-sm-inline" aria-hidden="true"></i>
                 <span>
-                    امکان دریافت حداکثر <span class="text-primary">دریافت نوبت</span>
+                     <span class="text-primary">سقف تعداد</span> نوبت
                 </span>
             </h3>
             <div class="main-toggle-group d-sm-flex align-item-center ms-0">
@@ -135,20 +135,34 @@
         <div class="collapse @if (isset($form['maxAvailabeAppointment']['eachDay']) || isset($form['maxAvailabeAppointment']['ForSecretery'])) show @endif " id="maximumAppointmentCanBePerchased"
             wire:ignore.self>
             <div class="card-body">
+                @if (isset($form['visitType']['online']) && $form['visitType']['online'] == true)
+                    <div class="row my-4">
+                        <div class="col-sm-3 text-secondary">
+                            <h4>
+                                <i class="fa fa-user fa-xl" aria-hidden="true"></i>
+                                ویزیت حضوری
+                            </h4>
+                        </div>
+                        <div class="col-sm-9">
+                            <hr class="bg-secondary">
+                        </div>
+                    </div>
+                @endif
+
                 @error('form.maxAvailabeAppointment.*')
                     <div class="alert alert-danger" role="alert">
-                        <p class="text-danger"> لطفا تعداد نوبت را مشخص کنید!!
+                        <p class="text-danger"> در صورت فعال سازی این بخش لازم هست که محدودیت تعداد نوبت را مشحص کنید!!
                         </p>
                     </div>
                 @enderror
                 {{-- section --}}
                 <div class="row">
                     <div class="col-md-3 pt-2">
-                        <label class="text-primary" for="basic-url">تعداد نوبت فعال در هر روز</label>
+                        <label class="text-primary" for="eachDayAppointmentAvailable">تعداد نوبت فعال در هر روز</label>
                     </div>
                     <div class="col-md-9 mb-1 mb-3">
                         <div class="input-group ">
-                            <input type="number" class="form-control" id="basic-url" aria-describedby="basic-addon3"
+                            <input type="number" class="form-control" id="eachDayAppointmentAvailable" aria-describedby="basic-addon3"
                                 wire:model='form.maxAvailabeAppointment.eachDay'>
                             <div class="input-group-prepend">
                                 <span class="input-group-text" id="basic-addon3">عدد</span>
@@ -160,12 +174,12 @@
                             هر روز بتواند چند نوبت دریافت بکند</span>
                     </div>
                     <div class="col-md-3 pt-2">
-                        <label class="text-primary" for="basic-url">تعداد نوبت فعال برای منشی</label>
+                        <label class="text-primary" for="maxSecuretyAvailableApp">تعداد نوبت فعال برای منشی</label>
                     </div>
                     <div class="col-md-9 mb-1 mb-3">
                         <div class="input-group ">
-                            <input type="number" class="form-control" id="basic-url" aria-describedby="basic-addon3"
-                                wire:model='form.maxAvailabeAppointment.ForSecretery'>
+                            <input type="number" class="form-control" id="maxSecuretyAvailableApp"
+                                aria-describedby="basic-addon3" wire:model='form.maxAvailabeAppointment.ForSecretery'>
                             <div class="input-group-prepend">
                                 <span class="input-group-text" id="basic-addon3">عدد</span>
                             </div>
@@ -175,6 +189,38 @@
                             بتواند حداکثر در هر روز چند نوبت ثبت بکند</span>
                     </div>
                 </div>
+                @if (isset($form['visitType']['online']) && $form['visitType']['online'] == true)
+                    <div class="row my-5">
+                        <div class="col-sm-3 text-secondary">
+                            <h4>
+                                <i class="fa fa-television fa-xl me-1" aria-hidden="true"></i>
+                                ویزیت آنلاین
+                            </h4>
+                        </div>
+                        <div class="col-sm-9">
+                            <hr class="bg-secondary">
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-3 pt-2">
+                            <label class="text-primary" for="maxOnlineAvaiableAppointment">تعداد نوبت فعال در هر روز</label>
+                        </div>
+                        <div class="col-md-9 mb-1 mb-3">
+                            <div class="input-group ">
+                                <input type="number" class="form-control" id="maxOnlineAvaiableAppointment"
+                                    aria-describedby="basic-addon3" wire:model='form.maxAvailabeAppointmentOnline'>
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text" id="basic-addon3">عدد</span>
+                                </div>
+                            </div>
+                            <span class="text-muted d-flex align-item-center ms-1 mt-1 mb-2"><i
+                                    class="fa fa-exclamation-circle fa-lg text-light me-1"
+                                    aria-hidden="true"></i>کاربران
+                                در
+                                هر روز بتواند چند نوبت آنلاین دریافت بکنند</span>
+                        </div>
+                    </div>
+                @endif
             </div>
         </div>
     </div>
@@ -184,7 +230,7 @@
             <h3 class="d-flex align-item-center">
                 <i class="fa fa-times me-2 d-none d-sm-inline" aria-hidden="true"></i>
                 <span>
-                    امکان <span class="text-primary">کنسل</span> کردن نوبت 
+                    امکان <span class="text-primary">کنسل</span> کردن نوبت
                 </span>
             </h3>
             <div class="main-toggle-group d-sm-flex align-item-center ms-0">
@@ -207,12 +253,12 @@
                 {{-- section --}}
                 <div class="row">
                     <div class="col-md-3 pt-2">
-                        <label class="text-primary" for="basic-url">چند روز قبل</label>
+                        <label class="text-primary" for="howManydayBEfore">چند روز قبل</label>
                     </div>
                     <div class="col-md-9">
                         <div class="input-group mb-3">
                             <input type="number"
-                                class="form-control  @error('form.cancel.day') is-invalid @enderror" id="basic-url"
+                                class="form-control  @error('form.cancel.day') is-invalid @enderror" id="howManydayBEfore"
                                 aria-describedby="basic-addon3" wire:model='form.cancel.day'>
                             <div class="input-group-prepend">
                                 <span class="input-group-text" id="basic-addon3">روز آینده</span>
@@ -264,7 +310,7 @@
             @enderror
             <div class="row">
                 <div class="col-md-3 pt-2">
-                    <label class="text-primary" for="basic-url">انتخاب تاریخ:</label>
+                    <label class="text-primary" for="endDatePicker">انتخاب تاریخ:</label>
                 </div>
                 <div class="col-md-9">
                     <div class="input-group mb-3">
@@ -455,7 +501,7 @@
             <h3 class="d-flex align-item-center">
                 <i class="fa fa-check-square me-2 d-none d-sm-inline" aria-hidden="true"></i>
                 <span>
-                    <span class="text-primary">پایش</span> نوبت 
+                    <span class="text-primary">پایش</span> نوبت
                 </span>
             </h3>
             <div class="main-toggle-group d-sm-flex align-item-center ms-0">
@@ -479,13 +525,13 @@
                 {{-- section --}}
                 <div class="row">
                     <div class="col-md-4 pt-2">
-                        <label class="text-primary" for="basic-url">مدت زمان انتظار برای پرداخت آنلاین: </label>
+                        <label class="text-primary" for="waitForPaymentOnline">مدت زمان انتظار برای پرداخت آنلاین: </label>
                     </div>
                     <div class="col-md-8">
                         <div class="input-group mb-3">
                             <input type="number"
                                 class="form-control  @error('form.monitoring.hour') is-invalid @enderror"
-                                id="basic-url" placeholder="ساعت پیشنهادی: 24" aria-describedby="basic-addon3"
+                                id="waitForPaymentOnline" placeholder="ساعت پیشنهادی: 24" aria-describedby="basic-addon3"
                                 wire:model='form.monitoring.hour'>
                             <div class="input-group-prepend">
                                 <span class="input-group-text" id="basic-addon3">ساعت</span>
@@ -539,7 +585,7 @@
             @endif
             <div class="row">
                 <div class="col-md-3 pt-2">
-                    <label class="text-primary" for="basic-url">انتخاب تاریخ:</label>
+                    <label class="text-primary" for="startDatePicker">انتخاب تاریخ:</label>
                 </div>
                 <div class="col-md-9">
                     <div class="input-group mb-3">
@@ -549,13 +595,13 @@
                     </div>
                 </div>
                 <div class="col-md-3 pt-2">
-                    <label class="text-primary" for="basic-url">انتخاب ساعت:</label>
+                    <label class="text-primary" for="timePickerAvailable">انتخاب ساعت:</label>
                 </div>
                 <div class="col-md-9 mb-3">
                     <div class="input-group ">
                         <input type="time" wire:model='form.startAppointment.time'
                             class="form-control @error('form.startAppointment.time') is-invalid @enderror"
-                            id="startDatePicker">
+                            id="timePickerAvailable">
                     </div>
                     <small class="text-gray ms-2">برای انتخاب روی آیکون ساعت کلیک کنید ویا مقدار را وارد کنید</small>
                 </div>
@@ -602,8 +648,8 @@
 
     <div class="text-end mb-5 me-3">
         <button type="submit" form="setting" wire:click='saveSetting'
-            wire:loading.class='btn-loading disabled btn-gray'
-            class="btn btn-success mt-5 py-2 px-4"><strong class="fs-6">ذخیره</strong></button>
+            wire:loading.class='btn-loading disabled btn-gray' class="btn btn-success mt-5 py-2 px-4"><strong
+                class="fs-6">ذخیره</strong></button>
 
     </div>
 </div>
@@ -628,10 +674,12 @@
             font-family: 'Vazir-Regular';
             font-size: 1.4rem;
         }
+
         @media (max-width: 570px) {
             h3 {
-                font-size: 1.2rem ;
+                font-size: 1.2rem;
             }
+
             p {
                 font-size: small !important
             }

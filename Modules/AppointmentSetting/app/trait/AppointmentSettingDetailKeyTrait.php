@@ -30,5 +30,7 @@ trait AppointmentSettingDetailKeyTrait
 
     const DONT_SHOW_TIMES_STATUS = 'status';
     const DONT_SHOW_TIMES_MESSAGE = 'message';
+    const MAX_ACTIVE_TIME_ONLINE_APPOINTMENT = 'maxActiveTimeOnlineAppointment';
+    const MAX_ACTIVE_APP_FOR_ONLINE_APP  = 'maxActiveAppointmentForOnlineAppointment';
 
 }

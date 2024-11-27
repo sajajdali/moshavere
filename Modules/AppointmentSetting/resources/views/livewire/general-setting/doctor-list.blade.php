@@ -70,7 +70,7 @@
                         <h5 class="text-muted mt-1 mb-5">برای تنظیم زمان حضور، پزشک مورد نظر را انتخاب کنید</h5>
                         @foreach ($doctors as $key => $doctor)
                             <div class="col-lg-6 col-md-12 col-sm-12">
-                                <div class="card mb-5">
+                                <div class="card mb-5 shadow-lg" style="border-radius: 10px">
                                     <div class="card-body">
                                         <div class="client-title mt-0 flex-column flex-sm-row">
                                             <figure class="rounded-circle align-self-start mb-0">

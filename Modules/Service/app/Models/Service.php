@@ -27,7 +27,7 @@ class Service extends Model
         'show_type' => ServiceShowTypeEnum::class,
         'detail' => 'json',
     ];
-
+    const APP_QUESTION_TITLE  = 'app_question_title';
     public function user()
     {
         return $this->belongsToMany(User::class);

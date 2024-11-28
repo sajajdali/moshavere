@@ -34,8 +34,7 @@
             </div>
             @if (isset($fetchData['firstTreeAvailableAppointment']) &&
                     !empty($fetchData['firstTreeAvailableAppointment']) &&
-                    $fetchData['isAppointmentActive']
-            )
+                    $fetchData['isAppointmentActive'])
                 <div class="appointment__modal-left" wire:loading.class='opacity-75'>
                     <div class="flex justify-between mb-4 align-center">
                         <p class="font-semibold">نوبت مورد نظر را انتخاب کنید</p>
@@ -165,17 +164,17 @@
                         امتحان
                         کنید!</span>
                 </div>
-    @endif
+            @endif
 </div>
-@if (isset($fetchData['firstTreeAvailableAppointment']) &&
-        !empty($fetchData['firstTreeAvailableAppointment']) &&
-        $fetchData['isAppointmentActive']
-)
-    <button type="button" class="btn__blue--round-full mt-4" id="nextstep_btn"
-        wire:click='TimeForReservesation'>
-        <span>مرحله بعد</span>
-    </button>
-@endif
+        @if (isset($fetchData['firstTreeAvailableAppointment']) &&
+                !empty($fetchData['firstTreeAvailableAppointment']) &&
+                $fetchData['isAppointmentActive']
+        )
+            <button type="button" class="btn__blue--round-full mt-4" id="nextstep_btn"
+                wire:click='TimeForReservesation'>
+                <span>مرحله بعد</span>
+            </button>
+        @endif
 </div>
 </main>
 </div>

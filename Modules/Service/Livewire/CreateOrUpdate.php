@@ -47,10 +47,18 @@ class CreateOrUpdate extends Component
             'priority'      => $this->form['priority']   ?? 1,
             'active'        => ActiveEnum::tryFrom($active),
             'show_type'     => $this->form['show_type'] ? ServiceShowTypeEnum::SHOW : ServiceShowTypeEnum::DONT_SHOW,
+            'detail'        => [Service::APP_QUESTION_TITLE => null ]
         ];
+        if(isset($this->form['qestion']) && $parentId == null ) {
+            $modelCreateOrUpdate['detail'] = [
+                Service::APP_QUESTION_TITLE => $this->form['qestion'] ,
+            ];
+        }
         if ($this->isEdited) {
             $this->service->update($modelCreateOrUpdate);
+            $msg = 'بخش با موفقیت ویرایش شد';
         } else {
+            $msg = 'بخش با موفقیت اضافه شد';
             $this->service =  Service::create($modelCreateOrUpdate);
         }
         //add doctors to Service
@@ -64,7 +72,7 @@ class CreateOrUpdate extends Component
             }
             $this->service->user()->sync($syncArr);
         }
-        return redirect()->route('admin.service.list')->with('success', 'بخش با موفقیت اضافه شد');
+        return redirect()->route('admin.service.list')->with('success', $msg);
     }
 
     private function addInitialValues()
@@ -76,6 +84,9 @@ class CreateOrUpdate extends Component
         $this->form['priority']  = $this->service->priority;
         $this->form['active']    =  $this->service->active == ActiveEnum::ACTIVE ? true : false;
         $this->form['show_type']    =  $this->service->show_type == ServiceShowTypeEnum::SHOW ? true : false;
+        if(isset($this->service->detail[Service::APP_QUESTION_TITLE])) {
+            $this->form['qestion'] = $this->service->detail[Service::APP_QUESTION_TITLE] ;
+        }
         $doctors =  $this->service->user->pluck('id')->toArray();
         foreach ($doctors as $doc) {
             $this->form['doctors'][$doc] =  true;

@@ -7,7 +7,6 @@ use Livewire\Component;
 use Livewire\Attributes\Title;
 use Livewire\Attributes\Layout;
 use Livewire\Attributes\Locked;
-use Modules\AppointmentUser\app\Jobs\GenerateAppointmentCache;
 use Modules\User\Entities\User;
 use Modules\Place\app\Models\Place;
 use Illuminate\Support\Facades\Cache;
@@ -17,11 +16,13 @@ use Modules\Setting\Enum\SettingKeyEnum;
 use Modules\AppointmentUser\Enum\AppointmentVia;
 use Modules\AppointmentUser\Enum\model\UserModel;
 use Modules\AppointmentUser\Enum\model\AppointmentModel;
+use Modules\AppointmentUser\app\Models\AppointmentOnline;
 use Modules\AppointmentUser\Enum\AppointmentUserKindEnum;
 use Modules\AppointmentUser\Enum\AppointmentUserTypeEnum;
 use Modules\AppointmentUser\Enum\AppointmentUserStatusEnum;
 use Modules\AppointmentUser\Enum\model\UserModelAppointment;
 use Modules\AppointmentSetting\app\Models\AppointmentSetting;
+use Modules\AppointmentUser\app\Jobs\GenerateAppointmentCache;
 
 #[Layout('front::layouts.app')]
 #[Title('ثبت نوبت')]
@@ -66,7 +67,7 @@ class Checkout extends Component
             $rules = [
                 'form.otherApp.first_name' => 'required|string|max:225',
                 'form.otherApp.last_name' => 'required|string|max:225',
-                'form.otherApp.gender' => 'required|string|max:225',
+                'form.otherApp.gender'         => 'required|string|max:225',
                 'form.otherApp.national_code' => 'required_if:form.otherApp.withOutNational_code,false|max:225',
                 'form.otherApp.mobile'        => 'required|digits:11',
                 'form.otherApp.insurence'      => 'nullable|string|max:225',
@@ -78,7 +79,13 @@ class Checkout extends Component
             // create a user
             $this->RegisterOtherAsUser();
         }
-
+        if( isset($this->fetchData['appSetting']->detail[AppointmentSetting::MAX_ACTIVE_APP_FOR_ONLINE_APP])) {
+            $maxAppointmentForEachDay = (int) $this->fetchData['appSetting']->detail[AppointmentSetting::MAX_ACTIVE_APP_FOR_ONLINE_APP] ;
+            if(AppointmentOnline::where('date_visit', now()->addDay())->count() > $maxAppointmentForEachDay) {
+                // appoitment reach their limit  
+                return $this->err = 'ظرفیت های نوبت آنلاین به اتمام رسیده است ، لطفا در روز دیگری تلاش کنید';
+            }
+        }
         // check user not have active appointment for that day
         if ($this->checkForActiveAppointment()) {
             // register the appointment
@@ -150,7 +157,6 @@ class Checkout extends Component
     }
     private function storeappointment()
     {
-
         $user = $this->user;
         // If he wants to take the appointmnet for someone else
         $someoneModel = null;

@@ -47,12 +47,18 @@ class CreateOrUpdate extends Component
             'priority'      => $this->form['priority']   ?? 1,
             'active'        => ActiveEnum::tryFrom($active),
             'show_type'     => $this->form['show_type'] ? ServiceShowTypeEnum::SHOW : ServiceShowTypeEnum::DONT_SHOW,
-            'detail'        => [Service::APP_QUESTION_TITLE => null ]
+            'detail'        => [
+                Service::APP_QUESTION_TITLE => null,
+                Service::NOT_SHOW_TO_USER   => false
+            ]
         ];
-        if(isset($this->form['qestion']) && $parentId == null ) {
+        if (isset($this->form['qestion']) && $parentId == null) {
             $modelCreateOrUpdate['detail'] = [
-                Service::APP_QUESTION_TITLE => $this->form['qestion'] ,
+                Service::APP_QUESTION_TITLE => $this->form['qestion'],
             ];
+        }
+        if (isset($this->form['notShowToUser'])) {
+            $modelCreateOrUpdate['detail'][Service::NOT_SHOW_TO_USER] =   $this->form['notShowToUser'];
         }
         if ($this->isEdited) {
             $this->service->update($modelCreateOrUpdate);
@@ -84,8 +90,11 @@ class CreateOrUpdate extends Component
         $this->form['priority']  = $this->service->priority;
         $this->form['active']    =  $this->service->active == ActiveEnum::ACTIVE ? true : false;
         $this->form['show_type']    =  $this->service->show_type == ServiceShowTypeEnum::SHOW ? true : false;
-        if(isset($this->service->detail[Service::APP_QUESTION_TITLE])) {
-            $this->form['qestion'] = $this->service->detail[Service::APP_QUESTION_TITLE] ;
+        if (isset($this->service->detail[Service::APP_QUESTION_TITLE])) {
+            $this->form['qestion'] = $this->service->detail[Service::APP_QUESTION_TITLE];
+        }
+        if (isset($this->service->detail[Service::NOT_SHOW_TO_USER])) {
+            $this->form['notShowToUser'] = $this->service->detail[Service::NOT_SHOW_TO_USER];
         }
         $doctors =  $this->service->user->pluck('id')->toArray();
         foreach ($doctors as $doc) {

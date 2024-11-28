@@ -101,7 +101,7 @@
                             </div>
                         </div>
                         <div class="row mt-4 mb-3">
-                            <label for="form_priority" class="col-md-3 form-label">نمایش در صفحه اصلی:</label>
+                            <label for="check_showType" class="col-md-3 form-label">نمایش در صفحه اصلی:</label>
                             <div class="col-md-9">
                                 <div class="custom-checkbox custom-control">
                                     <input type="checkbox" wire:model='form.show_type' data-checkboxes="mygroup"
@@ -111,6 +111,20 @@
                                     </label>
                                 </div>
                                 @error('form.priority')
+                                    <span class="text-danger">{{ $message }}</span>
+                                @enderror
+                            </div>
+                        </div>
+                        <div class="row mt-4 mb-3">
+                            <label for="customShow" class="col-md-3 form-label">عدم نمایش بخش به کاربر:</label>
+                            <div class="col-md-9">
+                                <div class="custom-checkbox custom-control">
+                                    <input type="checkbox" wire:model='form.notShowToUser' data-checkboxes="mygroup"
+                                        class="custom-control-input" checked id="customShow">
+                                    <label for="customShow" class="custom-control-label">بخش برای استفاده های مدیریتی میباشد و به کاربر نمایش داده نمیشود
+                                    </label>
+                                </div>
+                                @error('form.notShowToUser')
                                     <span class="text-danger">{{ $message }}</span>
                                 @enderror
                             </div>

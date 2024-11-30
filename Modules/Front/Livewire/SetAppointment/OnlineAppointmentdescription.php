@@ -12,6 +12,7 @@ use Modules\User\Entities\User;
 use Modules\Place\app\Models\Place;
 use Modules\Service\app\Models\Service;
 use Modules\Setting\Enum\SettingKeyEnum;
+use Modules\AppointmentUser\app\Models\AppointmentUser;
 use Modules\AppointmentUser\app\Models\AppointmentOnline;
 use Modules\AppointmentSetting\app\Models\AppointmentSetting;
 use Modules\AppointmentSetting\app\Models\AppointmentSegmentItem;
@@ -78,16 +79,19 @@ class OnlineAppointmentdescription extends Component
         if ($isServiceBelongToUser != true  || $isPlaceBelongToUser != true) {
             return abort(404);
         }
-        $appSetting = AppointmentSetting::where('user_id', $doc)->where(function ($q) use($service) {
+        $appSetting = AppointmentSetting::where('user_id', $doc)
+        ->where(function ($q) use($service) {
             return $q->where('service_id', $service)->orWhereNull('service_id');
         })->where(function ($q) use($place)  {
             return $q->where('place_id', $place)->orWhereNull('place_id');
         })->first();
         $this->fetchData['isAppAvailable'] = true ;
         if(isset($appSetting->detail[AppointmentSetting::MAX_ACTIVE_APP_FOR_ONLINE_APP] )) {
-            $maxAppointmentForEachDay = (int) $this->fetchData['appSetting']->detail[AppointmentSetting::MAX_ACTIVE_APP_FOR_ONLINE_APP] ;
-            if(AppointmentOnline::where('date_visit', now()->addDay())->count() > $maxAppointmentForEachDay) {
-                // appoitment reach their limit  
+            $maxAppointmentForEachDay = (int) $appSetting->detail[AppointmentSetting::MAX_ACTIVE_APP_FOR_ONLINE_APP] ;
+            if(AppointmentUser::whereHas('appointmentUser',function($q){
+                return $q->activeAppointmentStatus() ; 
+            })->whereDate('date_visit', now()->addDay())->count() >= $maxAppointmentForEachDay) {
+                // appoitment reach their limit
                 $this->fetchData['isAppAvailable'] = false ;
             }
         }

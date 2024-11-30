@@ -7,18 +7,19 @@ use Livewire\Component;
 use App\Models\ShortLink;
 use Livewire\Attributes\On;
 use Livewire\Attributes\Url;
+use Livewire\WithFileUploads;
 use Livewire\Attributes\Computed;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Storage;
-use Livewire\WithFileUploads;
-use Modules\AppointmentUser\app\Jobs\GenerateAppointmentCache;
-use Modules\Chat\app\Models\MessageTemplate;
 use Modules\Setting\Enum\SettingKeyEnum;
+use Modules\Chat\app\Models\MessageTemplate;
 use Modules\AppointmentUser\app\Models\AppointmentUser;
 use Modules\User\app\Notifications\UserSmsNotification;
 use Modules\AppointmentUser\app\Models\AppointmentOnline;
 use Modules\AppointmentUser\Enum\AppointmentUserStatusEnum;
+use Modules\AppointmentSetting\app\Models\AppointmentSetting;
 use Modules\AppointmentUser\Enum\AppointmentOnlineStatusEnum;
+use Modules\AppointmentUser\app\Jobs\GenerateAppointmentCache;
 use Modules\AppointmentUser\app\Models\AppointmentOnlineMessage;
 use Modules\AppointmentUser\Enum\AppointmentOnlineMessageSeenEnum;
 use Modules\AppointmentUser\Enum\AppointmentOnlineMessageTypeEnum;
@@ -184,7 +185,12 @@ class MessageDetail extends Component
             ));
         } catch (\Throwable $th) {
         }
-        $this->fetchData['appOnline']->update(['status' => AppointmentOnlineStatusEnum::ANSWER_BY_DOCTOR]);
+        $setting = $this->fetchData['appOnline']->setting ;
+        $appointmentOnlineUpdateModel = ['status' => AppointmentOnlineStatusEnum::ANSWER_BY_DOCTOR] ;
+        if(isset($setting->detail[AppointmentSetting::MAX_ACTIVE_TIME_ONLINE_APPOINTMENT])) {
+            $appointmentOnlineUpdateModel['ended_at'] = now()->addHours((int) $setting->detail[AppointmentSetting::MAX_ACTIVE_TIME_ONLINE_APPOINTMENT]);
+        }
+        $this->fetchData['appOnline']->update($appointmentOnlineUpdateModel);
         $this->dispatch('sendMessage', true);
     }
     public function messages()
@@ -300,14 +306,27 @@ class MessageDetail extends Component
     }
     public function mount()
     {
+        if (
+            !auth()->user()->can('appointment_user') &&
+            !auth()->user()->can('appointment_user.own') &&
+            !auth()->user()->can('appointment_user.message') &&
+            !auth()->user()->can('appointment_user.online')
+        ) {
+            abort(403, 'Unauthorized');
+        }
+
         $this->fetchData['appOnline'] = AppointmentOnline::find(request()->route('onlineAppId'));
-        $this->fetchData['messages']  = $this->fetchData['appOnline']->messages;
-        $this->fetchData['appOnline']->messages()
-            ->where('type', AppointmentOnlineMessageTypeEnum::QUESTION)
-            ->where('seen', AppointmentOnlineMessageSeenEnum::UNSEEN)
-            ->update(['seen' => AppointmentOnlineMessageSeenEnum::SEEN]);
-        $this->fetchData['user']      =  $this->fetchData['appOnline']->user;
-        $this->fetchData['messageTemplate']      =  MessageTemplate::doctorMessage($this->fetchData['appOnline']->doctor->id)->get();
+        if (isset($this->fetchData['appOnline'])) {
+            $this->fetchData['messages']  = $this->fetchData['appOnline']->messages;
+            $this->fetchData['appOnline']->messages()
+                ->where('type', AppointmentOnlineMessageTypeEnum::QUESTION)
+                ->where('seen', AppointmentOnlineMessageSeenEnum::UNSEEN)
+                ->update(['seen' => AppointmentOnlineMessageSeenEnum::SEEN]);
+            $this->fetchData['user']      =  $this->fetchData['appOnline']->user;
+            $this->fetchData['messageTemplate']      =  MessageTemplate::all();
+        } else {
+           abort(500,'نوبت یافت نشد');
+        }
     }
     public function booted()
     {

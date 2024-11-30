@@ -81,8 +81,10 @@ class Checkout extends Component
         }
         if( isset($this->fetchData['appSetting']->detail[AppointmentSetting::MAX_ACTIVE_APP_FOR_ONLINE_APP])) {
             $maxAppointmentForEachDay = (int) $this->fetchData['appSetting']->detail[AppointmentSetting::MAX_ACTIVE_APP_FOR_ONLINE_APP] ;
-            if(AppointmentOnline::where('date_visit', now()->addDay())->count() > $maxAppointmentForEachDay) {
-                // appoitment reach their limit  
+            if(AppointmentOnline::whereHas('appointmentUser',function($q){
+                return $q->activeAppointmentStatus() ;
+            })->whereDate('date_visit', now()->addDay())->count() >= $maxAppointmentForEachDay) {
+                // appoitment reach their limit
                 return $this->err = 'ظرفیت های نوبت آنلاین به اتمام رسیده است ، لطفا در روز دیگری تلاش کنید';
             }
         }

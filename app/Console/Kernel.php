@@ -15,6 +15,7 @@ use Modules\MigrateOldData\App\Console\MigrateUserMetasCommand;
 use Modules\MigrateOldData\App\Console\MigratePlaceUsersCommand;
 use Modules\MigrateOldData\App\Console\MigrateAppointmentSetting;
 use Modules\MigrateOldData\App\Console\MigrateServiceUserCommand;
+use Modules\AppointmentUser\App\Console\CompeleteOnlineAppointment;
 use Modules\MigrateOldData\App\Console\MigrateSpecialiteiesCommand;
 use Modules\MigrateOldData\App\Console\MigrateAppointmentUserCommand;
 use Modules\AppointmentUser\app\Console\CheckAppointmentUserDedlineDateCommand;
@@ -38,6 +39,7 @@ class Kernel extends ConsoleKernel
         MigrateAppointmentSetting::class ,
         MigrateUserMetasCommand::class ,
         MigrateAppointmentUserCommand::class ,
+        CompeleteOnlineAppointment::class
     ];
 
     /**
@@ -47,6 +49,7 @@ class Kernel extends ConsoleKernel
     {
         // $schedule->command('inspire')->hourly();
         $schedule->command('appointment:check-deadLine')->hourly();
+        $schedule->command('appointment:check-end-at')->hourly();
         $schedule->command('appointment:sendReminders')->everyFiveMinutes();
         $schedule->command('appointmentSetting:renew-cache')->daily();
     }

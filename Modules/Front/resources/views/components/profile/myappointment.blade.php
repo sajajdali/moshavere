@@ -46,8 +46,8 @@
                                     </p>
                                 </div>
                                 <div class="flex flex-col items-end gap-4">
-                                    @if($appointmentUser->isOnline() )
-                                    <a href="{{route('front.user.chatroom',['onlineAppId' => $appointmentUser->online->first()->id ])}}" class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded-lg shadow-md transition duration-300 ease-in-out">
+                                    @if($appointmentUser->isOnline() && $appointmentUser->online->isNotEmpty())
+                                    <a href="{{route('front.user.chatroom',['onlineAppId' => $appointmentUser->online->first()?->id ])}}" class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded-lg shadow-md transition duration-300 ease-in-out">
                                         ورود به چت
                                     </a>
                                     @endif

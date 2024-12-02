@@ -1,7 +1,10 @@
 <div>
     <div class="card @error('form.timeFrame') border border-danger @enderror">
         <div class="card-header border-bottom">
-            <h3>روز های حضور</h3>
+            <h3 class="d-flex align-items-center">
+                <i class="fa fa-calendar fa-xl me-2 d-none d-sm-inline" aria-hidden="true"></i>
+                <span>روز های حضور</span>
+            </h3>
         </div>
         <div class="row mt-3">
             <div class="card-body">

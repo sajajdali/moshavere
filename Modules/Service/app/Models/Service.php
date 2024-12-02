@@ -27,6 +27,8 @@ class Service extends Model
         'show_type' => ServiceShowTypeEnum::class,
         'detail' => 'json',
     ];
+    const APP_QUESTION_TITLE  = 'app_question_title';
+    const NOT_SHOW_TO_USER    = 'not_show_to_user';
 
     public function user()
     {
@@ -40,6 +42,14 @@ class Service extends Model
     public function scopeActive(Builder $query): Builder
     {
         return $query->where('active', ActiveEnum::ACTIVE->value);
+    }
+    
+    // this scope should called where service is load for user
+    public function scopeShowToUser(Builder $query) {
+        return $query->where(function ($q) {
+            $q->whereJsonDoesntContain('detail', self::NOT_SHOW_TO_USER)    // Property not set
+              ->orWhere('detail->' . self::NOT_SHOW_TO_USER, false);     // Property explicitly false
+        });
     }
     public static function maxPriority(): int
     {

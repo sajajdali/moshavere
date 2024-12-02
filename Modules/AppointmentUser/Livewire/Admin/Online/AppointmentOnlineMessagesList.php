@@ -3,6 +3,7 @@
 namespace Modules\AppointmentUser\Livewire\Admin\Online;
 
 use Livewire\Component;
+use Livewire\Attributes\Url;
 use Livewire\WithPagination;
 use Livewire\Attributes\Title;
 use Livewire\Attributes\Computed;
@@ -10,26 +11,21 @@ use Modules\User\Enum\UserMetaEnum;
 use Hekmatinasser\Verta\Facades\Verta;
 use Illuminate\Support\Facades\Validator;
 use Modules\AppointmentUser\Traits\OprationButtonsTrait;
+use Modules\AppointmentUser\app\Models\AppointmentOnline;
 use Modules\AppointmentUser\Enum\AppointmentOnlineStatusEnum;
 use Modules\AppointmentUser\app\Models\AppointmentOnlineMessage;
+use Modules\AppointmentUser\Enum\AppointmentOnlineMessageTypeEnum;
 
 #[Title('پیام های پشتیبانی')]
 class AppointmentOnlineMessagesList extends Component
 {
     use WithPagination;
     use OprationButtonsTrait;
-    public array $search = [
-        'user_id' => null,
-        'user_first_name' => null,
-        'user_last_name' => null,
-        'user_mobile' => null,
-        'appointment_date' => null,
-        'appointment_set_date' => null,
-        'appointment_end_date' => null,
-        'appointment_star_date' => null,
-        'AppointmentStatus' => null,
-        'appointment_messages' => null,
-    ];
+    #[Url]
+    public array $search = [];
+
+    #[Url]
+    public ?string $show = 'all';
     public array $form = [];
     public array $fetchData = [
         'showCaceledApp' => true,
@@ -49,18 +45,34 @@ class AppointmentOnlineMessagesList extends Component
     {
         $this->fetchData['showCaceledApp'] = false;
     }
+    public function showStatus($state)
+    {
+        $this->show = $state;
+        $this->handleSearch();
+    }
     #[Computed]
     public function handleSearch()
     {
         $logedInUser = auth()->user();
         // $query = AppointmentOnlineMessage::where('type',1)
-        $query = AppointmentOnlineMessage::query()->when(! $logedInUser->isAdmin() && $logedInUser->can('appointment_user.own'),function($q) use($logedInUser){
-             $q->whereHas('online',function($qq) use($logedInUser){
-                 $qq->whereHas('appointmentUser',function($qqq)  use($logedInUser){
-                    return  $qqq->where('doctor_id',$logedInUser->id)->orWhere('agent_id',$logedInUser->id);
-                }) ;
-            });
-        })->when(isset($this->fetchData['showCaceledApp']) && $this->fetchData['showCaceledApp'] == true, function ($q) {
+        $query = AppointmentOnlineMessage::query()
+            ->when(! $logedInUser->isAdmin() && $logedInUser->can('appointment_user.own'), function ($q) use ($logedInUser) {
+                $q->whereHas('online', function ($qq) use ($logedInUser) {
+                    $qq->whereHas('appointmentUser', function ($qqq)  use ($logedInUser) {
+                        return  $qqq->where('doctor_id', $logedInUser->id)->orWhere('agent_id', $logedInUser->id);
+                    });
+                });
+            })->when($logedInUser->isMama(), function ($q) {
+                $q->whereHas('online', function ($qq) {
+                    if ($this->show == 'all') {
+                        return  $qq->where('agent_id', auth()->user()->id)->orWhereNull('agent_id');
+                    } elseif ($this->show == 'empty') {
+                        return  $qq->WhereNull('agent_id');
+                    } elseif ($this->show == 'mine') {
+                        return   $qq->where('agent_id', auth()->user()->id);
+                    }
+                });
+            })->when(isset($this->fetchData['showCaceledApp']) && $this->fetchData['showCaceledApp'] == true, function ($q) {
                 $q->whereHas('online', function ($qq) {
                     $qq->whereIn('status', [
                         AppointmentOnlineStatusEnum::PENDING,
@@ -128,13 +140,13 @@ class AppointmentOnlineMessagesList extends Component
                 });
             })->when(isset($this->search['appointment_date']), function ($q) {
                 try {
-                   $appointmentDate =  Verta::parse($this->search['appointment_date'])->toCarbon();
+                    $appointmentDate =  Verta::parse($this->search['appointment_date'])->toCarbon();
                 } catch (\Throwable $th) {
-                  $this->addError('msgerror', 'فرمت تاریخ وارد شده صحیح نیست');
-                  return;
+                    $this->addError('msgerror', 'فرمت تاریخ وارد شده صحیح نیست');
+                    return;
                 }
-                return $q->whereHas('online',function($qq) use($appointmentDate){
-                    $qq->whereDate('created_at',$appointmentDate) ;
+                return $q->whereHas('online', function ($qq) use ($appointmentDate) {
+                    $qq->whereDate('created_at', $appointmentDate);
                 });
             })->when(isset($this->search['appointment_messages']), function ($q) {
                 return $q->where('body', 'LIKE', "%{$this->search['appointment_messages']}%");

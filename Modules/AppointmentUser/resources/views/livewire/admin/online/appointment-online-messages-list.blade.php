@@ -21,10 +21,10 @@
     </div>
     <!-- PAGE-HEADER END -->
     @error('msgerror')
-    <div class="col-md-12 alert alert-danger fade show" role="alert">
-        <i class="fa fa-remove me-2" aria-hidden="true"></i>
-        {{$message}}
-    </div>
+        <div class="col-md-12 alert alert-danger fade show" role="alert">
+            <i class="fa fa-remove me-2" aria-hidden="true"></i>
+            {{ $message }}
+        </div>
     @enderror
 
     @include('admin::layouts.components.alert')
@@ -38,10 +38,24 @@
                             <div>
                                 <h3 class="card-title">لیست نوبت های ثبت شده</h3>
                                 <span class="badge bg-light rounded-pill mt-1">
-                                    {{\Modules\AppointmentUser\app\Models\AppointmentOnlineMessage::totalUnreaedMessage()}} نوبت بدون پاسخ
+                                    {{ \Modules\AppointmentUser\app\Models\AppointmentOnlineMessage::totalUnreaedMessage() }}
+                                    نوبت بدون پاسخ
                                 </span>
                             </div>
-                            <div class="card-options flex-column flex-sm-row">
+                            @if (auth()->user()->isMama())
+                                <div class="d-flex justify-content-around">
+                                    <button wire:click='showStatus("all")' disabled
+                                        class="btn    @if ($show == 'all') btn-success   @else btn-info @endif">نمایش
+                                        همه</button>
+                                    <button wire:click='showStatus("mine")' disabled
+                                        class="btn    @if ($show == 'mine') btn-success  @else btn-info @endif mx-2">نوبت
+                                        های من</button>
+                                    <button wire:click='showStatus("empty")' disabled
+                                        class="btn    @if ($show == 'empty') btn-success @else btn-info @endif">نوبت
+                                        های خالی</button>
+                                </div>
+                            @endif
+                            <div class="flex-column flex-sm-row">
                                 <button class="btn btn-warning me-2" type="button" wire:click='showalltheMessages'>
                                     نمایش نوبت های تمام شده
                                 </button>
@@ -102,7 +116,8 @@
 
                                             </div>
                                             <div class="col-12">
-                                                <label for="search-UserMobile" class="form-label"><strong>کد ملی</strong></label>
+                                                <label for="search-UserMobile" class="form-label"><strong>کد
+                                                        ملی</strong></label>
                                                 <input class="form-control" id="search-UserMobile"
                                                     wire:model="search.nationalCode" placeholder="کد ملی بیمار"
                                                     type="text">
@@ -124,8 +139,7 @@
                                             <hr class="my-4">
                                         </div>
                                         <div class="collapse row
-                                        @if (isset($search['appointment_date']) ||
-                                                isset($search['appointment_set_date']) ) show @endif"
+                                        @if (isset($search['appointment_date']) || isset($search['appointment_set_date'])) show @endif"
                                             id="appointmentCollapsSearch" wire:ignore.self>
                                             <div class="col-md-6">
                                                 <label for="search-appointment_date" class="form-label"><strong>زمان
@@ -209,68 +223,81 @@
                     </div>
                     {{-- chats --}}
                     @foreach ($this->handleSearch() as $message)
-                    @php
-                    $color  = "f1f1f1" ;
-                    if($message->online->status == \Modules\AppointmentUser\Enum\AppointmentOnlineStatusEnum::REJECT ||
-                    $message->online->status == \Modules\AppointmentUser\Enum\AppointmentOnlineStatusEnum::CANCEL) {
-                        $color  = "ffcaca" ;
-                    }
-                    if($message->online->status == \Modules\AppointmentUser\Enum\AppointmentOnlineStatusEnum::COMPLETED_BY_DOCTOR ) {
-                        $color  = "f9f6cf" ;
-                    }
-                    @endphp
-                        <div class="card border-0 shadow rounded-lg mb-4" style="background-color: #{{$color}}">
+                        @php
+                            $color = 'f1f1f1';
+                            if (
+                                $message->online->status ==
+                                    \Modules\AppointmentUser\Enum\AppointmentOnlineStatusEnum::REJECT ||
+                                $message->online->status ==
+                                    \Modules\AppointmentUser\Enum\AppointmentOnlineStatusEnum::CANCEL
+                            ) {
+                                $color = 'ffcaca';
+                            }
+                            if (
+                                $message->online->status ==
+                                \Modules\AppointmentUser\Enum\AppointmentOnlineStatusEnum::COMPLETED_BY_DOCTOR
+                            ) {
+                                $color = 'f9f6cf';
+                            }
+                        @endphp
+                        <div class="card border-0 shadow rounded-lg mb-4"
+                            style="background-color: #{{ $color }}">
                             <div
                                 class="card-header bg-transparent border-0 d-flex justify-content-between align-items-center p-3">
                                 <div class="d-flex flex-column absoloute">
                                     <span class="text-muted">{{ $loop->count - $loop->index }}</span>
-                                    <a target="blank" class="fw-bold ms-2 mt-2 h5 mb-0" href="{{ route('admin.appointment_user.message.detail', ['onlineAppId' => $message->online->id]) }}" >{{ $message->user->full_name }}</a>
+                                    <a target="blank" class="fw-bold ms-2 mt-2 h5 mb-0"
+                                        href="{{ route('admin.appointment_user.message.detail', ['onlineAppId' => $message->online->id]) }}">{{ $message->user->full_name }}</a>
                                 </div>
                                 <div class="text-end">
-                                    <span
-                                        class=" badge bg-light small d-block mt-1  px-1"><strong>اخرین پیام</strong>:  {{ ($message->updated_at)->diffForHumans() }}
-                                         </span>
-                                    <span
-                                        class="mt-1 d-block bg-light bg-light">
+                                    <span class=" badge bg-light small d-block mt-1  px-1"><strong>اخرین
+                                            پیام</strong>: {{ $message->updated_at->diffForHumans() }}
+                                    </span>
+                                    <span class="mt-1 d-block bg-light bg-light">
                                         <span class="d-flex flex-column flex-md-row text-center  px-2">
-                                            <strong>زمان دریافت نوبت:</strong> <span>{{ verta($message->online->created_at)-> format('Y/m/d ساعت H:i')}}</span>
-                                            </span>
-                                         </span>
-                                         @if ($message->hasAnswer())
-                                         <span class="mt-1 d-block bg-light bg-light text-center px-1"><strong>پاسخ توسط</strong>: {{$message->findAwnswerer()}} </span>
-                                     @endif
+                                            <strong>زمان دریافت نوبت:</strong>
+                                            <span>{{ verta($message->online->created_at)->format('Y/m/d ساعت H:i') }}</span>
+                                        </span>
+                                    </span>
+                                    @if ($message->hasAnswer())
+                                        <span class="mt-1 d-block bg-light bg-light text-center px-1"><strong>پاسخ
+                                                توسط</strong>: {{ $message->findAwnswerer() }} </span>
+                                    @endif
                                 </div>
                             </div>
                             <div class="card-body d-flex justify-content-between align-items-center p-3">
-                                <a target="blank" class="btn  @if ($message->unReadedMessageCount() > 0) btn-secondary @else  btn-primary @endif rounded-full"
+                                <a target="blank"
+                                    class="btn  @if ($message->unReadedMessageCount() > 0) btn-secondary @else  btn-primary @endif rounded-full"
                                     href="{{ route('admin.appointment_user.message.detail', ['onlineAppId' => $message->online->id]) }}">
                                     @if ($message->unReadedMessageCount() > 0)
-                                    {{ $message->unReadedMessageCount() }} پیام
+                                        {{ $message->unReadedMessageCount() }} پیام
                                     @else
                                         بدون پیام جدید
                                     @endif
                                 </a>
 
                                 <div class="d-flex flex-column align-items-end">
-                                @if ($message->online->status->isPendding())
-                                        <button wire:click='ApproveOnlineAppointment("{{ $message->online->appointmentUser->id}}")' class="btn btn-success rounded-pill px-4 py-2 me-2 loading-btn">
+                                    @if ($message->online->status->isPendding())
+                                        <button
+                                            wire:click='ApproveOnlineAppointment("{{ $message->online->appointmentUser->id }}")'
+                                            class="btn btn-success rounded-pill px-4 py-2 me-2 loading-btn">
                                             <i class="fa fa-check me-2" aria-hidden="true"></i> تایید نوبت
                                         </button>
-                                        <button wire:click='disApproveOnlineAppointment("{{ $message->online->appointmentUser->id}}")' class="btn btn-danger rounded-pill px-4 py-2">
+                                        <button
+                                            wire:click='disApproveOnlineAppointment("{{ $message->online->appointmentUser->id }}")'
+                                            class="btn btn-danger rounded-pill px-4 py-2">
                                             <i class="fa fa-times me-2" aria-hidden="true"></i> رد کردن
                                         </button>
-
-                                @else
+                                    @else
                                         {!! $message->online->status->getMessageDetailBadge() !!}
-                                        @endif
+                                    @endif
                                 </div>
                             </div>
                         </div>
                     @endforeach
-
                 </div>
                 <div class="d-flex justify-content-center mb-5">
-                    {{$this->handleSearch()->links()}}
+                    {{ $this->handleSearch()->links() }}
                 </div>
             </div>
         </div>
@@ -324,14 +351,14 @@
                 }, 500);
             })
             Livewire.on('lunchModal', function() {
-            setTimeout(() => {
-                var myModal = new bootstrap.Modal(document.getElementById(
-                    'resoanForDisapproveModal'), {
-                    keyboard: false
-                });
-                myModal.show();
-            }, 1000);
-        });
+                setTimeout(() => {
+                    var myModal = new bootstrap.Modal(document.getElementById(
+                        'resoanForDisapproveModal'), {
+                        keyboard: false
+                    });
+                    myModal.show();
+                }, 1000);
+            });
         });
     </script>
 @endpush

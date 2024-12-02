@@ -20,6 +20,7 @@ use Modules\Chat\app\Models\ChatDetail;
 use Modules\Setting\Enum\SettingKeyEnum;
 use Modules\Chat\Enum\ChatDetailTypeEnum;
 use Modules\Chat\app\Models\ChatDetailsFile;
+use Modules\Chat\app\Models\MessageTemplate;
 use Modules\Chat\app\Events\AdminAnswerChatEvent;
 use Modules\User\app\Notifications\UserSmsNotification;
 use Modules\Api\app\Resources\Api\Chat\ChatDetailResource;
@@ -30,7 +31,7 @@ class ChatView extends Component
 
     #[Url]
     public int $chatId = 0;
-
+public array $fetchData =[];
     public $chatMessage = '';
     public $searchTerm = ''; // Property to hold the search term
 
@@ -110,16 +111,53 @@ class ChatView extends Component
     // ];
     // ChatDetailsFile::create($fileModel);
     // }
-
+    public function storeRecordedVoice($dontSendNotification = true)
+    {
+        if (isset($this->form['voice'])) {
+            $fileUrl = Storage::url($this->form['voice']);
+            $extension = pathinfo($fileUrl, PATHINFO_EXTENSION);
+            $fileName = pathinfo($fileUrl, PATHINFO_FILENAME); // Extracts the file name without extension
+            $chatDetail = $this->chat?->chatDetails()->create([
+                'content' => $this->ImgMessg,
+                'type' => ChatDetailTypeEnum::ADMIN_MESSAGE,
+                'user_id' => auth()->id(),
+            ]);
+            $fileModel = [
+                'user_id' => $this->chat?->user->id,
+                'answer_by' => auth()->user()->id,
+                'chat_detail_id' => $chatDetail->id,
+                'original_name' => $fileName,
+                'server_name' => $fileName,
+                'disk' => 'public',
+                'path' => $this->form['voice'],
+                'extension' => $extension,
+                'mime' => $extension,
+                'size' => 10,
+            ];
+            // Store the file record in the database
+            ChatDetailsFile::create($fileModel);
+        }
+    }
     public function sendMessage()
     {
-        if (empty($this->chatMessage) && ! isset($this->form['file']) && ! isset($this->form['capturedPic'])) {
+        if (empty($this->chatMessage) &&
+        ! isset($this->form['file']) &&
+         ! isset($this->form['capturedPic']) &&
+         ! isset($this->form['voice'])
+         ) {
             $this->dispatch('error', message: 'متن پیام خود را وارد کنید.');
             return;
         }
         if ($this->chat == null) {
             $this->dispatch('error', message: 'لطفا گفت و گوی مد نظر خود را انتخاب کنید');
             return;
+        }
+        if (isset($this->form['voice'])) {
+            if (! isset($this->form['file']) && ! isset($this->chatMessage)) {
+                $this->storeRecordedVoice();
+            } else {
+                $this->storeRecordedVoice(true);
+            }
         }
         if (isset($this->form['file'])) {
             $url = $this->form['file'];
@@ -216,14 +254,14 @@ class ChatView extends Component
         $this->chatMessage = '';
 
         // send pusher event
-        try {
-            $message = ChatDetailResource::make($chatDetail);
-            event(new PusherBroadcast($message, $this->chat->id));
-        } catch (\Throwable $th) {
-            Log::error('An error occurred during chat processing: ' . $th->getMessage(), [
-                'exception' => $th,
-            ]);
-        }
+        // try {
+        //     $message = ChatDetailResource::make($chatDetail);
+        //     event(new PusherBroadcast($message, $this->chat->id));
+        // } catch (\Throwable $th) {
+        //     Log::error('An error occurred during chat processing: ' . $th->getMessage(), [
+        //         'exception' => $th,
+        //     ]);
+        // }
         // send sms
         if (isset($this->form['sendSms']) && $this->form['sendSms'] == true) {
             $template = setting(SettingKeyEnum::SMS_FOR_SEND_MESSAGE_IN_CHATS);
@@ -291,6 +329,29 @@ class ChatView extends Component
     public function runSearch()
     {
         $this->render();
+    }
+    public function booted()
+    {
+        $this->dispatch('loadJs', true);
+    }
+    public function templateMessageSelect(MessageTemplate $messageTemplate)
+    {
+        // called when template message selected
+        if (isset($messageTemplate->body) && $messageTemplate->body != null) {
+            $this->chatMessage = $messageTemplate->body;
+        }
+        if (isset($messageTemplate->detail) && $messageTemplate->detail != null) {
+            if (isset($messageTemplate->detail['file']) && $messageTemplate->detail['file'] != null) {
+                $this->form['file'] = $messageTemplate->detail['file'];
+            }
+            if (isset($messageTemplate->detail['voice']) && $messageTemplate->detail['voice'] != null) {
+                $this->form['voice'] = $messageTemplate->detail['voice'];
+            }
+        }
+    }
+
+    public function mount() {
+        $this->fetchData['messageTemplate']      =  MessageTemplate::all();
     }
     public function render()
     {

@@ -32,11 +32,11 @@
 
     <!-- PAGE -->
     <div class="page">
-        <div class="page-main">
+        <div class="page-main" style="background-color: rgb(230 234 239)">
             @include('admin::layouts.components.app-header')
             @include('admin::layouts.components.app-sidebar')
             <!--app-content open-->
-            <div class="app-content main-content mt-0">
+            <div class="app-content main-content mt-0" >
                 <div class="side-app">
 
                     <!-- CONTAINER -->

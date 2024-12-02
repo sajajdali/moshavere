@@ -41,7 +41,7 @@
                         <div class="row mt-5 mb-3">
                             <label for="js-select2" class="col-md-3 form-label">زیر بخش:</label>
                             <div class="col-md-9">
-                                <div class="mb-3">
+                                <div class="mb-3" wire:ignore>
                                     <select class="form-control select2-show-search form-select" id="js-select2"
                                         data-placeholder="بدون والد">
                                         <option value="0">بدون والد</option>
@@ -67,6 +67,25 @@
                                 @enderror
                             </div>
                         </div>
+                        <div class="row mt-4 mb-3" id="questionContainer" wire:ignore.self>
+                            <label for="questionTitle" class="col-md-3 form-label  d-flex align-item-center">
+                                <i class="fa fa-mobile fa-2x me-2 mb-1" aria-hidden="true"></i>
+                                <span>عنوان سوال:</span>
+                            </label>
+                            <div class="col-md-9">
+                                <textarea rows="3" class="form-control mb-1  @error('form.qestion') is-invalid @enderror"
+                                    id="questionTitle" wire:model='form.qestion' type="number"></textarea>
+                                @error('form.qestion')
+                                    <span class="text-danger">{{ $message }}</span>
+                                @enderror
+                                <p class="text-muted">
+                                    <i class="fa fa-info-circle" aria-hidden="true"></i>
+                                    در صورتی که زیر بخش های این بخش باید در اپلیکیشن به صورت سوال نمایش داده شوند
+                                    ،
+                                    عنوان سوال را وارد کنید.
+                                </p>
+                            </div>
+                        </div>
                         <div class="row mt-4 mb-3">
                             <label for="form_priority" class="col-md-3 form-label">ترتیب نمایش:</label>
                             <div class="col-md-9">
@@ -82,7 +101,7 @@
                             </div>
                         </div>
                         <div class="row mt-4 mb-3">
-                            <label for="form_priority" class="col-md-3 form-label">نمایش در صفحه اصلی:</label>
+                            <label for="check_showType" class="col-md-3 form-label">نمایش در صفحه اصلی:</label>
                             <div class="col-md-9">
                                 <div class="custom-checkbox custom-control">
                                     <input type="checkbox" wire:model='form.show_type' data-checkboxes="mygroup"
@@ -92,6 +111,20 @@
                                     </label>
                                 </div>
                                 @error('form.priority')
+                                    <span class="text-danger">{{ $message }}</span>
+                                @enderror
+                            </div>
+                        </div>
+                        <div class="row mt-4 mb-3">
+                            <label for="customShow" class="col-md-3 form-label">عدم نمایش بخش به کاربر:</label>
+                            <div class="col-md-9">
+                                <div class="custom-checkbox custom-control">
+                                    <input type="checkbox" wire:model='form.notShowToUser' data-checkboxes="mygroup"
+                                        class="custom-control-input" checked id="customShow">
+                                    <label for="customShow" class="custom-control-label">بخش برای استفاده های مدیریتی میباشد و به کاربر نمایش داده نمیشود
+                                    </label>
+                                </div>
+                                @error('form.notShowToUser')
                                     <span class="text-danger">{{ $message }}</span>
                                 @enderror
                             </div>
@@ -109,8 +142,8 @@
                                         </button>
                                     </span>
                                     <input id="thumbnail"
-                                        class="form-control    @error('form.img') is-invalid   @enderror" type="text"
-                                        name="filepath" wire:model="form.img">
+                                        class="form-control    @error('form.img') is-invalid   @enderror"
+                                        type="text" name="filepath" wire:model="form.img">
 
                                 </div>
                                 @error('form.img')
@@ -126,7 +159,7 @@
                             <div class="row mt-5">
                                 <h4>پزشکان مربوط به این بخش</h4>
                                 <input type="text" id="doctor-search" placeholder="جستجوی پزشک..."
-                                class="form-control mb-3">
+                                    class="form-control mb-3">
                                 <hr style="opacity: 0.9">
                                 <div class="row">
                                     @foreach ($fetchdata['doctors'] as $key => $doctor)
@@ -197,19 +230,29 @@
                 $('#js-select2').select2();
             }, 1000);
             $('#js-select2').on('select2:select', function(e) {
-                @this.set('form.parent_id', $(this).val());
+                var value = $(this).val();
+                @this.set('form.parent_id', value);
+                console.log(value);
+                if (value == 0) {
+                    $('#questionContainer').fadeIn();
+                } else {
+                    $('#questionContainer').fadeOut();
+                }
             });
+            if ($('#js-select2').val() != 0) {
+                $('#questionContainer').css("display", "none");
+            }
             Livewire.on('select_file', (param) => {
                 @this.set('form.img', param.url);
                 //close modal
                 $('#file-selector-modal').modal('hide');
             });
-            $('body').on('keyup','#doctor-search',function(){
-                    var value = $(this).val().toLowerCase();
-                    $(".doctor-item").filter(function() {
-                        $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1)
-                    });
+            $('body').on('keyup', '#doctor-search', function() {
+                var value = $(this).val().toLowerCase();
+                $(".doctor-item").filter(function() {
+                    $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1)
                 });
+            });
         });
     </script>
 @endpush

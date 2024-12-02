@@ -6,10 +6,10 @@
 
     </div>
     @isset($msg)
-    <div class="col-md-12 alert alert-success fade show" role="alert">
-        <i class="fa fa-check-circle-o me-2" aria-hidden="true"></i>
-        {{ $msg}}
-    </div>
+        <div class="col-md-12 alert alert-success fade show" role="alert">
+            <i class="fa fa-check-circle-o me-2" aria-hidden="true"></i>
+            {{ $msg }}
+        </div>
     @endisset
     <div wire:loading>
         <div class="loading-overlay d-flex align-items-center justify-content-center">
@@ -283,7 +283,7 @@
                                                     </div>
                                                     <div class="media-body">
                                                         <div class="main-msg-wrapper">
-                                                            {{ $message->body }}
+                                                            {!! nl2br($message->body) !!}
                                                         </div>
                                                         <div>
                                                             <span>{{ $message->created_at->format('H:i') }}</span>
@@ -303,7 +303,7 @@
                             </div>
                         </div>
                         <div class="main-chat-footer d-flex justify-content-center pt-5"
-                            style="padding-top :40px !important;">
+                            style="padding-top :60px !important;">
                             @if ($this->fetchData['appOnline']->status == Modules\AppointmentUser\Enum\AppointmentOnlineStatusEnum::PENDING)
                                 <button type="button" class="btn btn-success ms-2" wire:click='approvedAppointment'
                                     wire:loading.class='btn-loading btn-gray' wire:target='approvedAppointment'> تایید
@@ -325,7 +325,8 @@
                                     <span>
                                         نوبت توسط پزشک پاسخ داده شده است و بسته شده!!
                                     </span>
-                                    <button class="btn btn-success" wire.loading.class='btn-loading' wire:click='reactivateChat'>
+                                    <button class="btn btn-success" wire.loading.class='btn-loading'
+                                        wire:click='reactivateChat'>
                                         باز کردن مجدد چت
                                     </button>
                                 </div>
@@ -334,7 +335,11 @@
                                 <div class="d-flex flex-column align-items-center mt-5">
                                     <button type="button" class="btn btn-secondary " data-bs-toggle="modal"
                                         data-bs-target="#soundRecorderModal">
-                                        <i class="fa fa-microphone fa-xl" aria-hidden="true"></i>
+                                        @if (isset($this->form['voice']))
+                                            <i class="fa fa-check" aria-hidden="true"></i>
+                                        @else
+                                            <i class="fa fa-microphone fa-xl" aria-hidden="true"></i>
+                                        @endif
                                     </button>
                                     <!-- Camera Button -->
                                     <button
@@ -349,9 +354,27 @@
                                     <input type="file" accept="image/*" capture="environment" id="cameraInput"
                                         wire:model='form.capturedPic' style="display:none;" />
                                 </div>
-                                <textarea rows="3" class="form-control mt-5 ms-1 @error('form.typedMessage') is-invalid @enderror"
-                                    wire:model='form.typedMessage'
-                                    placeholder="@error('form.typedMessage') {{ $message }} @else متن خود را یادداشت کنید @enderror"></textarea>
+                                <div class="w-100 mt-4">
+                                    @if (isset($fetchData['messageTemplate']))
+                                        <div class="col-12 mt-5">
+                                            <div class="form-group">
+                                                <select wire:igonre.self
+                                                    class="form-control select2-show-search form-select"
+                                                    data-placeholder="متن های اماده...">
+                                                    <option label="متن ثابت.."></option>
+                                                    @foreach ($fetchData['messageTemplate'] as $msgTemp)
+                                                        <option value="{{ $msgTemp->id }}">
+                                                            {{ $msgTemp->title }}
+                                                        </option>
+                                                    @endforeach
+                                                </select>
+                                            </div>
+                                        </div>
+                                    @endif
+                                    <textarea rows="3" class="form-control mt-1 ms-1 @error('form.typedMessage') is-invalid @enderror"
+                                        id="sendMessageBox" wire:model='form.typedMessage'
+                                        placeholder="@error('form.typedMessage') {{ $message }} @else متن خود را یادداشت کنید @enderror"></textarea>
+                                </div>
                                 <div class="d-flex flex-column align-items-center mt-5">
                                     <button wire:click='sendMessage' wire:target='sendMessage'
                                         wire:loading.class='btn-loading' wire:loading.attr='disabeld' type="button"
@@ -372,8 +395,8 @@
                             </nav>
                         </div>
                         <div class="row mt-5  pt-1 pt-sm-4">
-                            <div class="col-12">
-                                <span class="rounded-pill ms-1 mt-1 d-flex align-item-center">
+                            <div class="col-12 mt-5">
+                                <span class="rounded-pill ms-1 mt-1 d-flex align-item-center mt-5">
                                     <div class="material-switch">
                                         <input wire:model='form.sendSms' id="sendSms" name="siwtch04"
                                             type="checkbox" />
@@ -388,7 +411,6 @@
             </div>
         </div>
     </div>
-
     @include('appointmentuser::components.appointmentlist.disapprovemodal')
     <livewire:admin::file-manager-modal />
     <livewire:appointmentuser::admin.online.sound-recorder />
@@ -487,6 +509,21 @@
             Livewire.on('picUploade', function() {
                 $('#loading-spinner').fadeOut();
                 $('#loading-spinner').addClass('d-none');
+            });
+
+            function js() {
+                $('.select2-show-search').select2();
+                $('body').on('change', '.select2-show-search', function() {
+                    var modelName = $(this).val();
+                    @this.templateMessageSelect(modelName);
+                    // @this.set('form.typedMessage',modelName);
+                });
+            }
+            js();
+            Livewire.on('loadJs', function() {
+                setTimeout(() => {
+                    js();
+                }, 500);
             });
         });
     </script>

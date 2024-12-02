@@ -1,5 +1,11 @@
 <div class="card-header border-bottom d-flex justify-content-between  ">
-    <h3>زمان بندی و هزینه بخش ها</h3>
+    <h3 class="d-flex align-item-center">
+        <i class="fa fa-compress me-2 d-none d-sm-inline" aria-hidden="true"></i>
+        <span>
+            زمان بندی و هزینه بخش ها
+        </span>
+    </h3>
+    <h3></h3>
     <div class="main-toggle-group d-sm-flex align-items-center ms-0">
         <div class="toggle toggle-lg toggle-primary my-1 @if (isset($this->form['segments']['status']) && $this->form['segments']['status'] == true) on @else off @endif customCheckbox"
             wire:ignore.self data-bs-toggle="collapse" href="#sectionTimeTimeCollaps" role="button" aria-expanded="false"

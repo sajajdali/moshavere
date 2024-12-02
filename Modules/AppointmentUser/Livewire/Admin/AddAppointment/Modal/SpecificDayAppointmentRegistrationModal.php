@@ -89,6 +89,7 @@ class SpecificDayAppointmentRegistrationModal extends Component
                 'form.first_name' => 'required',
                 'form.last_name' => 'required',
                 'form.time.from' => 'required',
+                'form.time.until' => 'required',
             ]);
 
             if (!isset($this->fetchData['user'])) {

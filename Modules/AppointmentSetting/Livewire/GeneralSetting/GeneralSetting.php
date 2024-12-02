@@ -210,6 +210,15 @@ class GeneralSetting extends Component
             'form.payment.voip.price'             => 'required_if:form.payment.voip.status,true',
             'form.operators.ids'                  => 'required_if:form.operators.status,true',
         ];
+        if (isset($this->form['maxAvailabeAppointment']['status']) && $this->form['maxAvailabeAppointment']['status'] == true) {
+            if (isset($this->form['visitType']['online']) && $this->form['visitType']['online'] == true) {
+                if (! isset($this->form['maxAvailabeAppointmentOnline']) || (isset($this->form['maxAvailabeAppointmentOnline']) && $this->form['maxAvailabeAppointmentOnline'] == null)) {
+                    $rules['form.maxAvailabeAppointment.eachDay'] = 'required';
+                }
+            } else {
+                $rules['form.maxAvailabeAppointment.eachDay'] = 'required';
+            }
+        }
         $validateSpecialDate = $this->validateSpecialdate();
         return array_merge($dayRules,  $rules, $validateSpecialDate);
     }
@@ -232,6 +241,9 @@ class GeneralSetting extends Component
             }
             if (isset($this->form['maxAvailabeAppointment']['ForSecretery'])) {
                 unset($this->form['maxAvailabeAppointment']['ForSecretery']);
+            }
+            if (isset($this->form['maxAvailabeAppointmentOnline'])) {
+                unset($this->form['maxAvailabeAppointmentOnline']);
             }
         }
         if (isset($this->form['monitoring']['status'])  && $this->form['monitoring']['status'] == false) {
@@ -332,29 +344,34 @@ class GeneralSetting extends Component
             ]
         ];
 
-        if (isset($this->form['visitType']['online']) && $this->form['visitType']['online']){
-            $detail[AppointmentSetting::ONLINE_CAN_SEND_VOICE] = isset($this->form['accessibility']['online']['can_send_voice']) && $this->form['accessibility']['online']['can_send_voice'];
-        } else{
+        if (isset($this->form['visitType']['online']) && $this->form['visitType']['online']) {
+            // online appointment conditions
+            $detail[AppointmentSetting::ONLINE_CAN_SEND_VOICE]              = isset($this->form['accessibility']['online']['can_send_voice']) && $this->form['accessibility']['online']['can_send_voice'];
+            $detail[AppointmentSetting::MAX_ACTIVE_TIME_ONLINE_APPOINTMENT] = isset($this->form['onlinevisit']['time']) ? $this->form['onlinevisit']['time'] : null;
+            $detail[AppointmentSetting::MAX_ACTIVE_APP_FOR_ONLINE_APP]      = isset($this->form['maxAvailabeAppointmentOnline']) ? $this->form['maxAvailabeAppointmentOnline'] : null;
+        } else {
             unset($detail[AppointmentSetting::ONLINE_CAN_SEND_VOICE]);
+            $detail[AppointmentSetting::MAX_ACTIVE_TIME_ONLINE_APPOINTMENT] =  null;
+            $detail[AppointmentSetting::MAX_ACTIVE_APP_FOR_ONLINE_APP]      =  null;
         }
 
         $detail[AppointmentSetting::DONT_SHOW_TIMES] = [
-            AppointmentSetting::DONT_SHOW_TIMES_STATUS  => $this->form['accessibility']['dont_show_times']['status'] == 'on' ,
+            AppointmentSetting::DONT_SHOW_TIMES_STATUS  => $this->form['accessibility']['dont_show_times']['status'] == 'on',
             AppointmentSetting::DONT_SHOW_TIMES_MESSAGE => $this->form['accessibility']['dont_show_times']['message'] ?? null,
         ];
 
         // Clearing the message if it is inactive and does not display the message
-        if (!$detail[AppointmentSetting::DONT_SHOW_TIMES][AppointmentSetting::DONT_SHOW_TIMES_STATUS]){
+        if (!$detail[AppointmentSetting::DONT_SHOW_TIMES][AppointmentSetting::DONT_SHOW_TIMES_STATUS]) {
             $detail[AppointmentSetting::DONT_SHOW_TIMES][AppointmentSetting::DONT_SHOW_TIMES_MESSAGE] = null;
         }
 
         // Temporary deactivation online
         $detail[AppointmentSetting::TEMPORARY_DEACTIVATION_ONLINE] = [
-            AppointmentSetting::TEMPORARY_DEACTIVATION_ONLINE_STATUS  => $this->form['accessibility']['disable_online']['status'] == 'on' ,
+            AppointmentSetting::TEMPORARY_DEACTIVATION_ONLINE_STATUS  => $this->form['accessibility']['disable_online']['status'] == 'on',
             AppointmentSetting::TEMPORARY_DEACTIVATION_ONLINE_MESSAGE => $this->form['accessibility']['disable_online']['message'] ?? null,
         ];
 
-        if (!$detail[AppointmentSetting::TEMPORARY_DEACTIVATION_ONLINE][AppointmentSetting::TEMPORARY_DEACTIVATION_ONLINE_STATUS]){
+        if (!$detail[AppointmentSetting::TEMPORARY_DEACTIVATION_ONLINE][AppointmentSetting::TEMPORARY_DEACTIVATION_ONLINE_STATUS]) {
             $detail[AppointmentSetting::TEMPORARY_DEACTIVATION_ONLINE][AppointmentSetting::TEMPORARY_DEACTIVATION_ONLINE_MESSAGE] = null;
         }
 
@@ -520,20 +537,20 @@ class GeneralSetting extends Component
             }
         }
 
-        if (isset($apSet->detail[AppointmentSetting::ONLINE_CAN_SEND_VOICE]) && $apSet->detail[AppointmentSetting::ONLINE_CAN_SEND_VOICE]){
+        if (isset($apSet->detail[AppointmentSetting::ONLINE_CAN_SEND_VOICE]) && $apSet->detail[AppointmentSetting::ONLINE_CAN_SEND_VOICE]) {
             $this->form['accessibility']['online']['can_send_voice'] = true;
-        } else{
+        } else {
             $this->form['accessibility']['online']['can_send_voice'] = false;
         }
 
         // dont show times
-        if (isset($apSet->detail[AppointmentSetting::DONT_SHOW_TIMES])){
+        if (isset($apSet->detail[AppointmentSetting::DONT_SHOW_TIMES])) {
             $this->form['accessibility']['dont_show_times']['status'] = isset($apSet->detail[AppointmentSetting::DONT_SHOW_TIMES][AppointmentSetting::STATUS]) && $apSet->detail[AppointmentSetting::DONT_SHOW_TIMES][AppointmentSetting::STATUS] == 'on';
             $this->form['accessibility']['dont_show_times']['message'] = $apSet->detail[AppointmentSetting::DONT_SHOW_TIMES][AppointmentSetting::DONT_SHOW_TIMES_MESSAGE] ?? null;
         }
 
         //Temporary deactivation
-        if (isset($apSet->detail[AppointmentSetting::TEMPORARY_DEACTIVATION_ONLINE])){
+        if (isset($apSet->detail[AppointmentSetting::TEMPORARY_DEACTIVATION_ONLINE])) {
             $this->form['accessibility']['disable_online']['status'] = isset($apSet->detail[AppointmentSetting::TEMPORARY_DEACTIVATION_ONLINE][AppointmentSetting::STATUS]) && $apSet->detail[AppointmentSetting::TEMPORARY_DEACTIVATION_ONLINE][AppointmentSetting::STATUS] == 'on';
             $this->form['accessibility']['disable_online']['message'] = $apSet->detail[AppointmentSetting::TEMPORARY_DEACTIVATION_ONLINE][AppointmentSetting::TEMPORARY_DEACTIVATION_ONLINE_MESSAGE] ?? null;
         }
@@ -542,6 +559,13 @@ class GeneralSetting extends Component
 
         if (isset($apSet->detail[AppointmentSetting::MAX_AVAILABLE_APPOINTMENT_FOR_SECRETERY])) {
             $this->form['maxAvailabeAppointment']['ForSecretery'] = $apSet->detail[AppointmentSetting::MAX_AVAILABLE_APPOINTMENT_FOR_SECRETERY];
+        }
+        if (isset($apSet->detail[AppointmentSetting::MAX_ACTIVE_APP_FOR_ONLINE_APP])) {
+            $this->form['maxAvailabeAppointmentOnline']  = $apSet->detail[AppointmentSetting::MAX_ACTIVE_APP_FOR_ONLINE_APP];
+            $this->form['maxAvailabeAppointment']['eachDay'] = true ; 
+        }
+        if (isset($apSet->detail[AppointmentSetting::MAX_ACTIVE_TIME_ONLINE_APPOINTMENT])) {
+            $this->form['onlinevisit']['time'] =   $apSet->detail[AppointmentSetting::MAX_ACTIVE_TIME_ONLINE_APPOINTMENT];
         }
         if (isset($apSet->detail[AppointmentSetting::OPERATORS])) {
             if ($apSet->detail[AppointmentSetting::OPERATORS][AppointmentSetting::STATUS] == true) {
@@ -587,7 +611,6 @@ class GeneralSetting extends Component
         }
         // dd($this->form['specialDaytimeValues'],$this->form['specialTimeCounter']);
     }
-
     public function mount()
     {
         $this->fetchData['user']            =  request()->route('user');

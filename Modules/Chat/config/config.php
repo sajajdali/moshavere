@@ -10,7 +10,9 @@ return [
             'type' => 'light',
             'display_name' => 'پیام های پشتیبانی',
             'permissions' => [
-
+                'messageTemplate.create' => 'ایجاد پیام های پیشفرض',
+                'messageTemplate.edit' => 'ویرایش پیام های پیشفرض',
+                'messageTemplate.delete' => 'حذف پیام های پیشفرض'
             ],
         ],
     ],
@@ -33,6 +35,16 @@ return [
                     'class' => \Modules\Chat\app\Models\Chat::class,
                     'type' => 'badge badge-sm bg-secondary badge-hide'
                 ],
+                'has_child' => false,
+                'children' => null
+            ],
+            [
+                'title' => 'قالب های آماده پیام',
+                'gate' => 'viewAny',
+                'policy_class' => \Modules\Chat\app\Models\Chat::class,
+                'icon' => 'fe fe-edit',
+                'route' => 'admin.messagetemplate.create',
+                'has_badge' => false,
                 'has_child' => false,
                 'children' => null
             ],

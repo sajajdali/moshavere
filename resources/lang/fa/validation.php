@@ -213,6 +213,9 @@ return [
         "form.full_name" => "نام و نام خانوادگی",
         "form.province" => "استان/شهر",
         "form.otherApp.mobile" => "شماره موبایل ",
+        "form.body" => "متن ",
+        "form.time.until" => "زمان پایان ",
+        'form.onlinevisit.time' => 'زمان پایان نوبت آنلاین'
     ],
 
 ];

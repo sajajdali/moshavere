@@ -2,16 +2,19 @@
 
 namespace Modules\Admin\Livewire;
 
+use Livewire\Component;
+use Livewire\Attributes\On;
+use Livewire\WithPagination;
+use Livewire\WithFileUploads;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
 use League\Flysystem\FilesystemException;
-use Livewire\Attributes\On;
-use Livewire\Component;
-use Livewire\WithFileUploads;
+use Illuminate\Pagination\LengthAwarePaginator;
+use Livewire\Attributes\Computed;
 
 class FileManagerModal extends Component
 {
-    use WithFileUploads;
+    use WithFileUploads, WithPagination;
 
     public $uploadFile;
 
@@ -30,7 +33,8 @@ class FileManagerModal extends Component
     {
         $this->isDialogShow = false;
     }
-    public function listFiles(): array
+    #[Computed]
+    public function listFiles(): LengthAwarePaginator
     {
         $icons = [
             'png' => admin_asset('images/files/png.png'),
@@ -73,9 +77,21 @@ class FileManagerModal extends Component
                 )] : $icons['other'],
             ];
         }
-        return array(
-            'files' => $files,
-            'folders' => $folders,
+        // Combine files and folders
+        $items = array_merge(
+            array_map(fn($folder) => ['name' => $folder, 'type' => 'folder'], $folders),
+            array_map(fn($file) => ['type' => 'file'] + $file, $files)
+        );
+        // Pagination
+        $perPage = 2; // Number of items per page
+        $currentPage = LengthAwarePaginator::resolveCurrentPage();
+        $currentPageItems = array_slice($items, ($currentPage - 1) * $perPage, $perPage);
+        return new LengthAwarePaginator(
+            $currentPageItems,
+            count($items),
+            $perPage,
+            $currentPage,
+            ['path' => url()->current()]
         );
     }
     public function mount()
@@ -87,13 +103,13 @@ class FileManagerModal extends Component
             )
         );
         //file list files and folders in path
-        $this->files = $this->listFiles();
+        $this->listFiles();
         //aviable icons
     }
     public function goTo($index): void
     {
         $this->broadcamp = array_slice($this->broadcamp, 0, $index + 1);
-        $this->files = $this->listFiles($this->broadcamp[$index]['path']);
+        $this->listFiles($this->broadcamp[$index]['path']);
     }
 
     public function render()
@@ -119,7 +135,7 @@ class FileManagerModal extends Component
                 'title' => $folder,
                 'path' =>  $folder,
             );
-            $this->files = $this->listFiles();
+             $this->listFiles();
         } else {
             $this->dispatch('error_file_manager', message: 'این پوشه وجود ندارد');
         }
@@ -156,7 +172,7 @@ class FileManagerModal extends Component
         // Upload file to the current directory
         $current = implode('/', array_column($this->broadcamp, 'path'));
         $path =  $this->uploadFile->store($current, 'public');
-        $this->files = $this->listFiles();
+        $this->listFiles();
         $this->dispatch('upload_complete');
 
         // Get the full URL of the uploaded file

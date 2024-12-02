@@ -7,17 +7,19 @@ use Livewire\Component;
 use App\Models\ShortLink;
 use Livewire\Attributes\On;
 use Livewire\Attributes\Url;
+use Livewire\WithFileUploads;
 use Livewire\Attributes\Computed;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Storage;
-use Livewire\WithFileUploads;
-use Modules\AppointmentUser\app\Jobs\GenerateAppointmentCache;
 use Modules\Setting\Enum\SettingKeyEnum;
+use Modules\Chat\app\Models\MessageTemplate;
 use Modules\AppointmentUser\app\Models\AppointmentUser;
 use Modules\User\app\Notifications\UserSmsNotification;
 use Modules\AppointmentUser\app\Models\AppointmentOnline;
 use Modules\AppointmentUser\Enum\AppointmentUserStatusEnum;
+use Modules\AppointmentSetting\app\Models\AppointmentSetting;
 use Modules\AppointmentUser\Enum\AppointmentOnlineStatusEnum;
+use Modules\AppointmentUser\app\Jobs\GenerateAppointmentCache;
 use Modules\AppointmentUser\app\Models\AppointmentOnlineMessage;
 use Modules\AppointmentUser\Enum\AppointmentOnlineMessageSeenEnum;
 use Modules\AppointmentUser\Enum\AppointmentOnlineMessageTypeEnum;
@@ -37,20 +39,20 @@ class MessageDetail extends Component
         $this->getMessages();
     }
     #[On('fileHasUpload')]
-    public function storeRecordedVoice()
+    public function storeRecordedVoice($dontSendNotification = true)
     {
         if (isset($this->form['voice'])) {
             $fileUrl = Storage::url($this->form['voice']);
             $extension = pathinfo($fileUrl, PATHINFO_EXTENSION);
             $model = [
-                'appointment_online_id' =>  $this->fetchData['appOnline']->id,
-                'user_id'               =>  $this->fetchData['user']->id,
-                'answer_by'             =>  auth()->user()->id,
-                'type'                  =>  AppointmentOnlineMessageTypeEnum::ANSWER,
-                'seen'                  =>  AppointmentOnlineMessageSeenEnum::UNSEEN,
-                'body'                  =>  isset($this->form['typedMessage']) ? $this->form['typedMessage'] : '',
+                'appointment_online_id' => $this->fetchData['appOnline']->id,
+                'user_id' => $this->fetchData['user']->id,
+                'answer_by' => auth()->user()->id,
+                'type' => AppointmentOnlineMessageTypeEnum::ANSWER,
+                'seen' => AppointmentOnlineMessageSeenEnum::UNSEEN,
+                'body' => isset($this->form['typedMessage']) ? $this->form['typedMessage'] : '',
             ];
-            $AOM =  AppointmentOnlineMessage::create($model);
+            $AOM = AppointmentOnlineMessage::create($model);
             $fileModel = [
                 'user_id' => $this->fetchData['user']->id,
                 'answer_by' => auth()->user()->id,
@@ -64,9 +66,11 @@ class MessageDetail extends Component
                 'size' => 10,
             ];
             AppointmentOnlineMessageFile::create($fileModel);
-            $this->addError('success', 'ویس با موفقیت ارسال شد');
-            $this->fetchData['messages'] = $this->fetchData['appOnline']->messages;
-            $this->dispatch('sendMessage', true);
+            if ($dontSendNotification) {
+                $this->addError('success', 'ویس با موفقیت ارسال شد');
+                $this->fetchData['messages'] = $this->fetchData['appOnline']->messages;
+                $this->dispatch('sendMessage', true);
+            }
         }
     }
 
@@ -80,8 +84,15 @@ class MessageDetail extends Component
     public function sendMessage()
     {
         $this->validate([
-            'form.typedMessage' => 'required_without_all:form.file,form.capturedPic',
+            'form.typedMessage' => 'required_without_all:form.file,form.capturedPic,form.voice',
         ]);
+        if (isset($this->form['voice'])) {
+            if (! isset($this->form['file']) && ! isset($this->form['typedMessage'])) {
+                $this->storeRecordedVoice();
+            } else {
+                $this->storeRecordedVoice(true);
+            }
+        }
         $model = [
             'appointment_online_id' =>  $this->fetchData['appOnline']->id,
             'user_id'               =>  $this->fetchData['user']->id,
@@ -91,6 +102,7 @@ class MessageDetail extends Component
             'body'                  =>  isset($this->form['typedMessage']) ? $this->form['typedMessage'] : '',
         ];
         $AOM =  AppointmentOnlineMessage::create($model);
+        $AOM->online->update(['agent_id' => auth()->user()->id]);
         if (isset($this->form['file'])) {
             $url = $this->form['file'];
             // Parse the URL
@@ -173,7 +185,12 @@ class MessageDetail extends Component
             ));
         } catch (\Throwable $th) {
         }
-        $this->fetchData['appOnline']->update(['status' => AppointmentOnlineStatusEnum::ANSWER_BY_DOCTOR]);
+        $setting = $this->fetchData['appOnline']->setting ;
+        $appointmentOnlineUpdateModel = ['status' => AppointmentOnlineStatusEnum::ANSWER_BY_DOCTOR] ;
+        if(isset($setting->detail[AppointmentSetting::MAX_ACTIVE_TIME_ONLINE_APPOINTMENT])) {
+            $appointmentOnlineUpdateModel['ended_at'] = now()->addHours((int) $setting->detail[AppointmentSetting::MAX_ACTIVE_TIME_ONLINE_APPOINTMENT]);
+        }
+        $this->fetchData['appOnline']->update($appointmentOnlineUpdateModel);
         $this->dispatch('sendMessage', true);
     }
     public function messages()
@@ -203,7 +220,10 @@ class MessageDetail extends Component
     }
     public function approvedAppointment()
     {
-        $this->fetchData['appOnline']->appointmentUser()->update(['status' => AppointmentOnlineStatusEnum::ACCEPTED]);
+        $this->fetchData['appOnline']->appointmentUser()->update([
+            'status' => AppointmentUserStatusEnum::STATUS_SUCCESSFUL,
+            'deadline_at' => null
+        ]);
         $this->fetchData['appOnline']->update(['status' => AppointmentOnlineStatusEnum::ACCEPTED]);
         return redirect()->route('admin.appointment_user.message.detail', $this->fetchData['appOnline']->id);
     }
@@ -268,15 +288,49 @@ class MessageDetail extends Component
         $this->msg = 'چت با موفقیت فعال شد';
         return $this->render();
     }
+
+    public function templateMessageSelect(MessageTemplate $messageTemplate)
+    {
+        // called when template message selected
+        if (isset($messageTemplate->body) && $messageTemplate->body != null) {
+            $this->form['typedMessage'] = $messageTemplate->body;
+        }
+        if (isset($messageTemplate->detail) && $messageTemplate->detail != null) {
+            if (isset($messageTemplate->detail['file']) && $messageTemplate->detail['file'] != null) {
+                $this->form['file'] = $messageTemplate->detail['file'];
+            }
+            if (isset($messageTemplate->detail['voice']) && $messageTemplate->detail['voice'] != null) {
+                $this->form['voice'] = $messageTemplate->detail['voice'];
+            }
+        }
+    }
     public function mount()
     {
+        if (
+            !auth()->user()->can('appointment_user') &&
+            !auth()->user()->can('appointment_user.own') &&
+            !auth()->user()->can('appointment_user.message') &&
+            !auth()->user()->can('appointment_user.online')
+        ) {
+            abort(403, 'Unauthorized');
+        }
+
         $this->fetchData['appOnline'] = AppointmentOnline::find(request()->route('onlineAppId'));
-        $this->fetchData['messages']  = $this->fetchData['appOnline']->messages;
-        $this->fetchData['appOnline']->messages()
-            ->where('type', AppointmentOnlineMessageTypeEnum::QUESTION)
-            ->where('seen', AppointmentOnlineMessageSeenEnum::UNSEEN)
-            ->update(['seen' => AppointmentOnlineMessageSeenEnum::SEEN]);
-        $this->fetchData['user']      =  $this->fetchData['appOnline']->user;
+        if (isset($this->fetchData['appOnline'])) {
+            $this->fetchData['messages']  = $this->fetchData['appOnline']->messages;
+            $this->fetchData['appOnline']->messages()
+                ->where('type', AppointmentOnlineMessageTypeEnum::QUESTION)
+                ->where('seen', AppointmentOnlineMessageSeenEnum::UNSEEN)
+                ->update(['seen' => AppointmentOnlineMessageSeenEnum::SEEN]);
+            $this->fetchData['user']      =  $this->fetchData['appOnline']->user;
+            $this->fetchData['messageTemplate']      =  MessageTemplate::all();
+        } else {
+           abort(500,'نوبت یافت نشد');
+        }
+    }
+    public function booted()
+    {
+        $this->dispatch('loadJs', true);
     }
     public function render()
     {

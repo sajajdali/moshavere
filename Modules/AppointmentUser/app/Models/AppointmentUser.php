@@ -6,18 +6,19 @@ use Carbon\Carbon;
 use App\Models\ShortLink;
 use Modules\User\Entities\User;
 use Modules\Place\app\Models\Place;
+use Illuminate\Database\Query\Builder;
+use Modules\Front\app\Models\FeedBack;
 use Illuminate\Database\Eloquent\Model;
 use Modules\Service\app\Models\Service;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Modules\Transaction\app\Models\Transaction;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Modules\AppointmentSetting\app\Models\AppointmentSegmentItem;
 use Modules\AppointmentUser\Enum\AppointmentUserKindEnum;
 use Modules\AppointmentUser\Enum\AppointmentUserTypeEnum;
 use Modules\AppointmentUser\Enum\AppointmentUserStatusEnum;
 use Modules\AppointmentSetting\app\Models\AppointmentSetting;
-use Modules\Front\app\Models\FeedBack;
+use Modules\AppointmentSetting\app\Models\AppointmentSegmentItem;
 
 class AppointmentUser extends Model
 {
@@ -193,6 +194,13 @@ class AppointmentUser extends Model
             return;
         }
     }
+    public function scopeactiveAppointmentStatus($query)
+    {
+        $query->whereNotIn('status', [
+            AppointmentUserStatusEnum::STATUS_CANCEL,
+            AppointmentUserStatusEnum::STATUS_DISAPPROVED,
+        ]);
+    }
 
     public function attendedStatus()
     {
@@ -249,16 +257,18 @@ class AppointmentUser extends Model
             return $this->agent->mobile;
         }
     }
-    public function isOnline():bool   {
-        if($this->kind == AppointmentUserKindEnum::ONLINE ) {
-            return  true ;
+    public function isOnline(): bool
+    {
+        if ($this->kind == AppointmentUserKindEnum::ONLINE) {
+            return  true;
         }
-        return false ;
+        return false;
     }
-    public function isAppActive():bool {
-        if($this->status == AppointmentUserStatusEnum::STATUS_SUCCESSFUL){
-            return true ;
+    public function isAppActive(): bool
+    {
+        if ($this->status == AppointmentUserStatusEnum::STATUS_SUCCESSFUL) {
+            return true;
         }
-        return  false ;
+        return  false;
     }
 }

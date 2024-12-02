@@ -1,6 +1,6 @@
 <?php
 
-namespace Modules\AppointmentUser\App\Console;
+namespace Modules\AppointmentUser\app\Console;
 
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Log;

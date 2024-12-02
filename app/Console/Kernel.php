@@ -15,7 +15,7 @@ use Modules\MigrateOldData\App\Console\MigrateUserMetasCommand;
 use Modules\MigrateOldData\App\Console\MigratePlaceUsersCommand;
 use Modules\MigrateOldData\App\Console\MigrateAppointmentSetting;
 use Modules\MigrateOldData\App\Console\MigrateServiceUserCommand;
-use Modules\AppointmentUser\App\Console\CompeleteOnlineAppointment;
+use Modules\AppointmentUser\app\Console\CompeleteOnlineAppointment;
 use Modules\MigrateOldData\App\Console\MigrateSpecialiteiesCommand;
 use Modules\MigrateOldData\App\Console\MigrateAppointmentUserCommand;
 use Modules\AppointmentUser\app\Console\CheckAppointmentUserDedlineDateCommand;

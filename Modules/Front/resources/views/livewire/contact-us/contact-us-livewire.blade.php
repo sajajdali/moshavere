@@ -2,7 +2,7 @@
     <!-- header -->
     <header class="bg-primary-main p-4">
         <h1 class="font-semibold text-center text-2xl text-white">
-            تماس با ما
+            درخواست مشاوره
         </h1>
     </header>
 

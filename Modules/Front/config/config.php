@@ -50,7 +50,7 @@ if (!disableUi()) {
             'children' => null
         ],
         [
-            'title' => 'فرم تماس با ما',
+            'title' => 'درخواست های مشاوره',
             'gate' => ['contact-us'],
             'policy_class' => null,
             'icon' => 'fe fe-printer',

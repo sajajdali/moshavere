@@ -19,7 +19,7 @@
                     <a href="{{ route('front.aboutUs') }}">درباره ما</a>
                 </li>
                 <li class="navbar__menu-item">
-                    <a href="{{ route('front.contactUs') }}">تماس با ما</a>
+                    <a href="{{ route('front.contactUs') }}">درخواست مشاوره</a>
                 </li>
                 <li class="navbar__menu-item">
                     <a href="{{route('front.searchPage',['query' => 'پزشکان'])}}">لیست پزشکان</a>

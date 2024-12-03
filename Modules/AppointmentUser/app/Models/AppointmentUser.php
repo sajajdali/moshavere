@@ -196,11 +196,15 @@ class AppointmentUser extends Model
     }
     public function scopeactiveAppointmentStatus($query)
     {
-        $query->whereNotIn('status', [
+        return $query->whereNotIn('status', [
             AppointmentUserStatusEnum::STATUS_CANCEL,
             AppointmentUserStatusEnum::STATUS_DISAPPROVED,
         ]);
     }
+    public function scopeOnlineAppointment($query) {
+        return $this->where('kind',AppointmentUserKindEnum::online);
+    }
+
 
     public function attendedStatus()
     {

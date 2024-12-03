@@ -202,7 +202,7 @@ class AppointmentUser extends Model
         ]);
     }
     public function scopeOnlineAppointment($query) {
-        return $this->where('kind',AppointmentUserKindEnum::online);
+        return $this->where('kind',AppointmentUserKindEnum::ONLINE);
     }
 
 

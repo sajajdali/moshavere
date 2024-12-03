@@ -8,7 +8,7 @@
             <a href="{{ route('front.aboutUs') }}">درباره ما</a>
         </li>
         <li class="sidebar__menu-item">
-            <a href="{{ route('front.aboutUs') }}">ارتباط با ما</a>
+            <a href="{{ route('front.aboutUs') }}">درخواست مشاوره</a>
         </li>
         <li class="sidebar__menu-item">
             <a href=""{{ route('front.searchPage', ['query' => 'پزشکان']) }}">لیست پزشکان</a>

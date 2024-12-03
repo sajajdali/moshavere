@@ -88,9 +88,7 @@ class OnlineAppointmentdescription extends Component
         $this->fetchData['isAppAvailable'] = true ;
         if(isset($appSetting->detail[AppointmentSetting::MAX_ACTIVE_APP_FOR_ONLINE_APP] )) {
             $maxAppointmentForEachDay = (int) $appSetting->detail[AppointmentSetting::MAX_ACTIVE_APP_FOR_ONLINE_APP] ;
-            if(AppointmentUser::whereHas('appointmentUser',function($q){
-                return $q->activeAppointmentStatus() ; 
-            })->whereDate('date_visit', now()->addDay())->count() >= $maxAppointmentForEachDay) {
+            if(AppointmentUser::activeAppointmentStatus()->whereDate('date_visit', now()->addDay())->count() >= $maxAppointmentForEachDay) {
                 // appoitment reach their limit
                 $this->fetchData['isAppAvailable'] = false ;
             }

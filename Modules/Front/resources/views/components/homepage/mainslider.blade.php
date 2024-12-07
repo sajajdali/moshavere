@@ -53,5 +53,12 @@
                 </a>
             </div>
         </section>
+        <section class="w-full max-w-[770px] mx-auto px-5 flex flex-col items-center gap-6 md:gap-8">
+            <div class="flex flex-col md:flex-row gap-5 items-center justify-between rounded-xl bg-white py-4 px-5">
+                <a href="{{route('front.contactUs')}}" class="text-2xl md:text-3xl text-center leading-[2.5rem] text-xl font-semibold">
+                    درخواست مشاوره
+                </a>
+            </div>
+        </section>
     </header>
 </div>

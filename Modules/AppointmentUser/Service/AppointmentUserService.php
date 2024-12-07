@@ -190,7 +190,7 @@ class AppointmentUserService
 //                });
 
                 // Fetch attendance times for the day using the relationship
-                if ($attendanceTimes->isEmpty()) {
+                if ($attendanceTimes === null || $attendanceTimes->isEmpty()) {
                     $checkHoliday = true;
                     $attendanceTimes = $appointmentSettingTimes->filter(function ($appointmentTime) use ($currentDate) {
                         return $appointmentTime->day_number->value == $currentDate->copy()->addDay()->dayOfWeek;

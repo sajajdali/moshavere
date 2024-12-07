@@ -139,7 +139,9 @@ class AppointmentUserService
         $appointmentSettings = $appointmentSetting;
 
         // List of attendance times
-        $appointmentSettingTimes = $appointmentSettings->times()->get();
+        $appointmentSettingTimes                = $appointmentSettings->times()->whereNull('special_date')->get();
+        $appointmentSettingTimesHaveSpecialDays = $appointmentSettings->times()->whereNotNull('special_date')->get();
+
 
         // Initialize the output array
         $output = [];
@@ -177,9 +179,14 @@ class AppointmentUserService
 
                 //  check special date
                 $checkHoliday = false;
-                $attendanceTimes = $appointmentSettingTimes->filter(function ($appointmentTime) use ($currentDate) {
-                    return $appointmentTime->special_date == $currentDate->toDateString();
-                });
+                if ($appointmentSettingTimesHaveSpecialDays->count()){
+                    $attendanceTimes = $appointmentSettingTimesHaveSpecialDays->filter(function ($appointmentTime) use ($currentDate) {
+                        return $appointmentTime->special_date == $currentDate->copy()->toDateString();
+                    });
+                }
+//                $attendanceTimes = $appointmentSettingTimes->filter(function ($appointmentTime) use ($currentDate) {
+//                    return $appointmentTime->special_date == $currentDate->copy()->toDateString();
+//                });
 
                 // Fetch attendance times for the day using the relationship
                 if ($attendanceTimes->isEmpty()) {
@@ -444,7 +451,6 @@ class AppointmentUserService
         // You can return this array to your view
         return $output;
     }
-
     public function isAppointmentTimeAvailable($startDateTime, $endDateTime, $dateVisit, AppointmentSetting $appointmentSetting)
     {
         // Check if there are any overlapping appointments

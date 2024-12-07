@@ -179,6 +179,7 @@ class AppointmentUserService
 
                 //  check special date
                 $checkHoliday = false;
+                $attendanceTimes = null;
                 if ($appointmentSettingTimesHaveSpecialDays->count()){
                     $attendanceTimes = $appointmentSettingTimesHaveSpecialDays->filter(function ($appointmentTime) use ($currentDate) {
                         return $appointmentTime->special_date == $currentDate->copy()->toDateString();

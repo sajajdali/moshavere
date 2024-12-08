@@ -113,6 +113,21 @@ class GeneralSetting extends Component
     }
     public function removeFormCounter($counter)
     {
+        // remove date values
+        if (isset($this->form['specialDaydateValues']) && count($this->form['specialDaydateValues']) > 0) {
+            unset($this->form['specialDaydateValues'][count($this->form['specialDaydateValues']) - 1]);
+        }
+        // remove each day time iterator
+        if (
+            isset($this->form['specialTimeCounter'][count($this->form['specialDaytimeValues'])]) &&
+            $this->form['specialTimeCounter'][count($this->form['specialDaytimeValues'])] > 0
+        ) {
+            $this->form['specialTimeCounter'][count($this->form['specialDaytimeValues'])] = 1;
+        }
+        // remove each day time values
+        if (isset($this->form['specialDaytimeValues']) && count($this->form['specialDaytimeValues']) > 0) {
+            unset($this->form['specialDaytimeValues'][count($this->form['specialDaytimeValues']) - 1]);
+        }
         $this->form[$counter] =  $this->form[$counter] - 1;
         $this->render();
     }
@@ -133,11 +148,13 @@ class GeneralSetting extends Component
     }
     public function removespecialDayTimeCounter($counter, $itrator)
     {
-        $this->form[$counter][$itrator] =   $this->form[$counter][$itrator]  - 1;
         if ($counter == 'specialTimeCounter') {
-            $lastArr = array_key_last($this->form['specialDaytimeValues'][$itrator]);
-            unset($this->form['specialDaytimeValues'][$itrator][$lastArr + 1]);
+            if (isset($this->form['specialDaytimeValues'][$itrator])) {
+                $lastarrvalues = (count($this->form['specialDaytimeValues'][$itrator]) - 1);
+               unset($this->form['specialDaytimeValues'][$lastarrvalues]);
+            }
         }
+        $this->form[$counter][$itrator] =   $this->form[$counter][$itrator]  - 1;
         $this->render();
     }
     public function addCounter($day)
@@ -412,28 +429,9 @@ class GeneralSetting extends Component
         //store days and times
         if ($this->isEdited) {
             $this->appointment_setting->times()->delete();
-            //is user editing the times
-            if (isset($this->fetchData['service_id'])) {
-                if ($this->isSpecialTimeEdited) {
-                    //is user editing the times for special section
-                    foreach ($appointment_setting_times as $objectForStore) {
-                        $this->appointment_setting->times()->updateOrCreate($objectForStore);
-                    }
-                } else {
-                    foreach ($appointment_setting_times as $objectForStore) {
-                        $this->appointment_setting->times()->create($objectForStore);
-                    }
-                }
-            } else {
-                foreach ($appointment_setting_times as $objectForStore) {
-                    $this->appointment_setting->times()->updateOrCreate($objectForStore);
-                }
-            }
-        } else {
-            //user is not in edit mode
-            foreach ($appointment_setting_times as $objectForStore) {
-                $this->appointment_setting->times()->updateOrCreate($objectForStore);
-            }
+        }
+        foreach ($appointment_setting_times as $objectForStore) {
+            $this->appointment_setting->times()->create($objectForStore);
         }
         if (isset($this->form['segments']['status']) && $this->form['segments']['status'] == true) {
             $this->appointment_setting->segments()->sync($this->form['segments']['value']);
@@ -562,7 +560,7 @@ class GeneralSetting extends Component
         }
         if (isset($apSet->detail[AppointmentSetting::MAX_ACTIVE_APP_FOR_ONLINE_APP])) {
             $this->form['maxAvailabeAppointmentOnline']  = $apSet->detail[AppointmentSetting::MAX_ACTIVE_APP_FOR_ONLINE_APP];
-            $this->form['maxAvailabeAppointment']['eachDay'] = true ; 
+            $this->form['maxAvailabeAppointment']['eachDay'] = true;
         }
         if (isset($apSet->detail[AppointmentSetting::MAX_ACTIVE_TIME_ONLINE_APPOINTMENT])) {
             $this->form['onlinevisit']['time'] =   $apSet->detail[AppointmentSetting::MAX_ACTIVE_TIME_ONLINE_APPOINTMENT];
@@ -609,7 +607,6 @@ class GeneralSetting extends Component
                 $i = $i + 1;
             }
         }
-        // dd($this->form['specialDaytimeValues'],$this->form['specialTimeCounter']);
     }
     public function mount()
     {

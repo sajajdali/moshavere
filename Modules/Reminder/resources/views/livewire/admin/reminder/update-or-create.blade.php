@@ -209,7 +209,7 @@
                 {{-- line seperator --}}
                 <div class="col-12 col-md-3 mt-5  mt-md-5 mb-md-3">
                     <div
-                        class="d-flex align-items-center   @error('form.timeSend') text-danger @else text-primary @enderror">
+                        class="d-flex align-items-center   @if($errors->has('form.timeSend') || $errors->has('form.send_at_specific_date')) text-danger @else text-primary @endif">
                         <i class="fa fa-clock-o fa-2x mb-1 me-2" aria-hidden="true"></i>
                         <h4 class="mt-1">زمان ارسال</h4>
                     </div>
@@ -239,14 +239,14 @@
                                     @if (!isset($form['send_at_specific_date']) && $form['sendDate'] == 'sameDay') disabled @else value="@if (isset($form['send_at_specific_date'])) {{ $form['send_at_specific_date'] }} @endif"
                                     @endif placeholder="چند روز قبل از فرا رسیدن روز نوبت"
                                 type="text">
-                                @error('form.specificDay')
-                                    <div class="text-danger">
-                                        <i class="fa fa-exclamation-triangle ms-1 mt-1" aria-hidden="true"></i>
-                                        {{ $message }}
-                                    </div>
-                                @enderror
                             </div>
                         </div>
+                        @error('form.send_at_specific_date')
+                            <div class="text-danger">
+                                <i class="fa fa-exclamation-triangle ms-1 mt-1" aria-hidden="true"></i>
+                                {{ $message }}
+                            </div>
+                        @enderror
                     </div>
                 </div>
                 <div class="col-md-12 mb-3 mt-4">

@@ -33,9 +33,10 @@ class UpdateOrCreate extends Component
     }
     public function removeParam($i)
     {
-        if (isset($this->form['param'][$i])) {
-            unset($this->form['param'][$i]);
-            $this->form['param'] = array_values($this->form['param']);
+        $index = $i +1 ;
+        if (isset($this->form['parametr'][$index])) {
+            unset($this->form['parametr'][$index]);
+            $this->form['parametr'] = array_values($this->form['parametr']);
         }
         $this->fetchData['parametrCounter'] = $this->fetchData['parametrCounter'] - 1;
     }
@@ -64,7 +65,7 @@ class UpdateOrCreate extends Component
             'form.doctors'          => 'required',
             'form.specificDoctors'  => 'required_if:form.doctors,specificDoctor',
             'form.sendDate'         => 'required',
-            'form.specificDay'      => 'required_if:form.sendDay,selectedDate',
+            'form.send_at_specific_date'      => 'required_if:form.sendDate,selectedDate',
             'form.timeSend'         => 'required',
         ];
         return array_merge($custumrules , $generalRuls) ;
@@ -77,17 +78,16 @@ class UpdateOrCreate extends Component
             'form.notificationText.required' => 'لطفا متن نوتیفیکشن را وارد کنید ',
             'form.callAnnouncment.required' => 'لطفا عنوان قالب پیام تلفنی را وارد کنید ',
             'form.timeSend.required'        => 'لطفا ساعت ارسال را وارد کنید',
+            'form.send_at_specific_date.required_if'        => 'لطفا تعداد روز قبل از ارسال را وارد کنید',
         ];
     }
     public function storeReminder()
     {
-
         $this->validate();
         $this->StoreDBReminder();
     }
     private function StoreDBReminder()
     {
-
         if (isset($this->form['service']) && $this->form['service'] != null) {
             $service = Service::find($this->form['service']);
         }

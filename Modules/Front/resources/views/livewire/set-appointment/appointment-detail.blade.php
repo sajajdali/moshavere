@@ -53,7 +53,9 @@
                                 آنلاین پرداخت کنید تا نوبت شما ثبت شود و در صورت عدم
                                 پرداخت نوبت شما حذف خواهد شد.
                             </span>
-                            @if (setting(\Modules\Setting\Enum\SettingKeyEnum::APPOINTMENT_DETAIL_PAYMENT_DESCRIPTION_STATUS) != null && setting(\Modules\Setting\Enum\SettingKeyEnum::APPOINTMENT_DETAIL_PAYMENT_DESCRIPTION_TEXT) != null )
+                            @if (setting(\Modules\Setting\Enum\SettingKeyEnum::APPOINTMENT_DETAIL_PAYMENT_DESCRIPTION_STATUS) != null &&
+                             setting(\Modules\Setting\Enum\SettingKeyEnum::APPOINTMENT_DETAIL_PAYMENT_DESCRIPTION_TEXT) != null && 
+                             ! $fetchData['app']->isOnline())
                                 <span>
                                     {{setting(\Modules\Setting\Enum\SettingKeyEnum::APPOINTMENT_DETAIL_PAYMENT_DESCRIPTION_TEXT)}}
                                 </span>
@@ -298,6 +300,14 @@
                                         <strong>تاریخ دریافت نوبت:</strong>
                                     </p>
                                     <p class="mr-3">{{ verta($fetchData['app']->created_at)->format('d F') }}</p>
+                                </div>
+                                <div class="visit-detail flex mt-3">
+                                    <p>
+                                        <object class="inline-block"
+                                            data="{{ front_asset('assets/svg/calendar.svg') }}"></object>
+                                        <strong>زمان نوبت:</strong>
+                                    </p>
+                                    <p class="mr-3">{{ verta($fetchData['app']->date_visit)->format('d F') }}</p>
                                 </div>
                             @endif
                             @if ($fetchData['stauts']['payment'])

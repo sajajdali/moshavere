@@ -84,7 +84,7 @@
                                 </div>
                                 <div class="ms-2">
                                     <p class="fs-13 fw-semibold mb-0">تاریخ نوبت</p>
-                                    <p class="fs-12 text-muted">{{ verta($fetchData['appOnline']->appointmentUser->visited_at)->format('Y/m/d') }}</p>
+                                    <p class="fs-12 text-muted">{{ verta($fetchData['appOnline']->appointmentUser->date_visit)->format('Y/m/d') }}</p>
                                 </div>
                             </div>
                             {{-- <div class="d-flex mb-2">

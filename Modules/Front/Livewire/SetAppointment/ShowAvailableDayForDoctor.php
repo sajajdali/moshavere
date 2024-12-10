@@ -47,6 +47,7 @@ class ShowAvailableDayForDoctor extends Component
             'service_id' => $this->fetchData['service']->id,
             'start_time' => $startTime,
             'end_time' => $endTimestamp,
+            'is_online' => 'false',
         ];
         return $this->redirect(route('setAppointment.checkout', $parameter), true);
     }

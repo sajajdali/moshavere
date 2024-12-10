@@ -79,7 +79,7 @@ class Checkout extends Component
             // create a user
             $this->RegisterOtherAsUser();
         }
-        if( isset($this->fetchData['appSetting']->detail[AppointmentSetting::MAX_ACTIVE_APP_FOR_ONLINE_APP])) {
+        if( isset( $this->fechData['isOnline'])  &&  $this->fechData['isOnline'] &&   isset($this->fetchData['appSetting']->detail[AppointmentSetting::MAX_ACTIVE_APP_FOR_ONLINE_APP])) {
             $maxAppointmentForEachDay = (int) $this->fetchData['appSetting']->detail[AppointmentSetting::MAX_ACTIVE_APP_FOR_ONLINE_APP] ;
             if(AppointmentOnline::whereHas('appointmentUser',function($q){
                 return $q->activeAppointmentStatus() ;
@@ -233,7 +233,7 @@ class Checkout extends Component
         // get app time from route
         $this->fetchData['app_start_time']  =  request()->input('start_time');
         $this->fetchData['app_end_time']    =  request()->input('end_time');
-        $isOnlineRoute       =  request()->input('isOnline');
+        $isOnlineRoute                      = request()->boolean('isOnline');
         $this->fetchData['isOnline'] = (bool)$isOnlineRoute;
         $doc =  request()->input('doctor_id');
         $place =  request()->input('place_id');

@@ -83,6 +83,6 @@ class ContanctUsList extends Component
         }
 
 
-        return view('front::livewire.admin.contact-us.contanct-us-list', ['contactForms' => $query->paginate(10)]);
+        return view('front::livewire.admin.contact-us.contanct-us-list', ['contactForms' => $query->orderByDesc('id')->paginate(10)]);
     }
 }

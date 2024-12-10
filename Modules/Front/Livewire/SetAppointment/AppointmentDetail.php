@@ -26,7 +26,7 @@ use Modules\AppointmentSetting\app\Models\AppointmentSetting;
 use Modules\AppointmentUser\Enum\AppointmentOnlineMessageSeenEnum;
 use Modules\AppointmentUser\Enum\AppointmentOnlineMessageTypeEnum;
 use Modules\AppointmentUser\app\Notifications\AppointmentSmsNotification;
-use Modules\AppointmentUser\App\Notifications\AppointmentDocAndOperatorNotification;
+use Modules\AppointmentUser\app\Notifications\AppointmentDocAndOperatorNotification;
 
 #[Layout('front::layouts.app')]
 #[Title('جزئیات نوبت')]

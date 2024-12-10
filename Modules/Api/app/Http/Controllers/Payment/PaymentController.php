@@ -20,7 +20,7 @@ use Modules\AppointmentUser\Enum\AppointmentOnlineStatusEnum;
 use Modules\AppointmentUser\Enum\AppointmentOnlineMessageSeenEnum;
 use Modules\AppointmentUser\Enum\AppointmentOnlineMessageTypeEnum;
 use Modules\AppointmentUser\app\Notifications\AppointmentSmsNotification;
-use Modules\AppointmentUser\App\Notifications\AppointmentDocAndOperatorNotification;
+use Modules\AppointmentUser\app\Notifications\AppointmentDocAndOperatorNotification;
 
 class PaymentController extends Controller
 {

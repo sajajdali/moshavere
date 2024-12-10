@@ -1,6 +1,6 @@
 <?php
 
-namespace Modules\AppointmentUser\App\Notifications;
+namespace Modules\AppointmentUser\app\Notifications;
 
 use Illuminate\Bus\Queueable;
 use App\Broadcasting\SmsChannel;

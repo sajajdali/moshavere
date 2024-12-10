@@ -26,8 +26,8 @@ Route::group([], function () {
     Route::get('appointment_user/create', AppointmentUserCreateOrUpdate::class)->name('appointment_user.addApp')->middleware('can:appointment_user.addApp');
     Route::get('appointment_user/edit/{appointment_user}', AppointmentUserCreateOrUpdate::class)->name('appointment_user.edit')->can('edit', AppointmentUser::class);
     Route::get('appointment_user/Online/message/list', AppointmentOnlineMessagesList::class)->name('appointment_user.message.list')->middleware('can:appointment_user.message');
-    Route::get('appointment/feedback', Feedbackindex::class)->name('appointment.feedback')->middleware('can:appointment_user.message');
-    Route::get('appointment_user/Online/message/detail/{onlineAppId}', MessageDetail::class)->name('appointment_user.message.detail')->middleware(['can:appointment_user', 'can:appointment_user.own']);
+    Route::get('appointment/feedback', Feedbackindex::class)->name('appointment.feedback')->middleware('can:appointment_user.feedBack');
+    Route::get('appointment_user/Online/message/detail/{onlineAppId}', MessageDetail::class)->name('appointment_user.message.detail');
     Route::get('appointment/add/specificday/{serviceId}/{placeId}/{appId}/{date}', SpecificDayAvailableAppointment::class)->name('appointment.add.specificday');
     Route::get('appointment/add/{doctorId}/{sectionId}/{placeId}', ListOfAvailableDay::class)->name('appointment.add.setTime');
 });

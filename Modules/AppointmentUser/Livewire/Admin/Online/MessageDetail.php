@@ -307,9 +307,9 @@ class MessageDetail extends Component
     public function mount()
     {
         if (
-            !auth()->user()->can('appointment_user') &&
-            !auth()->user()->can('appointment_user.own') &&
-            !auth()->user()->can('appointment_user.message') &&
+            !auth()->user()->can('appointment_user') ||
+            !auth()->user()->can('appointment_user.own') ||
+            !auth()->user()->can('appointment_user.message') ||
             !auth()->user()->can('appointment_user.online')
         ) {
             abort(403, 'Unauthorized');

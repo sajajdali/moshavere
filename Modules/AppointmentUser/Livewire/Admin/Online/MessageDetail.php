@@ -162,7 +162,7 @@ class MessageDetail extends Component
         if (isset($this->form['sendSms']) && $this->form['sendSms'] == true) {
             $template = setting(SettingKeyEnum::SMS_FOR_SEND_MESSAGE_IN_CHATS);
             if (isset($template)) {
-                $messageLink = 'https://webapp.mata-app.com' . (\App\Enum\RouteEnum::ONLINE_MESSAGE->getLink($this->fetchData['appOnline']->id));
+                $messageLink = url((\App\Enum\RouteEnum::USER_CHATROOM->getLink($this->fetchData['appOnline']->id)));
                 $shortLink =  $this->fetchData['appOnline']->shortLink()->create([
                     'link_code' => ShortLink::generateShortLinkCode(),
                     'link_url'  => $messageLink,

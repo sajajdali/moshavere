@@ -618,7 +618,8 @@ class AppointmentUserService
             ];
         }
         // check if selected time exists in setting
-        if($appointmentSetting->timeIsOutOfrange($appointmentData->timestamp)){
+        if($appointmentData->kind == AppointmentUserKindEnum::IN_PERSION &&
+        $appointmentSetting->timeIsOutOfrange($appointmentData->timestamp)){
             return [
                 'status' => false,
                 'message' => 'ساعت انتخابی شما صحیح نیست ، لطفا بازگردید و یک ساعت دیگر انتخاب کنید',

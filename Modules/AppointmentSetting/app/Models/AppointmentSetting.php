@@ -2,6 +2,7 @@
 
 namespace Modules\AppointmentSetting\app\Models;
 
+use Carbon\Carbon;
 use App\Enum\ActiveEnum;
 use Modules\User\Entities\User;
 use Illuminate\Database\Eloquent\Model;
@@ -10,6 +11,9 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Modules\AppointmentUser\app\Models\AppointmentUser;
+use Modules\AppointmentSetting\app\Models\AppointmentSegment;
+use Modules\AppointmentSetting\app\Models\AppointmentSettingTime;
+use Modules\AppointmentSetting\app\Enum\AppintmentSettingDayNumber;
 use Modules\AppointmentSetting\app\trait\AppointmentSettingDetailKeyTrait;
 
 class AppointmentSetting extends Model
@@ -64,4 +68,33 @@ class AppointmentSetting extends Model
     public function ScopeActiveSetting($query) {
         return $query->where('active',ActiveEnum::ACTIVE) ;
     }
+    public function timeIsOutOfrange($time)
+    {
+        // AppintmentSettingDayNumber::
+        $userSelectedTime = Carbon::createFromTimestamp($time,  'Asia/Tehran');
+        $DayNumber        = AppintmentSettingDayNumber::getConstant(strtolower($userSelectedTime->copy()->format('l')))->value;
+        $hasSpecialTime   = $this->times()->where('special_date', $userSelectedTime->copy()->toDateString())->exists();
+        if ($hasSpecialTime) {
+            $checkForTimeRangeInSpecialDate =    $this->times()
+                ->where('special_date', $userSelectedTime->copy()->toDateString())
+                ->where('day_number', $DayNumber)
+                ->where('start_at', '<=', $userSelectedTime->copy()->format('H:i:s'))
+                ->where('end_at', '>=', $userSelectedTime->copy()->format('H:i:s'))->exists();
+            if ($checkForTimeRangeInSpecialDate) {
+                // selected time is correct and no action needed
+                return false;
+            }
+            return true;
+        }
+        
+        $normalDayTimeRangeCheck = $this->times()
+            ->where('day_number', $DayNumber)
+            ->where('start_at', '<=', $userSelectedTime->copy()->format('H:i:s'))
+            ->where('end_at', '>=', $userSelectedTime->copy()->format('H:i:s'))->exists();
+        if ($normalDayTimeRangeCheck) {
+            return false;
+        }
+        return true;
+    }
+
 }

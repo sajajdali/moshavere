@@ -617,7 +617,14 @@ class AppointmentUserService
                 'route' => 'time'
             ];
         }
-
+        // check if selected time exists in setting
+        if($appointmentSetting->timeIsOutOfrange($appointmentData->timestamp)){
+            return [
+                'status' => false,
+                'message' => 'ساعت انتخابی شما صحیح نیست ، لطفا بازگردید و یک ساعت دیگر انتخاب کنید',
+                'route' => 'time'
+            ];
+        }
 
         $paymentstatus = $this->paymentstatus($appointmentSetting);
         // create payment link

@@ -65,7 +65,7 @@ class ShowAvailableDayForDoctor extends Component
         $this->fetchData['maxShowDay'] = $this->fetchData['maxShowDay'] + 2;
 
         // check if date exist in the log or should recreate the app_log
-        if ($this->fetchData['lastDate']->lt($this->fetchData['last_active_day'])) {
+        if (isset($this->fetchData['lastDate']) && isset($this->fetchData['last_active_day']) && $this->fetchData['lastDate']->lt($this->fetchData['last_active_day'])) {
             // next date exist in log
             $this->fetchData['firstTreeAvailableAppointment'] =  $this->findFirstTreeAppointment($this->fetchData['rawlistOfAppointment'], $this->fetchData['lastDate']);
             if ($last_day_active == $this->fetchData['lastDate']) {

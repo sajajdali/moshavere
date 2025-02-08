@@ -73,7 +73,20 @@
                                 <p>اشتراک گذاری</p>
                             </button>
                         </div>
+
                     </footer>
+
+                    <button type="button" wire:click='reserveAppointment'
+                            @if (!$fetchData['is_app_available']) disabled @endif style="width: 100%" class="mobile-only btn__blue--round-full-between">
+                        @if ($doc->hasOnlineApp())
+                            <p>دریافت نوبت حضوری دکتر {{ $doc->full_name }}</p>
+                        @else
+                            <p>دریافت نوبت دکتر {{ $doc->full_name }}</p>
+                        @endif
+                        <svg class="w-6 h-6" xmlns="http://www.w3.org/2000/svg">
+                            <use xlink:href="#sprite-arrow-left-circle" />
+                        </svg>
+                    </button>
                 </div>
 
 
@@ -217,7 +230,7 @@
                                                     ن</div>
                                                 <div class="w-[calc(100%-65px-0.75rem)] space-y-2">
                                                     <p>{{ $fetchData['comments'][$i]->user->full_name }}</p>
-                                                  
+
                                                 </div>
                                             </div>
                                             <div
@@ -432,6 +445,15 @@
     </main>
     @include('front::components.set-appointment.model')
 </div>
+@push('styles')
+    <style>
+        @media (min-width: 768px) {
+            .mobile-only {
+                display: none !important;
+            }
+        }
+    </style>
+@endpush
 @push('scripts')
     <script>
         $(document).ready(function() {

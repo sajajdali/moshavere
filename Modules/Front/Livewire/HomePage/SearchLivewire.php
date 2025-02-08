@@ -96,6 +96,7 @@ class SearchLivewire extends Component
                     $result['service'] = $services;
                 }
             } elseif (isset($this->fetchData['service_id'])) {
+
                 $service = Service::find($this->fetchData['service_id']);
                 if (isset($service)) {
                     $result['doctors'] =  $service->user;
@@ -128,13 +129,11 @@ class SearchLivewire extends Component
                     });
                 })->whereHas('metas', function ($q) use ($sanitizedInput) {
                     $q->where(function ($q) use ($sanitizedInput) {
-                        $q->where([
-                            ['meta_key', UserMetaEnum::FIRST_NAME],
-                            ['meta_value', 'LIKE', "%{$sanitizedInput}%"]
-                        ])->orWhere([
-                            ['meta_key', UserMetaEnum::LAST_NAME],
-                            ['meta_value', 'LIKE', "%{$sanitizedInput}%"]
-                        ]);
+                        $q->where('meta_key', UserMetaEnum::FIRST_NAME)
+                            ->where('meta_value', 'LIKE', "%{$sanitizedInput}%");
+                    })->orWhere(function ($q) use ($sanitizedInput) {
+                        $q->where('meta_key', UserMetaEnum::LAST_NAME)
+                            ->where('meta_value', 'LIKE', "%{$sanitizedInput}%");
                     });
                 })->get();
                 if ($doctors->isNotEmpty()) {

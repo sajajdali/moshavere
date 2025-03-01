@@ -15,9 +15,10 @@ use Modules\Front\app\Models\Province;
 use Modules\Service\app\Models\Service;
 use Modules\Front\enum\CommentStatusEnum;
 use Modules\Front\enum\CommentShowHomePage;
+use Modules\Setting\Enum\SettingKeyEnum;
+use Artesaos\SEOTools\Facades\SEOTools;
 
 #[Layout('front::layouts.app')]
-#[Title('صفحه اصلی')]
 class HomePageLivewire extends Component
 {
 
@@ -95,6 +96,7 @@ class HomePageLivewire extends Component
     }
     public function mount()
     {
+        SEOTools::setTitle(setting(SettingKeyEnum::SITE_TITLE));
         // when disable ui template
         if (disableUi()) {
             return redirect()->route('front.login.doctor');

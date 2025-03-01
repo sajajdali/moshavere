@@ -19,18 +19,17 @@
                     </header>
                     <main class="bg-secondary-100 rounded-lg p-4 flex flex-col sm:flex-row items-center gap-5">
                         <div
-                            class="w-[70px] h-[70px] overflow-hidden rounded-full flex items-center justify-center border-2 border-white ring-2 ring-blue-sky">
+                                class="w-[70px] h-[70px] overflow-hidden rounded-full flex items-center justify-center border-2 border-white ring-2 ring-blue-sky">
                             <img src="{{ $doc->avatar }}" alt="doctor-image-name" />
                         </div>
                         <div
-                            class="w-[calc(100%-70px-1.25rem)] flex flex-col sm:flex-row items-center justify-between gap-3">
+                                class="w-[calc(100%-70px-1.25rem)] flex flex-col sm:flex-row items-center justify-between gap-3">
                             <div class="space-y-3 text-center sm:text-right">
-                                <a class="text-lg font-bold"
-                                    href="{{ route('front.doctor.profile', ['doctor_id' => $doc->id, 'doctor_name' => str_replace(' ', '_', $doc->full_name)]) }}">دکتر
-                                    {{ $doc->full_name }}</a>
-                                <p class="bg-secondary-200 rounded-lg py-2 px-3 text-sm">
+                                <h1 class="text-lg font-bold">دکتر
+                                    {{ $doc->full_name }}</h1>
+                                <h2 class="bg-secondary-200 rounded-lg py-2 px-3 text-sm">
                                     {{ $doc->DocSpecialities() }}
-                                </p>
+                                </h2>
                             </div>
                             <div class="flex flex-col items-center sm:items-end gap-4">
                                 <div class="flex items-center gap-3">
@@ -50,7 +49,7 @@
                         <div class="flex items-center text-sm gap-4">
                             @if (isset($fetchData['isFavarite']))
                                 <button wire:click='removeFromFavarite' type="button"
-                                    class="flex items-center gap-2 text-lime-700">
+                                        class="flex items-center gap-2 text-lime-700">
                                     <svg class="w-5 h-5" xmlns="http://www.w3.org/2000/svg">
                                         <use xlink:href="#sprite-save" />
                                     </svg>
@@ -58,7 +57,7 @@
                                 </button>
                             @else
                                 <button wire:click='addFavarite' type="button"
-                                    class="flex items-center gap-2 hover:text-lime-700">
+                                        class="flex items-center gap-2 hover:text-lime-700">
                                     <svg class="w-5 h-5" xmlns="http://www.w3.org/2000/svg">
                                         <use xlink:href="#sprite-save" />
                                     </svg>
@@ -188,7 +187,7 @@
                                 </div>
                             </main>
                             <footer
-                                class="flex flex-col sm:flex-row items-center justify-between text-secondary-400 gap-4">
+                                    class="flex flex-col sm:flex-row items-center justify-between text-secondary-400 gap-4">
                                 <div class="flex items-center gap-2">
                                     <svg class="w-5 h-5" xmlns="http://www.w3.org/2000/svg">
                                         <use xlink:href="#sprite-eye" />
@@ -226,7 +225,7 @@
                                         <div class="flex flex-col sm:flex-row items-start justify-between gap-3">
                                             <div class="flex items-center gap-4">
                                                 <div
-                                                    class="w-[65px] h-[65px] rounded-full flex items-center justify-center bg-primary-main text-white font-bold text-2xl">
+                                                        class="w-[65px] h-[65px] rounded-full flex items-center justify-center bg-primary-main text-white font-bold text-2xl">
                                                     ن</div>
                                                 <div class="w-[calc(100%-65px-0.75rem)] space-y-2">
                                                     <p>{{ $fetchData['comments'][$i]->user->full_name }}</p>
@@ -234,7 +233,7 @@
                                                 </div>
                                             </div>
                                             <div
-                                                class="flex items-center gap-2 bg-green/20 text-green rounded-full py-1 px-4 text-sm font-bold">
+                                                    class="flex items-center gap-2 bg-green/20 text-green rounded-full py-1 px-4 text-sm font-bold">
                                                 <p class="w-[calc(100%-1.75rem)]">
                                                     {{ $fetchData['comments'][$i]->star }}</p>
                                                 <svg class="w-5 h-5" xmlns="http://www.w3.org/2000/svg">
@@ -254,7 +253,7 @@
                             @endfor
                             @if (!isset($fetchData['iteratorStop']))
                                 <button wire:click='loadMoreComment' type="button"
-                                    class="w-full py-2 px-5 flex items-center justify-center gap-3">
+                                        class="w-full py-2 px-5 flex items-center justify-center gap-3">
                                     <svg class="w-5 h-5" xmlns="http://www.w3.org/2000/svg">
                                         <use xlink:href="#sprite-eye" />
                                     </svg>
@@ -265,31 +264,31 @@
                     @endif
                     <div class="bg-white p-4 flex flex-col items-center justify-between gap-3">
                         @error('CommentSuccess')
-                            <div class="container mb-4">
-                                <div
+                        <div class="container mb-4">
+                            <div
                                     class="bg-blue-200 border border-2 border-bule-200  p-4 rounded-xl flex items-center gap-3">
-                                    <p class="w-[calc(100%-3.25rem)] text-gray-600 leading-6 text-lg">
-                                        {{ $message }}
-                                    </p>
-                                </div>
+                                <p class="w-[calc(100%-3.25rem)] text-gray-600 leading-6 text-lg">
+                                    {{ $message }}
+                                </p>
                             </div>
+                        </div>
                         @else
                             <div class="w-full flex justify-between">
                                 <p class="font-bold">نظرات خود را با دیگران به اشتراک بگذارید</p>
                                 <button type="button" id="registerComment"
-                                    class="btn__blue--round-full-outline font-semibold">
+                                        class="btn__blue--round-full-outline font-semibold">
                                     ثبت نظر
                                 </button>
                             </div>
                             <div class="border-2 border-secondary-200 rounded-lg flex flex-col gap-4 p-4 w-full"
-                                id='registerCommentDiv' style="display: none" wire:ignore.self>
+                                 id='registerCommentDiv' style="display: none" wire:ignore.self>
                                 <div class="flex flex-col sm:flex-row items-center justify-between gap-3 mb-3">
                                     <div
-                                        class="flex items-center gap-2 bg-green/20 text-green rounded-full py-1 px-4 text-sm font-bold">
+                                            class="flex items-center gap-2 bg-green/20 text-green rounded-full py-1 px-4 text-sm font-bold">
                                         <div class="flex items-center gap-2">
                                             <input type="range" min="1" max="5" step="1"
-                                                wire:model='form.comment.rate' value="5"
-                                                class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer dark:bg-gray-700">
+                                                   wire:model='form.comment.rate' value="5"
+                                                   class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer dark:bg-gray-700">
                                             <span id="ratingValue" class="ml-2 text-gray-700 font-bold">5</span>
                                         </div>
                                         <svg class="w-5 h-5" xmlns="http://www.w3.org/2000/svg">
@@ -300,20 +299,20 @@
                                 <div class="flex flex-col md:flex-row gap-3 mt-3 mb-3">
                                     <form class="flex-grow relative flex items-center h-[40px]">
                                         <textarea wire:model='form.comment.body' type="text" rows="3"
-                                            class="flex-grow w-full  border-2 border-secondary-200 rounded-lg px-3" placeholder="متن نظر را بنویسید"></textarea>
+                                                  class="flex-grow w-full  border-2 border-secondary-200 rounded-lg px-3" placeholder="متن نظر را بنویسید"></textarea>
                                         @error('form.comment.body')
-                                            <span class="text-rose-500">{{ $message }}</span>
+                                        <span class="text-rose-500">{{ $message }}</span>
                                         @enderror
                                     </form>
                                 </div>
                                 <div class="w-full flex justify-end">
                                     <button type="button" wire:click='addComment'
-                                        class="btn__blue--round-full-outline font-semibold">
+                                            class="btn__blue--round-full-outline font-semibold">
                                         ارسال
                                     </button>
                                 </div>
                             </div>
-                        @enderror
+                            @enderror
                     </div>
                 </div>
                 <!-- end container -->
@@ -338,7 +337,7 @@
                                     @endisset
                                     @isset($fetchData['navigate'])
                                         <a target="blank" href="{{ $fetchData['navigate'] }}"
-                                            class="bg-secondary-100 text-black rounded-lg py-2 px-5 text-sm">
+                                           class="bg-secondary-100 text-black rounded-lg py-2 px-5 text-sm">
                                             مسیریابی
                                         </a>
                                     @endisset
@@ -355,11 +354,11 @@
                             @endisset
                         </div>
                         <button type="button" wire:click='reserveAppointment'
-                            @if (!$fetchData['is_app_available']) disabled @endif class="btn__blue--round-full-between">
+                                @if (!$fetchData['is_app_available']) disabled @endif class="btn__blue--round-full-between">
                             @if ($doc->hasOnlineApp())
-                            <p>دریافت نوبت حضوری دکتر {{ $doc->full_name }}</p>
+                                <p>دریافت نوبت حضوری دکتر {{ $doc->full_name }}</p>
                             @else
-                            <p>دریافت نوبت دکتر {{ $doc->full_name }}</p>
+                                <p>دریافت نوبت دکتر {{ $doc->full_name }}</p>
                             @endif
                             <svg class="w-6 h-6" xmlns="http://www.w3.org/2000/svg">
                                 <use xlink:href="#sprite-arrow-left-circle" />
@@ -367,8 +366,8 @@
                         </button>
                         @if ($doc->hasOnlineApp())
                             <button type="button" wire:click='reserveAppointment("online")'
-                                @if (!$fetchData['is_app_available']) disabled @endif
-                                class="btn__green--round-full-between">
+                                    @if (!$fetchData['is_app_available']) disabled @endif
+                                    class="btn__green--round-full-between">
                                 <p>دریافت نوبت آنلاین (گفت و گو محور) {{ $doc->full_name }}</p>
                                 <svg class="w-6 h-6" xmlns="http://www.w3.org/2000/svg">
                                     <use xlink:href="#sprite-arrow-left-circle" />
@@ -431,7 +430,7 @@
                         <p>
                         </p>
                         <div
-                            class="border-2 border-secondary-100 rounded-lg grid grid-cols-4 gap-12 p-4 overflow-auto  max-h-40">
+                                class="border-2 border-secondary-100 rounded-lg grid grid-cols-4 gap-12 p-4 overflow-auto  max-h-40">
                             @foreach ($fetchData['gallery'] as $gallery)
                                 <a href="{{ $gallery }}" data-fancybox="gallery-a" data-caption="Gallery A #1">
                                     <img class="min-h-28 min-w-28 rounded-lg" src="{{ $gallery }}" />

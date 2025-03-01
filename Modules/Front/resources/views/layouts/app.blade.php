@@ -8,7 +8,6 @@
     <meta charset="UTF-8">
     <meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes'>
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="description" content="سیستم نوبت دهی پزشکم">
     <meta name="author" content="شمیران وب">
     <meta name="keywords" content="{{ setting(Modules\Setting\Enum\SettingKeyEnum::SITE_TITLE) }}">
     <!-- Favicon -->
@@ -21,9 +20,8 @@
     <meta name="msapplication-TileColor" content="#ffffff">
     <meta name="theme-color" content="#ffffff">
     <!-- TITLE -->
-    <title>{{ setting(Modules\Setting\Enum\SettingKeyEnum::SITE_TITLE) }} @isset($title)
-            | {{ $title }}
-        @endisset </title>
+    {!! SEO::generate(true) !!}
+
     @include('front::layouts.components.styles')
     @stack('styles')
     @livewireStyles

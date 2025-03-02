@@ -27,7 +27,7 @@ class DoctorProfileLivewire extends Component
     ];
 
     #[Locked]
-    public string $appointmentType;
+    public string $appointmentType = 'IN_PERSON' ;
     public function reserveAppointment($type = 'IN_PERSON')
     {
         $this->appointmentType = $type ;
@@ -48,7 +48,6 @@ class DoctorProfileLivewire extends Component
                 }
                 return  $this->lunchModal();
             } elseif ($this->doc->activePlaces()->count() <= 1) {
-
                 // if ONE place exist
                 $place = $this->doc->activePlaces()->first();
                 $this->form['place_name'] = $place->title;

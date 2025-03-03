@@ -28,7 +28,7 @@ class DoctorProfileLivewire extends Component
 
     #[Locked]
     public string $appointmentType = 'IN_PERSON' ;
-    public function reserveAppointment($type = 'IN_PERSON')
+    public function reserveAppointment($type)
     {
         $this->appointmentType = $type ;
         // check if doctor was not banned

@@ -42,7 +42,7 @@
                         <div class="col-md-6">
                             <div class="form-group">
                                 <label for="exampleInputEmail2">تاریخ شروع</label>
-                                <input  type="email" class="form-control" id="startDate_package"
+                                <input type="email" class="form-control" id="startDate_package" data-jdp data-name=""
                                     placeholder="انتخاب کنید">
                             </div>
                         </div>
@@ -76,22 +76,11 @@
                 var selectedValue = $(this).val();
                 @this.set('selectedpackage', selectedValue);
             });
-
-            $('#startDate_package').persianDatepicker({
-                initialValue: false,
-                autoClose: true,
-                format: 'LLLL',
-                onSelect: function(unix) {
-                    @this.set('startDate_package', unix / 1000);
-                },
-            });
-            $('#EndDate_package').persianDatepicker({
-                initialValue: false,
-                autoClose: true,
-                format: 'LLLL',
-                onSelect: function(unix) {
-                    @this.set('EndDate_package', unix / 1000);
-                },
+            jalaliDatepicker.startWatch();
+            $(document).on('input', '[data-jdp]', function() {
+                let selectedDate = $(this).val();
+                let seterValue = $(this).data('name');
+                @this.set(seterValue, selectedDate);
             });
         })
     </script>

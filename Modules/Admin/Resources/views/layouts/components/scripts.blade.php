@@ -21,8 +21,9 @@
 
 <!-- COLOR THEME JS -->
 <script src="{{ admin_asset('js/themeColors.js') }}"></script>
-<script src="{{ admin_asset('js/persian-date.min.js') }}"></script>
-<script src="{{ admin_asset('js/persian-datepicker.min.js') }}"></script>
+{{-- <script src="{{ admin_asset('js/persian-date.min.js') }}"></script>
+<script src="{{ admin_asset('js/persian-datepicker.min.js') }}"></script> --}}
+<script src="{{ admin_asset('js/jalaliDatepicker.min.js') }}"></script>
 
 <!-- CUSTOM JS -->
 <script src="{{ admin_asset('js/custom.js') }}"></script>

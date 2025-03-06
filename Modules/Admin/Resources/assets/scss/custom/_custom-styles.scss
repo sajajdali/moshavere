@@ -10,7 +10,12 @@
         transition: none;
     }
 }
-
+.jdp-years svg {
+    fill: black !important;
+}
+.jdp-months svg {
+    fill: black !important;
+}
 .collapse:not(.show) {
     display: none;
     background: $white;

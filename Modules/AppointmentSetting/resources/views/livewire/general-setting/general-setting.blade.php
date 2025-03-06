@@ -315,7 +315,7 @@
                 <div class="col-md-9">
                     <div class="input-group mb-3">
                         <input type="text" wire:model='form.endAppointment.date' autocomplete="off"
-                            class="form-control @error('form.endAppointment.date') is-invalid @enderror"
+                            class="form-control @error('form.endAppointment.date') is-invalid @enderror" data-jdp data-name="form.endAppointment.date"
                             id="endDatePicker">
                     </div>
                 </div>
@@ -589,7 +589,7 @@
                 </div>
                 <div class="col-md-9">
                     <div class="input-group mb-3">
-                        <input type="text" wire:model='form.startAppointment.date' autocomplete="off"
+                        <input type="text" wire:model='form.startAppointment.date' autocomplete="off" data-jdp data-name="form.startAppointment.date"
                             class="form-control @error('form.startAppointment.date') is-invalid @enderror"
                             id="startDatePicker">
                     </div>
@@ -717,19 +717,11 @@
             }
 
             function addPersianDateClassForSpecialDate() {
-                $('.specialDate').persianDatepicker({
-                    initialValue: false,
-                    format: 'L',
-                    autoClose: true,
-                    onSelect: function(unix) {
-                        var specialDateValue = {};
-                        $('.specialDate').each(function(key, element) {
-                            var dataId = $(element).data('id');
-                            var value = $(element).val();
-                            specialDateValue[dataId] = value;
-                        });
-                        @this.set('form.specialDaydateValues', specialDateValue);
-                    }
+                jalaliDatepicker.startWatch();
+                $(document).on('input', '[data-jdp]', function() {
+                    let selectedDate = $(this).val();
+                    let seterValue = $(this).data('name');
+                    @this.set(seterValue, selectedDate);
                 });
             }
             addPersianDateClassForSpecialDate();
@@ -738,25 +730,6 @@
                     addPersianDateClassForSpecialDate();
                 }, 1000);
             });
-
-
-            $('#endDatePicker').persianDatepicker({
-                initialValue: false,
-                format: 'L',
-                autoClose: true,
-                onSelect: function(unix) {
-                    @this.set('form.endAppointment.date', $('#endDatePicker').val());
-                }
-            });
-            $('#startDatePicker').persianDatepicker({
-                initialValue: false,
-                format: 'L',
-                autoClose: true,
-                onSelect: function(unix) {
-                    @this.set('form.startAppointment.date', $('#startDatePicker').val());
-                }
-            });
-
             //operator
             setTimeout(() => {
                 $('.select2-show-search').select2();

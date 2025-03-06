@@ -73,7 +73,7 @@
                                     <label for="exampleInputPassword2">
                                         تاریخ شروع
                                     </label>
-                                    <input type="text" class="form-control datePicker"
+                                    <input type="text" class="form-control datePicker" data-jdp data-name="form.absence.{{ $i }}.start" autocomplete="off"
                                         id="absence.number-{{ $i }}"
                                         wire:model='form.absence.{{ $i }}.start'
                                         data-counter="absence.{{ $i }}.start"
@@ -85,7 +85,7 @@
                                     <label for="exampleInputPassword2">
                                         تاریخ پایان
                                     </label>
-                                    <input type="text" class="form-control datePicker"
+                                    <input type="text" class="form-control datePicker"  data-jdp data-name="form.absence.{{ $i }}.end" autocomplete="off"
                                         id="absence.number-{{ $i }}"
                                         wire:model='form.absence.{{ $i }}.end'
                                         data-counter="absence.{{ $i }}.end" placeholder="انتخاب تاریخ شروع">

@@ -24,15 +24,15 @@
                 <div class="row mb-5">
                     <div class="col-md-12">
                         <label for="discountText" class="form-label">کد تخفیف</label>
-                        <input wire:model='form.code' class="form-control  @error('form.code') is-invalid @enderror" id="discountText"
-                            type="text">
+                        <input wire:model='form.code' class="form-control  @error('form.code') is-invalid @enderror"
+                            id="discountText" type="text">
                     </div>
                     @error('form.code')
-                    <div class="text-danger mt-2">
-                        <i class="fa fa-exclamation-triangle ms-1 mt-1" aria-hidden="true"></i>
-                        {{ $message }}
-                    </div>
-                @enderror
+                        <div class="text-danger mt-2">
+                            <i class="fa fa-exclamation-triangle ms-1 mt-1" aria-hidden="true"></i>
+                            {{ $message }}
+                        </div>
+                    @enderror
                 </div>
                 {{-- seperator --}}
                 <div class="row text-info">
@@ -50,13 +50,11 @@
                             <label class="form-label">انتخاب بخش</label>
                             <select multiple class="form-control select2-show-search form-select"
                                 id="speciificDocSelect2" data-id="services" data-placeholder="انتخاب کنید...">
-                                <option @if ($isEdited  && $form['services'] == null ) selected @endif  value="null">تمام بخش ها</option>
+                                <option @if ($isEdited && $form['services'] == null) selected @endif value="null">تمام بخش ها
+                                </option>
                                 @foreach ($fetchData['services'] as $service)
-                                    <option
-                                    @if (isset($form['services']) && in_array($service->id,$form['services']))
-                                        selected
-                                    @endif
-                                     value="{{ $service->id }}">{{ $service->title }}</option>
+                                    <option @if (isset($form['services']) && in_array($service->id, $form['services'])) selected @endif
+                                        value="{{ $service->id }}">{{ $service->title }}</option>
                                 @endforeach
                             </select>
                             <small class="text-gray mt-1 ms-2">
@@ -73,34 +71,32 @@
                     </div>
                     <div class="col-md-12" id="selectDoctorSelectBox" wire:ignore>
                         @if (isset($fetchData['doctors']))
-                        <div class="form-group">
-                            <label class="form-label">انتخاب پزشک</label>
-                            <select multiple class="form-control select2-show-search form-select"
-                                id="speciificDocSelect2" data-id="doctors" data-placeholder="انتخاب کنید...">
-                                <option @if($isEdited && $form['doctors'] == null) selected @endif value="null">تمام پزشکان</option>
-                                @foreach ($fetchData['doctors'] as $service)
-                                    <option
-                                    @if (isset($form['doctors']) && in_array($service->id,$form['doctors']))
-                                    selected
-                                @endif
-                                    value="{{ $service->id }}">{{ $service->fullName }}</option>
-                                @endforeach
-                            </select>
-                            <small class="text-gray mt-1 ms-2">
-                                <i class="fa fa-info-circle" aria-hidden="true"></i>
-                                در صورتی که میخواهید کد تخفیف برای یک پزشک قابل استفاده باشد آن پزشک را انتخاب کنید.
-                            </small>
-                            @error('form.doctors')
-                                <div class="text-danger">
-                                    <i class="fa fa-exclamation-triangle ms-1 mt-1" aria-hidden="true"></i>
-                                    {{ $message }}
-                                </div>
-                            @enderror
-                        </div>
+                            <div class="form-group">
+                                <label class="form-label">انتخاب پزشک</label>
+                                <select multiple class="form-control select2-show-search form-select"
+                                    id="speciificDocSelect2" data-id="doctors" data-placeholder="انتخاب کنید...">
+                                    <option @if ($isEdited && $form['doctors'] == null) selected @endif value="null">تمام پزشکان
+                                    </option>
+                                    @foreach ($fetchData['doctors'] as $service)
+                                        <option @if (isset($form['doctors']) && in_array($service->id, $form['doctors'])) selected @endif
+                                            value="{{ $service->id }}">{{ $service->fullName }}</option>
+                                    @endforeach
+                                </select>
+                                <small class="text-gray mt-1 ms-2">
+                                    <i class="fa fa-info-circle" aria-hidden="true"></i>
+                                    در صورتی که میخواهید کد تخفیف برای یک پزشک قابل استفاده باشد آن پزشک را انتخاب کنید.
+                                </small>
+                                @error('form.doctors')
+                                    <div class="text-danger">
+                                        <i class="fa fa-exclamation-triangle ms-1 mt-1" aria-hidden="true"></i>
+                                        {{ $message }}
+                                    </div>
+                                @enderror
+                            </div>
                         @else
-                        <div class="col-md-12 alert alert-info fade show" role="alert">
-                            پزشکی وارد نشده است
-                        </div>
+                            <div class="col-md-12 alert alert-info fade show" role="alert">
+                                پزشکی وارد نشده است
+                            </div>
                         @endif
                     </div>
                 </div>
@@ -164,7 +160,7 @@
                     </div>
                 </div>
                 {{-- seperator --}}
-                <div class="row @if($errors->has('form.payment.type') || $errors->has('form.amount.value') ) text-danger @else text-info @endif  mb-3 mt-5">
+                <div class="row @if ($errors->has('form.payment.type') || $errors->has('form.amount.value')) text-danger @else text-info @endif  mb-3 mt-5">
                     <div class="col-md-4 d-flex">
                         <i class="fa fa-credit-card-alt fa-2x me-3" aria-hidden="true"></i>
                         <h5 class="mt-1">تعیین مبلغ و نوع</h5>
@@ -216,12 +212,13 @@
                     <div class="col-md-6" wire:ignore>
                         <label for="startDateId" class="form-label">تاریخ شروع</label>
                         <input wire:model='form.startDate' data-id="startDate" class="form-control datePicker"
-                            id="startDateId" placeholder="انتخاب کنید..." type="text">
+                            data-jdp data-name="form.startDate" id="startDateId" placeholder="انتخاب کنید..." autocomplete="off"
+                            type="text">
                     </div>
                     <div class="col-md-6" wire:ignore>
                         <label for="endDateId" class="form-label">تاریخ پایان</label>
-                        <input wire:model='form.endDate' data-id="endDate" class="form-control datePicker"
-                            id="endDateId" placeholder="انتخاب کنید..." type="text">
+                        <input wire:model='form.endDate' data-id="endDate" class="form-control datePicker" data-jdp autocomplete="off"
+                            data-name="form.endDate" id="endDateId" placeholder="انتخاب کنید..." type="text">
                     </div>
                 </div>
                 <div class="row mt-4">
@@ -282,16 +279,11 @@
             });
 
             function js() {
-                $('.datePicker').each(function() {
-                    var inp = $(this);
-                    $(this).persianDatepicker({
-                        initialValue: false,
-                        format: 'L',
-                        autoClose: true,
-                        onSelect: function(unix) {
-                            @this.set('form.' + inp.data('id'), inp.val());
-                        }
-                    });
+                jalaliDatepicker.startWatch();
+                $(document).on('input', '[data-jdp]', function() {
+                    let selectedDate = $(this).val();
+                    let seterValue = $(this).data('name');
+                    @this.set(seterValue, selectedDate);
                 });
             }
             js();

@@ -55,14 +55,14 @@
                             <div class="row mb-4">
                                 <label for="search-start_date" class="col-md-2 form-label datePicker">تاریخ شروع</label>
                                 <div class="col-md-10">
-                                    <input class="form-control datePicker" id="search-start_date" data-name='start_date'
+                                    <input class="form-control datePicker" id="search-start_date" data-name='search.start_date' data-jdp
                                         wire:model="search.start_date" placeholder="تاریخ شروع عدم حضور" type="text">
                                 </div>
                             </div>
                             <div class="row mb-4">
                                 <label for="search-end_date" class="col-md-2 form-label datePicker">تاریخ پایان</label>
                                 <div class="col-md-10">
-                                    <input class="form-control datePicker" id="search-end_date" wire:model="search.end_date" data-name='end_date'
+                                    <input class="form-control datePicker" id="search-end_date" wire:model="search.end_date" data-name='search.end_date' data-jdp
                                         placeholder="تاریخ پایان عدم حضور" type="text">
                                 </div>
                             </div>
@@ -143,24 +143,11 @@
     myCollapsible.addEventListener('hide.bs.collapse', function() {
         @this.set('searchPanel', '');
     })
-    $('.datePicker').each(function() {
-        if (!$(this).data('persianDatepickerInitialized')) {
-            var inp = $(this);
-            $(this).persianDatepicker({
-                initialValue: false
-                , format: 'L'
-                , autoClose: true
-                , onSelect: function(unix) {
-                    if (inp.data('dateType') == 'start') {
-                        @this.set('search.' + inp.data('name'), inp.val());
-                    } else {
-                        @this.set('search.' + inp.data('name'), inp.val());
-
-                    }
-                }
-            });
-            $(this).data('persianDatepickerInitialized', true); // Mark initialization
-        }
+    jalaliDatepicker.startWatch();
+    $(document).on('input', '[data-jdp]', function() {
+        let selectedDate = $(this).val();
+        let seterValue = $(this).data('name');
+        @this.set(seterValue, selectedDate);
     });
     Livewire.on('closeCollaps',function(){
         $('#advanceSearch').removeClass('show');

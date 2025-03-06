@@ -20,8 +20,9 @@
                             </div>
                             <div class="col-md-10">
                                 <div class="input-group mb-3">
-                                    <input type="text" class="form-control" placeholder="انتخاب کنید!!"
-                                        id="customDateInput" aria-describedby="basic-addon3">
+                                    <input type="text" class="form-control" placeholder="انتخاب کنید!!" data-jdp
+                                        data-name="specificDayDate" id="customDateInput"
+                                        aria-describedby="basic-addon3">
                                 </div>
                             </div>
                         </div>
@@ -124,13 +125,11 @@
 
 @push('scripts')
     <script>
-        $('#customDateInput').persianDatepicker({
-            initialValue: false,
-            format: 'L',
-            autoClose: true,
-            onSelect: function(unix) {
-                @this.set('specificDayDate', $('#customDateInput').val());
-            }
+        jalaliDatepicker.startWatch();
+        $(document).on('input', '[data-jdp]', function() {
+            let selectedDate = $(this).val();
+            let seterValue = $(this).data('name');
+            @this.set(seterValue, selectedDate);
         });
     </script>
 @endpush

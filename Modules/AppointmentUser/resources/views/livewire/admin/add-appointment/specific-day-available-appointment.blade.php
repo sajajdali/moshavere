@@ -34,8 +34,8 @@
                             data-bs-placement="top" title="روز قبل">
                             <i class="fa fa-arrow-right" aria-hidden="true"></i>
                         </button>
-                        <input class="text-center" type="text" id="currentDate"
-                            value="{{ $fetchData['selectedDate'] }}" style="max-width: fit-content">
+                        <input class="text-center" type="text" id="currentDate" data-jdp data-name="form.changeDate"
+                            value="{{ verta($fetchData['selectedDate'])->format('Y/m/d') }}" style="max-width: fit-content">
                         <button class="btn btn-light" wire:click='nextDay'>
                             <i class="fa fa-arrow-left" aria-hidden="true" data-bs-toggle="tooltip"
                                 data-bs-placement="top" title="روز بعد"></i>
@@ -114,50 +114,51 @@
                                         @elseif(isset($eachTime['appointment_user_id']))
                                             @php
                                                 $ap = Modules\AppointmentUser\app\Models\AppointmentUser::find(
-                                                    $eachTime['appointment_user_id']
+                                                    $eachTime['appointment_user_id'],
                                                 );
                                                 $user = $ap?->user;
                                             @endphp
                                             @if (isset($ap))
-                                            <tr class="{{ $ap->getColor() }} text-center">
-                                                <td class="alert text-center bg-info ">{{ $key + 1 }}</td>
-                                                <td>
-                                                    {{ substr($eachTime['from'], 0, -3) }} -
-                                                    {{ substr($eachTime['until'], 0, -3) }}
-                                                </td>
-                                                <td>
-                                                    {{ $user->fullName }}
-                                                </td>
-                                                <td>
-                                                    {{ $user->mobile }}
-                                                </td>
-                                                <td>
-                                                    <span
-                                                        class="badge {{ $ap->status->getBadgeColor() }} rounded-pill">
-                                                        {{ $ap->status->getName() }}
-                                                    </span>
-                                                    @if ($ap->type == Modules\AppointmentUser\Enum\AppointmentUserTypeEnum::BETWEEN_PATIENTS)
-                                                        <span class="badge bg-info rounded-pill ms-1">
-                                                            <strong> {{ $ap->type->getName() }}</strong>
-                                                        </span>
-                                                    @endif
-                                                </td>
-                                                <td>
-                                                    <div class="dropdown">
-                                                        <button
-                                                            class="btn  {{ $ap->status->getButtonColor() }} dropdown-toggle"
-                                                            type="button" id="dropdownMenuButton1"
-                                                            data-bs-toggle="dropdown" aria-expanded="false">
+                                                <tr class="{{ $ap->getColor() }} text-center">
+                                                    <td class="alert text-center bg-info ">{{ $key + 1 }}</td>
+                                                    <td>
+                                                        {{ substr($eachTime['from'], 0, -3) }} -
+                                                        {{ substr($eachTime['until'], 0, -3) }}
+                                                    </td>
+                                                    <td>
+                                                        {{ $user->fullName }}
+                                                    </td>
+                                                    <td>
+                                                        {{ $user->mobile }}
+                                                    </td>
+                                                    <td>
+                                                        <span
+                                                            class="badge {{ $ap->status->getBadgeColor() }} rounded-pill">
                                                             {{ $ap->status->getName() }}
-                                                        </button>
-                                                        <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton1">
-                                                            @can('update', $ap)
-                                                                @include('appointmentuser::components.appointmentlist.operationbutton')
-                                                            @endcan
-                                                        </ul>
-                                                    </div>
-                                                </td>
-                                            </tr>
+                                                        </span>
+                                                        @if ($ap->type == Modules\AppointmentUser\Enum\AppointmentUserTypeEnum::BETWEEN_PATIENTS)
+                                                            <span class="badge bg-info rounded-pill ms-1">
+                                                                <strong> {{ $ap->type->getName() }}</strong>
+                                                            </span>
+                                                        @endif
+                                                    </td>
+                                                    <td>
+                                                        <div class="dropdown">
+                                                            <button
+                                                                class="btn  {{ $ap->status->getButtonColor() }} dropdown-toggle"
+                                                                type="button" id="dropdownMenuButton1"
+                                                                data-bs-toggle="dropdown" aria-expanded="false">
+                                                                {{ $ap->status->getName() }}
+                                                            </button>
+                                                            <ul class="dropdown-menu"
+                                                                aria-labelledby="dropdownMenuButton1">
+                                                                @can('update', $ap)
+                                                                    @include('appointmentuser::components.appointmentlist.operationbutton')
+                                                                @endcan
+                                                            </ul>
+                                                        </div>
+                                                    </td>
+                                                </tr>
                                             @endif
                                         @elseif($eachTime['appointment_user_id'] == null)
                                             <tr style="background-color: #f7dcdc;">
@@ -239,12 +240,11 @@
                     var modal = bootstrap.Modal.getOrCreateInstance(myModalEl);
 
                     function addJs() {
-                        $('#currentDate').persianDatepicker({
-                            format: 'L',
-                            autoClose: true,
-                            onSelect: function(unix) {
-                                @this.set('form.changeDate', $('#currentDate').val());
-                            }
+                        jalaliDatepicker.startWatch();
+                        $(document).on('input', '[data-jdp]', function() {
+                            let selectedDate = $(this).val();
+                            let seterValue = $(this).data('name');
+                            @this.set(seterValue, selectedDate);
                         });
                     };
                     addJs();

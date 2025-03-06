@@ -73,6 +73,7 @@ mix
     .js('Resources/assets/js/sound/app.js', '../../public/assets/admin/js/sound')
     .js('Resources/assets/js/sound/Fr.voice.js', '../../public/assets/admin/js/sound')
     .js('Resources/assets/js/sound/recorder.js', '../../public/assets/admin/js/sound')
+    .js('Resources/assets/js/jalaliDatepicker.min.js', '../../public/assets/admin/js/jalaliDatepicker.min.js')
     .copyDirectory('Resources/assets/js/persian-date.min.js', '../../public/assets/admin/js')
     .copyDirectory('Resources/assets/js/persian-datepicker.min.js', '../../public/assets/admin/js')
     .postCss('Resources/assets/css/animated.css', '../../public/assets/admin/css')

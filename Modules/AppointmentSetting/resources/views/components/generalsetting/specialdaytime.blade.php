@@ -1,6 +1,6 @@
 <div class="@error('form.specialDaytimeValues.*') border border-danger @enderror">
     <div class="card-header border-bottom d-flex justify-content-between">
-        <h3> 
+        <h3>
             <i class="fa fa-calendar-plus-o me-2 d-none d-sm-inline" aria-hidden="true"></i>
             <span>
                 تغییر ساعت حضور برای<span class="text-primary"> یک روز خاص </span>
@@ -71,7 +71,7 @@
                             </div>
                             <div class="col-md-9">
                                 <div class="input-group mb-3">
-                                    <input type="text" wire:model='form.specialDaydateValues.{{ $i }}'
+                                    <input type="text" wire:model='form.specialDaydateValues.{{ $i }}'  data-jdp data-name="form.specialDaydateValues.{{ $i }}"
                                         data-id="{{ $i }}" class="form-control specialDate">
                                 </div>
                             </div>

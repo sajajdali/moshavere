@@ -144,7 +144,7 @@
                                             <div class="col-md-6">
                                                 <label for="search-appointment_date" class="form-label"><strong>زمان
                                                         نوبت</strong></label>
-                                                <input class="form-control" id="search-appointment_date"
+                                                <input class="form-control" id="search-appointment_date" data-jdp data-name="search.appointment_date"
                                                     wire:model="search.appointment_date"
                                                     placeholder="زمانی که نوبت دریافت شده" type="text">
 
@@ -215,150 +215,121 @@
                                                 wire:loading.class="bg-gray btn-loading disabled">نمایش
                                                 همه
                                             </button>
-                                        @break
-                                    @endif
-                                @endforeach
-                            </form>
+                                            @break
+                                        @endif
+                                    @endforeach
+                                </form>
+                            </div>
                         </div>
-                    </div>
-                    {{-- chats --}}
-                    @foreach ($this->handleSearch() as $message)
-                        @php
-                            $color = 'f1f1f1';
-                            if (
-                                $message->online->status ==
-                                    \Modules\AppointmentUser\Enum\AppointmentOnlineStatusEnum::REJECT ||
-                                $message->online->status ==
-                                    \Modules\AppointmentUser\Enum\AppointmentOnlineStatusEnum::CANCEL
-                            ) {
-                                $color = 'ffcaca';
-                            }
-                            if (
-                                $message->online->status ==
-                                \Modules\AppointmentUser\Enum\AppointmentOnlineStatusEnum::COMPLETED_BY_DOCTOR
-                            ) {
-                                $color = 'f9f6cf';
-                            }
-                        @endphp
-                        <div class="card border-0 shadow rounded-lg mb-4"
-                            style="background-color: #{{ $color }}">
-                            <div
-                                class="card-header bg-transparent border-0 d-flex justify-content-between align-items-center p-3">
-                                <div class="d-flex flex-column absoloute">
-                                    <span class="text-muted">{{ $loop->count - $loop->index }}</span>
-                                    <a target="blank" class="fw-bold ms-2 mt-2 h5 mb-0"
-                                        href="{{ route('admin.appointment_user.message.detail', ['onlineAppId' => $message->online->id]) }}">{{ $message->user->full_name }}</a>
-                                </div>
-                                <div class="text-end">
-                                    <span class=" badge bg-light small d-block mt-1  px-1"><strong>اخرین
-                                            پیام</strong>: {{ $message->updated_at->diffForHumans() }}
-                                    </span>
-                                    <span class="mt-1 d-block bg-light bg-light">
-                                        <span class="d-flex flex-column flex-md-row text-center  px-2">
-                                            <strong>زمان دریافت نوبت:</strong>
-                                            <span>{{ verta($message->online->created_at)->format('Y/m/d ساعت H:i') }}</span>
+                        {{-- chats --}}
+                        @foreach ($this->handleSearch() as $message)
+                            @php
+                                $color = 'f1f1f1';
+                                if (
+                                    $message->online->status ==
+                                        \Modules\AppointmentUser\Enum\AppointmentOnlineStatusEnum::REJECT ||
+                                    $message->online->status ==
+                                        \Modules\AppointmentUser\Enum\AppointmentOnlineStatusEnum::CANCEL
+                                ) {
+                                    $color = 'ffcaca';
+                                }
+                                if (
+                                    $message->online->status ==
+                                    \Modules\AppointmentUser\Enum\AppointmentOnlineStatusEnum::COMPLETED_BY_DOCTOR
+                                ) {
+                                    $color = 'f9f6cf';
+                                }
+                            @endphp
+                            <div class="card border-0 shadow rounded-lg mb-4"
+                                style="background-color: #{{ $color }}">
+                                <div
+                                    class="card-header bg-transparent border-0 d-flex justify-content-between align-items-center p-3">
+                                    <div class="d-flex flex-column absoloute">
+                                        <span class="text-muted">{{ $loop->count - $loop->index }}</span>
+                                        <a target="blank" class="fw-bold ms-2 mt-2 h5 mb-0"
+                                            href="{{ route('admin.appointment_user.message.detail', ['onlineAppId' => $message->online->id]) }}">{{ $message->user->full_name }}</a>
+                                    </div>
+                                    <div class="text-end">
+                                        <span class=" badge bg-light small d-block mt-1  px-1"><strong>اخرین
+                                                پیام</strong>: {{ $message->updated_at->diffForHumans() }}
                                         </span>
-                                    </span>
-                                    @if ($message->hasAnswer())
-                                        <span class="mt-1 d-block bg-light bg-light text-center px-1"><strong>پاسخ
-                                                توسط</strong>: {{ $message->findAwnswerer() }} </span>
-                                    @endif
+                                        <span class="mt-1 d-block bg-light bg-light">
+                                            <span class="d-flex flex-column flex-md-row text-center  px-2">
+                                                <strong>زمان دریافت نوبت:</strong>
+                                                <span>{{ verta($message->online->created_at)->format('Y/m/d ساعت H:i') }}</span>
+                                            </span>
+                                        </span>
+                                        @if ($message->hasAnswer())
+                                            <span class="mt-1 d-block bg-light bg-light text-center px-1"><strong>پاسخ
+                                                    توسط</strong>: {{ $message->findAwnswerer() }} </span>
+                                        @endif
+                                    </div>
                                 </div>
-                            </div>
-                            <div class="card-body d-flex justify-content-between align-items-center p-3">
-                                <a target="blank"
-                                    class="btn  @if ($message->unReadedMessageCount() > 0) btn-secondary @else  btn-primary @endif rounded-full"
-                                    href="{{ route('admin.appointment_user.message.detail', ['onlineAppId' => $message->online->id]) }}">
-                                    @if ($message->unReadedMessageCount() > 0)
-                                        {{ $message->unReadedMessageCount() }} پیام
-                                    @else
-                                        بدون پیام جدید
-                                    @endif
-                                </a>
+                                <div class="card-body d-flex justify-content-between align-items-center p-3">
+                                    <a target="blank"
+                                        class="btn  @if ($message->unReadedMessageCount() > 0) btn-secondary @else  btn-primary @endif rounded-full"
+                                        href="{{ route('admin.appointment_user.message.detail', ['onlineAppId' => $message->online->id]) }}">
+                                        @if ($message->unReadedMessageCount() > 0)
+                                            {{ $message->unReadedMessageCount() }} پیام
+                                        @else
+                                            بدون پیام جدید
+                                        @endif
+                                    </a>
 
-                                <div class="d-flex flex-column align-items-end">
-                                    @if ($message->online->status->isPendding())
-                                        <button
-                                            wire:click='ApproveOnlineAppointment("{{ $message->online->appointmentUser->id }}")'
-                                            class="btn btn-success rounded-pill px-4 py-2 me-2 loading-btn">
-                                            <i class="fa fa-check me-2" aria-hidden="true"></i> تایید نوبت
-                                        </button>
-                                        <button
-                                            wire:click='disApproveOnlineAppointment("{{ $message->online->appointmentUser->id }}")'
-                                            class="btn btn-danger rounded-pill px-4 py-2">
-                                            <i class="fa fa-times me-2" aria-hidden="true"></i> رد کردن
-                                        </button>
-                                    @else
-                                        {!! $message->online->status->getMessageDetailBadge() !!}
-                                    @endif
+                                    <div class="d-flex flex-column align-items-end">
+                                        @if ($message->online->status->isPendding())
+                                            <button
+                                                wire:click='ApproveOnlineAppointment("{{ $message->online->appointmentUser->id }}")'
+                                                class="btn btn-success rounded-pill px-4 py-2 me-2 loading-btn">
+                                                <i class="fa fa-check me-2" aria-hidden="true"></i> تایید نوبت
+                                            </button>
+                                            <button
+                                                wire:click='disApproveOnlineAppointment("{{ $message->online->appointmentUser->id }}")'
+                                                class="btn btn-danger rounded-pill px-4 py-2">
+                                                <i class="fa fa-times me-2" aria-hidden="true"></i> رد کردن
+                                            </button>
+                                        @else
+                                            {!! $message->online->status->getMessageDetailBadge() !!}
+                                        @endif
+                                    </div>
                                 </div>
                             </div>
-                        </div>
-                    @endforeach
-                </div>
-                <div class="d-flex justify-content-center mb-5">
-                    {{ $this->handleSearch()->links() }}
+                        @endforeach
+                    </div>
+                    <div class="d-flex justify-content-center mb-5">
+                        {{ $this->handleSearch()->links() }}
+                    </div>
                 </div>
             </div>
         </div>
+        @include('appointmentuser::components.appointmentlist.disapprovemodal')
     </div>
-    @include('appointmentuser::components.appointmentlist.disapprovemodal')
-</div>
-@push('scripts')
-    <script>
-        $(document).ready(function() {
-            function js() {
-                $('#search-appointment_date').persianDatepicker({
-                    initialValue: false,
-                    format: 'L',
-                    autoClose: true,
-                    onSelect: function(unix) {
-                        @this.set('search.appointment_date', $('#search-appointment_date').val());
-                    }
-                });
-                $('#search-appointment_set_date').persianDatepicker({
-                    initialValue: false,
-                    format: 'L',
-                    autoClose: true,
-                    onSelect: function(unix) {
-                        @this.set('search.appointment_set_date', $('#search-appointment_set_date')
-                            .val());
-                    }
-                });
-                $('#search-appointment_end_date').persianDatepicker({
-                    initialValue: false,
-                    format: 'L',
-                    autoClose: true,
-                    onSelect: function(unix) {
-                        @this.set('search.appointment_end_date', $('#search-appointment_end_date')
-                            .val());
-                    }
-                });
-                $('#search-appointment_star_date').persianDatepicker({
-                    initialValue: false,
-                    format: 'L',
-                    autoClose: true,
-                    onSelect: function(unix) {
-                        @this.set('search.appointment_star_date', $('#search-appointment_star_date')
-                            .val());
-                    }
-                });
-            }
-            js();
-            Livewire.on('loadJs', function() {
-                setTimeout(() => {
-                    js();
-                }, 500);
-            })
-            Livewire.on('lunchModal', function() {
-                setTimeout(() => {
-                    var myModal = new bootstrap.Modal(document.getElementById(
-                        'resoanForDisapproveModal'), {
-                        keyboard: false
+    @push('scripts')
+        <script>
+            $(document).ready(function() {
+                function js() {
+                    jalaliDatepicker.startWatch();
+                    $(document).on('input', '[data-jdp]', function() {
+                        let selectedDate = $(this).val();
+                        let seterValue = $(this).data('name');
+                        @this.set(seterValue, selectedDate);
                     });
-                    myModal.show();
-                }, 1000);
+                }
+                js();
+                Livewire.on('loadJs', function() {
+                    setTimeout(() => {
+                        js();
+                    }, 500);
+                })
+                Livewire.on('lunchModal', function() {
+                    setTimeout(() => {
+                        var myModal = new bootstrap.Modal(document.getElementById(
+                            'resoanForDisapproveModal'), {
+                            keyboard: false
+                        });
+                        myModal.show();
+                    }, 1000);
+                });
             });
-        });
-    </script>
-@endpush
+        </script>
+    @endpush

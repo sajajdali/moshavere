@@ -29,19 +29,11 @@
     <script>
         $(document).ready(function() {
             function js() {
-                $('.datePicker').each(function() {
-                    if (!$(this).data('persianDatepickerInitialized')) {
-                        var inp = $(this);
-                        $(this).persianDatepicker({
-                            initialValue: false,
-                            format: 'L',
-                            autoClose: true,
-                            onSelect: function(unix) {
-                                @this.set('form.' + inp.data('counter'), inp.val());
-                            }
-                        });
-                        $(this).data('persianDatepickerInitialized', true); // Mark initialization
-                    }
+                jalaliDatepicker.startWatch();
+                $(document).on('input', '[data-jdp]', function() {
+                    let selectedDate = $(this).val();
+                    let seterValue = $(this).data('name');
+                    @this.set(seterValue, selectedDate);
                 });
             }
             js();
@@ -89,13 +81,13 @@
                     if (docCheckBoxes) {
                         $('#operatorCard').addClass('opacity-25');
                         $('#doctorCard').removeClass('opacity-25');
-                    }else{
+                    } else {
                         $('#operatorCard').removeClass('opacity-25');
                     }
                     if (operatorsCheckBoxes) {
                         $('#operatorCard').removeClass('opacity-25');
                         $('#doctorCard').addClass('opacity-25');
-                    }else{
+                    } else {
                         $('#doctorCard').removeClass('opacity-25');
                     }
                 });

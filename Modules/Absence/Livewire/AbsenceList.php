@@ -41,7 +41,7 @@ class AbsenceList extends Component
     public function render()
     {
         $permistion_check= auth()->user();
-        if (!$permistion_check->can('absence', Absence::class) 
+        if (!$permistion_check->can('absence', Absence::class)
         && !$permistion_check->can('absence.own', Absence::class)) {
             abort(403, 'Unauthorized');
         }
@@ -65,9 +65,9 @@ class AbsenceList extends Component
                 $qq->where('title','LIKE',"%{$this->search['service_name']}%");
             });
         })->when(isset($this->search['start_date']) && !empty($this->search['start_date']), function ($q) {
-            return $q->where('start_at', Verta::parse($this->search['start_date'])->toCarbon());
+            return $q->where('start_at', '>=',Verta::parse($this->search['start_date'])->toCarbon());
         })->when(isset($this->search['end_date']) && !empty($this->search['end_date']), function ($q) {
-            return $q->where('end_at', Verta::parse($this->search['end_date'])->toCarbon());
+            return $q->where('end_at', '<=',Verta::parse($this->search['end_date'])->toCarbon());
         });
         return view('absence::livewire.absence-list', [
             'absences' => $query->paginate(10)

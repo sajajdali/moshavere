@@ -8,7 +8,9 @@ use Livewire\Attributes\Layout;
 use Livewire\Attributes\Locked;
 use Modules\User\Entities\User;
 use Modules\Place\app\Models\Place;
+use Artesaos\SEOTools\Facades\JsonLd;
 use Modules\Front\app\Models\Comment;
+use Artesaos\SEOTools\Facades\SEOTools;
 use Modules\Service\app\Models\Service;
 use Modules\Setting\Enum\SettingKeyEnum;
 use Modules\Front\enum\CommentStatusEnum;
@@ -348,10 +350,22 @@ class DoctorProfileLivewire extends Component
         $checkExistensOfdoctor =  User::find($doctor_id);
         if (isset($checkExistensOfdoctor) && $checkExistensOfdoctor->isDoctor()) {
             $this->doc = $checkExistensOfdoctor;
+            SEOTools::setTitle($this->doc->fullName);
+            SEOTools::setDescription($this->doc->dr_biography);
         } else {
             abort(404);
         }
         $this->fetchData['comments'] = Comment::doctroComments($this->doc->id);
+        $averageRating = $this->fetchData['comments']->avg('star');
+        $minRating     = $this->fetchData['comments']->min('star');
+        $maxRating     = $this->fetchData['comments']->max('star');
+        JsonLd::addValue('aggregateRating', [
+            "@type" => "AggregateRating",
+            "ratingValue" => $averageRating,
+            "bestRating"  => $maxRating,
+            "worstRating" => $minRating,
+            "ratingCount" => 5
+        ]);
         if (count($this->fetchData['comments']) > 2) {
             $this->fetchData['iteratorComments'] = 2;
         } else {

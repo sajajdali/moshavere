@@ -51,9 +51,10 @@
                        <p class="font-semibold">نماد ها</p>
                        <div class="grid grid-cols-2 gap-8">
                            <a referrerpolicy='origin' target='_blank'
-                               href='https://trustseal.enamad.ir/?id=524685&Code=XbRtaf8YeLbNzaEfJdrxZzyGgINAyaCR'><img class="h-[114px]"
+                               href='https://trustseal.enamad.ir/?id=524685&Code=XbRtaf8YeLbNzaEfJdrxZzyGgINAyaCR'
+                               ><img class="h-[114px]"
                                    referrerpolicy='origin'
-                                   src='https://trustseal.enamad.ir/logo.aspx?id=524685&Code=XbRtaf8YeLbNzaEfJdrxZzyGgINAyaCR'
+                                   src={{front_asset('img\enamad.png')}}
                                    alt='' style='cursor:pointer' code='XbRtaf8YeLbNzaEfJdrxZzyGgINAyaCR'></a>
                            {{-- <a href='https://trustseal.enamad.ir/?id=524685&Code=XbRtaf8YeLbNzaEfJdrxZzyGgINAyaCR'
                                referrerpolicy='origin' target='_blank' class="flex justify-center">

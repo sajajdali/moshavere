@@ -46,6 +46,7 @@ class Index extends Component
         $serviceName = request()->route('service_id');
         $service  = Service :: find($serviceName);
         $this->fetchData['service_id'] = $service->id;
+        $this->fetchData['service_name'] = $service->title;
         SEOTools::setTitle($service->title);
         $description ="بخش $service->title | نوبت‌دهی آنلاین از برترین پزشکان $service->title ، سریع و آسان
 در بخش $service->title ، بهترین متخصصان $service->title را پیدا کنید و نوبت خود را به‌صورت اینترنتی، سریع و بدون معطلی رزرو کنید. با سیستم نوبت‌دهی آنلاین، می‌توانید به‌راحتی پزشک موردنظر خود را انتخاب کرده و در کوتاه‌ترین زمان، وقت معاینه بگیرید. تجربه‌ای آسان، مطمئن و بدون دغدغه در دریافت خدمات پزشکی ارتوپدی!";

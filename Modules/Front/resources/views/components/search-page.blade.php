@@ -33,6 +33,13 @@
                 </button>
             </form>
         </section>
+        @if (isset($fetchData['service_name']))
+        <section class="bg-primary-main p-4 mt-4" style="display: none">
+            <h1 class="font-semibold text-center text-2xl text-white">
+                 {{$fetchData['service_name']}}
+            </h1>
+        </section>
+        @endif
     </header>
 
     <!-- main section -->
@@ -194,7 +201,7 @@
                                         <div
                                             class="w-[calc(100%-70px-1.25rem)] flex flex-col sm:flex-row items-center justify-between gap-3">
                                             <div class="space-y-3 text-center md:text-right">
-                                                <p class="text-lg font-bold">دکتر {{ $doctor->full_name }}</p>
+                                                <h2 class="text-lg font-bold">دکتر {{ $doctor->full_name }}</h2>
                                                 <p class="bg-secondary-200 rounded-lg py-2 px-3 text-sm">
                                                     {{ $doctor->DocSpecialities() }}
                                                 </p>

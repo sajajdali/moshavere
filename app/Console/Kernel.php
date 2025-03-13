@@ -3,6 +3,7 @@
 namespace App\Console;
 
 use Illuminate\Console\Scheduling\Schedule;
+use Modules\Front\app\Console\GenerateSitemapComman;
 use Modules\MigrateOldData\App\Console\MigrateAllOrders;
 use Modules\AppointmentUser\app\Console\MakeCacheCommand;
 use Illuminate\Foundation\Console\Kernel as ConsoleKernel;
@@ -39,7 +40,8 @@ class Kernel extends ConsoleKernel
         MigrateAppointmentSetting::class ,
         MigrateUserMetasCommand::class ,
         MigrateAppointmentUserCommand::class ,
-        CompeleteOnlineAppointment::class
+        CompeleteOnlineAppointment::class,
+        GenerateSitemapComman::class,
     ];
 
     /**

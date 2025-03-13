@@ -22,10 +22,10 @@ class GenerateSitemapComman extends Command
         $Services = Service::all();
 
         foreach ($doctors as $doctor) {
-            $sitemap->add(route('front.doctor.profile',['doctor_id' =>$doctor->id , 'doctor_name' => $doctor->fullName]));
+            $sitemap->add(route('front.doctor.profile',['doctor_id' =>$doctor->id , 'doctor_name' => str_replace(' ','-',$doctor->fullName)]));
         }
         foreach ($Services as $service) {
-            $sitemap->add(route('front.services',['service_id'=>$service->id , 'service_name'=>$service->title]));
+            $sitemap->add(route('front.services',['service_id'=>$service->id , 'service_name'=> str_replace(' ','-',$service->title) ]));
         }
         $sitemap->add(route('front.aboutUs'));
         $sitemap->add(route('front.contactUs'));

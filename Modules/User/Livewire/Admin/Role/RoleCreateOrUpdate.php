@@ -36,6 +36,7 @@ class RoleCreateOrUpdate extends Component
                 $permissions[] = $modulePermissions;
             }
         }
+        dd($permissions);
         $this->permissions = $permissions;
         $role = request()->route('role');
         if ($role instanceof Role) {

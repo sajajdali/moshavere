@@ -29,6 +29,7 @@
         "shetabit/payment": "^5.8",
         "spatie/laravel-permission": "^6.9.0",
         "spatie/laravel-sitemap": "^7.3",
+        "stancl/tenancy": "^3.9",
         "tecnickcom/tcpdf": "^6.7.5"
     },
     "require-dev": {

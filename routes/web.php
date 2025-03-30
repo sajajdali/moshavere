@@ -26,41 +26,11 @@ use Modules\AppointmentUser\Enum\AppointmentOnlineMessageTypeEnum;
 */
 
 Route::get('/s/{param}', [ShortLinkController::class, 'index']);
-
-// Route::get('teettt', function () {
-//     $appointmentUser = AppointmentUser::find(12576);
-//     $amount = $appointmentUser->details[AppointmentUser::DETAIL_PAYMENT][AppointmentUser::DETAIL_PAYMENT_PRICE]['int'];
-
-
-//     $receipt = \Shetabit\Payment\Facade\Payment::amount($amount)
-//         ->transactionId($appointmentUser->transaction->detail['transactionId'])
-//         ->verify();
-//     dd($receipt);
-//     if ($receipt) {
-//         $appointmentUser->update([
-//             'status' => AppointmentUserStatusEnum::STATUS_SUCCESSFUL,
-//             'deadline_at' => null
-//         ]);
-//         // if appointment is online
-//         if ($appointmentUser->kind == AppointmentUserKindEnum::ONLINE) {
-//             $appointmentUser->online->first()->update(['status' => \Modules\AppointmentUser\Enum\AppointmentOnlineStatusEnum::ACCEPTED]);
-//             // send online first message
-//             if (setting(SettingKeyEnum::ONILNE_SEND_ATUOMATIC_MESSAGE_STATUS)) {
-//                 $appointmentUser->online->last()->messages()->create([
-//                     'user_id' => $appointmentUser->online->last()->user_id,
-//                     'answer_by' => 1,
-//                     'type' => AppointmentOnlineMessageTypeEnum::ANSWER,
-//                     'seen' => AppointmentOnlineMessageSeenEnum::UNSEEN,
-//                     'body' => setting(SettingKeyEnum::ONILNE_SEND_ATUOMATIC_MESSAGE_MESSAGE) ?? 'سلام لطفا سوال خود را مطرح کنید',
-//                 ]);
-//             }
-//         }
-//         $tDetail =  $appointmentUser->transaction->detail;
-//         $respondDetaul = $receipt->getDetails();
-//         $newTdetail = array_merge($tDetail, [
-//             'card_hash' => $respondDetaul['card_hash'],
-//             'ref_id' => $respondDetaul['ref_id'],
-//         ]);
-//         $appointmentUser->transaction->update(['status' => TransactionStatusEnum::SUCCESSFUL, 'detail' => $newTdetail]);
-//     }
-// });
+Route::get('tenant', function () {
+    dd("Sa");
+});
+Route::get('/new_site', function () {
+    $tenant1 = App\Models\Tenant::create(['id' => 'nobat1']);
+    $tenant1 = App\Models\Tenant::find('nobat1');
+    $tenant1->domains()->create(['domain' => 'nobat1.test']);
+});

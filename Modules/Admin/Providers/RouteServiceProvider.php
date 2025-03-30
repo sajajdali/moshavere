@@ -5,6 +5,8 @@ namespace Modules\Admin\Providers;
 use Illuminate\Support\Facades\Route;
 use Modules\Transaction\app\Models\Transaction;
 use Illuminate\Foundation\Support\Providers\RouteServiceProvider as ServiceProvider;
+use Stancl\Tenancy\Middleware\InitializeTenancyByDomain;
+use Stancl\Tenancy\Middleware\PreventAccessFromCentralDomains;
 
 class RouteServiceProvider extends ServiceProvider
 {
@@ -48,7 +50,11 @@ class RouteServiceProvider extends ServiceProvider
      */
     protected function mapAdminRoutes(): void
     {
-        Route::middleware('web')
+        Route::middleware([
+            'web',
+            InitializeTenancyByDomain::class,
+            PreventAccessFromCentralDomains::class,
+        ])
             ->group(module_path('Admin', '/Routes/admin.php'));
     }
 

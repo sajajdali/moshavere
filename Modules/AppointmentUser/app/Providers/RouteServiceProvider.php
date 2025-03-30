@@ -5,6 +5,8 @@ namespace Modules\AppointmentUser\app\Providers;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Foundation\Support\Providers\RouteServiceProvider as ServiceProvider;
 use Modules\AppointmentUser\app\Models\AppointmentUser;
+use Stancl\Tenancy\Middleware\InitializeTenancyByDomain;
+use Stancl\Tenancy\Middleware\PreventAccessFromCentralDomains;
 
 class RouteServiceProvider extends ServiceProvider
 {
@@ -61,7 +63,9 @@ class RouteServiceProvider extends ServiceProvider
 
     protected function mapAdminRoutes(): void
     {
-        Route::middleware(['web', 'auth', 'admin'])
+        Route::middleware(['web',
+            InitializeTenancyByDomain::class,
+            PreventAccessFromCentralDomains::class, 'auth', 'admin'])
             ->prefix('admin')
             ->as('admin.')
             ->group(module_path('AppointmentUser', '/routes/admin.php'));

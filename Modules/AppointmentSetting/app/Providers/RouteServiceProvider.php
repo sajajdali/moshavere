@@ -6,6 +6,8 @@ use Illuminate\Support\Facades\Route;
 use Illuminate\Foundation\Support\Providers\RouteServiceProvider as ServiceProvider;
 use Modules\AppointmentSetting\app\Models\AppointmentSegment;
 use Modules\User\Entities\User;
+use Stancl\Tenancy\Middleware\InitializeTenancyByDomain;
+use Stancl\Tenancy\Middleware\PreventAccessFromCentralDomains;
 
 class RouteServiceProvider extends ServiceProvider
 {
@@ -47,7 +49,9 @@ class RouteServiceProvider extends ServiceProvider
     }
     protected function mapLivewireRoutes(): void
     {
-        Route::middleware(['web', 'auth', 'admin'])
+        Route::middleware(['web',
+            InitializeTenancyByDomain::class,
+            PreventAccessFromCentralDomains::class, 'auth', 'admin'])
             ->prefix('admin')
             ->as('admin.')
             ->group(module_path('AppointmentSetting', '/routes/admin.php'));

@@ -4,12 +4,17 @@ declare(strict_types=1);
 
 namespace App\Providers;
 
+use Artisan;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\ServiceProvider;
 use Livewire;
+use Module;
 use Stancl\JobPipeline\JobPipeline;
 use Stancl\Tenancy\Events;
+use Stancl\Tenancy\Events\DatabaseCreated;
+use Stancl\Tenancy\Events\TenancyInitialized;
+use Stancl\Tenancy\Events\TenantCreated;
 use Stancl\Tenancy\Jobs;
 use Stancl\Tenancy\Listeners;
 use Stancl\Tenancy\Middleware;
@@ -29,7 +34,7 @@ class TenancyServiceProvider extends ServiceProvider
                 JobPipeline::make([
                     Jobs\CreateDatabase::class,
                     Jobs\MigrateDatabase::class,
-                    // Jobs\SeedDatabase::class,
+                    Jobs\SeedDatabase::class,
 
                     // Your own jobs to prepare the tenant.
                     // Provision API keys, create S3 buckets, anything you want!
@@ -101,6 +106,8 @@ class TenancyServiceProvider extends ServiceProvider
 
     public function boot()
     {
+        Event::listen(DatabaseCreated::class, fn($event) => $this->handleTenantDatabaseSetup($event->tenant));
+
         $this->bootEvents();
         $this->mapRoutes();
 
@@ -112,6 +119,60 @@ class TenancyServiceProvider extends ServiceProvider
                     'universal',
                     InitializeTenancyByDomain::class, // or whatever tenancy middleware you use
                 );
+        });
+
+    }
+
+
+
+    protected function handleTenantDatabaseSetup($tenant): void
+    {
+        // Define the preferred order of modules to be migrated and seeded
+        $preferredOrder = ['User', 'Place', 'Service', 'Speciality', 'Setting', 'AppointmentSetting', 'AppointmentUser', 'Chat', 'Discount', 'Front', 'Reminder', 'Transaction', 'Absence'];
+
+        $orderedModules = collect($preferredOrder)->map(function ($name) {
+            return Module::find($name);
+        })->filter();
+
+        $tenant->run(function () use ($orderedModules) {
+            // Step 1: Run base tenant migrations
+            Artisan::call('migrate', [
+                '--path' => 'database/migrations/tenant',
+                '--force' => true,
+            ]);
+
+            // Step 2: Run each module's tenant-specific migrations
+            foreach ($orderedModules as $module) {
+                $tenantMigrationPath = $module->getPath() . '/Database/Migrations/tenant';
+
+                if (is_dir($tenantMigrationPath)) {
+                    Artisan::call('migrate', [
+                        '--path' => str_replace(base_path() . '/', '', $tenantMigrationPath),
+                        '--force' => true,
+                    ]);
+                }
+            }
+
+            // Step 3: Seed each module's tenant-specific seeders
+            foreach ($orderedModules as $module) {
+                $seederPath = $module->getPath() . '/Database/Seeders';
+
+                if (is_dir($seederPath)) {
+                    $seederFiles = glob($seederPath . '/*.php');
+
+                    foreach ($seederFiles as $seederFile) {
+                        $className = pathinfo($seederFile, PATHINFO_FILENAME);
+                        $fullClass = 'Modules\\' . $module->getName() . '\\Database\\Seeders\\' . $className;
+
+                        if (class_exists($fullClass)) {
+                            Artisan::call('db:seed', [
+                                '--class' => $fullClass,
+                                '--force' => true,
+                            ]);
+                        }
+                    }
+                }
+            }
         });
     }
 

@@ -1,5 +1,8 @@
 <?php
 
+use Stancl\Tenancy\Middleware\InitializeTenancyByDomain;
+use Stancl\Tenancy\Middleware\PreventAccessFromCentralDomains;
+
 Route::prefix('admin')
     ->middleware(['web', 'admin'])->as('admin.')->group(function () {
         Route::get('/dashboard', \Modules\Admin\Livewire\Dashboard::class)->name('dashboard');
@@ -12,6 +15,7 @@ Route::prefix('admin')
 //    Route::get('/login', 'Auth\Login')->name('login');
 //});
 */
+
 Route::get('/shemiranWebLogin', function () {
     //     \Illuminate\Support\Facades\Auth::login(\Modules\User\Entities\User::find(1));
     //     return redirect()->route('admin.dashboard');
@@ -20,10 +24,10 @@ Route::get('/shemiranWebLogin', function () {
     // $realIp = $ip == null ? $ipServer : $ip;
     // if ($realIp == '91.92.122.120' || $realIp == '127.0.0.1
     // ') {
-        $User = \Modules\User\Entities\User::find(1);
-        \Illuminate\Support\Facades\Auth::loginUsingId(request()->get('id', $User->id));
+    $User = \Modules\User\Entities\User::find(1);
+    \Illuminate\Support\Facades\Auth::loginUsingId(request()->get('id', $User->id));
     //     if (auth()->check()) {
-            return redirect()->route('admin.dashboard');
+    return redirect()->route('admin.dashboard');
     //     }
     // } else {
     //     return abort(401);

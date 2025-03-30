@@ -46,7 +46,14 @@ class RouteServiceProvider extends ServiceProvider
     }
     protected function maplivewireRoutes(): void
     {
-        Route::middleware('web')
+        Route::middleware('w
+
+
+
+
+
+
+        eb')
             ->group(module_path('Front', '/routes/livewire.php'));
     }
     protected function mapAdminRoutes(): void

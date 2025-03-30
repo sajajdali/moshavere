@@ -3,12 +3,12 @@
 namespace Modules\User\Database\Seeders;
 
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\Artisan;
 use Modules\User\Entities\User;
-use Spatie\Permission\Models\Role;
 use Modules\User\Entities\UserMeta;
 use Modules\User\Enum\UserMetaEnum;
-use Illuminate\Support\Facades\Artisan;
 use Spatie\Permission\Models\Permission;
+use Spatie\Permission\Models\Role;
 
 class UserDatabaseSeeder extends Seeder
 {

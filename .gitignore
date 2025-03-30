@@ -37,3 +37,4 @@ modules_statuses.json
 /storage/logs
 /storage/framework
 /public/uploads
+/storage/debugbar/

@@ -12,6 +12,6 @@ class FrontDatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        $this->call(ProvinceSeeder::class);
+        //$this->call(ProvinceSeeder::class);
     }
 }

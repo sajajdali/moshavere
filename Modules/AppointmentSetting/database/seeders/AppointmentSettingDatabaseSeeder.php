@@ -1,6 +1,6 @@
 <?php
 
-namespace Modules\AppointmentSetting\database\seeders;
+namespace Modules\AppointmentSetting\Database\Seeders;
 
 use Illuminate\Database\Seeder;
 

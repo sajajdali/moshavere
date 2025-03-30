@@ -4,6 +4,8 @@ namespace Modules\Transaction\app\Providers;
 
 use Illuminate\Support\Facades\Route;
 use Illuminate\Foundation\Support\Providers\RouteServiceProvider as ServiceProvider;
+use Stancl\Tenancy\Middleware\InitializeTenancyByDomain;
+use Stancl\Tenancy\Middleware\PreventAccessFromCentralDomains;
 
 class RouteServiceProvider extends ServiceProvider
 {
@@ -39,7 +41,9 @@ class RouteServiceProvider extends ServiceProvider
      */
     protected function mapWebRoutes(): void
     {
-        Route::middleware('web')
+        Route::middleware(['web',
+            InitializeTenancyByDomain::class,
+            PreventAccessFromCentralDomains::class])
             ->namespace($this->moduleNamespace)
             ->group(module_path('Transaction', '/routes/web.php'));
     }

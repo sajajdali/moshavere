@@ -31,7 +31,21 @@ function getCurrentSeason()
             return 'Unknown';
     }
 }
-
+function getFileIconClass($mimeType) {
+    return match(true) {
+        str_contains($mimeType, 'png') => 'image',
+        str_contains($mimeType, 'jpeg') => 'image',
+        str_contains($mimeType, 'jpg') => 'image',
+        str_contains($mimeType, 'webp') => 'image',
+        str_contains($mimeType, 'heif') => 'image',
+        str_contains($mimeType, 'pdf') => 'fa-file-pdf',
+        str_contains($mimeType, 'word') => 'fa-file-word',
+        str_contains($mimeType, 'excel') => 'fa-file-excel',
+        str_contains($mimeType, 'text') => 'fa-file-alt',
+        str_contains($mimeType, 'zip') => 'fa-file-archive',
+        default => 'fa-file',
+    };
+}
 function getValueAfterSlash($string) {
     // Check if "/" exists in the string
     if (strpos($string, '/') !== false) {

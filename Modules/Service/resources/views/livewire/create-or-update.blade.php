@@ -130,30 +130,15 @@
                             </div>
                         </div>
                         <div class="row mb-5 mt-3">
-                            <div class="form-row">
-                                <label for="password">تصویر بخش</label>
-                                <div class="input-group">
-                                    <span class="input-group-btn">
-                                        <button data-for="form.img" data-variable="form.img"
-                                            class="btn btn-primary select_file" data-bs-target="#file-selector-modal"
-                                            data-bs-toggle="modal" type="button">
-                                            <i class="fa fa-picture-o"></i>
-                                            انتخاب تصویر
-                                        </button>
-                                    </span>
-                                    <input id="thumbnail"
-                                        class="form-control    @error('form.img') is-invalid   @enderror"
-                                        type="text" name="filepath" wire:model="form.img">
-
-                                </div>
-                                @error('form.img')
-                                    <strong class="text-danger mt-1">{{ $message }}</strong>
-                                @enderror
-                                @if (isset($form['img']))
-                                    <img id="holder" style="margin-top:15px;max-height:100px;"
-                                        src="{{ $form['img'] }}" />
-                                @endif
-                            </div>
+                            <x-admin.core.form.image-upload
+                                label="ایکون بخش در سایت"
+                                uploadedPhotoUrl="{{ $uploadedPhotoUrl }}"
+                                uploadedFileName="{{ $uploadedFileName }}"
+                                uploadedFileType="{{ $uploadedFileType }}"
+                                deleteAction="deleteFile"
+                                model="photo"
+                                id="fileUpload"
+                            />
                         </div>
                         @if (!empty($fetchdata['doctors']))
                             <div class="row mt-5">

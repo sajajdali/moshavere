@@ -2,8 +2,11 @@
 
 namespace Modules\Service\Livewire;
 
+use App\trait\UploadFile;
+use Illuminate\Support\Facades\Storage;
 use Livewire\Component;
 use App\Enum\ActiveEnum;
+use Livewire\Features\SupportFileUploads\WithFileUploads;
 use Modules\User\Entities\User;
 use Spatie\Permission\Models\Role;
 use Illuminate\Support\Facades\Cache;
@@ -12,6 +15,10 @@ use Modules\Service\Enum\ServiceShowTypeEnum;
 
 class CreateOrUpdate extends Component
 {
+    use WithFileUploads , UploadFile;
+
+    protected $filePath = 'service';
+
     public ?Service $service;
     public $isEdited = false;
     public array $form = [
@@ -43,7 +50,6 @@ class CreateOrUpdate extends Component
         $modelCreateOrUpdate = [
             'title'         => $this->form['title']         ?? '',
             'parent_id'     => $parentId,
-            'icon'          => $this->form['img']            ?? null,
             'priority'      => $this->form['priority']   ?? 1,
             'active'        => ActiveEnum::tryFrom($active),
             'show_type'     => $this->form['show_type'] ? ServiceShowTypeEnum::SHOW : ServiceShowTypeEnum::DONT_SHOW,
@@ -52,6 +58,16 @@ class CreateOrUpdate extends Component
                 Service::NOT_SHOW_TO_USER   => false
             ]
         ];
+
+        // مدیریت تصویر
+        if (!empty($this->form['photo'])) {
+            $finalPath = str_replace('temp/', '', $this->form['photo']);
+            Storage::disk('tenant')->move($this->form['photo'], $finalPath);
+            $modelCreateOrUpdate['icon'] = $finalPath;
+        } else {
+            $modelCreateOrUpdate['icon'] = null;
+        }
+
         if (isset($this->form['qestion']) && $parentId == null) {
             $modelCreateOrUpdate['detail'] = [
                 Service::APP_QUESTION_TITLE => $this->form['qestion'],
@@ -108,10 +124,24 @@ class CreateOrUpdate extends Component
             $this->service           =  $service;
             $this->isEdited          = true;
             $this->addInitialValues();
+
+            //  load  image
+            $this->photo = $service->icon;
+            $path = $service->icon ;
+            if ($path) {
+                $this->uploadedPhotoUrl = Storage::disk('tenant')->url($path);
+                $this->uploadedFileName = basename($path);
+                $this->uploadedFileType = getFileIconClass(pathinfo($path, PATHINFO_EXTENSION));
+            } else {
+                $this->uploadedPhotoUrl = null;
+            }
         } else {
             $this->form['priority']      = Service::maxPriority();
             $this->form['active']        = 'true';
         }
+
+
+
         $this->fetchdata['doctors']  = User::doctors();
         $this->fetchdata['services'] = Service::whereNull('parent_id')->get();
     }

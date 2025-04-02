@@ -17,56 +17,76 @@ class UserDatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        //create first user factory
-        $user = User::create([
-            'mobile' => '09197729101',
-            'email' => 'info@jesmino.test',
-            'password' => '123',
-        ]);
+        // Create initial user
+        $user = User::firstOrCreate(
+            ['mobile' => '09197729101'],
+            [
+                'email' => 'info@jesmino.test',
+                'password' => '123',
+            ]
+        );
 
-        $user->metas()->saveMany([
-            new UserMeta([
-                'meta_key' => UserMetaEnum::FIRST_NAME,
-                'meta_value' => 'مدیر',
-            ]),
-            new UserMeta([
-                'meta_key' => UserMetaEnum::LAST_NAME,
-                'meta_value' => 'کل',
-            ]),
-        ]);
+        $user->metas()->updateOrCreate(
+            ['meta_key' => UserMetaEnum::FIRST_NAME],
+            ['meta_value' => 'مدیر']
+        );
+
+        $user->metas()->updateOrCreate(
+            ['meta_key' => UserMetaEnum::LAST_NAME],
+            ['meta_value' => 'کل']
+        );
 
         // Create roles
-        $role = Role::create(['name' => 'مدیر']);
-        $userDefaultRole = Role::create(['name' => 'بیمار']);
-        $doctorsRoles = Role::create(['name' => 'پزشک']);
-        $opdatorRoles = Role::create(['name' => 'اپراتور']);
-        $secretaryRoles = Role::create(['name' => 'منشی']);
-        $mamaRoles = Role::create(['name' => 'ماما']);
+        $roles = [
+            'مدیر' => null,
+            'بیمار' => null,
+            'پزشک' => null,
+            'اپراتور' => null,
+            'منشی' => null,
+            'ماما' => null,
+        ];
+
+        foreach ($roles as $name => &$role) {
+            $role = Role::firstOrCreate(['name' => $name, 'guard_name' => 'web']);
+        }
 
         // Create permissions
-        $adminPermission = Permission::create(['name' => 'ADMIN_ACCESS']);
-        $superAdminPermission = Permission::create(['name' => 'SUPER_ADMIN']);
-        $doctorPermission = Permission::create(['name' => 'DOCTOR']);
-        $secretaryPermission = Permission::create(['name' => 'SECRETERY']);
-        $userPermission = Permission::create(['name' => 'USER_ACCESS']);
-        $userDefaultPermission = Permission::create(['name' => 'USER_DEFAULT']);
+        $permissions = [
+            'ADMIN_ACCESS',
+            'SUPER_ADMIN',
+            'DOCTOR',
+            'SECRETERY',
+            'USER_ACCESS',
+            'USER_DEFAULT',
+        ];
+
+        $permissionInstances = [];
+        foreach ($permissions as $perm) {
+            $permissionInstances[$perm] = Permission::firstOrCreate(['name' => $perm, 'guard_name' => 'web']);
+        }
 
         // Assign permissions to roles
-        $role->givePermissionTo([$adminPermission, $superAdminPermission]);
-        $doctorsRoles->givePermissionTo([$adminPermission, $doctorPermission]);
+        $roles['مدیر']->syncPermissions([
+            $permissionInstances['ADMIN_ACCESS'],
+            $permissionInstances['SUPER_ADMIN'],
+        ]);
 
-        // Assign User essential permissions to کاربران Role
-        $userDefaultRole->givePermissionTo([$userPermission, $userDefaultPermission]);
+        $roles['پزشک']->syncPermissions([
+            $permissionInstances['ADMIN_ACCESS'],
+            $permissionInstances['DOCTOR'],
+        ]);
 
-        // Assign مدیر Role to first user factory (assuming $user is defined)
-        $user->assignRole($role);
+        $roles['بیمار']->syncPermissions([
+            $permissionInstances['USER_ACCESS'],
+            $permissionInstances['USER_DEFAULT'],
+        ]);
 
-        // Run permission synchronization command
+        $user->assignRole($roles['مدیر']);
+
         Artisan::call('auth:permission-sync');
 
-        // Sync permissions for secretery Role
-        $secretaryPermissions  = [
-            $secretaryPermission,
+        $secretaryPermissions = [
+            'SECRETERY',
             'appointment_user',
             'appointment_user.addApp',
             'appointment_user.edit',
@@ -91,7 +111,8 @@ class UserDatabaseSeeder extends Seeder
             'appointment_user.feedBack',
             'comment.own',
         ];
-        $doc  = [
+
+        $doctorPermissions = [
             'appointment_user.own',
             'AppointmentSetting.own',
             'absence.own',
@@ -116,11 +137,30 @@ class UserDatabaseSeeder extends Seeder
             'user.documentte',
             'appointment_user.feedBack',
         ];
-        $opdatorRoles->syncPermissions($secretaryPermissions);
-        $secretaryRoles->syncPermissions($secretaryPermissions);
-        $doctorsRoles->syncPermissions($doc);
-        // Sync permissions for mama Role
-        $mamaPermissions = [$adminPermission, 'appointment_user', 'appointment_user.online', 'appointment_user.message'];
-        $mamaRoles->syncPermissions($mamaPermissions);
+
+        foreach ($secretaryPermissions as $perm) {
+            Permission::firstOrCreate(['name' => $perm, 'guard_name' => 'web']);
+        }
+
+        foreach ($doctorPermissions as $perm) {
+            Permission::firstOrCreate(['name' => $perm, 'guard_name' => 'web']);
+        }
+
+        $roles['اپراتور']->syncPermissions($secretaryPermissions);
+        $roles['منشی']->syncPermissions($secretaryPermissions);
+        $roles['پزشک']->syncPermissions($doctorPermissions);
+
+        $mamaPermissions = [
+            'ADMIN_ACCESS',
+            'appointment_user',
+            'appointment_user.online',
+            'appointment_user.message',
+        ];
+
+        foreach ($mamaPermissions as $perm) {
+            Permission::firstOrCreate(['name' => $perm, 'guard_name' => 'web']);
+        }
+
+        $roles['ماما']->syncPermissions($mamaPermissions);
     }
 }

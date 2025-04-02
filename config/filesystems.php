@@ -62,6 +62,11 @@ return [
             'visibility' => 'public',
         ],
 
+        'tenant' => [
+            'driver' => 'local',
+            'root' => storage_path('app/public'),  // مسیر ذخیره‌سازی اختصاصی برای هر مستاجر
+            'visibility' => 'public',
+        ],
     ],
 
     /*

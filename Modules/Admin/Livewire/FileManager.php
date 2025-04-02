@@ -181,18 +181,28 @@ class FileManager extends Component
     }
 
     #[On('upload')]
-    public function upload()
+    public function upload(): void
     {
         $validatedData = Validator::make(
             ['uploadFile' => $this->uploadFile],
-            ['uploadFile' => 'required']);
+            ['uploadFile' => 'required|file|max:5120'] // 5MB max size
+        );
+
         if ($validatedData->fails()) {
-            $this->dispatch('error_file_manager', message:'لطفا فایل را انتخاب کنید');
+            $this->dispatch('error_file_manager', message: 'لطفا فایل مناسب را انتخاب کنید');
             return;
         }
-        //upload file to current directory
-        $current = implode('/', array_column($this->broadcamp, 'path'));
-        $this->uploadFile->store($current, 'public');
+
+        $currentPath = implode('/', array_column($this->broadcamp, 'path'));
+
+        // ذخیره فایل روی دیسک public در مسیر tenant-aware
+        try {
+            $this->uploadFile->store($currentPath, 'public');
+        } catch (\Throwable $e) {
+            $this->dispatch('error_file_manager', message: 'خطا در ذخیره‌سازی فایل: '.$e->getMessage());
+            return;
+        }
+
         $this->files = $this->listFiles();
         $this->dispatch('upload_complete');
     }

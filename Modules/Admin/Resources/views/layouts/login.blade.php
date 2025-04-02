@@ -1,3 +1,4 @@
+
 <!doctype html>
 <html lang="fa_IR" dir="rtl">
 <!-- This "custom-app.blade.php" master page is used only for "custom" page content present in "views/livewire" Ex: login, 404 -->

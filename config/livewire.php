@@ -1,6 +1,7 @@
 <?php
 
 use Stancl\Tenancy\Middleware\InitializeTenancyByDomain;
+use Stancl\Tenancy\Middleware\PreventAccessFromCentralDomains;
 
 return [
 
@@ -66,10 +67,10 @@ return [
     */
 
     'temporary_file_upload' => [
-        'disk' => null,        // Example: 'local', 's3'              | Default: 'default'
+        'disk' => 'public',        // Example: 'local', 's3'              | Default: 'default'
         'rules' => null,       // Example: ['file', 'mimes:png,jpg']  | Default: ['required', 'file', 'max:12288'] (12MB)
         'directory' => null,   // Example: 'tmp'                      | Default: 'livewire-tmp'
-        'middleware' => ['throttle:60,1', 'universal', InitializeTenancyByDomain::class],  // Example: 'throttle:5,1'             | Default: 'throttle:60,1'
+        'middleware' => ['throttle:60,1', InitializeTenancyByDomain::class ,  PreventAccessFromCentralDomains::class],  // Example: 'throttle:5,1'             | Default: 'throttle:60,1'
         'preview_mimes' => [   // Supported file types for temporary pre-signed file URLs...
             'png', 'gif', 'bmp', 'svg', 'wav', 'mp4',
             'mov', 'avi', 'wmv', 'mp3', 'm4a',
@@ -142,6 +143,7 @@ return [
     | "markers" into the rendered Blade surrounding @if, @class & @foreach.
     |
     */
+
 
     'inject_morph_markers' => true,
 

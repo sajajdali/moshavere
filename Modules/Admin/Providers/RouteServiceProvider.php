@@ -37,8 +37,13 @@ class RouteServiceProvider extends ServiceProvider
     public function map(): void
     {
         $this->mapAdminRoutes();
+        $this->mapCentralRoutes();
         $this->bindingModel();
 
+    }
+    protected function centralDomains(): array
+    {
+        return config('tenancy.central_domains', []);
     }
 
     /**
@@ -56,6 +61,16 @@ class RouteServiceProvider extends ServiceProvider
             PreventAccessFromCentralDomains::class,
         ])
             ->group(module_path('Admin', '/Routes/admin.php'));
+    }
+
+    protected function mapCentralRoutes(): void
+    {
+        foreach ($this->centralDomains() as $domain) {
+            Route::middleware('web')
+                ->domain($domain)
+//                ->namespace($this->moduleNamespace)
+                ->group(module_path('Admin', '/Routes/central.php'));
+        }
     }
 
     public function bindingModel(): void

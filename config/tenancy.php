@@ -57,7 +57,7 @@ return [
          * Tenant database names are created like this:
          * prefix + tenant_id + suffix.
          */
-        'prefix' => 'appointment_',
+        'prefix' => 'appointmentv4_',
         'suffix' => '',
 
         /**
@@ -105,7 +105,7 @@ return [
         /**
          * Each disk listed in the 'disks' array will be suffixed by the suffix_base, followed by the tenant_id.
          */
-        'suffix_base' => 'appointment_',
+        'suffix_base' => 'appointmentv4_',
         'disks' => [
             'local',
             'public',

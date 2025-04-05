@@ -21,7 +21,7 @@ return [
      */
     'central_domains' => [
         'central.test',
-        'central.test:8000',
+        'appointmentv5.shemiranweb.com',
     ],
 
 
@@ -57,7 +57,7 @@ return [
          * Tenant database names are created like this:
          * prefix + tenant_id + suffix.
          */
-        'prefix' => 'appointment_',
+        'prefix' => 'appointmentv5_',
         'suffix' => '',
 
         /**

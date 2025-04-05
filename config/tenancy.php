@@ -21,7 +21,7 @@ return [
      */
     'central_domains' => [
         'central.test',
-        'appointmentv5.shemiranweb.com',
+        'appointment.shemiranweb.com',
     ],
 
 

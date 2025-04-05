@@ -15,5 +15,5 @@ use Modules\Speciality\Http\Controllers\SpecialityController;
 */
 
 Route::group([], function () {
-    Route::resource('speciality', SpecialityController::class)->names('speciality');
+//    Route::resource('speciality', SpecialityController::class)->names('speciality');
 });

@@ -113,13 +113,15 @@ class TenancyServiceProvider extends ServiceProvider
         $this->mapRoutes();
 
         $this->makeTenancyMiddlewareHighestPriority();
-        \Livewire\Livewire::setUpdateRoute(function ($handle) {
-            return Route::post('/livewire/update', $handle)
-                ->middleware(
-                    'web',
-//                    'universal',
-                    InitializeTenancyByDomain::class, // or whatever tenancy middleware you use
-                );
+        Livewire::setUpdateRoute(function ($handle) {
+            $middleware = ['web'];
+
+            if (!in_array(request()->getHost(), config('tenancy.central_domains', []))) {
+                $middleware[] = \Stancl\Tenancy\Middleware\InitializeTenancyByDomain::class;
+                $middleware[] = \Stancl\Tenancy\Middleware\PreventAccessFromCentralDomains::class;
+            }
+
+            return Route::post('/livewire/update', $handle)->middleware($middleware);
         });
         FilePreviewController::$middleware = ['web', 'universal', InitializeTenancyByDomain::class];
 

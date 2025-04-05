@@ -2,6 +2,7 @@
 
 namespace App\Http;
 
+use App\Http\Middleware\PreventTenancyOnCentralDomain;
 use Modules\Api\app\Http\Middleware\BasicAuth;
 use Modules\Admin\Http\Middleware\AdminMiddleware;
 use Illuminate\Foundation\Http\Kernel as HttpKernel;
@@ -75,7 +76,8 @@ class Kernel extends HttpKernel
         'role' => \Spatie\Permission\Middlewares\RoleMiddleware::class,
         'permission' => \Spatie\Permission\Middlewares\PermissionMiddleware::class,
         'role_or_permission' => \Spatie\Permission\Middlewares\RoleOrPermissionMiddleware::class,
-        'role_or_permission' => \Spatie\Permission\Middlewares\RoleOrPermissionMiddleware::class,
-        'appointment_user_list_middlewere' =>         AppointmentUserListmiddleware::class,
+        'prevent-tenant' => \App\Http\Middleware\PreventTenancyOnCentralDomain::class,
+        'appointment_user_list_middlewere' =>  AppointmentUserListmiddleware::class,
+
     ];
 }

@@ -9,10 +9,17 @@ Route::get('/centralLogin', function () {
     $User = \Modules\User\Entities\User::find(1);
     \Illuminate\Support\Facades\Auth::loginUsingId(request()->get('id', $User->id));
     //     if (auth()->check()) {
-    return redirect()->route('admin.dashboard');
+
+    return redirect()->route('central.dashboard');
 
 });
 Route::prefix('central')
-    ->middleware(['web', 'admin'])->as('admin.')->group(function () {
+    ->middleware(['web', 'admin','prevent-tenant'])->as('central.')->group(function () {
         Route::get('dashboard', \Modules\Admin\Livewire\Central\CentralDashboard::class)->name('dashboard');
+
+
+        Route::get('new_site', \Modules\Admin\Livewire\Central\NewSiteCreateOrUpdate::class);
+        Route::get('new_site/create', \Modules\Admin\Livewire\Central\NewSiteCreateOrUpdate::class)->name('new_site.create');
+        Route::get('new_site/edit/{new_site}', \Modules\Admin\Livewire\Central\NewSiteCreateOrUpdate::class)->name('new_site.edit');
+
     });

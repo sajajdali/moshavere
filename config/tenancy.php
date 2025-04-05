@@ -11,16 +11,21 @@ return [
 
     'domain_model' => Domain::class,
 
+    'tenant_identification' => [
+        'default' => Stancl\Tenancy\Resolvers\DomainTenantResolver::class,
+    ],
     /**
      * The list of domains hosting your central app.
      *
      * Only relevant if you're using the domain or subdomain identification middleware.
      */
     'central_domains' => [
-        '127.0.0.1',
         'central.test',
-        'localhost',
+        'central.test:8000',
     ],
+
+
+
 
     /**
      * Tenancy bootstrappers are executed when tenancy is initialized.

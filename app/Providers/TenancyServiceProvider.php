@@ -148,13 +148,19 @@ class TenancyServiceProvider extends ServiceProvider
 
             // Step 2: Run each module's tenant-specific migrations
             foreach ($orderedModules as $module) {
-                $tenantMigrationPath = $module->getPath() . '/Database/Migrations/tenant';
+                $possiblePaths = [
+                    $module->getPath() . '/Database/Migrations/tenant',
+                    $module->getPath() . '/database/migrations/tenant',
+                ];
 
-                if (is_dir($tenantMigrationPath)) {
-                    Artisan::call('migrate', [
-                        '--path' => str_replace(base_path() . '/', '', $tenantMigrationPath),
-                        '--force' => true,
-                    ]);
+                foreach ($possiblePaths as $tenantMigrationPath) {
+                    if (is_dir($tenantMigrationPath)) {
+                        Artisan::call('migrate', [
+                            '--path' => str_replace(base_path() . '/', '', $tenantMigrationPath),
+                            '--force' => true,
+                        ]);
+                        break;
+                    }
                 }
             }
 

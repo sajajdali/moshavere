@@ -166,21 +166,34 @@ class TenancyServiceProvider extends ServiceProvider
 
             // Step 3: Seed each module's tenant-specific seeders
             foreach ($orderedModules as $module) {
-                $seederPath = $module->getPath() . '/Database/Seeders';
+                $possibleSeederPaths = [
+                    $module->getPath() . '/Database/Seeders',
+                    $module->getPath() . '/database/seeders',
+                    $module->getPath() . '/database/Seeders',
+                    $module->getPath() . '/Database/seeders',
+                ];
 
-                if (is_dir($seederPath)) {
-                    $seederFiles = glob($seederPath . '/*.php');
+                foreach ($possibleSeederPaths as $seederPath) {
+                    if (is_dir($seederPath)) {
+                        $seederFiles = glob($seederPath . '/*.php');
 
-                    foreach ($seederFiles as $seederFile) {
-                        $className = pathinfo($seederFile, PATHINFO_FILENAME);
-                        $fullClass = 'Modules\\' . $module->getName() . '\\Database\\Seeders\\' . $className;
+                        foreach ($seederFiles as $seederFile) {
+                            $className = pathinfo($seederFile, PATHINFO_FILENAME);
 
-                        if (class_exists($fullClass)) {
-                            Artisan::call('db:seed', [
-                                '--class' => $fullClass,
-                                '--force' => true,
-                            ]);
+                            $namespaceParts = explode('/', str_replace(base_path() . '/', '', $seederPath));
+                            $namespaceParts = array_map(fn($part) => ucfirst($part), $namespaceParts);
+                            $moduleNamespace = 'Modules\\' . $module->getName();
+                            $subNamespace = implode('\\', array_slice($namespaceParts, 2));
+                            $fullClass = $moduleNamespace . '\\' . $subNamespace . '\\' . $className;
+
+                            if (class_exists($fullClass)) {
+                                Artisan::call('db:seed', [
+                                    '--class' => $fullClass,
+                                    '--force' => true,
+                                ]);
+                            }
                         }
+                        break;
                     }
                 }
             }

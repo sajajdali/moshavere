@@ -41,6 +41,7 @@ enum SettingKeyEnum: int implements EnumHasNameInterface, SettingTypeInterface, 
     case APPOINTMENT_GALLERY_TITLE = 403;
     case APPOINTMENT_GALLERY_BODY = 404;
     case APPOINTMENT_ONLINE_DESCRPTION = 405;
+    case UI_NOW_SHOW_SEARCH_BAR = 406;
 
         // ABOUT US PAGE
     case ABOUT_US_FIRST_SECTION_TITLE = 23;
@@ -146,6 +147,7 @@ enum SettingKeyEnum: int implements EnumHasNameInterface, SettingTypeInterface, 
             self::APPOINTMENT_GALLERY_TITLE    => 'تیتر نمایش گالری پزشک',
             self::APPOINTMENT_GALLERY_BODY    => 'متن نمایش گالری پزشک',
             self::APPOINTMENT_ONLINE_DESCRPTION    => 'برای نوبت های آنلاین ، توضیحات قبل از دریافت نوبت',
+            self::UI_NOW_SHOW_SEARCH_BAR    => 'غیر بودن جست و جو در صفحه اصلی',
 
             // SMS
             self::SMS_API_TOKEN => 'توکن API پیامک',
@@ -302,6 +304,7 @@ enum SettingKeyEnum: int implements EnumHasNameInterface, SettingTypeInterface, 
             self::APP_FULL_APPOINTMENT_BODY => SettingTypeEnum::TEXTAREA,
             self::APPOINTMENT_GALLERY_BODY => SettingTypeEnum::TEXTAREA,
             self::APPOINTMENT_ONLINE_DESCRPTION => SettingTypeEnum::TEXTAREA,
+            self::UI_NOW_SHOW_SEARCH_BAR => SettingTypeEnum::CHECK,
             default => SettingTypeEnum::TEXT
         };
     }

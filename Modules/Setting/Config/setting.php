@@ -42,6 +42,8 @@ $setting = [
             \Modules\Setting\Enum\SettingKeyEnum::SITE_SECEND_SECTION_DESCRIPTION,
             \Modules\Setting\Enum\SettingKeyEnum::APPOINTMENT_GALLERY_TITLE,
             \Modules\Setting\Enum\SettingKeyEnum::APPOINTMENT_GALLERY_BODY,
+            \Modules\Setting\Enum\SettingKeyEnum::UI_NOW_SHOW_SEARCH_BAR,
+
         ],
     ],
     'appointment' => [

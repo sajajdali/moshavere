@@ -157,21 +157,17 @@
                                 </div>
                             @endif
                             <div class="form-row">
-                                <label for="password">تصویر کاربر</label>
-                                <div class="input-group">
-                                    <span class="input-group-btn">
-                                        <button data-for="userAvatar" data-variable="userAvatar"
-                                            class="btn btn-primary select_file" data-bs-target="#file-selector-modal"
-                                            data-bs-toggle="modal" type="button">
-                                            <i class="fa fa-picture-o"></i>
-                                            انتخاب تصویر
-                                        </button>
-                                    </span>
-                                    <input id="thumbnail" class="form-control" type="text" name="filepath"
-                                        wire:model="userAvatar">
+                                <div class="row mb-5 mt-3">
+                                    <x-admin.core.form.image-upload
+                                        label="عکس پروفایل"
+                                        uploadedPhotoUrl="{{ $uploadedPhotoUrl }}"
+                                        uploadedFileName="{{ $uploadedFileName }}"
+                                        uploadedFileType="{{ $uploadedFileType }}"
+                                        deleteAction="deleteFile"
+                                        model="photo"
+                                        id="fileUpload"
+                                    />
                                 </div>
-                                <img id="holder" style="margin-top:15px;max-height:100px;"
-                                    src="{{ $userAvatar }}" />
                             </div>
                             <br>
                             <button type="button" class="btn btn-primary"

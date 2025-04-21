@@ -2,8 +2,11 @@
 
 namespace Modules\User\Livewire\Admin\User;
 
+use App\trait\UploadFile;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
+use Illuminate\Support\Facades\Storage;
 use Livewire\Component;
+use Livewire\WithFileUploads;
 use Modules\Setting\Enum\SettingKeyEnum;
 use Modules\User\Entities\User;
 use Spatie\Permission\Models\Permission;
@@ -11,8 +14,11 @@ use Spatie\Permission\Models\Role;
 
 class UserCreateOrUpdate extends Component
 {
-    use AuthorizesRequests;
+    use AuthorizesRequests , WithFileUploads, UploadFile;
+    protected $filePath = 'users';
 
+
+    public array $form = [];
     public ?User $user = null;
 
     public string $userName = '';
@@ -69,6 +75,18 @@ class UserCreateOrUpdate extends Component
             //remove current user from supporter list
             unset($this->supportTeam[$this->user->id]);
             $this->supporter = $this->user?->supporter->pluck('id')->toArray() ?? [];
+
+
+            //  load  image
+            $path = $this->user->avatar ;
+            if ($path) {
+                $this->form['avatar'] = $this->user->avatar;
+                $this->uploadedPhotoUrl = Storage::disk('tenant')->url($path);
+                $this->uploadedFileName = basename($path);
+                $this->uploadedFileType = getFileIconClass(pathinfo($path, PATHINFO_EXTENSION));
+            } else {
+                $this->uploadedPhotoUrl = null;
+            }
         }
         if ($this->user === null && auth()->user()?->cannot('user')) {
             //append user own role to selected roles
@@ -126,9 +144,17 @@ class UserCreateOrUpdate extends Component
         if ($this->user === null) {
             $user->creator = auth()->id();
         }
-        if (!empty($this->userAvatar) && filter_var($this->userAvatar, FILTER_VALIDATE_URL)) {
-            $user->avatar = $this->userAvatar;
+
+
+        // مدیریت تصویر
+        if (!empty($this->form['photo'])) {
+            $finalPath = str_replace('temp/', '', $this->form['photo']);
+            Storage::disk('tenant')->move($this->form['photo'], $finalPath);
+            $modelCreateOrUpdate['icon'] = $finalPath;
+            $user->avatar = $finalPath;
         }
+
+
         $selectedPermitionForUser =  Role::where('id', $this->selectedRoles)?->get();
         if ($selectedPermitionForUser) {
             $selectedPermitionForUser->each(function ($rolse) use ($user) {

@@ -42,8 +42,19 @@ enum SettingKeyEnum: int implements EnumHasNameInterface, SettingTypeInterface, 
     case APPOINTMENT_GALLERY_BODY = 404;
     case APPOINTMENT_ONLINE_DESCRPTION = 405;
     case UI_NOW_SHOW_SEARCH_BAR = 406;
+    case ENABLE_CITY_SEARCH = 407;
+    case ENABLE_LATEST_DOCTORS = 408;
+    case ENABLE_HOME_FAQ = 409;
+    case ENABLE_MOST_VIEWED_SECTIONS = 410;
+    case DISABLE_FOOTER_DISPLAY = 411;
+    case SHOW_FLOATING_SOCIAL_ICONS = 412;
+    case WHATSAPP_ADDRESS = 413;
+    case ENABLE_DOCTOR_REGISTRATION = 414;
+    case FOOTER_ENAMAD = 415;
+    case    FOOTER_SAMANDEHI = 416;
 
-        // ABOUT US PAGE
+
+    // ABOUT US PAGE
     case ABOUT_US_FIRST_SECTION_TITLE = 23;
     case ABOUT_US_FIRST_SECTION_DESCRIPTION = 24;
     case ABOUT_US_SECEND_SECTION_TITLE = 25;
@@ -134,7 +145,9 @@ enum SettingKeyEnum: int implements EnumHasNameInterface, SettingTypeInterface, 
             self::APPOINTMENT_DESCRIPTION_IN_CHECKOUT_PAGE_REFUND    => 'توضیحات در صفحه قبل از تایید نوبت توس کاربر(checkout)',
             self::APPOINTMENT_MORE_THAT_ONE_PER_DAY    => 'امکان رزرو بیشتر از یک نوبت در هر روز برای هر بیمار',
             self::FOOTER_DESCRIPTION    => 'توضیحات در فورتر سایت',
-            self::INSTAGRAM_ADDRESS    => 'ادرس صفحه ی ابنتساگرام شما به صورت :https://www.instagram.com/shemiranweb/ ',
+            self::INSTAGRAM_ADDRESS    => 'ادرس صفحه ی ابنتساگرام شما: ',
+            self::WHATSAPP_ADDRESS    => 'ادرس صفحه ی واتس آپ شما: ',
+            self::ENABLE_DOCTOR_REGISTRATION    => 'فعال بودن ثبت نام پزشک: ',
             self::TELEGRAM_ADDRESS    => 'ادرس تلگرام شما ',
             self::SHOW_FALSE_APPOINTMENT_STATUS    => 'نمایش ساعت های پر شده در لیست ساعت ها به کاربران',
             self::SITE_FIRST_SECTION_TITLE    => 'عنوان بخش اول در صفحه ی اصلی(عنوان پیشنهادی: ویزیت فوری)',
@@ -145,9 +158,17 @@ enum SettingKeyEnum: int implements EnumHasNameInterface, SettingTypeInterface, 
             self::APPOINTMENT_DETAIL_PAYMENT_DESCRIPTION_TEXT    => 'متن توضیحات در صفحه ی جزئیات نوبت که مربوط به پرداخت میباشد ',
             self::APPOINTMENT_SHOW_FALSE_STATUS_DAYS    => 'در قسمت دریافت نوبت ، روز هایی که تمامی نوبت آنها پر هست به کاربر نمایش دهد',
             self::APPOINTMENT_GALLERY_TITLE    => 'تیتر نمایش گالری پزشک',
+            self::FOOTER_ENAMAD    => 'ای نماد (لینک کامل درج شود)',
+            self::FOOTER_SAMANDEHI    => 'نماد سامان دهی (لینک کامل درج شود)',
             self::APPOINTMENT_GALLERY_BODY    => 'متن نمایش گالری پزشک',
             self::APPOINTMENT_ONLINE_DESCRPTION    => 'برای نوبت های آنلاین ، توضیحات قبل از دریافت نوبت',
             self::UI_NOW_SHOW_SEARCH_BAR    => 'غیر بودن جست و جو در صفحه اصلی',
+            self::ENABLE_CITY_SEARCH    => 'فعال  بودن جست و جو بر اساس شهر',
+            self::ENABLE_LATEST_DOCTORS    => 'فعال بودن جدید ترین پزشکان صفحه اصلی',
+            self::ENABLE_HOME_FAQ    => 'فعال بودن سوالات متداول صفحه اصلی',
+            self::ENABLE_MOST_VIEWED_SECTIONS    => 'فعال بودن پربازدید ترین بخش ها',
+            self::DISABLE_FOOTER_DISPLAY    => 'غیر فعال شدن فوتر',
+            self::SHOW_FLOATING_SOCIAL_ICONS    => 'نمایش ایکون های اینستاگرام و واتس اپ به صورت شناور',
 
             // SMS
             self::SMS_API_TOKEN => 'توکن API پیامک',
@@ -235,6 +256,10 @@ enum SettingKeyEnum: int implements EnumHasNameInterface, SettingTypeInterface, 
              <br/> ۸ = شماره پیگیری
              ',
             self::SMS_APPROVED_MONITORING_APPOINTMENT => 'در صورت فعال بودن پایش نوبت ، و تغییر وضعیت نوبت به در انتظار پرداخت(تایید نوبت) این پیامک برای کاربر ارسال میشود',
+            self::INSTAGRAM_ADDRESS => 'آدرس باید به این صورت وارد شد https://www.instagram.com/shemiranweb/',
+            self::WHATSAPP_ADDRESS => 'آدرس باید به این صورت وارد شد https://wa.me/090000000',
+            self::FOOTER_ENAMAD => 'ادرس url فقط درج شود نه تگ کامل ',
+            self::FOOTER_SAMANDEHI => 'ادرس url فقط درج شود نه تگ کامل ',
             default => ''
         };
     }
@@ -302,9 +327,9 @@ enum SettingKeyEnum: int implements EnumHasNameInterface, SettingTypeInterface, 
             self::ABOUT_US_THIRD_SECTION_DESCRIPTION => SettingTypeEnum::TEXTAREA,
             self::ABOUT_US_FOURTH_SECTION_DESCRIPTION => SettingTypeEnum::TEXTAREA,
             self::APP_FULL_APPOINTMENT_BODY => SettingTypeEnum::TEXTAREA,
-            self::APPOINTMENT_GALLERY_BODY => SettingTypeEnum::TEXTAREA,
+            self::APPOINTMENT_GALLERY_BODY, self::FOOTER_ENAMAD ,  self::FOOTER_SAMANDEHI => SettingTypeEnum::TEXTAREA,
             self::APPOINTMENT_ONLINE_DESCRPTION => SettingTypeEnum::TEXTAREA,
-            self::UI_NOW_SHOW_SEARCH_BAR => SettingTypeEnum::CHECK,
+            self::UI_NOW_SHOW_SEARCH_BAR , self::ENABLE_CITY_SEARCH , self::ENABLE_LATEST_DOCTORS , self::ENABLE_HOME_FAQ , self::ENABLE_MOST_VIEWED_SECTIONS , self::ENABLE_DOCTOR_REGISTRATION , self::SHOW_FLOATING_SOCIAL_ICONS , self::DISABLE_FOOTER_DISPLAY=> SettingTypeEnum::CHECK,
             default => SettingTypeEnum::TEXT
         };
     }

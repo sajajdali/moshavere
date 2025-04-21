@@ -15,17 +15,17 @@
                 </li>
                 @unless(disableUi())
 
-                <li class="navbar__menu-item">
-                    <a href="{{ route('front.aboutUs') }}">درباره ما</a>
-                </li>
-                <li class="navbar__menu-item">
-                    <a href="{{ route('front.contactUs') }}">درخواست مشاوره</a>
-                </li>
+{{--                <li class="navbar__menu-item">--}}
+{{--                    <a href="{{ route('front.aboutUs') }}">درباره ما</a>--}}
+{{--                </li>--}}
+{{--                <li class="navbar__menu-item">--}}
+{{--                    <a href="{{ route('front.contactUs') }}">درخواست مشاوره</a>--}}
+{{--                </li>--}}
                 <li class="navbar__menu-item">
                     <a href="{{route('front.searchPage',['query' => 'پزشکان'])}}">لیست پزشکان</a>
                 </li>
                 <li class="navbar__menu-item">
-                    <a href="{{ route('front.contactUs') }}">ثبت شکایات</a>
+                    <a href="{{ route('front.contactUs') }}">ارتباط با ما</a>
                 </li>
                 @endunless
             </ul>

@@ -50,7 +50,7 @@ class MigrateUserMetasCommand extends Command
                     'user_id' => $data->user_id,
                     'meta_value' => $metavalue,
                 ];
-                DB::connection('mysql')->table('user_metas')->insert($newData);
+                DB::connection('new_mysql')->table('user_metas')->insert($newData);
             }
         }
         $this->info('users meta  migration completed successfully.');

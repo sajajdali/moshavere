@@ -54,7 +54,7 @@ class MigrateUsersCommand extends Command
                 'remember_token' => $data->remember_token ?? '',
                 // Add more transformations as needed
             ];
-            DB::connection('mysql')->table('users')->insert($newData);
+            DB::connection('new_mysql')->table('users')->insert($newData);
         }
         $this->info('users migration completed successfully.');
     }
@@ -80,7 +80,7 @@ class MigrateUsersCommand extends Command
                 'model_type' => 'Modules\User\Entities\User',
                 'model_id' => $userRole->model_id,
             ];
-            DB::connection('mysql')->table('model_has_roles')->insert($newUserRole);
+            DB::connection('new_mysql')->table('model_has_roles')->insert($newUserRole);
         }
         $this->info("roled has been assigned");
     }

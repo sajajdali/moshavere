@@ -50,7 +50,7 @@ class MigrateServiceseCommand extends Command
             ];
 
             // Insert the transformed data into the new database
-            DB::connection('mysql')->table('services')->insert($newData);
+            DB::connection('new_mysql')->table('services')->insert($newData);
         }
 
         $this->info('service migration completed successfully.');

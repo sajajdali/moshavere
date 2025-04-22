@@ -67,9 +67,9 @@ class MigrateAppointmentSetting extends Command
             ];
 
             // Insert the transformed data into the new database and get the new ID
-            $newId = DB::connection('mysql')->table('appointment_settings')->insertGetId($newData);
+            $newId = DB::connection('new_mysql')->table('appointment_settings')->insertGetId($newData);
             // Retrieve the newly created record
-            $appointment_setting = DB::connection('mysql')->table('appointment_settings')->find($newId);
+            $appointment_setting = DB::connection('new_mysql')->table('appointment_settings')->find($newId);
 
             $this->insertTimes($appointment_setting->id, $data);
             $this->segmnents($appointment_setting->id, $data);

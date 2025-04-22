@@ -45,7 +45,7 @@ class MigrateSpecialiteiesCommand extends Command
                 'updated_at' => $data->updated_at,
                 // Add more transformations as needed
             ];
-            DB::connection('mysql')->table('specialities')->insert($newData);
+            DB::connection('new_mysql')->table('specialities')->insert($newData);
         }
 
         $this->info('specialities migrate successfully.');

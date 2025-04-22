@@ -49,7 +49,7 @@ class MigratePlacesCommand extends Command
             ];
 
             // Insert the transformed data into the new database
-            DB::connection('mysql')->table('places')->insert($newData);
+            DB::connection('new_mysql')->table('places')->insert($newData);
         }
 
         $this->info($oldData->count() . ' place migration completed successfully.');

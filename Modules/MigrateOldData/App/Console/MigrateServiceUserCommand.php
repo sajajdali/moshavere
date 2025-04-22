@@ -44,7 +44,7 @@ class MigrateServiceUserCommand extends Command
                     'user_id' => $data->user_id,
                 ];
                 // Insert the transformed data into the new database
-                DB::connection('mysql')->table('service_user')->insert($newData);
+                DB::connection('new_mysql')->table('service_user')->insert($newData);
             }
         }
 

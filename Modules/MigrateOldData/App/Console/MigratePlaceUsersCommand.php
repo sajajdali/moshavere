@@ -43,7 +43,7 @@ class MigratePlaceUsersCommand extends Command
                     'place_id' => $data->appointment_office_id,
                 ];
                 // Insert the transformed data into the new database
-                DB::connection('mysql')->table('place_user')->insert($newData);
+                DB::connection('new_mysql')->table('place_user')->insert($newData);
              }
          }
 

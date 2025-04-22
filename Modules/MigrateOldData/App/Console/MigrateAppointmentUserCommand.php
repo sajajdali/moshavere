@@ -62,7 +62,7 @@ class MigrateAppointmentUserCommand extends Command
                     'details' => $this->convertDetails(),
                 ];
                 // Insert the transformed data into the new database
-                DB::connection('mysql')->table('appointment_users')->insert($newData);
+                DB::connection('new_mysql')->table('appointment_users')->insert($newData);
             }
         }
         $this->info('appointment user transfered successfuly.');

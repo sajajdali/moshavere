@@ -73,7 +73,7 @@ return [
             'unix_socket' => env('NEW_DB_SOCKET', ''),
             'charset' => 'utf8mb4',
             'collation' => 'utf8mb4_unicode_ci',
-            'prefix' => 'selp_',
+            'prefix' => 'shw_',
             'prefix_indexes' => true,
             'strict' => true,
             'engine' => null,

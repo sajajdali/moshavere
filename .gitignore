@@ -38,3 +38,5 @@ modules_statuses.json
 /storage/framework
 /public/uploads
 /storage/debugbar/
+/storage/appointmentv4_*
+/storage/appointmentv4_nobat1/

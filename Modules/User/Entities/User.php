@@ -415,4 +415,15 @@ class User extends Authenticatable
         ->whereJsonContains('detail', [AppointmentSetting::VISIT_TYPE_ONLINE => true])
             ->exists();
     }
+
+    public function getUserAvatar() :string {
+        if(isset($this->avatar)) {
+            if (\Illuminate\Support\Str::startsWith($this->avatar, 'http')) {
+                return $this->avatar;
+            }else{
+                return url('storage/'.$user->avatar) ;
+            }
+        }
+        return asset('assets/admin/images/svgs/user.svg') ;
+    }
 }

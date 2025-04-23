@@ -174,7 +174,7 @@
                                                                     <img alt="{{ $user->full_name }}"
                                                                         title="{{ $user->full_name }}"
                                                                         class="rounded-circle avatar-md"
-                                                                        src="{{ $user->avatar ? url('storage/'.$user->avatar) : asset('assets/admin/images/svgs/user.svg') }}">
+                                                                        src="{{ $user->getUserAvatar()}}">
                                                                 </a>
                                                             </div>
                                                         </div>

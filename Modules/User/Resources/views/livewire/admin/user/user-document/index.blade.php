@@ -66,7 +66,7 @@
                         <div class="col-lg-12">
                             <div class="table-responsive">
                                 <table class="table border  text-md-nowrap ">
-                                    <thead >
+                                    <thead>
                                         <tr class="text-center">
                                             <th>بخش</th>
                                             <th>مطب</th>
@@ -90,17 +90,20 @@
                                                         </div>
                                                     </td>
                                                     <td>
-
                                                         {{ $appointment->kind->getName() }}
-                                                        @if ($appointment->getUnseenMessageBadge() > 0)
-                                                        <a class="bg-red text-white p-2 rounded-pill small"
-                                                            href="{{ route('admin.appointment_user.message.detail', ['onlineAppId' => $appointment->online->first()->id]) }}">
-                                                            {{ $appointment->getUnseenMessageBadge() }} پیام
-                                                            جدید
-                                                        </a>
-                                                        @else
-                                                        <a class="bg-warning text-dark p-2 rounded-pill small"  href="{{ route('admin.appointment_user.message.detail', ['onlineAppId' => $appointment->online->first()->id]) }}"> مشاهده چت</a>
-                                                    @endif
+                                                        @if ($appointment->isOnline())
+                                                            @if ($appointment->getUnseenMessageBadge() > 0)
+                                                                <a class="bg-red text-white p-2 rounded-pill small"
+                                                                    href="{{ route('admin.appointment_user.message.detail', ['onlineAppId' => $appointment->online->first()->id]) }}">
+                                                                    {{ $appointment->getUnseenMessageBadge() }} پیام
+                                                                    جدید
+                                                                </a>
+                                                            @else
+                                                                <a class="bg-warning text-dark p-2 rounded-pill small"
+                                                                    href="{{ route('admin.appointment_user.message.detail', ['onlineAppId' => $appointment->online->first()?->id]) }}">
+                                                                    مشاهده چت</a>
+                                                            @endif
+                                                        @endif
                                                     </td>
                                                     <td>{{ verta($appointment->date_visit)->format('Y-m-d') }}</td>
                                                     <td>

@@ -9,7 +9,7 @@ return [
          * The default configurations to be used by the meta generator.
          */
         'defaults'       => [
-            'title'        => "پزشکم", // set false to total remove
+            'title'        => "", // set false to total remove
             'titleBefore'  => false, // Put defaults.title before page title, like 'It's Over 9000! - Dashboard'
             'description'  => 'پزشکم، سامانه نوبت‌دهی آنلاین پزشکان، کلینیک‌ها و بیمارستان‌ها. سریع و آسان پزشک موردنظر خود را جستجو کنید و نوبت بگیرید.', // set false to total remove
             'separator'    => ' - ',
@@ -53,7 +53,7 @@ return [
          */
         'defaults' => [
             'title'        => "پزشکم", // set false to total remove
-            'description'  => 'پزشکم، سامانه نوبت‌دهی آنلاین پزشکان، کلینیک‌ها و بیمارستان‌ها. سریع و آسان پزشک موردنظر خود را جستجو کنید و نوبت بگیرید.', 
+            'description'  => 'پزشکم، سامانه نوبت‌دهی آنلاین پزشکان، کلینیک‌ها و بیمارستان‌ها. سریع و آسان پزشک موردنظر خود را جستجو کنید و نوبت بگیرید.',
             'url'         => false, // Set null for using Url::current(), set false to total remove
             'type'        => false,
             'site_name'   => false,
@@ -75,7 +75,7 @@ return [
          */
         'defaults' => [
             'title'        => "پزشکم", // set false to total remove
-            'description'  => 'پزشکم، سامانه نوبت‌دهی آنلاین پزشکان، کلینیک‌ها و بیمارستان‌ها. سریع و آسان پزشک موردنظر خود را جستجو کنید و نوبت بگیرید.', 
+            'description'  => 'پزشکم، سامانه نوبت‌دهی آنلاین پزشکان، کلینیک‌ها و بیمارستان‌ها. سریع و آسان پزشک موردنظر خود را جستجو کنید و نوبت بگیرید.',
             'url'         => 'full', // Set to null or 'full' to use Url::full(), set to 'current' to use Url::current(), set false to total remove
             'type'        => 'WebPage',
             'images'      => [

@@ -212,6 +212,7 @@ class DoctorProfileLivewire extends Component
             $place = Place::where('active', ActiveEnum::ACTIVE)->where('id', $santetizeService)->first() ?? null;
             if (isset($place) && !empty($place)) {
                 $this->form['place'] = $place->id;
+                $this->form['place_id'] = $place->id;
                 $this->form['place_name'] = $place->title;
                 $this->fetchData['services'] = $this->doc->activeServices();
                 $this->fetchData['modalStep'] = 2;
@@ -343,6 +344,10 @@ class DoctorProfileLivewire extends Component
             return true;
         }
         return false;
+    }
+    public function editservice() {
+        unset($this->fetchData['segments']);
+        unset($this->form['service'] );
     }
     public function mount()
     {

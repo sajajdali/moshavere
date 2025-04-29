@@ -30,13 +30,15 @@ class CacheJob implements ShouldQueue
      */
     public function handle(): void
     {
-        $cacheName = 'appointmentList.'.$this->appointmentSetting->id;
-        Cache::forget($cacheName);
-        Cache::rememberForever($cacheName, function () {
-            return app('AppointmentUserService')->listAppointments($this->appointmentSetting);
-        });
-        $this->appointmentSetting->update([
-            'updated_log_at' => Carbon::now()
-        ]);
+        if (! app()->environment('local')){
+            $cacheName = 'appointmentList.'.$this->appointmentSetting->id;
+            Cache::forget($cacheName);
+            Cache::rememberForever($cacheName, function () {
+                return app('AppointmentUserService')->listAppointments($this->appointmentSetting);
+            });
+            $this->appointmentSetting->update([
+                'updated_log_at' => Carbon::now()
+            ]);
+        }
     }
 }

@@ -122,7 +122,7 @@ class ShowAvailableDayForDoctor extends Component
             foreach ($monthWithAppointment as $month => $appointments) {
 
                 foreach ($appointments as $day => $appointment) {
-                    if ((Carbon::parse($appointment['day_number_gmt'])->setTime(00,00,00)->lt(Carbon::now()->addDays($mainDaActive)->setTime(00,00,00)))) {
+                    if ((Carbon::parse($appointment['day_number_gmt'])->setTime(00, 00, 00)->lt(Carbon::now()->addDays($mainDaActive)->setTime(00, 00, 00)))) {
                         // check min day active
                         continue;
                     }
@@ -148,21 +148,27 @@ class ShowAvailableDayForDoctor extends Component
                     if ($date_to_check->gt($last_activeDay)) {
                         break 3;
                     }
-                    if($DaysDisplayed > $maxDay) {
-                        break 3 ;
+                    if ($DaysDisplayed > $maxDay) {
+                        break 3;
                     }
                     $DaysDisplayed++;
                     foreach ($appointment['times'] as $increment =>  $time) {
-                        $checkIfTimePass = false ;
-                        if($time['status']){
-                            $checkIfTimePass = Carbon::CreateFromTimeStamp($time['timestamp'],'Asia/Tehran')->isFuture();
+                        $checkIfTimePass = false;
+                        if ($time['status']) {
+                            $timeToCheck = Carbon::CreateFromTimeStamp($time['timestamp'], 'Asia/Tehran');
+                            $isToday = $timeToCheck->copy()->isToday();
+                            if ($isToday) {
+                                $checkIfTimePass = $timeToCheck->copy()->gt(now()->addHours(3));
+                            } else {
+                                $checkIfTimePass = $timeToCheck->isFuture();
+                            }
                         }
                         if ($time['status'] && $checkIfTimePass) {
                             $result[$dayNumber][] = [
                                 'status' => true,
-                                'day_of_week_name' =>  verta()->formatDifference(),
+                                'day_of_week_name'    =>  verta()->formatDifference(),
                                 'day_name'            =>  verta($dayNumber)->format('l'),
-                                'date_of_month'    =>  verta($dayNumber)->format('%d %B'),
+                                'date_of_month'       =>  verta($dayNumber)->format('%d %B'),
                                 'time_stamp' => Carbon::parse($dayNumber)->setTimeFromTimeString($time['from'])->timestamp,
                                 'from' => substr($time['from'], 0, 5),
                                 'until' => substr($time['until'], 0, 5),
@@ -179,15 +185,16 @@ class ShowAvailableDayForDoctor extends Component
                     // delete the day if all the status are false
                     // $checkForFalse = collect($result[$dayNumber]);
                     // $isStatusFalse = $checkForFalse->every(function ($appointment) {
-                    //     return $appointment['status'] == false;
+                        //     return $appointment['status'] == false;
                     // });
                     // if ($isStatusFalse) {
-                    //     unset($result[$dayNumber]);
-                    //     $DaysDisplayed = $DaysDisplayed - 1;
-                    // }
+                        //     unset($result[$dayNumber]);
+                        //     $DaysDisplayed = $DaysDisplayed - 1;
+                        // }
+                    }
                 }
             }
-        }
+            // dd($result);
         $dates = array_keys($result);
         // Get the last date
         $this->fetchData['lastDate'] = Carbon::parse(end($dates));
@@ -198,7 +205,7 @@ class ShowAvailableDayForDoctor extends Component
     {
         $appointmentSetting = AppointmentSetting::activeSetting()->where('service_id', $this->fetchData['service']->id)
             ->where('place_id', $this->fetchData['places']->id)
-            ->where('user_id', $this->fetchData['doc'])
+            ->where('user_id', $this->fetchData['doc']->id)
             ->first();
         //check for general setting
         if (!isset($appointmentSetting)) {
@@ -214,10 +221,15 @@ class ShowAvailableDayForDoctor extends Component
                 Cache::forget('appointmentList.' . $appointmentSetting->id);
             }
             // if segmen whouldnt exists , load the days from log
-            $listOfAppointment = Cache::rememberForever('appointmentList.' . $appointmentSetting->id, function () use ($appointmentSetting) {
+            if (app()->environment('local')) {
                 $appointmentSetting->update(['updated_log_at' => \now()]);
-                return app('AppointmentUserService')->listAppointments($appointmentSetting);
-            });
+                $listOfAppointment = app('AppointmentUserService')->listAppointments($appointmentSetting);
+            } else {
+                $listOfAppointment = Cache::rememberForever('appointmentList.' . $appointmentSetting->id, function () use ($appointmentSetting) {
+                    $appointmentSetting->update(['updated_log_at' => \now()]);
+                    return  app('AppointmentUserService')->listAppointments($appointmentSetting);
+                });
+            }
         }
         $this->fetchData['appointmentSetting'] = $appointmentSetting;
         $this->fetchData['rawlistOfAppointment'] = $listOfAppointment;

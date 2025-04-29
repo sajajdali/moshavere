@@ -1,10 +1,17 @@
 <section class="appointment__modal max-h-min" wire:ignore.self>
     <header class="appointment__modal-header  ">
         @if ($fetchData['modalStep'] == 2)
+            @isset($fetchData['segments'])
+            <button type="button" wire:click='editservice'
+                class="bg-white hover:bg-sky-100 hover:text-gray-700 border-2 border-blue-100 text-sky-400 flex items-center py-3 px-5 rounded-xl gap-3">
+                <span>ویرایش بخش</span>
+            </button>
+            @else
             <button type="button" wire:click='editPlace'
                 class="bg-white hover:bg-sky-100 hover:text-gray-700 border-2 border-blue-100 text-sky-400 flex items-center py-3 px-5 rounded-xl gap-3">
                 <span>ویرایش مطب</span>
             </button>
+            @endisset
         @elseif($fetchData['modalStep'] == 1)
             <span></span>
         @endif
@@ -35,10 +42,11 @@
                 </div>
             </div>
         @elseif($fetchData['modalStep'] == 2)
-            <div class="space-y-3">
+            <div class="space-y-3 @isset($fetchData['segments'])  hidden @endisset">
                 <div class="w-full flex justify-center">
                     <p class=" text-xl font-semibold">مطب :
-                        <a wire:click='editPlace' class="text-blue-400 hover:text-blue-700 cursor-pointer">{{ $form['place_name'] }}</a>
+                        <a wire:click='editPlace'
+                            class="text-blue-400 hover:text-blue-700 cursor-pointer">{{ $form['place_name'] }}</a>
                     </p>
                 </div>
                 <p class="font-semibold">لطفا بخش مورد نظر خود را امتخاب کنید</p>

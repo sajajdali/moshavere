@@ -37,8 +37,7 @@ class HomePageLivewire extends Component
     {
         //    Define a unique cache key
         $cacheKey = 'Introduction_doctors';
-        //    Attempt to get the data from the cache
-        return Cache::rememberForever($cacheKey,  function () {
+        if (app()->environment('local')) {
             return   User::introductionDoctors()->get()->filter(function ($doc) {
                 if ($doc->services()->exists() && $doc->places()->exists() && $doc->appointmentSettings()->exists()) {
                     return true;
@@ -48,7 +47,19 @@ class HomePageLivewire extends Component
             })->sortBy(function ($model) {
                 return $model->dr_info_order;
             });
-        });
+        } else {
+            return Cache::rememberForever($cacheKey,  function () {
+                return   User::introductionDoctors()->get()->filter(function ($doc) {
+                    if ($doc->services()->exists() && $doc->places()->exists() && $doc->appointmentSettings()->exists()) {
+                        return true;
+                    } else {
+                        return false;
+                    };
+                })->sortBy(function ($model) {
+                    return $model->dr_info_order;
+                });
+            });
+        }
     }
     private function emergencyDoctors()
     {
@@ -56,7 +67,7 @@ class HomePageLivewire extends Component
         // Define a unique cache key
         $cacheKey = 'emergency_doctors';
         // Attempt to get the data from the cache
-        return  Cache::rememberForever($cacheKey, function () {
+        if (app()->environment('local')) {
             return User::emergencyDoctors()->get()->filter(function ($doc) {
                 if ($doc->services()->exists() && $doc->places()->exists() && $doc->appointmentSettings()->exists()) {
                     return true;
@@ -66,7 +77,19 @@ class HomePageLivewire extends Component
             })->sortBy(function ($model) {
                 return $model->dr_emergencyvisit_order;
             });
-        });
+        } else {
+            return  Cache::rememberForever($cacheKey, function () {
+                return User::emergencyDoctors()->get()->filter(function ($doc) {
+                    if ($doc->services()->exists() && $doc->places()->exists() && $doc->appointmentSettings()->exists()) {
+                        return true;
+                    } else {
+                        return false;
+                    };
+                })->sortBy(function ($model) {
+                    return $model->dr_emergencyvisit_order;
+                });
+            });
+        }
     }
     private function getNewestDoc()
     {
@@ -109,12 +132,16 @@ class HomePageLivewire extends Component
         $this->fetchData['introductionDoctors'] = $this->getIntrudoceDocList();
         $this->fetchData['newestDocs']          = $this->getNewestDoc();
         $this->fetchData['faqs'] = Faq::all();
-        $this->fetchData['comments'] = Cache::rememberForever('homepageComments', function () {
-            return Comment::where('status', CommentStatusEnum::ACCEPTED)->where('show_in_homePage', CommentShowHomePage::SHOW)->get()->take(4);
-        });
-        $this->fetchData['province'] =  cache::rememberForever('front.provinces', function () {
-            return  Province::all();
-        });
+        if (app()->environment('local')) {
+            $this->fetchData['comments'] = Comment::where('status', CommentStatusEnum::ACCEPTED)
+                ->where('show_in_homePage', CommentShowHomePage::SHOW)->get()->take(4);
+        } else {
+            $this->fetchData['comments'] = Cache::rememberForever('homepageComments', function () {
+                Comment::where('status', CommentStatusEnum::ACCEPTED)->where('show_in_homePage', CommentShowHomePage::SHOW)->get()->take(4);
+            });
+        }
+        $this->fetchData['province'] =
+            Province::all();
     }
     public function render()
     {

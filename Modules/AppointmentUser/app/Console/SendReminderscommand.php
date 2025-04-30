@@ -38,8 +38,7 @@ class SendReminderscommand extends Command
     {
         Log::info('sendReminder connsole has been called');
         // sms reminder
-        AppointmentReminder::where('type', '1')
-            ->where('send_at', '<', \now()->subhours(4))
+        AppointmentReminder::where('send_at', '<', \now()->subhours(4))
             ->delete();
         $reminders =  AppointmentReminder::where('type', '1')
             ->whereHas('appointmentUser', function ($q) {

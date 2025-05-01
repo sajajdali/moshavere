@@ -1,21 +1,15 @@
-<div>
-    <div class="form-row">
-        <label for="thumbnail">{{ $meta->getName() }}</label>
-        <div class="input-group">
-            <span class="input-group-btn">
-                <a id="select_image_{{ $meta->value }}" data-input="thumbnail_{{ $meta->value }}"
-                    data-id = "{{ $meta->value }}" data-bs-target="#file-selector-modal" data-bs-toggle="modal"
-                    class="btn btn-primary image_handler select_file">
-                    <i class="fa fa-picture-o"></i> انتخاب تصویر
-                </a>
-            </span>
-            <input id="thumbnail_{{ $meta->value }}" class="form-control image_input_change" type="text"   data-id = "{{ $meta->value }}"
-                value="{{ $image }}" name="nolocal">
-        </div>
-        @if ($image !== null)
-            <div id="preview-{{ $meta->value }}" style="margin-top:15px;max-height:100px;">
-                <img src="{{ $image }}" style="height: 100%">
-            </div>
-        @endif
-    </div>
+<div class="form-group mb-4">
+    <x-admin.core.form.image-upload
+        label="{{ $meta->getName() }}"
+        uploadedPhotoUrl="{{ $uploadedPhotoUrl }}"
+        uploadedFileName="{{ $uploadedFileName }}"
+        uploadedFileType="{{ $uploadedFileType }}"
+        deleteAction="deleteFile"
+        model="photo"
+        id="setting_file_{{ $meta->value }}"
+    />
+
+    @if ($meta->getDescription())
+        <small class="text-muted d-block mt-2">{!! $meta->getDescription() !!}</small>
+    @endif
 </div>

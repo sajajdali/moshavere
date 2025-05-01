@@ -6,6 +6,11 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\File;
 use Modules\Front\enum\FeedbackId;
 
+
+function assetStorage($link)
+{
+    return asset('storage/'.$link);
+}
 function getCurrentSeason()
 {
     $month = \Carbon\Carbon::now()->format('n');

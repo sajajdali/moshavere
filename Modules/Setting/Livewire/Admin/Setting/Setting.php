@@ -2,10 +2,12 @@
 
 namespace Modules\Setting\Livewire\Admin\Setting;
 
+use App\trait\UploadFile;
 use Livewire\Attributes\On;
 use Livewire\Attributes\Title;
 use Livewire\Attributes\Url;
 use Livewire\Component;
+use Livewire\WithFileUploads;
 
 #[title('تنظیمات سایت')]
 class Setting extends Component
@@ -18,6 +20,7 @@ class Setting extends Component
     public ?array $menuSections = null;
 
     public array $settingValues;
+
 
     #[On('settingUpdateListener')]
     public function settingUpdateListener(int $settingKey, mixed $value): void

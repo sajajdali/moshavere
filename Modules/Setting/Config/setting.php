@@ -50,11 +50,32 @@ $setting = [
             \Modules\Setting\Enum\SettingKeyEnum::ENABLE_LATEST_DOCTORS,
             \Modules\Setting\Enum\SettingKeyEnum::ENABLE_HOME_FAQ,
             \Modules\Setting\Enum\SettingKeyEnum::ENABLE_MOST_VIEWED_SECTIONS,
+            \Modules\Setting\Enum\SettingKeyEnum::MOST_VIEWED_SECTIONS_ICONS_VIEW,
             \Modules\Setting\Enum\SettingKeyEnum::DISABLE_FOOTER_DISPLAY,
             \Modules\Setting\Enum\SettingKeyEnum::SHOW_FLOATING_SOCIAL_ICONS,
             \Modules\Setting\Enum\SettingKeyEnum::ENABLE_DOCTOR_REGISTRATION,
 
         ],
+    ],
+    'header' => [
+        'title' => 'تنظیمات هدر',
+        'icon' => 'fa fa-header',
+        'settings' => [
+            \Modules\Setting\Enum\SettingKeyEnum::ENABLE_DOCTORS_MENU,
+            \Modules\Setting\Enum\SettingKeyEnum::ENABLE_CONTACT_US_MENU,
+            \Modules\Setting\Enum\SettingKeyEnum::ACTIVE_HEADER,
+            \Modules\Setting\Enum\SettingKeyEnum::HEADER1_IMAGE,
+            \Modules\Setting\Enum\SettingKeyEnum::HEADER1_TITLE1,
+            \Modules\Setting\Enum\SettingKeyEnum::HEADER1_TITLE2,
+//            \Modules\Setting\Enum\SettingKeyEnum::HEADER1_SHOW_BUTTONS,
+            \Modules\Setting\Enum\SettingKeyEnum::HEADER1_SHOW_BUTTON1,
+            \Modules\Setting\Enum\SettingKeyEnum::HEADER1_BUTTON_TITLE1,
+            \Modules\Setting\Enum\SettingKeyEnum::HEADER1_BUTTON_HREF1,
+            \Modules\Setting\Enum\SettingKeyEnum::HEADER1_SHOW_BUTTON2,
+            \Modules\Setting\Enum\SettingKeyEnum::HEADER1_BUTTON_TITLE2,
+            \Modules\Setting\Enum\SettingKeyEnum::HEADER1_BUTTON_HREF2,
+
+        ]
     ],
     'appointment' => [
         'title' => 'نوبت دهی',

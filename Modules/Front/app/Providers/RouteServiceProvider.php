@@ -52,12 +52,18 @@ class RouteServiceProvider extends ServiceProvider
     }
     protected function maplivewireRoutes(): void
     {
+        $host = request()->getHost();
+        $tenantId = \App\Models\Domain::where('domain' , $host)->first()?->tenant_id;
+
+        $tenantRoutePath = module_path('Front', 'Tenants/'.$tenantId.'/routes/livewire.php');
+        $defaultRoutes = module_path('Front', '/routes/livewire.php');
+
         Route::middleware([
             'web',
             InitializeTenancyByDomain::class,
             PreventAccessFromCentralDomains::class,
         ])
-            ->group(module_path('Front', '/routes/livewire.php'));
+            ->group(file_exists($tenantRoutePath) ? $tenantRoutePath : $defaultRoutes);
     }
     protected function mapAdminRoutes(): void
     {

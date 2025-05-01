@@ -2,11 +2,7 @@
     @include('front::layouts.components.app-sidebar')
 
     {{-- اسلایدر اصلی --}}
-    @if(setting(\Modules\Setting\Enum\SettingKeyEnum::ACTIVE_HEADER) == null || setting(\Modules\Setting\Enum\SettingKeyEnum::ACTIVE_HEADER) == 'search_header')
-        @include('front::components.homepage.mainslider')
-    @elseif(setting(\Modules\Setting\Enum\SettingKeyEnum::ACTIVE_HEADER) == 'image_header')
-        @include('front::components.homepage.headers.header1')
-    @endif
+    @include('front::components.homepage.mainslider')
 
     {{-- پربازدید ترین بخش ها --}}
     @if(setting(\Modules\Setting\Enum\SettingKeyEnum::ENABLE_MOST_VIEWED_SECTIONS))

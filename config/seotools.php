@@ -9,9 +9,9 @@ return [
          * The default configurations to be used by the meta generator.
          */
         'defaults'       => [
-            'title'        => "", // set false to total remove
+            'title'        => "سامانه نوبت دهی", // set false to total remove
             'titleBefore'  => false, // Put defaults.title before page title, like 'It's Over 9000! - Dashboard'
-            'description'  => 'پزشکم، سامانه نوبت‌دهی آنلاین پزشکان، کلینیک‌ها و بیمارستان‌ها. سریع و آسان پزشک موردنظر خود را جستجو کنید و نوبت بگیرید.', // set false to total remove
+            'description'  => 'سامانه نوبت دهی آنلاین، سامانه نوبت‌دهی آنلاین پزشکان، کلینیک‌ها و بیمارستان‌ها. سریع و آسان پزشک موردنظر خود را جستجو کنید و نوبت بگیرید.', // set false to total remove
             'separator'    => ' - ',
             'keywords'     => [
                 "نوبت دهی آنلاین",
@@ -52,8 +52,8 @@ return [
          * The default configurations to be used by the opengraph generator.
          */
         'defaults' => [
-            'title'        => "پزشکم", // set false to total remove
-            'description'  => 'پزشکم، سامانه نوبت‌دهی آنلاین پزشکان، کلینیک‌ها و بیمارستان‌ها. سریع و آسان پزشک موردنظر خود را جستجو کنید و نوبت بگیرید.',
+            'title'        => "سامانه نوبت دهی آنلاین", // set false to total remove
+            'description'  => '، سامانه نوبت‌دهی آنلاین پزشکان، کلینیک‌ها و بیمارستان‌ها. سریع و آسان پزشک موردنظر خود را جستجو کنید و نوبت بگیرید.',
             'url'         => false, // Set null for using Url::current(), set false to total remove
             'type'        => false,
             'site_name'   => false,
@@ -74,8 +74,8 @@ return [
          * The default configurations to be used by the json-ld generator.
          */
         'defaults' => [
-            'title'        => "پزشکم", // set false to total remove
-            'description'  => 'پزشکم، سامانه نوبت‌دهی آنلاین پزشکان، کلینیک‌ها و بیمارستان‌ها. سریع و آسان پزشک موردنظر خود را جستجو کنید و نوبت بگیرید.',
+            'title'        => "سامانه نوبت دهی", // set false to total remove
+            'description'  => 'نوبت دهی آنلاین، سامانه نوبت‌دهی آنلاین پزشکان، کلینیک‌ها و بیمارستان‌ها. سریع و آسان پزشک موردنظر خود را جستجو کنید و نوبت بگیرید.',
             'url'         => 'full', // Set to null or 'full' to use Url::full(), set to 'current' to use Url::current(), set false to total remove
             'type'        => 'WebPage',
             'images'      => [

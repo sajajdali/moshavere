@@ -51,7 +51,21 @@ enum SettingKeyEnum: int implements EnumHasNameInterface, SettingTypeInterface, 
     case WHATSAPP_ADDRESS = 413;
     case ENABLE_DOCTOR_REGISTRATION = 414;
     case FOOTER_ENAMAD = 415;
-    case    FOOTER_SAMANDEHI = 416;
+    case FOOTER_SAMANDEHI = 416;
+    case ACTIVE_HEADER = 417;
+    case HEADER1_IMAGE = 418;
+    case HEADER1_TITLE1 = 419;
+    case HEADER1_TITLE2 = 427;
+    case HEADER1_SHOW_BUTTONS = 420;
+    case HEADER1_SHOW_BUTTON1 = 421;
+    case HEADER1_SHOW_BUTTON2 = 422;
+    case HEADER1_BUTTON_TITLE1 = 423;
+    case HEADER1_BUTTON_TITLE2 = 424;
+    case HEADER1_BUTTON_HREF1 = 425;
+    case HEADER1_BUTTON_HREF2 = 426;
+    case MOST_VIEWED_SECTIONS_ICONS_VIEW = 428;
+    case ENABLE_DOCTORS_MENU = 430;
+    case ENABLE_CONTACT_US_MENU = 431;
 
 
     // ABOUT US PAGE
@@ -159,6 +173,17 @@ enum SettingKeyEnum: int implements EnumHasNameInterface, SettingTypeInterface, 
             self::APPOINTMENT_SHOW_FALSE_STATUS_DAYS    => 'در قسمت دریافت نوبت ، روز هایی که تمامی نوبت آنها پر هست به کاربر نمایش دهد',
             self::APPOINTMENT_GALLERY_TITLE    => 'تیتر نمایش گالری پزشک',
             self::FOOTER_ENAMAD    => 'ای نماد (لینک کامل درج شود)',
+            self::ACTIVE_HEADER    => 'هدر فعال',
+            self::HEADER1_IMAGE    => 'عکس اصلی هدر',
+            self::HEADER1_TITLE1    => 'تیتر اصلی هدر',
+            self::HEADER1_TITLE2    => 'تیتر دوم هدر',
+            self::HEADER1_SHOW_BUTTONS    => 'نمایش کلید ها',
+            self::HEADER1_SHOW_BUTTON1    => 'نمایش کلید اول',
+            self::HEADER1_BUTTON_TITLE1    => 'تیتر کلید اول',
+            self::HEADER1_BUTTON_HREF1    => 'لینک کلید اول',
+            self::HEADER1_SHOW_BUTTON2    => 'نمایش کلید دوم',
+            self::HEADER1_BUTTON_TITLE2    => 'تیتر کلید دوم',
+            self::HEADER1_BUTTON_HREF2    => 'لینک کلید دوم',
             self::FOOTER_SAMANDEHI    => 'نماد سامان دهی (لینک کامل درج شود)',
             self::APPOINTMENT_GALLERY_BODY    => 'متن نمایش گالری پزشک',
             self::APPOINTMENT_ONLINE_DESCRPTION    => 'برای نوبت های آنلاین ، توضیحات قبل از دریافت نوبت',
@@ -167,6 +192,7 @@ enum SettingKeyEnum: int implements EnumHasNameInterface, SettingTypeInterface, 
             self::ENABLE_LATEST_DOCTORS    => 'فعال بودن جدید ترین پزشکان صفحه اصلی',
             self::ENABLE_HOME_FAQ    => 'فعال بودن سوالات متداول صفحه اصلی',
             self::ENABLE_MOST_VIEWED_SECTIONS    => 'فعال بودن پربازدید ترین بخش ها',
+            self::MOST_VIEWED_SECTIONS_ICONS_VIEW    => 'نمایش بخش های صفحه اصلی به صورت تک صفحه و بدون اسلاید',
             self::DISABLE_FOOTER_DISPLAY    => 'غیر فعال شدن فوتر',
             self::SHOW_FLOATING_SOCIAL_ICONS    => 'نمایش ایکون های اینستاگرام و واتس اپ به صورت شناور',
 
@@ -191,6 +217,9 @@ enum SettingKeyEnum: int implements EnumHasNameInterface, SettingTypeInterface, 
             self::SECREYERY_SEND_LINK_FOR_APPOINTMENT => 'امکان ارسال لینک پرداخت نوبت به کاربر توسط منشی',
             self::PAYMEN_ACTIVE_DRIVER => 'درگاه فعال',
 
+            // headers
+            self::ENABLE_DOCTORS_MENU => 'فعال بودن لیست پزشکان در منو',
+            self::ENABLE_CONTACT_US_MENU => 'فعال بودن  ارتباط با ما در منو',
             // sms
             self::SMS_APPOINTMENT_RECEIVING_SUCCESSFUL => 'پیامک به کاربر پس از دریافت نوبت موفق',
             self::SMS_APPOINTMENT_WAITING_PAYMENT => 'پیامک به کاربر در صورتی که پرداخت فعال باشد و نوبت برای کاربر ثبت شود (نوبتی که نیاز به پرداخت دارد)',
@@ -289,9 +318,10 @@ enum SettingKeyEnum: int implements EnumHasNameInterface, SettingTypeInterface, 
     public function getType(): SettingTypeEnum
     {
         return match ($this) {
+            self::SITE_LOGO_URL , self::HEADER1_IMAGE => SettingTypeEnum::IMAGE,
             self::DEFAULT_EXERCISE_STATUS => SettingTypeEnum::SELECT,
             self::PAYMEN_ACTIVE_DRIVER => SettingTypeEnum::SELECT,
-            self::APPOINTMENT_MORE_THAT_ONE_PER_DAY => SettingTypeEnum::CHECK,
+            self::APPOINTMENT_MORE_THAT_ONE_PER_DAY , self::HEADER1_SHOW_BUTTONS , self::HEADER1_SHOW_BUTTON1, self::HEADER1_SHOW_BUTTON2 , self::ENABLE_DOCTORS_MENU , self::ENABLE_CONTACT_US_MENU => SettingTypeEnum::CHECK,
             self::APPOINTMENT_SHOW_FALSE_STATUS_DAYS => SettingTypeEnum::CHECK,
             self::APPOINTMENT_DETAIL_PAYMENT_DESCRIPTION_STATUS => SettingTypeEnum::CHECK,
             self::ONILNE_SEND_ATUOMATIC_MESSAGE_STATUS => SettingTypeEnum::CHECK,
@@ -305,7 +335,7 @@ enum SettingKeyEnum: int implements EnumHasNameInterface, SettingTypeInterface, 
             self::APPOINTMENT_STATUS => SettingTypeEnum::CHECK,
             self::PAYMENT_RULES_AND_CONDITION_STATUS => SettingTypeEnum::CHECK,
             self::APPOINTMENT_USER_PERESENT_STATUS_REGISTRATION => SettingTypeEnum::CHECK,
-            self::SUPPORT_USER_ROLE => SettingTypeEnum::SELECT,
+            self::SUPPORT_USER_ROLE , self::ACTIVE_HEADER => SettingTypeEnum::SELECT,
             self::WEIGHT_CHART_DESCRIPTION_APP => SettingTypeEnum::TEXTAREA,
             self::APPOINTMENT_DESCRIPTION => SettingTypeEnum::TEXTAREA,
             self::APPOINTMENT_CANCEL_DESCRIPTION => SettingTypeEnum::TEXTAREA,
@@ -329,7 +359,7 @@ enum SettingKeyEnum: int implements EnumHasNameInterface, SettingTypeInterface, 
             self::APP_FULL_APPOINTMENT_BODY => SettingTypeEnum::TEXTAREA,
             self::APPOINTMENT_GALLERY_BODY, self::FOOTER_ENAMAD ,  self::FOOTER_SAMANDEHI => SettingTypeEnum::TEXTAREA,
             self::APPOINTMENT_ONLINE_DESCRPTION => SettingTypeEnum::TEXTAREA,
-            self::UI_NOW_SHOW_SEARCH_BAR , self::ENABLE_CITY_SEARCH , self::ENABLE_LATEST_DOCTORS , self::ENABLE_HOME_FAQ , self::ENABLE_MOST_VIEWED_SECTIONS , self::ENABLE_DOCTOR_REGISTRATION , self::SHOW_FLOATING_SOCIAL_ICONS , self::DISABLE_FOOTER_DISPLAY=> SettingTypeEnum::CHECK,
+            self::UI_NOW_SHOW_SEARCH_BAR , self::ENABLE_CITY_SEARCH , self::ENABLE_LATEST_DOCTORS , self::ENABLE_HOME_FAQ , self::MOST_VIEWED_SECTIONS_ICONS_VIEW, self::ENABLE_MOST_VIEWED_SECTIONS , self::ENABLE_DOCTOR_REGISTRATION , self::SHOW_FLOATING_SOCIAL_ICONS , self::DISABLE_FOOTER_DISPLAY=> SettingTypeEnum::CHECK,
             default => SettingTypeEnum::TEXT
         };
     }
@@ -340,6 +370,10 @@ enum SettingKeyEnum: int implements EnumHasNameInterface, SettingTypeInterface, 
     public function options(): array
     {
         return match ($this) {
+            self::ACTIVE_HEADER => [
+                'search_header' => 'هدر با سرچ',
+                'image_header' => 'هدر با معرفی',
+            ],
             self::SUPPORT_USER_ROLE => User::adminSupportRoles(),
             self::PAYMEN_ACTIVE_DRIVER => ['zrinpal' => 'zrinpal'],
             default => []

@@ -36,7 +36,14 @@
 <div class="input-group">
     <input wire:model="{{ $model }}" type="file" class="form-control" id="{{ $id }}"
            wire:loading.attr="disabled" wire:target="{{ $model }}">
-    <div wire:loading wire:target="{{ $model }}" class="text-info">Uploading...</div>
+    <div class="mt-2 ">
+        <div wire:loading wire:target="{{ $model }}">
+            <div class="d-flex align-items-center gap-2 mr-2 text-secondary small" style="margin-top: 6px;">
+                <div class="spinner-border spinner-border-sm text-primary" role="status" aria-hidden="true"></div>
+                <span>در حال آپلود تصویر...</span>
+            </div>
+        </div>
+    </div>
 </div>
 @error($model)
 <div class="text-danger mt-2">{{ $message }}</div>

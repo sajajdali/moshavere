@@ -17,7 +17,7 @@
                     @foreach ($fetchData['service'] as $service)
                         <a href="{{ $service->getServiceRoute() }}"
                            class="flex flex-col items-center gap-4 p-5 border border-secondary-200 bg-white rounded-lg h-[230px]">
-                            <img src="{{ $service->icon }}" class="h-[66px]" />
+                            <img src="{{ assetStorage($service->icon) }}" class="h-[66px]" />
                             <p class="font-semibold">{{ $service->title }}</p>
                             <p class="text-sm text-secondary-400">+{{ $service->user->count() }} پزشک</p>
                         </a>
@@ -47,7 +47,7 @@
              <div class="swiper-slide">
                 <a href="{{$service->getServiceRoute()}}"
                    class="flex flex-col items-center gap-4 p-5 border border-secondary-200 bg-white rounded-lg  h-[230px]">
-                   <img src="{{$service->icon}}" class="h-[66px]" />
+                   <img src="{{assetStorage($service->icon)}}" class="h-[66px]" />
                    <p class="font-semibold">{{$service->title}}</p>
                    <p class="text-sm text-secondary-400">+{{$service->user->count()}} پزشک</p>
                 </a>

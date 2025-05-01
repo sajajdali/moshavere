@@ -1,13 +1,1 @@
-(self["webpackChunkversion_4_jangi"] = self["webpackChunkversion_4_jangi"] || []).push([["spritemap"],{
-
-/***/ "?c20d":
-/*!******************************!*\
-  !*** spritemap-dummy-module ***!
-  \******************************/
-/***/ (() => {
-
-
-
-/***/ })
-
-}]);
+(self.webpackChunkversion_4_jangi=self.webpackChunkversion_4_jangi||[]).push([[654],{874:()=>{}}]);

@@ -391,8 +391,6 @@ class GeneralSetting extends Component
         if (!$detail[AppointmentSetting::TEMPORARY_DEACTIVATION_ONLINE][AppointmentSetting::TEMPORARY_DEACTIVATION_ONLINE_STATUS]) {
             $detail[AppointmentSetting::TEMPORARY_DEACTIVATION_ONLINE][AppointmentSetting::TEMPORARY_DEACTIVATION_ONLINE_MESSAGE] = null;
         }
-
-
         $updateOrCreateModel = [
             'user_id'               =>  $this->user->id,
             'service_id'            =>  $this->fetchData['service_id'],
@@ -404,7 +402,7 @@ class GeneralSetting extends Component
             'last_day_active'       =>  $endAppointmentTime,
             'first_day_active'      =>  $startAppointmentTime,
             'active_payment'        =>  isset($this->form['payment']['online']) ? AppintmentSettingPaymentStatus::tryFrom($this->form['payment']['status']) : 0,
-            'interference'          =>  isset($this->form['interference']['status'])  ? AppintmentSettingInterface::tryFrom($this->form['interference']['status']) : AppintmentSettingInterface::getDefault(),
+            'interference'          =>  $this->checkInterfaceStatus()->value,
             'active'                =>  ActiveEnum::tryFrom($this->form['avtive']),
             'detail'                =>  $detail,
         ];
@@ -440,6 +438,12 @@ class GeneralSetting extends Component
         CacheJob::dispatch($this->appointment_setting);
 
         return redirect()->route('admin.appointment.doctor.list')->with('success', 'تنظیمات با موفقیت ذخیره شد');
+    }
+    private function checkInterfaceStatus() {
+        if(isset($this->form['interference']['status'])) {
+           return  $this->form['interference']['status'] == true ? AppintmentSettingInterface::DONT_CHECK : AppintmentSettingInterface::CHECK ;
+        }
+        return AppintmentSettingInterface::getDefault();
     }
     private function storeTimes()
     {
@@ -512,7 +516,12 @@ class GeneralSetting extends Component
             $this->form['payment']['status'] = $apSet->active_payment;
         }
         if (isset($apSet->interference)) {
-            $this->form['interference']['status'] = $apSet->interference;
+            if($apSet->interference == false) {
+                // if this is false means that user activate the interface check
+                $this->form['interference']['status'] = true ;
+            }else{
+                $this->form['interference']['status'] = false ;
+            }
         }
         if (isset($apSet->detail[AppointmentSetting::PAYMENT])) {
             if (isset($apSet->detail[AppointmentSetting::PAYMENT][AppointmentSetting::STATUS])) {

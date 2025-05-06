@@ -115,15 +115,18 @@ class AppointmentUserService
 
         // Fetch appointments for the week
         $doctorId = $appointmentSetting->user->id;
+        $checkForInterface = $appointmentSetting->interference ;
         $appointments = AppointmentUser::where('doctor_id', $doctorId)
             ->where('kind', AppointmentUserKindEnum::IN_PERSION)
-            ->whereBetween('date_visit', [$startDate, $endDate])
+            ->when($checkForInterface == false && $appointmentSetting->service_id != null , function($q) use($appointmentSetting){
+                // check for interface 
+                    return $q->where('service_id',$appointmentSetting->service_id) ;
+            })->whereBetween('date_visit', [$startDate, $endDate])
             ->orderBy('start_time')
             ->get();
 
         // Has set a limit on the number that can be received for 1 day
         $maxAppointmentEachDay = (isset($appointmentSetting->detail[AppointmentSetting::MAX_AVAILABLE_APPOINTMENT_EACH_DAY]) && (int) $appointmentSetting->detail[AppointmentSetting::MAX_AVAILABLE_APPOINTMENT_EACH_DAY] > 0) ? $appointmentSetting->detail[AppointmentSetting::MAX_AVAILABLE_APPOINTMENT_EACH_DAY] : null;
-
         $appointments = $appointments->sortByDesc(function ($appointment) {
             // If there's no appointment with the same start_time, it should have the highest priority
             $maxEndTime = AppointmentUser::where('start_time', $appointment->start_time)

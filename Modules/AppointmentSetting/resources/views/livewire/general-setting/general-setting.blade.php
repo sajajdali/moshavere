@@ -477,7 +477,7 @@
                 </span>
             </h3>
             <div class="main-toggle-group d-sm-flex align-item-center ms-0">
-                <div class="toggle toggle-lg toggle-primary my-1 customCheckbox @if (isset($form['interface']['status']) && $form['interface']['status'] == 'true') on @else off @endif"
+                <div class="toggle toggle-lg toggle-primary my-1 customCheckbox @if (isset($form['interference']['status']) && $form['interference']['status'] == 'true') on @else off @endif"
                     data-id="interference.status" wire:ignore.self data-bs-toggle="collapse"
                     href="#checkForOtherAppointment" role="button" aria-expanded="false"
                     aria-controls="checkForOtherAppointment">
@@ -485,7 +485,7 @@
                 </div>
             </div>
         </div>
-        <div class="card-body collapse" id="checkForOtherAppointment" wire:ignore.self>
+        <div class="card-body collapse @if (isset($form['interference']['status']) && $form['interference']['status'] == 'true') show @endif " id="checkForOtherAppointment" wire:ignore.self>
             {{-- section --}}
             <div class="row">
 

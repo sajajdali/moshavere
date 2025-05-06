@@ -21,7 +21,9 @@ use Modules\MigrateOldData\App\Console\MigrateSpecialiteiesCommand;
 use Modules\MigrateOldData\App\Console\MigrateAppointmentUserCommand;
 use Modules\AppointmentUser\app\Console\CheckAppointmentUserDedlineDateCommand;
 use Modules\AppointmentUser\app\Console\DisabledAwnsweredOnlineAppointmentCommand;
-
+use Illuminate\Queue\Events\JobProcessing;
+use Illuminate\Support\Facades\Event;
+use Stancl\Tenancy\Facades\Tenancy;
 class Kernel extends ConsoleKernel
 {
     protected $commands = [
@@ -64,5 +66,13 @@ class Kernel extends ConsoleKernel
         $this->load(__DIR__.'/Commands');
 
         require base_path('routes/console.php');
+
+        Event::listen(JobProcessing::class, function (JobProcessing $event) {
+            $payload = $event->job->payload();
+
+            if (isset($payload['tenant_id'])) {
+                Tenancy::initialize($payload['tenant_id']);
+            }
+        });
     }
 }

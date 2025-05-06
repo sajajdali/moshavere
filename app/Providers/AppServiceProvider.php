@@ -43,16 +43,6 @@ class AppServiceProvider extends ServiceProvider
                     }
                 }
 
-                // تنظیم دیسک برای مستاجر
-//                config([
-//                    'filesystems.disks.tenant' => [
-//                        'driver' => 'local',
-//                        'root' => storage_path('app/tenants/' . $tenantId . '/uploads'), // مسیر اختصاصی برای هر مستاجر
-//                        'url' => url('    /').'/storage/tenants/'.$tenantId.'/uploads', // URL برای دسترسی به فایل‌ها
-//                        'visibility' => 'public',
-//                    ],
-//
-//                ]);
             }
         });
 
@@ -62,5 +52,21 @@ class AppServiceProvider extends ServiceProvider
         config([
             'payment.drivers.zarinpal.merchantId' => $merchantId,
         ]);
+
+        // ذخیره tenant_id هنگام dispatch شدن job
+        \Queue::createPayloadUsing(function ($connection, $queue, $payload) {
+            return [
+                'tenant_id' => tenant()?->getTenantKey(),
+            ];
+        });
+
+        // فعال‌سازی tenant هنگام اجرای job
+        \Event::listen(\Illuminate\Queue\Events\JobProcessing::class, function ($event) {
+            $payload = $event->job->payload();
+
+            if (isset($payload['tenant_id'])) {
+                tenancy()->initialize($payload['tenant_id']);
+            }
+        });
     }
 }

@@ -111,6 +111,8 @@ enum SettingKeyEnum: int implements EnumHasNameInterface, SettingTypeInterface, 
     case PAYMENT_RULES_AND_CONDITION_DESCRIPTION = 156;
     case SECREYERY_SEND_LINK_FOR_APPOINTMENT = 157;
     case PAYMEN_ACTIVE_DRIVER = 158;
+    case PAYMENT_PARSIAN_STATUS = 159;
+    case PAYMENT_PARSIAN_TOKEN = 161;
 
 
     case WEIGHT_CHART_DESCRIPTION_APP = 120;
@@ -216,6 +218,8 @@ enum SettingKeyEnum: int implements EnumHasNameInterface, SettingTypeInterface, 
             self::PAYMENT_RULES_AND_CONDITION_DESCRIPTION => 'شرایط و قوانین مربوط به پرداخت',
             self::SECREYERY_SEND_LINK_FOR_APPOINTMENT => 'امکان ارسال لینک پرداخت نوبت به کاربر توسط منشی',
             self::PAYMEN_ACTIVE_DRIVER => 'درگاه فعال',
+            self::PAYMENT_PARSIAN_STATUS => 'فعال بودن درگاه پارسیان',
+            self::PAYMENT_PARSIAN_TOKEN => 'کد PIN Code دریافتی از بانک پارسیان',
 
             // headers
             self::ENABLE_DOCTORS_MENU => 'فعال بودن لیست پزشکان در منو',
@@ -327,6 +331,7 @@ enum SettingKeyEnum: int implements EnumHasNameInterface, SettingTypeInterface, 
             self::ONILNE_SEND_ATUOMATIC_MESSAGE_STATUS => SettingTypeEnum::CHECK,
             self::APPOINTMENT_SET_APPOINTMENT_WITH_DOCUMENT_NUMBER => SettingTypeEnum::CHECK,
             self::SHOW_FALSE_APPOINTMENT_STATUS => SettingTypeEnum::CHECK,
+            self::PAYMENT_PARSIAN_STATUS => SettingTypeEnum::CHECK,
             self::PAYMENT_PAYSTAR_STATUS => SettingTypeEnum::CHECK,
             self::APPOINTMENT_FOR_OTHERS_STATUS => SettingTypeEnum::CHECK,
             self::PAYMENT_ZARINPAL_STATUS => SettingTypeEnum::CHECK,
@@ -375,7 +380,7 @@ enum SettingKeyEnum: int implements EnumHasNameInterface, SettingTypeInterface, 
                 'image_header' => 'هدر با معرفی',
             ],
             self::SUPPORT_USER_ROLE => User::adminSupportRoles(),
-            self::PAYMEN_ACTIVE_DRIVER => ['zrinpal' => 'zrinpal'],
+            self::PAYMEN_ACTIVE_DRIVER => ['zrinpal' => 'zrinpal','parsian'=> 'parsian'],
             default => []
         };
     }

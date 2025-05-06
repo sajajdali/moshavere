@@ -50,14 +50,16 @@ class Setting extends Model
 
     public static function reBuild(): void
     {
-        cache()->forget(self::CACHE_NAME);
-        $cacheItem = [];
-        foreach (self::all() as $setting) {
-            if ($setting->setting_key->isSupportCache()) {
-                $cacheItem[$setting->setting_key->value] = $setting->setting_value;
+        if (! app()->environment('local')) {
+            cache()->forget(self::CACHE_NAME);
+            $cacheItem = [];
+            foreach (self::all() as $setting) {
+                if ($setting->setting_key->isSupportCache()) {
+                    $cacheItem[$setting->setting_key->value] = $setting->setting_value;
+                }
             }
+            cache()->put(self::CACHE_NAME, $cacheItem);
         }
-        cache()->put(self::CACHE_NAME, $cacheItem);
     }
 
     public static function getOriginalVal(int $key)

@@ -190,7 +190,12 @@ class AppointmentDetail extends Component
         $invoice = (new Invoice)->amount($amount)
             ->detail('description', $description)
             ->via(setting(SettingKeyEnum::PAYMEN_ACTIVE_DRIVER));
-        $merchenId = setting(SettingKeyEnum::PAYMENT_ZARINPAL_MERCHENID);
+
+        $merchenId =  match (setting(SettingKeyEnum::PAYMEN_ACTIVE_DRIVER)) {
+            'zarinpal' => setting(SettingKeyEnum::PAYMENT_ZARINPAL_MERCHENID),
+            'parsian'  => setting(SettingKeyEnum::PAYMENT_PARSIAN_TOKEN),
+            default    => setting(SettingKeyEnum::PAYMENT_ZARINPAL_MERCHENID),
+        };
         $p =  Payment::config(['callbackUrl' => $callbackUrl, 'merchantId' => $merchenId])->purchase(
             $invoice,
             function ($driver, $transactionId) {
@@ -257,9 +262,9 @@ class AppointmentDetail extends Component
                     }
                 }
                 if (isset($this->fetchData['app']->doctor)) {
-                    if( isset($this->fetchData['app']->doctor->drStoreAppSms) && $this->fetchData['app']->doctor->drStoreAppSms != true ) {
+                    if (isset($this->fetchData['app']->doctor->drStoreAppSms) && $this->fetchData['app']->doctor->drStoreAppSms != true) {
                         $smsToDoctor = setting(SettingKeyEnum::SMS_APPOINTMENT_TO_DOCTOR);
-                    }elseif(! isset($this->fetchData['app']->doctor->drStoreAppSms)){
+                    } elseif (! isset($this->fetchData['app']->doctor->drStoreAppSms)) {
                         $smsToDoctor = setting(SettingKeyEnum::SMS_APPOINTMENT_TO_DOCTOR);
                     }
                     if (isset($smsToDoctor)) {

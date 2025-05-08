@@ -304,10 +304,12 @@ class AppointmentDetail extends Component
                 $this->fetchData['success']  = 'پرداخت باموفقیت انجام شد و نوبت شما فعال شد ';
                 $tDetail =  $this->fetchData['app']->transaction->detail;
                 $respondDetaul = $receipt->getDetails();
-                $newTdetail = array_merge($tDetail, [
-                    'card_hash' => $respondDetaul['card_hash'],
-                    'ref_id' => $respondDetaul['ref_id'],
-                ]);
+                if(isset($respondDetaul['card_hash']) && isset($respondDetaul['ref_id'])) {
+                    $newTdetail = array_merge($tDetail, [
+                        'card_hash' => $respondDetaul['card_hash'],
+                        'ref_id' => $respondDetaul['ref_id'],
+                    ]);
+                }
                 $this->fetchData['app']->transaction->update(['status' => TransactionStatusEnum::SUCCESSFUL, 'detail' => $newTdetail]);
                 $this->render();
             } catch (InvalidPaymentException $exception) {

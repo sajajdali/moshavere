@@ -246,6 +246,7 @@ class AppointmentDetail extends Component
     }
     public function bankCallback()
     {
+        $this->paymentSetting();
         if (! $this->fetchData['app']->details[AppointmentUser::DETAIL_PAYMENT]['status']) {
             $this->fetchData['alert'] = 'خطا در انجام تراکنش';
             $this->fetchData['app']->transaction->update(['status' => TransactionStatusEnum::REJECTED]);

@@ -46,12 +46,37 @@ class AppServiceProvider extends ServiceProvider
             }
         });
 
-        // Fetch the Zarinpal merchant ID from the settings
-        $merchantId = setting(SettingKeyEnum::PAYMENT_ZARINPAL_MERCHENID);
-        // Set the Zarinpal merchant ID dynamically
-        config([
-            'payment.drivers.zarinpal.merchantId' => $merchantId,
-        ]);
+        $activeGatway = setting(SettingKeyEnum::PAYMEN_ACTIVE_DRIVER);
+
+        if ($activeGatway == 'parsian'){
+            $merchantId = setting(SettingKeyEnum::PAYMENT_PARSIAN_TOKEN);
+            // Set the Zarinpal merchant ID dynamically
+            config([
+                'payment.default' => 'parsian',
+                'payment.drivers.parsian.merchantId' => $merchantId,
+            ]);
+        } else {
+            $merchantId = setting(SettingKeyEnum::PAYMENT_ZARINPAL_MERCHENID);
+            // Set the Zarinpal merchant ID dynamically
+            config([
+                'payment.drivers.zarinpal.merchantId' => $merchantId,
+            ]);
+        }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
         // ذخیره tenant_id هنگام dispatch شدن job
         \Queue::createPayloadUsing(function ($connection, $queue, $payload) {

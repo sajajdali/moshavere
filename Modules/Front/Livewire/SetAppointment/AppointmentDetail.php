@@ -190,13 +190,7 @@ class AppointmentDetail extends Component
         $invoice = (new Invoice)->amount($amount)
             ->detail('description', $description)
             ->via(setting(SettingKeyEnum::PAYMEN_ACTIVE_DRIVER));
-
-        $merchenId =  match (setting(SettingKeyEnum::PAYMEN_ACTIVE_DRIVER)) {
-            'zarinpal' => setting(SettingKeyEnum::PAYMENT_ZARINPAL_MERCHENID),
-            'parsian'  => setting(SettingKeyEnum::PAYMENT_PARSIAN_TOKEN),
-            default    => setting(SettingKeyEnum::PAYMENT_ZARINPAL_MERCHENID),
-        };
-        $p =  Payment::config(['callbackUrl' => $callbackUrl, 'merchantId' => $merchenId])->purchase(
+        $p =  Payment::config(['callbackUrl' => $callbackUrl])->purchase(
             $invoice,
             function ($driver, $transactionId) {
                 $this->transactionId = $transactionId;

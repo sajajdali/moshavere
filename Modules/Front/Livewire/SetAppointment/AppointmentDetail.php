@@ -311,8 +311,9 @@ class AppointmentDetail extends Component
                         'card_hash' => $respondDetaul['card_hash'],
                         'ref_id' => $respondDetaul['ref_id'],
                     ]);
+                    $this->fetchData['app']->transaction->update(['status' => TransactionStatusEnum::SUCCESSFUL, 'detail' => $newTdetail]);
                 }
-                $this->fetchData['app']->transaction->update(['status' => TransactionStatusEnum::SUCCESSFUL, 'detail' => $newTdetail]);
+                $this->fetchData['app']->transaction->update(['status' => TransactionStatusEnum::SUCCESSFUL]);
                 $this->render();
             } catch (InvalidPaymentException $exception) {
                 $this->fetchData['sweetAlert']['msg'] = 'خطا در انجام تراکنش.';

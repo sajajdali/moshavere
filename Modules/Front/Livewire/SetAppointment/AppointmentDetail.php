@@ -184,8 +184,12 @@ class AppointmentDetail extends Component
     }
     public function GotoPayment()
     {
-        $this->paymentSetting();
         $amount = $this->fetchData['stauts']['price'];
+        $this->paymentSetting();
+        $activeGateway = setting(SettingKeyEnum::PAYMEN_ACTIVE_DRIVER);
+        if ($activeGateway === 'parsian') {
+            $amount =(int) $this->fetchData['stauts']['price'] / 10;
+        }
         $t_data = [
             'amount' => $this->fetchData['stauts']['price'],
             'user_id' => $this->fetchData['app']->user->id,

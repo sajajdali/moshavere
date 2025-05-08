@@ -46,7 +46,7 @@ Route::middleware(['web'])->group( function () {
     Route::get('/appointment/days', ShowAvailableDayForDoctor::class)->name('front.setAppointment.days');
     Route::get('/appointment/online', OnlineAppointmentdescription::class)->name('front.setAppointment.online.description');
     Route::get('/appointment/checkout', Checkout::class)->name('setAppointment.checkout');
-    Route::get('/appointment/detail/{tracking_code}', AppointmentDetail::class)->name('front.setAppointment.detail');
+    Route::any('/appointment/detail/{tracking_code}', AppointmentDetail::class)->name('front.setAppointment.detail');
     Route::get('/doctor/profile/{doctor_id}/{doctor_name}', DoctorProfileLivewire::class)->name('front.doctor.profile');
 });
 Route::middleware(['web'])->name('front.')->group(function () {

@@ -62,22 +62,6 @@ class AppServiceProvider extends ServiceProvider
                 'payment.drivers.zarinpal.merchantId' => $merchantId,
             ]);
         }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
         // ذخیره tenant_id هنگام dispatch شدن job
         \Queue::createPayloadUsing(function ($connection, $queue, $payload) {
             return [

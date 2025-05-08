@@ -178,6 +178,7 @@ return [
         Nwidart\Modules\LaravelModulesServiceProvider::class,
         Shetabit\Payment\Provider\PaymentServiceProvider::class,
         App\Providers\TenancyServiceProvider::class, // <-- here
+        App\Providers\DynamicPaymentConfigServiceProvider::class,
     ])->toArray(),
 
     /*

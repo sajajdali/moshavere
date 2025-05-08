@@ -252,7 +252,8 @@ class AppointmentDetail extends Component
     {
         $this->paymentSetting();
         if (! $this->fetchData['app']->details[AppointmentUser::DETAIL_PAYMENT]['status']) {
-            $this->fetchData['alert'] = 'خطا در انجام تراکنش';
+            $this->fetchData['sweetAlert']['msg'] = 'خطا در انجام تراکنش.';
+            $this->fetchData['sweetAlert']['icon'] = 'danger';
             $this->fetchData['app']->transaction->update(['status' => TransactionStatusEnum::REJECTED]);
             return;
         }
@@ -301,7 +302,8 @@ class AppointmentDetail extends Component
                     }
                 }
 
-                $this->fetchData['success']  = 'پرداخت باموفقیت انجام شد و نوبت شما فعال شد ';
+                $this->fetchData['sweetAlert']['icon'] = 'success';
+                $this->fetchData['sweetAlert']['msg']  = 'پرداخت باموفقیت انجام شد و نوبت شما فعال شد ';
                 $tDetail =  $this->fetchData['app']->transaction->detail;
                 $respondDetaul = $receipt->getDetails();
                 if(isset($respondDetaul['card_hash']) && isset($respondDetaul['ref_id'])) {
@@ -313,7 +315,8 @@ class AppointmentDetail extends Component
                 $this->fetchData['app']->transaction->update(['status' => TransactionStatusEnum::SUCCESSFUL, 'detail' => $newTdetail]);
                 $this->render();
             } catch (InvalidPaymentException $exception) {
-                $this->fetchData['alert'] = 'خطا در انجام تراکنش';
+                $this->fetchData['sweetAlert']['msg'] = 'خطا در انجام تراکنش.';
+                $this->fetchData['sweetAlert']['icon'] = 'danger';
                 $this->fetchData['app']->transaction->update(['status' => TransactionStatusEnum::REJECTED]);
             }
         }

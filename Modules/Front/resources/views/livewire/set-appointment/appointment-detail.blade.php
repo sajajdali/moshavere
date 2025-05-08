@@ -49,15 +49,16 @@
                         <p class="font-bold text-sm px-4 text-gray-700 ">
                             <span>
                                 نوبت شما با موفقیت <span class="text-red">رزرو شد</span>.
-                                برای تایید نوبت باید مبلغ {{ number_format($fetchData['stauts']['price']) }} ریال را به صورت
+                                برای تایید نوبت باید مبلغ {{ number_format($fetchData['stauts']['price']) }} ریال را به
+                                صورت
                                 آنلاین پرداخت کنید تا نوبت شما ثبت شود و در صورت عدم
                                 پرداخت نوبت شما حذف خواهد شد.
                             </span>
                             @if (setting(\Modules\Setting\Enum\SettingKeyEnum::APPOINTMENT_DETAIL_PAYMENT_DESCRIPTION_STATUS) != null &&
-                             setting(\Modules\Setting\Enum\SettingKeyEnum::APPOINTMENT_DETAIL_PAYMENT_DESCRIPTION_TEXT) != null && 
-                             ! $fetchData['app']->isOnline())
+                                    setting(\Modules\Setting\Enum\SettingKeyEnum::APPOINTMENT_DETAIL_PAYMENT_DESCRIPTION_TEXT) != null &&
+                                    !$fetchData['app']->isOnline())
                                 <span>
-                                    {{setting(\Modules\Setting\Enum\SettingKeyEnum::APPOINTMENT_DETAIL_PAYMENT_DESCRIPTION_TEXT)}}
+                                    {{ setting(\Modules\Setting\Enum\SettingKeyEnum::APPOINTMENT_DETAIL_PAYMENT_DESCRIPTION_TEXT) }}
                                 </span>
                             @endif
                         </p>
@@ -188,10 +189,11 @@
                                 <span>بازگشت به اپلیکیشن</span>
                             </a>
                         @endisset
-                        @if(! disableUi() &&  $fetchData['app']->isOnline() && $fetchData['app']->isAppActive())
-                        <a href="{{route('front.user.chatroom',['onlineAppId' => $fetchData['app']->online->first()->id])}}" class="bg-emerald-500 hover:bg-lime-700 text-white font-bold py-2 px-4 rounded-lg shadow-md transition duration-300 ease-in-out">
-                          ورود به چت
-                        </a>
+                        @if (!disableUi() && $fetchData['app']->isOnline() && $fetchData['app']->isAppActive())
+                            <a href="{{ route('front.user.chatroom', ['onlineAppId' => $fetchData['app']->online->first()->id]) }}"
+                                class="bg-emerald-500 hover:bg-lime-700 text-white font-bold py-2 px-4 rounded-lg shadow-md transition duration-300 ease-in-out">
+                                ورود به چت
+                            </a>
                         @endif
                     </h3>
                     <div class="border-card space-y-4">
@@ -213,17 +215,17 @@
                                 </div>
                             </div>
                             @if (!$fetchData['app']->kind->isOnline())
-                            <div
-                                class="flex flex-row md:flex-col gap-2 justify-between md:justify-start items-center md:items-end">
-                                <a href="#" class="font-bold text-sm bg-secondary-100 px-3 py-1 rounded-2xl">
-                                    تماس با مطب
-                                </a>
-                                @if (isset($fetchData['app']->doctor->dr_licence_number))
-                                    <p class="text-xs">شماره نظام
-                                        پزشکی:{{ $fetchData['app']->doctor->dr_licence_number }}
-                                    </p>
-                                @endif
-                            </div>
+                                <div
+                                    class="flex flex-row md:flex-col gap-2 justify-between md:justify-start items-center md:items-end">
+                                    <a href="#" class="font-bold text-sm bg-secondary-100 px-3 py-1 rounded-2xl">
+                                        تماس با مطب
+                                    </a>
+                                    @if (isset($fetchData['app']->doctor->dr_licence_number))
+                                        <p class="text-xs">شماره نظام
+                                            پزشکی:{{ $fetchData['app']->doctor->dr_licence_number }}
+                                        </p>
+                                    @endif
+                                </div>
                             @endif
                         </div>
                         @if (!$fetchData['app']->kind->isOnline())
@@ -321,7 +323,8 @@
                                 </div>
                             @endif
 
-                            @if (isset($fetchData['app']->place->detail[Modules\Place\app\Models\Place::DETAIL_ADDRESS]) && !$fetchData['app']->kind->isOnline())
+                            @if (isset($fetchData['app']->place->detail[Modules\Place\app\Models\Place::DETAIL_ADDRESS]) &&
+                                    !$fetchData['app']->kind->isOnline())
                                 <div class="visit-detail flex mt-3 !mb-0">
                                     <p>
                                         <object class="inline-block"
@@ -414,6 +417,17 @@
             });
             $('body').on('click', '.dismissmodal', function() {
                 $('.appointment__modal').removeClass('opened');
+            });
+            let SAMessage = @json($fetchData['sweetAlert']['msg'] ?? false);
+            let SAIcon = @json($fetchData['sweetAlert']['icon'] ?? false);
+            var status = $('#swalStatus').val();
+            Swal.fire({
+                title: 'توجه!',
+                text: SAMessage,
+                icon: SAIcon,
+                showCancelButton: false,
+                confirmButtonText: 'متوجه شدم',
+                confirmButtonColor: '#008000', // You can change the color to your preference
             });
             $('body').on('click', '.cancelApp', function() {
                 var status = $('#swalStatus').val();

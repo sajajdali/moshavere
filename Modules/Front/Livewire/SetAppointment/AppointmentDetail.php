@@ -167,8 +167,24 @@ class AppointmentDetail extends Component
         session()->put('url.intended', route('front.setAppointment.detail', ['tracking_code' => $this->fetchData['app']->tracking_code]));
         return redirect()->route('front.login.user', ['cancelApp' => true]);
     }
+    private function paymentSetting()
+    {
+        $activeGateway = setting(SettingKeyEnum::PAYMEN_ACTIVE_DRIVER);
+        if ($activeGateway === 'parsian') {
+            config([
+                'payment.default' => 'parsian',
+                'payment.drivers.parsian.merchantId' => setting(SettingKeyEnum::PAYMENT_PARSIAN_TOKEN),
+            ]);
+        } else {
+            config([
+                'payment.default' => 'zarinpal',
+                'payment.drivers.zarinpal.merchantId' => setting(SettingKeyEnum::PAYMENT_ZARINPAL_MERCHENID),
+            ]);
+        }
+    }
     public function GotoPayment()
     {
+        $this->paymentSetting();
         $amount = $this->fetchData['stauts']['price'];
         $t_data = [
             'amount' => $this->fetchData['stauts']['price'],

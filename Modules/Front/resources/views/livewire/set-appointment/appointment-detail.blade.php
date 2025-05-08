@@ -421,14 +421,16 @@
             let SAMessage = @json($fetchData['sweetAlert']['msg'] ?? false);
             let SAIcon = @json($fetchData['sweetAlert']['icon'] ?? false);
             var status = $('#swalStatus').val();
-            Swal.fire({
-                title: 'توجه!',
-                text: SAMessage,
-                icon: SAIcon,
-                showCancelButton: false,
-                confirmButtonText: 'متوجه شدم',
-                confirmButtonColor: '#008000', // You can change the color to your preference
-            });
+            if(SAMessage){
+                Swal.fire({
+                    title: 'توجه!',
+                    text: SAMessage,
+                    icon: SAIcon,
+                    showCancelButton: false,
+                    confirmButtonText: 'متوجه شدم',
+                    confirmButtonColor: '#008000', // You can change the color to your preference
+                });
+            }
             $('body').on('click', '.cancelApp', function() {
                 var status = $('#swalStatus').val();
                 if (status) {

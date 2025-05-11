@@ -6,17 +6,32 @@ use App\Broadcasting\SmsChannel;
 use Illuminate\Bus\Queueable;
 use Illuminate\Notifications\Notification;
 use Illuminate\Contracts\Queue\ShouldQueue;
+use Stancl\Tenancy\Tenancy;
+
 
 class AppointmentSmsNotification extends Notification implements ShouldQueue
 {
     use Queueable;
+
+    protected ?string $tenantId = null;
 
     /**
      * @param string|null $template
      */
     public function __construct(public ?string $template)
     {
+        if (tenant()) {
+            $this->tenantId = tenant()->getTenantKey(); // ذخیره tenant جاری
+        }
     }
+
+    protected function initializeTenant(): void
+    {
+        if ($this->tenantId) {
+            app(Tenancy::class)->initialize($this->tenantId);
+        }
+    }
+
     /**
      * Create a new notification instance.
      */
@@ -43,6 +58,8 @@ class AppointmentSmsNotification extends Notification implements ShouldQueue
      */
     public function toArray($notifiable): array
     {
+        $this->initializeTenant();
+
         $doctorName = $notifiable->doctor?->full_name;
         $firstName = $notifiable->user?->first_name;
         $lastName = $notifiable->user?->last_name;

@@ -278,7 +278,7 @@ enum SettingKeyEnum: int implements EnumHasNameInterface, SettingTypeInterface, 
     public function getDescription()
     {
         return match ($this) {
-            self::SMS_APPOINTMENT_RECEIVING_SUCCESSFUL => 'پارامتر ها به ترتیب به شکل زیر باشد:
+            self::SMS_APPOINTMENT_RECEIVING_SUCCESSFUL,self::SMS_APPOINTMENT_AFTER_PAYMENT => 'پارامتر ها به ترتیب به شکل زیر باشد:
             <br />  ۱ = نام کاربر
              <br/> ۲ = نام خانوادگی کاربر
              <br/> ۳ = نام پزشک

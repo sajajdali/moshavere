@@ -317,7 +317,7 @@
                                     <p>
                                         <object class="inline-block"
                                             data="{{ front_asset('assets/svg/solar_card-outline.svg') }}"></object>
-                                        <strong>مبلغ ویزیت:</strong>
+                                        <strong>مبلغ پرداختی:</strong>
                                     </p>
                                     <p class="mr-2">{{ number_format($fetchData['stauts']['price']) }} ریال</p>
                                 </div>

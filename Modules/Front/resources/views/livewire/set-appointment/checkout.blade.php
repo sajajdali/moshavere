@@ -211,7 +211,7 @@
                                         <svg class="w-6 h-6" xmlns="http://www.w3.org/2000/svg">
                                             <use xlink:href="#sprite-credit" />
                                         </svg>
-                                        <p>مبلغ ویزیت</p>
+                                        <p>مبلغ پرداختی</p>
                                     </div>
                                     <p>30,000 ریال</p>
                                 </div>

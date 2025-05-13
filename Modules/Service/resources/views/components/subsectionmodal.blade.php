@@ -7,7 +7,7 @@
                     <h5 class="modal-title" id="staticBackdropLabel">زیر بخش های ویزیت</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
-                <div class="modal-body">
+                <div class="modal-body" style="overflow-y: scroll !important; max-height: 500px;">
                     <div class="row d-flex justify-content-center">
                         <span wire:loading class="spinner-border text-primary" role="status"></span>
                     </div>

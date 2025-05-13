@@ -99,9 +99,6 @@
                                 <tbody>
                                     @if ($services->isNotEmpty())
                                         @foreach ($services as $service)
-                                            @if (!empty($service->parent_id))
-                                                @continue
-                                            @endif
                                             <tr class="text-center">
                                                 <td>{{ $service->id }}</td>
                                                 <td>

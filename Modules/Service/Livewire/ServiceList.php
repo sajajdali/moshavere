@@ -43,7 +43,7 @@ class ServiceList extends Component
 
     public function render()
     {
-        $query =  Service::orderBy('priority', 'asc');
+        $query =  Service::orderBy('priority', 'asc')->whereNull('parent_id');
         $searchCriteria = [
             'idSearch' => [
                 'condition' => isset($this->search['id']),

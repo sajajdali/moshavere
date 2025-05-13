@@ -43,7 +43,9 @@ class CreateOrUpdate extends Component
     public function createOrUpdateSection()
     {
         $this->validate();
-        Cache::forget('most_viewed_service');
+        if(! app()->environment('local')){
+            Cache::forget('most_viewed_service');
+        }
         //data for update Or create Service
         $parentId = $this->form['parent_id'] == 0 || null ? null : $this->form['parent_id'];
         $active = $this->form['active'] == 'true' ? 1 : 0;

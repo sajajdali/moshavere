@@ -119,7 +119,7 @@ class AppointmentUserService
         $appointments = AppointmentUser::where('doctor_id', $doctorId)
             ->where('kind', AppointmentUserKindEnum::IN_PERSION)
             ->when($checkForInterface == false && $appointmentSetting->service_id != null , function($q) use($appointmentSetting){
-                // check for interface 
+                // check for interface
                     return $q->where('service_id',$appointmentSetting->service_id) ;
             })->whereBetween('date_visit', [$startDate, $endDate])
             ->orderBy('start_time')
@@ -268,7 +268,15 @@ class AppointmentUserService
                             break;
                         }
                     }
-
+                       // check firstDay active in setting
+                       if($appointmentSettings->first_day_active != null ){
+                        $firstDayActive = Carbon::parse($appointmentSettings->first_day_active) ;
+                        if($firstDayActive->gt($currentDate)){
+                            $dayOutput['status'] = false;
+                            $dayOutput['user_status'] = false;
+                            break;
+                        }
+                    }
                     if ($firstDayInLog == null) {
                         $firstDayInLog = clone $currentDate;
                     }

@@ -141,6 +141,13 @@ class ShowAvailableDayForDoctor extends Component
                             continue;
                         }
                     }
+                    // check firstDay active in setting
+                    if ($listOfAppointment['report']['first_day_active'] != null) {
+                        $firstDayActive = Carbon::parse($listOfAppointment['report']['first_day_active']);
+                        if ($firstDayActive->gt(Carbon::parse($appointment['day_number_gmt']))) {
+                            continue;
+                        }
+                    }
                     $dayNumber = $appointment['day_number_gmt'];
                     // check if user can access this date "max_day_active" from "setting"
                     $last_activeDay = \now()->addDays($this->fetchData['appointmentSetting']->max_day_active);
@@ -185,16 +192,16 @@ class ShowAvailableDayForDoctor extends Component
                     // delete the day if all the status are false
                     // $checkForFalse = collect($result[$dayNumber]);
                     // $isStatusFalse = $checkForFalse->every(function ($appointment) {
-                        //     return $appointment['status'] == false;
+                    //     return $appointment['status'] == false;
                     // });
                     // if ($isStatusFalse) {
-                        //     unset($result[$dayNumber]);
-                        //     $DaysDisplayed = $DaysDisplayed - 1;
-                        // }
-                    }
+                    //     unset($result[$dayNumber]);
+                    //     $DaysDisplayed = $DaysDisplayed - 1;
+                    // }
                 }
             }
-            // dd($result);
+        }
+        // dd($result);
         $dates = array_keys($result);
         // Get the last date
         $this->fetchData['lastDate'] = Carbon::parse(end($dates));

@@ -115,12 +115,12 @@ class AppointmentUserService
 
         // Fetch appointments for the week
         $doctorId = $appointmentSetting->user->id;
-        $checkForInterface = $appointmentSetting->interference ;
+        $checkForInterface = $appointmentSetting->interference;
         $appointments = AppointmentUser::where('doctor_id', $doctorId)
             ->where('kind', AppointmentUserKindEnum::IN_PERSION)
-            ->when($checkForInterface == false && $appointmentSetting->service_id != null , function($q) use($appointmentSetting){
+            ->when($checkForInterface == false && $appointmentSetting->service_id != null, function ($q) use ($appointmentSetting) {
                 // check for interface
-                    return $q->where('service_id',$appointmentSetting->service_id) ;
+                return $q->where('service_id', $appointmentSetting->service_id);
             })->whereBetween('date_visit', [$startDate, $endDate])
             ->orderBy('start_time')
             ->get();
@@ -183,14 +183,14 @@ class AppointmentUserService
                 //  check special date
                 $checkHoliday = false;
                 $attendanceTimes = null;
-                if ($appointmentSettingTimesHaveSpecialDays->count()){
+                if ($appointmentSettingTimesHaveSpecialDays->count()) {
                     $attendanceTimes = $appointmentSettingTimesHaveSpecialDays->filter(function ($appointmentTime) use ($currentDate) {
                         return $appointmentTime->special_date == $currentDate->copy()->toDateString();
                     });
                 }
-//                $attendanceTimes = $appointmentSettingTimes->filter(function ($appointmentTime) use ($currentDate) {
-//                    return $appointmentTime->special_date == $currentDate->copy()->toDateString();
-//                });
+                //                $attendanceTimes = $appointmentSettingTimes->filter(function ($appointmentTime) use ($currentDate) {
+                //                    return $appointmentTime->special_date == $currentDate->copy()->toDateString();
+                //                });
 
                 // Fetch attendance times for the day using the relationship
                 if ($attendanceTimes === null || $attendanceTimes->isEmpty()) {
@@ -263,15 +263,6 @@ class AppointmentUserService
                         $dayOutput['user_status'] = true;
                         $dayOutput['empty_appoints'] = 0;
                         if ($checkHoliday) {
-                            $dayOutput['status'] = false;
-                            $dayOutput['user_status'] = false;
-                            break;
-                        }
-                    }
-                       // check firstDay active in setting
-                       if($appointmentSettings->first_day_active != null ){
-                        $firstDayActive = Carbon::parse($appointmentSettings->first_day_active) ;
-                        if($firstDayActive->gt($currentDate)){
                             $dayOutput['status'] = false;
                             $dayOutput['user_status'] = false;
                             break;
@@ -457,6 +448,7 @@ class AppointmentUserService
             'last_day_active' => isset($appointmentSettings->last_day_active) ? $appointmentSettings->last_day_active->toDateString() : null,
             'last_day_in_log' => $lastDayInLog,
             'first_day_in_log' => $firstDayInLog?->toDateString(),
+            'first_day_active' => $appointmentSettings->first_day_active,
             'interference' => $appointmentSettings->interference == 1,
         ];
         // Now $output contains the formatted output for the week with filled appointments and empty slots arranged
@@ -629,8 +621,10 @@ class AppointmentUserService
             ];
         }
         // check if selected time exists in setting
-        if($appointmentData->kind == AppointmentUserKindEnum::IN_PERSION &&
-        $appointmentSetting->timeIsOutOfrange($appointmentData->timestamp)){
+        if (
+            $appointmentData->kind == AppointmentUserKindEnum::IN_PERSION &&
+            $appointmentSetting->timeIsOutOfrange($appointmentData->timestamp)
+        ) {
             return [
                 'status' => false,
                 'message' => 'ساعت انتخابی شما صحیح نیست ، لطفا بازگردید و یک ساعت دیگر انتخاب کنید',
@@ -846,7 +840,7 @@ class AppointmentUserService
                     $appointmentUser->notify(new AppointmentDocAndOperatorNotification($smsToOperator, $appointmentUser->operator->mobile));
                 }
             }
-            if ( $appointmentUser->status == AppointmentUserStatusEnum::STATUS_SUCCESSFUL && isset($appointmentUser->doctor)  && isset($appointmentData->smsToDoctor) && $appointmentData->smsToDoctor == true) {
+            if ($appointmentUser->status == AppointmentUserStatusEnum::STATUS_SUCCESSFUL && isset($appointmentUser->doctor)  && isset($appointmentData->smsToDoctor) && $appointmentData->smsToDoctor == true) {
                 // check if sms to doctor is active
                 $smsToDoctor = setting(SettingKeyEnum::SMS_APPOINTMENT_TO_DOCTOR);
                 if (isset($smsToDoctor)) {

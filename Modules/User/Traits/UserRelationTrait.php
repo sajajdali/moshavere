@@ -35,6 +35,11 @@ trait UserRelationTrait
         return $this->hasMany(AppointmentUser::class);
     }
 
+    public function doctorAppointments()
+    {
+        return $this->hasMany(AppointmentUser::class, 'doctor_id');
+    }
+
     public function appointmentSettings(): \Illuminate\Database\Eloquent\Relations\BelongsToMany
     {
         return $this->belongsToMany(AppointmentSetting::class);

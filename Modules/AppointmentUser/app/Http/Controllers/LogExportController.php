@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Modules\AppointmentUser\app\Models\AppointmentUser;
+use Modules\AppointmentUser\Enum\AppointmentUserStatusEnum;
 use Modules\Place\app\Models\Place;
 use Response;
 
@@ -42,7 +43,8 @@ class LogExportController extends Controller
                     'doctors' => [],
                 ];
 
-                foreach ($place->users as $doctor) {
+
+                foreach ($place->first()->users as $doctor) {
                     $doctorItem = [
                         'id' => $doctor->id,
                         'full_name' => $doctor->full_name,
@@ -53,7 +55,7 @@ class LogExportController extends Controller
                             'id' => optional($doctor->specialities->first())->id,
                             'name' => optional($doctor->specialities->first())->title,
                         ],
-                        'medical_code' => '',
+                        'medical_code' => $doctor->dr_licence_number ?? '',
                         'is_device' => false,
                         'parts' => [],
                     ];
@@ -64,7 +66,7 @@ class LogExportController extends Controller
                             'title' => $service->title,
                             'color' => '#dddddd',
                             'image_url' => $service->icon,
-                            'selakteb_code' => '',
+                            'selakteb_code' => $service->api_code,
                             'children' => [],
                             'appointment_users' => [],
                         ];
@@ -72,7 +74,7 @@ class LogExportController extends Controller
                         $appointmentsQuery = $doctor->doctorAppointments()
                             ->where('place_id', $place->id)
                             ->where('service_id', $service->id)
-                            ->where('status', '!=', AppointmentUser::STAT)
+                            ->where('status', '!=', AppointmentUserStatusEnum::STATUS_SUCCESSFUL)
                             ->with(['user', 'transaction']);
 
                         if ($date) {
@@ -147,7 +149,7 @@ class LogExportController extends Controller
                                         : 0,
                                 ],
 
-                                'discount' => $appointment->appointmentDiscount() ?? 0,
+                                'discount' =>  0,
                                 'time_left' => [
                                     'whole_minutes' => 0,
                                     'days' => 0,
@@ -158,13 +160,13 @@ class LogExportController extends Controller
                                     'title' => $appointment->kind->getName(),
                                     'value' => 'in-person'
                                 ],
-                                'kind' => AppointmentUser::$kinds[$appointment->kind] + ['id' => $appointment->kind],
+                                'kind' => '',
                                 'can_cancel' => false,
                                 'user_has_voted' => false,
                                 'online_call_options' => [],
                                 'code' => $appointment->code ?? null,
                                 'appointment_via' => [
-                                    'title' => AppointmentUser::$APPOINTMENT_VIA[$appointment->detail['APPOINTMENT_VIA'] ?? 3]['title'],
+                                    'title' =>'',
                                     'value' => $appointment->detail['APPOINTMENT_VIA'] ?? 3
                                 ],
                                 'survey' => [

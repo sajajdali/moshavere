@@ -104,9 +104,9 @@
                                                 <input value="{{ $role->id }}" type="checkbox"
                                                     id="user_role_{{ $role->id }}"
                                                     wire:model="selectedRoles"><span>{{ $role->name }}
-                                                    @if ($role->hasPermissionTo('USER_DEFAULT'))
-                                                        (نقش پیشفرض)
-                                                    @endif
+{{--                                                    @if ( $role->hasPermissionTo('USER_DEFAULT'))--}}
+{{--                                                        (نقش پیشفرض)--}}
+{{--                                                    @endif--}}
                                                 </span>
                                             </label>
                                         </div>

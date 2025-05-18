@@ -101,6 +101,20 @@
                             </div>
                         </div>
                         <div class="row mt-4 mb-3">
+                            <label for="form_api_code" class="col-md-3 form-label">کد نرم افزاری سلاک طب:</label>
+                            <div class="col-md-9">
+                                <input class="form-control mb-1  @error('form.api_code') is-invalid @enderror"
+                                       id="form_api_code" wire:model='form.api_code' type="number">
+                                @error('form.api_code')
+                                <span class="text-danger">{{ $message }}</span>
+                                @enderror
+                                <p class="text-muted">
+                                    <i class="fa fa-info-circle" aria-hidden="true"></i>
+                                    بخش ها به ترتب شماره گذاری نمایش داده میشوند.
+                                </p>
+                            </div>
+                        </div>
+                        <div class="row mt-4 mb-3">
                             <label for="check_showType" class="col-md-3 form-label">نمایش در صفحه اصلی:</label>
                             <div class="col-md-9">
                                 <div class="custom-checkbox custom-control">

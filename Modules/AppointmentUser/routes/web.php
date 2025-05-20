@@ -21,5 +21,5 @@ Route::group([], function () {
 //    Route::get('test' , [AppointmentUserController::class, 'test'])->name('appointmentuser.test');
 //    Route::get('appointment/payment/{appointmentUser}', \Modules\AppointmentUser\Livewire\AppointmentUserPayment::class)->name('appointmentUser.payment');
 
-    Route::get('/export-log', [\Modules\AppointmentUser\app\Http\Controllers\LogExportController::class, 'exportAppointmentsLog']);
+    Route::get('api/v1/general/appointment_user', [\Modules\AppointmentUser\app\Http\Controllers\LogExportController::class, 'exportAppointmentsLog'])->middleware('static.basic.auth');
 });

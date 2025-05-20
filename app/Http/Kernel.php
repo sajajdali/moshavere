@@ -78,6 +78,6 @@ class Kernel extends HttpKernel
         'role_or_permission' => \Spatie\Permission\Middlewares\RoleOrPermissionMiddleware::class,
         'prevent-tenant' => \App\Http\Middleware\PreventTenancyOnCentralDomain::class,
         'appointment_user_list_middlewere' =>  AppointmentUserListmiddleware::class,
-
+        'static.basic.auth' => \App\Http\Middleware\StaticBasicAuth::class,
     ];
 }

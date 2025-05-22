@@ -204,7 +204,7 @@
                                         <span class="block w-full h-full rounded-full bg-green"></span>
                                     </span>
                                     <img class="w-full h-full object-cover rounded-full"
-                                        src="{{ $fetchData['app']->doctor->avatar }}" alt="doctor" />
+                                        src="{{ $fetchData['app']->doctor->getUserAvatar() }}" alt="doctor" />
                                 </div>
 
                                 <div class="text-sm space-y-2">

@@ -10,7 +10,7 @@
                 <div class="bg-secondary-100 rounded-lg p-4 flex items-center gap-5 mb-4">
                     <div
                         class="w-[70px] h-[70px] overflow-hidden rounded-full flex items-center justify-center border-2 border-white ring-2 ring-blue-sky">
-                        <img src="{{ $fetchData['doc']->avatar }}" alt="doctor-image-name" />
+                        <img src="{{ $fetchData['doc']->getUserAvatar() }}" alt="doctor-image-name" />
                     </div>
                     <div class="w-[calc(100%-70px-1.25rem)] space-y-3">
                         <a href="{{ route('front.doctor.profile', ['doctor_id' => $fetchData['doc']->id, 'doctor_name' => str_replace(' ', '_', $fetchData['doc']->full_name)]) }}"

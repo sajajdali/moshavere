@@ -378,6 +378,7 @@ enum SettingKeyEnum: int implements EnumHasNameInterface, SettingTypeInterface, 
             self::ACTIVE_HEADER => [
                 'search_header' => 'هدر با سرچ',
                 'image_header' => 'هدر با معرفی',
+                'ba_image' => 'هدر با عکس پس زمینه',
             ],
             self::SUPPORT_USER_ROLE => User::adminSupportRoles(),
             self::PAYMEN_ACTIVE_DRIVER => ['zrinpal' => 'zrinpal','parsian'=> 'parsian'],

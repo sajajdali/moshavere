@@ -2,10 +2,13 @@
     @include('front::layouts.components.app-sidebar')
 
     {{-- اسلایدر اصلی --}}
-    @if(setting(\Modules\Setting\Enum\SettingKeyEnum::ACTIVE_HEADER) == null || setting(\Modules\Setting\Enum\SettingKeyEnum::ACTIVE_HEADER) == 'search_header')
+    @if(setting(\Modules\Setting\Enum\SettingKeyEnum::ACTIVE_HEADER) == null ||
+    setting(\Modules\Setting\Enum\SettingKeyEnum::ACTIVE_HEADER) == 'search_header')
         @include('front::components.homepage.mainslider')
     @elseif(setting(\Modules\Setting\Enum\SettingKeyEnum::ACTIVE_HEADER) == 'image_header')
-        @include('front::components.homepage.headers.header1')
+    @include('front::components.homepage.headers.header1')
+    @elseif(setting(\Modules\Setting\Enum\SettingKeyEnum::ACTIVE_HEADER) == 'ba_image')
+    @include('front::components.homepage.headers.header2')
     @endif
 
     {{-- پربازدید ترین بخش ها --}}

@@ -64,7 +64,7 @@ class UpdateOrCreate extends Component
             $this->user->dr_rate = $this->form['drRate'];
         }
         if (isset($this->form['showDocInEmergencyVisit']['status']) && $this->form['showDocInEmergencyVisit']['status']) {
-            $this->user->dr_emergencyvisit_order    = $this->form['showDocInEmergencyVisit']['order'];
+            $this->user->dr_emergencyvisit_order    = $this->form['showDocInEmergencyVisit']['order'] ?? 100;
             $this->user->dr_emergencyvisit_status   = $this->form['showDocInEmergencyVisit']['status'];
         } else {
             $this->user->dr_emergencyvisit_order    = false;
@@ -73,7 +73,7 @@ class UpdateOrCreate extends Component
         if (isset($this->form['ShowInIntrodocs']['status']) && $this->form['ShowInIntrodocs']['status']) {
 
             $this->user->dr_info_status = $this->form['ShowInIntrodocs']['status'];
-            $this->user->dr_info_order  = $this->form['ShowInIntrodocs']['order'];
+            $this->user->dr_info_order  = $this->form['ShowInIntrodocs']['order'] ?? 100;
         } else {
             $this->user->dr_info_status = false;
             $this->user->dr_info_order  = false;

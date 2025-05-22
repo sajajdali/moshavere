@@ -122,7 +122,7 @@ class Service extends Model
                     if ($appointmentSetting === null) {
                         $appointmentSetting = AppointmentSetting::firstWhere('user_id', $doctor->id);
                     }
-                    if ($appointmentSetting->segments()->exists()) {
+                    if ($appointmentSetting?->segments()->exists()) {
                         return route('front.doctor.profile', $routeProperty);
                     } else {
                         return route('front.setAppointment.days', $routeProperty);

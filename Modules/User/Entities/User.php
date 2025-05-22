@@ -421,7 +421,7 @@ class User extends Authenticatable
             if (\Illuminate\Support\Str::startsWith($this->avatar, 'http')) {
                 return $this->avatar;
             }else{
-                return url('storage/'.$user->avatar) ;
+                return url('storage/'.$this->avatar) ;
             }
         }
         return asset('assets/admin/images/svgs/user.svg') ;

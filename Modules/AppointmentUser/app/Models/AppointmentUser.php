@@ -22,6 +22,7 @@ use Modules\AppointmentSetting\app\Models\AppointmentSegmentItem;
 
 class AppointmentUser extends Model
 {
+
     use HasFactory, SoftDeletes, Notifiable;
     const DETAIL_APPOINTMENT_VIA = 'appointment_via';
     const STORE_FROM_APPLICATION = 'store_from_application';

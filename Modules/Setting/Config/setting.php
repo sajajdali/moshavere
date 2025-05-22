@@ -109,6 +109,15 @@ $setting = [
             \Modules\Setting\Enum\SettingKeyEnum::SUPPORT_USER_ROLE
         ],
     ],
+    'api' => [
+        'title' => 'تنظیمات API',
+        'icon' => 'fa fa-api',
+        'settings' => [
+            \Modules\Setting\Enum\SettingKeyEnum::ACTIVE_API,
+            \Modules\Setting\Enum\SettingKeyEnum::API_USERNAME,
+            \Modules\Setting\Enum\SettingKeyEnum::API_PASSWORD
+        ],
+    ],
     'payment' => [
         'title' => 'تنظیمات پرداخت',
         'icon' => 'fa fa-credit-card',

@@ -52,6 +52,7 @@ class CreateOrUpdate extends Component
         $modelCreateOrUpdate = [
             'title'         => $this->form['title']         ?? '',
             'parent_id'     => $parentId,
+            'api_code'     => $this->form['api_code']      ?? '',
             'priority'      => $this->form['priority']   ?? 1,
             'active'        => ActiveEnum::tryFrom($active),
             'show_type'     => $this->form['show_type'] ? ServiceShowTypeEnum::SHOW : ServiceShowTypeEnum::DONT_SHOW,
@@ -102,6 +103,7 @@ class CreateOrUpdate extends Component
     private function addInitialValues()
     {
 
+        $this->form['api_code']     = $this->service->api_code;
         $this->form['title']     = $this->service->title;
         $this->form['parent_id'] = $this->service->parent_id;
         $this->form['img']       = $this->service->icon;

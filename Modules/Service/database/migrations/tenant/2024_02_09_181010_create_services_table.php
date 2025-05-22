@@ -19,6 +19,7 @@ return new class extends Migration
             $table->integer('priority')->default(1);
             $table->tinyInteger('active')->default(1);
             $table->tinyInteger('show_type')->default(1)->comment('1=> show in the main page | 2 => not show in the main page');
+            $table->string('api_code')->nullable();
             $table->softDeletes();
             $table->timestamps();
         });

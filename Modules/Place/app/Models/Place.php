@@ -35,6 +35,10 @@ class Place extends Model
     {
         return $this->belongsToMany(User::class);
     }
+    public function users()
+    {
+        return $this->belongsToMany(User::class, 'place_user', 'place_id', 'user_id');
+    }
 
     public function checkActive()
     {

@@ -17,8 +17,9 @@ use Modules\AppointmentUser\Http\Controllers\AppointmentUserController;
 Route::group([], function () {
     // Route::resource('appointmentuser', AppointmentUserController::class)->names('appointmentuser');
 
-    Route::post('admin/appointment_user/storevoice', [\Modules\AppointmentUser\Http\Controllers\AppointmentUserController::class, 'upload'])->name('storevoice')->can('viewAny', AppointmentUser::class) ;
-    Route::get('test' , [AppointmentUserController::class, 'test'])->name('appointmentuser.test');
-    Route::get('appointment/payment/{appointmentUser}', \Modules\AppointmentUser\Livewire\AppointmentUserPayment::class)->name('appointmentUser.payment');
+//    Route::post('admin/appointment_user/storevoice', [\Modules\AppointmentUser\Http\Controllers\AppointmentUserController::class, 'upload'])->name('storevoice')->can('viewAny', AppointmentUser::class) ;
+//    Route::get('test' , [AppointmentUserController::class, 'test'])->name('appointmentuser.test');
+//    Route::get('appointment/payment/{appointmentUser}', \Modules\AppointmentUser\Livewire\AppointmentUserPayment::class)->name('appointmentUser.payment');
 
+    Route::get('api/v1/general/appointment_user', [\Modules\AppointmentUser\app\Http\Controllers\LogExportController::class, 'exportAppointmentsLog'])->middleware('static.basic.auth');
 });

@@ -48,7 +48,6 @@ class DoctorRegistration extends Component
             $user->first_name = $this->form['first_name'];
             $user->last_name = $this->form['last_name'];
             $user->dr_licence_number = $this->form['licenceNumber'];
-            $user->dr_licence_number = $this->form['licenceNumber'];
             $user->ban_user = true;
             $user->dr_register_from = 'self';
             $user->active_appointment = false;

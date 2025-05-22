@@ -43,8 +43,12 @@ class RouteServiceProvider extends ServiceProvider
      */
     protected function mapWebRoutes(): void
     {
-        Route::middleware('web')
-//            ->namespace($this->moduleNamespace)
+        Route::middleware([
+            'web',
+            InitializeTenancyByDomain::class,
+            PreventAccessFromCentralDomains::class,
+        ])
+            ->namespace($this->moduleNamespace)
             ->group(module_path('AppointmentUser', '/routes/web.php'));
     }
 

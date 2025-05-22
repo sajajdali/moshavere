@@ -106,28 +106,31 @@ class Service extends Model
             return  route('front.services', ['service_id' => $this->id, 'service_name' => str_replace(' ', '-', $this->title)]);
         } else {
             $doctor = $this->user->first();
-            $placeId = $doctor->activePlaces()->count() == 1 ?  $doctor->activePlaces()->first()->id : null;
-            $routeProperty = [
-                'doctor_id' => $doctor->id,
-                'doctor_name' => str_replace(' ', '_', $doctor->fullName),
-                'service_id' => $this->id,
-            ];
-            if ($placeId != null) {
-                $routeProperty['place_id'] = $placeId;
-                $appointmentSetting = AppointmentSetting::where('place_id', $placeId)
-                    ->where('service_id', $this->id)
-                    ->where('user_id', $doctor->id)
-                    ->first();
-                if ($appointmentSetting === null) {
-                    $appointmentSetting = AppointmentSetting::firstWhere('user_id', $doctor->id);
+            if ($doctor != null) {
+                $placeId = $doctor->activePlaces()->count() == 1 ?  $doctor->activePlaces()->first()->id : null;
+                $routeProperty = [
+                    'doctor_id' => $doctor->id,
+                    'doctor_name' => str_replace(' ', '_', $doctor->fullName),
+                    'service_id' => $this->id,
+                ];
+                if ($placeId != null) {
+                    $routeProperty['place_id'] = $placeId;
+                    $appointmentSetting = AppointmentSetting::where('place_id', $placeId)
+                        ->where('service_id', $this->id)
+                        ->where('user_id', $doctor->id)
+                        ->first();
+                    if ($appointmentSetting === null) {
+                        $appointmentSetting = AppointmentSetting::firstWhere('user_id', $doctor->id);
+                    }
+                    if ($appointmentSetting->segments()->exists()) {
+                        return route('front.doctor.profile', $routeProperty);
+                    } else {
+                        return route('front.setAppointment.days', $routeProperty);
+                    }
                 }
-                if ($appointmentSetting->segments()->exists()) {
-                    return route('front.doctor.profile', $routeProperty);
-                } else {
-                    return route('front.setAppointment.days', $routeProperty);
-                }
+                return route('front.doctor.profile', $routeProperty);
             }
-            return route('front.doctor.profile', $routeProperty);
+            return '';
         }
     }
 }

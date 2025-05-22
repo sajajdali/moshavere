@@ -21,7 +21,7 @@
                                     class="absolute top-0 right-0 block w-4 h-4 bg-green border-[3px] border-white rounded-full"></span>
                                 <div
                                     class="w-[60px] h-[60px] overflow-hidden rounded-full flex items-center justify-center">
-                                    <img src="{{ $newDocs->avatar }}" alt="doctor-image"
+                                    <img src="{{ $newDocs->getUserAvatar() }}" alt="doctor-image"
                                         class="w-full h-full object-cover" />
                                 </div>
                             </div>

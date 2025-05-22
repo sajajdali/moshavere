@@ -13,7 +13,7 @@
                     </a>
                 </div>
 
-                <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 xl:grid-cols-5 gap-4">
+                <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 xl:grid-cols-5 gap-4 relative">
                     @foreach ($fetchData['service'] as $service)
                         <a href="{{ $service->getServiceRoute() }}"
                            class="flex flex-col items-center gap-4 p-5 border border-secondary-200 bg-white rounded-lg h-[230px]">

@@ -75,7 +75,7 @@
                                         <div class="client-title mt-0 flex-column flex-sm-row">
                                             <figure class="rounded-circle align-self-start mb-0">
                                                 @if ($doctor->avatar)
-                                                    <img src="{{ $doctor->avatar }}" alt="Generic placeholder image"
+                                                    <img src="{{ $doctor->getUserAvatar() }}" alt="Generic placeholder image"
                                                         class="avatar brround avatar-lg me-3">
                                                 @else
                                                     <svg xmlns="http://www.w3.org/2000/svg" class="w-inner-icn"

@@ -77,7 +77,9 @@
                                     wire:model='form.segment.{{ $segmentsItem->id }}' />
                                 <div class="cart__radio--text">
                                     <h5>{{ $segmentsItem->title }}</h5>
-                                    <p>قیمت : {{ number_format($segmentsItem->price) }}</p>
+                                  @if ($segmentsItem->price > 0)
+                                  <p>قیمت : {{ number_format($segmentsItem->price) }}</p>
+                                  @endif
                                 </div>
                             </label>
                         @endforeach

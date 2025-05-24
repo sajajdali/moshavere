@@ -23,6 +23,7 @@ class SegmentCreateOrUpdate extends Component
     protected $rules = [
         'form.title' => 'required|string',
         'form.items.*.title' => 'required|string',
+        'form.items.*.priority' => 'required',
         'form.items.*.time' => 'required',
     ];
 
@@ -30,6 +31,7 @@ class SegmentCreateOrUpdate extends Component
         'form.title.required' => 'نام گروه بندی را وارد کنید',
         'form.items.*.title.required' => 'لطفا نام  گروه بندی را وارد کنید',
         'form.items.*.time.required' => 'لطفا زمان مورد نیاز را وارد کنید',
+        'form.items.*.priority.required' => 'لطفا اولویت نمایش را وارد کنید',
     ];
 
     public function mount()
@@ -76,14 +78,15 @@ class SegmentCreateOrUpdate extends Component
             'multiple_choice' => $this->form['multiple_choice'],
         ];
         if ($this->isEdited) {
-
             $this->appointmentSegment->update($segmentCreateOrUpdate);
             $message = 'تنظیمات با موفقیت ویرایش شد';
             // remove item when click to remove by use
             $listId = collect($this->form['items'])->pluck('id');
             $this->appointmentSegment->items()->whereNotIn('id', $listId)->delete();
             foreach ($this->form['items'] as $item) {
-
+                if($item['price'] == ""){
+                    $item['price'] = null;
+                }
                 if (isset($item['id'])){
                     unset($item['created_at']);
                     unset($item['updated_at']);

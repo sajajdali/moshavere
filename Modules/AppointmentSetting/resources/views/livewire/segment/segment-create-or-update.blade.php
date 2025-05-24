@@ -171,7 +171,7 @@
                         </div>
                         @error('*')
                         <div class="alert alert-danger alert-dismissible fade show" role="alert">
-                            <span class="alert-inner--text">لطفا ارور های موجود در فرم بالا را برطرف کنید</span>
+                            <span class="alert-inner--text">لطفا خطا های موجود در فرم بالا را برطرف کنید.</span>
                             <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close">
                                 <span aria-hidden="true">×</span>
                             </button>

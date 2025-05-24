@@ -86,8 +86,8 @@
                                                     <ul class="dropdown-menu" role="menu">
                                                         @can('update',$segment)
                                                             <li>
-                                                                <a href="{{ route('admin.appointment.segment.edit',$segment) }}">ویرایش
-                                                                    وعده
+                                                                <a href="{{ route('admin.appointment.segment.edit',$segment) }}">
+                                                                    ویرایش
                                                                 </a>
                                                             </li>
                                                         @endcan

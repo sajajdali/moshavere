@@ -25,7 +25,6 @@ use Modules\AppointmentUser\Enum\AppointmentOnlineMessageTypeEnum;
 |
 */
 
-Route::get('/s/{param}', [ShortLinkController::class, 'index']);
 Route::get('tenant', function () {
     dd("Sa");
 });

@@ -867,7 +867,7 @@ class AppointmentUserService
         }
         event(new StoreAppointmentEvent($appointmentUser));
 
-        $doctorAllSettings = AppointmentSetting::where('doctor_id', $appointmentSetting->user_id)->get();
+        $doctorAllSettings = AppointmentSetting::where('user_id', $appointmentSetting->user_id)->get();
         foreach ($doctorAllSettings as $setting) {
             GenerateAppointmentCache::dispatch($setting);
         }

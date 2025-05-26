@@ -1,5 +1,5 @@
 <div>
-    <div class="modal fade" id="docModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true"
+    <div class="modal effect-slide-in-bottom fade" id="docModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true"
         wire:ignore.self>
         <div class="modal-dialog">
             <div class="modal-content">

@@ -23,7 +23,7 @@ class SpecialSectionSetting extends Component
     private function fillTheFechData()
     {
         $this->fetchData['GeneralAppointmentSetting'] = AppointmentSetting::where('user_id', $this->fetchData['user'])->whereNull('service_id')->first();
-        $this->fetchData['SpecialAppointmentSetting'] = AppointmentSetting::where('user_id', $this->fetchData['user'])->whereNotNull('service_id')->get();
+        $this->fetchData['SpecialAppointmentSetting'] = AppointmentSetting::where('user_id', $this->fetchData['user'])->whereNotNull('service_id')->whereHas('service')->get();
     }
 
     #[Computed]

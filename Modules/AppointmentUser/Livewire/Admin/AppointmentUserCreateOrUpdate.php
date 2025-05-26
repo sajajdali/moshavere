@@ -17,7 +17,7 @@ class AppointmentUserCreateOrUpdate extends Component
 {
     use WithPagination;
     #[Locked]
-    public bool $permitionCheck ; 
+    public bool $permitionCheck;
     public array $search = [];
     public array $form = [
         'doctorSelected'    => null,
@@ -65,28 +65,48 @@ class AppointmentUserCreateOrUpdate extends Component
                     $this->fetchData['ServiceList'] = $doctor->activeServices();
                     //check if there is more than 1 service exist
                     if (count($this->fetchData['ServiceList']) == 1) {
-                        return redirect()->route(
-                            'admin.appointment.add.setTime',
-                            [
-                                'doctorId' =>  $this->form['modalSelectedData']['doctor'],
-                                'sectionId' => $this->fetchData['ServiceList']->first()->id,
-                                'placeId' => $this->form['modalSelectedData']['place']
-                            ]
-                        );
+                        if ($this->hasSegment($doctor, $this->fetchData['ServiceList']->first(), $this->form['modalSelectedData']['place'])) {
+                            $this->lunchModal('segmentModal');
+                            $this->form['modalSelectedData']['service'] = $this->fetchData['ServiceList']->first()->id;
+                        } else {
+                            return redirect()->route(
+                                'admin.appointment.add.setTime',
+                                [
+                                    'doctorId' =>  $this->form['modalSelectedData']['doctor'],
+                                    'sectionId' => $this->fetchData['ServiceList']->first()->id,
+                                    'placeId' => $this->form['modalSelectedData']['place']
+                                ]
+                            );
+                        }
                     } else {
-                        return  $this->lunchmodal('serviceModal');
+                        return  $this->lunchModal('serviceModal');
                     }
                 }
-                return  $this->lunchmodal('docModal');
+                return  $this->lunchModal('docModal');
             } else {
-                $this->lunchmodal('placeModal');
+                $this->lunchModal('placeModal');
             }
             // if()
         } else {
             return redirect()->route('admin.appointment.doctor.list')->with('error', " تنظیمات روز های حضور برای {$user->fullName} تعریف نشده است");
         }
     }
-
+    private function hasSegment($doctor, $service, $place): bool
+    {
+        $appSetting = AppointmentSetting::where('user_id', $doctor)
+            ->where('service_id', $service)
+            ->where('place_id', $place)?->first();
+        if ($appSetting == null) {
+            $appSetting = AppointmentSetting::where('user_id', $doctor)->whereNull('service_id')
+                ->whereNull('place_id')?->first();
+        }
+        if ($appSetting->segments()->exists()) {
+            $this->fetchData['segments']['is_one_choice'] = filter_var($appSetting->segments->first()->multiple_choice, FILTER_VALIDATE_BOOL);
+            $this->fetchData['segments']['items'] = $appSetting->segments->first()->items;
+            return true;
+        }
+        return false;
+    }
     public function placeSelected(Place $place)
     {
         $this->form['modalSelectedData']['place'] = $place->id;
@@ -97,33 +117,65 @@ class AppointmentUserCreateOrUpdate extends Component
             $doctor = User::find($this->form['modalSelectedData']['doctor']);
             $this->fetchData['ServiceList'] = $doctor->service;
             if (count($this->fetchData['ServiceList']) == 1) {
-                $this->dispatch('show-loading',true);
-                return redirect()->route(
-                    'admin.appointment.add.setTime',
-                    [
-                        'doctorId' =>  $this->form['modalSelectedData']['doctor'],
-                        'sectionId' => $this->fetchData['ServiceList']->first()->id,
-                        'placeId' => $this->form['modalSelectedData']['place']
-                    ]
-                );
+                if ($this->hasSegment($doctor, $this->fetchData['ServiceList']->first(), $this->form['modalSelectedData']['place'])) {
+                    $this->lunchModal('segmentModal');
+                    $this->form['modalSelectedData']['service'] = $this->fetchData['ServiceList']->first()->id;
+                } else {
+                    $this->dispatch('show-loading', true);
+                    return redirect()->route(
+                        'admin.appointment.add.setTime',
+                        [
+                            'doctorId' =>  $this->form['modalSelectedData']['doctor'],
+                            'sectionId' => $this->fetchData['ServiceList']->first()->id,
+                            'placeId' => $this->form['modalSelectedData']['place']
+                        ]
+                    );
+                }
             } else {
-                return  $this->lunchmodal('serviceModal');
+                return  $this->lunchModal('serviceModal');
             }
         }
         if (count($this->fetchData['docList']) == 1) {
-            return $this->docSelectedFrommodal($this->fetchData['docList']->first());
+            return $this->docSelectedFromModal($this->fetchData['docList']->first());
         }
-        return  $this->lunchmodal('docModal');
+        return  $this->lunchModal('docModal');
     }
     public function serviceSelected(Service $service)
     {
-        $this->dispatch('show-loading',true);
+        if ($this->hasSegment($this->form['modalSelectedData']['doctor'], $service->id, $this->form['modalSelectedData']['place'])) {
+            $this->lunchModal('segmentModal');
+            $this->form['modalSelectedData']['service'] = $service->id;
+        } else {
+            $this->dispatch('show-loading', true);
+            return redirect()->route(
+                'admin.appointment.add.setTime',
+                [
+                    'doctorId' =>  $this->form['modalSelectedData']['doctor'],
+                    'sectionId' => $service->id,
+                    'placeId' => $this->form['modalSelectedData']['place']
+                ]
+            );
+        }
+    }
+    public function segmentSelected($segmentItemId = null)
+    {
+        if ($segmentItemId == null) {
+            $segmentsItemIds = [];
+            foreach ($this->form['segmentSelectedIem'] as $itemId => $isSelected) {
+                if($isSelected){
+                    $segmentsItemIds[]= $itemId ;
+                }
+            }
+            $segmentItemId = implode(',', $segmentsItemIds);  
+        }
+        $this->dispatch('show-loading', true);
         return redirect()->route(
             'admin.appointment.add.setTime',
             [
-                'doctorId' =>  $this->form['modalSelectedData']['doctor'],
-                'sectionId' => $service->id,
-                'placeId' => $this->form['modalSelectedData']['place']
+                'doctorId'      =>  $this->form['modalSelectedData']['doctor'],
+                'sectionId'     => $this->form['modalSelectedData']['service'],
+                'placeId'       => $this->form['modalSelectedData']['place'],
+                'segmentItemId' => $segmentItemId,
             ]
         );
     }
@@ -143,7 +195,7 @@ class AppointmentUserCreateOrUpdate extends Component
             $this->lunchModal('placeModal');
         }
     }
-    public function docSelectedFrommodal(User $user)
+    public function docSelectedFromModal(User $user)
     {
         $this->form['modalSelectedData']['doctor'] = $user->id;
         if (
@@ -151,26 +203,28 @@ class AppointmentUserCreateOrUpdate extends Component
             !empty($this->form['modalSelectedData']['doctor']) &&
             !empty($this->form['modalSelectedData']['service'])
         ) {
-            $this->dispatch('show-loading',true);
-            return redirect()->route(
-                'admin.appointment.add.setTime',
-                [
-                    'doctorId' =>  $this->form['modalSelectedData']['doctor'],
-                    'sectionId' => $this->form['modalSelectedData']['service'],
-                    'placeId' => $this->form['modalSelectedData']['place']
-                ]
-            );
+            if ($this->hasSegment($user->id, $this->form['modalSelectedData']['service'], $this->form['modalSelectedData']['place'])) {
+                $this->lunchModal('segmentModal');
+            } else {
+                $this->dispatch('show-loading', true);
+                return redirect()->route(
+                    'admin.appointment.add.setTime',
+                    [
+                        'doctorId' =>  $this->form['modalSelectedData']['doctor'],
+                        'sectionId' => $this->form['modalSelectedData']['service'],
+                        'placeId' => $this->form['modalSelectedData']['place']
+                    ]
+                );
+            }
         }
     }
-    private function lunchmodal($name)
+    private function lunchModal($name)
     {
-        $this->dispatch('lunchmodal', name: $name);
+        $this->dispatch('lunchModal', name: $name);
     }
-
-
     public function mount()
     {
-      
+
         if (!Service::exists()) {
             return redirect()->route('admin.service.list')->with('error', 'لطفا حداقل یک بخش به سیستم اضافه کنید');
         }
@@ -178,9 +232,9 @@ class AppointmentUserCreateOrUpdate extends Component
     public function render()
     {
         $permitionCheck = auth()->user();
-        $permitionCondition = !$permitionCheck->isAdmin() && $permitionCheck->hasRole('پزشک') ; 
-        $docQuery = User::doctors_query()->when( $permitionCondition,function($q){
-                return $q->where('id',auth()->user()->id);
+        $permitionCondition = !$permitionCheck->isAdmin() && $permitionCheck->hasRole('پزشک');
+        $docQuery = User::doctors_query()->when($permitionCondition, function ($q) {
+            return $q->where('id', auth()->user()->id);
         });
         if (isset($docQuery)) {
             $docQuery =  $docQuery->where(function ($query) {
@@ -204,9 +258,9 @@ class AppointmentUserCreateOrUpdate extends Component
                 });
             })->orderByDesc('id')->paginate(20);
         }
-        $Services = Service::when( $permitionCondition,function($q){
-            return $q->whereHas('user',function($qq){
-                 $qq->where('users.id',auth()->user()->id);
+        $Services = Service::when($permitionCondition, function ($q) {
+            return $q->whereHas('user', function ($qq) {
+                $qq->where('users.id', auth()->user()->id);
             });
         })->where('active', ActiveEnum::ACTIVE)
             ->when(isset($this->search['searchService']) && !empty($this->search['searchService']), function ($query) {

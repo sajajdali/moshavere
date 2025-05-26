@@ -72,6 +72,6 @@
             appearLoading();
         });
     function appearLoading() {
-        document.getElementById('loading-indicator').setAttribute('style', 'background: rgba(255, 255, 255, 0.8); display: flex !important; top: 0; left: 0; z-index: 1050;');
+        document.getElementById('loading-indicator').setAttribute('style', 'background: rgba(255, 255, 255, 0.8); display: flex !important; top: 0; left: 0; z-index: 1051;');
     }
 </script>

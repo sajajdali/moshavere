@@ -86,8 +86,6 @@ class AppointmentUserService
             'overLapTime' => 0 // No overlap, so overlapped time is 0
         ];
     }
-
-
     public function listAppointments(AppointmentSetting $appointmentSetting, array $details = [])
     {
         // Get the date range for which you want to fetch appointments and available slots
@@ -778,6 +776,21 @@ class AppointmentUserService
         $detailDatabaseDB[AppointmentUser::DETAIL_APPOINTMENT_VIA] = $appointmentData->appointmentVia;
         if (isset($detail['wait_for_payment'])) {
             $detailDatabaseDB[AppointmentUser::PENDING_APPOINTMENT_BY_SECRETERY] = true;
+        }
+        if (isset($detail['segments_ids'])) {
+            $segmentItemId = explode(',', $detail['segments_ids']);
+            $segments =  $appointmentSetting->segments
+                ->first()
+                ->items
+                ->whereIn('id', $segmentItemId)
+                ->map(function ($item) {
+                    return [
+                        'id'    => $item->id,
+                        'title' => $item->title,
+                        'time'  => $item->time,
+                    ];
+                })->values()->toArray();
+            $detailDatabaseDB[AppointmentUser::DETAIL_SEGMENTS] = $segments;
         }
         $appointmentUserModel['details'] = $detailDatabaseDB;
 

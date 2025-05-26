@@ -219,9 +219,9 @@
         </div>
     </div>
     <livewire:appointmentuser::admin.add-appointment.modal.service-and-doctor-modal :appId="$fetchData['appId']" :appTime="$fetchData['time']"
-        :serviceId="$fetchData['service']->id" :placeId="$fetchData['place']" />
+        :serviceId="$fetchData['service']->id" :placeId="$fetchData['place']" :segmentId="$fetchData['segment']" />
     <livewire:appointmentuser::admin.add-appointment.modal.specific-day-appointment-registration-modal :appId="$fetchData['appId']"
-        :appTime="$fetchData['time']" :serviceId="$fetchData['service']->id" :placeId="$fetchData['place']" />
+        :appTime="$fetchData['time']" :serviceId="$fetchData['service']->id" :placeId="$fetchData['place']" :segmentId="$fetchData['segment']" />
     <div>
         @include('appointmentuser::components.appointmentlist.disapprovemodal')
     </div>

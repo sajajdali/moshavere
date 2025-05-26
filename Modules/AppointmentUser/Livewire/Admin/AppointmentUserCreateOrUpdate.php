@@ -65,7 +65,7 @@ class AppointmentUserCreateOrUpdate extends Component
                     $this->fetchData['ServiceList'] = $doctor->activeServices();
                     //check if there is more than 1 service exist
                     if (count($this->fetchData['ServiceList']) == 1) {
-                        if ($this->hasSegment($doctor, $this->fetchData['ServiceList']->first(), $this->form['modalSelectedData']['place'])) {
+                        if ($this->hasSegment($doctor->id, $this->fetchData['ServiceList']->first()->id, $this->form['modalSelectedData']['place'])) {
                             $this->lunchModal('segmentModal');
                             $this->form['modalSelectedData']['service'] = $this->fetchData['ServiceList']->first()->id;
                         } else {
@@ -117,7 +117,7 @@ class AppointmentUserCreateOrUpdate extends Component
             $doctor = User::find($this->form['modalSelectedData']['doctor']);
             $this->fetchData['ServiceList'] = $doctor->service;
             if (count($this->fetchData['ServiceList']) == 1) {
-                if ($this->hasSegment($doctor, $this->fetchData['ServiceList']->first(), $this->form['modalSelectedData']['place'])) {
+                if ($this->hasSegment($doctor->id, $this->fetchData['ServiceList']->first()->if, $this->form['modalSelectedData']['place'])) {
                     $this->lunchModal('segmentModal');
                     $this->form['modalSelectedData']['service'] = $this->fetchData['ServiceList']->first()->id;
                 } else {
@@ -166,7 +166,7 @@ class AppointmentUserCreateOrUpdate extends Component
                     $segmentsItemIds[]= $itemId ;
                 }
             }
-            $segmentItemId = implode(',', $segmentsItemIds);  
+            $segmentItemId = implode(',', $segmentsItemIds);
         }
         $this->dispatch('show-loading', true);
         return redirect()->route(

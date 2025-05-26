@@ -867,8 +867,10 @@ class AppointmentUserService
         }
         event(new StoreAppointmentEvent($appointmentUser));
 
-        GenerateAppointmentCache::dispatch($appointmentSetting);
-
+        $doctorAllSettings = AppointmentSetting::where('doctor_id', $appointmentSetting->user_id)->get();
+        foreach ($doctorAllSettings as $setting) {
+            GenerateAppointmentCache::dispatch($setting);
+        }
         $trackingUrl = route('front.setAppointment.detail', ['tracking_code' => $appointmentUser->tracking_code]);
         return [
             'status' => true,

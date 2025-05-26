@@ -66,8 +66,8 @@ class AppointmentUserCreateOrUpdate extends Component
                     //check if there is more than 1 service exist
                     if (count($this->fetchData['ServiceList']) == 1) {
                         if ($this->hasSegment($doctor->id, $this->fetchData['ServiceList']->first()->id, $this->form['modalSelectedData']['place'])) {
-                            $this->lunchModal('segmentModal');
                             $this->form['modalSelectedData']['service'] = $this->fetchData['ServiceList']->first()->id;
+                            return $this->lunchModal('segmentModal');
                         } else {
                             return redirect()->route(
                                 'admin.appointment.add.setTime',

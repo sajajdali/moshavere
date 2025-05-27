@@ -195,12 +195,12 @@ class SpecificDayAppointmentRegistrationModal extends Component
         if ($from->greaterThan($until)) {
             return $this->addError('form.time.from', 'زمان شروع نوبت نباید بزرگ تر از زمان پایان باشد');
         } else {
-            $is_time_free = $this->IsthisTimeAvaialable($from->toDateString(), $until->toDateString());
-            if ($is_time_free) {
+            // $is_time_free = $this->IsthisTimeAvaialable($from->toDateString(), $until->toDateString());
+            // if ($is_time_free) {
                 $this->storeApp();
-            } else {
-                $this->step = 4;
-            }
+            // } else {
+            //     $this->step = 4;
+            // }
             $this->render();
         }
     }

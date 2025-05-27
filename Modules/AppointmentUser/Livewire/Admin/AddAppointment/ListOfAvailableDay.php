@@ -20,14 +20,18 @@ class ListOfAvailableDay extends Component
     public function GotoSpecificDay()
     {
         $date = Verta::parse($this->specificDayDate)->format('Y-m-d');
+        $parameters = [
+            'serviceId' => $this->fethData['service']->id,
+            'placeId'    => $this->fethData['place']->id,
+            'appId' => $this->fethData['appointmentSetting'],
+            'date' => $date
+        ];
+        if (isset($this->fethData['segment'])) {
+            $parameters['segmentItemId'] = $this->fethData['segment'];
+        }
         return redirect()->route(
             'admin.appointment.add.specificday',
-            [
-                'serviceId' => $this->fethData['service']->id,
-                'placeId'    => $this->fethData['place']->id,
-                'appId' => $this->fethData['appointmentSetting'],
-                'date' => $date
-            ]
+            $parameters
         );
     }
     public function GotoAppointmentList($time, $day = null)
@@ -44,10 +48,10 @@ class ListOfAvailableDay extends Component
             'date' => $passedDate
         ];
         if (!empty($day)) {
-            $parameters['time'] = $passedHour ;
+            $parameters['time'] = $passedHour;
         }
         if (isset($this->fethData['segment'])) {
-            $parameters['segmentItemId'] = $this->fethData['segment'] ;
+            $parameters['segmentItemId'] = $this->fethData['segment'];
         }
         return redirect()->route('admin.appointment.add.specificday', $parameters);
     }
@@ -159,8 +163,8 @@ class ListOfAvailableDay extends Component
             Cache::forget('appointmentList.' . $appointmentSetting->id);
         }
         if (app()->environment('local') || $segmentItemId != null) {
-            $details=[];
-            if($segmentItemId != null){
+            $details = [];
+            if ($segmentItemId != null) {
                 $details['segment_time'] =  $this->fethData['segment_time'];
             }
             $listOfAppointment = app('AppointmentUserService')->listAppointments($appointmentSetting, $details);

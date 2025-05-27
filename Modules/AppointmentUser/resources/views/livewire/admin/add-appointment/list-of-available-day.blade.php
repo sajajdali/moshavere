@@ -20,7 +20,7 @@
                             </div>
                             <div class="col-md-10">
                                 <div class="input-group mb-3">
-                                    <input type="text" class="form-control" placeholder="انتخاب کنید!!" data-jdp
+                                    <input type="text" class="form-control" placeholder="انتخاب کنید!!" data-jdp autocomplete="off"
                                         data-name="specificDayDate" id="customDateInput"
                                         aria-describedby="basic-addon3">
                                 </div>

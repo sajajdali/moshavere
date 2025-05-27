@@ -237,7 +237,12 @@ class SpecificDayAvailableAppointment extends Component
     //opration button functions
     private function redirectToPage($msg)
     {
-        return redirect()->route('admin.appointment.add.specificday', ['serviceId' => $this->fetchData['service']->id, 'placeId' => $this->fetchData['place'], 'appId' => $this->fetchData['appId'],  'date' => verta($this->fetchData['selectedDate'])->format('Y-m-d')])->with('success', $msg);
+        return redirect()->route('admin.appointment.add.specificday',
+        ['serviceId' => $this->fetchData['service']->id,
+         'placeId' => $this->fetchData['place'],
+          'appId' => $this->fetchData['appId'],
+        'segmentItemId' => $this->fetchData['segment'],
+        'date' => verta($this->fetchData['selectedDate'])->format('Y-m-d')])->with('success', $msg);
     }
     // opration button functions
 

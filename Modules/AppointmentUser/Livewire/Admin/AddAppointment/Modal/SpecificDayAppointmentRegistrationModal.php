@@ -183,7 +183,7 @@ class SpecificDayAppointmentRegistrationModal extends Component
         return  app('AppointmentUserService')->isAppointmentTimeAvailable(
             $from,
             $until,
-            Verta::parse($this->appDate)->toCarbon()->format('Y/m/d'),
+            Verta::parse($this->appDate)->toCarbon()->toDateTimeString(),
             $appSetting
         );
     }
@@ -278,6 +278,7 @@ class SpecificDayAppointmentRegistrationModal extends Component
         );
 
         $detail = [];
+        $detail['store_from_admin_panel'] = true;
         if (isset($this->segmentId) && $this->segmentId != null) {
             $detail['segments_ids'] = $this->segmentId;
         }

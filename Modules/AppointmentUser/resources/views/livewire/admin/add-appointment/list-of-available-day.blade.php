@@ -2,7 +2,7 @@
     <div class="page-header">
         <div>
             <h1 class="page-title">شما در حال افزودن نوبت برای بخش <span
-                    class="text-primary">{{ $fethData['service']?->title }}</span> و دکتر
+                    class="text-primary">{{ $fethData['service']?->title }}</span> و {{$fethData['doctor']->speciality_type == 1 ? 'دکتر' : ''}}
                 <span class="text-primary">{{ $fethData['doctor']?->full_name }}</span> هستید.
             </h1>
         </div>

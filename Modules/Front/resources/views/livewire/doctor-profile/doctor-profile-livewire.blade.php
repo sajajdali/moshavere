@@ -10,7 +10,7 @@
             <section class="basis-full md:basis-[60%] flex flex-col gap-6">
                 <div class="bg-white rounded-lg space-y-4 p-4">
                     <header class="flex flex-col sm:flex-row items-center justify-between gap-3">
-                        <p class="text-lg font-semibold">اطلاعات تخصصی پزشک</p>
+                        <p class="text-lg font-semibold">اطلاعات تخصصی {{$doc->speciality_type == 1 ? 'پزشک' : ''}}</p>
                         @isset($doc->dr_rate)
                             <div class="bg-green text-white rounded-full py-2 px-5">
                                 {{ $doc->dr_rate }}% رضایت مراجعین
@@ -25,7 +25,7 @@
                         <div
                                 class="w-[calc(100%-70px-1.25rem)] flex flex-col sm:flex-row items-center justify-between gap-3">
                             <div class="space-y-3 text-center sm:text-right">
-                                <h1 class="text-lg font-bold">دکتر
+                                <h1 class="text-lg font-bold">{{$doc->speciality_type == 1 ? 'دکتر' : ''}}
                                     {{ $doc->full_name }}</h1>
                                 <h2 class="bg-secondary-200 rounded-lg py-2 px-3 text-sm">
                                     {{ $doc->DocSpecialities() }}
@@ -78,9 +78,9 @@
                     <button type="button" wire:click='reserveAppointment'
                             @if (!$fetchData['is_app_available']) disabled @endif style="width: 100%" class="mobile-only btn__blue--round-full-between">
                         @if ($doc->hasOnlineApp())
-                            <p>دریافت نوبت حضوری دکتر {{ $doc->full_name }}</p>
+                            <p>دریافت نوبت حضوری {{$doc->speciality_type == 1 ? 'دکتر' : ''}} {{ $doc->full_name }}</p>
                         @else
-                            <p>دریافت نوبت دکتر {{ $doc->full_name }}</p>
+                            <p>دریافت نوبت {{$doc->speciality_type == 1 ? 'دکتر' : ''}} {{ $doc->full_name }}</p>
                         @endif
                         <svg class="w-6 h-6" xmlns="http://www.w3.org/2000/svg">
                             <use xlink:href="#sprite-arrow-left-circle" />
@@ -131,7 +131,7 @@
                     <svg class="w-7 h-7" xmlns="http://www.w3.org/2000/svg">
                         <use xlink:href="#sprite-chevron-left" />
                     </svg>
-                    <span>{{ $doc->full_name }} دکتر</span>
+                    <span>{{ $doc->full_name }} {{$doc->speciality_type == 1 ? 'دکتر' : ''}}</span>
                 </div>
                 <!-- end breadcrumb -->
                 <!-- container -->
@@ -356,9 +356,9 @@
                         <button type="button" wire:click='reserveAppointment'
                                 @if (!$fetchData['is_app_available']) disabled @endif class="btn__blue--round-full-between">
                             @if ($doc->hasOnlineApp())
-                                <p>دریافت نوبت حضوری دکتر {{ $doc->full_name }}</p>
+                                <p>دریافت نوبت حضوری {{$doc->speciality_type == 1 ? 'دکتر' : ''}} {{ $doc->full_name }}</p>
                             @else
-                                <p>دریافت نوبت دکتر {{ $doc->full_name }}</p>
+                                <p>دریافت نوبت {{$doc->speciality_type == 1 ? 'دکتر' : ''}} {{ $doc->full_name }}</p>
                             @endif
                             <svg class="w-6 h-6" xmlns="http://www.w3.org/2000/svg">
                                 <use xlink:href="#sprite-arrow-left-circle" />

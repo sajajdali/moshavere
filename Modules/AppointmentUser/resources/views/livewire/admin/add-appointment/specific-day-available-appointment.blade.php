@@ -2,7 +2,7 @@
     <div class="page-header align-items-center">
         <div>
             @if (!$edited['status'])
-                <h1 class="page-title"> افزودن نوبت برای دکتر <span
+                <h1 class="page-title"> افزودن نوبت برای {{$fetchData['doc']->speciality_type == 1 ? 'دکتر' : ''}} <span
                         class="text-danger">{{ $fetchData['doc']->fullName }}</span> </h1>
             @else
                 <h1 class="page-title">تغییر زمان نوبت</h1>

@@ -31,7 +31,7 @@
                                             </div>
                                         </div>
                                         <div class="text-center space-y-1">
-                                            <h4 class="font-bold text-lg">دکتر {{ $introDoc->full_name }}</h4>
+                                            <h4 class="font-bold text-lg">{{$introDoc->speciality_type == 1 ? 'دکتر' : ''}} {{ $introDoc->full_name }}</h4>
                                             <p class="text-secondary-400">{{ $introDoc->DocSpecialities() }}</p>
                                         </div>
                                     </div>

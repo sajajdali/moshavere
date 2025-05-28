@@ -201,7 +201,7 @@
                                         <div
                                             class="w-[calc(100%-70px-1.25rem)] flex flex-col sm:flex-row items-center justify-between gap-3">
                                             <div class="space-y-3 text-center md:text-right">
-                                                <h2 class="text-lg font-bold">دکتر {{ $doctor->full_name }}</h2>
+                                                <h2 class="text-lg font-bold">{{$doctor->speciality_type == 1 ? 'دکتر' : ''}} {{ $doctor->full_name }}</h2>
                                                 <p class="bg-secondary-200 rounded-lg py-2 px-3 text-sm">
                                                     {{ $doctor->DocSpecialities() }}
                                                 </p>
@@ -222,7 +222,7 @@
                                     <div class="flex justify-end">
                                         <a href="#" wire:click='getApp("{{ $doctor->id }}")'
                                             class="btn__blue--round-full-between">
-                                            <span class="font-semibold">دریافت نوبت دکتر
+                                            <span class="font-semibold">دریافت نوبت {{$doctor->speciality_type == 1 ? 'دکتر' : ''}}
                                                 {{ $doctor->full_name }}</span>
                                             <svg class="w-6 h-6" xmlns="http://www.w3.org/2000/svg">
                                                 <use xlink:href="#sprite-chevron-left-circle" />

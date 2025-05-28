@@ -89,13 +89,14 @@ class UpdateOrCreate extends Component
         }
         if (isset($this->form['drStoreAppSms'])) {
             $this->user->drStoreAppSms = $this->form['drStoreAppSms'];
-        }else{
+        } else {
             $this->user->drStoreAppSms = false;
         }
         $this->user->ban_user = $this->form['banUser'];
-        Cache::forget('emergency_doctors');
-        Cache::forget('Introduction_doctors');
-
+        if (! app()->environment('local')) {
+            Cache::forget('emergency_doctors');
+            Cache::forget('Introduction_doctors');
+        }
         return redirect()->route('admin.user.index')->with('success', 'اطلاعات پزشک با موفقیت ثبت شد');
     }
 

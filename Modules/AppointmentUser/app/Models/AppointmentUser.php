@@ -277,4 +277,10 @@ class AppointmentUser extends Model
         }
         return  false;
     }
+    public function hasSegment(){
+        if(isset($this->details[AppointmentUser::DETAIL_SEGMENTS])){
+            return true ;
+        }
+        return false ;
+    }
 }

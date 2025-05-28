@@ -1,8 +1,11 @@
 <div>
     <div wire:loading>
         <div class="loading-overlay d-flex align-items-center justify-content-center">
-            <div class="spinner-border text-primary" role="status">
-                <span class="sr-only">Loading...</span>
+            <div class="dimmer active">
+                <div class="spinner2">
+                    <div class="cube1" style="width: 20px; height: 20px;"></div>
+                    <div class="cube2" style="width: 20px; height: 20px;"></div>
+                </div>
             </div>
         </div>
     </div>
@@ -11,8 +14,8 @@
             <h1 class="page-title">لیست نوبت های ثبت شده</h1>
         </div>
         @can('appointment_user.addApp')
-            <a href="{{ route('admin.appointment_user.addApp') }}" class=" mt-3 mt-md-0 btn btn-primary" aria-expanded="false"
-                aria-controls="customDate">افزودن نوبت</a>
+            <a href="{{ route('admin.appointment_user.addApp') }}" class=" mt-3 mt-md-0 btn btn-primary"
+                aria-expanded="false" aria-controls="customDate">افزودن نوبت</a>
         @endcan
     </div>
     @include('admin::layouts.components.alert')
@@ -174,8 +177,8 @@
                                     <div class="col-md-6">
                                         <label for="search-appointment_date" class="form-label"><strong>زمان
                                                 نوبت</strong></label>
-                                        <input class="form-control" id="search-appointment_date" data-jdp data-name="search.appointment_date"
-                                            wire:model="search.appointment_date"
+                                        <input class="form-control" id="search-appointment_date" data-jdp
+                                            data-name="search.appointment_date" wire:model="search.appointment_date"
                                             placeholder="زمانی که نوبت دریافت شده" type="text">
 
                                     </div>
@@ -183,7 +186,8 @@
                                         <label for="search-id-appointment_set_date" class="form-label"><strong>زمان
                                                 ثبت
                                                 نوبت</strong></label>
-                                        <input class="form-control" id="search-appointment_set_date" data-jdp data-name="search.appointment_set_date"
+                                        <input class="form-control" id="search-appointment_set_date" data-jdp
+                                            data-name="search.appointment_set_date"
                                             wire:model="search.appointment_set_date"
                                             placeholder="زمانی که نوبت ثبت شده" type="text">
 
@@ -191,7 +195,8 @@
                                     <div class="col-md-6">
                                         <label for="search-id-appointment_star_date" class="form-label"><strong>تاریخ
                                                 شروع</strong></label>
-                                        <input class="form-control" id="search-appointment_star_date"  data-jdp data-name="search.appointment_star_date"
+                                        <input class="form-control" id="search-appointment_star_date" data-jdp
+                                            data-name="search.appointment_star_date"
                                             wire:model="search.appointment_star_date"
                                             placeholder="نوبت های از این تاریخ به بعد" type="text">
 
@@ -199,7 +204,8 @@
                                     <div class="col-md-6">
                                         <label for="search-id-appointment_end_date" class="form-label"><strong>تاریخ
                                                 پایان</strong></label>
-                                        <input class="form-control" id="search-appointment_end_date" data-jdp data-name="search.appointment_end_date"
+                                        <input class="form-control" id="search-appointment_end_date" data-jdp
+                                            data-name="search.appointment_end_date"
                                             wire:model="search.appointment_end_date"
                                             placeholder="نوبت هایی ازین تاریخ به قبل" type="text">
 
@@ -473,7 +479,20 @@
                                                     @endif
                                                 </div>
                                             </td>
-                                            <td>{{ $ap->service?->title ?? 'سرویس حذف شده ' }}</td>
+                                            <td>
+                                                <div class="d-flex flex-column">
+                                                    <span>
+                                                        {{ $ap->service?->title ?? 'سرویس حذف شده ' }}
+                                                    </span>
+                                                    @if ($ap->hasSegment())
+                                                        @foreach ($this->segmentData($ap->id) as $segments)
+                                                            <small>
+                                                                {{ $segments['title'] }}
+                                                            </small>
+                                                        @endforeach
+                                                    @endif
+                                                </div>
+                                            </td>
                                             <td>
                                                 <div class="d-flex flex-column align-item-center">
                                                     <span>
@@ -526,6 +545,18 @@
     <script>
         $(document).ready(function() {
             function js() {
+                const iranianHolidays = @json(holidays_array());
+                jalaliDatepicker.startWatch({
+                    dayRendering: function(dayOptions, input) {
+                        const formatted =
+                            `${dayOptions.year}/${String(dayOptions.month).padStart(2, '0')}/${String(dayOptions.day).padStart(2, '0')}`;
+                        const isHoliday = iranianHolidays.includes(formatted);
+                        return {
+                            isHollyDay: isHoliday,
+                        };
+                    }
+                });
+
                 $('.checkbox').change(function() {
                     if ($('.checkbox:checked').length > 0) {
                         $('#exutebtn').removeClass('d-none');
@@ -542,7 +573,6 @@
 
                     @this.set('search.' + modelName, $(this).val());
                 });
-                jalaliDatepicker.startWatch();
                 $(document).on('input', '[data-jdp]', function() {
                     let selectedDate = $(this).val();
                     let seterValue = $(this).data('name');

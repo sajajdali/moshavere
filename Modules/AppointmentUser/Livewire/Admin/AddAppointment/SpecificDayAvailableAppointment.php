@@ -2,10 +2,10 @@
 
 namespace Modules\AppointmentUser\Livewire\Admin\AddAppointment;
 
+use App\Event;
 use Carbon\Carbon;
 use Livewire\Component;
 use Livewire\Attributes\On;
-use Modules\AppointmentUser\app\Jobs\GenerateAppointmentCache;
 use Modules\User\Entities\User;
 use Livewire\Attributes\Computed;
 use Illuminate\Support\Facades\Cache;
@@ -17,6 +17,7 @@ use Modules\AppointmentUser\Traits\OprationButtonsTrait;
 use Modules\AppointmentUser\Enum\AppointmentUserTypeEnum;
 use Modules\AppointmentUser\Enum\AppointmentUserStatusEnum;
 use Modules\AppointmentSetting\app\Models\AppointmentSetting;
+use Modules\AppointmentUser\app\Jobs\GenerateAppointmentCache;
 use Modules\AppointmentUser\app\Notifications\AppointmentSmsNotification;
 use Modules\AppointmentUser\Livewire\Admin\AddAppointment\Modal\SpecificDayAppointmentRegistrationModal;
 
@@ -354,6 +355,7 @@ class SpecificDayAvailableAppointment extends Component
         } else {
             $this->fetchData['showChangeServiceBtn'] = false;
         }
+
     }
     public function render()
     {

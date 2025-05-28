@@ -49,6 +49,13 @@ class ShowAvailableDayForDoctor extends Component
             'end_time' => $endTimestamp,
             'is_online' => 'false',
         ];
+        if(isset($this->fetchData['segments'])){
+            $segId = [] ;
+            foreach($this->fetchData['segments'] as $seg){
+                $segId[] = $seg->id ;
+            }
+            $parameter['segmentId'] = implode(',',$segId);
+        }
         return $this->redirect(route('setAppointment.checkout', $parameter), true);
     }
     public function loadMoreDays()
@@ -244,8 +251,8 @@ class ShowAvailableDayForDoctor extends Component
     }
     public function mount()
     {
-        $doc =  request()->input('doctor_id');
-        $place =  request()->input('place_id');
+        $doc     =  request()->input('doctor_id');
+        $place   =  request()->input('place_id');
         $service =  request()->input('service_id');
 
         if (!isset($doc) || !isset($place) || !isset($service)) {
@@ -272,7 +279,6 @@ class ShowAvailableDayForDoctor extends Component
         if (!isset($this->fetchData['doc']) || empty($this->fetchData['places']) ||  empty($this->fetchData['service'])) {
             return abort(404);
         }
-
         // check if service id not manipulate in url
         $userServices = $this->fetchData['doc']->activeServices()->pluck('id')->toArray();
         $isServiceBelongToUser =  in_array($this->fetchData['service']->id, $userServices);

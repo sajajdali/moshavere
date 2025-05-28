@@ -90,7 +90,7 @@ class AppointmentUserList extends Component
             'search.appointment_id' => [
                 'condition' => isset($this->search['appointment_id']),
                 'callback' => function ($query) {
-                    return $query->whereId( $this->search['appointment_id']);
+                    return $query->whereId($this->search['appointment_id']);
                 },
 
             ],
@@ -158,11 +158,11 @@ class AppointmentUserList extends Component
                 'callback' => function ($query) {
                     try {
                         $appointmentDate =  Verta::parse($this->search['appointment_date'])->toCarbon();
-                     } catch (\Throwable $th) {
-                       $this->addError('exelError','فرمت تاریخ انتخابی صحیح نیست،با گزینه نمایش همه ، فیلتر ها را پاک کنید');
-                       $this->dispatch('dateFormatWrong', true);
-                       return;
-                     }
+                    } catch (\Throwable $th) {
+                        $this->addError('exelError', 'فرمت تاریخ انتخابی صحیح نیست،با گزینه نمایش همه ، فیلتر ها را پاک کنید');
+                        $this->dispatch('dateFormatWrong', true);
+                        return;
+                    }
 
                     return $query->whereDate('date_visit', $appointmentDate);
                 },
@@ -172,11 +172,11 @@ class AppointmentUserList extends Component
                 'callback' => function ($query) {
                     try {
                         $appointment_set_date =  Verta::parse($this->search['appointment_set_date'])->toCarbon();
-                     } catch (\Throwable $th) {
-                       $this->addError('exelError','فرمت تاریخ انتخابی صحیح نیست،با گزینه نمایش همه ، فیلتر ها را پاک کنید');
-                       $this->dispatch('dateFormatWrong', true);
-                       return;
-                     }
+                    } catch (\Throwable $th) {
+                        $this->addError('exelError', 'فرمت تاریخ انتخابی صحیح نیست،با گزینه نمایش همه ، فیلتر ها را پاک کنید');
+                        $this->dispatch('dateFormatWrong', true);
+                        return;
+                    }
                     return $query->whereDate('created_at', $appointment_set_date);
                 },
             ],
@@ -185,12 +185,12 @@ class AppointmentUserList extends Component
                 'callback' => function ($query) {
                     try {
                         $appointment_end_date =  Verta::parse($this->search['appointment_end_date'])->toCarbon();
-                     } catch (\Throwable $th) {
-                       $this->addError('exelError','فرمت تاریخ انتخابی صحیح نیست،با گزینه نمایش همه ، فیلتر ها را پاک کنید');
-                       $this->dispatch('dateFormatWrong', true);
-                       return;
-                     }
-                    return $query->whereDate('date_visit', '<=',$appointment_end_date);
+                    } catch (\Throwable $th) {
+                        $this->addError('exelError', 'فرمت تاریخ انتخابی صحیح نیست،با گزینه نمایش همه ، فیلتر ها را پاک کنید');
+                        $this->dispatch('dateFormatWrong', true);
+                        return;
+                    }
+                    return $query->whereDate('date_visit', '<=', $appointment_end_date);
                 },
             ],
             'appointment_star_date' => [
@@ -198,16 +198,16 @@ class AppointmentUserList extends Component
                 'callback' => function ($query) {
                     try {
                         $appointment_star_date =  Verta::parse($this->search['appointment_star_date'])->toCarbon();
-                     } catch (\Throwable $th) {
-                       $this->addError('exelError','فرمت تاریخ انتخابی صحیح نیست،با گزینه نمایش همه ، فیلتر ها را پاک کنید');
-                       $this->dispatch('dateFormatWrong', true);
-                       return;
-                     }
-                    return $query->whereDate('date_visit', '>=',$appointment_star_date);
+                    } catch (\Throwable $th) {
+                        $this->addError('exelError', 'فرمت تاریخ انتخابی صحیح نیست،با گزینه نمایش همه ، فیلتر ها را پاک کنید');
+                        $this->dispatch('dateFormatWrong', true);
+                        return;
+                    }
+                    return $query->whereDate('date_visit', '>=', $appointment_star_date);
                 },
             ],
             'AppointmentStatus' => [
-                'condition' => isset($this->search['AppointmentStatus']) && $this->search['AppointmentStatus'] != null ,
+                'condition' => isset($this->search['AppointmentStatus']) && $this->search['AppointmentStatus'] != null,
                 'callback' => function ($query) {
                     return $query->where('status', AppointmentUserStatusEnum::tryFrom($this->search['AppointmentStatus']));
                 },
@@ -326,6 +326,13 @@ class AppointmentUserList extends Component
     public function booted()
     {
         $this->dispatch('loadJs', true);
+    }
+    #[Computed]
+    public function segmentData($appUserId)
+    {
+        $app = AppointmentUser::find($appUserId);
+        return $app->details[AppointmentUser::DETAIL_SEGMENTS];
+
     }
     public function mount()
     {

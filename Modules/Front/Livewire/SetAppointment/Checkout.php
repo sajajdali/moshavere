@@ -204,7 +204,9 @@ class Checkout extends Component
         );
 
         $detail = [];
-
+        if (isset($this->fetchData['segmentsId']) && $this->fetchData['segmentsId'] != null) {
+            $detail['segments_ids'] = $this->fetchData['segmentsId'];
+        }
         // sms Template
         if (
             $this->fetchData['appSetting']->detail[AppointmentSetting::PAYMENT][AppointmentSetting::STATUS] == true &&
@@ -234,16 +236,22 @@ class Checkout extends Component
         $this->fetchData['app_start_time']  =  request()->input('start_time');
         $this->fetchData['app_end_time']    =  request()->input('end_time');
         $isOnlineRoute                      = request()->boolean('isOnline');
-        $this->fetchData['isOnline'] = (bool)$isOnlineRoute;
-        $doc =  request()->input('doctor_id');
-        $place =  request()->input('place_id');
+        $this->fetchData['segmentsId']      = request()->get('segmentId',null);
+        $this->fetchData['isOnline']        = filter_var($isOnlineRoute,FILTER_VALIDATE_BOOL);
+        $doc     =  request()->input('doctor_id');
+        $place   =  request()->input('place_id');
         $service =  request()->input('service_id');
+
         if (!isset($doc) || empty($place) ||  empty($service)) {
             // redirect back with alert
             // return redirect()->route('front.homePage');
         }
         if (empty($this->fetchData['app_start_time']) || empty($this->fetchData['app_end_time'])) {
-            return redirect()->route('front.setAppointment.days', ['doctor_id' => $doc, 'place_id' => $place, 'service_id' => $service])->with('error', 'لطفا مجدد تاریخ را انتخاب کنید!');
+            return redirect()->route('front.setAppointment.days', [
+                'doctor_id' => $doc,
+                'place_id' => $place,
+                'service_id' => $service
+                ])->with('error', 'لطفا مجدد تاریخ را انتخاب کنید!');
         }
         $this->fetchData['date_for_blade'] = Carbon::createFromTimestamp($this->fetchData['app_start_time'], 'Asia/Tehran');
         if ($this->fetchData['date_for_blade']->lt(\now())) {
@@ -254,7 +262,7 @@ class Checkout extends Component
         $this->fetchData['service']  =   Service::find($service);
 
         if (
-            !isset($this->fetchData['doc'])        ||
+            !isset($this->fetchData['doc'])          ||
             !$this->fetchData['doc'] instanceof User ||
             empty($this->fetchData['places'])        ||
             empty($this->fetchData['service'])
@@ -276,11 +284,11 @@ class Checkout extends Component
             $this->user =  auth()->user();
         } else {
             $parameter = [
-                'doctor_id' => $this->fetchData['doc']->id,
-                'place_id'  => $this->fetchData['places']->id,
+                'doctor_id'  => $this->fetchData['doc']->id,
+                'place_id'   => $this->fetchData['places']->id,
                 'service_id' => $this->fetchData['service']->id,
                 'start_time' => $this->fetchData['app_start_time'],
-                'end_time' => $this->fetchData['app_end_time'],
+                'end_time'   => $this->fetchData['app_end_time'],
             ];
             $route = route('setAppointment.checkout', $parameter);
             session()->put('url.intended', $route);

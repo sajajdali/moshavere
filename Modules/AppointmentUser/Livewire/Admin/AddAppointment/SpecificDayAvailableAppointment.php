@@ -2,10 +2,10 @@
 
 namespace Modules\AppointmentUser\Livewire\Admin\AddAppointment;
 
+use App\Event;
 use Carbon\Carbon;
 use Livewire\Component;
 use Livewire\Attributes\On;
-use Modules\AppointmentUser\app\Jobs\GenerateAppointmentCache;
 use Modules\User\Entities\User;
 use Livewire\Attributes\Computed;
 use Illuminate\Support\Facades\Cache;
@@ -17,6 +17,7 @@ use Modules\AppointmentUser\Traits\OprationButtonsTrait;
 use Modules\AppointmentUser\Enum\AppointmentUserTypeEnum;
 use Modules\AppointmentUser\Enum\AppointmentUserStatusEnum;
 use Modules\AppointmentSetting\app\Models\AppointmentSetting;
+use Modules\AppointmentUser\app\Jobs\GenerateAppointmentCache;
 use Modules\AppointmentUser\app\Notifications\AppointmentSmsNotification;
 use Modules\AppointmentUser\Livewire\Admin\AddAppointment\Modal\SpecificDayAppointmentRegistrationModal;
 
@@ -237,7 +238,12 @@ class SpecificDayAvailableAppointment extends Component
     //opration button functions
     private function redirectToPage($msg)
     {
-        return redirect()->route('admin.appointment.add.specificday', ['serviceId' => $this->fetchData['service']->id, 'placeId' => $this->fetchData['place'], 'appId' => $this->fetchData['appId'],  'date' => verta($this->fetchData['selectedDate'])->format('Y-m-d')])->with('success', $msg);
+        return redirect()->route('admin.appointment.add.specificday',
+        ['serviceId' => $this->fetchData['service']->id,
+         'placeId' => $this->fetchData['place'],
+          'appId' => $this->fetchData['appId'],
+        'segmentItemId' => $this->fetchData['segment'],
+        'date' => verta($this->fetchData['selectedDate'])->format('Y-m-d')])->with('success', $msg);
     }
     // opration button functions
 
@@ -275,6 +281,7 @@ class SpecificDayAvailableAppointment extends Component
         $app = AppointmentSetting::find(request()->route('appId'));
         $this->fetchData['service'] = Service::find(request()->route('serviceId'));
         $this->fetchData['place'] = request()->route('placeId');
+        $segmentItemId   =  request()->get('segmentItemId', null);
         $this->fetchData['doc'] = $app->user;
         $this->fetchData['appId'] = $app->id;
         $this->fetchData['appointmentSetting'] = $app;
@@ -284,6 +291,24 @@ class SpecificDayAvailableAppointment extends Component
         } else {
             return redirect()->back()->with('error', 'لطفا مجدد تاریخ را انتخاب کنید');
         }
+        $this->fetchData['segment'] = null;
+        if ($app->segments()->exists()) {
+            if ($segmentItemId != null) {
+                $this->fetchData['segment']  = $segmentItemId;
+                $segmentItemId = explode(',', $segmentItemId);
+                $segments =  $app->segments->first()->items->whereIn('id', $segmentItemId);
+                if (count($segments) > 1) {
+                    $this->fetchData['segment_time'] = 0;
+                    foreach ($segments as $eachSegTime) {
+                        $this->fetchData['segment_time'] += $eachSegTime->time;
+                    }
+                } else {
+                    $this->fetchData['segment_time'] = $segments->first()->time;
+                }
+            } else {
+                return redirect()->route('admin.appointment_user.addApp')->with('error', 'زیر بخش انتخاب  نشده است');
+            }
+        }
         if ((request()->has('time'))) {
             $this->fetchData['time'] =  Carbon::createFromTimestamp(request()->get('time'))->toTimeString();
             $this->lunchAppModal();
@@ -291,15 +316,23 @@ class SpecificDayAvailableAppointment extends Component
         } else {
             $this->fetchData['time'] = null;
         }
-
         if (env('APPOINTMENT_SANDBOX')) {
             Cache::forget('appointmentList.' . $app->id);
         }
-        // create inital list aof appointment
-        $this->fetchData['RawlistOfAppointment']  = Cache::rememberForever('appointmentList.' . $app->id, function () use ($app) {
-            $app->update(['updated_log_at' => \now()]);
-            return app('AppointmentUserService')->listAppointments($app);
-        });
+        if (app()->environment('local') || isset($this->fetchData['segment_time'])){
+            $details=[];
+            if($segmentItemId != null){
+                $details['segment_time'] =  $this->fetchData['segment_time'];
+            }
+            $this->fetchData['RawlistOfAppointment'] =  app('AppointmentUserService')->listAppointments($app,$details);
+        }else{
+            // create inital list aof appointment
+            $this->fetchData['RawlistOfAppointment']  = Cache::rememberForever('appointmentList.' . $app->id, function () use ($app) {
+                $app->update(['updated_log_at' => \now()]);
+                return app('AppointmentUserService')->listAppointments($app);
+            });
+        }
+
         $this->fetchData['listOfAppointment'] = $this->listOfAppointment($this->fetchData['RawlistOfAppointment']);
 
         // check if selected date not exist in the log
@@ -322,6 +355,7 @@ class SpecificDayAvailableAppointment extends Component
         } else {
             $this->fetchData['showChangeServiceBtn'] = false;
         }
+
     }
     public function render()
     {

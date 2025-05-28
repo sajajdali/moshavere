@@ -20,14 +20,18 @@ class ListOfAvailableDay extends Component
     public function GotoSpecificDay()
     {
         $date = Verta::parse($this->specificDayDate)->format('Y-m-d');
+        $parameters = [
+            'serviceId' => $this->fethData['service']->id,
+            'placeId'    => $this->fethData['place']->id,
+            'appId' => $this->fethData['appointmentSetting'],
+            'date' => $date
+        ];
+        if (isset($this->fethData['segment'])) {
+            $parameters['segmentItemId'] = $this->fethData['segment'];
+        }
         return redirect()->route(
             'admin.appointment.add.specificday',
-            [
-                'serviceId' => $this->fethData['service']->id,
-                'placeId'    => $this->fethData['place']->id,
-                'appId' => $this->fethData['appointmentSetting'],
-                'date' => $date
-            ]
+            $parameters
         );
     }
     public function GotoAppointmentList($time, $day = null)
@@ -37,10 +41,19 @@ class ListOfAvailableDay extends Component
             $passedHour = Carbon::createFromTimestamp((int)$time)->setTime($timeArray[0], $timeArray[1])->timestamp;
         }
         $passedDate =  verta(Carbon::parse($time))->format('Y-m-d');
+        $parameters = [
+            'serviceId' => $this->fethData['service']->id,
+            'placeId'    => $this->fethData['place']->id,
+            'appId' => $this->fethData['appointmentSetting'],
+            'date' => $passedDate
+        ];
         if (!empty($day)) {
-            return redirect()->route('admin.appointment.add.specificday', ['serviceId' => $this->fethData['service']->id, 'placeId'    => $this->fethData['place']->id, 'appId' => $this->fethData['appointmentSetting'], 'date' => $passedDate, 'time' => $passedHour]);
+            $parameters['time'] = $passedHour;
         }
-        return redirect()->route('admin.appointment.add.specificday', ['serviceId' => $this->fethData['service']->id, 'placeId'    => $this->fethData['place']->id, 'appId' => $this->fethData['appointmentSetting'], 'date' => $passedDate]);
+        if (isset($this->fethData['segment'])) {
+            $parameters['segmentItemId'] = $this->fethData['segment'];
+        }
+        return redirect()->route('admin.appointment.add.specificday', $parameters);
     }
     private function findFirstTreeAppointment($listOfAppointment)
     {
@@ -107,10 +120,12 @@ class ListOfAvailableDay extends Component
         $serviceId =  request()->route('sectionId');
         $doctorId  =  request()->route('doctorId');
         $placeId   =  request()->route('placeId');
+        $segmentItemId   =  request()->get('segmentItemId', null);
 
         $this->fethData['service'] = Service::find($serviceId);
         $this->fethData['doctor']  = User::find($doctorId);
         $this->fethData['place']  = Place::find($placeId);
+
 
         //check for special setting for special section
         $appointmentSetting = AppointmentSetting::activeSetting()->where('service_id', $this->fethData['service']?->id ?? null)
@@ -127,13 +142,38 @@ class ListOfAvailableDay extends Component
         if (empty($appointmentSetting)) {
             return redirect()->route('admin.appointment.doctor.list')->with('error', 'تنظیمات حضور برای پزشک ثبت نشده است یا غیر فعال است');
         }
+        if ($appointmentSetting->segments()->exists()) {
+            if ($segmentItemId != null) {
+                $this->fethData['segment']  = $segmentItemId;
+                $segmentItemId = explode(',', $segmentItemId);
+                $segments =  $appointmentSetting->segments->first()->items->whereIn('id', $segmentItemId);
+                if (count($segments) > 1) {
+                    $this->fethData['segment_time'] = 0;
+                    foreach ($segments as $eachSegTime) {
+                        $this->fethData['segment_time'] += $eachSegTime->time;
+                    }
+                } else {
+                    $this->fethData['segment_time'] = $segments->first()->time;
+                }
+            } else {
+                return redirect()->route('admin.appointment.doctor.list')->with('error', 'زیر بخش انتخاب  نشده است');
+            }
+        }
         if (env('APPOINTMENT_SANDBOX')) {
             Cache::forget('appointmentList.' . $appointmentSetting->id);
         }
-        $listOfAppointment = Cache::rememberForever('appointmentList.' . $appointmentSetting->id, function () use ($appointmentSetting) {
-            $appointmentSetting->update(['updated_log_at' => \now()]);
-            return app('AppointmentUserService')->listAppointments($appointmentSetting);
-        });
+        if (app()->environment('local') || $segmentItemId != null) {
+            $details = [];
+            if ($segmentItemId != null) {
+                $details['segment_time'] =  $this->fethData['segment_time'];
+            }
+            $listOfAppointment = app('AppointmentUserService')->listAppointments($appointmentSetting, $details);
+        } else {
+            $listOfAppointment = Cache::rememberForever('appointmentList.' . $appointmentSetting->id, function () use ($appointmentSetting) {
+                $appointmentSetting->update(['updated_log_at' => \now()]);
+                return app('AppointmentUserService')->listAppointments($appointmentSetting);
+            });
+        }
         $this->fethData['firstTreeAvailableAppointment'] =  $this->findFirstTreeAppointment($listOfAppointment);
         $this->fethData['appointmentSetting'] = $appointmentSetting->id;
     }

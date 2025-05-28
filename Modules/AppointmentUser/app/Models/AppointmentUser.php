@@ -32,6 +32,7 @@ class AppointmentUser extends Model
     const DETAIL_SOMEONE = 'someone';
     const DETAIL_FOR_HIMSELF = 'for_himself';
     const DETAIL_PAYMENT = 'payment';
+    const DETAIL_SEGMENTS = 'segments';
     const USER_MODEL = 'user_model';
     const DISAPPROVED_DESCRIPTION = 'disapproved_description';
 
@@ -275,5 +276,11 @@ class AppointmentUser extends Model
             return true;
         }
         return  false;
+    }
+    public function hasSegment(){
+        if(isset($this->details[AppointmentUser::DETAIL_SEGMENTS])){
+            return true ;
+        }
+        return false ;
     }
 }

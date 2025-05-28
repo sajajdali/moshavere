@@ -2,7 +2,7 @@
     <div class="page-header">
         <div>
             <h1 class="page-title">شما در حال افزودن نوبت برای بخش <span
-                    class="text-primary">{{ $fethData['service']?->title }}</span> و دکتر
+                    class="text-primary">{{ $fethData['service']?->title }}</span> و {{$fethData['doctor']->speciality_type == 1 ? 'دکتر' : ''}}
                 <span class="text-primary">{{ $fethData['doctor']?->full_name }}</span> هستید.
             </h1>
         </div>
@@ -21,7 +21,7 @@
                             <div class="col-md-10">
                                 <div class="input-group mb-3">
                                     <input type="text" class="form-control" placeholder="انتخاب کنید!!" data-jdp
-                                        data-name="specificDayDate" id="customDateInput"
+                                        autocomplete="off" data-name="specificDayDate" id="customDateInput"
                                         aria-describedby="basic-addon3">
                                 </div>
                             </div>
@@ -125,7 +125,17 @@
 
 @push('scripts')
     <script>
-        jalaliDatepicker.startWatch();
+        const iranianHolidays = @json(holidays_array());
+        jalaliDatepicker.startWatch({
+            dayRendering: function(dayOptions, input) {
+                const formatted =
+                    `${dayOptions.year}/${String(dayOptions.month).padStart(2, '0')}/${String(dayOptions.day).padStart(2, '0')}`;
+                const isHoliday = iranianHolidays.includes(formatted);
+                return {
+                    isHollyDay: isHoliday,
+                };
+            }
+        });
         $(document).on('input', '[data-jdp]', function() {
             let selectedDate = $(this).val();
             let seterValue = $(this).data('name');

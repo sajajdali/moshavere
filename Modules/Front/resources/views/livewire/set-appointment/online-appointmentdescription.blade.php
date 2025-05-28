@@ -14,7 +14,7 @@
                     </div>
                     <div class="w-[calc(100%-70px-1.25rem)] space-y-3">
                         <a href="{{ route('front.doctor.profile', ['doctor_id' => $fetchData['doc']->id, 'doctor_name' => str_replace(' ', '_', $fetchData['doc']->full_name)]) }}"
-                            class="font-bold">دکتر {{ $fetchData['doc']->full_name }}</a>
+                            class="font-bold">{{$fetchData['doc']->speciality_type == 1 ? 'دکتر' : ''}} {{ $fetchData['doc']->full_name }}</a>
                         <p class="bg-secondary-200 rounded-lg py-2 px-3 text-sm">
                             {{ $fetchData['doc']->DocSpecialities() }}
                         </p>

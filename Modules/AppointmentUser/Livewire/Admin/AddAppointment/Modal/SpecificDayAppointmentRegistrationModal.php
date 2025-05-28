@@ -42,6 +42,7 @@ class SpecificDayAppointmentRegistrationModal extends Component
     public $serviceId;
     public $placeId;
     public $appDate;
+    public $segmentId;
 
     public function dismisModal()
     {
@@ -182,7 +183,7 @@ class SpecificDayAppointmentRegistrationModal extends Component
         return  app('AppointmentUserService')->isAppointmentTimeAvailable(
             $from,
             $until,
-            Verta::parse($this->appDate)->toCarbon()->format('Y/m/d'),
+            Verta::parse($this->appDate)->toCarbon()->toDateTimeString(),
             $appSetting
         );
     }
@@ -194,12 +195,12 @@ class SpecificDayAppointmentRegistrationModal extends Component
         if ($from->greaterThan($until)) {
             return $this->addError('form.time.from', 'زمان شروع نوبت نباید بزرگ تر از زمان پایان باشد');
         } else {
-            $is_time_free = $this->IsthisTimeAvaialable($from->toDateString(), $until->toDateString());
-            if ($is_time_free) {
+            // $is_time_free = $this->IsthisTimeAvaialable($from->toDateString(), $until->toDateString());
+            // if ($is_time_free) {
                 $this->storeApp();
-            } else {
-                $this->step = 4;
-            }
+            // } else {
+            //     $this->step = 4;
+            // }
             $this->render();
         }
     }
@@ -277,14 +278,22 @@ class SpecificDayAppointmentRegistrationModal extends Component
         );
 
         $detail = [];
-
-
+        $detail['store_from_admin_panel'] = true;
+        if (isset($this->segmentId) && $this->segmentId != null) {
+            $detail['segments_ids'] = $this->segmentId;
+        }
         if (setting(SettingKeyEnum::SECREYERY_SEND_LINK_FOR_APPOINTMENT) != null && isset($this->form['registerWithoutPayment']) && $this->form['registerWithoutPayment'] == 'true') {
             $detail['smsTemplate']      = setting(SettingKeyEnum::SMS_APPOINTMENT_WAITING_PAYMENT);
             $detail['wait_for_payment'] = true;
         }
         $storeAppointment = app('AppointmentUserService')->storeAppointment($appointmentSetting, $userModelAppointment, $appointmentModel, $detail);
-        return redirect()->route('admin.appointment.add.specificday', ['serviceId' => $this->fetchData['service']->id, 'placeId' => $this->placeId,  'appId' => $this->appId, 'date' => $this->appDate])->with('success', $storeAppointment['message']);
+        return redirect()->route('admin.appointment.add.specificday', [
+            'serviceId' => $this->fetchData['service']->id,
+            'placeId' => $this->placeId,
+            'appId' => $this->appId,
+            'date' => $this->appDate,
+            'segmentItemId' => $this->segmentId
+        ])->with('success', $storeAppointment['message']);
     }
 
     public function closeModal()
@@ -398,6 +407,19 @@ class SpecificDayAppointmentRegistrationModal extends Component
         if (isset($this->appTime) && !empty($this->appTime)) {
             $this->form['time']['from'] = $this->appTime;
             $this->form['time']['until'] = Carbon::createFromTimeString($this->appTime)->copy()->addMinutes($app->time_for_visit)->toTimeString();
+            if ($this->segmentId != null) {
+                $segmentItemId = explode(',', $this->segmentId);
+                $segments =  $app->segments->first()->items->whereIn('id', $segmentItemId);
+                if (count($segments) > 1) {
+                    $this->fetchData['segment_time'] = 0;
+                    foreach ($segments as $eachSegTime) {
+                        $this->fetchData['segment_time'] += $eachSegTime->time;
+                    }
+                } else {
+                    $this->fetchData['segment_time'] = $segments->first()->time;
+                }
+                $this->form['time']['until'] = Carbon::createFromTimeString($this->appTime)->copy()->addMinutes($this->fetchData['segment_time'])->toTimeString();
+            }
         }
         if (isset($this->serviceId)) {
             $this->fetchData['service'] = Service::find($this->serviceId);

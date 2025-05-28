@@ -208,7 +208,7 @@
                                 </div>
 
                                 <div class="text-sm space-y-2">
-                                    <p class="font-bold">دکتر {{ $fetchData['app']->doctor->full_name }}</p>
+                                    <p class="font-bold">{{$fetchData['app']->doctor->speciality_type == 1 ? 'دکتر' : ''}} {{ $fetchData['app']->doctor->full_name }}</p>
                                     <p class="bg-secondary-200 px-3 py-1 rounded-md">
                                         {{ $fetchData['app']->doctor->DocSpecialities() }}
                                     </p>

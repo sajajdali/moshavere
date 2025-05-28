@@ -13,7 +13,8 @@ class AppointmentSegment extends Model
     protected $casts = [
         'active' => 'boolean',
     ];
-
+    
+    // multiple_choice : 1 => one choice | 0 => multiple choice ;
     /**
      * The attributes that are mass assignable.
      */

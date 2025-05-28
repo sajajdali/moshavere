@@ -173,7 +173,7 @@
                                 <img src="{{ $fetchData['doc']->getUserAvatar() }}" alt="doctor-image-name" />
                             </div>
                             <div class="w-[calc(100%-70px-1.25rem)] space-y-3">
-                                <p class="font-bold">دکتر {{ $fetchData['doc']->full_name }}</p>
+                                <p class="font-bold">{{$fetchData['doc']->speciality_type == 1 ? 'دکتر' : ''}} {{ $fetchData['doc']->full_name }}</p>
                                 <p class="bg-secondary-200 rounded-lg py-2 px-3 text-sm">
                                     {{ $fetchData['doc']->DocSpecialities() }}
                                 </p>

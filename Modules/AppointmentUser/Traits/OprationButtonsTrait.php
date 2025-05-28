@@ -46,7 +46,10 @@ trait OprationButtonsTrait
                 'status' => AppointmentOnlineStatusEnum::CANCEL,
             ]);
         }
-        GenerateAppointmentCache::dispatch($app->setting);
+        $doctorAllSettings = AppointmentSetting::where('user_id', $app->setting->user_id)->get();
+        foreach ($doctorAllSettings as $setting) {
+            GenerateAppointmentCache::dispatch($setting);
+        }
         $this->sendNotification($app, 'وضعیت نوبت شما به بین مریض تغییر پیدا کرد');
         event(new CancelAppointmentEvent($app));
         return  $this->redirectToPage('نوبت با موفقیت کنسل شد');
@@ -57,7 +60,10 @@ trait OprationButtonsTrait
 
         $app = AppointmentUser::find($id);
         $app->delete();
-        GenerateAppointmentCache::dispatch($app->setting);
+        $doctorAllSettings = AppointmentSetting::where('user_id', $app->setting->user_id)->get();
+        foreach ($doctorAllSettings as $setting) {
+            GenerateAppointmentCache::dispatch($setting);
+        }
         $this->redirectToPage('نوبت با موفقیت حذف شد');
     }
     public function ApprovemonitoringAppointment($id)
@@ -149,7 +155,10 @@ trait OprationButtonsTrait
     {
         $app = AppointmentUser::find($id);
         $date = verta($app->date_visit)->format('Y-m-d');
-        GenerateAppointmentCache::dispatch($app->setting);
+        $doctorAllSettings = AppointmentSetting::where('user_id', $app->setting->user_id)->get();
+        foreach ($doctorAllSettings as $setting) {
+            GenerateAppointmentCache::dispatch($setting);
+        }
 
         $this->sendNotification($app, 'ساعت نوبت شما تغییر کرده است');
         return redirect()->route(

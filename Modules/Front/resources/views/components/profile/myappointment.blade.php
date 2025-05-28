@@ -40,7 +40,7 @@
                             <div
                                 class="w-[calc(100%-70px-1.25rem)] flex flex-col sm:flex-row items-center justify-between gap-3">
                                 <div class="space-y-3 text-center md:text-right">
-                                    <p class="text-lg font-bold">دکتر {{ $appointmentUser->doctor->full_name }}</p>
+                                    <p class="text-lg font-bold">{{$appointmentUser->doctor->speciality_type == 1 ? 'دکتر' : ''}} {{ $appointmentUser->doctor->full_name }}</p>
                                     <p class="bg-secondary-200 rounded-lg py-2 px-3 text-sm text-center">
                                         {{ $appointmentUser->doctor->DocSpecialities() }}
                                     </p>

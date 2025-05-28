@@ -86,8 +86,6 @@ class AppointmentUserService
             'overLapTime' => 0 // No overlap, so overlapped time is 0
         ];
     }
-
-
     public function listAppointments(AppointmentSetting $appointmentSetting, array $details = [])
     {
         // Get the date range for which you want to fetch appointments and available slots
@@ -779,6 +777,21 @@ class AppointmentUserService
         if (isset($detail['wait_for_payment'])) {
             $detailDatabaseDB[AppointmentUser::PENDING_APPOINTMENT_BY_SECRETERY] = true;
         }
+        if (isset($detail['segments_ids'])) {
+            $segmentItemId = explode(',', $detail['segments_ids']);
+            $segments =  $appointmentSetting->segments
+                ->first()
+                ->items
+                ->whereIn('id', $segmentItemId)
+                ->map(function ($item) {
+                    return [
+                        'id'    => $item->id,
+                        'title' => $item->title,
+                        'time'  => $item->time,
+                    ];
+                })->values()->toArray();
+            $detailDatabaseDB[AppointmentUser::DETAIL_SEGMENTS] = $segments;
+        }
         $appointmentUserModel['details'] = $detailDatabaseDB;
 
         // store appointment in DB
@@ -867,8 +880,10 @@ class AppointmentUserService
         }
         event(new StoreAppointmentEvent($appointmentUser));
 
-        GenerateAppointmentCache::dispatch($appointmentSetting);
-
+        $doctorAllSettings = AppointmentSetting::where('user_id', $appointmentSetting->user_id)->get();
+        foreach ($doctorAllSettings as $setting) {
+            GenerateAppointmentCache::dispatch($setting);
+        }
         $trackingUrl = route('front.setAppointment.detail', ['tracking_code' => $appointmentUser->tracking_code]);
         return [
             'status' => true,

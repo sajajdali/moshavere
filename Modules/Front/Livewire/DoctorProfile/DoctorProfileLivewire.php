@@ -29,10 +29,10 @@ class DoctorProfileLivewire extends Component
     ];
 
     #[Locked]
-    public string $appointmentType = 'IN_PERSON' ;
+    public string $appointmentType = 'IN_PERSON';
     public function reserveAppointment($type = 'IN_PERSON')
     {
-        $this->appointmentType = $type ;
+        $this->appointmentType = $type;
         // check if doctor was not banned
         if ($this->isDocAvaiable()) {
             // check for palce count
@@ -57,11 +57,14 @@ class DoctorProfileLivewire extends Component
 
                 // check for service count
                 if ($this->doc->activeServices()->count() <= 1) {
-                        return  $this->redirectToAppointmentDays(
-                            $this->doc->id,
-                            $place->id,
-                            $this->doc->activeServices()->first()->id
-                        );
+                    if($this->doc->activeServices()->first()->hasSegment($this->doc->id,$place->id)){
+
+                    }
+                    return  $this->redirectToAppointmentDays(
+                        $this->doc->id,
+                        $place->id,
+                        $this->doc->activeServices()->first()->id
+                    );
                 }
                 $this->fetchData['services'] = $this->doc->activeServices();
                 $this->fetchData['modalStep'] = 2;
@@ -69,12 +72,11 @@ class DoctorProfileLivewire extends Component
             }
 
             // if less than ONE service exist , redirect to appointment days list
-                $this->redirectToAppointmentDays(
-                    $this->doc->id,
-                    $this->doc->places()->first()->id,
-                    $this->doc->services()->first()->id
-                );
-
+            $this->redirectToAppointmentDays(
+                $this->doc->id,
+                $this->doc->places()->first()->id,
+                $this->doc->services()->first()->id
+            );
         }
     }
     public function reserveOnlineAppointment() {}
@@ -93,10 +95,10 @@ class DoctorProfileLivewire extends Component
         if (!empty($segment)) {
             $param['segment'] = $segment;
         }
-        if($this->appointmentType == 'IN_PERSON') {
+        if ($this->appointmentType == 'IN_PERSON') {
             $route = 'front.setAppointment.days';
-        }else{
-            $route = 'front.setAppointment.online.description' ;
+        } else {
+            $route = 'front.setAppointment.online.description';
         }
         return redirect()->route(
             $route,
@@ -345,9 +347,10 @@ class DoctorProfileLivewire extends Component
         }
         return false;
     }
-    public function editservice() {
+    public function editservice()
+    {
         unset($this->fetchData['segments']);
-        unset($this->form['service'] );
+        unset($this->form['service']);
     }
     public function mount()
     {

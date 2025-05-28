@@ -2,7 +2,7 @@
     <div class="page-header align-items-center">
         <div>
             @if (!$edited['status'])
-                <h1 class="page-title"> افزودن نوبت برای دکتر <span
+                <h1 class="page-title"> افزودن نوبت برای {{$fetchData['doc']->speciality_type == 1 ? 'دکتر' : ''}} <span
                         class="text-danger">{{ $fetchData['doc']->fullName }}</span> </h1>
             @else
                 <h1 class="page-title">تغییر زمان نوبت</h1>
@@ -35,7 +35,8 @@
                             <i class="fa fa-arrow-right" aria-hidden="true"></i>
                         </button>
                         <input class="text-center" type="text" id="currentDate" data-jdp data-name="form.changeDate"
-                            value="{{ verta($fetchData['selectedDate'])->format('Y/m/d') }}" style="max-width: fit-content">
+                            value="{{ verta($fetchData['selectedDate'])->format('Y/m/d') }}"
+                            style="max-width: fit-content">
                         <button class="btn btn-light" wire:click='nextDay'>
                             <i class="fa fa-arrow-left" aria-hidden="true" data-bs-toggle="tooltip"
                                 data-bs-placement="top" title="روز بعد"></i>
@@ -219,13 +220,21 @@
         </div>
     </div>
     <livewire:appointmentuser::admin.add-appointment.modal.service-and-doctor-modal :appId="$fetchData['appId']" :appTime="$fetchData['time']"
-        :serviceId="$fetchData['service']->id" :placeId="$fetchData['place']" />
+        :serviceId="$fetchData['service']->id" :placeId="$fetchData['place']" :segmentId="$fetchData['segment']" />
     <livewire:appointmentuser::admin.add-appointment.modal.specific-day-appointment-registration-modal :appId="$fetchData['appId']"
-        :appTime="$fetchData['time']" :serviceId="$fetchData['service']->id" :placeId="$fetchData['place']" />
+        :appTime="$fetchData['time']" :serviceId="$fetchData['service']->id" :placeId="$fetchData['place']" :segmentId="$fetchData['segment']" />
     <div>
         @include('appointmentuser::components.appointmentlist.disapprovemodal')
     </div>
 </div>
+@push('style')
+    {{-- <style>
+        .jdp-container .iran-holiday {
+            background-color: #e78e8e;
+            color: white;
+        }
+    </style> --}}
+@endpush
 @push('scripts')
     <!-- SELECT2 JS -->
     <script src="{{ admin_asset('plugins/select2/select2.full.min.js') }}"></script>
@@ -238,9 +247,17 @@
                     var setAppModalInst = bootstrap.Modal.getOrCreateInstance(setAppModal);
                     var myModalEl = document.querySelector('#changeDocmodal');
                     var modal = bootstrap.Modal.getOrCreateInstance(myModalEl);
-
                     function addJs() {
-                        jalaliDatepicker.startWatch();
+                        const iranianHolidays = @json( holidays_array());
+                        jalaliDatepicker.startWatch({
+                            dayRendering: function(dayOptions, input) {
+                                const formatted = `${dayOptions.year}/${String(dayOptions.month).padStart(2, '0')}/${String(dayOptions.day).padStart(2, '0')}`;
+                                const isHoliday = iranianHolidays.includes(formatted);
+                                return {
+                                    isHollyDay: isHoliday,
+                                };
+                            }
+                        });
                         $(document).on('input', '[data-jdp]', function() {
                             let selectedDate = $(this).val();
                             let seterValue = $(this).data('name');

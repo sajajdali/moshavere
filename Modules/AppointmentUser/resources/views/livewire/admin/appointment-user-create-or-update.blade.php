@@ -22,11 +22,11 @@
                                         href="#doctors" wire:ignore.self>
                                         پزشک ها
                                     </a>
-                                    @if(auth()->user()->isAdmin() || auth()->user()->hasRole('منشی'))
-                                    <a class="nav-link border border-bottom-0 br-sm-5 me-2  @if (isset($this->search['searchService'])) active @endif"
-                                        data-bs-toggle="tab" href="#sections" wire:ignore.self>
-                                        بخش ها
-                                    </a>
+                                    @if (auth()->user()->isAdmin() || auth()->user()->hasRole('منشی'))
+                                        <a class="nav-link border border-bottom-0 br-sm-5 me-2  @if (isset($this->search['searchService'])) active @endif"
+                                            data-bs-toggle="tab" href="#sections" wire:ignore.self>
+                                            بخش ها
+                                        </a>
                                     @endif
                                 </nav>
                             </div>
@@ -66,52 +66,54 @@
                                             </div>
                                         </div>
                                     </div>
-                                    @if(isset($doctors))
-                                    @foreach ($doctors as $key => $doctor)
-                                        <div class="col-md-4 col-sm-12">
-                                            <div class="card custom-card client-card border">
-                                                <div class="card-body">
-                                                    <div class="client-card-top">
-                                                        <div class="d-flex">
-                                                            <div class="rounded-circle align-self-start mb-0">
+                                    @if (isset($doctors))
+                                        @foreach ($doctors as $key => $doctor)
+                                            <div class="col-md-4 col-sm-12">
+                                                <div class="card custom-card client-card border">
+                                                    <div class="card-body">
+                                                        <div class="client-card-top">
+                                                            <div class="d-flex">
+                                                                <div class="rounded-circle align-self-start mb-0">
+                                                                </div>
+                                                                <div class="flex-fill my-1"> <a
+                                                                        href="javascript:void(0);">{{ $doctor?->fullName ?? '--' }}</a>
+                                                                    <p>
+                                                                        @if ($doctor?->specialities->isEmpty())
+                                                                            <span class="badge bg-danger rounded-pill">
+                                                                                تخصص ثبت نشده
+                                                                            </span>
+                                                                        @endif
+                                                                        {{ $doctor->DocSpecialities() }}
+                                                                    </p>
+                                                                </div>
                                                             </div>
-                                                            <div class="flex-fill my-1"> <a
-                                                                    href="javascript:void(0);">{{ $doctor?->fullName ?? '--' }}</a>
-                                                                <p>
-                                                                    @if ($doctor?->specialities->isEmpty())
-                                                                        <span class="badge bg-danger rounded-pill">
-                                                                            تخصص ثبت نشده
-                                                                        </span>
-                                                                    @endif
-                                                                    {{$doctor->DocSpecialities()}}
-                                                                </p>
-                                                            </div>
+                                                            <button class="btn btn-warning w-100"
+                                                                wire:click='docSelected({{ $doctor->id }})'>
+                                                                <div wire:loading.remove
+                                                                    wire:target='docSelected({{ $doctor->id }})'>
+                                                                    <i class="fa fa-check" aria-hidden="true"></i>
+                                                                    <span>افزودن نوبت</span>
+                                                                </div>
+                                                                <span wire:target='docSelected({{ $doctor->id }})'
+                                                                    wire:loading
+                                                                    wire:target='docSelected({{ $doctor->id }})'
+                                                                    class="spinner-border spinner-border-sm"
+                                                                    role="status" aria-hidden="true"></span>
+                                                            </button>
                                                         </div>
-                                                        <button class="btn btn-warning w-100"
-                                                            wire:click='docSelected({{ $doctor->id }})'>
-                                                            <div wire:loading.remove
-                                                                wire:target='docSelected({{ $doctor->id }})'>
-                                                                <i class="fa fa-check" aria-hidden="true"></i>
-                                                                <span>افزودن نوبت</span>
-                                                            </div>
-                                                            <span wire:target='docSelected({{ $doctor->id }})'
-                                                                wire:loading
-                                                                wire:target='docSelected({{ $doctor->id }})'
-                                                                class="spinner-border spinner-border-sm" role="status"
-                                                                aria-hidden="true"></span>
-                                                        </button>
                                                     </div>
                                                 </div>
                                             </div>
-                                        </div>
-                                    @endforeach
+                                        @endforeach
                                     @else
-                                    <div class="alert alert-primary alert-dismissible fade show" role="alert">
-                                        <span class="alert-inner--text">پزشکی یافت نشد،لطفا ابتدا پزشکان را به سیستم اضافه کنید!</span>
-                                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close">
-                                            <span aria-hidden="true">×</span>
-                                        </button>
-                                    </div>
+                                        <div class="alert alert-primary alert-dismissible fade show" role="alert">
+                                            <span class="alert-inner--text">پزشکی یافت نشد،لطفا ابتدا پزشکان را به سیستم
+                                                اضافه کنید!</span>
+                                            <button type="button" class="btn-close" data-bs-dismiss="alert"
+                                                aria-label="Close">
+                                                <span aria-hidden="true">×</span>
+                                            </button>
+                                        </div>
                                     @endif
                                 </div>
                                 <div class="d-flex justify-content-center">
@@ -161,12 +163,13 @@
                                                             <div class="rounded-circle align-self-start mb-0">
                                                             </div>
                                                             <div class="flex-fill my-1"> <a
-                                                                    href="{{route('admin.service.list')}}">{{ $service->title }}</a>
+                                                                    href="{{ route('admin.service.list') }}">{{ $service->title }}</a>
                                                                 <p class="mt-2 ms-1">{{ $service->user->count() }} پزشک
                                                                 </p>
                                                             </div>
                                                         </div>
-                                                        <button class="btn btn-warning w-100" wire:loading.class='btn-loading bg-gray'
+                                                        <button class="btn btn-warning w-100"
+                                                            wire:loading.class='btn-loading bg-gray'
                                                             wire:click='serviceSelectedFromServiceSection({{ $service->id }})'>
                                                             <i class="fa fa-check" aria-hidden="true"></i>
                                                             <span>افزودن نوبت</span>
@@ -281,11 +284,19 @@
     @include('appointmentuser::components.addappointment.modal.doclistmodal')
     @include('appointmentuser::components.addappointment.modal.placelistmodal')
     @include('appointmentuser::components.addappointment.modal.servicelistmodal')
+    @include('appointmentuser::components.addappointment.modal.segmentListModal')
 </div>
 @push('scripts')
     <script>
         $(document).ready(function() {
-            Livewire.on('lunchmodal', function(name) {
+            Livewire.on('lunchModal', function(name) {
+                // Close all currently open modals
+                $('.modal.show').each(function() {
+                    let modalInstance = bootstrap.Modal.getInstance(this);
+                    if (modalInstance) {
+                        modalInstance.hide();
+                    }
+                });
                 var myModal = new bootstrap.Modal(document.getElementById(name.name), {
                     keyboard: false
                 });

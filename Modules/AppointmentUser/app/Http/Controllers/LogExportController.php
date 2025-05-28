@@ -14,11 +14,11 @@ class LogExportController extends Controller
 {
     public function exportAppointmentsLog(Request $request)
     {
-        $lastUpdate = $request->input('last_update', 0);
+        $lastUpdate = $request->input('last_update');
         $date = $request->has('date') ? Carbon::createFromFormat('Y/m/d', $request->input('date')) : null;
 
         $result = [
-            'last_update' => (int) $lastUpdate,
+            'last_update' => $request->has('last_update') ? $request->get('last_update') : time(),
             'offices' => [],
         ];
 
@@ -74,7 +74,7 @@ class LogExportController extends Controller
                         $appointmentsQuery = $doctor->doctorAppointments()
                             ->where('place_id', $place->id)
                             ->where('service_id', $service->id)
-                            ->where('status', '!=', AppointmentUserStatusEnum::STATUS_SUCCESSFUL)
+                            ->whereIn('status', [AppointmentUserStatusEnum::STATUS_SUCCESSFUL , AppointmentUserStatusEnum::STATUS_NOT_ATTENDED, AppointmentUserStatusEnum::STATUS_ATTENDED])
                             ->with(['user', 'transaction']);
 
                         if ($date) {
@@ -85,6 +85,7 @@ class LogExportController extends Controller
                         }
 
                         $appointments = $appointmentsQuery->get();
+
 
                         foreach ($appointments as $appointment) {
                             $user = $appointment->self_appointment ? $appointment->user : $appointment->agent;

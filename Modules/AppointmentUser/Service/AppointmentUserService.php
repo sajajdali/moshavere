@@ -456,7 +456,9 @@ class AppointmentUserService
     public function isAppointmentTimeAvailable($startDateTime, $endDateTime, $dateVisit, AppointmentSetting $appointmentSetting)
     {
         // Check if there are any overlapping appointments
-        $existingAppointments = AppointmentUser::where('doctor_id', $appointmentSetting->user_id)->where('type', AppointmentUserTypeEnum::MAIN__APPOINTMENT)->whereIn('status', AppointmentUserStatusEnum::confirmed());
+        $existingAppointments = AppointmentUser::where('doctor_id', $appointmentSetting->user_id)
+        ->where('type', AppointmentUserTypeEnum::MAIN__APPOINTMENT)
+        ->whereIn('status', AppointmentUserStatusEnum::confirmed());
         if (!$appointmentSetting->interference) {
             $existingAppointments->where('appointment_setting_id', $appointmentSetting->id);
         }
@@ -469,7 +471,6 @@ class AppointmentUserService
                 });
             })
             ->exists();
-
         return !$existingAppointments;
     }
     public function paymentstatus(AppointmentSetting $appointmentSetting)
@@ -611,7 +612,8 @@ class AppointmentUserService
                 AppointmentUserStatusEnum::STATUS_MONITORING,
             ])
             ->where('date_visit', $appoiutnemtTime)->exists();
-        if ($checkForAppointmentExists) {
+         $isFromAdminPanell = isset($detail['store_from_admin_panel']) && $detail['store_from_admin_panel'] == true;
+        if (  ! $isFromAdminPanell && $checkForAppointmentExists) {
             return [
                 'status' => false,
                 'message' => 'ساعت انتخابی شما پر شده است، لطفا بازگردید و ساعت دیگری را انتخاب کنید',
@@ -620,6 +622,7 @@ class AppointmentUserService
         }
         // check if selected time exists in setting
         if (
+            ! $isFromAdminPanell &&
             $appointmentData->kind == AppointmentUserKindEnum::IN_PERSION &&
             $appointmentSetting->timeIsOutOfrange($appointmentData->timestamp)
         ) {

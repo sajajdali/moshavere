@@ -36,7 +36,7 @@
             @include('admin::layouts.components.app-header')
             @include('admin::layouts.components.app-sidebar')
             <!--app-content open-->
-            <div class="app-content main-content mt-0" >
+            <div class="app-content main-content mt-0">
                 <div class="side-app">
 
                     <!-- CONTAINER -->
@@ -45,8 +45,13 @@
                         <div id="loading-indicator"
                             class="d-flex justify-content-center align-items-center position-fixed w-100 h-100 opacity-75"
                             style="background: rgba(255, 255, 255, 0.8); display: none !important; top: 0; left: 0; z-index: 1050;">
-                            <div class="spinner-border text-primary" role="status">
-                                <span class="sr-only">Loading...</span>
+                            <div class="loading-overlay d-flex align-items-center justify-content-center">
+                                <div class="dimmer active">
+                                    <div class="spinner2">
+                                        <div class="cube1" style="width: 20px; height: 20px;"></div>
+                                        <div class="cube2" style="width: 20px; height: 20px;"></div>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                         {{-- loading --}}

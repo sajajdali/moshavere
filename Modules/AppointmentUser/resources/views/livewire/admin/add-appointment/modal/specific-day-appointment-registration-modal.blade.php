@@ -346,7 +346,8 @@
                         @endif
                     @elseif($step == 4)
                         <div class="row my-5">
-                            <div class="alert alert-warning alert-dismissible fade show" role="alert">
+                            <div class="alert alert-info alert-dismissible fade show" role="alert">
+                                <i class="fa fa-bell" aria-hidden="true"></i>
                                 در ساعت انتخابی شما ، یک
                                 نوبت ثبت شده است ، آیا مایل به ثبت نوبت هستید؟
                             </div>

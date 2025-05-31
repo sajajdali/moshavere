@@ -183,7 +183,7 @@ class SpecificDayAppointmentRegistrationModal extends Component
         return  app('AppointmentUserService')->isAppointmentTimeAvailable(
             $from,
             $until,
-            Verta::parse($this->appDate)->toCarbon()->toDateTimeString(),
+            Verta::parse($this->appDate)->toCarbon()->toDateString(),
             $appSetting
         );
     }
@@ -195,12 +195,16 @@ class SpecificDayAppointmentRegistrationModal extends Component
         if ($from->greaterThan($until)) {
             return $this->addError('form.time.from', 'زمان شروع نوبت نباید بزرگ تر از زمان پایان باشد');
         } else {
-            // $is_time_free = $this->IsthisTimeAvaialable($from->toDateString(), $until->toDateString());
-            // if ($is_time_free) {
+            if (setting(\Modules\Setting\Enum\SettingKeyEnum::ALLOW_MULTIPLE_APP_FROM_ADMIN_PANEL)) {
+                $is_time_free = $this->IsthisTimeAvaialable($from->toTimeString(), $until->toTimeString());
+                if ($is_time_free) {
+                    $this->storeApp();
+                } else {
+                    $this->step = 4;
+                }
+            } else {
                 $this->storeApp();
-            // } else {
-            //     $this->step = 4;
-            // }
+            }
             $this->render();
         }
     }
@@ -278,7 +282,9 @@ class SpecificDayAppointmentRegistrationModal extends Component
         );
 
         $detail = [];
-        $detail['store_from_admin_panel'] = true;
+        if (setting(\Modules\Setting\Enum\SettingKeyEnum::ALLOW_MULTIPLE_APP_FROM_ADMIN_PANEL)) {
+            $detail['store_from_admin_panel'] = true;
+        }
         if (isset($this->segmentId) && $this->segmentId != null) {
             $detail['segments_ids'] = $this->segmentId;
         }

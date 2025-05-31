@@ -179,7 +179,7 @@ class SpecificDayAvailableAppointment extends Component
     }
     public function passTimeToRegisterAppointmentModal($from, $until)
     {
-        $this->dateHasBeenChange();
+        $this->dispatch('dateHasBeenChange', newDate: verta($this->fetchData['selectedDate'])->format('Y-m-d'))->to(SpecificDayAppointmentRegistrationModal::class);
         $this->dispatch('time', from: $from, until: $until);
         $this->dispatch('lunchRegisterModal', true);
     }

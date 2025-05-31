@@ -1,9 +1,9 @@
 <div>
-    <div class="page-header align-items-center">
+    <div class="page-header align-items-center" >
         <div>
             @if (!$edited['status'])
-                <h1 class="page-title"> افزودن نوبت برای {{$fetchData['doc']->speciality_type == 1 ? 'دکتر' : ''}} <span
-                        class="text-danger">{{ $fetchData['doc']->fullName }}</span> </h1>
+                <h1 class="page-title"> افزودن نوبت برای {{ $fetchData['doc']->speciality_type == 1 ? 'دکتر' : '' }}
+                    <span class="text-danger">{{ $fetchData['doc']->fullName }}</span> </h1>
             @else
                 <h1 class="page-title">تغییر زمان نوبت</h1>
             @endif
@@ -19,6 +19,7 @@
         @endif
     </div>
     @include('admin::layouts.components.alert')
+    @include('admin::layouts.components.loading')
 
     @if ($edited['status'])
         <div class="col-md-12 alert alert-secondary fade show" role="alert">
@@ -48,7 +49,7 @@
                             نوبت</button>
                     @endif
                 </div>
-                <div class="card-body" wire:loading.class="opacity-50">
+                <div class="card-body">
                     <div class="spinner-border text-primary position-absolute top-50 start-50 " role="status"
                         wire:loading>
                     </div>
@@ -247,11 +248,13 @@
                     var setAppModalInst = bootstrap.Modal.getOrCreateInstance(setAppModal);
                     var myModalEl = document.querySelector('#changeDocmodal');
                     var modal = bootstrap.Modal.getOrCreateInstance(myModalEl);
+
                     function addJs() {
-                        const iranianHolidays = @json( holidays_array());
+                        const iranianHolidays = @json(holidays_array());
                         jalaliDatepicker.startWatch({
                             dayRendering: function(dayOptions, input) {
-                                const formatted = `${dayOptions.year}/${String(dayOptions.month).padStart(2, '0')}/${String(dayOptions.day).padStart(2, '0')}`;
+                                const formatted =
+                                    `${dayOptions.year}/${String(dayOptions.month).padStart(2, '0')}/${String(dayOptions.day).padStart(2, '0')}`;
                                 const isHoliday = iranianHolidays.includes(formatted);
                                 return {
                                     isHollyDay: isHoliday,
@@ -266,9 +269,7 @@
                     };
                     addJs();
                     Livewire.on('lunchRegisterModal', function() {
-                        setTimeout(() => {
-                            setAppModalInst.show();
-                        }, 500);
+                        setAppModalInst.show();
                     });
                     Livewire.on('lunchModal', function() {
                         setTimeout(() => {

@@ -66,7 +66,7 @@ enum SettingKeyEnum: int implements EnumHasNameInterface, SettingTypeInterface, 
     case MOST_VIEWED_SECTIONS_ICONS_VIEW = 428;
     case ENABLE_DOCTORS_MENU = 430;
     case ENABLE_CONTACT_US_MENU = 431;
-
+    case ALLOW_MULTIPLE_APP_FROM_ADMIN_PANEL = 432;
 
     // ABOUT US PAGE
     case ABOUT_US_FIRST_SECTION_TITLE = 23;
@@ -201,6 +201,7 @@ enum SettingKeyEnum: int implements EnumHasNameInterface, SettingTypeInterface, 
             self::MOST_VIEWED_SECTIONS_ICONS_VIEW => 'نمایش بخش های صفحه اصلی به صورت تک صفحه و بدون اسلاید',
             self::DISABLE_FOOTER_DISPLAY => 'غیر فعال شدن فوتر',
             self::SHOW_FLOATING_SOCIAL_ICONS => 'نمایش ایکون های اینستاگرام و واتس اپ به صورت شناور',
+            self::ALLOW_MULTIPLE_APP_FROM_ADMIN_PANEL => 'اجازه ثبت نوبت در پنل منشی، برای ساعت هایی که از قبل یک نوبت ثبت شده در آن ساعت وجود دارد',
 
             // SMS
             self::SMS_API_TOKEN => 'توکن API پیامک',
@@ -358,6 +359,7 @@ enum SettingKeyEnum: int implements EnumHasNameInterface, SettingTypeInterface, 
             self::APPOINTMENT_DESCRIPTION_IN_CHECKOUT_PAGE_REFUND => SettingTypeEnum::TEXTAREA,
 
             self::CONTACTUS_FIRST_SECTION_STATUS => SettingTypeEnum::CHECK,
+            self::ALLOW_MULTIPLE_APP_FROM_ADMIN_PANEL => SettingTypeEnum::CHECK,
             self::CONTACTUS_FIRST_SECTION_BODY => SettingTypeEnum::TEXTAREA,
             self::SITE_FIRST_SECTION_DESCRIPTION => SettingTypeEnum::TEXTAREA,
             self::SITE_SECEND_SECTION_DESCRIPTION => SettingTypeEnum::TEXTAREA,

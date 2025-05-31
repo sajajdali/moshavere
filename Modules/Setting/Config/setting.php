@@ -88,6 +88,7 @@ $setting = [
             \Modules\Setting\Enum\SettingKeyEnum::APPOINTMENT_SHOW_FALSE_STATUS_DAYS,
             \Modules\Setting\Enum\SettingKeyEnum::APPOINTMENT_SET_APPOINTMENT_WITH_DOCUMENT_NUMBER,
             \Modules\Setting\Enum\SettingKeyEnum::APPOINTMENT_DESCRIPTION_STATUS,
+            \Modules\Setting\Enum\SettingKeyEnum::ALLOW_MULTIPLE_APP_FROM_ADMIN_PANEL,
             \Modules\Setting\Enum\SettingKeyEnum::APPOINTMENT_DESCRIPTION,
             \Modules\Setting\Enum\SettingKeyEnum::APPOINTMENT_CANCEL_DESCRIPTION,
             \Modules\Setting\Enum\SettingKeyEnum::APPOINTMENT_USER_PERESENT_STATUS_REGISTRATION,

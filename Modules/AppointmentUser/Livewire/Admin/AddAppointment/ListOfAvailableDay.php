@@ -19,6 +19,11 @@ class ListOfAvailableDay extends Component
 
     public function GotoSpecificDay()
     {
+        $this->validate([
+            'specificDayDate'=> 'required'
+        ],[
+           'specificDayDate.required' =>  'لطفا تاریخ را انتخاب کنید',
+        ]);
         $date = Verta::parse($this->specificDayDate)->format('Y-m-d');
         $parameters = [
             'serviceId' => $this->fethData['service']->id,
@@ -29,6 +34,7 @@ class ListOfAvailableDay extends Component
         if (isset($this->fethData['segment'])) {
             $parameters['segmentItemId'] = $this->fethData['segment'];
         }
+        $this->dispatch('show-loading', true);
         return redirect()->route(
             'admin.appointment.add.specificday',
             $parameters
@@ -53,6 +59,7 @@ class ListOfAvailableDay extends Component
         if (isset($this->fethData['segment'])) {
             $parameters['segmentItemId'] = $this->fethData['segment'];
         }
+        $this->dispatch('show-loading', true);
         return redirect()->route('admin.appointment.add.specificday', $parameters);
     }
     private function findFirstTreeAppointment($listOfAppointment)

@@ -57,8 +57,9 @@ class DoctorProfileLivewire extends Component
 
                 // check for service count
                 if ($this->doc->activeServices()->count() <= 1) {
-                    if($this->doc->activeServices()->first()->hasSegment($this->doc->id,$place->id)){
-
+                    if ($this->doc->activeServices()->first()->hasSegment($this->doc->id, $place->id)) {
+                        $this->serviceHasSelected();
+                        return $this->lunchModal();
                     }
                     return  $this->redirectToAppointmentDays(
                         $this->doc->id,
@@ -130,7 +131,13 @@ class DoctorProfileLivewire extends Component
                 $this->fetchData['modalStep'] =  1;
             }
         } elseif ($this->fetchData['modalStep'] == 2) {
-            if (isset($this->form['segment'])) {
+            if (isset( $this->fetchData['segments'])) {
+                if(! isset($this->form['segment'] )){
+                   return $this->dispatch('swalError', msg: 'لطفا بخش بندی مورد نظر خود را انتخاب کنید!');
+                }
+                if (!in_array(true, $this->form['segment'], true)) {
+                    return $this->dispatch('swalError', msg: 'لطفا حداقل یک بخش بندی را انتخاب کنید!');
+                }
                 if (count($this->form['segment']) > 1) {
                     foreach ($this->form['segment'] as $segmentId => $status) {
                         if ($status) {
@@ -167,7 +174,7 @@ class DoctorProfileLivewire extends Component
             if (empty($app_setting)) {
                 $app_setting = AppointmentSetting::where('user_id', $this->doc->id)->whereNull('place_id')->whereNull('service_id')->first();
             }
-            if ($app_setting->segments->count()) {
+            if ($app_setting->segments->count() > 0) {
                 $segment = $app_setting->segments()->first();
                 if ($segment->multiple_choice == "1") {
                     // segment has one choise

@@ -86,7 +86,7 @@ class AppointmentSetting extends Model
             }
             return true;
         }
-        
+
         $normalDayTimeRangeCheck = $this->times()
             ->where('day_number', $DayNumber)
             ->where('start_at', '<=', $userSelectedTime->copy()->format('H:i:s'))
@@ -96,5 +96,14 @@ class AppointmentSetting extends Model
         }
         return true;
     }
-
+    public static function SpecialOrGeneralSetting($doctorId,$serviceId = null,$placeId = null){
+       $app =  self::where(
+            'user_id', $doctorId)->where('service_id',$serviceId)->where('place_id',$placeId)->first();
+        if($app == null){
+            $app =  AppointmentSetting::where('user_id', $doctorId)
+                ->whereNull('place_id')
+                ->whereNull('service_id')->first();
+        }
+        return $app;
+    }
 }

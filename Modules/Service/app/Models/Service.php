@@ -133,19 +133,14 @@ class Service extends Model
             return '';
         }
     }
-    public function hasSegment($doctorId,$placeId){
-       $appSetting=  AppointmentSetting::where([
-            'user_id'=> $doctorId,
-            'place_id'=> $placeId,
-            'service_id'=> $this->id,
-       ]);
-       $appSetting=  AppointmentSetting::where([
-            'user_id'=> $doctorId,
-            'place_id'=> $placeId,
-            'service_id'=> $this->id,
-       ]);
-       if($appSetting != null ){
-
-       }
+    public function hasSegment($doctorId, $placeId)
+    {
+        $appSetting =  AppointmentSetting::SpecialOrGeneralSetting($doctorId,$this->id,$placeId);
+        if ($appSetting != null) {
+            if ($appSetting->segments->isNotEmpty()) {
+                return true;
+            }
+        }
+        return false;
     }
 }

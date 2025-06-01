@@ -28,13 +28,13 @@ class LogExportController extends Controller
         }])->chunk(50, function ($places) use (&$result, $lastUpdate, $date) {
             foreach ($places as $place) {
                 $office = [
-                    'id' => $place->id,
-                    'name' => $place->title,
-                    'address' => $place->detail['address'] ?? '',
-                    'longitude' => $place->detail['location_lng'] ?? null,
-                    'latitude' => $place->detail['location_lat'] ?? null,
-                    'insurance' => '',
-                    'phone' => $place->detail['numbers'][0] ?? '',
+                    'id' =>(int) $place->id,
+                    'name' => (string) $place->title,
+                    'address' => (string) $place->detail['address'] ?? '',
+                    'longitude' => (float) $place->detail['location_lng'] ?? null,
+                    'latitude' => (float) $place->detail['location_lat'] ?? null,
+                    'insurance' => (string) '',
+                    'phone' => (string) $place->detail['numbers'][0] ?? '',
                     'type' => ['title' => 'حضوری', 'color' => '#0480ff'],
                     'status' => [
                         'title' => $place->checkActive() ? 'فعال' : 'غیرفعال',
@@ -178,6 +178,7 @@ class LogExportController extends Controller
                                 ],
                             ];
                         }
+
 
                         $doctorItem['parts'][] = $part;
                     }

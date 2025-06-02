@@ -4,6 +4,7 @@ namespace Modules\AppointmentUser\app\Http\Controllers;
 
 use App\Http\Controllers\Controller;
 use Carbon\Carbon;
+use Hekmatinasser\Verta\Verta;
 use Illuminate\Http\Request;
 use Modules\AppointmentUser\app\Models\AppointmentUser;
 use Modules\AppointmentUser\Enum\AppointmentUserStatusEnum;
@@ -15,10 +16,9 @@ class LogExportController extends Controller
     public function exportAppointmentsLog(Request $request)
     {
         $lastUpdate = $request->input('last_update');
-        $date = $request->has('date') ? Carbon::createFromFormat('Y/m/d', $request->input('date')) : null;
-
+        $date = $request->has('date') ? Verta::parse( $request->input('date'))->toCarbon() : null;
         $result = [
-            'last_update' => $request->has('last_update') ? $request->get('last_update') : time(),
+            'last_update' => (int) ($request->has('last_update') ? $request->get('last_update') : time()),
             'offices' => [],
         ];
 
@@ -29,12 +29,12 @@ class LogExportController extends Controller
             foreach ($places as $place) {
                 $office = [
                     'id' =>(int) $place->id,
-                    'name' => (string) $place->title,
-                    'address' => (string) $place->detail['address'] ?? '',
-                    'longitude' => (float) $place->detail['location_lng'] ?? null,
-                    'latitude' => (float) $place->detail['location_lat'] ?? null,
+                    'name' => isset($place->title) ? (string) $place->title : null,
+                    'address' =>isset($place->title) ? (string) $place->detail['address'] : '',
+                    'longitude' => isset($place->detail['location_lng'])  ?  ((float) $place->detail['location_lng'])  : null,
+                    'latitude' => isset($place->detail['location_lat'])  ?  ((float) $place->detail['location_lat'])  : null,
                     'insurance' => (string) '',
-                    'phone' => (string) $place->detail['numbers'][0] ?? '',
+                    'phone' => isset($place->detail['numbers'][0]) ? (string) $place->detail['numbers'][0] : '',
                     'type' => ['title' => 'حضوری', 'color' => '#0480ff'],
                     'status' => [
                         'title' => $place->checkActive() ? 'فعال' : 'غیرفعال',
@@ -88,7 +88,7 @@ class LogExportController extends Controller
 
 
                         foreach ($appointments as $appointment) {
-                            $user = $appointment->self_appointment ? $appointment->user : $appointment->agent;
+                            $user = $appointment->user;
                             $transaction = $appointment->transaction;
 
                             $part['appointment_users'][] = [

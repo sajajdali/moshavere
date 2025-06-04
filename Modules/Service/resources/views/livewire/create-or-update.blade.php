@@ -2,11 +2,23 @@
     <div>
         <div class="page-header">
             <div>
-                <h1 class="page-title">افزودن بخش</h1>
+                <h1 class="page-title">
+                    @if ($isEdited)
+                        ویرایش بخش <strong> {{ $service->title }} </strong>
+                    @else
+                        افزودن بخش
+                    @endif
+                </h1>
             </div>
             <div class="ms-auto pageheader-btn">
                 <ol class="breadcrumb">
-                    <li class="breadcrumb-item">افزودن بخش یا سرویس</li>
+                    <li class="breadcrumb-item">
+                        @if ($isEdited)
+                            ویرایش بخش
+                        @else
+                            افزودن بخش یا سرویس
+                        @endif
+                    </li>
                     <li class="breadcrumb-item active" aria-current="page"><a href="{{ route('admin.service.list') }}">بخش
                             ها</a></li>
                 </ol>
@@ -23,7 +35,13 @@
         <div class="row row-sm">
             <div class="card box-shadow-0">
                 <div class="card-header border-bottom">
-                    <h3 class="card-title">افزودن بخش جدید</h3>
+                    <h3 class="card-title">
+                        @if ($isEdited)
+                            ویرایش بخش
+                        @else
+                            افزودن بخش جدید
+                        @endif
+                    </h3>
                 </div>
                 <div class="card-body">
                     <form wire:submit='createOrUpdateSection' class="form-horizontal">
@@ -42,8 +60,8 @@
                             <label for="js-select2" class="col-md-3 form-label">زیر بخش:</label>
                             <div class="col-md-9">
                                 <div class="mb-3" wire:ignore>
-                                    <select class="form-control select2-show-search form-select" id="js-select2"
-                                        data-placeholder="بدون والد">
+                                    <select class="form-control select2-show-search form-select js-select2"
+                                        id="js-select2" data-name="parent" data-placeholder="بدون والد">
                                         <option value="0">بدون والد</option>
                                         @if (isset($fetchdata['services']))
                                             @foreach ($fetchdata['services'] as $service)
@@ -52,12 +70,12 @@
                                             @endforeach
                                         @endif
                                     </select>
-                                    <p class="text-muted">
-                                        <i class="fa fa-info-circle" aria-hidden="true"></i>
+                                    <p class="text-muted mt-1 ms-1 mt-1 ms-1">
+                                        <i class="fa fa-info-circle text-info text-info" aria-hidden="true"></i>
                                         بخشی که مایل هستید این بخش، زیر بخش آن بخش باشد را انتخاب کنید.
                                     </p>
-                                    <p class="text-muted">
-                                        <i class="fa fa-info-circle" aria-hidden="true"></i>
+                                    <p class="text-muted mt-1 ms-1 ms-1">
+                                        <i class="fa fa-info-circle text-info text-info" aria-hidden="true"></i>
                                         در صورتی که گزینه ی بدون والد را انتخاب کنید ، این بخش به عنوان یک بخش اصلی
                                         اضافه میشود.
                                     </p>
@@ -78,8 +96,8 @@
                                 @error('form.qestion')
                                     <span class="text-danger">{{ $message }}</span>
                                 @enderror
-                                <p class="text-muted">
-                                    <i class="fa fa-info-circle" aria-hidden="true"></i>
+                                <p class="text-muted mt-1 ms-1">
+                                    <i class="fa fa-info-circle text-info" aria-hidden="true"></i>
                                     در صورتی که زیر بخش های این بخش باید در اپلیکیشن به صورت سوال نمایش داده شوند
                                     ،
                                     عنوان سوال را وارد کنید.
@@ -94,10 +112,35 @@
                                 @error('form.priority')
                                     <span class="text-danger">{{ $message }}</span>
                                 @enderror
-                                <p class="text-muted">
-                                    <i class="fa fa-info-circle" aria-hidden="true"></i>
+                                <p class="text-muted mt-1 ms-1">
+                                    <i class="fa fa-info-circle text-info" aria-hidden="true"></i>
                                     بخش ها به ترتب شماره گذاری نمایش داده میشوند.
                                 </p>
+                            </div>
+                        </div>
+                        <div class="row mt-5 mb-3">
+                            <label for="place-select2" class="col-md-3 form-label">اختصاص به مطب:</label>
+                            <div class="col-md-9" wire:ignore>
+                                <div class="mb-3">
+                                    <select id="place-select2" data-name="place" multiple
+                                        class="form-control select2-show-search form-select js-select2"
+                                        data-placeholder="مطب اختصاصی">
+                                        <option value="0">انتخاب کنید..</option>
+                                        @if (isset($fetchdata['places']))
+                                            @foreach ($fetchdata['places'] as $place)
+                                                <option @if (in_array($place->id, $this->form['place'])) selected @endif
+                                                    value="{{ $place->id }}">{{ $place->title }}</option>
+                                            @endforeach
+                                        @endif
+                                    </select>
+                                    <p class="text-muted mt-1 ms-1">
+                                        <i class="fa fa-info-circle text-info" aria-hidden="true"></i>
+                                        با انتخاب مطب، بخش در سایر مطب ها دیده نمی شود.
+                                    </p>
+                                </div>
+                                @error('specialityTitle')
+                                    <span class="text-danger">{{ $message }}</span>
+                                @enderror
                             </div>
                         </div>
                         <div class="row mt-4 mb-3">
@@ -108,8 +151,8 @@
                                 @error('form.api_code')
                                 <span class="text-danger">{{ $message }}</span>
                                 @enderror
-                                <p class="text-muted">
-                                    <i class="fa fa-info-circle" aria-hidden="true"></i>
+                                <p class="text-muted mt-1 ms-1">
+                                    <i class="fa fa-info-circle text-info" aria-hidden="true"></i>
                                     بخش ها به ترتب شماره گذاری نمایش داده میشوند.
                                 </p>
                             </div>
@@ -226,21 +269,23 @@
     <script>
         $(document).ready(function() {
             setTimeout(() => {
-                $('#js-select2').select2();
-            }, 1000);
-            $('#js-select2').on('select2:select', function(e) {
+                $('.js-select2').select2();
+            }, 500);
+            $('.js-select2').on('select2:select select2:unselect', function(e) {
+                var name = $(this).data('name');
                 var value = $(this).val();
-                @this.set('form.parent_id', value);
-                console.log(value);
-                if (value == 0) {
-                    $('#questionContainer').fadeIn();
-                } else {
-                    $('#questionContainer').fadeOut();
+                @this.set('form.' + name, value);
+                if (name == 'parent') {
+                    if (value == 0) {
+                        $('#questionContainer').fadeIn();
+                    } else {
+                        $('#questionContainer').fadeOut();
+                    }
                 }
             });
             if ($('#js-select2').val() != 0) {
                 $('#questionContainer').css("display", "none");
-            }
+            };
             Livewire.on('select_file', (param) => {
                 @this.set('form.img', param.url);
                 //close modal

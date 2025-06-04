@@ -18,7 +18,7 @@ use Modules\AppointmentSetting\app\trait\AppointmentSettingDetailKeyTrait;
 
 class AppointmentSetting extends Model
 {
-    use HasFactory, SoftDeletes,AppointmentSettingDetailKeyTrait;
+    use HasFactory, SoftDeletes, AppointmentSettingDetailKeyTrait;
 
     protected $casts = [
         'active' => ActiveEnum::class,
@@ -57,16 +57,18 @@ class AppointmentSetting extends Model
     {
         return $this->belongsTo(Service::class);
     }
-    public function segments() {
-        return $this->belongsToMany(AppointmentSegment::class,'appointment_segment_setting');
+    public function segments()
+    {
+        return $this->belongsToMany(AppointmentSegment::class, 'appointment_segment_setting');
     }
 
     public function appointmentUsers()
     {
         return $this->hasMany(AppointmentUser::class);
     }
-    public function ScopeActiveSetting($query) {
-        return $query->where('active',ActiveEnum::ACTIVE) ;
+    public function ScopeActiveSetting($query)
+    {
+        return $query->where('active', ActiveEnum::ACTIVE);
     }
     public function timeIsOutOfrange($time)
     {
@@ -96,10 +98,15 @@ class AppointmentSetting extends Model
         }
         return true;
     }
-    public static function SpecialOrGeneralSetting($doctorId,$serviceId = null,$placeId = null){
-       $app =  self::where(
-            'user_id', $doctorId)->where('service_id',$serviceId)->where('place_id',$placeId)->first();
-        if($app == null){
+    public static function SpecialOrGeneralSetting($doctorId, $serviceId = null, $placeId = null)
+    {
+        $app =  self::Where('user_id', $doctorId)
+            ->when($serviceId != null, function ($q) use ($serviceId) {
+                return $q->where('service_id', $serviceId);
+            })->when($placeId != null, function ($q) use ($placeId) {
+                return $q->where('place_id', $placeId);
+            })->first();
+        if ($app == null) {
             $app =  AppointmentSetting::where('user_id', $doctorId)
                 ->whereNull('place_id')
                 ->whereNull('service_id')->first();

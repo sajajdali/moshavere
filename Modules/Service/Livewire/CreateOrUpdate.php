@@ -2,16 +2,17 @@
 
 namespace Modules\Service\Livewire;
 
-use App\trait\UploadFile;
-use Illuminate\Support\Facades\Storage;
 use Livewire\Component;
 use App\Enum\ActiveEnum;
-use Livewire\Features\SupportFileUploads\WithFileUploads;
+use App\trait\UploadFile;
 use Modules\User\Entities\User;
 use Spatie\Permission\Models\Role;
+use Modules\Place\app\Models\Place;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Storage;
 use Modules\Service\app\Models\Service;
 use Modules\Service\Enum\ServiceShowTypeEnum;
+use Livewire\Features\SupportFileUploads\WithFileUploads;
 
 class CreateOrUpdate extends Component
 {
@@ -23,8 +24,9 @@ class CreateOrUpdate extends Component
     public $isEdited = false;
     public array $form = [
         'parent_id' => null,
-        'doctors' => [],
+        'doctors'   => [],
         'show_type' => true,
+        'place'     => null,
     ];
     public array $fetchdata = [];
 
@@ -37,6 +39,7 @@ class CreateOrUpdate extends Component
             'form.img'       => 'nullable',
             'form.active'    => 'nullable',
             'form.show_type' => 'nullable',
+            'form.place'     => 'nullable',
         ];
     }
 
@@ -97,6 +100,9 @@ class CreateOrUpdate extends Component
             }
             $this->service->user()->sync($syncArr);
         }
+        if (isset($this->form['place'])) {
+            $this->service->place()->sync($this->form['place']);
+        }
         return redirect()->route('admin.service.list')->with('success', $msg);
     }
 
@@ -106,6 +112,7 @@ class CreateOrUpdate extends Component
         $this->form['api_code']     = $this->service->api_code;
         $this->form['title']     = $this->service->title;
         $this->form['parent_id'] = $this->service->parent_id;
+        $this->form['place']     = $this->service->place()?->pluck('places.id')->toArray();
         $this->form['img']       = $this->service->icon;
         $this->form['priority']  = $this->service->priority;
         $this->form['active']    =  $this->service->active == ActiveEnum::ACTIVE ? true : false;
@@ -148,6 +155,7 @@ class CreateOrUpdate extends Component
 
         $this->fetchdata['doctors']  = User::doctors();
         $this->fetchdata['services'] = Service::whereNull('parent_id')->get();
+        $this->fetchdata['places']   = Place::active()->get();
     }
     public function render()
     {

@@ -87,18 +87,10 @@
                                                                     </p>
                                                                 </div>
                                                             </div>
-                                                            <button class="btn btn-warning w-100"
+                                                            <button class="btn btn-warning w-100" wire:target='docSelected({{ $doctor->id }})' wire:loading.class='btn-loading bg-gray'
                                                                 wire:click='docSelected({{ $doctor->id }})'>
-                                                                <div wire:loading.remove
-                                                                    wire:target='docSelected({{ $doctor->id }})'>
                                                                     <i class="fa fa-check" aria-hidden="true"></i>
                                                                     <span>افزودن نوبت</span>
-                                                                </div>
-                                                                <span wire:target='docSelected({{ $doctor->id }})'
-                                                                    wire:loading
-                                                                    wire:target='docSelected({{ $doctor->id }})'
-                                                                    class="spinner-border spinner-border-sm"
-                                                                    role="status" aria-hidden="true"></span>
                                                             </button>
                                                         </div>
                                                     </div>
@@ -169,7 +161,7 @@
                                                             </div>
                                                         </div>
                                                         <button class="btn btn-warning w-100"
-                                                            wire:loading.class='btn-loading bg-gray'
+                                                            wire:loading.class='btn-loading bg-gray' wire:target='serviceSelectedFromServiceSection({{ $service->id }})'
                                                             wire:click='serviceSelectedFromServiceSection({{ $service->id }})'>
                                                             <i class="fa fa-check" aria-hidden="true"></i>
                                                             <span>افزودن نوبت</span>

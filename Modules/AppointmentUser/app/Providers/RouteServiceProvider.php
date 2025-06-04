@@ -5,6 +5,9 @@ namespace Modules\AppointmentUser\app\Providers;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Foundation\Support\Providers\RouteServiceProvider as ServiceProvider;
 use Modules\AppointmentUser\app\Models\AppointmentUser;
+use Modules\Place\app\Models\Place;
+use Modules\Service\app\Models\Service;
+use Modules\User\Entities\User;
 use Stancl\Tenancy\Middleware\InitializeTenancyByDomain;
 use Stancl\Tenancy\Middleware\PreventAccessFromCentralDomains;
 
@@ -78,5 +81,8 @@ class RouteServiceProvider extends ServiceProvider
     public function bindingModel(): void
     {
         Route::model('appointment_user', AppointmentUser::class);
+        Route::model('sectionId', Service::class);
+        Route::model('doctorId', User::class);
+        Route::model('placeId', Place::class);
     }
 }

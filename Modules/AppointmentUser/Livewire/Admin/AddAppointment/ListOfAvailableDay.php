@@ -20,9 +20,9 @@ class ListOfAvailableDay extends Component
     public function GotoSpecificDay()
     {
         $this->validate([
-            'specificDayDate'=> 'required'
-        ],[
-           'specificDayDate.required' =>  'لطفا تاریخ را انتخاب کنید',
+            'specificDayDate' => 'required'
+        ], [
+            'specificDayDate.required' =>  'لطفا تاریخ را انتخاب کنید',
         ]);
         $date = Verta::parse($this->specificDayDate)->format('Y-m-d');
         $parameters = [
@@ -122,29 +122,15 @@ class ListOfAvailableDay extends Component
         }
         return $result;
     }
-    public function mount()
+    public function mount($doctorId, $sectionId, $placeId)
     {
-        $serviceId =  request()->route('sectionId');
-        $doctorId  =  request()->route('doctorId');
-        $placeId   =  request()->route('placeId');
         $segmentItemId   =  request()->get('segmentItemId', null);
+        $this->fethData['service'] = $sectionId;
+        $this->fethData['doctor']  = $doctorId;
+        $this->fethData['place']   = $placeId;
 
-        $this->fethData['service'] = Service::find($serviceId);
-        $this->fethData['doctor']  = User::find($doctorId);
-        $this->fethData['place']  = Place::find($placeId);
-
-
-        //check for special setting for special section
-        $appointmentSetting = AppointmentSetting::activeSetting()->where('service_id', $this->fethData['service']?->id ?? null)
-            ->where('place_id', $this->fethData['place']?->id ?? null)
-            ->where('user_id', $this->fethData['doctor']?->id ?? null)
-            ->first();
-
-        //check for general setting
-        if (empty($appointmentSetting)) {
-            $appointmentSetting = AppointmentSetting::activeSetting()->where('user_id', $doctorId)->first();
-        }
-
+        $appointmentSetting = AppointmentSetting::SpecialOrGeneralSetting($doctorId->id,$sectionId->id,$placeId->id);
+    
         // redirect user if setting dosent exist
         if (empty($appointmentSetting)) {
             return redirect()->route('admin.appointment.doctor.list')->with('error', 'تنظیمات حضور برای پزشک ثبت نشده است یا غیر فعال است');
@@ -163,7 +149,8 @@ class ListOfAvailableDay extends Component
                     $this->fethData['segment_time'] = $segments->first()->time;
                 }
             } else {
-                return redirect()->route('admin.appointment.doctor.list')->with('error', 'زیر بخش انتخاب  نشده است');
+                session()->flash('error', 'زیر بخش انتخاب  نشده است');
+                return redirect()->route('admin.appointment.doctor.list');
             }
         }
         if (env('APPOINTMENT_SANDBOX')) {

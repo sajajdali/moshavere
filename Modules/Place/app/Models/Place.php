@@ -6,6 +6,7 @@ use App\Enum\ActiveEnum;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Modules\Service\app\Models\Service;
 use Modules\User\Entities\User;
 
 class Place extends Model
@@ -65,5 +66,9 @@ class Place extends Model
             'id' => $this->id ?? null,
             'title' => $this->title ?? null
         ];
+    }
+    public function service()
+    {
+        return $this->belongsToMany(Service::class);
     }
 }

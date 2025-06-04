@@ -6,6 +6,7 @@ $setting = [
         'icon' => 'fa fa-mobile',
         'disable_ui' => disableUi(),
         'settings' => [
+            \Modules\Setting\Enum\SettingKeyEnum::SMS_SENDER,
             \Modules\Setting\Enum\SettingKeyEnum::SMS_API_TOKEN,
             \Modules\Setting\Enum\SettingKeyEnum::SMS_API_LOGIN_TEMPLATE,
             \Modules\Setting\Enum\SettingKeyEnum::CALL_LOGIN_TEMPLATE,

@@ -82,6 +82,7 @@ enum SettingKeyEnum: int implements EnumHasNameInterface, SettingTypeInterface, 
     case ABOUT_US_FOURTH_SECTION_IMAGE = 33;
 
         //sms
+    case SMS_SENDER = 79;
     case SMS_API_TOKEN = 60;
     case SMS_API_LOGIN_TEMPLATE = 61;
     case SMS_APPOINTMENT_RECEIVING_SUCCESSFUL = 62;
@@ -212,6 +213,7 @@ enum SettingKeyEnum: int implements EnumHasNameInterface, SettingTypeInterface, 
             self::SMS_AFTER_REFUND => 'نام الگوی پیامکی، بعد از استرداد وجه',
             self::SMS_FOR_SEND_MESSAGE_IN_CHATS => 'نام الگوی پیامکی، بعد از پاسخ دادن به چت',
             self::SMS_SET_APP_MONITORING => 'در صورت فعال بودن پایش نوبت، پیامک ثبت نوبت',
+            self::SMS_SENDER => 'پنل ارسال کننده ی پیامک',
 
             //payment
             self::PAYMENT_PAYSTAR_STATUS => 'فعال بودن درگاه پی استار',
@@ -304,6 +306,7 @@ enum SettingKeyEnum: int implements EnumHasNameInterface, SettingTypeInterface, 
             self::WHATSAPP_ADDRESS => 'آدرس باید به این صورت وارد شد https://wa.me/090000000',
             self::FOOTER_ENAMAD => 'ادرس url فقط درج شود نه تگ کامل ',
             self::FOOTER_SAMANDEHI => 'ادرس url فقط درج شود نه تگ کامل ',
+            self::SMS_SENDER => 'دیفالت بر روی shsms میباشد',
             default => ''
         };
     }
@@ -335,6 +338,7 @@ enum SettingKeyEnum: int implements EnumHasNameInterface, SettingTypeInterface, 
         return match ($this) {
             self::SITE_LOGO_URL , self::HEADER1_IMAGE => SettingTypeEnum::IMAGE,
             self::DEFAULT_EXERCISE_STATUS => SettingTypeEnum::SELECT,
+            self::SMS_SENDER => SettingTypeEnum::SELECT,
             self::PAYMEN_ACTIVE_DRIVER => SettingTypeEnum::SELECT,
             self::APPOINTMENT_MORE_THAT_ONE_PER_DAY , self::HEADER1_SHOW_BUTTONS , self::HEADER1_SHOW_BUTTON1, self::HEADER1_SHOW_BUTTON2 , self::ENABLE_DOCTORS_MENU , self::ENABLE_CONTACT_US_MENU => SettingTypeEnum::CHECK,
             self::APPOINTMENT_SHOW_FALSE_STATUS_DAYS => SettingTypeEnum::CHECK,
@@ -391,6 +395,10 @@ enum SettingKeyEnum: int implements EnumHasNameInterface, SettingTypeInterface, 
                 'search_header' => 'هدر با سرچ',
                 'image_header' => 'هدر با معرفی',
                 'ba_image' => 'هدر با عکس پس زمینه',
+            ],
+            self::SMS_SENDER => [
+                'shsms' => 'shsms',
+                'ghasedak' => 'ghasedak',
             ],
             self::SUPPORT_USER_ROLE => User::adminSupportRoles(),
             self::PAYMEN_ACTIVE_DRIVER => ['zrinpal' => 'zrinpal','parsian'=> 'parsian'],

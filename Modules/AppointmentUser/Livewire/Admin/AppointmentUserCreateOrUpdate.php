@@ -65,10 +65,15 @@ class AppointmentUserCreateOrUpdate extends Component
                     $this->fetchData['ServiceList'] = $doctor->activeServices();
                     //check if there is more than 1 service exist
                     if (count($this->fetchData['ServiceList']) == 1) {
-                        if ($this->hasSegment($doctor->id, $this->fetchData['ServiceList']->first()->id, $this->form['modalSelectedData']['place'])) {
+                        if ($this->hasSegment(
+                            $doctor->id,
+                            $this->fetchData['ServiceList']->first()->id,
+                            $this->form['modalSelectedData']['place']
+                        )) {
                             $this->form['modalSelectedData']['service'] = $this->fetchData['ServiceList']->first()->id;
                             return $this->lunchModal('segmentModal');
                         } else {
+                            $this->dispatch('show-loading', true);
                             return redirect()->route(
                                 'admin.appointment.add.setTime',
                                 [
@@ -88,6 +93,7 @@ class AppointmentUserCreateOrUpdate extends Component
             }
             // if()
         } else {
+            $this->dispatch('show-loading', true);
             return redirect()->route('admin.appointment.doctor.list')->with('error', " تنظیمات روز های حضور برای {$user->fullName} تعریف نشده است");
         }
     }
@@ -115,11 +121,17 @@ class AppointmentUserCreateOrUpdate extends Component
             !empty($this->form['modalSelectedData']['place'])
         ) {
             $doctor = User::find($this->form['modalSelectedData']['doctor']);
-            $this->fetchData['ServiceList'] = $doctor->service;
+            if ($place->service->isNotEmpty()) {
+                $this->fetchData['ServiceList'] = $place->service()->whereHas('user', function ($s) use ($doctor) {
+                    return $s->where('user_id', $doctor->id);
+                })->get();
+            } else {
+                $this->fetchData['ServiceList'] = $doctor->service()->get();
+            }
             if (count($this->fetchData['ServiceList']) == 1) {
-                if ($this->hasSegment($doctor->id, $this->fetchData['ServiceList']->first()->if, $this->form['modalSelectedData']['place'])) {
-                    $this->lunchModal('segmentModal');
+                if ($this->hasSegment($doctor->id, $this->fetchData['ServiceList']->first()->id, $this->form['modalSelectedData']['place'])) {
                     $this->form['modalSelectedData']['service'] = $this->fetchData['ServiceList']->first()->id;
+                    return $this->lunchModal('segmentModal');
                 } else {
                     $this->dispatch('show-loading', true);
                     return redirect()->route(
@@ -132,13 +144,13 @@ class AppointmentUserCreateOrUpdate extends Component
                     );
                 }
             } else {
-                return  $this->lunchModal('serviceModal');
+                return  $this->lunchmodal('serviceModal');
             }
         }
         if (count($this->fetchData['docList']) == 1) {
-            return $this->docSelectedFromModal($this->fetchData['docList']->first());
+            return $this->docSelectedFrommodal($this->fetchData['docList']->first());
         }
-        return  $this->lunchModal('docModal');
+        return  $this->lunchmodal('docModal');
     }
     public function serviceSelected(Service $service)
     {
@@ -162,8 +174,8 @@ class AppointmentUserCreateOrUpdate extends Component
         if ($segmentItemId == null) {
             $segmentsItemIds = [];
             foreach ($this->form['segmentSelectedIem'] as $itemId => $isSelected) {
-                if($isSelected){
-                    $segmentsItemIds[]= $itemId ;
+                if ($isSelected) {
+                    $segmentsItemIds[] = $itemId;
                 }
             }
             $segmentItemId = implode(',', $segmentsItemIds);
@@ -188,7 +200,11 @@ class AppointmentUserCreateOrUpdate extends Component
         $this->form['modalSelectedData']['service'] = $service->id;
         $this->fetchData['docList'] = $service->user;
         $associatedService = Service::with('user.places')->find($service->id);
-        $this->fetchData['placeList'] = $associatedService->user->flatMap->activePlaces()->unique('id');
+        if ($associatedService->place->isNotEmpty()) {
+            $this->fetchData['placeList'] = $associatedService->place()->active()->get();
+        } else {
+            $this->fetchData['placeList'] = $associatedService->user->flatMap->activePlaces()->unique('id');
+        }
         if (count($this->fetchData['placeList']) == 1) {
             $this->placeSelected($this->fetchData['placeList']->first());
         } else {

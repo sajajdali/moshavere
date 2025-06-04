@@ -4,6 +4,7 @@ namespace Modules\Service\app\Models;
 
 use App\Enum\ActiveEnum;
 use Modules\User\Entities\User;
+use Modules\Place\app\Models\Place;
 use Illuminate\Support\Facades\Cache;
 use function PHPUnit\Framework\isNull;
 use Illuminate\Database\Eloquent\Model;
@@ -11,8 +12,8 @@ use Illuminate\Database\Eloquent\Builder;
 use Modules\Reminder\app\Models\Reminder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\SoftDeletes;
-use Modules\Service\Enum\ServiceShowTypeEnum;
 
+use Modules\Service\Enum\ServiceShowTypeEnum;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Modules\AppointmentSetting\app\Models\AppointmentSetting;
 
@@ -142,5 +143,9 @@ class Service extends Model
             }
         }
         return false;
+    }
+    public function place()
+    {
+        return $this->belongsToMany(Place::class);
     }
 }

@@ -129,7 +129,7 @@
                                         @if (isset($fetchdata['places']))
                                             @foreach ($fetchdata['places'] as $place)
                                                 <option @if (isset($this->form['place']) &&
-                                                                ! is_null($this->form['place'])
+                                                                ! is_null($this->form['place']) &&
                                                  in_array($place->id, $this->form['place'])) selected @endif
                                                     value="{{ $place->id }}">{{ $place->title }}</option>
                                             @endforeach

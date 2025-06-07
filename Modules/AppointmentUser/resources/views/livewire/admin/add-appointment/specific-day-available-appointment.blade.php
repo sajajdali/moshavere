@@ -3,14 +3,12 @@
         <div>
             @if (!$edited['status'])
                 <h1 class="page-title"> افزودن نوبت برای {{ $fetchData['doc']->speciality_type == 1 ? 'دکتر' : '' }}
-                    <span class="text-danger">{{ $fetchData['doc']->fullName }}</span> </h1>
+                    <strong class="text-danger">{{ $fetchData['doc']->fullName }}</strong>
+                    در بخش <strong class="text-danger"> {{$this->fetchData['service']->title ?? ''}}</strong>
+                </h1>
             @else
                 <h1 class="page-title">تغییر زمان نوبت</h1>
             @endif
-        </div>
-        <div class="mt-2">
-            <h5><mark class="p-2">
-                    ثبت نوبت در روز {{ verta($fetchData['selectedDate'])->format('d F Y') }}</mark></h5>
         </div>
         @if ($fetchData['showChangeServiceBtn'])
             <button id="changeDocButton" class="btn btn-primary mt-3 mt-sm-0" type="button" class="btn btn-primary"
@@ -43,6 +41,10 @@
                                 data-bs-placement="top" title="روز بعد"></i>
                         </button>
                     </div>
+                    <div class="mt-2">
+                        <h5><mark class="p-2">
+                                ثبت نوبت در روز {{ verta($fetchData['selectedDate'])->format('l d F Y') }}</mark></h5>
+                    </div>
                     @if (!$edited['status'])
                         <button class="btn btn-success" data-bs-toggle="modal" wire:click='dateHasBeenChange'
                             data-bs-target="#RegistrAnAppointment">ثبت
@@ -73,7 +75,7 @@
                                             <tr>
                                                 <td colspan="6">
                                                     <div class="alert alert-avatar alert-primary alert-dismissible">
-                                                        حضور از ساعت {{ substr($eachTime['from'], 0, -6) }}
+                                                        حضور از ساعت <strong>{{ substr($eachTime['from'], 0, -6) }}</strong> در روز <strong>{{ verta($fetchData['selectedDate'])->format('l')}}</strong>
                                                     </div>
                                                 </td>
                                             </tr>
@@ -128,7 +130,12 @@
                                                         {{ substr($eachTime['until'], 0, -3) }}
                                                     </td>
                                                     <td>
-                                                        {{ $user->fullName }}
+                                                        <span>
+                                                            {{ $user->fullName }} -
+                                                        </span>
+                                                        <small >
+                                                            {{$ap->service->title}}
+                                                        </small>
                                                     </td>
                                                     <td>
                                                         {{ $user->mobile }}
@@ -202,7 +209,7 @@
                                             <tr>
                                                 <td colspan="6">
                                                     <div class="alert alert-avatar alert-primary alert-dismissible">
-                                                        حضور تا ساعت {{ substr($eachTime['until'], 0, -6) }}
+                                                        حضور تا ساعت <strong>{{ substr($eachTime['until'], 0, -6) }}</strong> در روز <strong>{{ verta($fetchData['selectedDate'])->format('l')}}</strong>
                                                     </div>
                                                 </td>
                                             </tr>

@@ -280,6 +280,9 @@ class AppointmentUserList extends Component
             });
         }
         if ($isExported) {
+            if (collect($this->search)->each(fn($item) => $item != null)) {
+                return  $appointments = $query->orderByRaw('DATE(date_visit) DESC, TIME(date_visit) ASC')->get();
+            }
             return $appointments =  $query->orderByDesc('id')->get();
         }
         $appointments =  $query->orderByDesc('id')->paginate(10);
@@ -332,7 +335,6 @@ class AppointmentUserList extends Component
     {
         $app = AppointmentUser::find($appUserId);
         return $app->details[AppointmentUser::DETAIL_SEGMENTS];
-
     }
     public function mount()
     {

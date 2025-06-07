@@ -1,5 +1,5 @@
 <!-- BOOTSTRAP CSS -->
-<link id="style" href="{{ admin_asset('plugins/bootstrap/css/bootstrap.min.css') }}" rel="stylesheet" />
+<link  href="{{ admin_asset('plugins/bootstrap/css/bootstrap.min.css') }}" rel="stylesheet" />
 
 <!-- STYLE CSS -->
 <link href="{{ admin_asset('css/style.css') }}" rel="stylesheet" />

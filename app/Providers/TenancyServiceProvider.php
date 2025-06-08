@@ -124,7 +124,7 @@ class TenancyServiceProvider extends ServiceProvider
 
     protected function handleTenantDatabaseSetup($tenant): void
     {
-        $preferredOrder = ['User', 'Place', 'Service', 'Speciality', 'Setting', 'AppointmentSetting', 'AppointmentUser', 'Chat', 'Discount', 'Front', 'Reminder', 'Transaction', 'Absence' , 'API'];
+        $preferredOrder = ['User', 'Service','Place', 'Speciality', 'Setting', 'AppointmentSetting', 'AppointmentUser', 'Chat', 'Discount', 'Front', 'Reminder', 'Transaction', 'Absence' , 'API'];
 
         $orderedModules = collect($preferredOrder)->map(function ($name) {
             return Module::find($name);

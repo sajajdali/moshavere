@@ -145,7 +145,7 @@ class DoctorProfileLivewire extends Component
                         }
                     }
                 } else {
-                    $this->form['selectedSegmentForRoute'] = $this->form['segment'];
+                    $this->form['selectedSegmentForRoute'][] = array_key_first($this->form['segment']);
                 }
                 $this->redirectToAppointmentDays(
                     $this->doc->id,

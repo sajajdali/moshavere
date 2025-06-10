@@ -251,15 +251,14 @@ class ShowAvailableDayForDoctor extends Component
     }
     public function mount()
     {
-        $doc     =  request()->input('doctor_id');
-        $place   =  request()->input('place_id');
-        $service =  request()->input('service_id');
-
+        $doc     = filter_var(request()->get('doctor_id', null), FILTER_SANITIZE_NUMBER_INT);
+        $place   = filter_var(request()->get('place_id', null), FILTER_SANITIZE_NUMBER_INT);
+        $service = filter_var(request()->get('service_id', null), FILTER_SANITIZE_NUMBER_INT);
         if (!isset($doc) || !isset($place) || !isset($service)) {
             return abort(404);
         }
         if (request()->has('segment')) {
-            $route_segments =  request()->input('segment');
+            $route_segments = filter_var_array(request()->get('segment'), FILTER_SANITIZE_NUMBER_INT);
             foreach ($route_segments as $item) {
                 $this->fetchData['segments'][] =  AppointmentSegmentItem::find($item);
             }
@@ -272,6 +271,7 @@ class ShowAvailableDayForDoctor extends Component
                 $this->fetchData['segment_time'] = $this->fetchData['segments'][0]->time;
             }
         }
+
         $this->fetchData['doc']      =   User::find($doc);
         $this->fetchData['places']   =   place::find($place);
         $this->fetchData['service']  =   Service::find($service);
@@ -288,6 +288,7 @@ class ShowAvailableDayForDoctor extends Component
             return abort(404);
         }
         $this->fetchData['maxShowDay'] = 2;
+
         //check if doctor has active appointmentsetting
         if (! AppointmentSetting::activeSetting()
             ->where('user_id', $this->fetchData['doc']->id)
@@ -299,6 +300,7 @@ class ShowAvailableDayForDoctor extends Component
         if (setting(SettingKeyEnum::APPOINTMENT_STATUS) != true) {
             $this->fetchData['isAppointmentActive'] = false;
         }
+        
         //select the nearest appointment
         foreach ($this->fetchData['firstTreeAvailableAppointment']  as $date => $appointmentsWithDaysIndex) {
             foreach ($appointmentsWithDaysIndex as $eachTime => $appointmentDetail) {

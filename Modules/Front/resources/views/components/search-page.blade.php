@@ -239,7 +239,7 @@
                                         @if (isset($service->icon))
                                             <div
                                                 class="w-[70px] h-[70px] overflow-hidden rounded-full flex items-center justify-center border-2 border-white ring-2 ring-blue-sky">
-                                                <img src="{{ $service->icon }}" alt="doctor-image-name" />
+                                                <img src="{{ {{ assetStorage($service->icon) }} }}" alt="doctor-image-name" />
                                             </div>
                                         @endif
                                         <div

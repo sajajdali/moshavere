@@ -283,9 +283,9 @@ class AppointmentUserList extends Component
             if (collect($this->search)->each(fn($item) => $item != null)) {
                 return  $appointments = $query->orderByRaw('DATE(date_visit) DESC, TIME(date_visit) ASC')->get();
             }
-            return $appointments =  $query->orderByDesc('id')->get();
+            return $appointments =  $query->orderByRaw('DATE(date_visit) DESC, TIME(date_visit) ASC')->get();
         }
-        $appointments =  $query->orderByDesc('id')->paginate(10);
+        $appointments = $query->orderByRaw('DATE(date_visit) DESC, TIME(date_visit) ASC')->paginate(10);
         return $appointments;
     }
     public function ExportData()

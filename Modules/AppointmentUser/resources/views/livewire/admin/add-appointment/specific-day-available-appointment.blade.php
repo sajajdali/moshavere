@@ -135,6 +135,9 @@
                                                         </span>
                                                         <small >
                                                             {{$ap->service->title}}
+                                                            @if($ap->hasSegment())
+                                                                {{$ap->segmentsNames()}}
+                                                            @endif
                                                         </small>
                                                     </td>
                                                     <td>

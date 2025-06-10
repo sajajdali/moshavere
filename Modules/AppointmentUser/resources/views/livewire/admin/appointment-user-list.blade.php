@@ -351,7 +351,7 @@
                             </button>
                         </form>
                     </div>
-                    <div class="table-responsive mb-3">
+                    <div class="table-responsive mb-3" style="min-height: 400px">
                         <table class="table text-nowrap text-md-nowrap table-bordered text-center">
                             <thead>
                                 <tr>

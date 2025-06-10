@@ -283,4 +283,13 @@ class AppointmentUser extends Model
         }
         return false ;
     }
+    public function segmentsNames(){
+        $segNames = '';
+        if(isset($this->details[AppointmentUser::DETAIL_SEGMENTS])){
+            foreach($this->details[AppointmentUser::DETAIL_SEGMENTS] as $segs){
+                 $segNames .= ' - ' . $segs['title'];
+            }
+        }
+        return $segNames ;
+    }
 }

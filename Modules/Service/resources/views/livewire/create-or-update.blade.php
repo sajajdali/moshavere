@@ -65,7 +65,7 @@
                                         <option value="0">بدون والد</option>
                                         @if (isset($fetchdata['services']))
                                             @foreach ($fetchdata['services'] as $service)
-                                                <option @if ($this->form['parent'] == $service->id) selected @endif
+                                                <option @if (isset($this->form['parent']) && $this->form['parent'] == $service->id) selected @endif
                                                     value="{{ $service->id }}">{{ $service->title }}</option>
                                             @endforeach
                                         @endif

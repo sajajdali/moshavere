@@ -94,10 +94,10 @@ class Service extends Model
         $cacheKey = 'most_viewed_service';
         // Attempt to get the data from the cache
         if (app()->environment('local')) {
-            return $query->whereNull('parent_id')->get();
+            return $query->get();
         } else {
             return Cache::remember($cacheKey, 60 * 60, function () use ($query) {
-                return $query->whereNull('parent_id')->get();
+                return $query->get();
             });
         }
     }

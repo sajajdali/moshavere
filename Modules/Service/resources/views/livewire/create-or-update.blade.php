@@ -65,7 +65,7 @@
                                         <option value="0">بدون والد</option>
                                         @if (isset($fetchdata['services']))
                                             @foreach ($fetchdata['services'] as $service)
-                                                <option @if ($this->form['parent_id'] == $service->id) selected @endif
+                                                <option @if ($this->form['parent'] == $service->id) selected @endif
                                                     value="{{ $service->id }}">{{ $service->title }}</option>
                                             @endforeach
                                         @endif
@@ -91,8 +91,8 @@
                                 <span>عنوان سوال:</span>
                             </label>
                             <div class="col-md-9">
-                                <textarea rows="3" class="form-control mb-1  @error('form.qestion') is-invalid @enderror"
-                                    id="questionTitle" wire:model='form.qestion' type="number"></textarea>
+                                <textarea rows="3" class="form-control mb-1  @error('form.qestion') is-invalid @enderror" id="questionTitle"
+                                    wire:model='form.qestion' type="number"></textarea>
                                 @error('form.qestion')
                                     <span class="text-danger">{{ $message }}</span>
                                 @enderror
@@ -128,9 +128,7 @@
                                         <option value="0">انتخاب کنید..</option>
                                         @if (isset($fetchdata['places']))
                                             @foreach ($fetchdata['places'] as $place)
-                                                <option @if (isset($this->form['place']) &&
-                                                                ! is_null($this->form['place']) &&
-                                                 in_array($place->id, $this->form['place'])) selected @endif
+                                                <option @if (isset($this->form['place']) && !is_null($this->form['place']) && in_array($place->id, $this->form['place'])) selected @endif
                                                     value="{{ $place->id }}">{{ $place->title }}</option>
                                             @endforeach
                                         @endif
@@ -149,9 +147,9 @@
                             <label for="form_api_code" class="col-md-3 form-label">کد نرم افزاری سلاک طب:</label>
                             <div class="col-md-9">
                                 <input class="form-control mb-1  @error('form.api_code') is-invalid @enderror"
-                                       id="form_api_code" wire:model='form.api_code' type="number">
+                                    id="form_api_code" wire:model='form.api_code' type="number">
                                 @error('form.api_code')
-                                <span class="text-danger">{{ $message }}</span>
+                                    <span class="text-danger">{{ $message }}</span>
                                 @enderror
                                 <p class="text-muted mt-1 ms-1">
                                     <i class="fa fa-info-circle text-info" aria-hidden="true"></i>
@@ -180,7 +178,8 @@
                                 <div class="custom-checkbox custom-control">
                                     <input type="checkbox" wire:model='form.notShowToUser' data-checkboxes="mygroup"
                                         class="custom-control-input" checked id="customShow">
-                                    <label for="customShow" class="custom-control-label">بخش برای استفاده های مدیریتی میباشد و به کاربر نمایش داده نمیشود
+                                    <label for="customShow" class="custom-control-label">بخش برای استفاده های مدیریتی
+                                        میباشد و به کاربر نمایش داده نمیشود
                                     </label>
                                 </div>
                                 @error('form.notShowToUser')
@@ -189,15 +188,11 @@
                             </div>
                         </div>
                         <div class="row mb-5 mt-3">
-                            <x-admin.core.form.image-upload
-                                label="ایکون بخش در سایت"
+                            <x-admin.core.form.image-upload label="ایکون بخش در سایت"
                                 uploadedPhotoUrl="{{ $uploadedPhotoUrl }}"
                                 uploadedFileName="{{ $uploadedFileName }}"
-                                uploadedFileType="{{ $uploadedFileType }}"
-                                deleteAction="deleteFile"
-                                model="photo"
-                                id="fileUpload"
-                            />
+                                uploadedFileType="{{ $uploadedFileType }}" deleteAction="deleteFile" model="photo"
+                                id="fileUpload" />
                         </div>
                         @if (!empty($fetchdata['doctors']))
                             <div class="row mt-5">

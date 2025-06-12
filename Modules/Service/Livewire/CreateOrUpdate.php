@@ -50,7 +50,7 @@ class CreateOrUpdate extends Component
             Cache::forget('most_viewed_service');
         }
         //data for update Or create Service
-        $parentId = $this->form['parent_id'] == 0 || null ? null : $this->form['parent_id'];
+        $parentId = ($this->form['parent'] == 0 || null) ? null : $this->form['parent'];
         $active = $this->form['active'] == 'true' ? 1 : 0;
         $modelCreateOrUpdate = [
             'title'         => $this->form['title']         ?? '',
@@ -111,7 +111,7 @@ class CreateOrUpdate extends Component
 
         $this->form['api_code']     = $this->service->api_code;
         $this->form['title']     = $this->service->title;
-        $this->form['parent_id'] = $this->service->parent_id;
+        $this->form['parent'] = $this->service->parent_id;
         $this->form['place']     = $this->service->place()?->pluck('places.id')->toArray();
         $this->form['img']       = $this->service->icon;
         $this->form['priority']  = $this->service->priority;

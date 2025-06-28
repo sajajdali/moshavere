@@ -1,10 +1,10 @@
 <div>
-    <div class="page-header align-items-center" >
+    <div class="page-header align-items-center">
         <div>
             @if (!$edited['status'])
                 <h1 class="page-title"> افزودن نوبت برای {{ $fetchData['doc']->speciality_type == 1 ? 'دکتر' : '' }}
                     <strong class="text-danger">{{ $fetchData['doc']->fullName }}</strong>
-                    در بخش <strong class="text-danger"> {{$this->fetchData['service']->title ?? ''}}</strong>
+                    در بخش <strong class="text-danger"> {{ $this->fetchData['service']->title ?? '' }}</strong>
                 </h1>
             @else
                 <h1 class="page-title">تغییر زمان نوبت</h1>
@@ -75,7 +75,9 @@
                                             <tr>
                                                 <td colspan="6">
                                                     <div class="alert alert-avatar alert-primary alert-dismissible">
-                                                        حضور از ساعت <strong>{{ substr($eachTime['from'], 0, -6) }}</strong> در روز <strong>{{ verta($fetchData['selectedDate'])->format('l')}}</strong>
+                                                        حضور از ساعت
+                                                        <strong>{{ substr($eachTime['from'], 0, -6) }}</strong> در روز
+                                                        <strong>{{ verta($fetchData['selectedDate'])->format('l') }}</strong>
                                                     </div>
                                                 </td>
                                             </tr>
@@ -133,10 +135,10 @@
                                                         <span>
                                                             {{ $user->fullName }} -
                                                         </span>
-                                                        <small >
-                                                            {{$ap->service->title}}
-                                                            @if($ap->hasSegment())
-                                                                {{$ap->segmentsNames()}}
+                                                        <small>
+                                                            {{ $ap->service->title }}
+                                                            @if ($ap->hasSegment())
+                                                                {{ $ap->segmentsNames() }}
                                                             @endif
                                                         </small>
                                                     </td>
@@ -212,7 +214,9 @@
                                             <tr>
                                                 <td colspan="6">
                                                     <div class="alert alert-avatar alert-primary alert-dismissible">
-                                                        حضور تا ساعت <strong>{{ substr($eachTime['until'], 0, -6) }}</strong> در روز <strong>{{ verta($fetchData['selectedDate'])->format('l')}}</strong>
+                                                        حضور تا ساعت
+                                                        <strong>{{ substr($eachTime['until'], 0, -6) }}</strong> در روز
+                                                        <strong>{{ verta($fetchData['selectedDate'])->format('l') }}</strong>
                                                     </div>
                                                 </td>
                                             </tr>
@@ -254,75 +258,75 @@
     <script src="{{ admin_asset('plugins/treeview/treeview.js') }}"></script>
     <script>
         $(document).ready(function() {
-                    var setAppModal = document.querySelector('#RegistrAnAppointment');
-                    var setAppModalInst = bootstrap.Modal.getOrCreateInstance(setAppModal);
-                    var myModalEl = document.querySelector('#changeDocmodal');
-                    var modal = bootstrap.Modal.getOrCreateInstance(myModalEl);
+            var setAppModal = document.querySelector('#RegistrAnAppointment');
+            var setAppModalInst = bootstrap.Modal.getOrCreateInstance(setAppModal);
+            var myModalEl = document.querySelector('#changeDocmodal');
+            var modal = bootstrap.Modal.getOrCreateInstance(myModalEl);
 
-                    function addJs() {
-                        const iranianHolidays = @json(holidays_array());
-                        jalaliDatepicker.startWatch({
-                            dayRendering: function(dayOptions, input) {
-                                const formatted =
-                                    `${dayOptions.year}/${String(dayOptions.month).padStart(2, '0')}/${String(dayOptions.day).padStart(2, '0')}`;
-                                const isHoliday = iranianHolidays.includes(formatted);
-                                return {
-                                    isHollyDay: isHoliday,
-                                };
-                            }
-                        });
-                        $(document).on('input', '[data-jdp]', function() {
-                            let selectedDate = $(this).val();
-                            let seterValue = $(this).data('name');
-                            @this.set(seterValue, selectedDate);
-                        });
-                    };
+            function addJs() {
+                const iranianHolidays = @json(holidays_array());
+                jalaliDatepicker.startWatch({
+                    dayRendering: function(dayOptions, input) {
+                        const formatted =
+                            `${dayOptions.year}/${String(dayOptions.month).padStart(2, '0')}/${String(dayOptions.day).padStart(2, '0')}`;
+                        const isHoliday = iranianHolidays.includes(formatted);
+                        return {
+                            isHollyDay: isHoliday,
+                        };
+                    }
+                });
+                $(document).on('input', '[data-jdp]', function() {
+                    let selectedDate = $(this).val();
+                    let seterValue = $(this).data('name');
+                    @this.set(seterValue, selectedDate);
+                });
+            };
+            addJs();
+            Livewire.on('lunchRegisterModal', function() {
+                setAppModalInst.show();
+            });
+            Livewire.on('lunchModal', function() {
+                setTimeout(() => {
+                    var myModal = new bootstrap.Modal(document.getElementById(
+                        'resoanForDisapproveModal'), {
+                        keyboard: false
+                    });
+                    myModal.show();
+                }, 1000);
+            });
+            Livewire.on('loadJs', function() {
+                setTimeout(() => {
                     addJs();
-                    Livewire.on('lunchRegisterModal', function() {
-                        setAppModalInst.show();
-                    });
-                    Livewire.on('lunchModal', function() {
-                        setTimeout(() => {
-                            var myModal = new bootstrap.Modal(document.getElementById(
-                                'resoanForDisapproveModal'), {
-                                keyboard: false
-                            });
-                            myModal.show();
-                        }, 1000);
-                    });
-                    Livewire.on('loadJs', function() {
-                        setTimeout(() => {
-                            addJs();
-                        }, 500);
-                    });
-                    if ({{ $fetchData['showRegisterModal'] }}) {
-                        @this.dateHasBeenChange();
-                        setTimeout(() => {
-                            setAppModalInst.show();
-                        }, 1000);
-                    };
-                    Livewire.on('closeModal', function() {
-                        modal.hide();
-                        setAppModalInst.hide();
-                    });
-                    Livewire.on('urlDateChange', function(newDate) {
-                        var currentUrl = window.location.href;
-                        var baseUrl = currentUrl.split('/').slice(0, -1).join('/');
-                        var newUrl = baseUrl + '/' + newDate.newDate;
-                        window.history.pushState({
-                            path: newUrl
-                        }, '', newUrl);
-                    })
-                    @if (setting(\Modules\Setting\Enum\SettingKeyEnum::SECREYERY_SEND_LINK_FOR_APPOINTMENT))
-                        {
-                            $('body').on('change', '.payment_pending_input', function() {
-                                if ($(this).val() == 'false') {
-                                    $('#sendSubmitPaymentStatus').removeClass('d-none');
-                                } else {
-                                    $('#sendSubmitPaymentStatus').addClass('d-none');
-                                }
-                            });
-                        @endif
-                    });
+                }, 500);
+            });
+            if ({{ $fetchData['showRegisterModal'] }}) {
+                @this.dateHasBeenChange();
+                setTimeout(() => {
+                    setAppModalInst.show();
+                }, 1000);
+            };
+            Livewire.on('closeModal', function() {
+                modal.hide();
+                setAppModalInst.hide();
+            });
+            Livewire.on('urlDateChange', function(newDate) {
+                var currentUrl = window.location.href;
+                var baseUrl = currentUrl.split('/').slice(0, -1).join('/');
+                var newUrl = baseUrl + '/' + newDate.newDate;
+                window.history.pushState({
+                    path: newUrl
+                }, '', newUrl);
+            })
+            const payment_link = @json($fetchData['secretary_send_payment_link']);
+            if (payment_link) {
+                $('body').on('change', '.payment_pending_input', function() {
+                    if ($(this).val() == 'false') {
+                        $('#sendSubmitPaymentStatus').removeClass('d-none');
+                    } else {
+                        $('#sendSubmitPaymentStatus').addClass('d-none');
+                    }
+                });
+            }
+        });
     </script>
 @endpush

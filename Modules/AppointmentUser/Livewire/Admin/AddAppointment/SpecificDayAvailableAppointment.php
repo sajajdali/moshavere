@@ -355,6 +355,7 @@ class SpecificDayAvailableAppointment extends Component
         } else {
             $this->fetchData['showChangeServiceBtn'] = false;
         }
+        $this->fetchData['secretary_send_payment_link'] = filter_var(setting(\Modules\Setting\Enum\SettingKeyEnum::SECREYERY_SEND_LINK_FOR_APPOINTMENT),FILTER_VALIDATE_BOOL);
 
     }
     public function render()

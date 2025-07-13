@@ -50,7 +50,10 @@ class CreateOrUpdate extends Component
             Cache::forget('most_viewed_service');
         }
         //data for update Or create Service
-        $parentId = (isset($this->form['parent']) && $this->form['parent'] == 0 || null) ? null : $this->form['parent'];
+        $parentId = null ;
+        if(isset($this->form['parent'])) {
+            $parentId = $this->form['parent'] == 0 || null ? null : $this->form['parent'];
+        }
         $active = $this->form['active'] == 'true' ? 1 : 0;
         $modelCreateOrUpdate = [
             'title'         => $this->form['title']         ?? '',

@@ -758,6 +758,13 @@ class AppointmentUserService
                 AppointmentUser::DETAIL_PAYMENT_PRICE => $paymentstatus['in_person']['price'],
             ];
         }
+        if (isset($detail['wait_for_payment'])) {
+            // force payment for secretery send link appointments
+            $detailDatabaseDB[AppointmentUser::DETAIL_PAYMENT] = [
+                'status' => true,
+                AppointmentUser::DETAIL_PAYMENT_PRICE => $paymentstatus['in_person']['price'],
+            ];
+        }
 
         // detailDatabase
 

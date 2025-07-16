@@ -136,7 +136,7 @@
                                                             {{ $user->fullName }} -
                                                         </span>
                                                         <small>
-                                                            {{ $ap->service->title }}
+                                                            {{ $ap->service->title ?? '(بخش حذف شده)' }}
                                                             @if ($ap->hasSegment())
                                                                 {{ $ap->segmentsNames() }}
                                                             @endif

@@ -51,11 +51,17 @@ class MigrateUsersCommand extends Command
             if (User::where('mobile', $data->mobile)->exists()) {
                 continue;
             }
+            $counter = 656;
             // -------------------------------
-            // NOTICE ::::  639 is the number if existing user in current appointment and need to change if want to run again
+            // NOTICE ::::  763 is the number if existing user in current appointment and need to change if want to run again
             // -------------------------------
+            $newId = $counter + $data->id;
+            if (DB::connection('new_mysql')->table('users')->where('id', $newId)->exists()) {
+                $this->warn("User ID $newId already exists. Skipping...");
+                continue;
+            }
             $newData = [
-                'id' =>  $data->id + 639,
+                'id' =>  $newId,
                 'mobile' => $data->mobile ?? $this->randomMobile(),
                 'email' => $data->email ?? $data->mobile . uniqId() . '@info.com',
                 'password' => $data->password ?? Hash::make('awjhfawjpofawpokfapow45s6e4ge56sgWedwgpouqoiwmpogjawjgpaowhg2014891@((%&)(@*#@_)*@_)*%UPJVKLEJVIJ)(*&@)(&$)(@)'),

@@ -3,7 +3,9 @@
 namespace Modules\MigrateOldData\App\Console;
 
 use Illuminate\Console\Command;
+use Modules\User\Entities\User;
 use Illuminate\Support\Facades\DB;
+use Modules\User\Enum\UserMetaEnum;
 use Illuminate\Support\Facades\Hash;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Input\InputArgument;
@@ -34,7 +36,7 @@ class MigrateUsersCommand extends Command
         $this->migrateUsers();
 
         // Migrate Roles
-        $this->migrateUserRoles();
+        // $this->migrateUserRoles();
     }
     private function migrateUsers()
     {
@@ -46,15 +48,21 @@ class MigrateUsersCommand extends Command
                 continue;
             }
             // Transform the data according to new structure
+            if (User::where('mobile', $data->mobile)->exists()) {
+                continue;
+            }
+            // -------------------------------
+            // NOTICE ::::  639 is the number if existing user in current appointment and need to change if want to run again
+            // -------------------------------
             $newData = [
-                'id' => $data->id,
+                'id' =>  $data->id + 639,
                 'mobile' => $data->mobile ?? $this->randomMobile(),
                 'email' => $data->email ?? $data->mobile . uniqId() . '@info.com',
                 'password' => $data->password ?? Hash::make('awjhfawjpofawpokfapow45s6e4ge56sgWedwgpouqoiwmpogjawjgpaowhg2014891@((%&)(@*#@_)*@_)*%UPJVKLEJVIJ)(*&@)(&$)(@)'),
                 'remember_token' => $data->remember_token ?? '',
-                // Add more transformations as needed
             ];
             DB::connection('new_mysql')->table('users')->insert($newData);
+            $this->insertUserMetas($newData);
         }
         $this->info('users migration completed successfully.');
     }
@@ -89,5 +97,28 @@ class MigrateUsersCommand extends Command
     {
         $rand = mt_rand(1000000, 9999999);
         return '0900' . $rand;
+    }
+    private function insertUserMetas($userData)
+    {
+        $oldData = DB::connection('old_mysql')->table('user_metas')->where('user_id', $userData['id'])->get();
+        foreach ($oldData as $data) {
+            $newKey = $this->findMetaKeyEnumValue($data->meta_key, $data->user_id);
+            $metavalue = $data->meta_value;
+            if ($newKey == UserMetaEnum::AVATAR) {
+                $metavalue = url('public/avatar/' . $data->meta_value);
+            }
+            if ($newKey != null) {
+                $newData = [
+                    'meta_key' => $newKey,
+                    'user_id' => $userData['id'],
+                    'meta_value' => $metavalue,
+                ];
+                DB::connection('new_mysql')->table('user_metas')->insert($newData);
+            }
+        }
+    }
+    private function findMetaKeyEnumValue($metaValue, $userid)
+    {
+        return  UserMetaEnum::fromOldKey($metaValue, $userid);
     }
 }

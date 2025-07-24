@@ -159,6 +159,7 @@ class Checkout extends Component
     }
     private function storeappointment()
     {
+        /* @var $user User */
         $user = $this->user;
         // If he wants to take the appointmnet for someone else
         $someoneModel = null;
@@ -167,8 +168,8 @@ class Checkout extends Component
         // main user data
         $mainUser = new UserModel(
             user: $user,
-            firstName: $user->first_name,
-            lastName: $user->last_name,
+            firstName: $user->firstName,
+            lastName: $user->lastName,
         );
         // full user model
         $userModelAppointment = new UserModelAppointment(userModel: $mainUser, forHimself: $foHimself, userSomeoneModel: $someoneModel);
@@ -222,7 +223,6 @@ class Checkout extends Component
         if ($storeAppointment['status']) {
             $appointmentSetting = AppointmentSetting::find($this->fetchData['appSetting']->id);
             GenerateAppointmentCache::dispatch($appointmentSetting);
-
             return redirect()->route('front.setAppointment.detail', ['tracking_code' => $storeAppointment['detail']['tracking_code']]);
         } else {
             $this->err = $storeAppointment['message'];

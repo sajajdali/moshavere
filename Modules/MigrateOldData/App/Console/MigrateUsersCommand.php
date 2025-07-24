@@ -40,8 +40,35 @@ class MigrateUsersCommand extends Command
     }
     private function migrateUsers()
     {
+        $users = DB::connection('new_mysql')->table('users')->where('id', '>', 300)->get();
+        foreach ($users as $key => $user) {
+            $oldUser = DB::connection('old_mysql')->table('users')->where('mobile', $user->mobile)->first();
+            if (! $oldUser) {
+                continue;
+            }
+            $oldData = DB::connection('old_mysql')->table('user_metas')->where('user_id', $oldUser->id)->get();
+            foreach ($oldData as $data) {
+                $newKey = $this->findMetaKeyEnumValue($data->meta_key, $oldUser->id);
+                $metavalue = $data->meta_value;
+                if ($newKey == UserMetaEnum::AVATAR) {
+                    $metavalue = url('public/avatar/' . $data->meta_value);
+                }
+                if (! is_null($newKey)) {
+                    DB::connection('new_mysql')->table('user_metas')->updateOrInsert(
+                        [
+                            'meta_key' => $newKey,
+                            'user_id' => $user->id
+                        ],
+                        [
+                            'meta_value' => $metavalue
+                        ]
+                    );
+                }
+            }
+        }
+        return;
         // Connect to the old database
-        $oldData = DB::connection('old_mysql')->table('users')->get();
+
         // Loop through each record and transform it
         foreach ($oldData as $data) {
             if ($data->id == 1) {
@@ -60,9 +87,12 @@ class MigrateUsersCommand extends Command
                 $this->warn("User ID $newId already exists. Skipping...");
                 continue;
             }
+            if (is_null($data->mobile)) {
+                continue;
+            }
             $newData = [
                 'id' =>  $newId,
-                'mobile' => $data->mobile ?? $this->randomMobile(),
+                'mobile' => $data->mobile,
                 'email' => $data->email ?? $data->mobile . uniqId() . '@info.com',
                 'password' => $data->password ?? Hash::make('awjhfawjpofawpokfapow45s6e4ge56sgWedwgpouqoiwmpogjawjgpaowhg2014891@((%&)(@*#@_)*@_)*%UPJVKLEJVIJ)(*&@)(&$)(@)'),
                 'remember_token' => $data->remember_token ?? '',
@@ -108,7 +138,7 @@ class MigrateUsersCommand extends Command
     {
         $oldData = DB::connection('old_mysql')->table('user_metas')->where('user_id', $userData['id'])->get();
         foreach ($oldData as $data) {
-            $newKey = $this->findMetaKeyEnumValue($data->meta_key, $data->user_id);
+            $newKey = $this->findMetaKeyEnumValue($data->meta_key, $userData['id']);
             $metavalue = $data->meta_value;
             if ($newKey == UserMetaEnum::AVATAR) {
                 $metavalue = url('public/avatar/' . $data->meta_value);

@@ -16,7 +16,7 @@
                     @if ($step == 1)
                         <div class="row">
                             <label for="inputPassword" class=" col-form-label">ثبت نوبت با شماره همراه </label>
-                            <input type="text" wire:ignore wire:keydown.enter='numberSet' autocomplete="off"
+                            <input type="text" wire:ignore wire:keydown.enter='numberSet'
                                 class="form-control @error('form.number') is-invalid @enderror" id="inputPassword"
                                 wire:model='form.number'>
                             @error('form.number')

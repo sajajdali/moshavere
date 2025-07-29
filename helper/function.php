@@ -11,6 +11,32 @@ function assetStorage($link)
 {
     return asset('storage/'.$link);
 }
+if (!function_exists('tenant_url')) {
+    if (!function_exists('tenant_url')) {
+        function tenant_url(string $path = '', array $query = [], ?string $fragment = null): string
+        {
+            // سعی می‌کنیم tenant domain رو بگیریم، در غیر این صورت از APP_URL استفاده کنیم
+            $domain = function_exists('tenant') && tenant()
+                ? tenant()->domains->first()?->domain
+                : null;
+
+            $base = $domain ? "https://{$domain}" : rtrim(config('app.url'), '/');
+            $path = '/' . ltrim($path, '/');
+            $url = $base . $path;
+
+            if (!empty($query)) {
+                $url .= '?' . http_build_query($query);
+            }
+
+            if ($fragment) {
+                $url .= '#' . ltrim($fragment, '#');
+            }
+
+            return $url;
+        }
+    }
+}
+
 function getCurrentSeason()
 {
     $month = \Carbon\Carbon::now()->format('n');

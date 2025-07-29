@@ -58,15 +58,29 @@ class AppointmentSmsNotification extends Notification implements ShouldQueue
      */
     public function toArray($notifiable): array
     {
-        $this->initializeTenant();
+        $this->initializeTenant(); // اگه نیاز به اتصال DB هست، این بمونه
 
         $doctorName = $notifiable->doctor?->full_name;
         $firstName = $notifiable->user?->first_name;
         $lastName = $notifiable->user?->last_name;
         $serviceName = $notifiable->service?->title;
-        $link = url('/s/' . $notifiable->shortLink->link_code);
+
+        $link = tenant_url('/s/' . $notifiable->shortLink->link_code);
+
         $dateAppointment = dateFormatSimlpe($notifiable->date_visit);
         $hour = substr($notifiable->start_time, 0, -3);
+
+        // ذخیره لاگ برای بررسی
+//        $logPath = base_path('fake-sms-log.txt');
+//        $timestamp = now()->toDateTimeString();
+
+//        $logContent = "=== [{$timestamp}] ===\n";
+//        $logContent .= "Tenant ID: " . ($this->tenantId ?? 'N/A') . "\n";
+//        $logContent .= "Generated URL: " . $link . "\n";
+//        $logContent .= "User: {$firstName} {$lastName}\n";
+//        $logContent .= "--------------------------\n\n";
+//        file_put_contents($logPath, $logContent, FILE_APPEND);
+
         return [
             'template' => $this->template,
             'receptor' => $notifiable->user->mobile,

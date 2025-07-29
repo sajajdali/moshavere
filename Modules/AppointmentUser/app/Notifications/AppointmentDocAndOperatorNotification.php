@@ -36,7 +36,7 @@ class AppointmentDocAndOperatorNotification extends Notification
         $firstName = $notifiable->user?->first_name;
         $lastName = $notifiable->user?->last_name;
         $serviceName = $notifiable->service?->title;
-        $link = url('/s/' . $notifiable->shortLink->link_code);
+        $link = tenant_url('/s/' . $notifiable->shortLink->link_code);
         $dateAppointment = dateFormatSimlpe($notifiable->date_visit);
         $hour = substr($notifiable->start_time, 0, -3);
         return [

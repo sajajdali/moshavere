@@ -39,7 +39,7 @@ class AppointmentUserFeedbackSmsnotification extends Notification
         $firstName = $notifiable->user?->first_name;
         $lastName = $notifiable->user?->last_name;
         $serviceName = $notifiable->service?->title;
-        $link = url('/s/' . $this->link_code);
+        $link = tenant_url('/s/' . $this->link_code);
         $dateAppointment = dateFormatSimlpe($notifiable->date_visit);
         $hour = substr($notifiable->start_time, 0, -3);
         return [

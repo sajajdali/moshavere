@@ -298,8 +298,9 @@ class SpecificDayAppointmentRegistrationModal extends Component
             'placeId' => $this->placeId,
             'appId' => $this->appId,
             'date' => $this->appDate,
-            'segmentItemId' => $this->segmentId
-        ])->with('success', $storeAppointment['message']);
+            'segmentItemId' => $this->segmentId,
+            'storedApp' =>  $storeAppointment['detail']['appointment_user_id']
+        ])->with('success', value: $storeAppointment['message']);
     }
 
     public function closeModal()

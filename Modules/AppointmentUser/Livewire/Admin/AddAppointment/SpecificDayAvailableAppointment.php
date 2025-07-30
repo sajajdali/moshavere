@@ -117,6 +117,10 @@ class SpecificDayAvailableAppointment extends Component
         $isDay   = Carbon::now()->format('Y-m-d');
         $result = [];
         $temPResult = [];
+        $reservedAppBeforeCacheCreate = null;
+        if (isset($this->fetchData['reserve_app_till_cache_create'])) {
+            $reservedAppBeforeCacheCreate = $this->fetchData['reserve_app_till_cache_create'];
+        }
         if (isset($listOfAppointment['data'])) {
             foreach ($listOfAppointment['data'] as $yeay => $day) {
                 foreach ($day as $month => $appointments) {
@@ -132,6 +136,19 @@ class SpecificDayAvailableAppointment extends Component
                                     'until' => $time['until'],
                                     'gap' => isset($time['gap']) ? true : false,
                                 ];
+
+                                // check for existing app before cache generate
+                                if (! is_null($reservedAppBeforeCacheCreate)) {
+                                    if ($reservedAppBeforeCacheCreate->date_visit->timestamp == $time['timestamp']) {
+                                        $temPResult[] = [
+                                            'status' => false,
+                                            'from' => $time['from'],
+                                            'until' => $time['until'],
+                                            'appointment_user_id' => $reservedAppBeforeCacheCreate->id,
+                                            'gap' => isset($time['gap']) ? true : false,
+                                        ];
+                                    }
+                                }
                                 // If two matches are found, break out of the loop
                             } else {
                                 $temPResult[] = [
@@ -290,6 +307,10 @@ class SpecificDayAvailableAppointment extends Component
         $this->fetchData['appId'] = $app->id;
         $this->fetchData['appointmentSetting'] = $app;
 
+        // fill the app till cache created
+        if (request()->has('storedApp')) {
+            $this->fetchData['reserve_app_till_cache_create'] = AppointmentUser::find(request()->get('storedApp'));
+        }
         if (!empty(request()->route('date'))) {
             $this->fetchData['selectedDate']  = Verta::parse(request()->route('date'))->toCarbon();
         } else {

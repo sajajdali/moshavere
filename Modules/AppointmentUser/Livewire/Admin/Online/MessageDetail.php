@@ -19,7 +19,6 @@ use Modules\AppointmentUser\app\Models\AppointmentOnline;
 use Modules\AppointmentUser\Enum\AppointmentUserStatusEnum;
 use Modules\AppointmentSetting\app\Models\AppointmentSetting;
 use Modules\AppointmentUser\Enum\AppointmentOnlineStatusEnum;
-use Modules\AppointmentUser\app\Jobs\GenerateAppointmentCache;
 use Modules\AppointmentUser\app\Models\AppointmentOnlineMessage;
 use Modules\AppointmentUser\Enum\AppointmentOnlineMessageSeenEnum;
 use Modules\AppointmentUser\Enum\AppointmentOnlineMessageTypeEnum;
@@ -266,7 +265,8 @@ class MessageDetail extends Component
         if (isset($smsTemplate)) {
             $appointmentUser->notify(new AppointmentUserFeedbackSmsnotification($smsTemplate, $link_code));
         }
-        GenerateAppointmentCache::dispatch($appointmentUser->setting);
+        // generate cache
+        $appointmentUser->setting->runGenerateCacheJob(specialDayConvert($appointmentUser->date_visit));
 
         $this->fetchData['appOnline']->update(['status' => AppointmentOnlineStatusEnum::COMPLETED_BY_DOCTOR]);
         $this->fetchData['appOnline']->appointmentUser()->update(['status' => AppointmentUserStatusEnum::STATUS_ONILNE_CLOSED]);

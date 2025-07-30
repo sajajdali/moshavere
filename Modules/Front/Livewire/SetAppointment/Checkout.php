@@ -22,7 +22,6 @@ use Modules\AppointmentUser\Enum\AppointmentUserTypeEnum;
 use Modules\AppointmentUser\Enum\AppointmentUserStatusEnum;
 use Modules\AppointmentUser\Enum\model\UserModelAppointment;
 use Modules\AppointmentSetting\app\Models\AppointmentSetting;
-use Modules\AppointmentUser\app\Jobs\GenerateAppointmentCache;
 
 #[Layout('front::layouts.app')]
 #[Title('ثبت نوبت')]
@@ -222,7 +221,7 @@ class Checkout extends Component
         $storeAppointment = app('AppointmentUserService')->storeAppointment($this->fetchData['appSetting'], $userModelAppointment, $appointmentModel, $detail);
         if ($storeAppointment['status']) {
             $appointmentSetting = AppointmentSetting::find($this->fetchData['appSetting']->id);
-            GenerateAppointmentCache::dispatch($appointmentSetting , specialDayConvert($storeAppointment['detail']['']));
+            $appointmentSetting->runGenerateCacheJob(specialDayConvert($storeAppointment['detail']['']));
             return redirect()->route('front.setAppointment.detail', ['tracking_code' => $storeAppointment['detail']['tracking_code']]);
         } else {
             $this->err = $storeAppointment['message'];

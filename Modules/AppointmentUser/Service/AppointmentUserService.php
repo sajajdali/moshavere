@@ -8,7 +8,6 @@ use App\Enum\RouteEnum;
 use App\Models\ShortLink;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Cache;
-use Modules\AppointmentUser\app\Jobs\GenerateAppointmentCache;
 use Modules\Service\app\Models\Service;
 use Modules\Setting\Enum\SettingKeyEnum;
 use Modules\Api\Transformers\UserResource;
@@ -689,9 +688,9 @@ class AppointmentUserService
             'status' => $status,
             'kind' => $appointmentData->kind,
             'type' => $appointmentData->type,
-            'start_time' => $visitDateTime->toTimeString(),
+            'start_time' => $visitDateTime->copy()->toTimeString(),
             'end_time' => $endTime,
-            'date_visit' => $visitDateTime->toDateTimeString(),
+            'date_visit' => $visitDateTime->copy()->toDateTimeString(),
             'user_ip' => ip(),
         ];
         if ($status == AppointmentUserStatusEnum::STATUS_WAIT_PAYMENT) {
@@ -890,10 +889,9 @@ class AppointmentUserService
         }
         event(new StoreAppointmentEvent($appointmentUser));
 
-        $doctorAllSettings = AppointmentSetting::where('user_id', $appointmentSetting->user_id)->get();
-        foreach ($doctorAllSettings as $setting) {
-            GenerateAppointmentCache::dispatch($setting, $visitDateTime->toDateString());
-        }
+        // generate cache
+        $appointmentUser->setting->runGenerateCacheJob($visitDateTime);
+
         $trackingUrl = route('front.setAppointment.detail', ['tracking_code' => $appointmentUser->tracking_code]);
         return [
             'status' => true,

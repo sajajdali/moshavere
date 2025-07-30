@@ -17,7 +17,6 @@ use Modules\AppointmentUser\Enum\AppointmentUserKindEnum;
 use Modules\AppointmentUser\Enum\AppointmentUserTypeEnum;
 use Modules\AppointmentUser\Enum\model\UserModelAppointment;
 use Modules\AppointmentSetting\app\Models\AppointmentSetting;
-use Modules\AppointmentUser\app\Jobs\GenerateAppointmentCache;
 use Modules\Api\Http\Controllers\Appointment\AppointmentApiController;
 
 class VoipController extends Controller
@@ -151,7 +150,7 @@ class VoipController extends Controller
 
         $appointmentSetting = $doctor->appointmentSettings()->active()
             ->when(isset($servicesId), function ($q) use ($servicesId) {
-                return $q->where('service_id', $servicesId)->orWhere('service_id',null);
+                return $q->where('service_id', $servicesId)->orWhere('service_id', null);
             })->when(!isset($servicesId), function ($q) {
                 return $q->whereNull('service_id')->orWhereNull('service_id');
             })->when(isset($placesId), function ($q) use ($placesId) {
@@ -207,7 +206,7 @@ class VoipController extends Controller
         }
         // appointment model
         $appointmentModel = new AppointmentModel(
-            timestamp: $startDate->timestamp,
+            timestamp: $startDate->copy()->timestamp,
             appointmentVia: AppointmentVia::SELF,
             sendSmsToUser: true,
             serviceId: $servicesId ?? $doctor->service->first(),
@@ -235,7 +234,8 @@ class VoipController extends Controller
 
         $storeAppointment = app('AppointmentUserService')->storeAppointment($appointmentSetting, $userModelAppointment, $appointmentModel, $detail);
         if ($storeAppointment['status']) {
-            GenerateAppointmentCache::dispatch($appointmentSetting);
+            // generate cache
+            $appointmentSetting->runGenerateCacheJob($startDate->toDateTimeString());
             return $this->ok(
                 [
                     'status' => true,

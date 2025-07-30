@@ -12,6 +12,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Modules\AppointmentUser\app\Models\AppointmentUser;
 use Modules\AppointmentSetting\app\Models\AppointmentSegment;
+use Modules\AppointmentUser\app\Jobs\GenerateAppointmentCache;
 use Modules\AppointmentSetting\app\Models\AppointmentSettingTime;
 use Modules\AppointmentSetting\app\Enum\AppintmentSettingDayNumber;
 use Modules\AppointmentSetting\app\trait\AppointmentSettingDetailKeyTrait;
@@ -112,5 +113,30 @@ class AppointmentSetting extends Model
                 ->whereNull('service_id')->first();
         }
         return $app;
+    }
+    public function hasDaySetting($date): bool
+    {
+        // check if setting for that day exists
+        $date = Carbon::parse($date);
+        if ($this->times()
+            ->where('day_number', AppintmentSettingDayNumber::getConstant(strtolower($date->copy()->format('l'))))
+            ->exists()
+        ) {
+            return true;
+        }
+        return false;
+    }
+    public function  runGenerateCacheJob($date)
+    {
+        $doctorAllSettings = AppointmentSetting::where('user_id', $this->user_id)->get();
+        if ($this->interference) {
+            foreach ($doctorAllSettings as $setting) {
+                if ($setting->hasDaySetting($date)) {
+                    GenerateAppointmentCache::dispatch($setting, $date);
+                }
+            }
+        } else {
+            GenerateAppointmentCache::dispatch($this, $date);
+        }
     }
 }

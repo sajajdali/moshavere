@@ -17,7 +17,6 @@ use Modules\AppointmentUser\Traits\OprationButtonsTrait;
 use Modules\AppointmentUser\Enum\AppointmentUserTypeEnum;
 use Modules\AppointmentUser\Enum\AppointmentUserStatusEnum;
 use Modules\AppointmentSetting\app\Models\AppointmentSetting;
-use Modules\AppointmentUser\app\Jobs\GenerateAppointmentCache;
 use Modules\AppointmentUser\app\Notifications\AppointmentSmsNotification;
 use Modules\AppointmentUser\Livewire\Admin\AddAppointment\Modal\SpecificDayAppointmentRegistrationModal;
 
@@ -194,7 +193,8 @@ class SpecificDayAvailableAppointment extends Component
             'type' => AppointmentUserTypeEnum::BETWEEN_PATIENTS,
         ]);
         $appointmentSetting = AppointmentSetting::find($this->fetchData['appId']);
-        GenerateAppointmentCache::dispatch($appointmentSetting);
+        // generate cache
+        $appointmentSetting->runGenerateCacheJob(specialDayConvert($appUser->date_visit));
 
         return redirect()->route(
             'admin.appointment.add.specificday',
@@ -238,12 +238,16 @@ class SpecificDayAvailableAppointment extends Component
     //opration button functions
     private function redirectToPage($msg)
     {
-        return redirect()->route('admin.appointment.add.specificday',
-        ['serviceId' => $this->fetchData['service']->id,
-         'placeId' => $this->fetchData['place'],
-          'appId' => $this->fetchData['appId'],
-        'segmentItemId' => $this->fetchData['segment'],
-        'date' => verta($this->fetchData['selectedDate'])->format('Y-m-d')])->with('success', $msg);
+        return redirect()->route(
+            'admin.appointment.add.specificday',
+            [
+                'serviceId' => $this->fetchData['service']->id,
+                'placeId' => $this->fetchData['place'],
+                'appId' => $this->fetchData['appId'],
+                'segmentItemId' => $this->fetchData['segment'],
+                'date' => verta($this->fetchData['selectedDate'])->format('Y-m-d')
+            ]
+        )->with('success', $msg);
     }
     // opration button functions
 
@@ -319,13 +323,13 @@ class SpecificDayAvailableAppointment extends Component
         if (env('APPOINTMENT_SANDBOX')) {
             Cache::forget('appointmentList.' . $app->id);
         }
-        if (app()->environment('local') || isset($this->fetchData['segment_time'])){
-            $details=[];
-            if($segmentItemId != null){
+        if (app()->environment('local') || isset($this->fetchData['segment_time'])) {
+            $details = [];
+            if ($segmentItemId != null) {
                 $details['segment_time'] =  $this->fetchData['segment_time'];
             }
-            $this->fetchData['RawlistOfAppointment'] =  app('AppointmentUserService')->listAppointments($app,$details);
-        }else{
+            $this->fetchData['RawlistOfAppointment'] =  app('AppointmentUserService')->listAppointments($app, $details);
+        } else {
             // create inital list aof appointment
             $this->fetchData['RawlistOfAppointment']  = Cache::rememberForever('appointmentList.' . $app->id, function () use ($app) {
                 $app->update(['updated_log_at' => \now()]);
@@ -355,8 +359,7 @@ class SpecificDayAvailableAppointment extends Component
         } else {
             $this->fetchData['showChangeServiceBtn'] = false;
         }
-        $this->fetchData['secretary_send_payment_link'] = filter_var(setting(\Modules\Setting\Enum\SettingKeyEnum::SECREYERY_SEND_LINK_FOR_APPOINTMENT),FILTER_VALIDATE_BOOL);
-
+        $this->fetchData['secretary_send_payment_link'] = filter_var(setting(\Modules\Setting\Enum\SettingKeyEnum::SECREYERY_SEND_LINK_FOR_APPOINTMENT), FILTER_VALIDATE_BOOL);
     }
     public function render()
     {

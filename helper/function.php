@@ -36,7 +36,10 @@ if (!function_exists('tenant_url')) {
         }
     }
 }
-
+function specialDayConvert($specialDay)
+{
+    return  \Carbon\Carbon::parse($specialDay)->toDateString();
+}
 function getCurrentSeason()
 {
     $month = \Carbon\Carbon::now()->format('n');

@@ -222,7 +222,7 @@ class Checkout extends Component
         $storeAppointment = app('AppointmentUserService')->storeAppointment($this->fetchData['appSetting'], $userModelAppointment, $appointmentModel, $detail);
         if ($storeAppointment['status']) {
             $appointmentSetting = AppointmentSetting::find($this->fetchData['appSetting']->id);
-            GenerateAppointmentCache::dispatch($appointmentSetting);
+            GenerateAppointmentCache::dispatch($appointmentSetting , specialDayConvert($storeAppointment['detail']['']));
             return redirect()->route('front.setAppointment.detail', ['tracking_code' => $storeAppointment['detail']['tracking_code']]);
         } else {
             $this->err = $storeAppointment['message'];

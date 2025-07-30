@@ -1,6 +1,7 @@
 <?php
 
 namespace Modules\AppointmentUser\app\Jobs;
+
 use Carbon\Carbon;
 use Illuminate\Bus\Queueable;
 use Illuminate\Support\Facades\Log;
@@ -18,13 +19,13 @@ class GenerateAppointmentCache implements ShouldQueue
 
     public $timeout = 300; // Allow up to 5 minutes for job execution
     /**
-     * Create a new job instance.
-     *
-     * @param  AppointmentSetting  $appointmentSetting
-     * @return void
+     * @param AppointmentSetting $appointmentSetting
+     * @param string|null $specialDay
      */
-    public function __construct(protected AppointmentSetting $appointmentSetting , $forceDelete = false)
-    {
+    public function __construct(
+        protected AppointmentSetting $appointmentSetting,
+        protected ?string $specialDay = null
+    ) {
         $this->onQueue('low');
     }
 
@@ -33,16 +34,57 @@ class GenerateAppointmentCache implements ShouldQueue
      *
      * @return void
      */
-    public function handle()
+    public function handle(): void
     {
         try {
-            Cache::forget('appointmentList.' . $this->appointmentSetting->id);
-            Cache::rememberForever('appointmentList.' . $this->appointmentSetting->id, function () {
-                $this->appointmentSetting->update(['updated_log_at' => now()]);
-                return app(AppointmentUserService::class)->listAppointments($this->appointmentSetting);
-            });
+            $cacheKey = 'appointmentList.' . $this->appointmentSetting->id;
+
+            if ($this->specialDay) {
+                // If a specific day is given, fetch appointments only for that day
+                $newOneDayData = app('AppointmentUserService')->listAppointments($this->appointmentSetting, [
+                    'oneDay' => $this->specialDay,
+                ]);
+
+                if (Cache::has($cacheKey)) {
+                    $cachedData = Cache::get($cacheKey);
+
+                    // Replace the specific day data inside the cached structure
+                    if (isset($newOneDayData['data'])) {
+                        foreach ($newOneDayData['data'] as $year => $months) {
+                            foreach ($months as $month => $days) {
+                                foreach ($days as $day => $dayData) {
+                                    $cachedData['data'][$year][$month][$day] = $dayData;
+                                }
+                            }
+                        }
+                        // Update cache with modified day
+                        Cache::forever($cacheKey, $cachedData);
+                    }
+                } else {
+                    // If cache doesn't exist, generate full cache
+                    $fullData = app('AppointmentUserService')->listAppointments($this->appointmentSetting);
+                    Cache::forever($cacheKey, $fullData);
+                }
+            } else {
+                // If no specific day is provided, generate full cache directly
+                $fullData = app('AppointmentUserService')->listAppointments($this->appointmentSetting);
+                Cache::forever($cacheKey, $fullData);
+            }
         } catch (\Exception $ex) {
-            Log::info('GenerateAppointmentCache Error:  ' . $ex->getMessage() . ' time: ' . Carbon::now() );
+            Log::info('GenerateAppointmentCache Error: ' . $ex->getMessage() . ' at ' . Carbon::now());
         }
     }
+
+    // public function handle()
+    // {
+    //     try {
+    //         Cache::forget('appointmentList.' . $this->appointmentSetting->id);
+    //         Cache::rememberForever('appointmentList.' . $this->appointmentSetting->id, function () {
+    //             $this->appointmentSetting->update(['updated_log_at' => now()]);
+    //             return app(AppointmentUserService::class)->listAppointments($this->appointmentSetting);
+    //         });
+    //     } catch (\Exception $ex) {
+    //         Log::info('GenerateAppointmentCache Error:  ' . $ex->getMessage() . ' time: ' . Carbon::now());
+    //     }
+    // }
 }

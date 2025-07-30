@@ -96,7 +96,7 @@ class AppointmentDetail extends Component
                 $this->fetchData['app']->notify(new AppointmentSmsNotification($smsTemplate));
                 session()->flash('success', 'نوبت شما با موفقیت کنسل شد');
             }
-            GenerateAppointmentCache::dispatch($this->fetchData['app']->setting);
+            GenerateAppointmentCache::dispatch($this->fetchData['app']->setting, specialDayConvert($this->fetchData['app']->date_visit));
             return redirect()->route('front.setAppointment.detail', ['tracking_code' => $this->fetchData['app']->tracking_code]);
         } else {
             abort(401);

@@ -26,7 +26,7 @@ trait OprationButtonsTrait
     {
         $app = AppointmentUser::find($id);
         $app->update(['type' =>  AppointmentUserTypeEnum::BETWEEN_PATIENTS]);
-        GenerateAppointmentCache::dispatch($app->setting);
+        GenerateAppointmentCache::dispatch($app->setting, specialDayConvert($app->date_visit));
 
         $this->sendNotification($app, 'وضعیت نوبت شما به بین مریض تغییر پیدا کرد');
         return  $this->redirectToPage('نوبت به بین مریض تغییر پیدا کرد');
@@ -48,7 +48,7 @@ trait OprationButtonsTrait
         }
         $doctorAllSettings = AppointmentSetting::where('user_id', $app->setting->user_id)->get();
         foreach ($doctorAllSettings as $setting) {
-            GenerateAppointmentCache::dispatch($setting);
+            GenerateAppointmentCache::dispatch($app->setting, specialDayConvert($app->date_visit));
         }
         $this->sendNotification($app, 'وضعیت نوبت شما به بین مریض تغییر پیدا کرد');
         event(new CancelAppointmentEvent($app));
@@ -62,7 +62,7 @@ trait OprationButtonsTrait
         $app->delete();
         $doctorAllSettings = AppointmentSetting::where('user_id', $app->setting->user_id)->get();
         foreach ($doctorAllSettings as $setting) {
-            GenerateAppointmentCache::dispatch($setting);
+            GenerateAppointmentCache::dispatch($setting, specialDayConvert($app->date_visit));
         }
         $this->redirectToPage('نوبت با موفقیت حذف شد');
     }
@@ -73,7 +73,7 @@ trait OprationButtonsTrait
         $Appoointment_dedLine = now()->addHours((int)$deadLine_Time);
         $app->update(['status' => AppointmentUserStatusEnum::STATUS_WAIT_PAYMENT, 'deadline_at' => $Appoointment_dedLine]);
         $app->notify(new AppointmentSmsNotification(setting(SettingKeyEnum::SMS_APPROVED_MONITORING_APPOINTMENT)));
-        GenerateAppointmentCache::dispatch($app->setting);
+        GenerateAppointmentCache::dispatch($app->setting, specialDayConvert($app->date_visit));
         $this->sendNotification($app, 'نوبت شما تایید شد');
         $this->redirectToPage('نوبت با موفقیت تایید شد');
     }
@@ -81,7 +81,7 @@ trait OprationButtonsTrait
     {
         $app = AppointmentUser::find($id);
         $app->update(['status' => AppointmentUserStatusEnum::STATUS_DISAPPROVED, 'deadline_at' => null]);
-        GenerateAppointmentCache::dispatch($app->setting);
+        GenerateAppointmentCache::dispatch($app->setting, specialDayConvert($app->date_visit));
         $this->redirectToPage('نوبت با موفقیت عدم تایید شد');
     }
     public function disApprovemonitoringAppointmentWithSms($id)
@@ -89,7 +89,7 @@ trait OprationButtonsTrait
         $app = AppointmentUser::find($id);
         $app->update(['status' => AppointmentUserStatusEnum::STATUS_DISAPPROVED, 'deadline_at' => null]);
         $app->notify(new AppointmentSmsNotification(setting(SettingKeyEnum::SMS_DIS_APPROVED_MONITORING_APPOINTMENT)));
-        GenerateAppointmentCache::dispatch($app->setting);
+        GenerateAppointmentCache::dispatch($app->setting, specialDayConvert($app->date_visit));
         $this->redirectToPage('نوبت با موفقیت عدم تایید شد');
     }
     public function ApproveOnlineAppointment($id)
@@ -107,7 +107,7 @@ trait OprationButtonsTrait
         }
         $onlineApp?->update(['status' => AppointmentOnlineStatusEnum::ACCEPTED, 'details' => $detail]);
         $app->update(['status' => AppointmentUserStatusEnum::STATUS_SUCCESSFUL]);
-        GenerateAppointmentCache::dispatch($app->setting);
+        GenerateAppointmentCache::dispatch($app->setting, specialDayConvert($app->date_visit));
         $this->sendNotification($app, 'نوبت شما تایید شد');
         $this->redirectToPage('نوبت با موفقیت تایید شد');
     }
@@ -117,7 +117,7 @@ trait OprationButtonsTrait
         $this->fetchData['disapproveId'] = $id;
         $this->dispatch('lunchModal', true);
 
-        GenerateAppointmentCache::dispatch($appointmentUser->setting);
+        GenerateAppointmentCache::dispatch($app->setting, specialDayConvert($appointmentUser->date_visit));
     }
     public function disaprovedModal()
     {
@@ -143,7 +143,7 @@ trait OprationButtonsTrait
         } catch (\Exception $th) {
             return redirect()->route('admin.appointment_user.list')->with('error', 'خطا در به روز رسانی');
         }
-        GenerateAppointmentCache::dispatch($app->setting);
+        GenerateAppointmentCache::dispatch($app->setting, specialDayConvert($app->date_visit));
         $this->redirectToPage('وضعیت نوبت به عدم تایید ، تغییر پیدا کرد');
     }
     public function ignoreDisaproveModal()
@@ -157,7 +157,7 @@ trait OprationButtonsTrait
         $date = verta($app->date_visit)->format('Y-m-d');
         $doctorAllSettings = AppointmentSetting::where('user_id', $app->setting->user_id)->get();
         foreach ($doctorAllSettings as $setting) {
-            GenerateAppointmentCache::dispatch($setting);
+            GenerateAppointmentCache::dispatch($app->setting, specialDayConvert($app->date_visit));
         }
 
         $this->sendNotification($app, 'ساعت نوبت شما تغییر کرده است');
@@ -176,13 +176,13 @@ trait OprationButtonsTrait
     {
         $this->sendfeedBackLink($appointmentUser);
         $this->changeAttendedStatus($appointmentUser, true);
-        GenerateAppointmentCache::dispatch($appointmentUser->setting);
+        GenerateAppointmentCache::dispatch($appointmentUser->setting, specialDayConvert($appointmentUser->date_visit));
         $this->redirectToPage('وضعیت نوبت به کاربر حضور پیدا کرده تغییر کرد');
     }
     public function userNotAttenedToAppointment(AppointmentUser $appointmentUser)
     {
         $this->changeAttendedStatus($appointmentUser, false);
-        GenerateAppointmentCache::dispatch($appointmentUser->setting);
+        GenerateAppointmentCache::dispatch($appointmentUser->setting, specialDayConvert($appointmentUser->date_visit));
         $this->redirectToPage('وضعیت نوبت به کاربر حضور پیدا نکرده تغییر کرد');
     }
     protected function changeAttendedStatus(AppointmentUser $appointmentUser, $status)
@@ -194,7 +194,7 @@ trait OprationButtonsTrait
         } else {
             $new_details = $user_attended;
         }
-        GenerateAppointmentCache::dispatch($appointmentUser->setting);
+        GenerateAppointmentCache::dispatch($appointmentUser->setting, specialDayConvert($appointmentUser->date_visit));
         $appointmentUser->update(['details' => $new_details]);
     }
     protected function sendfeedBackLink(AppointmentUser $appointmentUser)
@@ -211,7 +211,7 @@ trait OprationButtonsTrait
         if (isset($smsTemplate)) {
             $appointmentUser->notify(new AppointmentUserFeedbackSmsnotification(template: $smsTemplate, link_code: $link_code));
         }
-        GenerateAppointmentCache::dispatch($appointmentUser->id);
+        GenerateAppointmentCache::dispatch($appointmentUser->setting, specialDayConvert($appointmentUser->date_visit));
     }
     // TODO :: refund
     protected function refuntPaiedApp($model)
@@ -264,7 +264,7 @@ trait OprationButtonsTrait
                 if ($smsTemplate) {
                     $appointmentUser->notify(new AppointmentSmsNotification($smsTemplate));
                 }
-                GenerateAppointmentCache::dispatch($appointmentUser->setting);
+                GenerateAppointmentCache::dispatch($appointmentUser->setting, specialDayConvert($appointmentUser->date_visit));
                 $this->redirectToPage('وضعیت نوبت به کاربر حضور پیدا نکرده تغییر کرد');
             }
             $this->sendNotification($appointmentUser, 'وجه پرداختی به جساب شما بازگشت داده شد');

@@ -892,7 +892,7 @@ class AppointmentUserService
 
         $doctorAllSettings = AppointmentSetting::where('user_id', $appointmentSetting->user_id)->get();
         foreach ($doctorAllSettings as $setting) {
-            GenerateAppointmentCache::dispatch($setting);
+            GenerateAppointmentCache::dispatch($setting, $visitDateTime->toDateString());
         }
         $trackingUrl = route('front.setAppointment.detail', ['tracking_code' => $appointmentUser->tracking_code]);
         return [

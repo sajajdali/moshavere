@@ -221,7 +221,8 @@ class Checkout extends Component
         $storeAppointment = app('AppointmentUserService')->storeAppointment($this->fetchData['appSetting'], $userModelAppointment, $appointmentModel, $detail);
         if ($storeAppointment['status']) {
             $appointmentSetting = AppointmentSetting::find($this->fetchData['appSetting']->id);
-            $appointmentSetting->runGenerateCacheJob(specialDayConvert($storeAppointment['detail']['']));
+            $date = Carbon::createFromTimestamp($this->fetchData['app_start_time'],'Asia/Tehran')->toDateString();
+            $appointmentSetting->runGenerateCacheJob($date);
             return redirect()->route('front.setAppointment.detail', ['tracking_code' => $storeAppointment['detail']['tracking_code']]);
         } else {
             $this->err = $storeAppointment['message'];

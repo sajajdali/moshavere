@@ -168,7 +168,7 @@ class ListOfAvailableDay extends Component
                 $details['segment_time'] =  $this->fethData['segment_time'];
             }
             $listOfAppointment = Cache::rememberForever('appointmentList.' . $appointmentSetting->id . '-' .$this->fethData['segment_time'] , function () use ($appointmentSetting,$details) {
-                $listOfAppointment = app('AppointmentUserService')->listAppointments($appointmentSetting, $details);
+                return  app('AppointmentUserService')->listAppointments($appointmentSetting, $details);
             });
         }
         $this->fethData['firstTreeAvailableAppointment'] =  $this->findFirstTreeAppointment($listOfAppointment);

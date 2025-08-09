@@ -162,17 +162,21 @@ trait OprationButtonsTrait
         $date = verta($app->date_visit)->format('Y-m-d');
         // regenerate cache
         $this->reGenerateCacheJob($app);
-
+        $parameters = [
+            'serviceId'     => $app->service_id,
+            'placeId'       => $app->place_id,
+            'appId'         => $app->setting->id,
+            'date'          => $date,
+            'tracking_code' => $app->tracking_code
+        ];
+        if (isset($app->details[AppointmentUser::DETAIL_SEGMENTS])) {
+            $segmentsIds =  implode(',', array_column($app->details['segments'], 'id'));
+            $parameters['segmentItemId'] = $segmentsIds;
+        }
         $this->sendNotification($app, 'ساعت نوبت شما تغییر کرده است');
         return redirect()->route(
             'admin.appointment.add.specificday',
-            [
-                'serviceId'     => $app->service_id,
-                'placeId'       => $app->place_id,
-                'appId'         => $app->setting->id,
-                'date'          => $date,
-                'tracking_code' => $app->tracking_code
-            ]
+            $parameters
         );
     }
     public function userAttenedToAppointment(AppointmentUser $appointmentUser)

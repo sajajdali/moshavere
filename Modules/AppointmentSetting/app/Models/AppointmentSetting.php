@@ -126,17 +126,17 @@ class AppointmentSetting extends Model
         }
         return false;
     }
-    public function  runGenerateCacheJob($date)
+    public function  runGenerateCacheJob($date,$segment=null)
     {
         $doctorAllSettings = AppointmentSetting::where('user_id', $this->user_id)->get();
         if ($this->interference) {
             foreach ($doctorAllSettings as $setting) {
                 if ($setting->hasDaySetting($date)) {
-                    GenerateAppointmentCache::dispatch($setting, $date);
+                    GenerateAppointmentCache::dispatch($setting, $date,$segment);
                 }
             }
         } else {
-            GenerateAppointmentCache::dispatch($this, $date);
+            GenerateAppointmentCache::dispatch($this, $date,$segment);
         }
     }
 }

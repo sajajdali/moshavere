@@ -24,8 +24,10 @@ class GenerateAppointmentCache implements ShouldQueue
      */
     public function __construct(
         protected AppointmentSetting $appointmentSetting,
-        protected ?string $specialDay = null
+        protected ?string $specialDay = null,
+        protected mixed $segment = null,
     ) {
+        $this->segment ??= null;
         $this->onQueue('low');
     }
 
@@ -38,7 +40,11 @@ class GenerateAppointmentCache implements ShouldQueue
     {
         try {
             $cacheKey = 'appointmentList.' . $this->appointmentSetting->id;
-
+            if (! is_null($this->segment)) {
+                if ($this->appointmentSetting->segments()->exists()) {
+                    $cacheKey = 'appointmentList.' . $this->appointmentSetting->id . '-' . $this->segment;
+                }
+            }
             if ($this->specialDay) {
                 // If a specific day is given, fetch appointments only for that day
                 $newOneDayData = app('AppointmentUserService')->listAppointments($this->appointmentSetting, [

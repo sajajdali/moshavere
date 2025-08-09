@@ -129,8 +129,8 @@ class ListOfAvailableDay extends Component
         $this->fethData['doctor']  = $doctorId;
         $this->fethData['place']   = $placeId;
 
-        $appointmentSetting = AppointmentSetting::SpecialOrGeneralSetting($doctorId->id,$sectionId->id,$placeId->id);
-    
+        $appointmentSetting = AppointmentSetting::SpecialOrGeneralSetting($doctorId->id, $sectionId->id, $placeId->id);
+
         // redirect user if setting dosent exist
         if (empty($appointmentSetting)) {
             return redirect()->route('admin.appointment.doctor.list')->with('error', 'تنظیمات حضور برای پزشک ثبت نشده است یا غیر فعال است');
@@ -156,16 +156,19 @@ class ListOfAvailableDay extends Component
         if (env('APPOINTMENT_SANDBOX')) {
             Cache::forget('appointmentList.' . $appointmentSetting->id);
         }
-        if (app()->environment('local') || $segmentItemId != null) {
+        if (app()->environment('local')) {
             $details = [];
             if ($segmentItemId != null) {
                 $details['segment_time'] =  $this->fethData['segment_time'];
             }
             $listOfAppointment = app('AppointmentUserService')->listAppointments($appointmentSetting, $details);
         } else {
-            $listOfAppointment = Cache::rememberForever('appointmentList.' . $appointmentSetting->id, function () use ($appointmentSetting) {
-                $appointmentSetting->update(['updated_log_at' => \now()]);
-                return app('AppointmentUserService')->listAppointments($appointmentSetting);
+            $details = [];
+            if ($segmentItemId != null) {
+                $details['segment_time'] =  $this->fethData['segment_time'];
+            }
+            $listOfAppointment = Cache::rememberForever('appointmentList.' . $appointmentSetting->id . '-' .$this->fethData['segment_time'] , function () use ($appointmentSetting,$details) {
+                $listOfAppointment = app('AppointmentUserService')->listAppointments($appointmentSetting, $details);
             });
         }
         $this->fethData['firstTreeAvailableAppointment'] =  $this->findFirstTreeAppointment($listOfAppointment);

@@ -364,7 +364,7 @@ class SpecificDayAvailableAppointment extends Component
                 $details['segment_time'] =  $this->fetchData['segment_time'];
             }
             // create inital list aof appointment
-            $this->fetchData['RawlistOfAppointment']  = Cache::rememberForever('appointmentList.' . $app->id . '-' . $this->fethData['segment_time'], function () use ($app, $details) {
+            $this->fetchData['RawlistOfAppointment']  = Cache::rememberForever('appointmentList.' . $app->id . '-' . $this->fetchData['segment_time'], function () use ($app, $details) {
                 $app->update(['updated_log_at' => \now()]);
                 return app('AppointmentUserService')->listAppointments($app, $details);
             });

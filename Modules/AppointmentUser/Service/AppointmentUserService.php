@@ -241,7 +241,6 @@ class AppointmentUserService
                     $dow             = $currentDate->copy()->addDay()->dayOfWeek; // preserved your original +1 day logic
                     $attendanceTimes = collect($weeklyTimesByDow[$dow] ?? []);
                 }
-
                 // Place booked appointments (only for this day)
                 if (!empty($appointmentsByDay[$dateKey])) {
                     foreach ($appointmentsByDay[$dateKey] as $appointment) {
@@ -389,7 +388,6 @@ class AppointmentUserService
                                     }
                                 } else {
                                     $startTime->subMinutes($overlaps['overLapTime']);
-
                                     $getLastOverLapsTime = $this->isTimeRangeAvailable(
                                         $startTime->toTimeString(),
                                         $startTime->copy()->addMinutes($timeForVisit)->toTimeString(),
@@ -403,13 +401,25 @@ class AppointmentUserService
                                     if ($timeForVisit > $getLastOverLapsTime['overLapTime']) {
                                         $startTime->subMinutes($timeForVisit - $getLastOverLapsTime['overLapTime']);
                                     }
-
-                                    $dayOutput['times'][] = [
-                                        'status' => false,
-                                        'from'   => $startTimeOverLap,
-                                        'until'  => $overlapsAgain['existingFrom'],
-                                        'gap'    => true,
-                                    ];
+                                    if ($startTimeOverLap != $overlapsAgain['existingFrom']) {
+                                        if (
+                                            !$this->hasExactBooked(
+                                                $dayOutput['times'],
+                                                $startTimeOverLap,
+                                                $overlapsAgain['existingFrom']
+                                            )
+                                            && $startTimeOverLap !== $overlapsAgain['existingFrom']
+                                        ) {
+                                        } else {
+                                            // مدت زمان ویزیت کمتر از زمان ویزیت میباشد را نمایشد نمیدهد
+                                            $dayOutput['times'][] = [
+                                                'status' => false,
+                                                'from'   => $startTimeOverLap,
+                                                'until'  => $overlapsAgain['existingFrom'],
+                                                'gap'    => true,
+                                            ];
+                                        }
+                                    }
                                 }
                             }
                         }
@@ -482,11 +492,21 @@ class AppointmentUserService
             'first_day_active' => $appointmentSettings->first_day_active,
             'interference'     => $appointmentSettings->interference == 1,
         ];
-
         return $output;
     }
-
-
+    private function hasExactBooked(array $times, string $from, string $until): bool
+    {
+        foreach ($times as $t) {
+            if (
+                isset($t['appointment_user_id']) &&
+                ($t['from'] ?? null) === $from &&
+                ($t['until'] ?? null) === $until
+            ) {
+                return true;
+            }
+        }
+        return false;
+    }
     public function isAppointmentTimeAvailable($startDateTime, $endDateTime, $dateVisit, AppointmentSetting $appointmentSetting)
     {
         // Check if there are any overlapping appointments

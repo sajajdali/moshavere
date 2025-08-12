@@ -5,6 +5,7 @@ namespace Modules\AppointmentSetting\app\Models;
 use Carbon\Carbon;
 use App\Enum\ActiveEnum;
 use Modules\User\Entities\User;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Database\Eloquent\Model;
 use Modules\Service\app\Models\Service;
 use Illuminate\Database\Eloquent\Builder;
@@ -128,6 +129,7 @@ class AppointmentSetting extends Model
     }
     public function  runGenerateCacheJob($date,$segment=null)
     {
+        Cache::flush();
         $doctorAllSettings = AppointmentSetting::where('user_id', $this->user_id)->get();
         if ($this->interference) {
             foreach ($doctorAllSettings as $setting) {

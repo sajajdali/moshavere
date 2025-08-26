@@ -2,7 +2,7 @@
     <div>
         <div class="page-header">
             <div>
-                <h1 class="page-title">لیست کد های تخفیف</h1>
+                <h1 class="page-title">لیست تراکنش ها</h1>
             </div>
         </div>
         @include('admin::layouts.components.alert')
@@ -10,7 +10,7 @@
             <div class="col-lg-12">
                 <div class="card custom-card">
                     <div class="card-header d-flex justify-content-between border-bottom">
-                        <h3 class="card-title">مدیریت کد های تخفیف </h3>
+                        <h3 class="card-title"> </h3>
                         <div class="card-options">
                             <button class="btn btn-primary" type="button" data-bs-toggle="collapse"
                                 data-bs-target="#advanceSearch" aria-expanded="false" aria-controls="advanceSearch">
@@ -104,6 +104,7 @@
                                         <th scope="col">زمان ایجاد تراکنش</th>
                                         <th scope="col">زمان ارجاع به بانک</th>
                                         <th scope="col">وضعیت</th>
+                                        <th scope="col">مبلغ</th>
                                         <th scope="col">کارت آیدی</th>
                                         <th scope="col">عملیات</th>
                                     </tr>
@@ -132,6 +133,11 @@
                                                 <td>
                                                     <span class=" badge {{ $transaction->status->badgeClass() }}">
                                                         {{ $transaction->status->getName() }}
+                                                    </span>
+                                                </td>
+                                                <td>
+                                                    <span>
+                                                        {{ number_format($transaction->total_cost) }}
                                                     </span>
                                                 </td>
                                                 <td>
@@ -200,7 +206,7 @@
                 tempInput.value = cartHash; // Set the text content
                 document.body.appendChild(tempInput);
                 tempInput.select();
-                tempInput.setSelectionRange(0, 99999); 
+                tempInput.setSelectionRange(0, 99999);
                 try {
                     document.execCommand('copy');
                     alert('کپی شد');

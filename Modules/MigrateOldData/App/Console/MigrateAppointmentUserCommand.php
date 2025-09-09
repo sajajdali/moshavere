@@ -22,7 +22,7 @@ class MigrateAppointmentUserCommand extends Command
     /**
      * The console command description.
      */
-    protected $description = 'transer user appointment .';
+    protected $description = 'transfer user appointment .';
 
     /**
      * Create a new command instance.
@@ -46,7 +46,7 @@ class MigrateAppointmentUserCommand extends Command
             if ($this->checkUserForegnKey($data->user_id)) {
                 $newData = [
                     'id' => $data->id,
-                    'agent_id' => $data->agent_id,
+                    'agent_id' => $this->agentIdExists($data->agent_id) ? $data->agent_id : null,
                     'appointment_setting_id' => $this->settingId($data),
                     'user_id' => $data->user_id,
                     'doctor_id' => $data->doctor_id,
@@ -67,20 +67,27 @@ class MigrateAppointmentUserCommand extends Command
         }
         $this->info('appointment user transfered successfuly.');
     }
+    private function agentIdExists($id){
+        return Db::connection('new_mysql')->table('users')->where('id',$id)->exists();
+    }
     private function findOperatorId($oprator)
     {
-        $arrop = json_decode($oprator, true);
-        if (isset($arrop[0]) && $arrop[0] != null) {
-            $user = User::find((int)$arrop[0]);
-            if (isset($user)) {
-                return $user->id;
-            }
-        }
-        return null;
+        $ids = (array) json_decode($oprator, true);
+        $first = isset($ids[0]) ? (int)$ids[0] : null;
+        if (!$first) return null;
+
+        // don’t rely on Eloquent’s default connection
+        $id = DB::connection('new_mysql')
+            ->table('users')  // shw_users with prefix
+            ->whereKey($first)
+            ->value('id');
+
+        return $id ?: null;
     }
     private function trackingCode($code)
     {
-        if (!AppointmentUser::where('tracking_code', $code)->exists()) {
+        if (! DB::connection('new_mysql')
+            ->table('appointment_users')->where('tracking_code', $code)->exists()) {
             return $code;
         } else {
             return  AppointmentUser::generateTrackingCode();
@@ -107,12 +114,19 @@ class MigrateAppointmentUserCommand extends Command
     {
         $serviceId = $data->appointment_part_id;
         $placeId = $data->appointment_office_id;
-        $setting = AppointmentSetting::where('service_id', $serviceId)->where('place_id', $placeId)->first()?->id ?? null;
+        $setting = DB::connection('new_mysql')
+            ->table('appointment_settings')
+            ->where('service_id', $serviceId)
+            ->where('place_id', $placeId)
+            ->first()?->id ?? null;
         return $setting;
     }
     private function checkUserForegnKey($user_id)
     {
-        $user_exists = User::find($user_id) !== null;
+        $user_exists = DB::connection('new_mysql')
+            ->table('users')
+            ->where('id', $user_id)
+            ->first() !== null;
         return $user_exists;
     }
 }

@@ -38,13 +38,15 @@ class MigratePlacesCommand extends Command
         $oldData = DB::connection('old_mysql')->table('appointment_offices')->get();
 
         // Loop through each record and transform it
+        $priority = (int) (DB::connection('new_mysql')->table('places')->max('priority') ?? 0);
         foreach ($oldData as $data) {
             // Transform the data according to new structure
+            $priority++;
             $newData = [
                 'id' => $data->id,
                 'title' => $data->name ?? 'بدون نام',
                 'active' => $this->StatusCheck($data->status),
-                'priority' => Place::maxPriority(),
+                'priority' => $priority,
                 'detail' => $this->createDetails($data),
             ];
 

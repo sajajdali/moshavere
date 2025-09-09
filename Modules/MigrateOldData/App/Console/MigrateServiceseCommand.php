@@ -36,9 +36,10 @@ class MigrateServiceseCommand extends Command
     {
         // Connect to the old database
         $oldData = DB::connection('old_mysql')->table('appointment_parts')->orderBy('id')->get();
-
+        $priority = (int) (DB::connection('new_mysql')->table('Services')->max('priority') ?? 0);
         // Loop through each record and transform it
         foreach ($oldData as $data) {
+            $priority++ ;
             // Transform the data according to new structure
             $newData = [
                 'id' => $data->id,
@@ -46,7 +47,7 @@ class MigrateServiceseCommand extends Command
                 'parent_id' => $data->parent_id == 0 ? null : ($data->parent_id),
                 'show_type' => ServiceShowTypeEnum::tryFrom($data->show_type),
                 'active' => ActiveEnum::tryFrom($data->status),
-                'priority' => \Modules\Service\app\Models\Service::maxPriority(),
+                'priority' => $priority,
             ];
 
             // Insert the transformed data into the new database

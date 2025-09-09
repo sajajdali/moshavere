@@ -19,9 +19,9 @@ class RolSeeder extends Seeder
     {
         // Create initial user
         $user = User::firstOrCreate(
-            ['mobile' => '09122978167'],
+            ['mobile' => '09197729101'],
             [
-                'email' => 'info@central.test',
+                'email' => 'info@jesmino.test',
                 'password' => '123',
             ]
         );
@@ -39,6 +39,11 @@ class RolSeeder extends Seeder
         // Create roles
         $roles = [
             'مدیر' => null,
+            'بیمار' => null,
+            'پزشک' => null,
+            'اپراتور' => null,
+            'منشی' => null,
+            'ماما' => null,
         ];
 
         foreach ($roles as $name => &$role) {
@@ -49,6 +54,10 @@ class RolSeeder extends Seeder
         $permissions = [
             'ADMIN_ACCESS',
             'SUPER_ADMIN',
+            'DOCTOR',
+            'SECRETERY',
+            'USER_ACCESS',
+            'USER_DEFAULT',
         ];
 
         $permissionInstances = [];
@@ -62,10 +71,84 @@ class RolSeeder extends Seeder
             $permissionInstances['SUPER_ADMIN'],
         ]);
 
+        $roles['پزشک']->syncPermissions([
+            $permissionInstances['ADMIN_ACCESS'],
+            $permissionInstances['DOCTOR'],
+        ]);
+
+        $roles['بیمار']->syncPermissions([
+            $permissionInstances['USER_ACCESS'],
+            $permissionInstances['USER_DEFAULT'],
+        ]);
 
         $user->assignRole($roles['مدیر']);
 
         Artisan::call('auth:permission-sync');
+
+        $secretaryPermissions = [
+            'SECRETERY',
+            'appointment_user',
+            'appointment_user.addApp',
+            'appointment_user.edit',
+            'appointment_user.delete',
+            'appointment_user.list',
+            'appointment_user.online',
+            'appointment_user.message',
+            'absence',
+            'absence.create',
+            'absence.delete',
+            'admin.dashboard',
+            'admin.dashboard.appointments',
+            'admin.dashboard.analytic',
+            'AppointmentSetting',
+            'AppointmentSetting.update',
+            'chat',
+            'user',
+            'user.create',
+            'user.edit',
+            'user.delete',
+            'user.documentte',
+            'appointment_user.feedBack',
+            'comment.own',
+        ];
+
+        $doctorPermissions = [
+            'appointment_user.own',
+            'AppointmentSetting.own',
+            'absence.own',
+            'appointment_user.addApp',
+            'appointment_user.edit',
+            'appointment_user.delete',
+            'appointment_user.list',
+            'appointment_user.online',
+            'appointment_user.message',
+            'absence.create',
+            'absence.delete',
+            'admin.dashboard',
+            'admin.dashboard.appointments',
+            'admin.dashboard.analytic',
+            'AppointmentSetting',
+            'AppointmentSetting.update',
+            'chat',
+            'user',
+            'user.create',
+            'user.edit',
+            'user.delete',
+            'user.documentte',
+            'appointment_user.feedBack',
+        ];
+
+        foreach ($secretaryPermissions as $perm) {
+            Permission::firstOrCreate(['name' => $perm, 'guard_name' => 'web']);
+        }
+
+        foreach ($doctorPermissions as $perm) {
+            Permission::firstOrCreate(['name' => $perm, 'guard_name' => 'web']);
+        }
+
+        $roles['اپراتور']->syncPermissions($secretaryPermissions);
+        $roles['منشی']->syncPermissions($secretaryPermissions);
+        $roles['پزشک']->syncPermissions($doctorPermissions);
 
         $mamaPermissions = [
             'ADMIN_ACCESS',
@@ -78,6 +161,6 @@ class RolSeeder extends Seeder
             Permission::firstOrCreate(['name' => $perm, 'guard_name' => 'web']);
         }
 
+        $roles['ماما']->syncPermissions($mamaPermissions);
     }
-
 }

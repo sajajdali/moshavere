@@ -36,62 +36,25 @@ class MigrateUsersCommand extends Command
         $this->migrateUsers();
 
         // Migrate Roles
-        // $this->migrateUserRoles();
+        $this->migrateUserRoles();
     }
     private function migrateUsers()
     {
-        $users = DB::connection('new_mysql')->table('users')->where('id', '>', 300)->get();
-        foreach ($users as $key => $user) {
-            $oldUser = DB::connection('old_mysql')->table('users')->where('mobile', $user->mobile)->first();
-            if (! $oldUser) {
-                continue;
-            }
-            $oldData = DB::connection('old_mysql')->table('user_metas')->where('user_id', $oldUser->id)->get();
-            foreach ($oldData as $data) {
-                $newKey = $this->findMetaKeyEnumValue($data->meta_key, $oldUser->id);
-                $metavalue = $data->meta_value;
-                if ($newKey == UserMetaEnum::AVATAR) {
-                    $metavalue = url('public/avatar/' . $data->meta_value);
-                }
-                if (! is_null($newKey)) {
-                    DB::connection('new_mysql')->table('user_metas')->updateOrInsert(
-                        [
-                            'meta_key' => $newKey,
-                            'user_id' => $user->id
-                        ],
-                        [
-                            'meta_value' => $metavalue
-                        ]
-                    );
-                }
-            }
-        }
-        return;
-        // Connect to the old database
-
+        $oldData = DB::connection('old_mysql')->table('users')->get();
         // Loop through each record and transform it
         foreach ($oldData as $data) {
-            if ($data->id == 1) {
+            if ($data->id <= 2) {
                 continue;
             }
             // Transform the data according to new structure
             if (User::where('mobile', $data->mobile)->exists()) {
                 continue;
             }
-            $counter = 656;
-            // -------------------------------
-            // NOTICE ::::  763 is the number if existing user in current appointment and need to change if want to run again
-            // -------------------------------
-            $newId = $counter + $data->id;
-            if (DB::connection('new_mysql')->table('users')->where('id', $newId)->exists()) {
-                $this->warn("User ID $newId already exists. Skipping...");
-                continue;
-            }
             if (is_null($data->mobile)) {
                 continue;
             }
             $newData = [
-                'id' =>  $newId,
+                'id' =>  $data->id,
                 'mobile' => $data->mobile,
                 'email' => $data->email ?? $data->mobile . uniqId() . '@info.com',
                 'password' => $data->password ?? Hash::make('awjhfawjpofawpokfapow45s6e4ge56sgWedwgpouqoiwmpogjawjgpaowhg2014891@((%&)(@*#@_)*@_)*%UPJVKLEJVIJ)(*&@)(&$)(@)'),

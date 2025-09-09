@@ -32,14 +32,15 @@ class MigrateSpecialiteiesCommand extends Command
     {
         // Connect to the old database
         $oldData = DB::connection('old_mysql')->table('appointment_specialties')->get();
-
+        $priority = (int) (DB::connection('new_mysql')->table('specialities')->max('priority') ?? 0);
         // Loop through each record and transform it
         foreach ($oldData as $data) {
             // Transform the data according to new structure
+            $priority++ ;
             $newData = [
                 'id' => $data->id,
                 'title' => $data->name,
-                'priority' => \Modules\Speciality\app\Models\Speciality::maxOrder(),
+                'priority' => $priority,
                 'active' => \Modules\Speciality\Enum\SpecialityStatusEnum::ACTIVE,
                 'created_at' => $data->created_at,
                 'updated_at' => $data->updated_at,

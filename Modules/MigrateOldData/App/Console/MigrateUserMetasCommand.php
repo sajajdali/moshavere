@@ -38,6 +38,14 @@ class MigrateUserMetasCommand extends Command
         $oldData = DB::connection('old_mysql')->table('user_metas')->get();
         // Loop through each record and transform it
         foreach ($oldData as $data) {
+            if ($data->user_id <= 2) {
+                continue;
+            }
+
+            if (!$this->checkUserForeignKey($data->user_id)) {
+                // user not migrated into new DB → skip to avoid FK error
+                continue;
+            }
             // Transform the data according to new structure
             $newKey = $this->findMetaKeyEnumValue($data->meta_key, $data->user_id);
             $metavalue = $data->meta_value;
@@ -55,6 +63,14 @@ class MigrateUserMetasCommand extends Command
         }
         $this->info('users meta  migration completed successfully.');
     }
+    private function checkUserForeignKey($user_id): bool
+    {
+        return DB::connection('new_mysql')
+            ->table('users') // becomes shw_users with prefix
+            ->where('id', $user_id)
+            ->exists();
+    }
+
     private function findMetaKeyEnumValue($metaValue, $userid)
     {
         return  UserMetaEnum::fromOldKey($metaValue, $userid);

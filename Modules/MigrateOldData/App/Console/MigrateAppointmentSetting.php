@@ -116,20 +116,22 @@ class MigrateAppointmentSetting extends Command
     private function insertTimes($appointment_setting_id, $data)
     {
         $days = json_decode($data->content);
-        $appointment_setting =  AppointmentSetting::find($appointment_setting_id);
+        $appointment_setting =  DB::connection('new_mysql')->table('appointment_settings')->where('id', $appointment_setting_id)->first();
         foreach ($days as $dayName => $dayTime) {
             if ($dayTime->STATUS == false) {
                 continue;
             }
             $app_setting_times = [
-                'day_number'            => $this->findDayName($dayName),
-                'start_at'              => $this->calculateStartTime($dayTime),
-                'end_at'                => $this->calculateEndTime($dayTime),
+                'appointment_setting_id'            => $appointment_setting->id,
+                'day_number'                        => $this->findDayName($dayName),
+                'start_at'                          => $this->calculateStartTime($dayTime),
+                'end_at'                            => $this->calculateEndTime($dayTime) ?? "00:00",
             ];
             if ($app_setting_times['start_at'] == '00:00' && $app_setting_times['end_at'] == '00:00') {
                 continue;
             } else {
-                $appointment_setting->times()->create($app_setting_times);
+                DB::connection('new_mysql')->table('appointment_setting_times')->insert($app_setting_times);
+                // $appointment_setting->times()->create($app_setting_times);
             }
         }
     }
@@ -156,13 +158,12 @@ class MigrateAppointmentSetting extends Command
     private function calculateEndTime($dayTime)
     {
         $end_time = '00:00';
-        if (isset($dayTime->TIME)) {
+        if (isset($dayTime->TIME) && ! is_null($end_time)) {
             foreach ($dayTime->TIME as $times) {
                 if ($times->TO == '00:00' || $times->TO == '00:00') {
                     continue;
                 } elseif ($times->FROM != null) {
                     $end_time = $times->TO;
-
                     break;
                 }
             }
@@ -172,7 +173,7 @@ class MigrateAppointmentSetting extends Command
     private function segmnents($appointment_setting_id, $data)
     {
         $segment = json_decode($data->time_for_visit, true);
-        $appointment_setting =  AppointmentSetting::find($appointment_setting_id);
+        $appointment_setting =  DB::connection('new_mysql')->table('appointment_settings')->where('id', $appointment_setting_id)->first();
         if ($segment['STATUS'] == true) {
             $segmentObj =  AppointmentSegment::create([
                 'title' => $appointment_setting->service?->title  . ' زمانبندی',

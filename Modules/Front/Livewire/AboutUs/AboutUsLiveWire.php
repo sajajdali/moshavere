@@ -22,9 +22,13 @@ class AboutUsLiveWire extends Component
 
     public function mount()
     {
-        $this->fetchData['comments'] = Cache::rememberForever('homepageComments', function () {
-            return Comment::where('status', CommentStatusEnum::ACCEPTED)->where('show_in_homePage', CommentShowHomePage::SHOW)->get()->take(4);
-        });
+        if (config('app.without_cache')) {
+            $this->fetchData['comments'] = Comment::where('status', CommentStatusEnum::ACCEPTED)->where('show_in_homePage', CommentShowHomePage::SHOW)->get()->take(4);
+        } else {
+            $this->fetchData['comments'] = Cache::rememberForever('homepageComments', function () {
+                return Comment::where('status', CommentStatusEnum::ACCEPTED)->where('show_in_homePage', CommentShowHomePage::SHOW)->get()->take(4);
+            });
+        }
         // Define a unique cache key
         $cacheKey = 'emergency_doctors';
         // Attempt to get the data from the cache

@@ -186,10 +186,14 @@ class SpecificDayAvailableAppointment extends Component
         if (env('APPOINTMENT_SANDBOX')) {
             Cache::forget('appointmentList.' . $app->id);
         }
-        $this->fetchData['RawlistOfAppointment']  = Cache::rememberForever('appointmentList.' . $app->id, function () use ($app) {
-            $app->update(['updated_log_at' => \now()]);
-            return app('AppointmentUserService')->listAppointments($app);
-        });
+        if (config('app.without_cache')) {
+            $this->fetchData['RawlistOfAppointment']  = app('AppointmentUserService')->listAppointments($app);
+        } else {
+            $this->fetchData['RawlistOfAppointment']  = Cache::rememberForever('appointmentList.' . $app->id, function () use ($app) {
+                $app->update(['updated_log_at' => \now()]);
+                return app('AppointmentUserService')->listAppointments($app);
+            });
+        }
         // dd($this->fetchData['RawlistOfAppointment']);
         $this->fetchData['listOfAppointment'] = $this->listOfAppointment($this->fetchData['RawlistOfAppointment']);
     }

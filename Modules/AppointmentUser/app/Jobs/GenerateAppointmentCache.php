@@ -38,6 +38,9 @@ class GenerateAppointmentCache implements ShouldQueue
      */
     public function handle(): void
     {
+        if (config('app.without_cache')) {
+            return ; 
+        }
         try {
             $cacheKey = 'appointmentList.' . $this->appointmentSetting->id;
             if (! is_null($this->segment)) {

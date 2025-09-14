@@ -49,12 +49,12 @@ class ShowAvailableDayForDoctor extends Component
             'end_time' => $endTimestamp,
             'is_online' => 'false',
         ];
-        if(isset($this->fetchData['segments'])){
-            $segId = [] ;
-            foreach($this->fetchData['segments'] as $seg){
-                $segId[] = $seg->id ;
+        if (isset($this->fetchData['segments'])) {
+            $segId = [];
+            foreach ($this->fetchData['segments'] as $seg) {
+                $segId[] = $seg->id;
             }
-            $parameter['segmentId'] = implode(',',$segId);
+            $parameter['segmentId'] = implode(',', $segId);
         }
         return $this->redirect(route('setAppointment.checkout', $parameter), true);
     }
@@ -239,10 +239,14 @@ class ShowAvailableDayForDoctor extends Component
                 $appointmentSetting->update(['updated_log_at' => \now()]);
                 $listOfAppointment = app('AppointmentUserService')->listAppointments($appointmentSetting);
             } else {
-                $listOfAppointment = Cache::rememberForever('appointmentList.' . $appointmentSetting->id, function () use ($appointmentSetting) {
-                    $appointmentSetting->update(['updated_log_at' => \now()]);
-                    return  app('AppointmentUserService')->listAppointments($appointmentSetting);
-                });
+                if (config('app.without_cache')) {
+                    $listOfAppointment = app('AppointmentUserService')->listAppointments($appointmentSetting);
+                } else {
+                    $listOfAppointment = Cache::rememberForever('appointmentList.' . $appointmentSetting->id, function () use ($appointmentSetting) {
+                        $appointmentSetting->update(['updated_log_at' => \now()]);
+                        return  app('AppointmentUserService')->listAppointments($appointmentSetting);
+                    });
+                }
             }
         }
         $this->fetchData['appointmentSetting'] = $appointmentSetting;
@@ -300,7 +304,7 @@ class ShowAvailableDayForDoctor extends Component
         if (setting(SettingKeyEnum::APPOINTMENT_STATUS) != true) {
             $this->fetchData['isAppointmentActive'] = false;
         }
-        
+
         //select the nearest appointment
         foreach ($this->fetchData['firstTreeAvailableAppointment']  as $date => $appointmentsWithDaysIndex) {
             foreach ($appointmentsWithDaysIndex as $eachTime => $appointmentDetail) {

@@ -197,4 +197,6 @@ return [
 
     ])->toArray(),
 
+
+    'without_cache' => env('WITHOUT_CACHE',false),
 ];

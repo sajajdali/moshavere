@@ -392,11 +392,14 @@ class AppointmentApiController extends Controller
         if (env('APPOINTMENT_SANDBOX')) {
             Cache::forget('appointmentList.' . $appointmentSetting->id);
         }
-        $listDays = Cache::rememberForever('appointmentList.' . $appointmentSetting->id, function () use ($appointmentSetting) {
-            $appointmentSetting->update(['updated_log_at' => \now()]);
-            return app('AppointmentUserService')->listAppointments($appointmentSetting);
-        });
-
+        if (config('app.without_cache')) {
+            $listDays = app('AppointmentUserService')->listAppointments($appointmentSetting);
+        }else{
+            $listDays = Cache::rememberForever('appointmentList.' . $appointmentSetting->id, function () use ($appointmentSetting) {
+                $appointmentSetting->update(['updated_log_at' => \now()]);
+                return app('AppointmentUserService')->listAppointments($appointmentSetting);
+            });
+        }
 
         //        $firstTwoEmpty = $this->getFirstTwoEmpty($listDays);
         $resultList = $this->getListEmptyAppointment($listDays, $appointmentSetting);

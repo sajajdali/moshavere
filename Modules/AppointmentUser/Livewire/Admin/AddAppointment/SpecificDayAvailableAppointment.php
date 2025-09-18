@@ -364,17 +364,26 @@ class SpecificDayAvailableAppointment extends Component
             $this->fetchData['RawlistOfAppointment'] =  app('AppointmentUserService')->listAppointments($app, $details);
         } else {
             $details = [];
-            if ($segmentItemId != null) {
-                $details['segment_time'] =  $this->fetchData['segment_time'];
-                $this->fetchData['RawlistOfAppointment']  = Cache::rememberForever('appointmentList.' . $app->id . '-' . $this->fetchData['segment_time'], function () use ($app, $details) {
-                    $app->update(['updated_log_at' => \now()]);
-                    return app('AppointmentUserService')->listAppointments($app, $details);
-                });
+            if (config('app.without_cache')) {
+                if ($segmentItemId != null) {
+                    $details['segment_time'] =  $this->fetchData['segment_time'];
+                    $this->fetchData['RawlistOfAppointment']  = app('AppointmentUserService')->listAppointments($app, $details);
+                } else {
+                    $this->fetchData['RawlistOfAppointment']  =  app('AppointmentUserService')->listAppointments($app, $details);
+                }
             } else {
-                $this->fetchData['RawlistOfAppointment']  = Cache::rememberForever('appointmentList.' . $app->id, function () use ($app, $details) {
-                    $app->update(['updated_log_at' => \now()]);
-                    return app('AppointmentUserService')->listAppointments($app, $details);
-                });
+                if ($segmentItemId != null) {
+                    $details['segment_time'] =  $this->fetchData['segment_time'];
+                    $this->fetchData['RawlistOfAppointment']  = Cache::rememberForever('appointmentList.' . $app->id . '-' . $this->fetchData['segment_time'], function () use ($app, $details) {
+                        $app->update(['updated_log_at' => \now()]);
+                        return app('AppointmentUserService')->listAppointments($app, $details);
+                    });
+                } else {
+                    $this->fetchData['RawlistOfAppointment']  = Cache::rememberForever('appointmentList.' . $app->id, function () use ($app, $details) {
+                        $app->update(['updated_log_at' => \now()]);
+                        return app('AppointmentUserService')->listAppointments($app, $details);
+                    });
+                }
             }
         }
 

@@ -104,12 +104,10 @@ class AppointmentUserService
             $startDate = Carbon::parse($details['specialDay']);
             $endDate   = $startDate->copy()->addDays($details['numberDays'] ?? 60);
         }
-
         if (!$specialDaySelected && !isset($startDate)) {
             $startDate = Carbon::today();
             $endDate   = Carbon::today()->addDays(60);
         }
-
         // -----------------------------
         // 2) Bulk-load everything we’ll need (no N+1)
         // -----------------------------
@@ -472,7 +470,7 @@ class AppointmentUserService
         }
 
         $output['report'] = [
-            'time_for_visit'   => $timeForVisit,
+            'time_for_visit'   => $appointmentSettings->time_for_visit,
             'payment'          => [
                 'status'         => $paymentStatus,
                 'price'          => $paymentPrice,

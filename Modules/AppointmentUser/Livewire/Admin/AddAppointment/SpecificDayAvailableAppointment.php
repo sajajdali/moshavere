@@ -360,10 +360,12 @@ class SpecificDayAvailableAppointment extends Component
             $details = [];
             if ($segmentItemId != null) {
                 $details['segment_time'] =  $this->fetchData['segment_time'];
+                $details['specialDay'] =   $this->fetchData['selectedDate']->toDateString();
             }
             $this->fetchData['RawlistOfAppointment'] =  app('AppointmentUserService')->listAppointments($app, $details);
         } else {
             $details = [];
+            $details['specialDays'] = $this->fetchData['selectedDate']->toDateString();
             if (config('app.without_cache')) {
                 if ($segmentItemId != null) {
                     $details['segment_time'] =  $this->fetchData['segment_time'];
@@ -388,13 +390,6 @@ class SpecificDayAvailableAppointment extends Component
         }
 
         $this->fetchData['listOfAppointment'] = $this->listOfAppointment($this->fetchData['RawlistOfAppointment']);
-
-        // check if selected date not exist in the log
-        if ($this->fetchData['selectedDate']->gt(\now()->addDays(60))) {
-            $this->form['changeDate'] = verta($this->fetchData['selectedDate'])->format('Y-m-d');
-            $this->loadDifferentDayDetail();
-        }
-
         // if user want to change the date of specific apppointment
         if (request()->has('tracking_code')) {
             $this->edited['status'] = true;

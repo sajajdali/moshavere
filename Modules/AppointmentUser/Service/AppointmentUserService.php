@@ -472,7 +472,7 @@ class AppointmentUserService
         }
 
         $output['report'] = [
-            'time_for_visit'   => $appointmentSettings->time_for_visit,
+            'time_for_visit'   => $timeForVisit,
             'payment'          => [
                 'status'         => $paymentStatus,
                 'price'          => $paymentPrice,

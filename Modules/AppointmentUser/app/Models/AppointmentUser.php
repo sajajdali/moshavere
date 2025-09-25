@@ -203,8 +203,9 @@ class AppointmentUser extends Model
             AppointmentUserStatusEnum::STATUS_DISAPPROVED,
         ]);
     }
-    public function scopeOnlineAppointment($query) {
-        return $this->where('kind',AppointmentUserKindEnum::ONLINE);
+    public function scopeOnlineAppointment($query)
+    {
+        return $this->where('kind', AppointmentUserKindEnum::ONLINE);
     }
 
 
@@ -277,19 +278,28 @@ class AppointmentUser extends Model
         }
         return  false;
     }
-    public function hasSegment(){
-        if(isset($this->details[AppointmentUser::DETAIL_SEGMENTS])){
-            return true ;
+    public function hasSegment()
+    {
+        if (isset($this->details[AppointmentUser::DETAIL_SEGMENTS])) {
+            return true;
         }
-        return false ;
+        return false;
     }
-    public function segmentsNames(){
+    public function segmentsNames()
+    {
         $segNames = '';
-        if(isset($this->details[AppointmentUser::DETAIL_SEGMENTS])){
-            foreach($this->details[AppointmentUser::DETAIL_SEGMENTS] as $segs){
-                 $segNames .= ' - ' . $segs['title'];
+        if (isset($this->details[AppointmentUser::DETAIL_SEGMENTS])) {
+            foreach ($this->details[AppointmentUser::DETAIL_SEGMENTS] as $segs) {
+                $segNames .= ' - ' . $segs['title'];
             }
         }
-        return $segNames ;
+        return $segNames;
+    }
+    public function getAppDescription(): string
+    {
+        if (isset($this->details[self::DETAIL_DESCRIPTION])) {
+            return $this->details[self::DETAIL_DESCRIPTION];
+        }
+        return  '-';
     }
 }

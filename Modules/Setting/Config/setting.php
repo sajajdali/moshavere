@@ -55,6 +55,7 @@ $setting = [
             \Modules\Setting\Enum\SettingKeyEnum::DISABLE_FOOTER_DISPLAY,
             \Modules\Setting\Enum\SettingKeyEnum::SHOW_FLOATING_SOCIAL_ICONS,
             \Modules\Setting\Enum\SettingKeyEnum::ENABLE_DOCTOR_REGISTRATION,
+            \Modules\Setting\Enum\SettingKeyEnum::APPOINTMENT_SHOW_DESCRIPTION_IN_APP_LIST,
 
         ],
     ],

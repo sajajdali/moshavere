@@ -129,6 +129,9 @@ class AppointmentSetting extends Model
     }
     public function  runGenerateCacheJob($date,$segment=null)
     {
+        if(app()->environment('local')){
+            return ;
+        }
         Cache::flush();
         $doctorAllSettings = AppointmentSetting::where('user_id', $this->user_id)->get();
         if ($this->interference) {

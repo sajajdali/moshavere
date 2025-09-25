@@ -43,6 +43,7 @@ class AppointmentListExport implements FromCollection, WithMapping, WithHeadings
             verta($app->start_time)->format('H:i'),
             verta($app->date_visit)->format('Y/m/d'),
             verta($app->created_at)->format('Y/m/d'),
+            $app->getAppDescription(),
 
         ];
     }
@@ -61,6 +62,7 @@ class AppointmentListExport implements FromCollection, WithMapping, WithHeadings
             'زمان نوبت',
             'تاریخ نوبت',
             'تاریخ ثبت نوبت',
+            'توضیحات',
         ];
     }
     public function styles(Worksheet $sheet)

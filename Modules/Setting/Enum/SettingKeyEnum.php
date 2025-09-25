@@ -27,6 +27,7 @@ enum SettingKeyEnum: int implements EnumHasNameInterface, SettingTypeInterface, 
     case APPOINTMENT_FOR_OTHERS_STATUS = 13;
     case APPOINTMENT_MORE_THAT_ONE_PER_DAY = 14;
     case APPOINTMENT_SET_APPOINTMENT_WITH_DOCUMENT_NUMBER = 220;
+    case APPOINTMENT_SHOW_DESCRIPTION_IN_APP_LIST = 221;
     case FOOTER_DESCRIPTION = 15;
     case INSTAGRAM_ADDRESS = 16;
     case TELEGRAM_ADDRESS = 17;
@@ -203,6 +204,7 @@ enum SettingKeyEnum: int implements EnumHasNameInterface, SettingTypeInterface, 
             self::DISABLE_FOOTER_DISPLAY => 'غیر فعال شدن فوتر',
             self::SHOW_FLOATING_SOCIAL_ICONS => 'نمایش ایکون های اینستاگرام و واتس اپ به صورت شناور',
             self::ALLOW_MULTIPLE_APP_FROM_ADMIN_PANEL => 'اجازه ثبت نوبت در پنل منشی، برای ساعت هایی که از قبل یک نوبت ثبت شده در آن ساعت وجود دارد',
+            self::APPOINTMENT_SHOW_DESCRIPTION_IN_APP_LIST => 'نمایش توضیحات مربوط به نوبت در صفحه ی لیست نوبت ها',
 
             // SMS
             self::SMS_API_TOKEN => 'توکن API پیامک',
@@ -363,6 +365,7 @@ enum SettingKeyEnum: int implements EnumHasNameInterface, SettingTypeInterface, 
             self::APPOINTMENT_DESCRIPTION_IN_CHECKOUT_PAGE_REFUND => SettingTypeEnum::TEXTAREA,
 
             self::CONTACTUS_FIRST_SECTION_STATUS => SettingTypeEnum::CHECK,
+            self::APPOINTMENT_SHOW_DESCRIPTION_IN_APP_LIST => SettingTypeEnum::CHECK,
             self::ALLOW_MULTIPLE_APP_FROM_ADMIN_PANEL => SettingTypeEnum::CHECK,
             self::CONTACTUS_FIRST_SECTION_BODY => SettingTypeEnum::TEXTAREA,
             self::SITE_FIRST_SECTION_DESCRIPTION => SettingTypeEnum::TEXTAREA,

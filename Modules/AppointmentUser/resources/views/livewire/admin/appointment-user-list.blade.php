@@ -367,6 +367,9 @@
                                     <th scope="col">ثبت شده توسط</th>
                                     <th scope="col">بخش </th>
                                     <th scope="col">تاریخ ثبت نوبت</th>
+                                    @if ($setting['show_description'])
+                                        <th scope="col">توضیحات</th>
+                                    @endif
                                     <th scope="col">کد ملی</th>
                                 </tr>
                             </thead>
@@ -503,6 +506,11 @@
                                                     </span>
                                                 </div>
                                             </td>
+                                            @if ($setting['show_description'])
+                                            <td style="white-space: normal; overflow-wrap: anywhere;">
+                                                {{ $ap->getAppDescription() }} {{$ap->getAppDescription()}}
+                                                </td>
+                                            @endif
                                             <td>{{ $ap->user?->national_code ?? '---' }}</td>
                                         </tr>
                                     @endforeach

@@ -41,6 +41,7 @@ class AppointmentUserList extends Component
         'kind'                 => null,
     ];
     public array $fetchData = [];
+    public array $setting = [];
     public array $form = [];
     public bool $showcollaps = true;
     public ?string $msg = null;
@@ -341,7 +342,8 @@ class AppointmentUserList extends Component
         $this->fetchData['appointmentSetter'] = Role::all();
         $this->fetchData['Services'] = Service::all();
         $this->fetchData['doctors'] = User::doctors();
-
+        $this->setting['show_description'] =  ! is_null(setting(\Modules\Setting\Enum\SettingKeyEnum::APPOINTMENT_SHOW_DESCRIPTION_IN_APP_LIST)) &&
+        setting(\Modules\Setting\Enum\SettingKeyEnum::APPOINTMENT_SHOW_DESCRIPTION_IN_APP_LIST) ;
         if (request()->has('search')) {
             $seaechInputs =  request()->input('search');
             if (isset($seaechInputs['kind']) && $seaechInputs['kind'] === "2" && isset($seaechInputs['AppointmentStatus']) && $seaechInputs['AppointmentStatus'] === "0") {

@@ -13,6 +13,26 @@ use Response;
 
 class LogExportController extends Controller
 {
+    private  function generateTrackingUuid($id, $trackingCode)
+    {
+        // ترکیب داده‌ها
+        $combined = $id . '-' . $trackingCode;
+
+        // ساخت هش MD5 از مقدار ترکیبی
+        $hash = md5($combined);
+
+        // قالب‌بندی به صورت UUID استاندارد (نسخه 4)
+        $uuid = sprintf(
+            '%08s-%04s-%04x-%04x-%12s',
+            substr($hash, 0, 8),
+            substr($hash, 8, 4),
+            (hexdec(substr($hash, 12, 4)) & 0x0fff) | 0x4000, // version 4
+            (hexdec(substr($hash, 16, 4)) & 0x3fff) | 0x8000, // variant
+            substr($hash, 20, 12)
+        );
+
+        return $uuid;
+    }
     public function exportAppointmentsLog(Request $request)
     {
         $lastUpdate = $request->input('last_update');
@@ -93,6 +113,7 @@ class LogExportController extends Controller
 
                             $part['appointment_users'][] = [
                                 'id' => $appointment->id,
+                                'uuid' =>  $this->generateTrackingUuid($appointment->id, $appointment->tracking_code),
                                 'user' => [
                                     'first_name' => $user->first_name ?? null,
                                     'last_name' => $user->last_name ?? null,

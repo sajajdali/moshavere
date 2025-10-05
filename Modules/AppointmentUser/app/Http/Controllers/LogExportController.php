@@ -105,19 +105,19 @@ class LogExportController extends Controller
                                 'assistant' => null,
                                 'for_self' => $appointment->for_self,
                                 'start_time' => [
-                                    'timestamp' => strtotime("{$appointment->date_visit} {$appointment->start_time}"),
+//                                    'timestamp' => strtotime("{$appointment->date_visit} {$appointment->start_time}"),
                                     'clock_type' => verta($appointment->date_visit)->hour < 13 ? 'قبل از ظهر' : 'بعد از ظهر',
                                     'time_beauty' => $appointment->start_time,
                                     'date_beauty' => verta($appointment->date_visit)->format('Y/m/d'),
                                 ],
                                 'end_time' => [
-                                    'timestamp' => strtotime("{$appointment->date_visit} {$appointment->end_time}"),
+//                                    'timestamp' => strtotime("{$appointment->date_visit} {$appointment->end_time}"),
                                     'clock_type' => verta($appointment->date_visit)->hour < 13 ? 'قبل از ظهر' : 'بعد از ظهر',
                                     'time_beauty' => $appointment->end_time,
                                     'date_beauty' => verta($appointment->date_visit)->format('Y/m/d'),
                                 ],
                                 'created_at' => [
-                                    'timestamp' => $appointment->created_at->timestamp,
+//                                    'timestamp' => $appointment->created_at->timestamp,
                                     'clock_type' => verta($appointment->date_visit)->hour < 13 ? 'قبل از ظهر' : 'بعد از ظهر',
                                     'time_beauty' => $appointment->created_at->format('H:i'),
                                     'date_beauty' => verta($appointment->created_at)->format('Y/m/d'),
@@ -136,7 +136,7 @@ class LogExportController extends Controller
                                 'transaction' => $transaction ? [
                                     'id' => $transaction->id,
                                     'code' => $transaction->transaction_code,
-                                    'status' => $transaction->status->value,
+                                    'status' => (int) $transaction->status->value,
                                     'paid_by' => $transaction->paid_by->value,
                                 ] : null,
 

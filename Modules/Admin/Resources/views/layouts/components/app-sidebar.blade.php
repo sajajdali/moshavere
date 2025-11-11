@@ -4,10 +4,10 @@
     <div class="app-sidebar">
         <div class="side-header">
             <a class="header-brand1" href="{{ route('admin.dashboard') }}">
-                <img src="{{ setting(Modules\Setting\Enum\SettingKeyEnum::SITE_LOGO_URL) }}" class="header-brand-img desktop-logo" alt="{{setting(Modules\Setting\Enum\SettingKeyEnum::SITE_TITLE)}}">
-                <img src="{{ setting(Modules\Setting\Enum\SettingKeyEnum::SITE_LOGO_URL) }}" class="header-brand-img toggle-logo" alt="{{setting(Modules\Setting\Enum\SettingKeyEnum::SITE_TITLE)}}">
-                <img src="{{ setting(Modules\Setting\Enum\SettingKeyEnum::SITE_LOGO_URL) }}" class="header-brand-img light-logo" alt="{{setting(Modules\Setting\Enum\SettingKeyEnum::SITE_TITLE)}}">
-                <img src="{{ setting(Modules\Setting\Enum\SettingKeyEnum::SITE_LOGO_URL) }}" class="header-brand-img light-logo1" alt="{{setting(Modules\Setting\Enum\SettingKeyEnum::SITE_TITLE)}}">
+                <img src="{{ assetStorage(setting(Modules\Setting\Enum\SettingKeyEnum::SITE_LOGO_URL)) }}" class="header-brand-img desktop-logo" alt="{{setting(Modules\Setting\Enum\SettingKeyEnum::SITE_TITLE)}}">
+                <img src="{{ assetStorage(setting(Modules\Setting\Enum\SettingKeyEnum::SITE_LOGO_URL)) }}" class="header-brand-img toggle-logo" alt="{{setting(Modules\Setting\Enum\SettingKeyEnum::SITE_TITLE)}}">
+                <img src="{{ assetStorage(setting(Modules\Setting\Enum\SettingKeyEnum::SITE_LOGO_URL)) }}" class="header-brand-img light-logo" alt="{{setting(Modules\Setting\Enum\SettingKeyEnum::SITE_TITLE)}}">
+                <img src="{{ assetStorage(setting(Modules\Setting\Enum\SettingKeyEnum::SITE_LOGO_URL)) }}" class="header-brand-img light-logo1" alt="{{setting(Modules\Setting\Enum\SettingKeyEnum::SITE_TITLE)}}">
             </a><!-- LOGO -->
         </div>
         <div class="main-sidemenu">

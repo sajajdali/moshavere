@@ -125,7 +125,7 @@ class HomePageLivewire extends Component
             return redirect()->route('front.login.doctor');
         }
 
-        $this->fetchData['service'] = Service::mostViewedService();
+        $this->fetchData['service'] = Service::show()->mostViewedService();
 
         // Fetch doctors with dr_info_status set to true and order them by dr_info_order
         $this->fetchData['EmergencyDoctors']    = $this->emergencyDoctors();

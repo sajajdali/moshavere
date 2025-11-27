@@ -10,9 +10,9 @@ use function PHPUnit\Framework\isNull;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Builder;
 use Modules\Reminder\app\Models\Reminder;
+
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\SoftDeletes;
-
 use Modules\Service\Enum\ServiceShowTypeEnum;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Modules\AppointmentSetting\app\Models\AppointmentSetting;
@@ -38,7 +38,10 @@ class Service extends Model
     {
         return $this->belongsToMany(User::class);
     }
-
+    protected function scopeShow()
+    {
+        return $this->where('show_type', ServiceShowTypeEnum::SHOW);
+    }
     public function checkActive()
     {
         return $this->active == ActiveEnum::ACTIVE->value;
@@ -136,7 +139,7 @@ class Service extends Model
     }
     public function hasSegment($doctorId, $placeId)
     {
-        $appSetting =  AppointmentSetting::SpecialOrGeneralSetting($doctorId,$this->id,$placeId);
+        $appSetting =  AppointmentSetting::SpecialOrGeneralSetting($doctorId, $this->id, $placeId);
         if ($appSetting != null) {
             if ($appSetting->segments->isNotEmpty()) {
                 return true;

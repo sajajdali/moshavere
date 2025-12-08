@@ -226,7 +226,9 @@
                                                             <ul class="dropdown-menu" role="menu">
                                                                 @can('update', $user)
                                                                     <li>
+                                                                        @unless ($user->id === 1)
                                                                         <a href="{{ route('admin.user.edit', $user) }}">ویرایش</a>
+                                                                        @endunless
                                                                     </li>
                                                                     @if ($user->hasrole('پزشک'))
                                                                         <li>

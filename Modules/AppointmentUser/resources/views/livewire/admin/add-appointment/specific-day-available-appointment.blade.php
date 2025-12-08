@@ -134,6 +134,15 @@
                                                     <td>
                                                         <span>
                                                             {{ $user->fullName }} -
+                                                            @if (
+                                                                $ap->setting?->detail[\Modules\AppointmentSetting\app\Models\AppointmentSetting::OPERATORS][
+                                                                    \Modules\AppointmentSetting\app\Models\AppointmentSetting::STATUS
+                                                                ]
+                                                            )
+                                                                <span
+                                                                    class="badge badge-sm bg-info">{{ $ap->operator?->full_name ?? 'بدون اپراتور' }}
+                                                                </span>
+                                                            @endif
                                                         </span>
                                                         <small>
                                                             {{ $ap->service->title ?? '(بخش حذف شده)' }}

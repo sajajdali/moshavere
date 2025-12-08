@@ -329,72 +329,72 @@ class SpecificDayAppointmentRegistrationModal extends Component
     }
     private function checkForAvaiableOperator()
     {
-        $selected_date_visit = (Verta::parse($this->appDate)->toCarbon());
-        if (isset($this->appTime)) {
-            $start_visit_time = explode(':', $this->appTime);
-        }
-        $start_visit_time = explode(':', $this->form['time']['from']);
-        $appTime = Verta::parse($this->appDate)->tocarbon()->setTime($start_visit_time[0], $start_visit_time[1])->toTimeString();
-        $untilTimeString = $this->form['time']['until'];
-        if ($untilTimeString) {
-            $endTime = Carbon::createFromTimeString($untilTimeString)->toTimeString();
-        } else {
-            $endTime = Carbon::parse($appTime)->addMinutes($this->fetchData['app']->time_for_visit)->toTimeString();
-        }
+        // $selected_date_visit = (Verta::parse($this->appDate)->toCarbon());
+        // if (isset($this->appTime)) {
+        //     $start_visit_time = explode(':', $this->appTime);
+        // }
+        // $start_visit_time = explode(':', $this->form['time']['from']);
+        // $appTime = Verta::parse($this->appDate)->tocarbon()->setTime($start_visit_time[0], $start_visit_time[1])->toTimeString();
+        // $untilTimeString = $this->form['time']['until'];
+        // if ($untilTimeString) {
+        //     $endTime = Carbon::createFromTimeString($untilTimeString)->toTimeString();
+        // } else {
+        //     $endTime = Carbon::parse($appTime)->addMinutes($this->fetchData['app']->time_for_visit)->toTimeString();
+        // }
 
-        $this->fetchData['appointmentUser_with_operator'] = AppointmentUser::whereNotNull('operator_id')
-            ->whereDate('date_visit', $selected_date_visit)
-            ->where(function ($query) use ($appTime, $endTime) {
-                // Check if the new appointment starts during an existing appointment
-                $query->where(function ($query) use ($appTime) {
-                    $query->whereTime('start_time', '<=', $appTime)
-                        ->whereTime('end_time', '>', $appTime);
-                })
-                    // Check if the new appointment ends during an existing appointment
-                    ->orWhere(function ($query) use ($endTime) {
-                        $query->whereTime('start_time', '<', $endTime)
-                            ->whereTime('end_time', '>=', $endTime);
-                    })
-                    // Check if the new appointment completely overlaps an existing appointment
-                    ->orWhere(function ($query) use ($appTime, $endTime) {
-                        $query->whereTime('start_time', '>=', $appTime)
-                            ->whereTime('end_time', '<=', $endTime);
-                    });
-            })
-            ->get();
-
-
-        // todo::HERE
-        //check for operator Absence
-        $absence_of_operators = Absence::whereIn('user_id', array_keys($this->fetchData['operators']))
-            ->whereDate('start_at', '<=', $selected_date_visit)
-            ->whereDate('end_at', '>=', $selected_date_visit)
-            ->pluck('user_id')
-            ->toArray();
-
-        $existing_operators = [];
-        if ($this->fetchData['appointmentUser_with_operator']->isNotEmpty()) {
-            foreach ($this->fetchData['appointmentUser_with_operator'] as $appointmentUser) {
-                $existing_operators[] = $appointmentUser->operator_id;
-            }
-        }
-        // todo::HERE
+        // $this->fetchData['appointmentUser_with_operator'] = AppointmentUser::whereNotNull('operator_id')
+        //     ->whereDate('date_visit', $selected_date_visit)
+        //     ->where(function ($query) use ($appTime, $endTime) {
+        //         // Check if the new appointment starts during an existing appointment
+        //         $query->where(function ($query) use ($appTime) {
+        //             $query->whereTime('start_time', '<=', $appTime)
+        //                 ->whereTime('end_time', '>', $appTime);
+        //         })
+        //             // Check if the new appointment ends during an existing appointment
+        //             ->orWhere(function ($query) use ($endTime) {
+        //                 $query->whereTime('start_time', '<', $endTime)
+        //                     ->whereTime('end_time', '>=', $endTime);
+        //             })
+        //             // Check if the new appointment completely overlaps an existing appointment
+        //             ->orWhere(function ($query) use ($appTime, $endTime) {
+        //                 $query->whereTime('start_time', '>=', $appTime)
+        //                     ->whereTime('end_time', '<=', $endTime);
+        //             });
+        //     })
+        //     ->get();
 
 
-        // Merge existing operators with absent operators
-        $all_existing_or_absent_operators = array_merge($existing_operators, $absence_of_operators);
+        // // todo::HERE
+        // //check for operator Absence
+        // $absence_of_operators = Absence::whereIn('user_id', array_keys($this->fetchData['operators']))
+        //     ->whereDate('start_at', '<=', $selected_date_visit)
+        //     ->whereDate('end_at', '>=', $selected_date_visit)
+        //     ->pluck('user_id')
+        //     ->toArray();
 
-        if (!empty($all_existing_or_absent_operators)) {
+        // $existing_operators = [];
+        // if ($this->fetchData['appointmentUser_with_operator']->isNotEmpty()) {
+        //     foreach ($this->fetchData['appointmentUser_with_operator'] as $appointmentUser) {
+        //         $existing_operators[] = $appointmentUser->operator_id;
+        //     }
+        // }
+        // // todo::HERE
 
-            $operatorsToDeleteFlipped = array_flip($all_existing_or_absent_operators);
-            $filteredOperators = array_diff_key($this->fetchData['operators'], $operatorsToDeleteFlipped);
-            return $this->fetchData['operators'] = $filteredOperators;
-        }
+
+        // // Merge existing operators with absent operators
+        // $all_existing_or_absent_operators = array_merge($existing_operators, $absence_of_operators);
+
+        // if (!empty($all_existing_or_absent_operators)) {
+
+        //     $operatorsToDeleteFlipped = array_flip($all_existing_or_absent_operators);
+        //     $filteredOperators = array_diff_key($this->fetchData['operators'], $operatorsToDeleteFlipped);
+        //     return $this->fetchData['operators'] = $filteredOperators;
+        // }
+        return $this->fetchData['operators'] = User::operators()->mapWithKeys(fn($item) => [$item->id => $item->fullName])->toArray();
     }
 
     public function mount()
     {
-
         if (isset($this->appId)) {
             $app =  AppointmentSetting::find($this->appId);
             $this->fetchData['app_kind'] =

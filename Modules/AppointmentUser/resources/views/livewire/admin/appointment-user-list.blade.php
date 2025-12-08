@@ -117,7 +117,7 @@
                                     <div class="col-md-6">
                                         <label for="search-UserMobile" class="form-label"><strong>شماره
                                                 موبایل</strong></label>
-                                        <input class="form-control" id="search-UserMobile"
+                                        <input class="form-control" id="search-UserMobile" autocomplete="on"
                                             wire:model="search.user_mobile" placeholder="شماره تماس" type="text">
 
                                     </div>

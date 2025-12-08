@@ -56,6 +56,9 @@ class ShowAvailableDayForDoctor extends Component
             }
             $parameter['segmentId'] = implode(',', $segId);
         }
+        if (isset($this->fetchData['selected_operator'])) {
+            $parameter['operator'] = $this->fetchData['selected_operator'];
+        }
         return $this->redirect(route('setAppointment.checkout', $parameter), true);
     }
     public function loadMoreDays()
@@ -258,11 +261,13 @@ class ShowAvailableDayForDoctor extends Component
         $doc     = filter_var(request()->get('doctor_id', null), FILTER_SANITIZE_NUMBER_INT);
         $place   = filter_var(request()->get('place_id', null), FILTER_SANITIZE_NUMBER_INT);
         $service = filter_var(request()->get('service_id', null), FILTER_SANITIZE_NUMBER_INT);
+        $segments =  request()->get('segment', null);
+        $operators =  trim(request()->get('operator', null));
         if (!isset($doc) || !isset($place) || !isset($service)) {
             return abort(404);
         }
-        if (request()->has('segment')) {
-            $route_segments = filter_var_array(request()->get('segment'), FILTER_SANITIZE_NUMBER_INT);
+        if (! is_null($segments)) {
+            $route_segments = filter_var_array($segments, FILTER_SANITIZE_NUMBER_INT);
             foreach ($route_segments as $item) {
                 $this->fetchData['segments'][] =  AppointmentSegmentItem::find($item);
             }
@@ -276,13 +281,24 @@ class ShowAvailableDayForDoctor extends Component
             }
         }
 
-        $this->fetchData['doc']      =   User::find($doc);
-        $this->fetchData['places']   =   place::find($place);
-        $this->fetchData['service']  =   Service::find($service);
+        if (! is_null($operators) && ! empty($operators)) {
+            $this->fetchData['selected_operator'] = User::findOrFail((int) $operators);
+            if (! $this->fetchData['selected_operator']->isOperator()) {
+                abort(404);
+            }
+        }
 
-        if (!isset($this->fetchData['doc']) || empty($this->fetchData['places']) ||  empty($this->fetchData['service'])) {
+        $this->fetchData['doc']      =   User::findOrFail($doc);
+
+        $this->fetchData['places']   =   place::findOrFail($place);
+        $this->fetchData['service']  =   Service::findOrFail($service);
+        if (
+            !$this->fetchData['places']->users()->where('user_id', $this->fetchData['doc']->id)->exists() ||
+            !$this->fetchData['service']->user()->where('user_id', $this->fetchData['doc']->id)->exists()
+        ) {
             return abort(404);
         }
+
         // check if service id not manipulate in url
         $userServices = $this->fetchData['doc']->activeServices()->pluck('id')->toArray();
         $isServiceBelongToUser =  in_array($this->fetchData['service']->id, $userServices);

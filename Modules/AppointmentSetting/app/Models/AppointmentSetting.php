@@ -127,21 +127,50 @@ class AppointmentSetting extends Model
         }
         return false;
     }
-    public function  runGenerateCacheJob($date,$segment=null)
+    public function  runGenerateCacheJob($date, $segment = null)
     {
-        if(app()->environment('local')){
-            return ;
+        if (app()->environment('local')) {
+            return;
         }
         Cache::flush();
         $doctorAllSettings = AppointmentSetting::where('user_id', $this->user_id)->get();
         if ($this->interference) {
             foreach ($doctorAllSettings as $setting) {
                 if ($setting->hasDaySetting($date)) {
-                    GenerateAppointmentCache::dispatch($setting, $date,$segment);
+                    GenerateAppointmentCache::dispatch($setting, $date, $segment);
                 }
             }
         } else {
-            GenerateAppointmentCache::dispatch($this, $date,$segment);
+            GenerateAppointmentCache::dispatch($this, $date, $segment);
         }
+    }
+    public static function findSettingId($doctorId, $ServiceId, $PlaceId)
+    {
+        $setting = self::where('user_id', $doctorId)
+            ->where('service_id', $ServiceId)
+            ->where('place_id', $PlaceId)
+            ->first();
+        if (is_null($setting)) {
+            $setting = self::where('user_id', $doctorId)
+                ->whereNull('service_id')
+                ->whereNull('place_id')
+                ->first();
+        }
+        return $setting;
+    }
+    public static function doseSettingHasOperator(self $appointmentSetting): bool
+    {
+        $d = data_get($appointmentSetting->detail, 'operators', null);
+        if (! is_null($d)) {
+            if (isset($d['ids']) && isset($d['status']) && $d['status'] == true) {
+                return true;
+            }
+        }
+        return false;
+    }
+    public static function findOperators(self $appointmentSetting)
+    {
+        $operatorIds = data_get($appointmentSetting->detail, 'operators.ids');
+        return User::whereIn('id', $operatorIds)->get();
     }
 }

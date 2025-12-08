@@ -78,10 +78,10 @@ class Checkout extends Component
             // create a user
             $this->RegisterOtherAsUser();
         }
-        if( isset( $this->fechData['isOnline'])  &&  $this->fechData['isOnline'] &&   isset($this->fetchData['appSetting']->detail[AppointmentSetting::MAX_ACTIVE_APP_FOR_ONLINE_APP])) {
-            $maxAppointmentForEachDay = (int) $this->fetchData['appSetting']->detail[AppointmentSetting::MAX_ACTIVE_APP_FOR_ONLINE_APP] ;
-            if(AppointmentOnline::whereHas('appointmentUser',function($q){
-                return $q->activeAppointmentStatus() ;
+        if (isset($this->fechData['isOnline'])  &&  $this->fechData['isOnline'] &&   isset($this->fetchData['appSetting']->detail[AppointmentSetting::MAX_ACTIVE_APP_FOR_ONLINE_APP])) {
+            $maxAppointmentForEachDay = (int) $this->fetchData['appSetting']->detail[AppointmentSetting::MAX_ACTIVE_APP_FOR_ONLINE_APP];
+            if (AppointmentOnline::whereHas('appointmentUser', function ($q) {
+                return $q->activeAppointmentStatus();
             })->whereDate('date_visit', now()->addDay())->count() >= $maxAppointmentForEachDay) {
                 // appoitment reach their limit
                 return $this->err = 'ظرفیت های نوبت آنلاین به اتمام رسیده است ، لطفا در روز دیگری تلاش کنید';
@@ -173,20 +173,14 @@ class Checkout extends Component
         // full user model
         $userModelAppointment = new UserModelAppointment(userModel: $mainUser, forHimself: $foHimself, userSomeoneModel: $someoneModel);
 
-        //check if operator
-        if (isset($this->form['operator']) && !empty($this->form['operator'])) {
-            $oprator =  $this->form['operator'];
-        } else {
-            $oprator = null;
-        }
         if ($this->fetchData['isOnline']) {
             $kind = AppointmentUserKindEnum::ONLINE;
         } else {
             $kind = AppointmentUserKindEnum::IN_PERSION;
         }
-        $smsToDoctor = true ;
-        if(isset($this->fetchData['appSetting']->doctor->drStoreAppSms) && $this->fetchData['appSetting']->doctor->drStoreAppSms == true ) {
-            $smsToDoctor = false ;
+        $smsToDoctor = true;
+        if (isset($this->fetchData['appSetting']->doctor->drStoreAppSms) && $this->fetchData['appSetting']->doctor->drStoreAppSms == true) {
+            $smsToDoctor = false;
         }
         // appointment model
         $appointmentModel = new AppointmentModel(
@@ -196,6 +190,7 @@ class Checkout extends Component
             serviceId: $this->fetchData['appSetting']->service?->id ?? $this->fetchData['service']->id,
             placeId: $this->fetchData['appSetting']->place?->id ?? $this->fetchData['places']->id,
             agentId: auth()->user()->id,
+            operatorId: data_get($this->fetchData,'operator',null),
             kind: $kind,
             smsToDoctor: $smsToDoctor,
             description: isset($this->form['description']) ? $this->form['description'] : '',
@@ -221,7 +216,7 @@ class Checkout extends Component
         $storeAppointment = app('AppointmentUserService')->storeAppointment($this->fetchData['appSetting'], $userModelAppointment, $appointmentModel, $detail);
         if ($storeAppointment['status']) {
             $appointmentSetting = AppointmentSetting::find($this->fetchData['appSetting']->id);
-            $date = Carbon::createFromTimestamp($this->fetchData['app_start_time'],'Asia/Tehran')->toDateString();
+            $date = Carbon::createFromTimestamp($this->fetchData['app_start_time'], 'Asia/Tehran')->toDateString();
             $appointmentSetting->runGenerateCacheJob($date);
             return redirect()->route('front.setAppointment.detail', ['tracking_code' => $storeAppointment['detail']['tracking_code']]);
         } else {
@@ -231,54 +226,43 @@ class Checkout extends Component
 
     public function mount()
     {
-
         // get app time from route
-        $this->fetchData['app_start_time']  =  request()->input('start_time');
+        $startTime =  $this->fetchData['app_start_time']  =  request()->input('start_time');
         $this->fetchData['app_end_time']    =  request()->input('end_time');
         $isOnlineRoute                      = request()->boolean('isOnline');
-        $this->fetchData['segmentsId']      = request()->get('segmentId',null);
-        $this->fetchData['isOnline']        = filter_var($isOnlineRoute,FILTER_VALIDATE_BOOL);
-        $doc     =  request()->input('doctor_id');
-        $place   =  request()->input('place_id');
-        $service =  request()->input('service_id');
+        $this->fetchData['segmentsId']      = request()->get('segmentId', null);
+        $this->fetchData['isOnline']        = filter_var($isOnlineRoute, FILTER_VALIDATE_BOOL);
 
-        if (!isset($doc) || empty($place) ||  empty($service)) {
-            // redirect back with alert
-            // return redirect()->route('front.homePage');
+        $doc     = filter_var(request()->get('doctor_id', null), FILTER_SANITIZE_NUMBER_INT);
+        $place   = filter_var(request()->get('place_id', null), FILTER_SANITIZE_NUMBER_INT);
+        $service = filter_var(request()->get('service_id', null), FILTER_SANITIZE_NUMBER_INT);
+        $this->fetchData['operator'] = request()->get('operator', null);
+        $this->fetchData['doc'] = User::findOrFail($doc);
+        $this->fetchData['places'] =  place::findOrFail($place);
+        $this->fetchData['service'] = Service::findOrFail($service);
+        if(isset($this->fetchData['operator']) && ! empty($this->fetchData['operator'])) {
+            $o = User::findOrFail ((int) $this->fetchData['operator']);
+            if(! $o->isOperator()) {
+                return abort(404);
+            }
         }
-        if (empty($this->fetchData['app_start_time']) || empty($this->fetchData['app_end_time'])) {
+        if (
+            ! $this->fetchData['places']->users()->where('user_id', $this->fetchData['doc']->id)->exists() ||
+            ! $this->fetchData['service']->user()->where('user_id', $this->fetchData['doc']->id)->exists()
+        ) {
+            return abort(404);
+        }
+        if (empty($startTime) || empty($this->fetchData['app_end_time'])) {
             return redirect()->route('front.setAppointment.days', [
                 'doctor_id' => $doc,
                 'place_id' => $place,
                 'service_id' => $service
-                ])->with('error', 'لطفا مجدد تاریخ را انتخاب کنید!');
+            ])->with('error', 'لطفا مجدد تاریخ را انتخاب کنید!');
         }
-        $this->fetchData['date_for_blade'] = Carbon::createFromTimestamp($this->fetchData['app_start_time'], 'Asia/Tehran');
+        $this->fetchData['date_for_blade'] = Carbon::createFromTimestamp($startTime, 'Asia/Tehran');
         if ($this->fetchData['date_for_blade']->lt(\now())) {
             return abort(404);
         }
-        $this->fetchData['doc']      =   User::find($doc);
-        $this->fetchData['places']   =  place::find($place);
-        $this->fetchData['service']  =   Service::find($service);
-
-        if (
-            !isset($this->fetchData['doc'])          ||
-            !$this->fetchData['doc'] instanceof User ||
-            empty($this->fetchData['places'])        ||
-            empty($this->fetchData['service'])
-        ) {
-            abort(404);
-        }
-
-        // check if service id not manipulate in url
-        $userServices = $this->fetchData['doc']->activeServices()->pluck('id')->toArray();
-        $isServiceBelongToUser =  in_array($this->fetchData['service']->id, $userServices);
-        $PlaceUser = $this->fetchData['doc']->activePlaces()->pluck('id')->toArray();
-        $isPlaceBelongToUser =  in_array($this->fetchData['places']->id, $PlaceUser);
-        if ($isServiceBelongToUser != true  || $isPlaceBelongToUser != true) {
-            return abort(404);
-        }
-
         // check for login
         if (auth()->check()) {
             $this->user =  auth()->user();
@@ -289,24 +273,18 @@ class Checkout extends Component
                 'service_id' => $this->fetchData['service']->id,
                 'start_time' => $this->fetchData['app_start_time'],
                 'end_time'   => $this->fetchData['app_end_time'],
+                'segments'   => $this->fetchData['segmentsId'],
+                'operator'   => $this->fetchData['operator']
             ];
             $route = route('setAppointment.checkout', $parameter);
             session()->put('url.intended', $route);
             return redirect()->route('front.login.user', ['appointment' => 'true']);
         }
-
-        // find app special setting
-        $this->fetchData['appSetting'] = AppointmentSetting::where('service_id', $this->fetchData['service']->id)
-            ->where('place_id', $this->fetchData['places']->id)
-            ->where('user_id', $this->fetchData['doc']->id)
-            ->first();
-        //check for general setting
-        if (!isset($this->fetchData['appSetting'])) {
-            $this->fetchData['appSetting'] = AppointmentSetting::where('user_id', $this->fetchData['doc']->id)
-                ->whereNull('place_id')
-                ->whereNull('service_id')
-                ->first();
-        }
+        $this->fetchData['appSetting'] = AppointmentSetting::findSettingId(
+            $this->fetchData['doc']->id,
+            $this->fetchData['service']->id,
+            $this->fetchData['places']->id
+        );
     }
     public function render()
     {

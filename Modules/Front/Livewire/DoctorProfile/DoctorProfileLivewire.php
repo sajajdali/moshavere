@@ -33,12 +33,14 @@ class DoctorProfileLivewire extends Component
     public function reserveAppointment($type = 'IN_PERSON')
     {
         $this->appointmentType = $type;
+        $place   =  data_get($this->form, 'place', null);
+        $service =  data_get($this->form, 'service', null);
         // check if doctor was not banned
-        if ($this->isDocAvaiable()) {
+        if ($this->isDocAvailable()) {
             // check for palce count
             if ($this->doc->activePlaces()->count() > 1) {
                 // check if place has selected in route
-                if (!isset($this->form['place']) || empty($this->form['place'])) {
+                if ($place) {
                     $this->fetchData['places'] = $this->doc->activePlaces();
                     $this->fetchData['modalStep'] = 1;
                     if (isset($this->fetchData['services'])) {
@@ -54,30 +56,18 @@ class DoctorProfileLivewire extends Component
                 $place = $this->doc->activePlaces()->first();
                 $this->form['place_name'] = $place->title;
                 $this->form['place'] = $place->id;
-
                 // check for service count
                 if ($this->doc->activeServices()->count() <= 1) {
-                    if ($this->doc->activeServices()->first()->hasSegment($this->doc->id, $place->id)) {
-                        $this->serviceHasSelected();
-                        return $this->lunchModal();
-                    }
-                    return  $this->redirectToAppointmentDays(
-                        $this->doc->id,
-                        $place->id,
-                        $this->doc->activeServices()->first()->id
-                    );
+                    $this->checkForOperator();
+                    $this->lunchModal();
+                    return;
                 }
                 $this->fetchData['services'] = $this->doc->activeServices();
                 $this->fetchData['modalStep'] = 2;
                 return $this->lunchModal();
             }
-
             // if less than ONE service exist , redirect to appointment days list
-            $this->redirectToAppointmentDays(
-                $this->doc->id,
-                $this->doc->places()->first()->id,
-                $this->doc->services()->first()->id
-            );
+            return  $this->checkForOperator();
         }
     }
     public function reserveOnlineAppointment() {}
@@ -85,16 +75,18 @@ class DoctorProfileLivewire extends Component
     {
         return $this->dispatch('lucnhModal', true);
     }
-    private function redirectToAppointmentDays($doctor_id, $place_id, $service_id, $segment = null)
+    private function redirectToAppointmentDays($doctor_id, $place_id, $service_id, $segment = null, $operator = null)
     {
         $param = [
             'doctor_id'     => $doctor_id,
             'place_id'      => $place_id,
             'service_id'    => $service_id
-
         ];
         if (!empty($segment)) {
             $param['segment'] = $segment;
+        }
+        if (! is_null($operator)) {
+            $param['operator'] = $operator;
         }
         if ($this->appointmentType == 'IN_PERSON') {
             $route = 'front.setAppointment.days';
@@ -106,75 +98,97 @@ class DoctorProfileLivewire extends Component
             $param
         );
     }
-    public function modalSubmit()
+    protected function lvlOneModal($place, $service)
     {
-        if ($this->fetchData['modalStep'] == 1) {
-            if (isset($this->form['place'])) {
-                $this->form['place_name'] = Place::find($this->form['place'])?->title ?? '';
-                $this->fetchData['services'] = $this->doc->activeServices();
-                if (isset($this->form['service']) && !empty($this->form['service'])) {
-                    // user selected service on privous page
-                    $this->serviceHasSelected();
-                    $this->fetchData['modalStep']++;
-                } else {
-                    $this->form['place'] = $this->doc->activePlaces()->first()->id;
-                    $this->fetchData['modalStep']++;
-                    if ($this->doc->activeServices()->count() <= 1) {
-                        $this->redirectToAppointmentDays(
-                            $this->doc->id,
-                            $this->form['place'],
-                            $this->doc->activeServices()->first()->id
-                        );
-                    }
-                }
+        if (isset($place)) {
+            $this->form['place_name']    = Place::find($place)?->title ?? '';
+            $this->fetchData['services'] = $this->doc->activeServices();
+            if (! is_null($service)) {
+                // user selected service on privous page
+                $this->serviceHasSelected();
             } else {
-                $this->fetchData['modalStep'] =  1;
+                $place = $this->doc->activePlaces()->first()->id;
+                if ($this->doc->activeServices()->count() <= 1) {
+                    $this->checkForOperator();
+                }
             }
-        } elseif ($this->fetchData['modalStep'] == 2) {
-            if (isset( $this->fetchData['segments'])) {
-                if(! isset($this->form['segment'] )){
-                   return $this->dispatch('swalError', msg: 'لطفا بخش بندی مورد نظر خود را انتخاب کنید!');
-                }
-                if (!in_array(true, $this->form['segment'], true)) {
-                    return $this->dispatch('swalError', msg: 'لطفا حداقل یک بخش بندی را انتخاب کنید!');
-                }
-                if (count($this->form['segment']) > 1) {
-                    foreach ($this->form['segment'] as $segmentId => $status) {
-                        if ($status) {
-                            $this->form['selectedSegmentForRoute'][] = $segmentId;
-                        }
+            $this->fetchData['modalStep']++;
+        } else {
+            $this->fetchData['modalStep'] =  1;
+        }
+    }
+    protected function lvlTwoModal($place, $service)
+    {
+        $segmentIds = data_get($this->form, 'segment', null);
+        if (! is_null($segmentIds)) {
+            if (count($segmentIds) > 1) {
+                foreach ($segmentIds as $segmentId => $status) {
+                    if ($status) {
+                        $this->form['selectedSegmentForRoute'][] = $segmentId;
                     }
-                } else {
-                    $this->form['selectedSegmentForRoute'][] = array_key_first($this->form['segment']);
                 }
-                $this->redirectToAppointmentDays(
-                    $this->doc->id,
-                    $this->form['place'],
-                    $this->form['service'],
-                    $this->form['selectedSegmentForRoute'],
-                );
             } else {
-                if (isset($this->form['service'])) {
-                    $this->redirectToAppointmentDays(
-                        $this->doc->id,
-                        $this->form['place'],
-                        $this->form['service']
-                    );
-                } else {
-                    $this->dispatch('swalError', msg: 'لطفا بخش مورد نظر خود را انتخاب کنید!');
-                }
+                $this->form['selectedSegmentForRoute'] = $segmentIds;
+            }
+            $this->checkForOperator();
+        } else {
+            if (! is_null($service)) {
+                $this->checkForOperator();
+            } else {
+                $this->dispatch('swalError', msg: 'لطفا بخش مورد نظر خود را انتخاب کنید!');
             }
         }
     }
+    protected function lvlThreeModal()
+    {
+        $segments =  data_get($this->form, 'selectedSegmentForRoute');
+        $operator =  data_get($this->form, 'operator');
+        $this->redirectToAppointmentDays(
+            $this->doc->id,
+            $this->form['place'],
+            $this->form['service'],
+            $segments,
+            $operator
+        );
+    }
+    public function modalSubmit()
+    {
+        $step    = data_get($this->fetchData, 'modalStep', 1);
+        $place   = data_get($this->form, 'place', null);
+        $service = data_get($this->form, 'service', null);
+        return match ($step) {
+            1 => $this->lvlOneModal($place, $service),
+            2 => $this->lvlTwoModal($place, $service),
+            3 => $this->lvlThreeModal(),
+        };
+    }
 
+    public function checkForOperator()
+    {
+        $app_setting = AppointmentSetting::findSettingId($this->doc->id, $this->form['service'], $this->form['place']);
+        $operator = null;
+        if (AppointmentSetting::doseSettingHasOperator($app_setting)) {
+            $operator = $this->fetchData['operators'] = AppointmentSetting::findOperators($app_setting);
+            if (count($this->fetchData['operators']) > 1) {
+                $this->fetchData['modalStep'] = 3;
+                return;
+            }
+            $operator = $operator->first();
+        }
+        $segments =  data_get($this->form, 'selectedSegmentForRoute');
+        $this->redirectToAppointmentDays(
+            $this->doc->id,
+            $this->form['place'],
+            $this->form['service'],
+            $segments,
+            $operator
+        );
+    }
     public function serviceHasSelected()
     {
+        $app_setting = AppointmentSetting::findSettingId($this->doc->id, $this->form['service'], $this->form['place']);
         if (isset($this->form['service'])) {
-            $app_setting = AppointmentSetting::where('user_id', $this->doc->id)->where('place_id', $this->form['place'])->where('service_id', $this->form['service'])->first();
-            if (empty($app_setting)) {
-                $app_setting = AppointmentSetting::where('user_id', $this->doc->id)->whereNull('place_id')->whereNull('service_id')->first();
-            }
-            if ($app_setting->segments->count() > 0) {
+            if ($app_setting->segments->count()) {
                 $segment = $app_setting->segments()->first();
                 if ($segment->multiple_choice == "1") {
                     // segment has one choise
@@ -185,11 +199,7 @@ class DoctorProfileLivewire extends Component
                 }
                 $this->fetchData['segments'] = $segment->items()->where('display_on_site', true)->orderBy('priority')->get();
             } else {
-                $this->redirectToAppointmentDays(
-                    $this->doc->id,
-                    $this->form['place'],
-                    $this->form['service']
-                );
+                $this->checkForOperator();
             }
         }
     }
@@ -204,7 +214,6 @@ class DoctorProfileLivewire extends Component
         $this->fetchData['places'] = $this->doc->activePlaces();
         $this->fetchData['modalStep'] = 1;
     }
-
     // check is user redirect to this page with service_id and place_id
     private function routeHasServiceOrPlace()
     {
@@ -267,7 +276,6 @@ class DoctorProfileLivewire extends Component
             $this->addError('CommentSuccess', 'نظر شما با موفقیت ثبت شد و بعد از تایید در سایت نمایش داده میشود');
         }
     }
-
     public function loadMoreComment()
     {
         $totallComments =  count($this->fetchData['comments']);
@@ -307,7 +315,6 @@ class DoctorProfileLivewire extends Component
         $user->favorite_dr = $privius_docs;
         $this->fetchData['isFavarite'] = true;
     }
-
     public function removeFromFavarite()
     {
         // Check if the user is logged in
@@ -341,7 +348,7 @@ class DoctorProfileLivewire extends Component
             unset($this->fetchData['isFavarite']);
         }
     }
-    private function isDocAvaiable()
+    private function isDocAvailable()
     {
         if (setting(SettingKeyEnum::APPOINTMENT_STATUS) != true) {
             return false;
@@ -358,18 +365,16 @@ class DoctorProfileLivewire extends Component
     {
         unset($this->fetchData['segments']);
         unset($this->form['service']);
+        $this->fetchData['modalStep'] = 2;
     }
-    public function mount()
+    public function ignoreSelected()
     {
-        $doctor_id =   request()->route('doctor_id');
-        $checkExistensOfdoctor =  User::find($doctor_id);
-        if (isset($checkExistensOfdoctor) && $checkExistensOfdoctor->isDoctor()) {
-            $this->doc = $checkExistensOfdoctor;
-            SEOTools::setTitle($this->doc->fullName);
-            SEOTools::setDescription($this->doc->dr_biography);
-        } else {
-            abort(404);
-        }
+        unset($this->fetchData['segments']);
+        unset($this->form['service']);
+        $this->fetchData['modalStep'] = 1;
+    }
+    private function fetchData()
+    {
         $this->fetchData['comments'] = Comment::doctroComments($this->doc->id);
         $averageRating = $this->fetchData['comments']->avg('star');
         $minRating     = $this->fetchData['comments']->min('star');
@@ -381,6 +386,7 @@ class DoctorProfileLivewire extends Component
             "worstRating" => $minRating,
             "ratingCount" => 5
         ]);
+
         if (count($this->fetchData['comments']) > 2) {
             $this->fetchData['iteratorComments'] = 2;
         } else {
@@ -403,11 +409,25 @@ class DoctorProfileLivewire extends Component
             $this->fetchData['navigate'] = "https://maps.google.com/maps?daddr=" . $place->detail[Place::DETAIL_KEY_LOCATION][Place::DETAIL_KEY_LOCATION_LAT] . ',' . $place->detail[Place::DETAIL_KEY_LOCATION][Place::DETAIL_KEY_LOCATION_LNG];
         }
         $this->fetchData['modalStep'] = 1;
-        $this->fetchData['is_app_available'] = $this->isDocAvaiable();
+        $this->fetchData['is_app_available'] = $this->isDocAvailable();
         $this->routeHasServiceOrPlace();
         // bread crumb
+
         $this->fetchData['site_title'] = Setting(SettingKeyEnum::SITE_TITLE);
         $this->fetchData['gallery'] = json_decode($this->doc->dr_gallery, true);
+    }
+    public function mount()
+    {
+        $doctor_id =   request()->route('doctor_id');
+        $checkExistensOfdoctor =  User::findOrFail($doctor_id);
+        if ($checkExistensOfdoctor->isDoctor()) {
+            $this->doc = $checkExistensOfdoctor;
+            SEOTools::setTitle($this->doc->fullName);
+            SEOTools::setDescription($this->doc->dr_biography);
+        } else {
+            abort(404);
+        }
+        $this->fetchData();
     }
     public function render()
     {

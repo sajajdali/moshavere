@@ -1,5 +1,5 @@
 <div>
-    <div class="card-header border-bottom d-flex justify-content-between">      
+    <div class="card-header border-bottom d-flex justify-content-between">
         <h3 class="d-flex align-item-center">
             <i class="fa fa-user-plus me-2 d-none d-sm-inline" aria-hidden="true"></i>
             <span>
@@ -32,7 +32,7 @@
                             data-placeholder="انتخاب کنید...">
                             <option label="انتخاب کنید..."></option>
                             @foreach ($fetchData['operator'] as $doctor)
-                                <option @if (isset($form['operators']) && in_array($doctor->id, $form['operators'])) selected @endif value="{{ $doctor->id }}">
+                                <option @if (isset($form['operators']['ids']) && in_array($doctor->id, $form['operators']['ids'])) selected @endif value="{{ $doctor->id }}">
                                     {{ $doctor->fullname }}</option>
                             @endforeach
                         </select>

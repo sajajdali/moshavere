@@ -330,6 +330,14 @@ class User extends Authenticatable
             return false;
         }
     }
+    public function isOperator():bool
+    {
+        if ($this->hasrole('اپراتور')) {
+            return true;
+        } else {
+            return false;
+        }
+    }
     public static function generatePassword()
     {
         $pass =  bin2hex(random_bytes(16));;

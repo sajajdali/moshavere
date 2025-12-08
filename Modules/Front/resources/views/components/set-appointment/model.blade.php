@@ -2,20 +2,26 @@
     <header class="appointment__modal-header  ">
         @if ($fetchData['modalStep'] == 2)
             @isset($fetchData['segments'])
-            <button type="button" wire:click='editservice'
-                class="bg-white hover:bg-sky-100 hover:text-gray-700 border-2 border-blue-100 text-sky-400 flex items-center py-3 px-5 rounded-xl gap-3">
-                <span>ویرایش بخش</span>
-            </button>
+                <button type="button" wire:click='editservice'
+                    class="bg-white hover:bg-sky-100 hover:text-gray-700 border-2 border-blue-100 text-sky-400 flex items-center py-3 px-5 rounded-xl gap-3">
+                    <span>ویرایش بخش</span>
+                </button>
             @else
-            <button type="button" wire:click='editPlace'
-                class="bg-white hover:bg-sky-100 hover:text-gray-700 border-2 border-blue-100 text-sky-400 flex items-center py-3 px-5 rounded-xl gap-3">
-                <span>ویرایش مطب</span>
-            </button>
+                <button type="button" wire:click='editPlace'
+                    class="bg-white hover:bg-sky-100 hover:text-gray-700 border-2 border-blue-100 text-sky-400 flex items-center py-3 px-5 rounded-xl gap-3">
+                    <span>ویرایش مطب</span>
+                </button>
             @endisset
         @elseif($fetchData['modalStep'] == 1)
             <span></span>
         @endif
-        <button type="button"
+        @if ($fetchData['modalStep'] == 3)
+            <button type="button" wire:click='editservice'
+                class="bg-white hover:bg-sky-100 hover:text-gray-700 border-2 border-blue-100 text-sky-400 flex items-center py-3 px-5 rounded-xl gap-3">
+                <span>ویرایش بخش</span>
+            </button>
+        @endif
+        <button type="button" wire:click='ignoreSelected'
             class="bg-white border-2 border-red text-red flex items-center py-3 px-5 rounded-xl gap-3 dismissmodal">
             <span>بستن</span>
             <svg class="w-4 h-4" xmlns="http://www.w3.org/2000/svg">
@@ -77,16 +83,30 @@
                                     wire:model='form.segment.{{ $segmentsItem->id }}' />
                                 <div class="cart__radio--text">
                                     <h5>{{ $segmentsItem->title }}</h5>
-                                  @if ($segmentsItem->price > 0)
-                                  <p>قیمت : {{ number_format($segmentsItem->price) }}</p>
-                                  @endif
+                                    @if ($segmentsItem->price > 0)
+                                        <p>قیمت : {{ number_format($segmentsItem->price) }}</p>
+                                    @endif
                                 </div>
                             </label>
                         @endforeach
                     </div>
                 </div>
             @endisset
-
+        @elseif($fetchData['modalStep'] == 3)
+            <div class="space-y-3">
+                <p class="font-semibold">لطفا اپراتور مورد نظر خود را انتخاب بفرمایید!</p>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+                    @foreach ($this->fetchData['operators'] as $index_key => $operators)
+                        <label for="operator-{{ $index_key }}" class="cart__radio--container">
+                            <input type="radio" name="operator" value="{{ $operators->id }}"
+                                id="operator-{{ $index_key }}" wire:model='form.operator' />
+                            <div class="cart__radio--text">
+                                <h5>{{ $operators->fullName }}</h5>
+                            </div>
+                        </label>
+                    @endforeach
+                </div>
+            </div>
         @endif
         {{-- <div class="warning_badge">
             <svg class="w-8 h-8" xmlns="http://www.w3.org/2000/svg">

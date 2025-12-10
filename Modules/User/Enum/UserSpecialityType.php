@@ -20,4 +20,10 @@ enum UserSpecialityType: int implements EnumHasNameInterface
             self::SECRETARY => 'منشی',
         };
     }
+    public function getPreName():string {
+        return match ($this) {
+            self::DOCTOR => 'پزشک',
+            default => '',
+        };
+    }
 }

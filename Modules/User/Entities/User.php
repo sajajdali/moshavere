@@ -13,6 +13,7 @@ use Illuminate\Support\Facades\Cache;
 use Modules\Front\app\Models\Province;
 use Spatie\Permission\Traits\HasRoles;
 use Illuminate\Notifications\Notifiable;
+use Modules\User\Enum\UserSpecialityType;
 use Modules\User\Traits\UserRelationTrait;
 use Modules\User\Traits\UserAttributeTrait;
 use Illuminate\Database\Eloquent\Collection;
@@ -195,7 +196,8 @@ class User extends Authenticatable
     {
         return $this->roles()->where('id', 1)->count() > 0;
     }
-    public function isMama() {
+    public function isMama()
+    {
         return $this->roles()->where('id', 6)->count() > 0;
     }
 
@@ -330,7 +332,7 @@ class User extends Authenticatable
             return false;
         }
     }
-    public function isOperator():bool
+    public function isOperator(): bool
     {
         if ($this->hasrole('اپراتور')) {
             return true;
@@ -418,20 +420,26 @@ class User extends Authenticatable
                 ]
             )->whereHas('messages')?->first();
     }
-    public function hasOnlineApp() {
+    public function hasOnlineApp()
+    {
         return $this->appointmentSettings()
-        ->whereJsonContains('detail', [AppointmentSetting::VISIT_TYPE_ONLINE => true])
+            ->whereJsonContains('detail', [AppointmentSetting::VISIT_TYPE_ONLINE => true])
             ->exists();
     }
 
-    public function getUserAvatar() :string {
-        if(isset($this->avatar)) {
+    public function getUserAvatar(): string
+    {
+        if (isset($this->avatar)) {
             if (\Illuminate\Support\Str::startsWith($this->avatar, 'http')) {
                 return $this->avatar;
-            }else{
-                return url('storage/'.$this->avatar) ;
+            } else {
+                return url('storage/' . $this->avatar);
             }
         }
-        return asset('assets/admin/images/svgs/user.svg') ;
+        return asset('assets/admin/images/svgs/user.svg');
+    }
+    public function specialtyTypeName(): string
+    {
+        return  UserSpecialityType::tryFrom($this->specialityType)->getPreName();
     }
 }

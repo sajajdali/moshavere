@@ -26,7 +26,7 @@
                                 </div>
                             </div>
                             <div class="text-center space-y-1">
-                                <h4 class="font-bold text-lg">{{$newDocs == 1 ? 'دکتر' : ''}} {{ $newDocs->full_name }}</h4>
+                                <h4 class="font-bold text-lg">{{$newDocs->specialtyTypeName()}} {{ $newDocs->full_name }}</h4>
                                 <p class="text-secondary-400">{{ $newDocs->DocSpecialities() }}</p>
                             </div>
                         </div>

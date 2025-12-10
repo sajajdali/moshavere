@@ -10,6 +10,7 @@ function showSwalSuccess(title, text) {
     });
 }
 
+
 $(function (e) {
     $('body').on('click', '.delete_confirm_alert', function (e) {
         e.preventDefault();

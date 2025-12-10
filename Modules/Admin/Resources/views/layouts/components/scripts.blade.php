@@ -27,6 +27,7 @@
 
 <!-- CUSTOM JS -->
 <script src="{{ admin_asset('js/custom.js') }}"></script>
+<script src="{{ admin_asset('js/admin.sweetalert.js') }}"></script>
 <script>
     (function($) {
 

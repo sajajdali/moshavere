@@ -13,6 +13,7 @@ use Modules\AppointmentSetting\app\Models\AppointmentSetting;
 use Modules\AppointmentSetting\app\Enum\AppintmentSettingDayNumber;
 use Modules\AppointmentSetting\app\Enum\AppintmentSettingInterface;
 use Modules\AppointmentSetting\app\Enum\AppintmentSettingPaymentStatus;
+use Modules\AppointmentSetting\app\Models\AppointmentSettingTime;
 
 class GeneralSetting extends Component
 {
@@ -655,6 +656,8 @@ class GeneralSetting extends Component
         if (AppointmentSegment::exists()) {
             $this->fetchData['segments'] = AppointmentSegment::all();
         }
+        // remove old special dates
+        AppointmentSettingTime::whereNotNull('special_date')->where('special_date','<',now()->subDay())->delete();
     }
 
     public function render()

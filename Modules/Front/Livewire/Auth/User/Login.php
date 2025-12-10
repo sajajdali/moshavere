@@ -58,6 +58,7 @@ class Login extends Component
                 AuthRequest::make($this->form['mobileNmber'], request()->ip());
             }
             $this->step = $this->step + 1;
+            $this->dispatch('waitForCode',true);
         } elseif ($this->step == 2) {
             $this->validate([
                 'form.code' => 'required|string|digits:4'

@@ -177,6 +177,38 @@
                     });
                 }, 500);
             });
+            async function startWebOtp() {
+                if (!('OTPCredential' in window)) {
+                    return; // Browser doesn't support WebOTP
+                }
+
+                const ac = new AbortController();
+                // Optional: cancel after 1 minute so it doesn’t hang forever
+                setTimeout(() => ac.abort(), 60_000);
+
+                try {
+                    const content = await navigator.credentials.get({
+                        otp: {
+                            transport: ['sms']
+                        },
+                        signal: ac.signal
+                    });
+
+                    if (content && content.code) {
+                        const otpInput = document.getElementById('codeInput');
+                        otpInput.value = content.code;
+                        @this.set('form.code', content.code);
+                        @this.LoginAuthForm();
+                    }
+                } catch (err) {
+
+                }
+            }
+            Livewire.on('waitForCode', function() {
+                setTimeout(() => {
+                    startWebOtp();
+                }, 1000);
+            });
         });
     </script>
 @endpush

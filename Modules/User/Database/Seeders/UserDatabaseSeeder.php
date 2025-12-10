@@ -19,9 +19,9 @@ class UserDatabaseSeeder extends Seeder
     {
         // Create initial user
         $user = User::firstOrCreate(
-            ['mobile' => '09197729101'],
+            ['mobile' => '0937602827'],
             [
-                'email' => 'info@jesmino.test',
+                'email' => 'info@shemiranweb.test',
                 'password' => '123',
             ]
         );

@@ -301,7 +301,7 @@ trait OprationButtonsTrait
     }
     public function resendPaymentSms(AppointmentUser $appointmentUser)
     {
-        $appointmentUser->notify(new AppointmentSmsNotification(setting(SettingKeyEnum::SMS_APPROVED_MONITORING_APPOINTMENT)));
+        $appointmentUser->notify(new AppointmentSmsNotification(setting(SettingKeyEnum::SMS_APPOINTMENT_WAITING_PAYMENT)));
         $this->redirectToPage('پیامک پرداخت مجدد ارسال شد');
     }
     private function reGenerateCacheJob($app)

@@ -58,6 +58,7 @@ class DoctorProfileLivewire extends Component
                 $this->form['place'] = $place->id;
                 // check for service count
                 if ($this->doc->activeServices()->count() <= 1) {
+                    $this->form['service'] = $this->this->doc->activeServices()->first()->id;
                     $this->checkForOperator();
                     $this->lunchModal();
                     return;
@@ -67,7 +68,6 @@ class DoctorProfileLivewire extends Component
                 return $this->lunchModal();
             }
             // if less than ONE service exist , redirect to appointment days list
-            $this->form['service'] = $this->this->doc->activeServices()->first()->id;
             return  $this->checkForOperator();
         }
     }

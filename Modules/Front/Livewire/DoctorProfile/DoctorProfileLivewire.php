@@ -67,6 +67,7 @@ class DoctorProfileLivewire extends Component
                 return $this->lunchModal();
             }
             // if less than ONE service exist , redirect to appointment days list
+            $this->form['service'] = $this->this->doc->activeServices()->first()->id;
             return  $this->checkForOperator();
         }
     }

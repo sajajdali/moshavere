@@ -35,10 +35,11 @@ class DoctorProfileLivewire extends Component
         $this->appointmentType = $type;
         $place   =  data_get($this->form, 'place', null);
         $service =  data_get($this->form, 'service', null);
+        $activePlaceCount = $this->doc->activePlaces()->count() ;
         // check if doctor was not banned
         if ($this->isDocAvailable()) {
             // check for palce count
-            if ($this->doc->activePlaces()->count() > 1) {
+            if ($activePlaceCount > 1) {
                 // check if place has selected in route
                 if ($place) {
                     $this->fetchData['places'] = $this->doc->activePlaces();
@@ -51,7 +52,7 @@ class DoctorProfileLivewire extends Component
                     }
                 }
                 return  $this->lunchModal();
-            } elseif ($this->doc->activePlaces()->count() <= 1) {
+            } elseif ($activePlaceCount <= 1) {
                 // if ONE place exist
                 $place = $this->doc->activePlaces()->first();
                 $this->form['place_name'] = $place->title;
@@ -60,7 +61,6 @@ class DoctorProfileLivewire extends Component
                 if ($this->doc->activeServices()->count() <= 1) {
                     $this->form['service'] = $this->doc->activeServices()->first()->id;
                     $this->checkForOperator();
-                    $this->lunchModal();
                     return;
                 }
                 $this->fetchData['services'] = $this->doc->activeServices();
@@ -172,6 +172,7 @@ class DoctorProfileLivewire extends Component
             $operator = $this->fetchData['operators'] = AppointmentSetting::findOperators($app_setting);
             if (count($this->fetchData['operators']) > 1) {
                 $this->fetchData['modalStep'] = 3;
+                $this->lunchModal();
                 return;
             }
             $operator = $operator->first();

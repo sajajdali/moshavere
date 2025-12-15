@@ -2,19 +2,25 @@
 
 namespace Modules\AppointmentUser\app\Http\Controllers;
 
-use App\Http\Controllers\Controller;
+use Response;
 use Carbon\Carbon;
-use Hekmatinasser\Verta\Verta;
 use Illuminate\Http\Request;
+use Hekmatinasser\Verta\Verta;
+use Modules\Place\app\Models\Place;
+use App\Http\Controllers\Controller;
+use Modules\Setting\Enum\SettingKeyEnum;
 use Modules\AppointmentUser\app\Models\AppointmentUser;
 use Modules\AppointmentUser\Enum\AppointmentUserStatusEnum;
-use Modules\Place\app\Models\Place;
-use Response;
 
 class LogExportController extends Controller
 {
     private  function generateTrackingUuid($id, $trackingCode)
     {
+        $isApiActive = setting(SettingKeyEnum::ACTIVE_API) ?? false;
+        if (! $isApiActive) {
+            return abort(401);
+        }
+
         // ترکیب داده‌ها
         $combined = $id . '-' . $trackingCode;
 
@@ -36,7 +42,7 @@ class LogExportController extends Controller
     public function exportAppointmentsLog(Request $request)
     {
         $lastUpdate = $request->input('last_update');
-        $date = $request->has('date') ? Verta::parse( $request->input('date'))->toCarbon() : null;
+        $date = $request->has('date') ? Verta::parse($request->input('date'))->toCarbon() : null;
         $result = [
             'last_update' => (int) ($request->has('last_update') ? $request->get('last_update') : time()),
             'offices' => [],
@@ -48,9 +54,9 @@ class LogExportController extends Controller
         }])->chunk(50, function ($places) use (&$result, $lastUpdate, $date) {
             foreach ($places as $place) {
                 $office = [
-                    'id' =>(int) $place->id,
+                    'id' => (int) $place->id,
                     'name' => isset($place->title) ? (string) $place->title : null,
-                    'address' =>isset($place->title) ? (string) $place->detail['address'] : '',
+                    'address' => isset($place->title) ? (string) $place->detail['address'] : '',
                     'longitude' => isset($place->detail['location_lng'])  ?  ((float) $place->detail['location_lng'])  : null,
                     'latitude' => isset($place->detail['location_lat'])  ?  ((float) $place->detail['location_lat'])  : null,
                     'insurance' => (string) '',
@@ -94,7 +100,7 @@ class LogExportController extends Controller
                         $appointmentsQuery = $doctor->doctorAppointments()
                             ->where('place_id', $place->id)
                             ->where('service_id', $service->id)
-                            ->whereIn('status', [AppointmentUserStatusEnum::STATUS_SUCCESSFUL , AppointmentUserStatusEnum::STATUS_NOT_ATTENDED, AppointmentUserStatusEnum::STATUS_ATTENDED])
+                            ->whereIn('status', [AppointmentUserStatusEnum::STATUS_SUCCESSFUL, AppointmentUserStatusEnum::STATUS_NOT_ATTENDED, AppointmentUserStatusEnum::STATUS_ATTENDED])
                             ->with(['user', 'transaction']);
 
                         if ($date) {
@@ -126,19 +132,19 @@ class LogExportController extends Controller
                                 'assistant' => null,
                                 'for_self' => $appointment->for_self,
                                 'start_time' => [
-//                                    'timestamp' => strtotime("{$appointment->date_visit} {$appointment->start_time}"),
+                                    //                                    'timestamp' => strtotime("{$appointment->date_visit} {$appointment->start_time}"),
                                     'clock_type' => verta($appointment->date_visit)->hour < 13 ? 'قبل از ظهر' : 'بعد از ظهر',
                                     'time_beauty' => $appointment->start_time,
                                     'date_beauty' => verta($appointment->date_visit)->format('Y/m/d'),
                                 ],
                                 'end_time' => [
-//                                    'timestamp' => strtotime("{$appointment->date_visit} {$appointment->end_time}"),
+                                    //                                    'timestamp' => strtotime("{$appointment->date_visit} {$appointment->end_time}"),
                                     'clock_type' => verta($appointment->date_visit)->hour < 13 ? 'قبل از ظهر' : 'بعد از ظهر',
                                     'time_beauty' => $appointment->end_time,
                                     'date_beauty' => verta($appointment->date_visit)->format('Y/m/d'),
                                 ],
                                 'created_at' => [
-//                                    'timestamp' => $appointment->created_at->timestamp,
+                                    //                                    'timestamp' => $appointment->created_at->timestamp,
                                     'clock_type' => verta($appointment->date_visit)->hour < 13 ? 'قبل از ظهر' : 'بعد از ظهر',
                                     'time_beauty' => $appointment->created_at->format('H:i'),
                                     'date_beauty' => verta($appointment->created_at)->format('Y/m/d'),
@@ -188,13 +194,13 @@ class LogExportController extends Controller
                                 'online_call_options' => [],
                                 'code' => $appointment->code ?? null,
                                 'appointment_via' => [
-                                    'title' =>'',
+                                    'title' => '',
                                     'value' => $appointment->detail['APPOINTMENT_VIA'] ?? 3
                                 ],
                                 'survey' => [
                                     'score' => $appointment->detail['SURVEY']['SURVEY'] ?? null,
                                     'file' => isset($appointment->detail['SURVEY']['SURVEY_FEEDBACK_FILE']) && $appointment->detail['SURVEY']['SURVEY_FEEDBACK_FILE'] != ''
-                                        ? url('uploads/voip/'.$appointment->detail['SURVEY']['SURVEY_FEEDBACK_FILE'])
+                                        ? url('uploads/voip/' . $appointment->detail['SURVEY']['SURVEY_FEEDBACK_FILE'])
                                         : null
                                 ],
                             ];

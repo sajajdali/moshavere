@@ -16,7 +16,7 @@ use Livewire\Features\SupportFileUploads\WithFileUploads;
 
 class CreateOrUpdate extends Component
 {
-    use WithFileUploads , UploadFile;
+    use WithFileUploads, UploadFile;
 
     protected $filePath = 'service';
 
@@ -46,12 +46,12 @@ class CreateOrUpdate extends Component
     public function createOrUpdateSection()
     {
         $this->validate();
-        if(! app()->environment('local')){
+        if (! app()->environment('local')) {
             Cache::forget('most_viewed_service');
         }
         //data for update Or create Service
-        $parentId = null ;
-        if(isset($this->form['parent'])) {
+        $parentId = null;
+        if (isset($this->form['parent'])) {
             $parentId = $this->form['parent'] == 0 || null ? null : $this->form['parent'];
         }
         $active = $this->form['active'] == 'true' ? 1 : 0;
@@ -134,6 +134,7 @@ class CreateOrUpdate extends Component
     public function mount()
     {
         $service = request()->route('service');
+        $this->fetchdata['services'] = Service::whereNull('parent_id')->get();
         if ($service instanceof Service) {
             $this->service           =  $service;
             $this->isEdited          = true;
@@ -141,7 +142,7 @@ class CreateOrUpdate extends Component
 
             //  load  image
             $this->photo = $service->icon;
-            $path = $service->icon ;
+            $path = $service->icon;
             if ($path) {
                 $this->uploadedPhotoUrl = Storage::disk('tenant')->url($path);
                 $this->uploadedFileName = basename($path);
@@ -149,6 +150,9 @@ class CreateOrUpdate extends Component
             } else {
                 $this->uploadedPhotoUrl = null;
             }
+            $this->fetchdata['services'] = $this->fetchdata['services']->filter(function ($item) use ($service) {
+                return $item->id !== $service->id; // Compare the IDs of the models
+            });
         } else {
             $this->form['priority']      = Service::maxPriority();
             $this->form['active']        = 'true';
@@ -157,7 +161,6 @@ class CreateOrUpdate extends Component
 
 
         $this->fetchdata['doctors']  = User::doctors();
-        $this->fetchdata['services'] = Service::whereNull('parent_id')->get();
         $this->fetchdata['places']   = Place::active()->get();
     }
     public function render()

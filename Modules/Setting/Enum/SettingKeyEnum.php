@@ -102,6 +102,12 @@ enum SettingKeyEnum: int implements EnumHasNameInterface, SettingTypeInterface, 
     case  SMS_FOR_SEND_MESSAGE_IN_CHATS = 76;
     case  SMS_SET_APP_MONITORING = 77;
     case  CALL_LOGIN_TEMPLATE = 78;
+    case SMS_PARSSMS_SENDER_NUMBER =  85;
+    case SMS_PARSSMS_LOGIN_TEXT = 80 ;
+    case SMS_PARSSMS_ADD_APPOINTMENT_TEXT = 81 ;
+    case SMS_PARSSMS_EDIT_APPOINTMENT_TEXT = 82 ;
+    case SMS_PARSSMS_CANCEL_APPOINTMENT_TEXT = 83 ;
+    case SMS_PARSSMS_REMINDER_TEXT = 84 ;
 
         //payment
     case PAYMENT_PAYSTAR_STATUS = 152;
@@ -247,6 +253,14 @@ enum SettingKeyEnum: int implements EnumHasNameInterface, SettingTypeInterface, 
             self::SMS_FEEDBACK => 'پیامک ارسال نظر سنجی به کاربر، بعد از ثبت حضور کاربر',
             self::CALL_LOGIN_TEMPLATE => 'الگوی تماس برای ورود کاربر',
 
+            // PARS SMS
+            self::SMS_PARSSMS_LOGIN_TEXT => 'متن پیامک ورود',
+            self::SMS_PARSSMS_ADD_APPOINTMENT_TEXT => 'متن پیامک بعد از دریافت نوبت موفق',
+            self::SMS_PARSSMS_EDIT_APPOINTMENT_TEXT => 'متن پیامک ارسالی بعد از ویرایش نوبت',
+            self::SMS_PARSSMS_CANCEL_APPOINTMENT_TEXT => 'متن پیامک ارسالی بعد از کنسل کردن نوبت',
+            self::SMS_PARSSMS_REMINDER_TEXT => 'متن پیامک ارسالی برای یادآوری نوبت',
+            self::SMS_PARSSMS_SENDER_NUMBER => 'شماره ارسال پیامک در پنل',
+
             // voip
             self::VOIP_USERNAME => 'نام کاربری برای API ',
             self::VOIP_PASSWORD => 'کلمه عبور برای API ',
@@ -309,6 +323,15 @@ enum SettingKeyEnum: int implements EnumHasNameInterface, SettingTypeInterface, 
             self::FOOTER_ENAMAD => 'ادرس url فقط درج شود نه تگ کامل ',
             self::FOOTER_SAMANDEHI => 'ادرس url فقط درج شود نه تگ کامل ',
             self::SMS_SENDER => 'دیفالت بر روی shsms میباشد',
+            self::SMS_PARSSMS_LOGIN_TEXT => 'شامل یک پارامتر که کد ارسالی است میباشد.',
+            self::SMS_PARSSMS_ADD_APPOINTMENT_TEXT => 'پارامتر های قابل قرار گیری: <br />  ۱ = نام کاربر
+             <br/> ۲ = نام خانوادگی کاربر
+             <br/> ۳ = نام پزشک
+             <br/> ۴ = نام بخش
+             <br/> ۵ = تاریخ نوبت
+             <br/> ۶ = ساعت نوبت
+             <br/> ۷ = لینک جزئیات
+             <br/> ۸ = شماره پیگیری.',
             default => ''
         };
     }
@@ -382,12 +405,12 @@ enum SettingKeyEnum: int implements EnumHasNameInterface, SettingTypeInterface, 
             self::ABOUT_US_FOURTH_SECTION_DESCRIPTION => SettingTypeEnum::TEXTAREA,
             self::APP_FULL_APPOINTMENT_BODY => SettingTypeEnum::TEXTAREA,
             self::APPOINTMENT_GALLERY_BODY, self::FOOTER_ENAMAD ,  self::FOOTER_SAMANDEHI => SettingTypeEnum::TEXTAREA,
+            self::SMS_PARSSMS_LOGIN_TEXT, self::SMS_PARSSMS_EDIT_APPOINTMENT_TEXT , self::SMS_PARSSMS_ADD_APPOINTMENT_TEXT, self::SMS_PARSSMS_CANCEL_APPOINTMENT_TEXT ,self::SMS_PARSSMS_REMINDER_TEXT => SettingTypeEnum::TEXTAREA,
             self::APPOINTMENT_ONLINE_DESCRPTION => SettingTypeEnum::TEXTAREA,
             self::UI_NOW_SHOW_SEARCH_BAR , self::ACTIVE_API, self::ENABLE_CITY_SEARCH , self::ENABLE_LATEST_DOCTORS , self::ENABLE_HOME_FAQ , self::MOST_VIEWED_SECTIONS_ICONS_VIEW, self::ENABLE_MOST_VIEWED_SECTIONS , self::ENABLE_DOCTOR_REGISTRATION , self::SHOW_FLOATING_SOCIAL_ICONS , self::DISABLE_FOOTER_DISPLAY=> SettingTypeEnum::CHECK,
             default => SettingTypeEnum::TEXT
         };
     }
-
     /**
      * Radio, select and checkbox options
      */
@@ -402,6 +425,7 @@ enum SettingKeyEnum: int implements EnumHasNameInterface, SettingTypeInterface, 
             self::SMS_SENDER => [
                 'shsms' => 'shsms',
                 'ghasedak' => 'ghasedak',
+                'parsasms' => 'parsasms',
             ],
             self::SUPPORT_USER_ROLE => User::adminSupportRoles(),
             self::PAYMEN_ACTIVE_DRIVER => ['zrinpal' => 'zrinpal','parsian'=> 'parsian'],

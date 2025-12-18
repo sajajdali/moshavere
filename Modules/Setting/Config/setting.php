@@ -27,6 +27,19 @@ $setting = [
 
         ],
     ],
+    'parssms' => [
+        'title' => 'متن های پیامک پارس',
+        'icon' => 'fa fa-envelope-o',
+        'disable_ui' => disableUi(),
+        'settings' => [
+            \Modules\Setting\Enum\SettingKeyEnum::SMS_PARSSMS_SENDER_NUMBER ,
+            \Modules\Setting\Enum\SettingKeyEnum::SMS_PARSSMS_LOGIN_TEXT ,
+            \Modules\Setting\Enum\SettingKeyEnum::SMS_PARSSMS_ADD_APPOINTMENT_TEXT ,
+            \Modules\Setting\Enum\SettingKeyEnum::SMS_PARSSMS_EDIT_APPOINTMENT_TEXT,
+            \Modules\Setting\Enum\SettingKeyEnum::SMS_PARSSMS_CANCEL_APPOINTMENT_TEXT,
+            \Modules\Setting\Enum\SettingKeyEnum::SMS_PARSSMS_REMINDER_TEXT,
+        ],
+    ],
     'website' => [
         'title' => 'تنظمات وبسایت',
         'icon' => 'fa fa-globe',

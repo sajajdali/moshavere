@@ -32,11 +32,30 @@ class SmsChannel
      */
     public function send($notifiable, Notification $notification): void
     {
-        $senderDriver = setting(SettingKeyEnum::SMS_SENDER);
-        $data = $notification->toArray($notifiable);
+        $settingCollection = \Modules\Setting\Entities\Setting::whereIn('setting_key', [
+            SettingKeyEnum::SMS_SENDER,
+            SettingKeyEnum::SMS_PARSSMS_SENDER_NUMBER,
+            SettingKeyEnum::SMS_API_TOKEN,
+            SettingKeyEnum::SMS_PARSSMS_LOGIN_TEXT,
+            SettingKeyEnum::SMS_PARSSMS_ADD_APPOINTMENT_TEXT,
+            SettingKeyEnum::SMS_PARSSMS_EDIT_APPOINTMENT_TEXT,
+            SettingKeyEnum::SMS_PARSSMS_CANCEL_APPOINTMENT_TEXT,
+            SettingKeyEnum::SMS_PARSSMS_REMINDER_TEXT,
+            SettingKeyEnum::SMS_API_LOGIN_TEMPLATE,               //login
+            SettingKeyEnum::SMS_APPOINTMENT_RECEIVING_SUCCESSFUL, //get app
+            SettingKeyEnum::SMS_APPOINTMENT_TIME_UPDATE,          //edit app
+            SettingKeyEnum::SMS_APPOINTMENT_CANCEL,               //cancel app
+
+        ])->get();
+        $apiToken     = $this->getSettingValue($settingCollection, SettingKeyEnum::SMS_API_TOKEN);
+        $senderDriver = $this->getSettingValue($settingCollection, SettingKeyEnum::SMS_SENDER);
+        $smsSandbox   = env('SMS_SEND_SANDBOX');
+        $data         = $notification->toArray($notifiable);
+        if ($senderDriver == 'parsasms') {
+            $this->sendWithParsSms($apiToken, $data, $settingCollection);
+            return;
+        }
         if (isset($data['template']) && !empty($data['template'])) {
-            $smsSandbox = env('SMS_SEND_SANDBOX');
-            $apiToken = setting(SettingKeyEnum::SMS_API_TOKEN);
             //data should have receptor and template and at least one params
             if (
                 $smsSandbox !== true && $apiToken != ''
@@ -89,5 +108,64 @@ class SmsChannel
         } catch (\Throwable $th) {
             Log::error('shsms has issue: ' .  $th->getMessage());
         }
+    }
+    private function sendWithParsSms($apiToken, $data, $settings): void
+    {
+        try {
+            $findSmsText =  $this->findSmsText($data['template'], $settings);
+            $finalText = $this->paramToText($findSmsText, $data['params']);
+            $r = \Illuminate\Support\Facades\Http::withHeader('apiKey', $apiToken)
+                ->post('http://api.ghasedaksms.com/v2/sms/send/simple', [
+                    'sender' => $this->getSettingValue($settings, SettingKeyEnum::SMS_PARSSMS_SENDER_NUMBER),
+                    'message' => $finalText,
+                    'receptor' => $data['receptor'],
+                ]);
+            // Log::info('Response Status Code: ' . $r->status());
+            Log::info('Response Body: ' . $r->getBody()->getContents());
+        } catch (\Exception $e) {
+            Log::error('pars sms send error', [
+                'error message' => $e->getMessage(),
+                'error line' => $e->getTrace(),
+            ]);
+        }
+        return;
+    }
+    private function getSettingValue($settingCollection, $settingKey)
+    {
+        return $settingCollection->firstWhere('setting_key', $settingKey)?->setting_value;
+    }
+    private function findSmsText($template, $settings)
+    {
+        return match ($template) {
+            $this->getSettingValue($settings, SettingKeyEnum::SMS_API_LOGIN_TEMPLATE)                => $this->getSettingValue($settings, SettingKeyEnum::SMS_PARSSMS_LOGIN_TEXT),
+            $this->getSettingValue($settings, SettingKeyEnum::SMS_APPOINTMENT_RECEIVING_SUCCESSFUL)  => $this->getSettingValue($settings, SettingKeyEnum::SMS_PARSSMS_ADD_APPOINTMENT_TEXT),
+            $this->getSettingValue($settings, SettingKeyEnum::SMS_APPOINTMENT_TIME_UPDATE)           => $this->getSettingValue($settings, SettingKeyEnum::SMS_PARSSMS_EDIT_APPOINTMENT_TEXT),
+            $this->getSettingValue($settings, SettingKeyEnum::SMS_APPOINTMENT_CANCEL)                => $this->getSettingValue($settings, SettingKeyEnum::SMS_PARSSMS_CANCEL_APPOINTMENT_TEXT),
+        };
+    }
+
+    public function paramToText($msg, $params)
+    {
+        $ss                 = $this->changeSmsParameters($params);
+        $final_mesg         = $this->computeSms($msg, $ss);
+        return $final_mesg;
+    }
+    private function changeSmsParameters($params)
+    {
+        if (! is_array($params) || $params === []) {
+            return $params;
+        }
+        $newParams = [];
+        foreach ($params as $index => $param) {
+            $newParams['%param' . ($index + 1) . '%'] = $param;
+        }
+        return $newParams;
+    }
+    private function computeSms(string $message, array $params)
+    {
+        if ($params === []) {
+            return $message;
+        }
+        return strtr($message, $params);
     }
 }

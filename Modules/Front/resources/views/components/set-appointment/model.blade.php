@@ -1,6 +1,6 @@
 <section class="appointment__modal max-h-min" wire:ignore.self>
     <header class="appointment__modal-header  ">
-        @if ($fetchData['modalStep'] == 2)
+        {{-- @if ($fetchData['modalStep'] == 2)
             @isset($fetchData['segments'])
                 <button type="button" wire:click='editservice'
                     class="bg-white hover:bg-sky-100 hover:text-gray-700 border-2 border-blue-100 text-sky-400 flex items-center py-3 px-5 rounded-xl gap-3">
@@ -12,9 +12,9 @@
                     <span>ویرایش مطب</span>
                 </button>
             @endisset
-        @elseif($fetchData['modalStep'] == 1)
+        @elseif($fetchData['modalStep'] == 1) --}}
             <span></span>
-        @endif
+        {{-- @endif --}}
         @if ($fetchData['modalStep'] == 3)
             <button type="button" wire:click='editservice'
                 class="bg-white hover:bg-sky-100 hover:text-gray-700 border-2 border-blue-100 text-sky-400 flex items-center py-3 px-5 rounded-xl gap-3">

@@ -35,7 +35,7 @@ class DoctorProfileLivewire extends Component
         $this->appointmentType = $type;
         $place   =  data_get($this->form, 'place', null);
         $service =  data_get($this->form, 'service', null);
-        $activePlaceCount = $this->doc->activePlaces()->count() ;
+        $activePlaceCount = $this->doc->activePlaces()->count();
         // check if doctor was not banned
         if ($this->isDocAvailable()) {
             // check for palce count
@@ -121,6 +121,14 @@ class DoctorProfileLivewire extends Component
     protected function lvlTwoModal($place, $service)
     {
         $segmentIds = data_get($this->form, 'segment', null);
+        if ($this->fetchData['segments']->isNotEmpty() && is_null($segmentIds)) {
+            $this->dispatch('swalError', msg: 'لطفا ناحیه مورد نظر خود را انتخاب کنید');
+            return;
+        }
+        if(count(array_filter($segmentIds)) == 0){
+            $this->dispatch('swalError', msg: 'لطفا ناحیه مورد نظر خود را انتخاب کنید');
+            return;
+        }
         if (! is_null($segmentIds)) {
             if (count($segmentIds) > 1) {
                 foreach ($segmentIds as $segmentId => $status) {
@@ -129,7 +137,7 @@ class DoctorProfileLivewire extends Component
                     }
                 }
             } else {
-                $this->form['selectedSegmentForRoute'] = $segmentIds;
+                $this->form['selectedSegmentForRoute'] = [array_key_first($segmentIds)];
             }
             $this->checkForOperator();
         } else {

@@ -65,11 +65,11 @@ class ServiceAndPlaceModal extends Component
         if ($this->step == 1) {
             $query = Place::when(isset($this->search) && !empty($this->search), function ($query) {
                 return $query->where('title', 'LIKE', "%{$this->search}%");
-            })->take(10)->get();
+            })->get();
         } else {
-            $query = $this->doctor->service()->when(isset($this->search) && !empty($this->search), function ($query) {
+            $query = $this->doctor->service()->active()->when(isset($this->search) && !empty($this->search), function ($query) {
                 return $query->where('title', 'LIKE', "%{$this->search}%");
-            })->get()->take(10);
+            })->get();
         }
         return $query;
     }

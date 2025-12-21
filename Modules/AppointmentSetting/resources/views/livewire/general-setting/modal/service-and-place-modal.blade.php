@@ -1,6 +1,6 @@
 <div class="modal fade" id="ServiceAndPlaceModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
     wire:ignore.self aria-labelledby="staticBackdropLabel" aria-hidden="true">
-    <div class="modal-dialog">
+    <div class="modal-dialog modal-xl overflow-scroll">
         <div class="modal-content">
             <div class="modal-header">
                 @if (isset($search))
@@ -35,7 +35,7 @@
                     </div>
                     <div class="row" wire:loading.remove>
                         @foreach ($ServiceOrPlace as $place)
-                            <div class="col-md-6">
+                            <div class="col-md-4">
                                 <div class="card">
                                     <div class="card-body">
                                         <a href="#" wire:click="showRelatedSection({{ $place->id }})">
@@ -49,17 +49,17 @@
                     </div>
                 @elseif($step == 2)
                     <div class="row">
-                        @foreach ($ServiceOrPlace as $key => $service)
-                            <div class="col-md-6">
-                                <div class="card">
-                                    <div class="card-body">
-                                        <a href="#" wire:click='selectSection({{ $service->id }})'>
-                                            <span style="font-size: medium">{{ $service->title }}</span>
-                                        </a>
+                            @foreach ($ServiceOrPlace as $key => $service)
+                                <div class="col-sm-6  col-md-4 col-xl-3">
+                                    <div class="card">
+                                        <div class="card-body">
+                                            <a href="#" wire:click='selectSection({{ $service->id }})'>
+                                                <span style="font-size: medium">{{ $service->title }}</span>
+                                            </a>
+                                        </div>
                                     </div>
                                 </div>
-                            </div>
-                        @endforeach
+                            @endforeach
                     </div>
                 @endif
             </div>

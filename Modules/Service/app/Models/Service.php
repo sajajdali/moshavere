@@ -100,7 +100,7 @@ class Service extends Model
             return $query->get();
         } else {
             return Cache::remember($cacheKey, 60 * 60, function () use ($query) {
-                return $query->get();
+                return $query->orderBy('priority')->get();
             });
         }
     }

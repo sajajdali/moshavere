@@ -137,13 +137,17 @@ class SmsChannel
     private function findSmsText($template, $settings)
     {
         return match ($template) {
-            $this->getSettingValue($settings, SettingKeyEnum::SMS_API_LOGIN_TEMPLATE)                => $this->getSettingValue($settings, SettingKeyEnum::SMS_PARSSMS_LOGIN_TEXT),
-            $this->getSettingValue($settings, SettingKeyEnum::SMS_APPOINTMENT_RECEIVING_SUCCESSFUL)  => $this->getSettingValue($settings, SettingKeyEnum::SMS_PARSSMS_ADD_APPOINTMENT_TEXT),
-            $this->getSettingValue($settings, SettingKeyEnum::SMS_APPOINTMENT_TIME_UPDATE)           => $this->getSettingValue($settings, SettingKeyEnum::SMS_PARSSMS_EDIT_APPOINTMENT_TEXT),
-            $this->getSettingValue($settings, SettingKeyEnum::SMS_APPOINTMENT_CANCEL)                => $this->getSettingValue($settings, SettingKeyEnum::SMS_PARSSMS_CANCEL_APPOINTMENT_TEXT),
+            $this->getSettingValue($settings, SettingKeyEnum::SMS_API_LOGIN_TEMPLATE)                  => $this->getSettingValue($settings, SettingKeyEnum::SMS_PARSSMS_LOGIN_TEXT),
+            $this->getSettingValue($settings, SettingKeyEnum::SMS_APPOINTMENT_RECEIVING_SUCCESSFUL)    => $this->getSettingValue($settings, SettingKeyEnum::SMS_PARSSMS_ADD_APPOINTMENT_TEXT),
+            $this->getSettingValue($settings, SettingKeyEnum::SMS_APPOINTMENT_TIME_UPDATE)             => $this->getSettingValue($settings, SettingKeyEnum::SMS_PARSSMS_EDIT_APPOINTMENT_TEXT),
+            $this->getSettingValue($settings, SettingKeyEnum::SMS_APPOINTMENT_CANCEL)                  => $this->getSettingValue($settings, SettingKeyEnum::SMS_PARSSMS_CANCEL_APPOINTMENT_TEXT),
+            $this->getSettingValue($settings, SettingKeyEnum::SMS_SET_APP_MONITORING)                  => $this->getSettingValue($settings, SettingKeyEnum::SMS_PRRSSMS_MONITORING_APP),
+            $this->getSettingValue($settings, SettingKeyEnum::SMS_APPROVED_MONITORING_APPOINTMENT)     => $this->getSettingValue($settings, SettingKeyEnum::SMS_PARSSMS_MONITORING_APPROVED_APP),
+            $this->getSettingValue($settings, SettingKeyEnum::SMS_DIS_APPROVED_MONITORING_APPOINTMENT) => $this->getSettingValue($settings, SettingKeyEnum::SMS_PARSSMS_MONITORING_DIS_APPROVED_APP),
             default => '',
         };
     }
+
 
     public function paramToText($msg, $params)
     {

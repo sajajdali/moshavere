@@ -38,6 +38,9 @@ $setting = [
             \Modules\Setting\Enum\SettingKeyEnum::SMS_PARSSMS_EDIT_APPOINTMENT_TEXT,
             \Modules\Setting\Enum\SettingKeyEnum::SMS_PARSSMS_CANCEL_APPOINTMENT_TEXT,
             \Modules\Setting\Enum\SettingKeyEnum::SMS_PARSSMS_REMINDER_TEXT,
+            \Modules\Setting\Enum\SettingKeyEnum::SMS_PRRSSMS_MONITORING_APP,
+            \Modules\Setting\Enum\SettingKeyEnum::SMS_PARSSMS_MONITORING_APPROVED_APP,
+            \Modules\Setting\Enum\SettingKeyEnum::SMS_PARSSMS_MONITORING_DIS_APPROVED_APP,
         ],
     ],
     'website' => [

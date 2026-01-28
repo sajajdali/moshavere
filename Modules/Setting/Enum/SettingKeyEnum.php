@@ -108,6 +108,10 @@ enum SettingKeyEnum: int implements EnumHasNameInterface, SettingTypeInterface, 
     case SMS_PARSSMS_EDIT_APPOINTMENT_TEXT = 82 ;
     case SMS_PARSSMS_CANCEL_APPOINTMENT_TEXT = 83 ;
     case SMS_PARSSMS_REMINDER_TEXT = 84 ;
+    case SMS_PRRSSMS_MONITORING_APP = 86 ;
+    case SMS_PARSSMS_MONITORING_APPROVED_APP = 87 ;
+    case SMS_PARSSMS_MONITORING_DIS_APPROVED_APP = 89 ;
+
 
         //payment
     case PAYMENT_PAYSTAR_STATUS = 152;
@@ -260,6 +264,9 @@ enum SettingKeyEnum: int implements EnumHasNameInterface, SettingTypeInterface, 
             self::SMS_PARSSMS_CANCEL_APPOINTMENT_TEXT => 'متن پیامک ارسالی بعد از کنسل کردن نوبت',
             self::SMS_PARSSMS_REMINDER_TEXT => 'متن پیامک ارسالی برای یادآوری نوبت',
             self::SMS_PARSSMS_SENDER_NUMBER => 'شماره ارسال پیامک در پنل',
+            self::SMS_PRRSSMS_MONITORING_APP => 'متن نوبت های در انتظار پایش',
+            self::SMS_PARSSMS_MONITORING_APPROVED_APP => 'متن پیامک بعد از تایید نوبت های پایش نوبت',
+            self::SMS_PARSSMS_MONITORING_DIS_APPROVED_APP => 'متن پیامک بعد از رد نوبت های پایش نوبت',
 
             // voip
             self::VOIP_USERNAME => 'نام کاربری برای API ',

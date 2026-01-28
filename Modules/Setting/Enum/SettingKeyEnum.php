@@ -405,6 +405,8 @@ enum SettingKeyEnum: int implements EnumHasNameInterface, SettingTypeInterface, 
             self::FOOTER_DESCRIPTION => SettingTypeEnum::TEXTAREA,
             self::APPOINTMENT_DETAIL_PAYMENT_DESCRIPTION_TEXT => SettingTypeEnum::TEXTAREA,
 
+    
+            self::SMS_PRRSSMS_MONITORING_APP,self::SMS_PARSSMS_MONITORING_APPROVED_APP,self::SMS_PARSSMS_MONITORING_DIS_APPROVED_APP => SettingTypeEnum::TEXTAREA,
             self::ONILNE_SEND_ATUOMATIC_MESSAGE_MESSAGE => SettingTypeEnum::TEXTAREA,
             self::ABOUT_US_FIRST_SECTION_DESCRIPTION => SettingTypeEnum::TEXTAREA,
             self::ABOUT_US_SECEND_SECTION_DESCRIPTION => SettingTypeEnum::TEXTAREA,

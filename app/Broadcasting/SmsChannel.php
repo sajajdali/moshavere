@@ -141,6 +141,7 @@ class SmsChannel
             $this->getSettingValue($settings, SettingKeyEnum::SMS_APPOINTMENT_RECEIVING_SUCCESSFUL)  => $this->getSettingValue($settings, SettingKeyEnum::SMS_PARSSMS_ADD_APPOINTMENT_TEXT),
             $this->getSettingValue($settings, SettingKeyEnum::SMS_APPOINTMENT_TIME_UPDATE)           => $this->getSettingValue($settings, SettingKeyEnum::SMS_PARSSMS_EDIT_APPOINTMENT_TEXT),
             $this->getSettingValue($settings, SettingKeyEnum::SMS_APPOINTMENT_CANCEL)                => $this->getSettingValue($settings, SettingKeyEnum::SMS_PARSSMS_CANCEL_APPOINTMENT_TEXT),
+            default => '',
         };
     }
 

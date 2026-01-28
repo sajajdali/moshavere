@@ -41,6 +41,7 @@ $setting = [
             \Modules\Setting\Enum\SettingKeyEnum::SMS_PRRSSMS_MONITORING_APP,
             \Modules\Setting\Enum\SettingKeyEnum::SMS_PARSSMS_MONITORING_APPROVED_APP,
             \Modules\Setting\Enum\SettingKeyEnum::SMS_PARSSMS_MONITORING_DIS_APPROVED_APP,
+            \Modules\Setting\Enum\SettingKeyEnum::SMS_PRSSMS_APPOINTMENT_WAITING_PAYMENT,
         ],
     ],
     'website' => [

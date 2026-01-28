@@ -111,6 +111,7 @@ enum SettingKeyEnum: int implements EnumHasNameInterface, SettingTypeInterface, 
     case SMS_PRRSSMS_MONITORING_APP = 86 ;
     case SMS_PARSSMS_MONITORING_APPROVED_APP = 87 ;
     case SMS_PARSSMS_MONITORING_DIS_APPROVED_APP = 89 ;
+    case SMS_PRSSMS_APPOINTMENT_WAITING_PAYMENT = 91 ;
 
 
         //payment
@@ -267,6 +268,7 @@ enum SettingKeyEnum: int implements EnumHasNameInterface, SettingTypeInterface, 
             self::SMS_PRRSSMS_MONITORING_APP => 'متن نوبت های در انتظار پایش',
             self::SMS_PARSSMS_MONITORING_APPROVED_APP => 'متن پیامک بعد از تایید نوبت های پایش نوبت',
             self::SMS_PARSSMS_MONITORING_DIS_APPROVED_APP => 'متن پیامک بعد از رد نوبت های پایش نوبت',
+            self::SMS_PRSSMS_APPOINTMENT_WAITING_PAYMENT => 'متن پیامک در انتظار پرداخت',
 
             // voip
             self::VOIP_USERNAME => 'نام کاربری برای API ',
@@ -405,8 +407,9 @@ enum SettingKeyEnum: int implements EnumHasNameInterface, SettingTypeInterface, 
             self::FOOTER_DESCRIPTION => SettingTypeEnum::TEXTAREA,
             self::APPOINTMENT_DETAIL_PAYMENT_DESCRIPTION_TEXT => SettingTypeEnum::TEXTAREA,
 
-    
+
             self::SMS_PRRSSMS_MONITORING_APP,self::SMS_PARSSMS_MONITORING_APPROVED_APP,self::SMS_PARSSMS_MONITORING_DIS_APPROVED_APP => SettingTypeEnum::TEXTAREA,
+            self::SMS_PRSSMS_APPOINTMENT_WAITING_PAYMENT => SettingTypeEnum::TEXTAREA,
             self::ONILNE_SEND_ATUOMATIC_MESSAGE_MESSAGE => SettingTypeEnum::TEXTAREA,
             self::ABOUT_US_FIRST_SECTION_DESCRIPTION => SettingTypeEnum::TEXTAREA,
             self::ABOUT_US_SECEND_SECTION_DESCRIPTION => SettingTypeEnum::TEXTAREA,

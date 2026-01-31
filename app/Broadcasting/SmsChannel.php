@@ -121,7 +121,6 @@ class SmsChannel
     {
         try {
             $findSmsText =  $this->findSmsText($data['template'], $settings);
-            dd($findSmsText);
             $finalText = $this->paramToText($findSmsText, $data['params']);
             $r = \Illuminate\Support\Facades\Http::withHeader('apiKey', $apiToken)
                 ->post('http://api.ghasedaksms.com/v2/sms/send/simple', [

@@ -45,6 +45,14 @@ class SmsChannel
             SettingKeyEnum::SMS_APPOINTMENT_RECEIVING_SUCCESSFUL, //get app
             SettingKeyEnum::SMS_APPOINTMENT_TIME_UPDATE,          //edit app
             SettingKeyEnum::SMS_APPOINTMENT_CANCEL,               //cancel app
+            SettingKeyEnum::SMS_PRRSSMS_MONITORING_APP,
+            SettingKeyEnum::SMS_PARSSMS_MONITORING_APPROVED_APP,
+            SettingKeyEnum::SMS_PARSSMS_MONITORING_DIS_APPROVED_APP,
+            SettingKeyEnum::SMS_PRSSMS_APPOINTMENT_WAITING_PAYMENT,
+            SettingKeyEnum::SMS_SET_APP_MONITORING,
+            SettingKeyEnum::SMS_APPROVED_MONITORING_APPOINTMENT,
+            SettingKeyEnum::SMS_DIS_APPROVED_MONITORING_APPOINTMENT,
+            SettingKeyEnum::SMS_APPOINTMENT_WAITING_PAYMENT,
 
         ])->get();
         $apiToken     = $this->getSettingValue($settingCollection, SettingKeyEnum::SMS_API_TOKEN);
@@ -113,6 +121,7 @@ class SmsChannel
     {
         try {
             $findSmsText =  $this->findSmsText($data['template'], $settings);
+            dd($findSmsText);
             $finalText = $this->paramToText($findSmsText, $data['params']);
             $r = \Illuminate\Support\Facades\Http::withHeader('apiKey', $apiToken)
                 ->post('http://api.ghasedaksms.com/v2/sms/send/simple', [
@@ -120,7 +129,8 @@ class SmsChannel
                     'message' => $finalText,
                     'receptor' => $data['receptor'],
                 ]);
-            // Log::info('Response Status Code: ' . $r->status());
+            Log::info('message text : ' . $finalText);
+            Log::info('Response Status Code: ' . $r->status());
             Log::info('Response Body: ' . $r->getBody()->getContents());
         } catch (\Exception $e) {
             Log::error('pars sms send error', [
@@ -144,11 +154,10 @@ class SmsChannel
             $this->getSettingValue($settings, SettingKeyEnum::SMS_SET_APP_MONITORING)                  => $this->getSettingValue($settings, SettingKeyEnum::SMS_PRRSSMS_MONITORING_APP),
             $this->getSettingValue($settings, SettingKeyEnum::SMS_APPROVED_MONITORING_APPOINTMENT)     => $this->getSettingValue($settings, SettingKeyEnum::SMS_PARSSMS_MONITORING_APPROVED_APP),
             $this->getSettingValue($settings, SettingKeyEnum::SMS_DIS_APPROVED_MONITORING_APPOINTMENT) => $this->getSettingValue($settings, SettingKeyEnum::SMS_PARSSMS_MONITORING_DIS_APPROVED_APP),
+            $this->getSettingValue($settings, SettingKeyEnum::SMS_APPOINTMENT_WAITING_PAYMENT)         => $this->getSettingValue($settings, SettingKeyEnum::SMS_PRSSMS_APPOINTMENT_WAITING_PAYMENT),
             default => '',
         };
     }
-
-
     public function paramToText($msg, $params)
     {
         $ss                 = $this->changeSmsParameters($params);

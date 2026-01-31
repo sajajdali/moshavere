@@ -128,9 +128,9 @@ class SmsChannel
                     'message' => $finalText,
                     'receptor' => $data['receptor'],
                 ]);
-            Log::info('message text : ' . $finalText);
-            Log::info('Response Status Code: ' . $r->status());
-            Log::info('Response Body: ' . $r->getBody()->getContents());
+            // Log::info('message text : ' . $finalText);
+            // Log::info('Response Status Code: ' . $r->status());
+            // Log::info('Response Body: ' . $r->getBody()->getContents());
         } catch (\Exception $e) {
             Log::error('pars sms send error', [
                 'error message' => $e->getMessage(),

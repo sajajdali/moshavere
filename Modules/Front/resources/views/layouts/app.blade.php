@@ -117,6 +117,7 @@
             <!--app-content open-->
             <div class="main-front-container">
                 @yield('content')
+                @include('front::layouts.components.app-sidebar')
                 {{ $slot ?? '' }}
             </div>
         </div>

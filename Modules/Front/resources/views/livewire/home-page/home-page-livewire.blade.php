@@ -1,5 +1,4 @@
 <div>
-    @include('front::layouts.components.app-sidebar')
 
     {{-- اسلایدر اصلی --}}
     @if(setting(\Modules\Setting\Enum\SettingKeyEnum::ACTIVE_HEADER) == null ||

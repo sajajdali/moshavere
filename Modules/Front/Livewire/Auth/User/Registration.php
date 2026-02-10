@@ -41,6 +41,7 @@ class Registration extends Component
             'form.last_name'  => 'required|string|max:225',
             'form.gender'     => 'required|string|max:225',
             'form.email'      => 'nullable|email|max:225',
+            'form.national_code'  => 'nullable|digits:10',
         ]);
         $this->user->first_name = $this->form['first_name'];
         $this->user->last_name = $this->form['last_name'];

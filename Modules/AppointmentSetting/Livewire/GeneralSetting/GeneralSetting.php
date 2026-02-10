@@ -20,6 +20,7 @@ class GeneralSetting extends Component
     public ?User $user;
     public array $fetchData = [];
     public $isEdited = false;
+    public $hasSpecialTimeForVisit = false;
     public $isSpecialTimeEdited = false;
     public ?AppointmentSetting $appointment_setting;
     /*
@@ -152,7 +153,7 @@ class GeneralSetting extends Component
         if ($counter == 'specialTimeCounter') {
             if (isset($this->form['specialDaytimeValues'][$itrator])) {
                 $lastarrvalues = (count($this->form['specialDaytimeValues'][$itrator]) - 1);
-               unset($this->form['specialDaytimeValues'][$lastarrvalues]);
+                unset($this->form['specialDaytimeValues'][$lastarrvalues]);
             }
         }
         $this->form[$counter][$itrator] =   $this->form[$counter][$itrator]  - 1;
@@ -440,9 +441,10 @@ class GeneralSetting extends Component
 
         return redirect()->route('admin.appointment.doctor.list')->with('success', 'تنظیمات با موفقیت ذخیره شد');
     }
-    private function checkInterfaceStatus() {
-        if(isset($this->form['interference']['status'])) {
-           return  $this->form['interference']['status'] == true ? AppintmentSettingInterface::DONT_CHECK : AppintmentSettingInterface::CHECK ;
+    private function checkInterfaceStatus()
+    {
+        if (isset($this->form['interference']['status'])) {
+            return  $this->form['interference']['status'] == true ? AppintmentSettingInterface::DONT_CHECK : AppintmentSettingInterface::CHECK;
         }
         return AppintmentSettingInterface::getDefault();
     }
@@ -456,6 +458,7 @@ class GeneralSetting extends Component
                         'day_number' => AppintmentSettingDayNumber::getConstant($dayName),
                         'start_at'  => $timeFrame['start'],
                         'end_at'  => $timeFrame['end'],
+                        'time_for_visit' => data_get($this->form, 'specialVisitTime.' . $dayName, null),
                     ];
                 }
             }
@@ -517,11 +520,11 @@ class GeneralSetting extends Component
             $this->form['payment']['status'] = $apSet->active_payment;
         }
         if (isset($apSet->interference)) {
-            if($apSet->interference == false) {
+            if ($apSet->interference == false) {
                 // if this is false means that user activate the interface check
-                $this->form['interference']['status'] = true ;
-            }else{
-                $this->form['interference']['status'] = false ;
+                $this->form['interference']['status'] = true;
+            } else {
+                $this->form['interference']['status'] = false;
             }
         }
         if (isset($apSet->detail[AppointmentSetting::PAYMENT])) {
@@ -596,8 +599,13 @@ class GeneralSetting extends Component
             $this->form['visitType'][AppintmentSettingDayNumber::tryFrom($dayNumber)->getEnName()] = true;
             $this->counter[AppintmentSettingDayNumber::tryFrom($dayNumber)->getEnName()] = count($eachDayColleciton);
             foreach ($eachDayColleciton as $iterator => $value) {
-                $this->form['timeFrame'][AppintmentSettingDayNumber::tryFrom($dayNumber)->getEnName()][$iterator]['start'] = $value->start_at;
-                $this->form['timeFrame'][AppintmentSettingDayNumber::tryFrom($dayNumber)->getEnName()][$iterator]['end'] = $value->end_at;
+                $dayEnName = AppintmentSettingDayNumber::tryFrom($dayNumber)->getEnName();
+                $this->form['timeFrame'][$dayEnName][$iterator]['start'] = $value->start_at;
+                $this->form['timeFrame'][$dayEnName][$iterator]['end'] = $value->end_at;
+                if (! is_null($value->time_for_visit)) {
+                    $this->form['specialVisitTime'][$dayEnName] = $value->time_for_visit;
+                    $this->hasSpecialTimeForVisit = true;
+                }
             }
         }
         // special_date
@@ -657,7 +665,7 @@ class GeneralSetting extends Component
             $this->fetchData['segments'] = AppointmentSegment::all();
         }
         // remove old special dates
-        AppointmentSettingTime::whereNotNull('special_date')->where('special_date','<',now()->subDay())->delete();
+        AppointmentSettingTime::whereNotNull('special_date')->where('special_date', '<', now()->subDay())->delete();
     }
 
     public function render()

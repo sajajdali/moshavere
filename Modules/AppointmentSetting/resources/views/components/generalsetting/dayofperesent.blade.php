@@ -1,10 +1,14 @@
 <div>
-    <div class="card @error('form.timeFrame') border border-danger @enderror">
-        <div class="card-header border-bottom">
+    <div class="card @error('form.timeFrame') border border-danger @enderror" x-data="{ customVisitTate: @entangle('hasSpecialTimeForVisit') }">
+        <div class="card-header border-bottom d-flex justify-content-between">
             <h3 class="d-flex align-items-center">
                 <i class="fa fa-calendar fa-xl me-2 d-none d-sm-inline" aria-hidden="true"></i>
                 <span>روز های حضور</span>
             </h3>
+            <button type="button" class="btn btn-outline-info text-center"
+                x-on:click="customVisitTate = !customVisitTate">
+                افزودن زمان ویزیت اختصاصی
+            </button>
         </div>
         <div class="row mt-3">
             <div class="card-body">
@@ -40,10 +44,6 @@
                     <div class="collapse @if (isset($this->form['visitType']['saturday']) && $this->form['visitType']['saturday']) show @endif col-12 mt-2"
                         id="saturdayTimeCollaps" wire:ignore.self>
                         <div class="card card-body @if ($errors->has('form.timeFrame.saturday.*')) border border-danger @endif">
-                            {{-- TODO::modify Error message --}}
-                            {{-- <div class="alert alert-danger" role="alert"> درصورت فعال سازی روز لطفا ساعت حضور
-                                    در
-                                    روز را تعیین کنید! </div> --}}
                             <div class="d-flex justify-content-between">
                                 <p class="text-muted">تعیین زمان حضور برای شنبه</p>
                                 <div>
@@ -90,7 +90,17 @@
                                     </div>
                                 </div>
                             @endfor
-
+                            <div x-show="customVisitTate">
+                                <div class="input-group mt-3">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text" id="basic-addon3">مدت زمان مورد نیاز ویزیت برای شنبه</span>
+                                    </div>
+                                    <input type="number"
+                                        class="form-control  @error('form.specialVisitTime.saturday') is-invalid @enderror"
+                                        id="howManydayBEfore" aria-describedby="basic-addon3"
+                                        wire:model='form.specialVisitTime.saturday'>
+                                </div>
+                            </div>
                         </div>
                     </div>
                     <hr class="w-75" style="opacity: 0.5">
@@ -159,6 +169,17 @@
                                 </div>
                             @endfor
 
+                            <div x-show="customVisitTate">
+                                <div class="input-group mt-3">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text" id="basic-addon3">مدت زمان مورد نیاز ویزیت برای یکشنبه</span>
+                                    </div>
+                                    <input type="number"
+                                        class="form-control  @error('form.specialVisitTime.sunday') is-invalid @enderror"
+                                        id="howManydayBEfore" aria-describedby="basic-addon3"
+                                        wire:model='form.specialVisitTime.sunday'>
+                                </div>
+                            </div>
                         </div>
                     </div>
                     <hr class="w-75" style="opacity: 0.5">
@@ -226,7 +247,17 @@
                                     </div>
                                 </div>
                             @endfor
-
+                            <div x-show="customVisitTate">
+                                <div class="input-group mt-3">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text" id="basic-addon3">مدت زمان مورد نیاز ویزیت برای دوشنبه</span>
+                                    </div>
+                                    <input type="number"
+                                        class="form-control  @error('form.specialVisitTime.monday') is-invalid @enderror"
+                                        id="howManydayBEfore" aria-describedby="basic-addon3"
+                                        wire:model='form.specialVisitTime.monday'>
+                                </div>
+                            </div>
                         </div>
                     </div>
                     <hr class="w-75" style="opacity: 0.5">
@@ -294,7 +325,17 @@
                                     </div>
                                 </div>
                             @endfor
-
+                            <div x-show="customVisitTate">
+                                <div class="input-group mt-3">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text" id="basic-addon3">مدت زمان مورد نیاز ویزیت برای سه شنبه</span>
+                                    </div>
+                                    <input type="number"
+                                        class="form-control  @error('form.specialVisitTime.tuesday') is-invalid @enderror"
+                                        id="howManydayBEfore" aria-describedby="basic-addon3"
+                                        wire:model='form.specialVisitTime.tuesday'>
+                                </div>
+                            </div>
                         </div>
                     </div>
                     <hr class="w-75" style="opacity: 0.5">
@@ -362,7 +403,17 @@
                                     </div>
                                 </div>
                             @endfor
-
+                            <div x-show="customVisitTate">
+                                <div class="input-group mt-3">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text" id="basic-addon3">مدت زمان مورد نیاز ویزیت برای چهارشنبه</span>
+                                    </div>
+                                    <input type="number"
+                                        class="form-control  @error('form.specialVisitTime.wednesday') is-invalid @enderror"
+                                        id="howManydayBEfore" aria-describedby="basic-addon3"
+                                        wire:model='form.specialVisitTime.wednesday'>
+                                </div>
+                            </div>
                         </div>
                     </div>
                     <hr class="w-75" style="opacity: 0.5">
@@ -430,7 +481,17 @@
                                     </div>
                                 </div>
                             @endfor
-
+                            <div x-show="customVisitTate">
+                                <div class="input-group mt-3">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text" id="basic-addon3">مدت زمان مورد نیاز ویزیت برای پنجشنبه</span>
+                                    </div>
+                                    <input type="number"
+                                        class="form-control  @error('form.specialVisitTime.thursday') is-invalid @enderror"
+                                        id="howManydayBEfore" aria-describedby="basic-addon3"
+                                        wire:model='form.specialVisitTime.thursday'>
+                                </div>
+                            </div>
                         </div>
                     </div>
                     <hr class="w-75" style="opacity: 0.5">
@@ -498,7 +559,17 @@
                                     </div>
                                 </div>
                             @endfor
-
+                            <div x-show="customVisitTate">
+                                <div class="input-group mt-3">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text" id="basic-addon3">مدت زمان مورد نیاز ویزیت برای جمعه</span>
+                                    </div>
+                                    <input type="number"
+                                        class="form-control  @error('form.specialVisitTime.friday') is-invalid @enderror"
+                                        id="howManydayBEfore" aria-describedby="basic-addon3"
+                                        wire:model='form.specialVisitTime.friday'>
+                                </div>
+                            </div>
                         </div>
                     </div>
 

@@ -28,6 +28,7 @@ use Modules\AppointmentSetting\app\Models\AppointmentSetting;
 use Modules\AppointmentUser\app\Events\StoreAppointmentEvent;
 use Modules\AppointmentUser\Enum\AppointmentOnlineMessageSeenEnum;
 use Modules\AppointmentUser\Enum\AppointmentOnlineMessageTypeEnum;
+use Modules\AppointmentSetting\app\Enum\AppintmentSettingDayNumber;
 use Modules\AppointmentUser\app\Notifications\AppointmentSmsNotification;
 use Modules\AppointmentUser\app\Notifications\AppointmentDocAndOperatorNotification;
 
@@ -226,7 +227,9 @@ class AppointmentUserService
                 if (isset($details['segment_time'])) {
                     $timeForVisit = $details['segment_time'];
                 }
-
+                $dayNumberFromEnum = AppintmentSettingDayNumber::getConstant(strToLower($currentDate->copy()->format('l')))->value;
+                $customTimeVisit = $appointmentSettingTimes->firstWhere('day_number', $dayNumberFromEnum)?->time_for_visit;
+                $timeForVisit = is_null($customTimeVisit) ? $timeForVisit : $customTimeVisit;
                 // Pick attendance times for the day (special first, else weekly)
                 $checkHoliday    = false;
                 $attendanceTimes = [];
@@ -291,6 +294,7 @@ class AppointmentUserService
 
                     $startTime = Carbon::parse($attendanceTime->start_at);
                     $endTime   = Carbon::parse($attendanceTime->end_at);
+
 
                     // Slot generation loop (unchanged logic)
                     while ($startTime->lt($endTime)) {

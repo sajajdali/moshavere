@@ -1,10 +1,21 @@
-function showSwalSuccess(title, text) {
+function showSwalSuccess(text) {
     swal({
-        title: title,
+        title: 'موفق',
         text: text,
         buttonsStyling: false,
         confirmButtonClass: "btn btn-success",
         type: "success",
+        confirmButtonText: "باشه",
+        timer: 1500
+    });
+}
+function showSwalError( text) {
+    swal({
+        title: 'خطا',
+        text: text,
+        buttonsStyling: false,
+        confirmButtonClass: "btn btn-success",
+        type: "danger",
         confirmButtonText: "باشه",
         timer: 1500
     });

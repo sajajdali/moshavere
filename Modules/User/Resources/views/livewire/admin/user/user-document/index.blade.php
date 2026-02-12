@@ -30,12 +30,13 @@
                         </div>
 
                         <div class="col-lg-12">
-                            <div class="table-responsive">
+                            <div class="table-responsive text-center">
                                 <table class="table border text-nowrap text-md-nowrap table-striped">
                                     <thead>
                                         <tr>
                                             <th>نام</th>
                                             <th>موبایل</th>
+                                            <th>کد ملی</th>
                                             <th>شماره پرونده</th>
                                             <th>ایمیل</th>
                                         </tr>
@@ -43,7 +44,48 @@
                                     <tbody>
                                         <tr>
                                             <td>{{ $user->fullName ?? 'ثبت نشده است' }}</td>
-                                            <td>{{ $user->mobile ?? 'ثبت نشده است' }}</td>
+                                            <td x-data="{ edit: false, value: '{{ $user->mobile }}' }">
+                                                <div class="d-flex  align-items-center justify-content-center gap-1">
+                                                    <input type="text" class="form-control form-control-sm"
+                                                        x-show="edit" x-cloak x-model="value"
+                                                        style="width: 110px" />
+                                                    <span x-show="!edit" x-text="value || 'ثبت نشده'"
+                                                        style="width: 110px"></span>
+
+                                                    <div class="d-flex gap-2">
+                                                        <a type="button" @click="edit = !edit" title="ویرایش">
+                                                            <i class="fa fa-pencil-square-o fs-5"></i>
+                                                        </a>
+
+                                                        <a type="button" x-show="edit" x-cloak class="text-success"
+                                                            title="ذخیره"
+                                                            @click="$wire.updateUserMbile({{ $user->id }}, value); edit = false">
+                                                            <i class="fa fa-floppy-o fs-5"></i>
+                                                        </a>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            <td x-data="{ edit: false, value: '{{ $user->nationalCode }}' }">
+                                                <div class="d-flex  align-items-center justify-content-center gap-1">
+                                                    <input type="text" class="form-control form-control-sm"
+                                                        x-show="edit" x-cloak x-model="value"
+                                                        style="width: 110px" />
+                                                    <span x-show="!edit" x-text="value || 'ثبت نشده'"
+                                                        style="width: 110px"></span>
+
+                                                    <div class="d-flex gap-2">
+                                                        <a type="button" @click="edit = !edit" title="ویرایش">
+                                                            <i class="fa fa-pencil-square-o fs-5"></i>
+                                                        </a>
+
+                                                        <a type="button" x-show="edit" x-cloak class="text-success"
+                                                            title="ذخیره"
+                                                            @click="$wire.updateNationalCode({{ $user->id }}, value); edit = false">
+                                                            <i class="fa fa-floppy-o fs-5"></i>
+                                                        </a>
+                                                    </div>
+                                                </div>
+                                            </td>
                                             <td>{{ $user->document_number ?? 'ثبت نشده است' }}</td>
                                             <td>{{ $user->email ?? 'ثبت نشده است' }}</td>
                                         </tr>
@@ -56,7 +98,7 @@
                             <div class="col-md-3">
                                 <h5 class="text-info">
                                     <i class="fa fa-bookmark me-1" aria-hidden="true"></i>
-                                    نوبت های گذشته
+                                    تاریخچه نوبت های بیمار
                                 </h5>
                             </div>
                             <div class="col-md-9">
@@ -76,7 +118,7 @@
                                             <th>تاریخ ویزیت</th>
                                         </tr>
                                     </thead>
-                                    <tbody>
+                                    <tbody class="text-center">
                                         @if ($fetchData['appointments']->isNotEmpty())
                                             @foreach ($fetchData['appointments'] as $key => $appointment)
                                                 <tr class=" {{ $appointment->getColor() }} text-center">
@@ -184,4 +226,15 @@
 @push('scripts')
     <script src="{{ admin_asset('plugins/sweet-alert/sweetalert.min.js') }}"></script>
     <script src="{{ admin_asset('plugins/sweet-alert/admin.sweetalert.js') }}"></script>
+
+    <script>
+        $(document).ready(function() {
+            Livewire.on('showAlert', param => {
+                showSwalSuccess(param.message)
+            });
+            Livewire.on('error', param => {
+                showSwalError(param.message)
+            });
+        });
+    </script>
 @endpush]

@@ -412,7 +412,9 @@
                                             <td>
                                                 <div class="d-flex flex-column">
                                                     <span>
-                                                        {{ $ap->user?->full_name ?? 'کاربر حذف شده' }}
+                                                        <a href="{{route('admin.user.document',['user' => $ap->user->id])}}">
+                                                            {{ $ap->user?->full_name ?? 'کاربر حذف شده' }}
+                                                        </a>
                                                     </span>
                                                     @if (setting(\Modules\Setting\Enum\SettingKeyEnum::APPOINTMENT_USER_PERESENT_STATUS_REGISTRATION))
                                                         {!! $ap->attendedStatus() !!}

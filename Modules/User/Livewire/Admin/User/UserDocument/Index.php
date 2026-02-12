@@ -25,6 +25,25 @@ class Index extends Component
         $this->render();
     }
 
+    public function updateUserMbile($userid, $value)
+    {
+        if(! is_null($value) && strlen($value) == 11) {
+            User::find($userid)->update(['mobile' => $value]);
+            $this->dispatch('showAlert', message: 'شماره موبایل به روز رسانی شد');
+        }else{
+            $this->dispatch('error', message: 'شماره موبایل باید 11 رقم باشد');
+        }
+    }
+    public function updateNationalCode($userid, $value)
+    {
+        if(! is_null($value) && strlen($value) == 10) {
+            User::find($userid)->nationalCode = $value;
+            $this->dispatch('showAlert', message: 'کد ملی به روز رسانی شد');
+        }else{
+            $this->dispatch('error', message: 'کد ملی باید 10 رقم باشد');
+        }
+    }
+
     #[On('delete')]
     public function delete(Comment $model)
     {

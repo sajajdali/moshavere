@@ -72,20 +72,22 @@
 </head>
 
 <body class="rtl app sidebar-mini">
-
+    @php
+        $settingValues =  front_setting_array();
+    @endphp
     <!-- Google Tag Manager (noscript) -->
     <noscript>
         <iframe src="https://www.googletagmanager.com/ns.html?id=GTM-PGHHCTPG" height="0" width="0"
             style="display:none;visibility:hidden"></iframe>
     </noscript>
     <!-- End Google Tag Manager (noscript) -->
-    @include('front::layouts.components.app-header')
+    @include('front::layouts.components.app-header',['settingValues'=> $settingValues])
     <!-- Icons Fixed on Left Side -->
     @if (!disableUi())
-        @if (setting(\Modules\Setting\Enum\SettingKeyEnum::SHOW_FLOATING_SOCIAL_ICONS))
+        @if (settingVfc($settingValues,\Modules\Setting\Enum\SettingKeyEnum::SHOW_FLOATING_SOCIAL_ICONS))
             <div class="fixed-icons">
                 <!-- Instagram SVG Icon -->
-                @if (setting(\Modules\Setting\Enum\SettingKeyEnum::INSTAGRAM_ADDRESS))
+                @if (settingVfc($settingValues,\Modules\Setting\Enum\SettingKeyEnum::INSTAGRAM_ADDRESS))
                     <a href="{{ setting(\Modules\Setting\Enum\SettingKeyEnum::INSTAGRAM_ADDRESS) }}" target="_blank"
                         class="icon-link instagram">
                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
@@ -96,9 +98,9 @@
                     </a>
                 @endif
 
-                @if (setting(\Modules\Setting\Enum\SettingKeyEnum::WHATSAPP_ADDRESS))
+                @if (settingVfc($settingValues,\Modules\Setting\Enum\SettingKeyEnum::WHATSAPP_ADDRESS))
                     <!-- WhatsApp SVG Icon -->
-                    <a href="{{ setting(\Modules\Setting\Enum\SettingKeyEnum::WHATSAPP_ADDRESS) }}" target="_blank"
+                    <a href="{{ settingVfc($settingValues,\Modules\Setting\Enum\SettingKeyEnum::WHATSAPP_ADDRESS) }}" target="_blank"
                         class="icon-link whatsapp">
                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
                             class="bi bi-whatsapp" viewBox="0 0 16 16">
@@ -117,7 +119,7 @@
             <!--app-content open-->
             <div class="main-front-container">
                 @yield('content')
-                @include('front::layouts.components.app-sidebar')
+                @include('front::layouts.components.app-sidebar',['settingValues'=> $settingValues])
                 {{ $slot ?? '' }}
             </div>
         </div>
@@ -127,8 +129,8 @@
     </div>
     <!-- page -->
 
-    @if (!setting(\Modules\Setting\Enum\SettingKeyEnum::DISABLE_FOOTER_DISPLAY))
-        @include('front::layouts.components.footer')
+    @if (!settingVfc($settingValues,\Modules\Setting\Enum\SettingKeyEnum::DISABLE_FOOTER_DISPLAY))
+        @include('front::layouts.components.footer',['settingValues'=> $settingValues])
     @endif
     @include('front::layouts.components.scripts')
 

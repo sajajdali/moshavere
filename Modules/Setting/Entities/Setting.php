@@ -87,4 +87,21 @@ class Setting extends Model
 
         return $returnValue;
     }
+    public static function getSettingByArray($enums)
+    {
+        return self::whereIn('setting_key', $enums)
+            ->select('setting_key', 'setting_value')
+            ->get();
+    }
+
+    // value from collection
+    public static function vc($collection, $v)
+    {
+        return $collection->firstWhere('setting_key', $v)->setting_value;
+    }
+    // boolean value from collection
+    public static function vcBool($collection, $v):bool
+    {
+        return (bool) $collection->firstWhere('setting_key', $v)->setting_value;
+    }
 }

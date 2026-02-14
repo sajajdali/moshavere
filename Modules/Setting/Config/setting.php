@@ -82,6 +82,7 @@ $setting = [
         'settings' => [
             \Modules\Setting\Enum\SettingKeyEnum::ENABLE_DOCTORS_MENU,
             \Modules\Setting\Enum\SettingKeyEnum::ENABLE_CONTACT_US_MENU,
+            \Modules\Setting\Enum\SettingKeyEnum::SHOW_ABOUT_US_MENU_BUTTON,
             \Modules\Setting\Enum\SettingKeyEnum::ACTIVE_HEADER,
             \Modules\Setting\Enum\SettingKeyEnum::HEADER1_IMAGE,
             \Modules\Setting\Enum\SettingKeyEnum::HEADER1_TITLE1,

@@ -10,17 +10,17 @@
             <div class="container py-10 flex flex-col gap-3">
                 <div class="flex flex-col md:flex-row items-start md:items-center justify-between gap-3">
                     <h2 class="font-semibold text-lg">
-                        {{ setting(\Modules\Setting\Enum\SettingKeyEnum::ABOUT_US_FIRST_SECTION_TITLE) }}
+                        {{ $fetchData['settingsModel']->vc($fetchData['settings'],\Modules\Setting\Enum\SettingKeyEnum::ABOUT_US_FIRST_SECTION_TITLE) }}
                     </h2>
-                    <a href="{{route('front.searchPage',['query' => 'پزشکان'])}}" class="flex items-center gap-4 text-primary-main">
-                        <span class="font-semibold">لیست پزشکان</span>
+                    <a href="{{route('front.searchPage', ['query' => 'بخش ها'])}}" class="flex items-center gap-4 text-primary-main">
+                        <span class="font-semibold">دریافت نوبت</span>
                         <svg class="w-5 h-5" xmlns="http://www.w3.org/2000/svg">
                             <use xlink:href="#sprite-arrow-left" />
                         </svg>
                     </a>
                 </div>
                 <p class="leading-7 text-secondary-400">
-                    {{ setting(\Modules\Setting\Enum\SettingKeyEnum::ABOUT_US_FIRST_SECTION_DESCRIPTION) }}
+                    {{ $fetchData['settingsModel']->vc($fetchData['settings'],\Modules\Setting\Enum\SettingKeyEnum::ABOUT_US_FIRST_SECTION_DESCRIPTION) }}
                 </p>
             </div>
         </section>
@@ -31,41 +31,29 @@
         <section class="grid grid-cols-1 md:grid-cols-2 gap-10">
             <div class="flex flex-col items-start gap-4">
                 <h3 class="font-semibold text-xl">
-                    {{ setting(\Modules\Setting\Enum\SettingKeyEnum::ABOUT_US_SECEND_SECTION_TITLE) }}
+                    {{ $fetchData['settingsModel']->vc($fetchData['settings'],\Modules\Setting\Enum\SettingKeyEnum::ABOUT_US_SECEND_SECTION_TITLE) }}
                 </h3>
                 <p class="leading-7 text-secondary-400">
-                    {{ setting(\Modules\Setting\Enum\SettingKeyEnum::ABOUT_US_SECEND_SECTION_DESCRIPTION) }}
+                    {{ $fetchData['settingsModel']->vc($fetchData['settings'],\Modules\Setting\Enum\SettingKeyEnum::ABOUT_US_SECEND_SECTION_DESCRIPTION) }}
                 </p>
-                <a href="{{route('front.searchPage',['query' => 'پزشکان'])}}" class="btn__blue--round-full">
-                    <span>لیست پزشکان برتر</span>
-                    <svg class="w-6 h-6" xmlns="http://www.w3.org/2000/svg">
-                        <use xlink:href="#sprite-chevron-left-circle" />
-                    </svg>
-                </a>
             </div>
             <div class="h-[300px] overflow-hidden rounded-lg">
-                <img src="{{ setting(\Modules\Setting\Enum\SettingKeyEnum::ABOUT_US_SECEND_SECTION_IMAGE) }}"
+                <img src="{{ Storage::url($fetchData['settingsModel']->vc($fetchData['settings'],\Modules\Setting\Enum\SettingKeyEnum::ABOUT_US_SECEND_SECTION_IMAGE)) }}"
                     alt="about doctors" class="w-full h-full object-cover" />
             </div>
         </section>
         <section class="grid grid-cols-1 md:grid-cols-2 gap-10">
             <div class="h-[300px] overflow-hidden rounded-lg">
-                <img src="{{ setting(\Modules\Setting\Enum\SettingKeyEnum::ABOUT_US_THIRD_SECTION_IMAGE) }}"
+                <img src="{{ Storage::url($fetchData['settingsModel']->vc($fetchData['settings'],\Modules\Setting\Enum\SettingKeyEnum::ABOUT_US_THIRD_SECTION_IMAGE)) }}"
                     alt="about doctors" class="w-full h-full object-cover" />
             </div>
             <div class="flex flex-col items-start gap-4">
                 <h3 class="font-semibold text-xl">
-                    {{ setting(\Modules\Setting\Enum\SettingKeyEnum::ABOUT_US_THIRD_SECTION_TITLE) }}
+                    {{ $fetchData['settingsModel']->vc($fetchData['settings'],\Modules\Setting\Enum\SettingKeyEnum::ABOUT_US_THIRD_SECTION_TITLE) }}
                 </h3>
                 <p class="leading-7 text-secondary-400">
-                    {{ setting(\Modules\Setting\Enum\SettingKeyEnum::ABOUT_US_THIRD_SECTION_DESCRIPTION) }}
+                    {{ $fetchData['settingsModel']->vc($fetchData['settings'],\Modules\Setting\Enum\SettingKeyEnum::ABOUT_US_THIRD_SECTION_DESCRIPTION) }}
                 </p>
-                <a href="{{route('front.searchPage',['query' => 'پزشکان'])}}" class="btn__blue--round-full">
-                    <span>لیست پزشکان برتر</span>
-                    <svg class="w-6 h-6" xmlns="http://www.w3.org/2000/svg">
-                        <use xlink:href="#sprite-chevron-left-circle" />
-                    </svg>
-                </a>
             </div>
         </section>
     </section>
@@ -79,27 +67,19 @@
     <section class="container py-16 grid grid-cols-1 md:grid-cols-2 gap-12">
         <div class="flex flex-col gap-4">
             <h3 class="font-semibold text-xl">
-                {{ setting(\Modules\Setting\Enum\SettingKeyEnum::ABOUT_US_FOURTH_SECTION_TITLE) }}
+                {{ $fetchData['settingsModel']->vc($fetchData['settings'],\Modules\Setting\Enum\SettingKeyEnum::ABOUT_US_FOURTH_SECTION_TITLE) }}
             </h3>
             <p class="leading-7 text-secondary-400">
-                {{ setting(\Modules\Setting\Enum\SettingKeyEnum::ABOUT_US_FOURTH_SECTION_TITLE) }}
+                {{ $fetchData['settingsModel']->vc($fetchData['settings'],\Modules\Setting\Enum\SettingKeyEnum::ABOUT_US_FOURTH_SECTION_DESCRIPTION) }}
             </p>
             <div class="w-full grid grid-cols-1 md:grid-cols-2 gap-5">
 
-            </div>
-            <div class="flex">
-                <a href="{{route('front.searchPage',['query' => 'پزشکان'])}}" class="btn__blue--round-full">
-                    <span>لیست پزشکان برتر</span>
-                    <svg class="w-6 h-6" xmlns="http://www.w3.org/2000/svg">
-                        <use xlink:href="#sprite-chevron-left-circle" />
-                    </svg>
-                </a>
             </div>
         </div>
         <div class="-translate-x-1 relative">
             <div class="w-full h-[400px] rounded-lg bg-primary-main"></div>
             <div class="absolute left-4 top-4 w-full h-[400px] overflow-hidden rounded-lg">
-                <img src="{{ setting(\Modules\Setting\Enum\SettingKeyEnum::ABOUT_US_FOURTH_SECTION_IMAGE) }}" alt="about doctors" class="w-full h-full object-cover" />
+                <img src="{{ Storage::url($fetchData['settingsModel']->vc($fetchData['settings'],\Modules\Setting\Enum\SettingKeyEnum::ABOUT_US_FOURTH_SECTION_IMAGE)) }}" alt="about doctors" class="w-full h-full object-cover" />
             </div>
         </div>
     </section>

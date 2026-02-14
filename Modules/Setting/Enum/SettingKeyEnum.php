@@ -152,6 +152,9 @@ enum SettingKeyEnum: int implements EnumHasNameInterface, SettingTypeInterface, 
     case APP_FULL_APPOINTMENT_HEADER = 352 ;
     case APP_FULL_APPOINTMENT_BODY = 353 ;
 
+    // front menu
+    case SHOW_ABOUT_US_MENU_BUTTON = 354 ;
+
     public function isSupportCache(): bool
     {
         return match ($this) {
@@ -216,6 +219,7 @@ enum SettingKeyEnum: int implements EnumHasNameInterface, SettingTypeInterface, 
             self::SHOW_FLOATING_SOCIAL_ICONS => 'نمایش ایکون های اینستاگرام و واتس اپ به صورت شناور',
             self::ALLOW_MULTIPLE_APP_FROM_ADMIN_PANEL => 'اجازه ثبت نوبت در پنل منشی، برای ساعت هایی که از قبل یک نوبت ثبت شده در آن ساعت وجود دارد',
             self::APPOINTMENT_SHOW_DESCRIPTION_IN_APP_LIST => 'نمایش توضیحات مربوط به نوبت در صفحه ی لیست نوبت ها',
+            self::SHOW_ABOUT_US_MENU_BUTTON => 'نمایش درباره ما در منو',
 
             // SMS
             self::SMS_API_TOKEN => 'توکن API پیامک',
@@ -403,10 +407,12 @@ enum SettingKeyEnum: int implements EnumHasNameInterface, SettingTypeInterface, 
             self::SITE_FIRST_SECTION_DESCRIPTION => SettingTypeEnum::TEXTAREA,
             self::SITE_SECEND_SECTION_DESCRIPTION => SettingTypeEnum::TEXTAREA,
             self::CONTACTUS_FORM_STATUS => SettingTypeEnum::CHECK,
+            self::SHOW_ABOUT_US_MENU_BUTTON => SettingTypeEnum::CHECK,
             self::CONTACTUS_FORM_ADDRESS => SettingTypeEnum::TEXTAREA,
             self::FOOTER_DESCRIPTION => SettingTypeEnum::TEXTAREA,
             self::APPOINTMENT_DETAIL_PAYMENT_DESCRIPTION_TEXT => SettingTypeEnum::TEXTAREA,
 
+            self::ABOUT_US_SECEND_SECTION_IMAGE,self::ABOUT_US_THIRD_SECTION_IMAGE,self::ABOUT_US_FOURTH_SECTION_IMAGE => SettingTypeEnum::IMAGE,
 
             self::SMS_PRRSSMS_MONITORING_APP,self::SMS_PARSSMS_MONITORING_APPROVED_APP,self::SMS_PARSSMS_MONITORING_DIS_APPROVED_APP => SettingTypeEnum::TEXTAREA,
             self::SMS_PRSSMS_APPOINTMENT_WAITING_PAYMENT => SettingTypeEnum::TEXTAREA,

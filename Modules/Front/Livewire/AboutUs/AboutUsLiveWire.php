@@ -8,7 +8,7 @@ use Livewire\Attributes\Title;
 use Livewire\Component;
 use Modules\Front\app\Models\Comment;
 use Modules\Front\app\Models\Faq;
-use Modules\Front\Enum\CommentShowHomePage;
+use Modules\Front\enum\CommentShowHomePage;
 use Modules\Front\enum\CommentStatusEnum;
 use Modules\Service\app\Models\Service;
 use Modules\Setting\Entities\Setting;

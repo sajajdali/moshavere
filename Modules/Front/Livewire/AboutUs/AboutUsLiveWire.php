@@ -22,6 +22,17 @@ class AboutUsLiveWire extends Component
 
     public array $fetchData = [];
 
+    public function docpage(User $user)
+    {
+        if (empty($user)) {
+            return redirect()->to('/404');
+        }
+        if ($user->exists() || $user->isDoctor()) {
+            return redirect()->route('front.doctor.profile', ['doctor_id' => $user->id, 'doctor_name' => str_replace(' ', '_', $user->full_name)]);
+        }
+        return redirect()->to('/404');
+    }
+
     public function mount()
     {
         if (config('app.without_cache')) {

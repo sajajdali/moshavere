@@ -97,11 +97,11 @@ class Setting extends Model
     // value from collection
     public static function vc($collection, $v)
     {
-        return $collection->firstWhere('setting_key', $v)->setting_value;
+        return $collection->firstWhere('setting_key', $v)?->setting_value;
     }
     // boolean value from collection
     public static function vcBool($collection, $v):bool
     {
-        return (bool) $collection->firstWhere('setting_key', $v)->setting_value;
+        return (bool) $collection->firstWhere('setting_key', $v)?->setting_value;
     }
 }

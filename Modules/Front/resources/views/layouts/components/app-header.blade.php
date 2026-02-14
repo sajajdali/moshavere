@@ -6,7 +6,7 @@
         <div class="navbar__container">
             @unless (disableUi())
                 <a href="{{ route('front.homePage') }}">
-                    <img src="{{ assetStorage(settingVfc($settingValues,Modules\Setting\Enum\SettingKeyEnum::ENABLE_DOCTORS_MENU)) }}"
+                    <img src="{{ assetStorage(settingVfc($settingValues,Modules\Setting\Enum\SettingKeyEnum::SITE_LOGO_URL)) }}"
                         class="max-h-[70px] h-auto w-auto" />
                 </a>
                 <ul class="navbar__menu">

@@ -121,7 +121,7 @@ class DoctorProfileLivewire extends Component
     protected function lvlTwoModal($place, $service)
     {
         $segmentIds = data_get($this->form, 'segment', null);
-        if (isset($$this->fetchData['segments']) && $this->fetchData['segments']->isNotEmpty() && is_null($segmentIds)) {
+        if (isset($this->fetchData['segments']) && $this->fetchData['segments']->isNotEmpty() && is_null($segmentIds)) {
             $this->dispatch('swalError', msg: 'لطفا ناحیه مورد نظر خود را انتخاب کنید');
             return;
         }

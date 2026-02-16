@@ -161,7 +161,7 @@
                                                     <span
                                                         class="badge {{ $app->status->getBadgeColor() }}">{{ $app->status->getName() }}</span>
                                                 </td>
-                                                <td>{{ verta($app->visited_at)->format('H:i') }}</td>
+                                                <td>{{ verta($app->date_visit)->format('H:i') }}</td>
 
                                             </tr>
                                         @endforeach

@@ -321,7 +321,10 @@ class SpecificDayAvailableAppointment extends Component
 
         // fill the app till cache created
         if (request()->has('storedApp')) {
-            $this->fetchData['reserve_app_till_cache_create'] = AppointmentUser::find(request()->get('storedApp'));
+            $apid = request()->get('storedApp',null);
+            if (! is_null($apid)) {
+                $this->fetchData['reserve_app_till_cache_create'] = AppointmentUser::find($apid);
+            }
         }
         if (!empty(request()->route('date'))) {
             $this->fetchData['selectedDate']  = Verta::parse(request()->route('date'))->toCarbon();

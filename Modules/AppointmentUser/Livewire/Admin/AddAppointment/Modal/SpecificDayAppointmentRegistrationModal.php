@@ -299,7 +299,7 @@ class SpecificDayAppointmentRegistrationModal extends Component
             'appId' => $this->appId,
             'date' => $this->appDate,
             'segmentItemId' => $this->segmentId,
-            'storedApp' =>  $storeAppointment['detail']['appointment_user_id']
+            'storedApp' =>  data_get($storeAppointment,'detail.appointment_user_id',null)
         ])->with('success', value: $storeAppointment['message']);
     }
 

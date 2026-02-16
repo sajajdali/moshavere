@@ -72,9 +72,6 @@
 </head>
 
 <body class="rtl app sidebar-mini">
-    @php
-        $settingValues =  front_setting_array();
-    @endphp
     <!-- Google Tag Manager (noscript) -->
     <noscript>
         <iframe src="https://www.googletagmanager.com/ns.html?id=GTM-PGHHCTPG" height="0" width="0"

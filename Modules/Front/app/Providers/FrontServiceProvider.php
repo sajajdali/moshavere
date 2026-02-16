@@ -3,6 +3,7 @@
 namespace Modules\Front\app\Providers;
 
 use Illuminate\Support\Facades\Blade;
+use Illuminate\Support\Facades\View;
 use Illuminate\Support\ServiceProvider;
 
 class FrontServiceProvider extends ServiceProvider
@@ -22,6 +23,13 @@ class FrontServiceProvider extends ServiceProvider
         $this->registerConfig();
         $this->registerViews();
         $this->loadMigrationsFrom(module_path($this->moduleName, 'database/migrations'));
+        View::composer('front::layouts.app', function ($view) {
+            if (!tenancy()->initialized) {
+                $view->with('settingValues', []);
+                return;
+            }
+            $view->with('settingValues', front_setting_array());
+        });
     }
 
     /**

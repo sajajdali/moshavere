@@ -36,6 +36,9 @@ if (! function_exists('settingVfc')) {
     function settingVfc($collection, $enum): null |string
     {
         $setting = new Setting();
+        if (is_array($collection)) {
+            $collection = collect($collection);
+        }
         return $setting->vc($collection, $enum);
     }
 }

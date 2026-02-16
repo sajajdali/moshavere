@@ -307,6 +307,8 @@ trait OprationButtonsTrait
     private function reGenerateCacheJob($app)
     {
         // generate cache
-        $app->setting->runGenerateCacheJob(specialDayConvert($app->date_visit));
+        if(! is_null($app->setting)) {
+            $app->setting?->runGenerateCacheJob(specialDayConvert($app->date_visit));
+        }
     }
 }

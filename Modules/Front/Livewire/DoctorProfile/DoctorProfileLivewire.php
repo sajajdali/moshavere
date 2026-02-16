@@ -125,7 +125,7 @@ class DoctorProfileLivewire extends Component
             $this->dispatch('swalError', msg: 'لطفا ناحیه مورد نظر خود را انتخاب کنید');
             return;
         }
-        if(count(array_filter($segmentIds)) == 0){
+        if (! is_null($segmentIds) && count(array_filter($segmentIds)) == 0) {
             $this->dispatch('swalError', msg: 'لطفا ناحیه مورد نظر خود را انتخاب کنید');
             return;
         }

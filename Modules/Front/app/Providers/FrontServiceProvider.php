@@ -25,7 +25,7 @@ class FrontServiceProvider extends ServiceProvider
         $this->loadMigrationsFrom(module_path($this->moduleName, 'database/migrations'));
         View::composer('front::layouts.app', function ($view) {
             if (!tenancy()->initialized) {
-                $view->with('settingValues', []);
+                $view->with('settingValues', collect());
                 return;
             }
             $view->with('settingValues', front_setting_array());

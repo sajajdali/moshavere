@@ -151,6 +151,7 @@ $setting = [
             \Modules\Setting\Enum\SettingKeyEnum::PAYMENT_PARSIAN_STATUS,
             \Modules\Setting\Enum\SettingKeyEnum::PAYMENT_PARSIAN_TOKEN,
             \Modules\Setting\Enum\SettingKeyEnum::PAYMENT_RULES_AND_CONDITION_STATUS,
+            \Modules\Setting\Enum\SettingKeyEnum::PAYMENT_RULES_AND_CONDITION_DESCRIPTION,
             \Modules\Setting\Enum\SettingKeyEnum::PAYMEN_ACTIVE_DRIVER,
         ],
     ],
@@ -213,6 +214,13 @@ $setting = [
         'settings' => [
             \Modules\Setting\Enum\SettingKeyEnum::APP_FULL_APPOINTMENT_HEADER,
             \Modules\Setting\Enum\SettingKeyEnum::APP_FULL_APPOINTMENT_BODY,
+        ],
+    ],
+    'REGISTRATION' => [
+        'title' => 'ثبت نام بیماران',
+        'icon' => 'fa fa-user',
+        'settings' => [
+            \Modules\Setting\Enum\SettingKeyEnum::USER_REGISTER_NATIONAL_CODE_REQUIRED,
         ],
     ],
 ];

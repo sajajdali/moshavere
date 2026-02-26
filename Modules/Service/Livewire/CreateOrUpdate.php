@@ -76,7 +76,6 @@ class CreateOrUpdate extends Component
         } else {
             $modelCreateOrUpdate['icon'] = null;
         }
-
         if (isset($this->form['qestion']) && $parentId == null) {
             $modelCreateOrUpdate['detail'] = [
                 Service::APP_QUESTION_TITLE => $this->form['qestion'],
@@ -144,9 +143,11 @@ class CreateOrUpdate extends Component
             $this->photo = $service->icon;
             $path = $service->icon;
             if ($path) {
+                $this->form['photo'] = $path ; 
                 $this->uploadedPhotoUrl = Storage::disk('tenant')->url($path);
                 $this->uploadedFileName = basename($path);
                 $this->uploadedFileType = getFileIconClass(pathinfo($path, PATHINFO_EXTENSION));
+
             } else {
                 $this->uploadedPhotoUrl = null;
             }

@@ -220,7 +220,7 @@ $setting = [
         'title' => 'ثبت نام بیماران',
         'icon' => 'fa fa-user',
         'settings' => [
-            \Modules\Setting\Enum\SettingKeyEnum::USER_REGISTER_NATIONAL_CODE_REQUIRED,
+            // \Modules\Setting\Enum\SettingKeyEnum::USER_REGISTER_NATIONAL_CODE_REQUIRED,
         ],
     ],
 ];

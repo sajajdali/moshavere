@@ -199,4 +199,5 @@ return [
 
 
     'without_cache' => env('WITHOUT_CACHE',false),
+    'dont_check_ip' => env('DONT_CHECK_IP',false) ,
 ];

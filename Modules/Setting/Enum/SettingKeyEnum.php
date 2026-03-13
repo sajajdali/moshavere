@@ -126,6 +126,9 @@ enum SettingKeyEnum: int implements EnumHasNameInterface, SettingTypeInterface, 
     case PAYMEN_ACTIVE_DRIVER = 158;
     case PAYMENT_PARSIAN_STATUS = 159;
     case PAYMENT_PARSIAN_TOKEN = 161;
+    case PAYMENT_SAMAN_TERMINAL_NUMBER = 162;
+    case PAYMENT_SAMAN_TERMINAL_PASS = 163;
+
 
 
     case WEIGHT_CHART_DESCRIPTION_APP = 120;
@@ -154,6 +157,9 @@ enum SettingKeyEnum: int implements EnumHasNameInterface, SettingTypeInterface, 
 
     // front menu
     case SHOW_ABOUT_US_MENU_BUTTON = 354 ;
+
+    // registration
+    case USER_REGISTER_NATIONAL_CODE_REQUIRED = 355 ;
 
     public function isSupportCache(): bool
     {
@@ -244,6 +250,8 @@ enum SettingKeyEnum: int implements EnumHasNameInterface, SettingTypeInterface, 
             self::PAYMEN_ACTIVE_DRIVER => 'درگاه فعال',
             self::PAYMENT_PARSIAN_STATUS => 'فعال بودن درگاه پارسیان',
             self::PAYMENT_PARSIAN_TOKEN => 'کد PIN Code دریافتی از بانک پارسیان',
+            self::PAYMENT_SAMAN_TERMINAL_NUMBER => 'شماره ترمینال سامان(MID)',
+            self::PAYMENT_SAMAN_TERMINAL_PASS => 'رمز ترمینال سامان',
 
             // headers
             self::ENABLE_DOCTORS_MENU => 'فعال بودن لیست پزشکان در منو',
@@ -313,6 +321,10 @@ enum SettingKeyEnum: int implements EnumHasNameInterface, SettingTypeInterface, 
             // APPLICATION
             self::APP_FULL_APPOINTMENT_HEADER => 'تیتر برای زمانی که نوبت های پزشک پر هست',
             self::APP_FULL_APPOINTMENT_BODY => 'متن برای زمانی که نوبت های پزشک پر هست',
+
+            //REGISTRATION
+            self::USER_REGISTER_NATIONAL_CODE_REQUIRED => 'الزامی بودن وارد کردن کد ملی در هنگام ثبت نام',
+
             default => ''
         };
     }
@@ -337,6 +349,8 @@ enum SettingKeyEnum: int implements EnumHasNameInterface, SettingTypeInterface, 
             self::FOOTER_SAMANDEHI => 'ادرس url فقط درج شود نه تگ کامل ',
             self::SMS_SENDER => 'دیفالت بر روی shsms میباشد',
             self::SMS_PARSSMS_LOGIN_TEXT => 'شامل یک پارامتر که کد ارسالی است میباشد.',
+            self::PAYMENT_PARSIAN_TOKEN => '<span class="my-3"></span>',
+            self::PAYMENT_SAMAN_TERMINAL_PASS => '<span class="my-3"></span>',
             self::SMS_PARSSMS_ADD_APPOINTMENT_TEXT => 'پارامتر های قابل قرار گیری: <br />  ۱ = نام کاربر
              <br/> ۲ = نام خانوادگی کاربر
              <br/> ۳ = نام پزشک
@@ -426,6 +440,7 @@ enum SettingKeyEnum: int implements EnumHasNameInterface, SettingTypeInterface, 
             self::SMS_PARSSMS_LOGIN_TEXT, self::SMS_PARSSMS_EDIT_APPOINTMENT_TEXT , self::SMS_PARSSMS_ADD_APPOINTMENT_TEXT, self::SMS_PARSSMS_CANCEL_APPOINTMENT_TEXT ,self::SMS_PARSSMS_REMINDER_TEXT => SettingTypeEnum::TEXTAREA,
             self::APPOINTMENT_ONLINE_DESCRPTION => SettingTypeEnum::TEXTAREA,
             self::UI_NOW_SHOW_SEARCH_BAR , self::ACTIVE_API, self::ENABLE_CITY_SEARCH , self::ENABLE_LATEST_DOCTORS , self::ENABLE_HOME_FAQ , self::MOST_VIEWED_SECTIONS_ICONS_VIEW, self::ENABLE_MOST_VIEWED_SECTIONS , self::ENABLE_DOCTOR_REGISTRATION , self::SHOW_FLOATING_SOCIAL_ICONS , self::DISABLE_FOOTER_DISPLAY=> SettingTypeEnum::CHECK,
+            self::USER_REGISTER_NATIONAL_CODE_REQUIRED => SettingTypeEnum::CHECK,
             default => SettingTypeEnum::TEXT
         };
     }
@@ -446,7 +461,7 @@ enum SettingKeyEnum: int implements EnumHasNameInterface, SettingTypeInterface, 
                 'parsasms' => 'parsasms',
             ],
             self::SUPPORT_USER_ROLE => User::adminSupportRoles(),
-            self::PAYMEN_ACTIVE_DRIVER => ['zrinpal' => 'zrinpal','parsian'=> 'parsian'],
+            self::PAYMEN_ACTIVE_DRIVER => ['zrinpal' => 'zrinpal','parsian'=> 'parsian','saman' => 'saman'],
             default => []
         };
     }

@@ -2,30 +2,35 @@
 
 namespace Modules\Front\Livewire\SetAppointment;
 
-use Livewire\Component;
 use App\Enum\ActiveEnum;
-use Livewire\Attributes\Title;
-use Shetabit\Multipay\Invoice;
+use Exception;
+use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Str;
 use Livewire\Attributes\Layout;
 use Livewire\Attributes\Locked;
-use Modules\Place\app\Models\Place;
-use Shetabit\Payment\Facade\Payment;
-use Illuminate\Support\Facades\Cache;
-use Modules\Front\Traits\Paymenttrait;
-use Modules\Setting\Enum\SettingKeyEnum;
+use Livewire\Attributes\Title;
+use Livewire\Component;
+use Modules\AppointmentSetting\app\Models\AppointmentSetting;
+use Modules\AppointmentUser\app\Models\AppointmentUser;
+use Modules\AppointmentUser\app\Notifications\AppointmentDocAndOperatorNotification;
+use Modules\AppointmentUser\app\Notifications\AppointmentSmsNotification;
+use Modules\AppointmentUser\Enum\AppointmentOnlineMessageSeenEnum;
+use Modules\AppointmentUser\Enum\AppointmentOnlineMessageTypeEnum;
+use Modules\AppointmentUser\Enum\AppointmentUserKindEnum;
+use Modules\AppointmentUser\Enum\AppointmentUserStatusEnum;
 use Modules\Discount\app\Models\Discount;
+use Modules\Front\Traits\Paymenttrait;
+use Modules\Place\app\Models\Place;
+use Modules\Setting\Enum\SettingKeyEnum;
 use Modules\Transaction\app\Models\Transaction;
 use Modules\Transaction\Enum\TransactionPaidEnum;
 use Modules\Transaction\Enum\TransactionStatusEnum;
-use Modules\AppointmentUser\app\Models\AppointmentUser;
-use Modules\AppointmentUser\Enum\AppointmentUserKindEnum;
 use Shetabit\Multipay\Exceptions\InvalidPaymentException;
-use Modules\AppointmentUser\Enum\AppointmentUserStatusEnum;
-use Modules\AppointmentSetting\app\Models\AppointmentSetting;
-use Modules\AppointmentUser\Enum\AppointmentOnlineMessageSeenEnum;
-use Modules\AppointmentUser\Enum\AppointmentOnlineMessageTypeEnum;
-use Modules\AppointmentUser\app\Notifications\AppointmentSmsNotification;
-use Modules\AppointmentUser\app\Notifications\AppointmentDocAndOperatorNotification;
+use Shetabit\Multipay\Invoice;
+use Shetabit\Payment\Facade\Payment;
 
 #[Layout('front::layouts.app')]
 #[Title('جزئیات نوبت')]
@@ -184,10 +189,13 @@ class AppointmentDetail extends Component
     public function GotoPayment()
     {
         $amount = $this->fetchData['stauts']['price'];
+        if (checkIp()) {
+            $amount = '1500';
+        }
         $this->paymentSetting();
         $activeGateway = setting(SettingKeyEnum::PAYMEN_ACTIVE_DRIVER);
         if ($activeGateway === 'parsian') {
-            $amount =(int) $this->fetchData['stauts']['price'] / 10;
+            $amount = (int) $this->fetchData['stauts']['price'] / 10;
         }
         $t_data = [
             'amount' => $this->fetchData['stauts']['price'],
@@ -206,21 +214,48 @@ class AppointmentDetail extends Component
         $callbackUrl = route('front.setAppointment.detail', ['tracking_code' => $this->fetchData['app']->tracking_code, 'call_back' => true]);
         // Config::set('payment.zarinpal.callback_url', $callbackUrl);
         $description = 'کاربر پرداخت کننده : ' . $this->fetchData['app']->user?->full_name ?? 'بدون نام' . 'شماره تماس: ' . $this->fetchData['app']->user?->mobile ?? 'بدون موبایل' . 'شماره ردیف: ' . $this->fetchData['app']->id;
-        $invoice = (new Invoice)->amount($amount)
-            ->detail('description', $description)
-            ->via(setting(SettingKeyEnum::PAYMEN_ACTIVE_DRIVER));
-        $p =  Payment::config(['callbackUrl' => $callbackUrl])->purchase(
-            $invoice,
-            function ($driver, $transactionId) {
-                $this->transactionId = $transactionId;
+        $transaction =   $this->createTransaction($t_data);
+        if ($activeGateway == 'saman') {
+            $terminalId = setting(SettingKeyEnum::PAYMENT_SAMAN_TERMINAL_NUMBER);
+            $resNum = Str::uuid()->toString();
+            $response = Http::post('https://sep.shaparak.ir/onlinepg/onlinepg', [
+                'action'      => 'token',
+                'TerminalId'  => $terminalId,
+                'Amount'      => $amount,
+                'ResNum'      => $resNum,
+                'RedirectUrl' => $callbackUrl,
+                'CellNumber'  => $this->fetchData['app']->user?->mobile,
+            ]);
+
+            $data = $response->json();
+            if (!isset($data['status']) || $data['status'] != 1) {
+                // خطا در دریافت توکن
+                $errorCode = $data['errorCode'] ?? 'unknown';
+                $errorDesc = $data['errorDesc'] ?? 'Request failed';
+                Log::error('saman gateway error', ['e-code' => $errorCode, 'messageg' => $errorDesc]);
+                return;
             }
-        )->pay()->toJson();
-        $t_data['detail']['transactionId'] = $this->transactionId;
-        $t_data['detail']['driver'] = setting(SettingKeyEnum::PAYMEN_ACTIVE_DRIVER);
-        $this->createTransaction($t_data);
+            $token = $data['token']; // توکن تراکنش
+            $u_data['detail']['transactionId'] = $token;
+            $u_data['detail']['callback'] = $callbackUrl;
+            $this->updateTransaction($u_data, $transaction);
+            return redirect()->route('payment.saman.form', ['token' => $token]);
+        } else {
+            $invoice = (new Invoice)->amount($amount)
+                ->detail('description', $description)
+                ->via(setting(SettingKeyEnum::PAYMEN_ACTIVE_DRIVER));
+            $p =  Payment::config(['callbackUrl' => $callbackUrl])->purchase(
+                $invoice,
+                function ($driver, $transactionId) {
+                    $this->transactionId = $transactionId;
+                }
+            )->pay()->toJson();
+            $t_data['detail']['transactionId'] = $this->transactionId;
+            $t_data['detail']['driver'] = setting(SettingKeyEnum::PAYMEN_ACTIVE_DRIVER);
+        }
+
         return redirect()->to(json_decode($p, true)['action']);
     }
-
     private function createTransaction($initial_data)
     {
         $transactionData = [
@@ -247,6 +282,73 @@ class AppointmentDetail extends Component
         }
         return $t;
     }
+    protected function updateTransaction($u_data, Transaction $transaction)
+    {
+        $old_Detials = $transaction->detail;
+        $newDetail = array_merge($old_Detials, $u_data['detail']);
+        $transaction->update(['detail' => $newDetail]);
+    }
+    private function sendSmsSuccessfulSms(AppointmentUser $appointment)
+    {
+        $smsTemplate = setting(SettingKeyEnum::SMS_APPOINTMENT_AFTER_PAYMENT);
+        if (isset($smsTemplate)) {
+            $appointment->notify(new AppointmentSmsNotification($smsTemplate));
+        }
+        // sms to operator and doctor
+        if (isset($appointmentUser->operator)) {
+            $smsToOperator = setting(SettingKeyEnum::SMS_APPOINTMENT_TO_OPERATOR);
+            if (isset($smsToOperator)) {
+                $appointment->notify(new AppointmentDocAndOperatorNotification($smsToOperator, $appointment->operator->mobile));
+            }
+        }
+        if (isset($appointment->doctor)) {
+            if (isset($appointment->doctor->drStoreAppSms) && $appointment->doctor->drStoreAppSms != true) {
+                $smsToDoctor = setting(SettingKeyEnum::SMS_APPOINTMENT_TO_DOCTOR);
+            } elseif (! isset($appointment->doctor->drStoreAppSms)) {
+                $smsToDoctor = setting(SettingKeyEnum::SMS_APPOINTMENT_TO_DOCTOR);
+            }
+            if (isset($smsToDoctor)) {
+                $appointment->notify(new AppointmentDocAndOperatorNotification($smsToDoctor, $appointment->doctor->mobile));
+            }
+        }
+    }
+    private function sendOnlineAppointmentFirstMessage(AppointmentUser $appointment)
+    {
+        // if appointment is online
+        if ($appointment->kind == AppointmentUserKindEnum::ONLINE) {
+            $appointment->online->first()->update(['status' => \Modules\AppointmentUser\Enum\AppointmentOnlineStatusEnum::ACCEPTED]);
+            // send online first message
+            if (setting(SettingKeyEnum::ONILNE_SEND_ATUOMATIC_MESSAGE_STATUS)) {
+                $appointment->online->last()->messages()->create([
+                    'user_id' => $appointment->online->last()->user_id,
+                    'answer_by' => 1,
+                    'type' => AppointmentOnlineMessageTypeEnum::ANSWER,
+                    'seen' => AppointmentOnlineMessageSeenEnum::UNSEEN,
+                    'body' => setting(SettingKeyEnum::ONILNE_SEND_ATUOMATIC_MESSAGE_MESSAGE) ?? 'سلام لطفا سوال خود را مطرح کنید',
+                ]);
+            }
+        }
+    }
+    private function updateTranastionDetail(AppointmentUser $appointment, $receipt)
+    {
+        $tDetail =  $appointment->transaction->detail;
+        $activeGateway = setting(SettingKeyEnum::PAYMEN_ACTIVE_DRIVER);
+        if ($activeGateway == 'saman') {
+            $respondDetaul = $receipt->getDetails();
+            $newTdetail = array_merge($tDetail, [
+                'card_hash' => request()->post('SecurePan', null),
+                'ref_id'    => request()->post('ResNum', null),
+            ]);
+        } else {
+            $respondDetaul = $receipt->getDetails();
+            $newTdetail = array_merge($tDetail, [
+                'card_hash' => $respondDetaul['card_hash'],
+                'ref_id'    => $respondDetaul['ref_id'],
+            ]);
+        }
+        return $newTdetail;
+    }
+
     public function bankCallback()
     {
         $this->paymentSetting();
@@ -258,66 +360,51 @@ class AppointmentDetail extends Component
         }
         if ($this->fetchData['app']->status == AppointmentUserStatusEnum::STATUS_WAIT_PAYMENT) {
             try {
-                $amount = $this->fetchData['app']->details[AppointmentUser::DETAIL_PAYMENT][AppointmentUser::DETAIL_PAYMENT_PRICE]['int'];
+                $amount      = data_get(
+                    $this->fetchData['app'],
+                    AppointmentUser::DETAIL_PAYMENT . '.' . AppointmentUser::DETAIL_PAYMENT_PRICE . '.int'
+                );
+                if (checkIp()) {
+                    $amount = '1500';
+                }
                 $receipt = Payment::amount($amount)
-                    ->transactionId($this->fetchData['app']->transaction->detail['transactionId'])->verify();
-                $this->fetchData['app']->update([
-                    'status' => AppointmentUserStatusEnum::STATUS_SUCCESSFUL,
-                    'deadline_at' => null
-                ]);
-                $smsTemplate = setting(SettingKeyEnum::SMS_APPOINTMENT_AFTER_PAYMENT);
-                if (isset($smsTemplate)) {
-                    $this->fetchData['app']->notify(new AppointmentSmsNotification($smsTemplate));
-                }
-                // sms to operator and doctor
-                if (isset($appointmentUser->operator)) {
-                    $smsToOperator = setting(SettingKeyEnum::SMS_APPOINTMENT_TO_OPERATOR);
-                    if (isset($smsToOperator)) {
-                        $this->fetchData['app']->notify(new AppointmentDocAndOperatorNotification($smsToOperator, $this->fetchData['app']->operator->mobile));
-                    }
-                }
-                if (isset($this->fetchData['app']->doctor)) {
-                    if (isset($this->fetchData['app']->doctor->drStoreAppSms) && $this->fetchData['app']->doctor->drStoreAppSms != true) {
-                        $smsToDoctor = setting(SettingKeyEnum::SMS_APPOINTMENT_TO_DOCTOR);
-                    } elseif (! isset($this->fetchData['app']->doctor->drStoreAppSms)) {
-                        $smsToDoctor = setting(SettingKeyEnum::SMS_APPOINTMENT_TO_DOCTOR);
-                    }
-                    if (isset($smsToDoctor)) {
-                        $this->fetchData['app']->notify(new AppointmentDocAndOperatorNotification($smsToDoctor, $this->fetchData['app']->doctor->mobile));
-                    }
-                }
-                // if appointment is online
-                if ($this->fetchData['app']->kind == AppointmentUserKindEnum::ONLINE) {
-                    $this->fetchData['app']->online->first()->update(['status' => \Modules\AppointmentUser\Enum\AppointmentOnlineStatusEnum::ACCEPTED]);
-                    // send online first message
-                    if (setting(SettingKeyEnum::ONILNE_SEND_ATUOMATIC_MESSAGE_STATUS)) {
-                        $this->fetchData['app']->online->last()->messages()->create([
-                            'user_id' => $this->fetchData['app']->online->last()->user_id,
-                            'answer_by' => 1,
-                            'type' => AppointmentOnlineMessageTypeEnum::ANSWER,
-                            'seen' => AppointmentOnlineMessageSeenEnum::UNSEEN,
-                            'body' => setting(SettingKeyEnum::ONILNE_SEND_ATUOMATIC_MESSAGE_MESSAGE) ?? 'سلام لطفا سوال خود را مطرح کنید',
-                        ]);
-                    }
-                }
-
-                $this->fetchData['sweetAlert']['icon'] = 'success';
-                $this->fetchData['sweetAlert']['msg']  = 'پرداخت باموفقیت انجام شد و نوبت شما فعال شد ';
-                $tDetail =  $this->fetchData['app']->transaction->detail;
-                $respondDetaul = $receipt->getDetails();
-                if(isset($respondDetaul['card_hash']) && isset($respondDetaul['ref_id'])) {
-                    $newTdetail = array_merge($tDetail, [
-                        'card_hash' => $respondDetaul['card_hash'],
-                        'ref_id' => $respondDetaul['ref_id'],
+                    ->transactionId($this->fetchData['app']->transaction->detail['transactionId'])
+                    ->verify();
+                $receipt = Payment::amount($amount)
+                    ->transactionId($this->fetchData['app']->transaction->detail['transactionId'])
+                    ->verify();
+                DB::transaction(function () use ($receipt) {
+                    $appointment = $this->fetchData['app'];
+                    $appointment->update([
+                        'status' => AppointmentUserStatusEnum::STATUS_SUCCESSFUL,
+                        'deadline_at' => null
                     ]);
-                    $this->fetchData['app']->transaction->update(['status' => TransactionStatusEnum::SUCCESSFUL, 'detail' => $newTdetail]);
-                }
-                $this->fetchData['app']->transaction->update(['status' => TransactionStatusEnum::SUCCESSFUL]);
-                $this->render();
+
+                    $this->sendSmsSuccessfulSms($appointment);
+                    $this->sendOnlineAppointmentFirstMessage($appointment);
+
+                    $this->fetchData['sweetAlert']['icon'] = 'success';
+                    $this->fetchData['sweetAlert']['msg']  = 'پرداخت باموفقیت انجام شد و نوبت شما فعال شد ';
+
+                    $newTdetail = $this->updateTranastionDetail($appointment, $receipt);
+                    $appointment->transaction->update(['status' => TransactionStatusEnum::SUCCESSFUL, 'detail' => $newTdetail]);
+                });
+                return;
             } catch (InvalidPaymentException $exception) {
                 $this->fetchData['sweetAlert']['msg'] = 'خطا در انجام تراکنش.';
                 $this->fetchData['sweetAlert']['icon'] = 'danger';
+                Log::error('Error in payment verification process', [
+                    'error_message' => $exception->getMessage(),
+                    'stack_trace' => $exception->getTraceAsString(),
+                ]);
                 $this->fetchData['app']->transaction->update(['status' => TransactionStatusEnum::REJECTED]);
+            } catch (Exception $e) {
+                $this->fetchData['sweetAlert']['msg'] = 'خطا در انجام تراکنش.';
+                $this->fetchData['sweetAlert']['icon'] = 'danger';
+                Log::error('Error in payment verification process', [
+                    'error_message' => $e->getMessage(),
+                    'stack_trace' => $e->getTraceAsString(),
+                ]);
             }
         }
     }

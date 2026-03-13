@@ -15,5 +15,8 @@ use Modules\Front\Http\Controllers\FrontController;
 */
 
 Route::group([], function () {
+    Route::get('/payment/saman/{token}', function ($token) {
+        return view('payment.saman-form', ['token' => $token]);
+    })->name('payment.saman.form');
     Route::resource('front', FrontController::class)->names('front');
 });

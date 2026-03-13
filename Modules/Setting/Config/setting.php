@@ -143,6 +143,7 @@ $setting = [
         'title' => 'تنظیمات پرداخت',
         'icon' => 'fa fa-credit-card',
         'settings' => [
+            \Modules\Setting\Enum\SettingKeyEnum::PAYMEN_ACTIVE_DRIVER,
             \Modules\Setting\Enum\SettingKeyEnum::PAYMENT_PAYSTAR_STATUS,
             \Modules\Setting\Enum\SettingKeyEnum::PAYMENT_PAYSTAR_TOKEN,
             \Modules\Setting\Enum\SettingKeyEnum::PAYMENT_PAYSTAR_SIGN,
@@ -150,9 +151,10 @@ $setting = [
             \Modules\Setting\Enum\SettingKeyEnum::PAYMENT_ZARINPAL_MERCHENID,
             \Modules\Setting\Enum\SettingKeyEnum::PAYMENT_PARSIAN_STATUS,
             \Modules\Setting\Enum\SettingKeyEnum::PAYMENT_PARSIAN_TOKEN,
+            \Modules\Setting\Enum\SettingKeyEnum::PAYMENT_SAMAN_TERMINAL_NUMBER,
+            \Modules\Setting\Enum\SettingKeyEnum::PAYMENT_SAMAN_TERMINAL_PASS,
             \Modules\Setting\Enum\SettingKeyEnum::PAYMENT_RULES_AND_CONDITION_STATUS,
             \Modules\Setting\Enum\SettingKeyEnum::PAYMENT_RULES_AND_CONDITION_DESCRIPTION,
-            \Modules\Setting\Enum\SettingKeyEnum::PAYMEN_ACTIVE_DRIVER,
         ],
     ],
     'voip' => [

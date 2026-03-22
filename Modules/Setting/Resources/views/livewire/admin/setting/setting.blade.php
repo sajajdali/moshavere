@@ -62,7 +62,7 @@
 </div>
 @push('scripts')
     <!-- WYSIWYG Editor JS -->
-    <script src="//cdn.ckeditor.com/4.20.2/full/ckeditor.js"></script>
+    {{-- <script src="//cdn.ckeditor.com/4.20.2/full/ckeditor.js"></script> --}}
     <script src="{{ admin_asset('js/stand-alone-button.js') }}"></script>
     <script src="{{ admin_asset('plugins/select2/select2.full.min.js') }}"></script>
     <script src="{{ admin_asset('plugins/notify/js/notifIt.js') }}"></script>

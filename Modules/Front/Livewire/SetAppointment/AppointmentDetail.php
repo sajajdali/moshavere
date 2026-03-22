@@ -243,7 +243,7 @@ class AppointmentDetail extends Component
         } else {
             $invoice = (new Invoice)->amount($amount)
                 ->detail('description', $description)
-                ->via(setting(SettingKeyEnum::PAYMEN_ACTIVE_DRIVER));
+                ->via($activeGateway);
             $p =  Payment::config(['callbackUrl' => $callbackUrl])->purchase(
                 $invoice,
                 function ($driver, $transactionId) {
@@ -251,7 +251,7 @@ class AppointmentDetail extends Component
                 }
             )->pay()->toJson();
             $t_data['detail']['transactionId'] = $this->transactionId;
-            $t_data['detail']['driver'] = setting(SettingKeyEnum::PAYMEN_ACTIVE_DRIVER);
+            $t_data['detail']['driver'] = $activeGateway;
         }
 
         return redirect()->to(json_decode($p, true)['action']);
@@ -265,7 +265,7 @@ class AppointmentDetail extends Component
             'cost' => $initial_data['amount'],
             'total_cost' => $initial_data['amount'],
             'paid_by' => TransactionPaidEnum::ONLINE,
-            'detail' => $initial_data['detail'],
+            'detail' => data_get($initial_data,'detail'),
         ];
         if (isset($initial_data['discount'])) {
             $transactionData['discount_id'] = $initial_data['discount']['discount_id'];

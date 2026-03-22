@@ -9,7 +9,6 @@ use Illuminate\Support\Facades\Log;
 use Modules\Setting\Enum\SettingKeyEnum;
 use Illuminate\Notifications\Notification;
 use Ghasedak\DataTransferObjects\Request\ReceptorDTO;
-use Ghasedak\DataTransferObjects\Request\SingleMessageDTO;
 use Ghasedak\DataTransferObjects\Request\OtpMessageWithParamsDTO;
 
 class SmsChannel
@@ -35,6 +34,7 @@ class SmsChannel
         $settingCollection = \Modules\Setting\Entities\Setting::whereIn('setting_key', [
             SettingKeyEnum::SMS_SENDER,
             SettingKeyEnum::SMS_PARSSMS_SENDER_NUMBER,
+            SettingKeyEnum::SMS_FARAZ_LINE_NUMBER,
             SettingKeyEnum::SMS_API_TOKEN,
             SettingKeyEnum::SMS_PARSSMS_LOGIN_TEXT,
             SettingKeyEnum::SMS_PARSSMS_ADD_APPOINTMENT_TEXT,
@@ -61,6 +61,10 @@ class SmsChannel
         $data         = $notification->toArray($notifiable);
         if ($senderDriver == 'parsasms') {
             $this->sendWithParsSms($apiToken, $data, $settingCollection);
+            return;
+        }
+        if ($senderDriver == 'farazsms') {
+            $this->sendWithFarrazSms($apiToken, $data, $settingCollection);
             return;
         }
         if (isset($data['template']) && !empty($data['template'])) {
@@ -128,13 +132,29 @@ class SmsChannel
                     'message' => $finalText,
                     'receptor' => $data['receptor'],
                 ]);
-            // Log::info('message text : ' . $finalText);
-            // Log::info('Response Status Code: ' . $r->status());
-            // Log::info('Response Body: ' . $r->getBody()->getContents());
         } catch (\Exception $e) {
             Log::error('pars sms send error', [
                 'error message' => $e->getMessage(),
                 'error line' => $e->getTrace(),
+            ]);
+        }
+        return;
+    }
+    private function sendWithFarrazSms($apiToken, $data, $settings)
+    {
+        try {
+            $findSmsText =  $this->findSmsText($data['template'], $settings);
+            $finalText = $this->paramToText($findSmsText, $data['params']);
+            $r = \Illuminate\Support\Facades\Http::withHeader('apiKey', $apiToken)
+                ->post('https://api.iranpayamak.com/ws/v1/sms/simple', [
+                    'line_number'    => $this->getSettingValue($settings, SettingKeyEnum::SMS_FARAZ_LINE_NUMBER),
+                    'text'           => $finalText,
+                    'recipients'     => [$data['receptor']],
+                ]);
+        } catch (\Exception $e) {
+            Log::error('farzSms send error', [
+                'error message' => $e->getMessage(),
+                'error line'    => $e->getTrace(),
             ]);
         }
         return;
@@ -160,8 +180,11 @@ class SmsChannel
     public function paramToText($msg, $params)
     {
         $ss                 = $this->changeSmsParameters($params);
-        $final_mesg         = $this->computeSms($msg, $ss);
-        return $final_mesg;
+        if (! is_null($msg)) {
+            $final_mesg         = $this->computeSms($msg, $ss);
+            return $final_mesg;
+        }
+        return '';
     }
     private function changeSmsParameters($params)
     {

@@ -12,14 +12,14 @@
                             <p>اطلاعات شخصی</p>
                         </a>
                     </li>
-                    {{-- <li class="dashboard__side-item" data-section='passwordSection'>
+                    <li class="dashboard__side-item" data-section='jibitCredit'>
                         <a href="#">
                             <svg class="w-5 h-5" xmlns="http://www.w3.org/2000/svg">
                                 <use xlink:href="#sprite-lock" />
                             </svg>
-                            <p>رمز عبور</p>
+                            <p>اعتبار جیبیت</p>
                         </a>
-                    </li> --}}
+                    </li>
                     <li class="dashboard__side-item" data-section='userAppointmentSection' wire:ignore.self>
                         <a href="#">
                             <svg class="w-5 h-5" xmlns="http://www.w3.org/2000/svg">
@@ -58,6 +58,7 @@
                 </ul>
             </aside>
             @include('front::components.profile.personalinfo')
+            @include('front::components.profile.jibitCreditComponent')
             {{-- @include('front::components.profile.pasword') --}}
             @include('front::components.profile.myappointment')
             @include('front::components.profile.mycomments')

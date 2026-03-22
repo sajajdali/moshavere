@@ -191,7 +191,11 @@ return [
      */
     'migration_parameters' => [
         '--force' => true, // This needs to be true to run migrations in production.
-        '--path' => [database_path('migrations/tenant'),'Modules/Place/database/migrations/tenant','Modules/AppointmentUser/database/migrations/tenant'],
+        '--path' => [database_path('migrations/tenant'),
+        'Modules/Place/database/migrations/tenant',
+        'Modules/AppointmentUser/database/migrations/tenant',
+        'Modules/User/database/migrations/tenant',
+    ],
         '--realpath' => true,
     ],
 

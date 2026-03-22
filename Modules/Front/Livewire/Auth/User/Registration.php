@@ -8,6 +8,7 @@ use Livewire\Attributes\Layout;
 use Livewire\Attributes\Locked;
 use Modules\User\Entities\User;
 use Illuminate\Support\Facades\Session;
+use Modules\Setting\Enum\SettingKeyEnum;
 
 #[Layout('front::layouts.app')]
 #[Title('ورود')]
@@ -16,6 +17,7 @@ class Registration extends Component
 
     #[Locked]
     public array $fetchData = [];
+
     public array $form = [];
     public User $user;
 
@@ -34,15 +36,23 @@ class Registration extends Component
             'form.email.email'         => 'ایمیل وارد شده صحیح نیست',
         ];
     }
-    public function completeUserInfo()
+    protected function rules()
     {
-        $this->validate([
+        $rules =  [
             'form.first_name' => 'required|string|max:225',
             'form.last_name'  => 'required|string|max:225',
             'form.gender'     => 'required|string|max:225',
             'form.email'      => 'nullable|email|max:225',
             'form.national_code'  => 'nullable|digits:10',
-        ]);
+        ];
+        if ($this->fetchData['is_national_code_required']) {
+            $rules['form.national_code'] = 'required|digits:10';
+        }
+        return $rules;
+    }
+    public function completeUserInfo()
+    {
+        $this->validate();
         $this->user->first_name = $this->form['first_name'];
         $this->user->last_name = $this->form['last_name'];
         $this->user->gender = $this->form['gender'];
@@ -56,7 +66,7 @@ class Registration extends Component
         $intendedUrl = Session::pull('url.intended', route('front.homePage'));
         if (isset($intendedUrl)) {
             session()->forget('url.intended');
-            session()->flash('authsuccess','ثبت نام با موفقیت انجام شد');
+            session()->flash('authsuccess', 'ثبت نام با موفقیت انجام شد');
             return redirect()->intended($intendedUrl);
         }
         return redirect()->route('front.homePage');
@@ -64,6 +74,7 @@ class Registration extends Component
     public function mount()
     {
         $this->user  = auth()->user();
+        $this->fetchData['is_national_code_required'] = (bool) setting(SettingKeyEnum::USER_REGISTER_NATIONAL_CODE_REQUIRED);
     }
     public function render()
     {

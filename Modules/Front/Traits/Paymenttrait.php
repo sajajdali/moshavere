@@ -4,32 +4,17 @@ namespace Modules\Front\Traits;
 
 use Modules\Setting\Enum\SettingKeyEnum;
 use Modules\Transaction\app\Models\Transaction;
-use Modules\Transaction\Enum\TransactionPaidEnum;
-use Modules\Transaction\Enum\TransactionStatusEnum;
 use Modules\AppointmentUser\app\Models\AppointmentUser;
 
 trait Paymenttrait
 {
-    public function createPayment($data)
-    {
-        $paystar_status = setting(SettingKeyEnum::PAYMENT_PAYSTAR_STATUS);
-        $zarinPl_status = setting(SettingKeyEnum::PAYMENT_ZARINPAL_STATUS);
-        if (isset($zarinPl_status)) {
-            return $this->createZarinPlaPayment($data);
-        } else {
-
-            if ($zarinPl_status) {
-                return   $this->createPaystarPayment($data);
-            }
-        }
-    }
     public function createZarinPlaPayment($initial_data)
     {
 
         $amount = $initial_data['amount'] . '0';
         $transaction =  $this->createTransaction($initial_data);
         $data = [
-            'merchant_id' => setting(SettingKeyEnum::PAYMENT_ZARINPAL_STATUS),
+            // 'merchant_id' => setting(SettingKeyEnum::PAYMENT_ZARINPAL_STATUS),
             'amount' => intval($amount),
             'callback_url' => route('front.setAppointment.detail.zarinpal',['tracking_code' => $initial_data['tracking_code'] ]) . '?transaction_id=' . $transaction->id,
             'currency' => 'IRR',

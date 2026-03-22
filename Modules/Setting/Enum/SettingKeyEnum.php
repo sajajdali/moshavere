@@ -98,10 +98,10 @@ enum SettingKeyEnum: int implements EnumHasNameInterface, SettingTypeInterface, 
     case SMS_DIS_APPROVED_MONITORING_APPOINTMENT = 71;
     case SMS_FEEDBACK = 72;
     case SUPPORT_USER_ROLE = 73;
-    case  SMS_AFTER_REFUND = 74;
-    case  SMS_FOR_SEND_MESSAGE_IN_CHATS = 76;
-    case  SMS_SET_APP_MONITORING = 77;
-    case  CALL_LOGIN_TEMPLATE = 78;
+    case SMS_AFTER_REFUND = 74;
+    case SMS_FOR_SEND_MESSAGE_IN_CHATS = 76;
+    case SMS_SET_APP_MONITORING = 77;
+    case CALL_LOGIN_TEMPLATE = 78;
     case SMS_PARSSMS_SENDER_NUMBER =  85;
     case SMS_PARSSMS_LOGIN_TEXT = 80 ;
     case SMS_PARSSMS_ADD_APPOINTMENT_TEXT = 81 ;
@@ -112,19 +112,17 @@ enum SettingKeyEnum: int implements EnumHasNameInterface, SettingTypeInterface, 
     case SMS_PARSSMS_MONITORING_APPROVED_APP = 87 ;
     case SMS_PARSSMS_MONITORING_DIS_APPROVED_APP = 89 ;
     case SMS_PRSSMS_APPOINTMENT_WAITING_PAYMENT = 91 ;
+    case SMS_FARAZ_LINE_NUMBER = 92 ;
 
 
         //payment
-    case PAYMENT_PAYSTAR_STATUS = 152;
     case PAYMENT_PAYSTAR_TOKEN = 150;
     case PAYMENT_PAYSTAR_SIGN = 151;
-    case PAYMENT_ZARINPAL_STATUS = 153;
     case PAYMENT_ZARINPAL_MERCHENID = 154;
     case PAYMENT_RULES_AND_CONDITION_STATUS = 155;
     case PAYMENT_RULES_AND_CONDITION_DESCRIPTION = 156;
     case SECREYERY_SEND_LINK_FOR_APPOINTMENT = 157;
     case PAYMEN_ACTIVE_DRIVER = 158;
-    case PAYMENT_PARSIAN_STATUS = 159;
     case PAYMENT_PARSIAN_TOKEN = 161;
     case PAYMENT_SAMAN_TERMINAL_NUMBER = 162;
     case PAYMENT_SAMAN_TERMINAL_PASS = 163;
@@ -160,6 +158,9 @@ enum SettingKeyEnum: int implements EnumHasNameInterface, SettingTypeInterface, 
 
     // registration
     case USER_REGISTER_NATIONAL_CODE_REQUIRED = 355 ;
+
+    // jibi
+    case ACTIVE_JIBIT = 356 ;
 
     public function isSupportCache(): bool
     {
@@ -237,18 +238,16 @@ enum SettingKeyEnum: int implements EnumHasNameInterface, SettingTypeInterface, 
             self::SMS_FOR_SEND_MESSAGE_IN_CHATS => 'نام الگوی پیامکی، بعد از پاسخ دادن به چت',
             self::SMS_SET_APP_MONITORING => 'در صورت فعال بودن پایش نوبت، پیامک ثبت نوبت',
             self::SMS_SENDER => 'پنل ارسال کننده ی پیامک',
+            self::SMS_FARAZ_LINE_NUMBER => 'شماره ارسال کننده پیامک از فراز SMS',
 
             //payment
-            self::PAYMENT_PAYSTAR_STATUS => 'فعال بودن درگاه پی استار',
             self::PAYMENT_PAYSTAR_TOKEN => 'کد درگاه پرداخت پی استار',
             self::PAYMENT_PAYSTAR_SIGN => 'امضا درگاه پی استار',
-            self::PAYMENT_ZARINPAL_STATUS => 'فعال بودن درگاه زرین پال',
             self::PAYMENT_ZARINPAL_MERCHENID => 'مرچند ایدی درگاه زرین پال',
             self::PAYMENT_RULES_AND_CONDITION_STATUS => 'فعال سازی شرایط و قوانین پرداخت',
             self::PAYMENT_RULES_AND_CONDITION_DESCRIPTION => 'شرایط و قوانین مربوط به پرداخت',
             self::SECREYERY_SEND_LINK_FOR_APPOINTMENT => 'امکان ارسال لینک پرداخت نوبت به کاربر توسط منشی',
             self::PAYMEN_ACTIVE_DRIVER => 'درگاه فعال',
-            self::PAYMENT_PARSIAN_STATUS => 'فعال بودن درگاه پارسیان',
             self::PAYMENT_PARSIAN_TOKEN => 'کد PIN Code دریافتی از بانک پارسیان',
             self::PAYMENT_SAMAN_TERMINAL_NUMBER => 'شماره ترمینال سامان(MID)',
             self::PAYMENT_SAMAN_TERMINAL_PASS => 'رمز ترمینال سامان',
@@ -325,6 +324,9 @@ enum SettingKeyEnum: int implements EnumHasNameInterface, SettingTypeInterface, 
             //REGISTRATION
             self::USER_REGISTER_NATIONAL_CODE_REQUIRED => 'الزامی بودن وارد کردن کد ملی در هنگام ثبت نام',
 
+            //JIBIT
+            self::ACTIVE_JIBIT => 'فعال سازی اعتبار جیبیت',
+
             default => ''
         };
     }
@@ -351,6 +353,7 @@ enum SettingKeyEnum: int implements EnumHasNameInterface, SettingTypeInterface, 
             self::SMS_PARSSMS_LOGIN_TEXT => 'شامل یک پارامتر که کد ارسالی است میباشد.',
             self::PAYMENT_PARSIAN_TOKEN => '<span class="my-3"></span>',
             self::PAYMENT_SAMAN_TERMINAL_PASS => '<span class="my-3"></span>',
+            self::ACTIVE_JIBIT => 'در حال توسعه...',
             self::SMS_PARSSMS_ADD_APPOINTMENT_TEXT => 'پارامتر های قابل قرار گیری: <br />  ۱ = نام کاربر
              <br/> ۲ = نام خانوادگی کاربر
              <br/> ۳ = نام پزشک
@@ -379,7 +382,12 @@ enum SettingKeyEnum: int implements EnumHasNameInterface, SettingTypeInterface, 
         }
         return false ;
     }
-
+    public function deactiveFeature():bool {
+        return match($this) {
+            self::ACTIVE_JIBIT => true ,
+            default => false ,
+        };
+    }
     public function render(): string
     {
         return $this->getType()->component($this->value);
@@ -398,13 +406,11 @@ enum SettingKeyEnum: int implements EnumHasNameInterface, SettingTypeInterface, 
             self::ONILNE_SEND_ATUOMATIC_MESSAGE_STATUS => SettingTypeEnum::CHECK,
             self::APPOINTMENT_SET_APPOINTMENT_WITH_DOCUMENT_NUMBER => SettingTypeEnum::CHECK,
             self::SHOW_FALSE_APPOINTMENT_STATUS => SettingTypeEnum::CHECK,
-            self::PAYMENT_PARSIAN_STATUS => SettingTypeEnum::CHECK,
-            self::PAYMENT_PAYSTAR_STATUS => SettingTypeEnum::CHECK,
             self::APPOINTMENT_FOR_OTHERS_STATUS => SettingTypeEnum::CHECK,
-            self::PAYMENT_ZARINPAL_STATUS => SettingTypeEnum::CHECK,
             self::APPOINTMENT_DESCRIPTION_STATUS => SettingTypeEnum::CHECK,
             self::SECREYERY_SEND_LINK_FOR_APPOINTMENT => SettingTypeEnum::CHECK,
             self::APPOINTMENT_STATUS => SettingTypeEnum::CHECK,
+            self::ACTIVE_JIBIT => SettingTypeEnum::CHECK,
             self::PAYMENT_RULES_AND_CONDITION_STATUS => SettingTypeEnum::CHECK,
             self::APPOINTMENT_USER_PERESENT_STATUS_REGISTRATION => SettingTypeEnum::CHECK,
             self::SUPPORT_USER_ROLE , self::ACTIVE_HEADER => SettingTypeEnum::SELECT,
@@ -444,6 +450,24 @@ enum SettingKeyEnum: int implements EnumHasNameInterface, SettingTypeInterface, 
             default => SettingTypeEnum::TEXT
         };
     }
+
+    public function separatorTitle() {
+        return match ($this) {
+            self::SMS_SENDER => 'تنظیمات ارسال کننده پیامک',
+            self::SMS_API_LOGIN_TEMPLATE => 'ورود و ثبت نوبت',
+            self::SMS_APPOINTMENT_WAITING_PAYMENT => 'پیامک های مربوط به پرداخت',
+            self::SMS_SET_APP_MONITORING => 'پایش نوبت',
+            self::SMS_APPOINTMENT_TO_DOCTOR => 'اطلاع رسانی به اپراتور و پزشک',
+            self::APPOINTMENT_STATUS => 'تنظیمات عمومی',
+            self::APPOINTMENT_DESCRIPTION_STATUS => 'صفحه جزئیات نوبت',
+            self::PAYMENT_PAYSTAR_TOKEN => 'درگاه پی استار',
+            self::PAYMENT_ZARINPAL_MERCHENID => 'درگاه زرین پال',
+            self::PAYMENT_PARSIAN_TOKEN => 'درگاه پارسیان',
+            self::PAYMENT_SAMAN_TERMINAL_NUMBER => 'درگاه سامان',
+            self::PAYMENT_RULES_AND_CONDITION_STATUS => 'شرایط و قوانین پرداخت',
+            default => '' ,
+        };
+    }
     /**
      * Radio, select and checkbox options
      */
@@ -457,11 +481,12 @@ enum SettingKeyEnum: int implements EnumHasNameInterface, SettingTypeInterface, 
             ],
             self::SMS_SENDER => [
                 'shsms' => 'shsms',
-                'ghasedak' => 'ghasedak',
-                'parsasms' => 'parsasms',
+                'ghasedak' => 'قاصدک',
+                'parsasms' => 'پارس',
+                'farazsms' => 'فراز',
             ],
             self::SUPPORT_USER_ROLE => User::adminSupportRoles(),
-            self::PAYMEN_ACTIVE_DRIVER => ['zrinpal' => 'zrinpal','parsian'=> 'parsian','saman' => 'saman'],
+            self::PAYMEN_ACTIVE_DRIVER => ['zrinpal' => 'زرین پال','parsian'=> 'پارسیان','saman' => 'سامان'],
             default => []
         };
     }

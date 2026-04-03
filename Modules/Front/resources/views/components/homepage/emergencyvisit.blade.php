@@ -51,7 +51,7 @@
                                         </div>
                                         <div class="flex items-center gap-2">
                                             {{-- TODO::load rate from feedBack --}}
-                                            <span>4.5</span>
+                                            <span>5</span>
                                             <svg class="w-5 h-5" xmlns="http://www.w3.org/2000/svg">
                                                 <use xlink:href="#sprite-star-full" />
                                             </svg>

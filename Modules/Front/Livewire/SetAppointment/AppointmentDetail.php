@@ -189,9 +189,9 @@ class AppointmentDetail extends Component
     public function GotoPayment()
     {
         $amount = $this->fetchData['stauts']['price'];
-        if (checkIp()) {
-            $amount = '1500';
-        }
+        // if (checkIp()) {
+        //     $amount = '1500';
+        // }
         $this->paymentSetting();
         $activeGateway = setting(SettingKeyEnum::PAYMEN_ACTIVE_DRIVER);
         if ($activeGateway === 'parsian') {
@@ -252,6 +252,7 @@ class AppointmentDetail extends Component
             )->pay()->toJson();
             $t_data['detail']['transactionId'] = $this->transactionId;
             $t_data['detail']['driver'] = $activeGateway;
+            $this->updateTransaction($t_data, $transaction);
         }
 
         return redirect()->to(json_decode($p, true)['action']);
@@ -265,7 +266,7 @@ class AppointmentDetail extends Component
             'cost' => $initial_data['amount'],
             'total_cost' => $initial_data['amount'],
             'paid_by' => TransactionPaidEnum::ONLINE,
-            'detail' => data_get($initial_data,'detail'),
+            'detail' => data_get($initial_data, 'detail'),
         ];
         if (isset($initial_data['discount'])) {
             $transactionData['discount_id'] = $initial_data['discount']['discount_id'];
@@ -276,7 +277,8 @@ class AppointmentDetail extends Component
         $appUser = AppointmentUser::find($initial_data['appointmentUser_id']);
         // Check if a transaction exists
         if ($appUser->transaction) {
-            $t = $appUser->transaction->update($transactionData);
+            $appUser->transaction->update($transactionData);
+            $t = $appUser->transaction;
         } else {
             $t = $appUser->transaction()->create($transactionData);
         }
@@ -284,7 +286,7 @@ class AppointmentDetail extends Component
     }
     protected function updateTransaction($u_data, Transaction $transaction)
     {
-        $old_Detials = $transaction->detail;
+        $old_Detials = $transaction->detail ?? [];
         $newDetail = array_merge($old_Detials, $u_data['detail']);
         $transaction->update(['detail' => $newDetail]);
     }
@@ -332,6 +334,7 @@ class AppointmentDetail extends Component
     private function updateTranastionDetail(AppointmentUser $appointment, $receipt)
     {
         $tDetail =  $appointment->transaction->detail;
+        $newTdetail = $appointment->transaction->detail;
         $activeGateway = setting(SettingKeyEnum::PAYMEN_ACTIVE_DRIVER);
         if ($activeGateway == 'saman') {
             $respondDetaul = $receipt->getDetails();
@@ -341,10 +344,12 @@ class AppointmentDetail extends Component
             ]);
         } else {
             $respondDetaul = $receipt->getDetails();
-            $newTdetail = array_merge($tDetail, [
-                'card_hash' => $respondDetaul['card_hash'],
-                'ref_id'    => $respondDetaul['ref_id'],
-            ]);
+            if (isset($respondDetaul['card_hash']) && isset($respondDetaul['ref_id'])) {
+                $newTdetail = array_merge($tDetail, [
+                    'card_hash' => $respondDetaul['card_hash'],
+                    'ref_id'    => $respondDetaul['ref_id'],
+                ]);
+            }
         }
         return $newTdetail;
     }
@@ -364,9 +369,9 @@ class AppointmentDetail extends Component
                     $this->fetchData['app'],
                     AppointmentUser::DETAIL_PAYMENT . '.' . AppointmentUser::DETAIL_PAYMENT_PRICE . '.int'
                 );
-                if (checkIp()) {
-                    $amount = '1500';
-                }
+                // if (checkIp()) {
+                //     $amount = '1500';
+                // }
                 $receipt = Payment::amount($amount)
                     ->transactionId($this->fetchData['app']->transaction->detail['transactionId'])
                     ->verify();

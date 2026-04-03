@@ -28,14 +28,16 @@ if (! function_exists('holidays_array')) {
 if (! function_exists('checkIp')) {
     function checkIp()
     {
+        $ip = request()->header('X-Forwarded-For', request()->header('X-Real-Ip', request()->header('ar-real-ip')));
+        $ipServer = request()->ip();
+        $realIp = $ip == null ? $ipServer : $ip;
         if (config('app.dont_check_ip')) {
             return true;
         }
-        $allowedIps = [
-            '127.0.0.1',
-            '91.92.122.120',
-            '79.127.12.8'
-        ];
-        return in_array(request()->ip(), $allowedIps);
+        if ($realIp == '91.92.122.120' || $realIp == '127.0.0.1' || $realIp == '79.127.12.8') {
+            return true;
+        } else {
+            return false;
+        }
     }
 }

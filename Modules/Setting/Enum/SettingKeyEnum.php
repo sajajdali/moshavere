@@ -126,6 +126,7 @@ enum SettingKeyEnum: int implements EnumHasNameInterface, SettingTypeInterface, 
     case PAYMENT_PARSIAN_TOKEN = 161;
     case PAYMENT_SAMAN_TERMINAL_NUMBER = 162;
     case PAYMENT_SAMAN_TERMINAL_PASS = 163;
+    case PAYMENT_SEP_TERMINAL_ID = 164;
 
 
 
@@ -251,6 +252,7 @@ enum SettingKeyEnum: int implements EnumHasNameInterface, SettingTypeInterface, 
             self::PAYMENT_PARSIAN_TOKEN => 'کد PIN Code دریافتی از بانک پارسیان',
             self::PAYMENT_SAMAN_TERMINAL_NUMBER => 'شماره ترمینال سامان(MID)',
             self::PAYMENT_SAMAN_TERMINAL_PASS => 'رمز ترمینال سامان',
+            self::PAYMENT_SEP_TERMINAL_ID => 'شماره ترمینال سپ',
 
             // headers
             self::ENABLE_DOCTORS_MENU => 'فعال بودن لیست پزشکان در منو',
@@ -464,6 +466,7 @@ enum SettingKeyEnum: int implements EnumHasNameInterface, SettingTypeInterface, 
             self::PAYMENT_ZARINPAL_MERCHENID => 'درگاه زرین پال',
             self::PAYMENT_PARSIAN_TOKEN => 'درگاه پارسیان',
             self::PAYMENT_SAMAN_TERMINAL_NUMBER => 'درگاه سامان',
+            self::PAYMENT_SEP_TERMINAL_ID => 'درگاه سپ(درگاه سامان کیش)',
             self::PAYMENT_RULES_AND_CONDITION_STATUS => 'شرایط و قوانین پرداخت',
             default => '' ,
         };
@@ -486,7 +489,7 @@ enum SettingKeyEnum: int implements EnumHasNameInterface, SettingTypeInterface, 
                 'farazsms' => 'فراز',
             ],
             self::SUPPORT_USER_ROLE => User::adminSupportRoles(),
-            self::PAYMEN_ACTIVE_DRIVER => ['zrinpal' => 'زرین پال','parsian'=> 'پارسیان','saman' => 'سامان'],
+            self::PAYMEN_ACTIVE_DRIVER => ['zrinpal' => 'زرین پال','parsian'=> 'پارسیان','saman' => 'سامان','sep' => 'سپ'],
             default => []
         };
     }

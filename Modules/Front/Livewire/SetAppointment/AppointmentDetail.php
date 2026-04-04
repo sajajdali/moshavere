@@ -244,12 +244,28 @@ class AppointmentDetail extends Component
             $invoice = (new Invoice)->amount($amount)
                 ->detail('description', $description)
                 ->via($activeGateway);
-            $p =  Payment::config(['callbackUrl' => $callbackUrl])->purchase(
-                $invoice,
-                function ($driver, $transactionId) {
-                    $this->transactionId = $transactionId;
-                }
-            )->pay()->toJson();
+            if ($activeGateway == 'sep') {
+                $p =  Payment::config(
+                    [
+                        'callbackUrl' => $callbackUrl,
+                        'terminalId'  => setting(SettingKeyEnum::PAYMENT_SAMAN_TERMINAL_NUMBER),
+                        'via'         => $activeGateway,
+
+                    ]
+                )->purchase(
+                    $invoice,
+                    function ($driver, $transactionId) {
+                        $this->transactionId = $transactionId;
+                    }
+                )->pay()->toJson();
+            } else {
+                $p =  Payment::config(['callbackUrl' => $callbackUrl, 'via' => $activeGateway])->purchase(
+                    $invoice,
+                    function ($driver, $transactionId) {
+                        $this->transactionId = $transactionId;
+                    }
+                )->pay()->toJson();
+            }
             $t_data['detail']['transactionId'] = $this->transactionId;
             $t_data['detail']['driver'] = $activeGateway;
             $this->updateTransaction($t_data, $transaction);
@@ -357,6 +373,7 @@ class AppointmentDetail extends Component
     public function bankCallback()
     {
         $this->paymentSetting();
+        $activeGateway = setting(SettingKeyEnum::PAYMEN_ACTIVE_DRIVER);
         if (! $this->fetchData['app']->details[AppointmentUser::DETAIL_PAYMENT]['status']) {
             $this->fetchData['sweetAlert']['msg'] = 'خطا در انجام تراکنش.';
             $this->fetchData['sweetAlert']['icon'] = 'danger';
@@ -372,10 +389,7 @@ class AppointmentDetail extends Component
                 // if (checkIp()) {
                 //     $amount = '1500';
                 // }
-                $receipt = Payment::amount($amount)
-                    ->transactionId($this->fetchData['app']->transaction->detail['transactionId'])
-                    ->verify();
-                $receipt = Payment::amount($amount)
+                $receipt = Payment::config(['via' => $activeGateway])->amount($amount)
                     ->transactionId($this->fetchData['app']->transaction->detail['transactionId'])
                     ->verify();
                 DB::transaction(function () use ($receipt) {

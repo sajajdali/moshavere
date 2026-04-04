@@ -151,6 +151,7 @@ $setting = [
             \Modules\Setting\Enum\SettingKeyEnum::PAYMENT_SAMAN_TERMINAL_PASS,
             \Modules\Setting\Enum\SettingKeyEnum::PAYMENT_PAYSTAR_TOKEN,
             \Modules\Setting\Enum\SettingKeyEnum::PAYMENT_PAYSTAR_SIGN,
+            \Modules\Setting\Enum\SettingKeyEnum::PAYMENT_SEP_TERMINAL_ID,
             \Modules\Setting\Enum\SettingKeyEnum::PAYMENT_RULES_AND_CONDITION_STATUS,
             \Modules\Setting\Enum\SettingKeyEnum::PAYMENT_RULES_AND_CONDITION_DESCRIPTION,
         ],

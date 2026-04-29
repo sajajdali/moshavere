@@ -17,6 +17,97 @@
     </div>
     @include('admin::layouts.components.alert')
 
+    @php
+        $scheduleSettingsHasErrors = collect([
+            'form.visitType.*',
+            'form.timeFrame',
+            'form.timeFrame.*',
+            'form.visitTime',
+            'form.openTime.*',
+            'form.openAppointment',
+            'form.minDayAvaialbe',
+            'form.maxDayAvaialbe',
+            'form.maxAvailabeAppointment.*',
+            'form.maxAvailabeAppointmentOnline',
+            'form.cancel.*',
+            'form.endAppointment.*',
+            'form.startAppointment.*',
+            'form.segments.*',
+            'form.specialDaydateValues.*',
+            'form.specialDaytimeValues.*',
+        ])->contains(fn ($key) => $errors->has($key));
+
+        $paymentSettingsHasErrors = collect([
+            'form.payment.*',
+            'form.monitoring.*',
+        ])->contains(fn ($key) => $errors->has($key));
+
+        $advancedSettingsHasErrors = collect([
+            'form.operators.*',
+            'form.interference.*',
+            'form.avtive',
+        ])->contains(fn ($key) => $errors->has($key));
+    @endphp
+
+    <div class="setting-action-bar d-flex flex-column flex-md-row align-items-md-center justify-content-between gap-3 mb-4">
+        <div class="flex-grow-1">
+            @error('*')
+                <div class="alert alert-danger mb-0" role="alert">
+                    <p class="text-danger mb-0"><strong>خطا!!</strong> لطفا خطا های به وجود آمده را برطرف کنید!</p>
+                </div>
+            @else
+                <div class="alert alert-info mb-0" role="alert">
+                    <p class="mb-0">بعد از بررسی تنظیمات، تغییرات را ذخیره کنید.</p>
+                </div>
+            @enderror
+        </div>
+        <div class="text-end">
+            <button type="submit" form="setting" wire:click='saveSetting'
+                wire:loading.class='btn-loading disabled btn-gray' class="btn btn-success py-2 px-4">
+                <strong class="fs-6">ذخیره</strong>
+            </button>
+        </div>
+    </div>
+
+    <ul class="nav nav-tabs general-setting-tabs mb-4" id="generalSettingTabs" role="tablist" wire:ignore.self>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link active @if ($scheduleSettingsHasErrors) general-setting-tab-error @endif" id="schedule-settings-tab" data-bs-toggle="tab"
+                data-bs-target="#schedule-settings" type="button" role="tab" aria-controls="schedule-settings" wire:ignore.self
+                aria-selected="true">
+                <i class="fa fa-calendar me-1" aria-hidden="true"></i>
+                تنظیمات زمانبندی
+                @if ($scheduleSettingsHasErrors)
+                    <span class="tab-error-dot"></span>
+                @endif
+            </button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link @if ($paymentSettingsHasErrors) general-setting-tab-error @endif" id="payment-settings-tab" data-bs-toggle="tab" data-bs-target="#payment-settings"
+                type="button" role="tab" aria-controls="payment-settings" aria-selected="false" wire:ignore.self>
+                <i class="fa fa-credit-card-alt me-1" aria-hidden="true"></i>
+                تنظیمات پرداخت
+                @if ($paymentSettingsHasErrors)
+                    <span class="tab-error-dot"></span>
+                @endif
+            </button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link @if ($advancedSettingsHasErrors) general-setting-tab-error @endif" id="advanced-settings-tab" data-bs-toggle="tab"
+                data-bs-target="#advanced-settings" type="button" role="tab" aria-controls="advanced-settings"
+                aria-selected="false" wire:ignore.self>
+                <i class="fa fa-sliders me-1" aria-hidden="true"></i>
+                تنظیمات پیشرفته
+                @if ($advancedSettingsHasErrors)
+                    <span class="tab-error-dot"></span>
+                @endif
+            </button>
+        </li>
+    </ul>
+
+    <div class="tab-content" id="generalSettingTabsContent" wire:ignore.self>
+        <div class="tab-pane fade show active" id="schedule-settings" role="tabpanel"
+            aria-labelledby="schedule-settings-tab" wire:ignore.self>
+
     {{-- visit Type Conditions  --}}
     <div class="card shadow-sm custom-card-Setting @if ($errors->has('form.visitType.inPerson') || $errors->has('form.visitType.online')) border border-danger @endif">
         @include('appointmentsetting::components.generalsetting.visittype')
@@ -32,6 +123,10 @@
     {{-- time for each appointmernt --}}
     <div class="card shadow-sm custom-card-Setting  @error('form.visitTime') border border-danger @enderror">
         @include('appointmentsetting::components.generalsetting.visittime')
+    </div>
+    {{-- time for opening appointments --}}
+    <div class="card shadow-sm custom-card-Setting  @error('form.openAppointment') border border-danger @enderror">
+        @include('appointmentsetting::components.generalsetting.open-time-appointments')
     </div>
     {{-- min time  --}}
     <div class="card shadow-sm custom-card-Setting @error('form.minDayAvaialbe') border border-danger @enderror">
@@ -91,7 +186,8 @@
             @enderror
             <div class="row">
                 <div class="col-md-5 pt-2">
-                    <label class="text-primary" for="maxDaysAvailableApp"> بیمار حداکثر برای چند روز فعال بعد بتواند نوبت دریافت
+                    <label class="text-primary" for="maxDaysAvailableApp"> بیمار حداکثر برای چند روز فعال بعد بتواند
+                        نوبت دریافت
                         کند</label>
                 </div>
                 <div class="col-md-7">
@@ -120,7 +216,7 @@
             <h3 class="d-flex align-item-center">
                 <i class="fa fa-bar-chart me-2 d-none d-sm-inline" aria-hidden="true"></i>
                 <span>
-                     <span class="text-primary">سقف تعداد</span> نوبت
+                    <span class="text-primary">سقف تعداد</span> نوبت
                 </span>
             </h3>
             <div class="main-toggle-group d-sm-flex align-item-center ms-0">
@@ -162,8 +258,8 @@
                     </div>
                     <div class="col-md-9 mb-1 mb-3">
                         <div class="input-group ">
-                            <input type="number" class="form-control" id="eachDayAppointmentAvailable" aria-describedby="basic-addon3"
-                                wire:model='form.maxAvailabeAppointment.eachDay'>
+                            <input type="number" class="form-control" id="eachDayAppointmentAvailable"
+                                aria-describedby="basic-addon3" wire:model='form.maxAvailabeAppointment.eachDay'>
                             <div class="input-group-prepend">
                                 <span class="input-group-text" id="basic-addon3">عدد</span>
                             </div>
@@ -203,7 +299,8 @@
                     </div>
                     <div class="row">
                         <div class="col-md-3 pt-2">
-                            <label class="text-primary" for="maxOnlineAvaiableAppointment">تعداد نوبت فعال در هر روز</label>
+                            <label class="text-primary" for="maxOnlineAvaiableAppointment">تعداد نوبت فعال در هر
+                                روز</label>
                         </div>
                         <div class="col-md-9 mb-1 mb-3">
                             <div class="input-group ">
@@ -258,8 +355,8 @@
                     <div class="col-md-9">
                         <div class="input-group mb-3">
                             <input type="number"
-                                class="form-control  @error('form.cancel.day') is-invalid @enderror" id="howManydayBEfore"
-                                aria-describedby="basic-addon3" wire:model='form.cancel.day'>
+                                class="form-control  @error('form.cancel.day') is-invalid @enderror"
+                                id="howManydayBEfore" aria-describedby="basic-addon3" wire:model='form.cancel.day'>
                             <div class="input-group-prepend">
                                 <span class="input-group-text" id="basic-addon3">روز آینده</span>
                             </div>
@@ -315,8 +412,8 @@
                 <div class="col-md-9">
                     <div class="input-group mb-3">
                         <input type="text" wire:model='form.endAppointment.date' autocomplete="off"
-                            class="form-control @error('form.endAppointment.date') is-invalid @enderror" data-jdp data-name="form.endAppointment.date"
-                            id="endDatePicker">
+                            class="form-control @error('form.endAppointment.date') is-invalid @enderror" data-jdp
+                            data-name="form.endAppointment.date" id="endDatePicker">
                     </div>
                 </div>
                 <div class="d-flex  mt-2">
@@ -328,6 +425,67 @@
             </div>
         </div>
     </div>
+    {{-- start Date time  --}}
+    <div class="card shadow-sm custom-card-Setting @if ($errors->has('form.startAppointment.date') || $errors->has('form.startAppointment.time')) border border-danger @endif">
+        <div class="card-header border-bottom d-flex justify-content-between">
+            <h3 class="d-flex align-item-center">
+                <i class="fa fa-calendar-check-o me-2 d-none d-sm-inline" aria-hidden="true"></i>
+                <span>
+                    تعیین تاریخ شروع نوبت دهی
+                </span>
+            </h3>
+            <div class="main-toggle-group d-sm-flex align-item-center ms-0">
+                <div class="toggle toggle-lg toggle-primary my-1 customCheckbox @if (isset($form['startAppointment']['date'])) on @else off @endif"
+                    data-id="startAppointment.status" wire:ignore.self data-bs-toggle="collapse"
+                    href="#startTimecollaps" role="button" aria-expanded="false" aria-controls="startTimecollaps">
+                    <span></span>
+                </div>
+            </div>
+        </div>
+        <div class="card-body collapse @if (isset($form['startAppointment']['date'])) show @endif " id="startTimecollaps"
+            wire:ignore.self>
+            {{-- section --}}
+            @if ($errors->has('form.startAppointment.date', 'form.startAppointment.time'))
+                <div class="alert alert-danger" role="alert">
+                    <p class="text-danger"> لطفا تاریخ و ساعت را انتخاب کنید!!
+                    </p>
+                </div>
+            @endif
+            <div class="row">
+                <div class="col-md-3 pt-2">
+                    <label class="text-primary" for="startDatePicker">انتخاب تاریخ:</label>
+                </div>
+                <div class="col-md-9">
+                    <div class="input-group mb-3">
+                        <input type="text" wire:model='form.startAppointment.date' autocomplete="off" data-jdp
+                            data-name="form.startAppointment.date"
+                            class="form-control @error('form.startAppointment.date') is-invalid @enderror"
+                            id="startDatePicker">
+                    </div>
+                </div>
+                <div class="col-md-3 pt-2">
+                    <label class="text-primary" for="timePickerAvailable">انتخاب ساعت:</label>
+                </div>
+                <div class="col-md-9 mb-3">
+                    <div class="input-group ">
+                        <input type="time" wire:model='form.startAppointment.time'
+                            class="form-control @error('form.startAppointment.time') is-invalid @enderror"
+                            id="timePickerAvailable">
+                    </div>
+                    <small class="text-gray ms-2">برای انتخاب روی آیکون ساعت کلیک کنید ویا مقدار را وارد کنید</small>
+                </div>
+                <div class="col-12 mt-3 d-flex">
+                    <p><strong>نکته:</strong></p> &nbsp;
+                    <p>
+                        با تعیین این تاریخ ، نوبت دهی قبل از این تاریخ برای کاربران غیر فعال میشود و امکان ثبت نوبت از
+                        طریق پنل مدیریت برای منشی وجود دارد.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+        </div>
+        <div class="tab-pane fade" id="payment-settings" role="tabpanel" aria-labelledby="payment-settings-tab" wire:ignore.self>
     {{-- payment  --}}
     <div class="card shadow-sm custom-card-Setting @error('form.payment.*') border border-danger @enderror">
         <div class="card-header border-bottom d-flex justify-content-between">
@@ -467,34 +625,6 @@
             </div>
         </div>
     </div>
-    {{-- interference  --}}
-    <div class="card">
-        <div class="card-header border-bottom d-flex justify-content-between">
-            <h3 class="d-flex align-item-center">
-                <i class="fa fa-paperclip me-2 d-none d-sm-inline" aria-hidden="true"></i>
-                <span>
-                    عدم کنترل تداخل نوبت ها
-                </span>
-            </h3>
-            <div class="main-toggle-group d-sm-flex align-item-center ms-0">
-                <div class="toggle toggle-lg toggle-primary my-1 customCheckbox @if (isset($form['interference']['status']) && $form['interference']['status'] == 'true') on @else off @endif"
-                    data-id="interference.status" wire:ignore.self data-bs-toggle="collapse"
-                    href="#checkForOtherAppointment" role="button" aria-expanded="false"
-                    aria-controls="checkForOtherAppointment">
-                    <span></span>
-                </div>
-            </div>
-        </div>
-        <div class="card-body collapse @if (isset($form['interference']['status']) && $form['interference']['status'] == 'true') show @endif " id="checkForOtherAppointment" wire:ignore.self>
-            {{-- section --}}
-            <div class="row">
-
-                <p class="text-muted"><strong class="me-1"> نکته!! </strong> با فعال سازی این قسمت، نوبت های این
-                    بخش بدون اینکه با سایر نوبت های همان روز
-                    پزشک بررسی شود ، ثبت میشود، به عبارتی ممکن است در یک زمان چند نوبت برای این پزشک ثبت شود </p>
-            </div>
-        </div>
-    </div>
     {{-- MONITORING  --}}
     <div class="card shadow-sm custom-card-Setting @error('form.monitoring.hour') border border-danger @enderror">
         <div class="card-header border-bottom d-flex justify-content-between">
@@ -525,14 +655,15 @@
                 {{-- section --}}
                 <div class="row">
                     <div class="col-md-4 pt-2">
-                        <label class="text-primary" for="waitForPaymentOnline">مدت زمان انتظار برای پرداخت آنلاین: </label>
+                        <label class="text-primary" for="waitForPaymentOnline">مدت زمان انتظار برای پرداخت آنلاین:
+                        </label>
                     </div>
                     <div class="col-md-8">
                         <div class="input-group mb-3">
                             <input type="number"
                                 class="form-control  @error('form.monitoring.hour') is-invalid @enderror"
-                                id="waitForPaymentOnline" placeholder="ساعت پیشنهادی: 24" aria-describedby="basic-addon3"
-                                wire:model='form.monitoring.hour'>
+                                id="waitForPaymentOnline" placeholder="ساعت پیشنهادی: 24"
+                                aria-describedby="basic-addon3" wire:model='form.monitoring.hour'>
                             <div class="input-group-prepend">
                                 <span class="input-group-text" id="basic-addon3">ساعت</span>
                             </div>
@@ -557,65 +688,37 @@
             </div>
         </div>
     </div>
-    {{-- start Date time  --}}
-    <div class="card shadow-sm custom-card-Setting @if ($errors->has('form.startAppointment.date') || $errors->has('form.startAppointment.time')) border border-danger @endif">
+        </div>
+        <div class="tab-pane fade" id="advanced-settings" role="tabpanel" aria-labelledby="advanced-settings-tab" wire:ignore.self>
+    {{-- interference  --}}
+    <div class="card">
         <div class="card-header border-bottom d-flex justify-content-between">
             <h3 class="d-flex align-item-center">
-                <i class="fa fa-calendar-check-o me-2 d-none d-sm-inline" aria-hidden="true"></i>
+                <i class="fa fa-paperclip me-2 d-none d-sm-inline" aria-hidden="true"></i>
                 <span>
-                    تعیین تاریخ شروع نوبت دهی
+                    عدم کنترل تداخل نوبت ها
                 </span>
             </h3>
             <div class="main-toggle-group d-sm-flex align-item-center ms-0">
-                <div class="toggle toggle-lg toggle-primary my-1 customCheckbox @if (isset($form['startAppointment']['date'])) on @else off @endif"
-                    data-id="startAppointment.status" wire:ignore.self data-bs-toggle="collapse"
-                    href="#startTimecollaps" role="button" aria-expanded="false" aria-controls="startTimecollaps">
+                <div class="toggle toggle-lg toggle-primary my-1 customCheckbox @if (isset($form['interference']['status']) && $form['interference']['status'] == 'true') on @else off @endif"
+                    data-id="interference.status" wire:ignore.self data-bs-toggle="collapse"
+                    href="#checkForOtherAppointment" role="button" aria-expanded="false"
+                    aria-controls="checkForOtherAppointment">
                     <span></span>
                 </div>
             </div>
         </div>
-        <div class="card-body collapse @if (isset($form['startAppointment']['date'])) show @endif " id="startTimecollaps"
+        <div class="card-body collapse @if (isset($form['interference']['status']) && $form['interference']['status'] == 'true') show @endif " id="checkForOtherAppointment"
             wire:ignore.self>
             {{-- section --}}
-            @if ($errors->has('form.startAppointment.date', 'form.startAppointment.time'))
-                <div class="alert alert-danger" role="alert">
-                    <p class="text-danger"> لطفا تاریخ و ساعت را انتخاب کنید!!
-                    </p>
-                </div>
-            @endif
             <div class="row">
-                <div class="col-md-3 pt-2">
-                    <label class="text-primary" for="startDatePicker">انتخاب تاریخ:</label>
-                </div>
-                <div class="col-md-9">
-                    <div class="input-group mb-3">
-                        <input type="text" wire:model='form.startAppointment.date' autocomplete="off" data-jdp data-name="form.startAppointment.date"
-                            class="form-control @error('form.startAppointment.date') is-invalid @enderror"
-                            id="startDatePicker">
-                    </div>
-                </div>
-                <div class="col-md-3 pt-2">
-                    <label class="text-primary" for="timePickerAvailable">انتخاب ساعت:</label>
-                </div>
-                <div class="col-md-9 mb-3">
-                    <div class="input-group ">
-                        <input type="time" wire:model='form.startAppointment.time'
-                            class="form-control @error('form.startAppointment.time') is-invalid @enderror"
-                            id="timePickerAvailable">
-                    </div>
-                    <small class="text-gray ms-2">برای انتخاب روی آیکون ساعت کلیک کنید ویا مقدار را وارد کنید</small>
-                </div>
-                <div class="col-12 mt-3 d-flex">
-                    <p><strong>نکته:</strong></p> &nbsp;
-                    <p>
-                        با تعیین این تاریخ ، نوبت دهی قبل از این تاریخ برای کاربران غیر فعال میشود و امکان ثبت نوبت از
-                        طریق پنل مدیریت برای منشی وجود دارد.
-                    </p>
-                </div>
+
+                <p class="text-muted"><strong class="me-1"> نکته!! </strong> با فعال سازی این قسمت، نوبت های این
+                    بخش بدون اینکه با سایر نوبت های همان روز
+                    پزشک بررسی شود ، ثبت میشود، به عبارتی ممکن است در یک زمان چند نوبت برای این پزشک ثبت شود </p>
             </div>
         </div>
     </div>
-
     {{-- add operator  --}}
     <div class="card shadow-sm custom-card-Setting @error('form.operators.*') border border-danger @enderror">
         @include('appointmentsetting::components.generalsetting.addoperator')
@@ -640,18 +743,9 @@
         </div>
     </div>
 
-    @error('*')
-        <div class="alert alert-danger" role="alert">
-            <p class="text-danger"><strong>خطا!!</strong> لطفا خطا های بالا را برطرف کنید!</p>
         </div>
-    @enderror
-
-    <div class="text-end mb-5 me-3">
-        <button type="submit" form="setting" wire:click='saveSetting'
-            wire:loading.class='btn-loading disabled btn-gray' class="btn btn-success mt-5 py-2 px-4"><strong
-                class="fs-6">ذخیره</strong></button>
-
     </div>
+
 </div>
 </div>
 
@@ -673,6 +767,61 @@
         h3 {
             font-family: 'Vazir-Regular';
             font-size: 1.4rem;
+        }
+
+        .setting-action-bar {
+            position: sticky;
+            top: 0;
+            z-index: 5;
+            background: #fff;
+            border: 1px solid #e9edf4;
+            border-radius: 8px;
+            padding: .75rem;
+            box-shadow: 0 4px 14px rgba(15, 23, 42, .05);
+        }
+
+        .general-setting-tabs {
+            gap: .5rem;
+            overflow-x: auto;
+            overflow-y: hidden;
+            flex-wrap: nowrap;
+            border-bottom: 1px solid #e9edf4;
+            padding-bottom: .25rem;
+        }
+
+        .general-setting-tabs .nav-link {
+            white-space: nowrap;
+            border-radius: 8px 8px 0 0;
+            font-size: 1rem;
+            font-weight: 600;
+        }
+
+        .general-setting-tabs .nav-link.active {
+            color: #fff;
+            background-color: var(--primary-bg-color, #6259ca);
+            border-color: var(--primary-bg-color, #6259ca);
+        }
+
+        .general-setting-tabs .nav-link.general-setting-tab-error {
+            color: #dc3545;
+            border-color: #dc3545;
+            background-color: #fff5f5;
+        }
+
+        .general-setting-tabs .nav-link.general-setting-tab-error.active {
+            color: #fff;
+            background-color: #dc3545;
+            border-color: #dc3545;
+        }
+
+        .tab-error-dot {
+            display: inline-block;
+            width: .55rem;
+            height: .55rem;
+            margin-right: .35rem;
+            border-radius: 50%;
+            background-color: currentColor;
+            vertical-align: middle;
         }
 
         @media (max-width: 570px) {

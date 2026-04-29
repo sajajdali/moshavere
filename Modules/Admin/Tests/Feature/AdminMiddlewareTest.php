@@ -42,11 +42,11 @@ class AdminMiddlewareTest extends TestCase
     }
 
     /**
-     * Test if the AdminMiddleware redirects authenticated non-admin users to the profile dashboard.
+     * Test if the AdminMiddleware redirects authenticated non-admin users to the user profile page.
      *
      * @return void
      */
-    public function testNonAdminRedirectToProfileDashboard()
+    public function testNonAdminRedirectToUserProfile()
     {
         // Mocking a user without the 'ADMIN_ACCESS' permission
         $user = factory(User::class)->create();
@@ -63,17 +63,17 @@ class AdminMiddlewareTest extends TestCase
             return response('Success', 200);
         });
 
-        // Assert that the middleware redirected to the profile dashboard route (302 status code)
+        // Assert that the middleware redirected to the user profile route (302 status code)
         $this->assertEquals(302, $response->status());
-        $this->assertStringContainsString('admin.dashboard', $response->headers->get('Location'));
+        $this->assertStringContainsString('profile', $response->headers->get('Location'));
     }
 
     /**
-     * Test if the AdminMiddleware redirects unauthenticated users to the admin login route.
+     * Test if the AdminMiddleware aborts with a 404 for unauthenticated users.
      *
      * @return void
      */
-    public function testUnauthenticatedRedirectToAdminLogin()
+    public function testUnauthenticatedUsersReceive404()
     {
         // Create a mock request for testing
         $request = Request::create('/some-admin-route', 'GET');
@@ -81,13 +81,10 @@ class AdminMiddlewareTest extends TestCase
         // Create an instance of the middleware
         $middleware = new AdminMiddleware();
 
-        // Execute the middleware
-        $response = $middleware->handle($request, function ($req) {
+        $this->expectException(\Symfony\Component\HttpKernel\Exception\NotFoundHttpException::class);
+
+        $middleware->handle($request, function ($req) {
             return response('Success', 200);
         });
-
-        // Assert that the middleware redirected to the admin login route (302 status code)
-        $this->assertEquals(302, $response->status());
-        $this->assertStringContainsString('admin.login', $response->headers->get('Location'));
     }
 }

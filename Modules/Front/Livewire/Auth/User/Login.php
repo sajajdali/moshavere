@@ -9,6 +9,7 @@ use Livewire\Attributes\Locked;
 use Modules\User\Entities\User;
 use Modules\Api\Entities\AuthRequest;
 use Illuminate\Support\Facades\Session;
+use Modules\Setting\Enum\SettingKeyEnum;
 
 #[Layout('front::layouts.app')]
 #[Title('ورود')]
@@ -25,6 +26,9 @@ class Login extends Component
 
     #[Locked]
     public $watitTime = null;
+
+    #[Locked]
+    public bool $login_without_otp = false;
     public function messages()
     {
         return [
@@ -36,12 +40,34 @@ class Login extends Component
             'form.code.string' => 'فرمت وارد شده قابل قبول نیست! لطفا زبان کیبورد را به اینگلیسی تغییر دهید!',
         ];
     }
+
     public function LoginAuthForm()
     {
         if ($this->step == 1) {
             $this->validate([
                 'form.mobileNmber' => 'required|digits:11|numeric'
             ]);
+            $loginWithoutAuth = setting(SettingKeyEnum::LOGIN_WITHOUT_OTP) ?? false;
+            if ($loginWithoutAuth) {
+                $user =  AuthRequest::getUser($this->form['mobileNmber']);
+                if ($user->isPatient()) {
+                    auth()->login($user);
+                    if (!isset($user->first_name)) {
+                        session()->put('RegistrationUser', $user->id);
+                        return redirect()->route('front.user.registration');
+                    }
+
+                    $intendedUrl = Session::pull('url.intended', route('front.homePage'));
+                    if (isset($intendedUrl)) {
+                        session()->forget('url.intended');
+                        session()->flash('authsuccess', 'ورود با موفقیت انجام شد');
+                        return redirect()->intended($intendedUrl);
+                    }
+                    return redirect()->route('front.homePage');
+                } else {
+                    return redirect()->route('front.login.doctor');
+                }
+            }
             $oldRequest = AuthRequest::where('mobile', $this->form['mobileNmber'])
                 ->first();
             // check if request exist
@@ -58,7 +84,7 @@ class Login extends Component
                 AuthRequest::make($this->form['mobileNmber'], request()->ip());
             }
             $this->step = $this->step + 1;
-            $this->dispatch('waitForCode',true);
+            $this->dispatch('waitForCode', true);
         } elseif ($this->step == 2) {
             $this->validate([
                 'form.code' => 'required|string|digits:4'
@@ -74,9 +100,9 @@ class Login extends Component
                         return redirect()->route('front.user.registration');
                     }
                     $intendedUrl = Session::pull('url.intended', route('front.homePage'));
-                    if(isset($intendedUrl)) {
-                        session()->forget('url.intended') ;
-                        session()->flash('authsuccess','ورود با موفقیت انجام شد');
+                    if (isset($intendedUrl)) {
+                        session()->forget('url.intended');
+                        session()->flash('authsuccess', 'ورود با موفقیت انجام شد');
                         return redirect()->intended($intendedUrl);
                     }
                     return redirect()->route('front.homePage');
@@ -101,23 +127,25 @@ class Login extends Component
         unset($this->form);
         $this->step = 1;
     }
-    public function mount() {
+    public function mount()
+    {
         // when disable ui template
-        if (disableUi()){
+        if (disableUi()) {
             return redirect()->route('front.login.doctor');
         }
-        if(request()->has('appointment')){
+        if (request()->has('appointment')) {
             $this->fetchData['alert'] = 'برای ادامه مراحل دریافت نوبت لطفا ابتدا وارد شوید';
         }
-        if(request()->has('comment')){
+        if (request()->has('comment')) {
             $this->fetchData['alert'] = 'برای گذاشتن نظر، لطفا ابتدا وارد شوید';
         }
-        if(request()->has('favariteDr')){
+        if (request()->has('favariteDr')) {
             $this->fetchData['alert'] = 'برای پسندیدن دکتر ، لطفا ابتدا  وارد شوید';
         }
-        if(request()->has('cancelApp')){
+        if (request()->has('cancelApp')) {
             $this->fetchData['alert'] = 'برای کنسل کردن نوبت لازم هست که وارد شوید!';
         }
+        $this->login_without_otp = filter_var(setting(SettingKeyEnum::LOGIN_WITHOUT_OTP),FILTER_VALIDATE_BOOL);
     }
     public function render()
     {

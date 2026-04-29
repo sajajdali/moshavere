@@ -28,7 +28,13 @@
                 @enderror
                 <button type="submit" class="btn__blue--round-full" wire:loading.attr='disabled'
                     wire:target='LoginAuthForm'>
-                    <span wire:loading.remove wire:target='LoginAuthForm'>ارسال کد تایید</span>
+                    <span wire:loading.remove wire:target='LoginAuthForm'>
+                        @if ($login_without_otp)
+                            ورود
+                        @else
+                            ارسال کد تایید
+                        @endif
+                    </span>
                     <div role="status" wire:loading wire:target='LoginAuthForm'>
                         <svg aria-hidden="true"
                             class="w-5 h-5 text-white-200 animate-spin dark:text-white-600 fill-gray-700"

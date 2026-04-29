@@ -15,6 +15,7 @@ use Modules\Service\app\Models\Service;
 use Modules\Setting\Enum\SettingKeyEnum;
 use Modules\AppointmentUser\Enum\AppointmentVia;
 use Modules\AppointmentUser\Enum\model\UserModel;
+use Modules\AppointmentUser\app\Models\AppointmentUser;
 use Modules\AppointmentUser\Enum\model\AppointmentModel;
 use Modules\AppointmentUser\app\Models\AppointmentOnline;
 use Modules\AppointmentUser\Enum\AppointmentUserKindEnum;
@@ -218,7 +219,17 @@ class Checkout extends Component
             $appointmentSetting = AppointmentSetting::find($this->fetchData['appSetting']->id);
             $date = Carbon::createFromTimestamp($this->fetchData['app_start_time'], 'Asia/Tehran')->toDateString();
             $appointmentSetting->runGenerateCacheJob($date);
-            return redirect()->route('front.setAppointment.detail', ['tracking_code' => $storeAppointment['detail']['tracking_code']]);
+
+            $routeParameters = ['tracking_code' => $storeAppointment['detail']['tracking_code']];
+            $appointmentUser = AppointmentUser::find($storeAppointment['detail']['appointment_user_id']);
+            if (
+                setting(SettingKeyEnum::GO_TO_PAYMENT_DIRECTLY) &&
+                $appointmentUser?->status == AppointmentUserStatusEnum::STATUS_WAIT_PAYMENT
+            ) {
+                $routeParameters['direct_payment'] = true;
+            }
+
+            return redirect()->route('front.setAppointment.detail', $routeParameters);
         } else {
             $this->err = $storeAppointment['message'];
         }

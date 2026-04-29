@@ -127,6 +127,7 @@ enum SettingKeyEnum: int implements EnumHasNameInterface, SettingTypeInterface, 
     case PAYMENT_SAMAN_TERMINAL_NUMBER = 162;
     case PAYMENT_SAMAN_TERMINAL_PASS = 163;
     case PAYMENT_SEP_TERMINAL_ID = 164;
+    case GO_TO_PAYMENT_DIRECTLY = 167;
 
 
 
@@ -159,6 +160,7 @@ enum SettingKeyEnum: int implements EnumHasNameInterface, SettingTypeInterface, 
 
     // registration
     case USER_REGISTER_NATIONAL_CODE_REQUIRED = 355 ;
+    case LOGIN_WITHOUT_OTP = 357;
 
     // jibi
     case ACTIVE_JIBIT = 356 ;
@@ -253,6 +255,7 @@ enum SettingKeyEnum: int implements EnumHasNameInterface, SettingTypeInterface, 
             self::PAYMENT_SAMAN_TERMINAL_NUMBER => 'شماره ترمینال سامان(MID)',
             self::PAYMENT_SAMAN_TERMINAL_PASS => 'رمز ترمینال سامان',
             self::PAYMENT_SEP_TERMINAL_ID => 'شماره ترمینال سپ',
+            self::GO_TO_PAYMENT_DIRECTLY => 'انتقال مستقیم به درگاه بعد از انتخاب گزینه تایید نوبت',
 
             // headers
             self::ENABLE_DOCTORS_MENU => 'فعال بودن لیست پزشکان در منو',
@@ -325,6 +328,7 @@ enum SettingKeyEnum: int implements EnumHasNameInterface, SettingTypeInterface, 
 
             //REGISTRATION
             self::USER_REGISTER_NATIONAL_CODE_REQUIRED => 'الزامی بودن وارد کردن کد ملی در هنگام ثبت نام',
+            self::LOGIN_WITHOUT_OTP => 'ورود بدون تایید شماره موبایل',
 
             //JIBIT
             self::ACTIVE_JIBIT => 'فعال سازی اعتبار جیبیت',
@@ -356,6 +360,7 @@ enum SettingKeyEnum: int implements EnumHasNameInterface, SettingTypeInterface, 
             self::PAYMENT_PARSIAN_TOKEN => '<span class="my-3"></span>',
             self::PAYMENT_SAMAN_TERMINAL_PASS => '<span class="my-3"></span>',
             self::ACTIVE_JIBIT => 'در حال توسعه...',
+            self::LOGIN_WITHOUT_OTP => 'اخطار امنیتی: با فعال کردن این ویژگی، هر شخصی میتواند با هر شماره ای وارد سیستم شده و نوبت های مربوط به هر شماره را مشاهده کند!!!!!',
             self::SMS_PARSSMS_ADD_APPOINTMENT_TEXT => 'پارامتر های قابل قرار گیری: <br />  ۱ = نام کاربر
              <br/> ۲ = نام خانوادگی کاربر
              <br/> ۳ = نام پزشک
@@ -449,6 +454,8 @@ enum SettingKeyEnum: int implements EnumHasNameInterface, SettingTypeInterface, 
             self::APPOINTMENT_ONLINE_DESCRPTION => SettingTypeEnum::TEXTAREA,
             self::UI_NOW_SHOW_SEARCH_BAR , self::ACTIVE_API, self::ENABLE_CITY_SEARCH , self::ENABLE_LATEST_DOCTORS , self::ENABLE_HOME_FAQ , self::MOST_VIEWED_SECTIONS_ICONS_VIEW, self::ENABLE_MOST_VIEWED_SECTIONS , self::ENABLE_DOCTOR_REGISTRATION , self::SHOW_FLOATING_SOCIAL_ICONS , self::DISABLE_FOOTER_DISPLAY=> SettingTypeEnum::CHECK,
             self::USER_REGISTER_NATIONAL_CODE_REQUIRED => SettingTypeEnum::CHECK,
+            self::LOGIN_WITHOUT_OTP => SettingTypeEnum::CHECK,
+            self::GO_TO_PAYMENT_DIRECTLY => SettingTypeEnum::CHECK,
             default => SettingTypeEnum::TEXT
         };
     }
@@ -468,6 +475,8 @@ enum SettingKeyEnum: int implements EnumHasNameInterface, SettingTypeInterface, 
             self::PAYMENT_SAMAN_TERMINAL_NUMBER => 'درگاه سامان',
             self::PAYMENT_SEP_TERMINAL_ID => 'درگاه سپ(درگاه سامان کیش)',
             self::PAYMENT_RULES_AND_CONDITION_STATUS => 'شرایط و قوانین پرداخت',
+            self::LOGIN_WITHOUT_OTP => 'دارای حساسیت امنیتی',
+            self::GO_TO_PAYMENT_DIRECTLY => 'تنظیمات UX',
             default => '' ,
         };
     }

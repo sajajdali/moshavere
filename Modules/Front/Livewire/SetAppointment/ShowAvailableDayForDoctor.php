@@ -65,8 +65,8 @@ class ShowAvailableDayForDoctor extends Component
     {
         $last_day_active = $this->fetchData['lastDate'];
         // //  check if user can access this date of appointments
-        if (isset($this->fetchData['appointmentSetting']->max_day_active)) {
-            $max_days_app_available = Carbon::now()->addDays($this->fetchData['appointmentSetting']->max_day_active);
+        $max_days_app_available = $this->maxAvailableAppointmentDate();
+        if ($max_days_app_available) {
             if ($max_days_app_available->lte($this->fetchData['lastDate'])) {
                 $this->dispatch('scrollToBottom', true);
                 return $this->msg = 'بازه ی نمایش به اتمام رسیده است!';
@@ -109,6 +109,32 @@ class ShowAvailableDayForDoctor extends Component
             }
         }
     }
+
+    private function maxAvailableAppointmentDate(): ?Carbon
+    {
+        $appointmentSetting = $this->fetchData['appointmentSetting'] ?? null;
+        if (! isset($appointmentSetting->max_day_active)) {
+            return null;
+        }
+
+        $now = Carbon::now('Asia/Tehran');
+        $maxAvailableDate = $now->copy()->startOfDay()->addDays((int) $appointmentSetting->max_day_active);
+        $openTime = data_get($appointmentSetting->detail, AppointmentSetting::OPEN_TIME,'00:00');
+
+        if (! empty($openTime)) {
+            try {
+                $openAt = $now->copy()->setTimeFromTimeString($openTime);
+                if ($now->lt($openAt)) {
+                    $maxAvailableDate->subDay();
+                }
+            } catch (\Throwable $exception) {
+                // Invalid stored time should not block appointments; fall back to the old midnight behavior.
+            }
+        }
+
+        return $maxAvailableDate;
+    }
+
     private function findFirstTreeAppointment($listOfAppointment)
     {
         $firstTwoEmpty = [];
@@ -160,9 +186,9 @@ class ShowAvailableDayForDoctor extends Component
                     }
                     $dayNumber = $appointment['day_number_gmt'];
                     // check if user can access this date "max_day_active" from "setting"
-                    $last_activeDay = \now()->addDays($this->fetchData['appointmentSetting']->max_day_active);
+                    $last_activeDay = $this->maxAvailableAppointmentDate();
                     $date_to_check = carbon::parse($dayNumber);
-                    if ($date_to_check->gt($last_activeDay)) {
+                    if ($last_activeDay && $date_to_check->gt($last_activeDay)) {
                         break 3;
                     }
                     if ($DaysDisplayed > $maxDay) {

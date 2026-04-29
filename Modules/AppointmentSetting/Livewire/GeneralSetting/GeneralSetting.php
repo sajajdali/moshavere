@@ -228,6 +228,7 @@ class GeneralSetting extends Component
             'form.payment.online.price'           => 'required_if:form.payment.online.status,true',
             'form.payment.voip.price'             => 'required_if:form.payment.voip.status,true',
             'form.operators.ids'                  => 'required_if:form.operators.status,true',
+            'form.openTime.time'                  => 'required_if:form.openTime.status,true',
         ];
         if (isset($this->form['maxAvailabeAppointment']['status']) && $this->form['maxAvailabeAppointment']['status'] == true) {
             if (isset($this->form['visitType']['online']) && $this->form['visitType']['online'] == true) {
@@ -362,7 +363,9 @@ class GeneralSetting extends Component
                 ],
             ]
         ];
-
+        if (isset($this->form['openTime']['status']) && data_get($this->form, 'openTime.status', false)) {
+            $detail[AppointmentSetting::OPEN_TIME] = data_get($this->form, 'openTime.time');
+        }
         if (isset($this->form['visitType']['online']) && $this->form['visitType']['online']) {
             // online appointment conditions
             $detail[AppointmentSetting::ONLINE_CAN_SEND_VOICE]              = isset($this->form['accessibility']['online']['can_send_voice']) && $this->form['accessibility']['online']['can_send_voice'];
@@ -591,6 +594,10 @@ class GeneralSetting extends Component
         if (isset($apSet->detail[AppointmentSetting::MONITORTING_APPOINTMENT])) {
             $this->form['monitoring']['status'] = true;
             $this->form['monitoring']['hour'] = $apSet->detail[AppointmentSetting::MONITORTING_APPOINTMENT];
+        }
+        if (isset($apSet->detail[AppointmentSetting::OPEN_TIME])) {
+            $this->form['openTime']['status'] = 'on';
+            $this->form['openTime']['time'] = $apSet->detail[AppointmentSetting::OPEN_TIME];
         }
     }
     private function fillTheTime($apSet)

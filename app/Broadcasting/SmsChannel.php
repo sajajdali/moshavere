@@ -67,6 +67,7 @@ class SmsChannel
             $this->sendWithFarrazSms($apiToken, $data, $settingCollection);
             return;
         }
+        \Log::info('shsms is called');
         if (isset($data['template']) && !empty($data['template'])) {
             //data should have receptor and template and at least one params
             if (
@@ -84,7 +85,9 @@ class SmsChannel
                 //     $this->sendWithGhasedak($apiToken, $condition);
                 //     return;
                 // }
+                \Log::info('shsms is working');
                 try {
+                    \Log::info('try catch is called');
                     if (isset($data['type']) && $data['type'] == 2) {
                         \Illuminate\Support\Facades\Http::withToken($apiToken)->get('https://shsms.ir/api/v1/call', $condition);
                     } else {
@@ -92,6 +95,8 @@ class SmsChannel
                     }
                 } catch (\Throwable $th) {
                     Log::error('shsms has issue:' .  $th->getMessage());
+                }catch (\Exception $e) {
+                    Log::error('shsms has issue:' .  $e->getMessage());
                 }
             }
         }

@@ -174,24 +174,34 @@ class AppointmentDetail extends Component
     private function paymentSetting()
     {
         $activeGateway = setting(SettingKeyEnum::PAYMEN_ACTIVE_DRIVER);
-        if ($activeGateway === 'parsian') {
-            config([
-                'payment.default' => 'parsian',
-                'payment.drivers.parsian.merchantId' => setting(SettingKeyEnum::PAYMENT_PARSIAN_TOKEN),
-            ]);
-        } else {
-            config([
-                'payment.default' => 'zarinpal',
-                'payment.drivers.zarinpal.merchantId' => setting(SettingKeyEnum::PAYMENT_ZARINPAL_MERCHENID),
-            ]);
+        switch ($activeGateway) {
+            case 'parsian':
+                config([
+                    'payment.default' => 'parsian',
+                    'payment.drivers.parsian.merchantId' => setting(SettingKeyEnum::PAYMENT_PARSIAN_TOKEN),
+                ]);
+                break;
+            case 'saman':
+                $merchantId = setting(SettingKeyEnum::PAYMENT_SAMAN_TERMINAL_NUMBER);
+                config([
+                    'payment.default' => 'saman',
+                    'payment.drivers.saman.merchantId' => $merchantId,
+                ]);
+                break;
+            default:
+                config([
+                    'payment.default' => 'zarinpal',
+                    'payment.drivers.zarinpal.merchantId' => setting(SettingKeyEnum::PAYMENT_ZARINPAL_MERCHENID),
+                ]);
+                break;
         }
     }
     public function GotoPayment()
     {
         $amount = $this->fetchData['stauts']['price'];
-        // if (checkIp()) {
-        //     $amount = '1500';
-        // }
+        if (checkIp()) {
+            $amount = '1500';
+        }
         $this->paymentSetting();
         $activeGateway = setting(SettingKeyEnum::PAYMEN_ACTIVE_DRIVER);
         if ($activeGateway === 'parsian') {
@@ -306,6 +316,12 @@ class AppointmentDetail extends Component
         $newDetail = array_merge($old_Detials, $u_data['detail']);
         $transaction->update(['detail' => $newDetail]);
     }
+    private function shouldGoToPaymentDirectly(): bool
+    {
+        return request()->boolean('direct_payment')
+            && setting(SettingKeyEnum::GO_TO_PAYMENT_DIRECTLY)
+            && $this->fetchData['stauts']['payment'];
+    }
     private function sendSmsSuccessfulSms(AppointmentUser $appointment)
     {
         $smsTemplate = setting(SettingKeyEnum::SMS_APPOINTMENT_AFTER_PAYMENT);
@@ -382,13 +398,13 @@ class AppointmentDetail extends Component
         }
         if ($this->fetchData['app']->status == AppointmentUserStatusEnum::STATUS_WAIT_PAYMENT) {
             try {
-                $amount      = data_get(
+                $amount      = (int) data_get(
                     $this->fetchData['app'],
                     AppointmentUser::DETAIL_PAYMENT . '.' . AppointmentUser::DETAIL_PAYMENT_PRICE . '.int'
                 );
-                // if (checkIp()) {
-                //     $amount = '1500';
-                // }
+                if (checkIp()) {
+                    $amount = (int) 1500;
+                }
                 $receipt = Payment::config(['via' => $activeGateway])->amount($amount)
                     ->transactionId($this->fetchData['app']->transaction->detail['transactionId'])
                     ->verify();
@@ -441,6 +457,9 @@ class AppointmentDetail extends Component
             $this->userCanCancell();
             $this->hasDescripion();
             $this->appStatus();
+            if ($this->shouldGoToPaymentDirectly()) {
+                return $this->GotoPayment();
+            }
             $this->placeSocialMedia();
         } else {
             abort(404);

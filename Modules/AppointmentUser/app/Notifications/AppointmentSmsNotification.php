@@ -80,7 +80,6 @@ class AppointmentSmsNotification extends Notification implements ShouldQueue
 //        $logContent .= "User: {$firstName} {$lastName}\n";
 //        $logContent .= "--------------------------\n\n";
 //        file_put_contents($logPath, $logContent, FILE_APPEND);
-
         return [
             'template' => $this->template,
             'receptor' => $notifiable->user->mobile,

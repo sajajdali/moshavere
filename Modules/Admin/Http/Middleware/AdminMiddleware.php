@@ -16,9 +16,9 @@ class AdminMiddleware
             return $next($request);
         }
         if ($request->user()) {
-            return redirect()->route('admin.dashboard');
+            return redirect()->route('user.profile');
         }
-        //send 404
+
         abort(404);
     }
 }

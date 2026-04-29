@@ -442,4 +442,11 @@ class User extends Authenticatable
     {
         return  UserSpecialityType::tryFrom($this->specialityType)->getPreName();
     }
+    public function isPatient(): bool
+    {
+        if ($this->hasAnyRole('بیمار')) {
+            return true;
+        }
+        return false;
+    }
 }

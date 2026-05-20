@@ -191,7 +191,7 @@ class Checkout extends Component
             serviceId: $this->fetchData['appSetting']->service?->id ?? $this->fetchData['service']->id,
             placeId: $this->fetchData['appSetting']->place?->id ?? $this->fetchData['places']->id,
             agentId: auth()->user()->id,
-            operatorId: data_get($this->fetchData,'operator',null),
+            operatorId: data_get($this->fetchData, 'operator', null),
             kind: $kind,
             smsToDoctor: $smsToDoctor,
             description: isset($this->form['description']) ? $this->form['description'] : '',
@@ -228,7 +228,6 @@ class Checkout extends Component
             ) {
                 $routeParameters['direct_payment'] = true;
             }
-
             return redirect()->route('front.setAppointment.detail', $routeParameters);
         } else {
             $this->err = $storeAppointment['message'];
@@ -251,9 +250,9 @@ class Checkout extends Component
         $this->fetchData['doc'] = User::findOrFail($doc);
         $this->fetchData['places'] =  place::findOrFail($place);
         $this->fetchData['service'] = Service::findOrFail($service);
-        if(isset($this->fetchData['operator']) && ! empty($this->fetchData['operator'])) {
-            $o = User::findOrFail ((int) $this->fetchData['operator']);
-            if(! $o->isOperator()) {
+        if (isset($this->fetchData['operator']) && ! empty($this->fetchData['operator'])) {
+            $o = User::findOrFail((int) $this->fetchData['operator']);
+            if (! $o->isOperator()) {
                 return abort(404);
             }
         }
@@ -296,6 +295,12 @@ class Checkout extends Component
             $this->fetchData['service']->id,
             $this->fetchData['places']->id
         );
+        if (filter_var(setting(SettingKeyEnum::GO_TO_PAYMENT_DIRECTLY), FILTER_VALIDATE_BOOL)) {
+            if ($this->checkForActiveAppointment()) {
+                // register the appointment
+                $this->storeAppointment();
+            }
+        }
     }
     public function render()
     {

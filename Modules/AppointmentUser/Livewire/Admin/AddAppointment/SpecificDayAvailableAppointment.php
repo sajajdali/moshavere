@@ -43,10 +43,18 @@ class SpecificDayAvailableAppointment extends Component
     {
         // if date has been change , this functio would be call
         $this->fetchData['selectedDate']      =  Verta::parse($this->form['changeDate'])->tocarbon();
-        $start_date_in_list = carbon::parse($this->fetchData['listOfAppointment'][0]['date']);
-        $end_date_in_list = carbon::parse($this->fetchData['listOfAppointment'][count($this->fetchData['listOfAppointment']) - 1]['date']);
-        if ($this->fetchData['selectedDate']->gt($start_date_in_list) && $this->fetchData['selectedDate']->lte($end_date_in_list)) {
+        $firstDateINList = data_get($this->fetchData['listOfAppointment'], '0.date');
+        if ($firstDateINList) {
+            $start_date_in_list = carbon::parse($this->fetchData['listOfAppointment'][0]['date']);
+            $end_date_in_list = carbon::parse($this->fetchData['listOfAppointment'][count($this->fetchData['listOfAppointment']) - 1]['date']);
         } else {
+            $start_date_in_list = null;
+            $end_date_in_list = null;
+            $this->RecreatelistOfAppointment();
+        }
+        if ((! is_null($start_date_in_list) && !$this->fetchData['selectedDate']->gt($start_date_in_list)) &&
+            (! is_null($end_date_in_list) && ! $this->fetchData['selectedDate']->lte($end_date_in_list))
+        ) {
             $this->RecreatelistOfAppointment();
         }
         // array_column($this->fetchData['listOfAppointment'] , 'date')
@@ -321,7 +329,7 @@ class SpecificDayAvailableAppointment extends Component
 
         // fill the app till cache created
         if (request()->has('storedApp')) {
-            $apid = request()->get('storedApp',null);
+            $apid = request()->get('storedApp', null);
             if (! is_null($apid)) {
                 $this->fetchData['reserve_app_till_cache_create'] = AppointmentUser::find($apid);
             }

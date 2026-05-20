@@ -18,7 +18,7 @@ return [
     ],
     'menu' => [
         'title' => 'امور مالی',
-        'gate' => 'viewAny',
+        'gate' => ['viewAny','Transction'],
         'policy_class' => \Modules\Discount\app\Models\Discount::class,
         'has_divider' => true,
         'priority' => 70,
@@ -56,7 +56,7 @@ return [
                 'gate' => 'Transction',
                 'policy_class' => null,
                 'icon' => 'fe fe-dollar-sign',
-                'route' => 'admin.trnasction',
+                'route' => 'admin.Transction',
                 'has_badge' => false,
                 'has_child' => false,
                 'children' => null

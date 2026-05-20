@@ -148,19 +148,17 @@
                                                     </span>
                                                 </td>
                                                 <td>
-                                                    @can('delete', $transaction)
+                                                    @can('Transction.delete')
                                                         <div class="btn-group mt-2 mb-2">
                                                             <button type="button" class="btn btn-primary dropdown-toggle"
                                                                 data-bs-toggle="dropdown">
                                                                 عملیات <span class="caret"></span>
                                                             </button>
                                                             <ul class="dropdown-menu" role="menu">
-                                                                @can('delete', $transaction)
-                                                                    <li><a class="delete_confirm_alert" data-label="حذف "
-                                                                            data-id="{{ $transaction->id }}"
-                                                                            href="#">حذف</a>
-                                                                    </li>
-                                                                @endcan
+                                                                <li><a class="delete_confirm_alert" data-label="حذف "
+                                                                        data-id="{{ $transaction->id }}"
+                                                                        href="#">حذف</a>
+                                                                </li>
                                                             </ul>
                                                         </div>
                                                     @else

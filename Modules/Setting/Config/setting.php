@@ -15,6 +15,7 @@ $setting = [
             \Modules\Setting\Enum\SettingKeyEnum::SMS_APPOINTMENT_TIME_UPDATE,
             \Modules\Setting\Enum\SettingKeyEnum::SMS_APPOINTMENT_CANCEL,
             \Modules\Setting\Enum\SettingKeyEnum::SMS_APPOINTMENT_WAITING_PAYMENT,
+            \Modules\Setting\Enum\SettingKeyEnum::DONT_SEND_SMS_FOR_PAYMENT_LINK,
             \Modules\Setting\Enum\SettingKeyEnum::SMS_APPOINTMENT_AFTER_PAYMENT,
             \Modules\Setting\Enum\SettingKeyEnum::SMS_APPOINTMENT_REMOVAL_WHEN_NON_PAYMENT,
             \Modules\Setting\Enum\SettingKeyEnum::SMS_SET_APP_MONITORING,

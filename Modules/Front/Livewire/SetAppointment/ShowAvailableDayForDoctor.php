@@ -144,10 +144,12 @@ class ShowAvailableDayForDoctor extends Component
         $isMonth = verta()->addDays($mainDaActive)->month;
         $isYear  = verta()->addDays($mainDaActive)->year;
 
+        $minHourForReserveForToday  = now()->addMinutes(30) ; //if appointment is for today , add this hour ;
+
         $result = [];
         $maxDay = $this->fetchData['maxShowDay'];
         $DaysDisplayed = 0;
-
+        $showFalseStatusDay = setting(SettingKeyEnum::APPOINTMENT_SHOW_FALSE_STATUS_DAYS) ;
         // select the last active day
         $this->caculateLastActiveDay($listOfAppointment['data']);
 
@@ -168,7 +170,7 @@ class ShowAvailableDayForDoctor extends Component
                     if ($day < $isDay && $month < $isMonth && $yeay < $isYear) {
                         continue;
                     }
-                    if (setting(SettingKeyEnum::APPOINTMENT_SHOW_FALSE_STATUS_DAYS) && setting(SettingKeyEnum::APPOINTMENT_SHOW_FALSE_STATUS_DAYS) != false) {
+                    if ($showFalseStatusDay && $showFalseStatusDay != false) {
                         if ($appointment['status'] == false  &&  empty($appointment['times'])) {
                             continue;
                         }
@@ -201,7 +203,7 @@ class ShowAvailableDayForDoctor extends Component
                             $timeToCheck = Carbon::CreateFromTimeStamp($time['timestamp'], 'Asia/Tehran');
                             $isToday = $timeToCheck->copy()->isToday();
                             if ($isToday) {
-                                $checkIfTimePass = $timeToCheck->copy()->gt(now()->addHours(3));
+                                $checkIfTimePass = $timeToCheck->copy()->gt($minHourForReserveForToday);
                             } else {
                                 $checkIfTimePass = $timeToCheck->isFuture();
                             }

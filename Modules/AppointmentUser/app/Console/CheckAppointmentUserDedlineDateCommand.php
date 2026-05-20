@@ -42,7 +42,7 @@ class CheckAppointmentUserDedlineDateCommand extends Command
             ->get();
         if ($appointmentsToDelete->isNotEmpty()) {
             $appointmentsToDelete->each(function ($appointment) {
-                if ($appointment->status == AppointmentUserStatusEnum::STATUS_PENDING) {
+                if ($appointment->status == AppointmentUserStatusEnum::STATUS_WAIT_PAYMENT) {
                     $smsTemplate = setting(SettingKeyEnum::SMS_APPOINTMENT_REMOVAL_WHEN_NON_PAYMENT);
                     if (isset($smsTemplate)) {
                         $appointment->notify(new AppointmentSmsNotification($smsTemplate));

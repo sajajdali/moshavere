@@ -113,6 +113,7 @@ enum SettingKeyEnum: int implements EnumHasNameInterface, SettingTypeInterface, 
     case SMS_PARSSMS_MONITORING_DIS_APPROVED_APP = 89 ;
     case SMS_PRSSMS_APPOINTMENT_WAITING_PAYMENT = 91 ;
     case SMS_FARAZ_LINE_NUMBER = 92 ;
+    case DONT_SEND_SMS_FOR_PAYMENT_LINK = 168 ;
 
 
         //payment
@@ -241,7 +242,7 @@ enum SettingKeyEnum: int implements EnumHasNameInterface, SettingTypeInterface, 
             self::SMS_FOR_SEND_MESSAGE_IN_CHATS => 'نام الگوی پیامکی، بعد از پاسخ دادن به چت',
             self::SMS_SET_APP_MONITORING => 'در صورت فعال بودن پایش نوبت، پیامک ثبت نوبت',
             self::SMS_SENDER => 'پنل ارسال کننده ی پیامک',
-            self::SMS_FARAZ_LINE_NUMBER => 'شماره ارسال کننده پیامک از فراز SMS',
+            self::SMS_FARAZ_LINE_NUMBER => 'شماره ارسال کننده پیامک',
 
             //payment
             self::PAYMENT_PAYSTAR_TOKEN => 'کد درگاه پرداخت پی استار',
@@ -273,6 +274,7 @@ enum SettingKeyEnum: int implements EnumHasNameInterface, SettingTypeInterface, 
             self::SMS_DIS_APPROVED_MONITORING_APPOINTMENT => 'پیامک به کاربر بعد از عدم تایید نوبت در  پایش نوبت',
             self::SMS_FEEDBACK => 'پیامک ارسال نظر سنجی به کاربر، بعد از ثبت حضور کاربر',
             self::CALL_LOGIN_TEMPLATE => 'الگوی تماس برای ورود کاربر',
+            self::DONT_SEND_SMS_FOR_PAYMENT_LINK => 'غیر فعال سازی ارسال پیامک در زمانی که پرداخت فعال است و بیماران نوبت در انتظار پرداخت دریافت میکنند',
 
             // PARS SMS
             self::SMS_PARSSMS_LOGIN_TEXT => 'متن پیامک ورود',
@@ -361,6 +363,7 @@ enum SettingKeyEnum: int implements EnumHasNameInterface, SettingTypeInterface, 
             self::PAYMENT_SAMAN_TERMINAL_PASS => '<span class="my-3"></span>',
             self::ACTIVE_JIBIT => 'در حال توسعه...',
             self::LOGIN_WITHOUT_OTP => 'اخطار امنیتی: با فعال کردن این ویژگی، هر شخصی میتواند با هر شماره ای وارد سیستم شده و نوبت های مربوط به هر شماره را مشاهده کند!!!!!',
+            self::SMS_FARAZ_LINE_NUMBER => 'الزامی برای ارسال توسط فراز و آیپی پنل',
             self::SMS_PARSSMS_ADD_APPOINTMENT_TEXT => 'پارامتر های قابل قرار گیری: <br />  ۱ = نام کاربر
              <br/> ۲ = نام خانوادگی کاربر
              <br/> ۳ = نام پزشک
@@ -456,6 +459,7 @@ enum SettingKeyEnum: int implements EnumHasNameInterface, SettingTypeInterface, 
             self::USER_REGISTER_NATIONAL_CODE_REQUIRED => SettingTypeEnum::CHECK,
             self::LOGIN_WITHOUT_OTP => SettingTypeEnum::CHECK,
             self::GO_TO_PAYMENT_DIRECTLY => SettingTypeEnum::CHECK,
+            self::DONT_SEND_SMS_FOR_PAYMENT_LINK => SettingTypeEnum::CHECK,
             default => SettingTypeEnum::TEXT
         };
     }
@@ -496,9 +500,15 @@ enum SettingKeyEnum: int implements EnumHasNameInterface, SettingTypeInterface, 
                 'ghasedak' => 'قاصدک',
                 'parsasms' => 'پارس',
                 'farazsms' => 'فراز',
+                'ippannel' => 'آی پی پنل',
+                'starpayam' => 'استار پیام',
             ],
             self::SUPPORT_USER_ROLE => User::adminSupportRoles(),
-            self::PAYMEN_ACTIVE_DRIVER => ['zrinpal' => 'زرین پال','parsian'=> 'پارسیان','saman' => 'سامان','sep' => 'سپ'],
+            self::PAYMEN_ACTIVE_DRIVER => [
+                'zrinpal' => 'زرین پال',
+                'parsian'=> 'پارسیان',
+                'saman' => 'سامان',
+                'sep' => 'سپ'],
             default => []
         };
     }

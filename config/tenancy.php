@@ -191,11 +191,23 @@ return [
      */
     'migration_parameters' => [
         '--force' => true, // This needs to be true to run migrations in production.
-        '--path' => [database_path('migrations/tenant'),
-        'Modules/Place/database/migrations/tenant',
-        'Modules/AppointmentUser/database/migrations/tenant',
-        'Modules/User/database/migrations/tenant',
-    ],
+        '--path' => [
+            database_path('migrations/tenant'),
+            base_path('Modules/User/Database/Migrations/tenant'),
+            base_path('Modules/Service/database/migrations/tenant'),
+            base_path('Modules/Place/database/migrations/tenant'),
+            base_path('Modules/Speciality/database/migrations/tenant'),
+            base_path('Modules/Setting/Database/Migrations/tenant'),
+            base_path('Modules/AppointmentSetting/database/migrations/tenant'),
+            base_path('Modules/AppointmentUser/database/migrations/tenant'),
+            base_path('Modules/Chat/database/migrations/tenant'),
+            base_path('Modules/Discount/database/migrations/tenant'),
+            base_path('Modules/Front/Database/Migrations/tenant'),
+            base_path('Modules/Reminder/database/migrations/tenant'),
+            base_path('Modules/Transaction/database/migrations/tenant'),
+            base_path('Modules/Absence/database/migrations/tenant'),
+            base_path('Modules/Api/Database/Migrations/tenant'),
+        ],
         '--realpath' => true,
     ],
 

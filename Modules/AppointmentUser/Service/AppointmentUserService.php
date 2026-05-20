@@ -782,7 +782,7 @@ class AppointmentUserService
         $paymentLink = null;
         $needToPayment = false;
         $smsTemplate = setting(SettingKeyEnum::SMS_APPOINTMENT_RECEIVING_SUCCESSFUL);
-
+        $dontSendPAymentSms = setting(SettingKeyEnum::DONT_SEND_SMS_FOR_PAYMENT_LINK);
         if (
             $appointmentData->appointmentVia == AppointmentVia::SELF &&
             $appointmentData->kind == AppointmentUserKindEnum::ONLINE &&
@@ -790,6 +790,14 @@ class AppointmentUserService
         ) {
             $needToPayment = true;
             $smsTemplate = setting(SettingKeyEnum::SMS_APPOINTMENT_WAITING_PAYMENT);
+
+            if (
+                isset($dontSendPAymentSms) &&
+                filter_var($dontSendPAymentSms, FILTER_VALIDATE_BOOL) &&
+                $appointmentData->appointmentVia == AppointmentVia::SELF
+            ) {
+                $smsTemplate = null ;
+            }
             $appointmentUserModel['deadline_at'] = $paymentstatus['online']['deadline'];
             if ($paymentstatus['online']['force_payment']) {
                 $appointmentUserModel['status'] = AppointmentUserStatusEnum::STATUS_WAIT_PAYMENT;
@@ -806,6 +814,13 @@ class AppointmentUserService
         ) {
             $needToPayment = true;
             $smsTemplate = setting(SettingKeyEnum::SMS_APPOINTMENT_WAITING_PAYMENT);
+            if (
+                isset($dontSendPAymentSms) &&
+                filter_var($dontSendPAymentSms, FILTER_VALIDATE_BOOL) &&
+                $appointmentData->appointmentVia == AppointmentVia::SELF
+            ) {
+                $smsTemplate = null ;
+            }
             if ($paymentstatus['in_person']['force_payment']) {
                 $appointmentUserModel['status'] = AppointmentUserStatusEnum::STATUS_WAIT_PAYMENT;
             }

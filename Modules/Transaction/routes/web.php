@@ -15,6 +15,6 @@ use Modules\Transaction\Livewire\TransactionLivewire;
 */
 
 Route::prefix('admin')
-    ->middleware(['web', 'admin','can:Transaction'])->as('admin.')->group(function () {
-        Route::get('/trnasction', TransactionLivewire::class)->name('trnasction');
+    ->middleware(['web', 'admin','can:Transction'])->as('admin.')->group(function () {
+        Route::get('/trnasction', TransactionLivewire::class)->name('Transction');
     });

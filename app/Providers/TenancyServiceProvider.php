@@ -131,31 +131,10 @@ class TenancyServiceProvider extends ServiceProvider
         })->filter();
 
         $tenant->run(function () use ($orderedModules) {
-            // Step 1: Run base tenant migrations
-            Artisan::call('migrate', [
-                '--path' => 'database/migrations/tenant',
-                '--force' => true,
-            ]);
+            // Run all tenant migrations together so Laravel can sort dependencies by migration name.
+            Artisan::call('migrate', config('tenancy.migration_parameters'));
 
-            // Step 2: Run each module's tenant-specific migrations
-            foreach ($orderedModules as $module) {
-                $possiblePaths = [
-                    $module->getPath() . '/Database/Migrations/tenant',
-                    $module->getPath() . '/database/migrations/tenant',
-                ];
-
-                foreach ($possiblePaths as $tenantMigrationPath) {
-                    if (is_dir($tenantMigrationPath)) {
-                        Artisan::call('migrate', [
-                            '--path' => str_replace(base_path() . '/', '', $tenantMigrationPath),
-                            '--force' => true,
-                        ]);
-                        break;
-                    }
-                }
-            }
-
-            // Step 3: Seed each module's tenant-specific seeders
+            // Step 2: Seed each module's tenant-specific seeders
             foreach ($orderedModules as $module) {
                 $possibleSeederPaths = [
                     $module->getPath() . '/Database/Seeders',

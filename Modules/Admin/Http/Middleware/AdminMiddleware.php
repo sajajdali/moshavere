@@ -16,7 +16,7 @@ class AdminMiddleware
             return $next($request);
         }
         if ($request->user()) {
-            return redirect()->route('user.profile');
+            return redirect()->route('front.user.profile');
         }
 
         abort(404);

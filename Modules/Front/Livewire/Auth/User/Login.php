@@ -29,6 +29,9 @@ class Login extends Component
 
     #[Locked]
     public bool $login_without_otp = false;
+
+    #[Locked]
+    public bool $callLoginTemplate = false;
     public function messages()
     {
         return [
@@ -112,16 +115,30 @@ class Login extends Component
             }
         }
     }
-    public function resendotpCode()
+    public function resendotpCode(int $sendForCall = 1)
     {
-        $this->watitTime = now()->addMinutes(2);
-        if (now()->lessThanOrEqualTo($this->watitTime)) {
-            AuthRequest::make($this->form['mobileNmber'], request()->ip());
-            $this->dispatch('startCountDown', true);
-        } else {
-            $this->addError('form.code', 'برای ارسال محدد کد باید دو دقیقه صبر کنید!');
+        if ($sendForCall === 2 && ! $this->callLoginTemplate) {
+            $this->addError('form.code', 'امکان دریافت کد با تماس فعال نیست.');
+            return;
         }
+
+        $oldRequest = AuthRequest::where('mobile', $this->form['mobileNmber'])
+            ->first();
+
+        if ($oldRequest?->updated_at?->greaterThan(now()->subMinutes(2))) {
+            $this->addError('form.code', 'برای ارسال مجدد کد باید دو دقیقه صبر کنید!');
+            return;
+        }
+
+        AuthRequest::make($this->form['mobileNmber'], request()->ip(), $sendForCall);
+        $this->dispatch('startCountDown', true);
     }
+
+    public function resendCallOtpCode()
+    {
+        $this->resendotpCode(2);
+    }
+
     public function changeNumber()
     {
         unset($this->form);
@@ -145,7 +162,11 @@ class Login extends Component
         if (request()->has('cancelApp')) {
             $this->fetchData['alert'] = 'برای کنسل کردن نوبت لازم هست که وارد شوید!';
         }
-        $this->login_without_otp = filter_var(setting(SettingKeyEnum::LOGIN_WITHOUT_OTP),FILTER_VALIDATE_BOOL);
+        $this->login_without_otp = filter_var(setting(SettingKeyEnum::LOGIN_WITHOUT_OTP), FILTER_VALIDATE_BOOL);
+        $callTemplate = setting(SettingKeyEnum::CALL_LOGIN_TEMPLATE);
+        if (filled($callTemplate)) {
+            $this->callLoginTemplate = true;
+        }
     }
     public function render()
     {

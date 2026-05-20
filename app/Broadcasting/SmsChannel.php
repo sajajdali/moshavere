@@ -6,6 +6,7 @@ use DateTimeImmutable;
 use Ghasedak\GhasedaksmsApi;
 use Modules\User\Entities\User;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Http;
 use Modules\Setting\Enum\SettingKeyEnum;
 use Illuminate\Notifications\Notification;
 use Ghasedak\DataTransferObjects\Request\ReceptorDTO;
@@ -67,7 +68,14 @@ class SmsChannel
             $this->sendWithFarrazSms($apiToken, $data, $settingCollection);
             return;
         }
-        \Log::info('shsms is called');
+        if ($senderDriver == 'ippannel') {
+            $this->sendWithIpPanel($apiToken, $data, $settingCollection);
+            return;
+        }
+        if ($senderDriver == 'starpayam') {
+            $this->sendWithStarPayam($apiToken, $data, $settingCollection);
+            return;
+        }
         if (isset($data['template']) && !empty($data['template'])) {
             //data should have receptor and template and at least one params
             if (
@@ -85,9 +93,7 @@ class SmsChannel
                 //     $this->sendWithGhasedak($apiToken, $condition);
                 //     return;
                 // }
-                \Log::info('shsms is working');
                 try {
-                    \Log::info('try catch is called');
                     if (isset($data['type']) && $data['type'] == 2) {
                         \Illuminate\Support\Facades\Http::withToken($apiToken)->get('https://shsms.ir/api/v1/call', $condition);
                     } else {
@@ -95,11 +101,99 @@ class SmsChannel
                     }
                 } catch (\Throwable $th) {
                     Log::error('shsms has issue:' .  $th->getMessage());
-                }catch (\Exception $e) {
+                } catch (\Exception $e) {
                     Log::error('shsms has issue:' .  $e->getMessage());
                 }
             }
         }
+    }
+    private function sendWithStarPayam($apiToken, $data, $settings): void
+    {
+        $findSmsText =  $this->findSmsText($data['template'], $settings);
+        $finalText = $this->paramToText($findSmsText, $data['params']);
+        try {
+            $payload = [
+                'receptor' => $data['receptor'] ?? null,
+                'sender'   => $this->getSettingValue($settings, SettingKeyEnum::SMS_FARAZ_LINE_NUMBER),
+                'message'  => $finalText
+            ];
+            $response =  Http::withHeaders([
+                'apikey' => $apiToken,
+            ])->post('http://api.iransmsservice.com/v2/sms/send/simple', $payload);
+            if (! $response->successful()) {
+                Log::error('starPayam SMS failed', [
+                    'payload' => $payload,
+                    'response' => $response->body(),
+                ]);
+            }
+        } catch (\Throwable $e) {
+            Log::error('starPayam Exception: ' . $e->getMessage());
+        }
+    }
+    private function sendWithIpPanel($apiToken, $data, $settings): void
+    {
+        try {
+            $variables = [];
+
+            foreach (array_values($data['params'] ?? []) as $index => $value) {
+                $variables['param' . ($index + 1)] = $value;
+            }
+            $payload = [
+                'sending_type' => 'pattern',
+                'from_number' => $this->getSettingValue($settings, SettingKeyEnum::SMS_FARAZ_LINE_NUMBER),
+                'code' => $data['template'] ?? null,
+                'recipients' => [
+                    $data['receptor'] ?? null,
+                ],
+                'params' => $variables,
+            ];
+
+            $response = Http::withHeaders([
+                'Authorization' => $apiToken,
+                'Content-Type' => 'application/json',
+            ])->post('https://edge.ippanel.com/v1/api/send', $payload);
+
+            if (! $response->successful()) {
+                Log::error('IPPANEL SMS failed', [
+                    'payload' => $payload,
+                    'response' => $response->body(),
+                ]);
+            }
+        } catch (\Exception $e) {
+            Log::error('IPPANEL exception: ' . $e->getMessage());
+        }
+    }
+    private function normalizeIpPanelMobile(?string $mobile): ?string
+    {
+        if (is_null($mobile)) {
+            return null;
+        }
+
+        $mobile = trim($mobile);
+
+        if (str_starts_with($mobile, '+')) {
+            return $mobile;
+        }
+
+        $mobile = preg_replace('/\D/', '', $mobile);
+
+        if (str_starts_with($mobile, '00')) {
+            return '+' . substr($mobile, 2);
+        }
+
+        if (str_starts_with($mobile, '98')) {
+            return '+' . $mobile;
+        }
+
+        if (str_starts_with($mobile, '0')) {
+            return '+98' . substr($mobile, 1);
+        }
+
+        return '+98' . $mobile;
+    }
+    private function isValidIpPanelMobile(?string $mobile): bool
+    {
+        return is_string($mobile) && preg_match('/^\+98\d{10}$/', $mobile) === 1;
     }
     private function sendWithGhasedak($apiToken, $condition)
     {

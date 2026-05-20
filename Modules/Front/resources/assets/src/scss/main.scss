@@ -41,8 +41,20 @@ $font: 'iranSans', sans-serif;
 @layer base {
    body {
       position: relative;
+      display: flex;
+      flex-direction: column;
       overflow-x: hidden;
       min-height: 100vh;
+   }
+
+   .page,
+   .page-main {
+      flex: 1 0 auto;
+   }
+
+   .page {
+      display: flex;
+      flex-direction: column;
    }
 
    img {

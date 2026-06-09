@@ -445,7 +445,6 @@ class AppointmentDetail extends Component
     }
     public function mount()
     {
-
         $trackingCode  = request()->route('tracking_code');
         $cleanedTrackingCode = preg_replace('/[^0-9]/', '', $trackingCode);
         $this->fetchData['app'] = AppointmentUser::firstWhere('tracking_code', $cleanedTrackingCode);

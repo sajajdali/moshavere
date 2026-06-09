@@ -63,6 +63,9 @@ return [
 
     'url' => env('APP_URL', 'http://localhost'),
 
+    'tenant_renew_cost' => env('TENANT_RENEW_COST', 7500000),
+    'tenant_renew_callback_token' => env('TENANT_RENEW_CALLBACK_TOKEN', '+[S}XnL+@kFo4UZP62r\b~6De)+n[3iD`2Pl<eRh?Vl`C£l(/1'),
+
     'asset_url' => env('ASSET_URL'),
 
     /*
@@ -198,6 +201,6 @@ return [
     ])->toArray(),
 
 
-    'without_cache' => env('WITHOUT_CACHE',false),
-    'dont_check_ip' => env('DONT_CHECK_IP',false) ,
+    'without_cache' => env('WITHOUT_CACHE', false),
+    'dont_check_ip' => env('DONT_CHECK_IP', false),
 ];

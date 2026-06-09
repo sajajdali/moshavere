@@ -6,9 +6,13 @@ use Stancl\Tenancy\Middleware\PreventAccessFromCentralDomains;
 Route::prefix('admin')
     ->middleware(['web', 'admin'])->as('admin.')->group(function () {
         Route::get('/dashboard', \Modules\Admin\Livewire\Dashboard::class)->name('dashboard');
+        Route::get('/tenant/renew', \Modules\Admin\Livewire\TenantRenew::class)->name('tenant-renew');
         Route::get('/file', \Modules\Admin\Livewire\FileManager::class)->name('file');
         Route::get('logout', 'Modules\Admin\Http\Controllers\AdminController@logout')->name('logout');
     });
+
+Route::post('/admin/tenant/renew/callback', \Modules\Admin\Http\Controllers\TenantRenewCallbackController::class)
+    ->name('admin.tenant-renew.callback');
 /*
 //livewire routes
 //Route::prefix('admin')->namespace('Modules\Admin\Http\Livewire')->as('admin.')->group(function() {

@@ -29,6 +29,20 @@
 
 <body class="rtl app sidebar-mini">
 
+    @php
+        $currentTenant = tenancy()->initialized ? tenant() : null;
+        $tenantExpiresAt = $currentTenant?->expires_at;
+        $tenantDaysUntilExpiration = $tenantExpiresAt
+            ? (int) now()
+                ->startOfDay()
+                ->diffInDays($tenantExpiresAt->copy()->startOfDay(), false)
+            : null;
+        $tenantAccessExpired =
+            $tenantDaysUntilExpiration !== null &&
+            $tenantDaysUntilExpiration < -30 &&
+            !request()->routeIs('admin.tenant-renew');
+        $tenantAccessExpired = false; //todo temporary
+    @endphp
 
     <!-- PAGE -->
     <div class="page">
@@ -54,9 +68,14 @@
                                 </div>
                             </div>
                         </div>
-                        {{-- loading --}}
-                        @yield('content')
-                        {{ $slot ?? '' }}
+                        {{-- TODO:: remove id check  --}}
+                        @if (checkIp())
+                            @include('admin::layouts.components.tenant-expiration-alert')
+                        @endif
+                        @unless ($tenantAccessExpired)
+                            @yield('content')
+                            {{ $slot ?? '' }}
+                        @endunless
                     </div>
                 </div>
             </div>

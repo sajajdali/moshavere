@@ -276,6 +276,20 @@ class Checkout extends Component
         // check for login
         if (auth()->check()) {
             $this->user =  auth()->user();
+            if( $this->user->isNotRegistered()) {
+                $parameter = [
+                    'doctor_id'  => $this->fetchData['doc']->id,
+                    'place_id'   => $this->fetchData['places']->id,
+                    'service_id' => $this->fetchData['service']->id,
+                    'start_time' => $this->fetchData['app_start_time'],
+                    'end_time'   => $this->fetchData['app_end_time'],
+                    'segments'   => $this->fetchData['segmentsId'],
+                    'operator'   => $this->fetchData['operator']
+                ];
+                $route = route('setAppointment.checkout', $parameter);
+                session()->put('url.intended', $route);
+                return redirect()->route('front.user.registration');
+            }
         } else {
             $parameter = [
                 'doctor_id'  => $this->fetchData['doc']->id,

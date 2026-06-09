@@ -13,5 +13,6 @@ class VerifyCsrfToken extends Middleware
      */
     protected $except = [
         'appointment/detail/*',
+        'admin/tenant/renew/callback',
     ];
 }

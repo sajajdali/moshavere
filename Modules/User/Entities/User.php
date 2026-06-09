@@ -2,30 +2,31 @@
 
 namespace Modules\User\Entities;
 
-use Verta;
 use App\Enum\ActiveEnum;
-use Laravel\Sanctum\HasApiTokens;
-use Modules\Chat\app\Models\Chat;
-use Spatie\Permission\Models\Role;
-use Modules\Place\app\Models\Place;
-use Modules\User\Enum\UserMetaEnum;
-use Illuminate\Support\Facades\Cache;
-use Modules\Front\app\Models\Province;
-use Spatie\Permission\Traits\HasRoles;
-use Illuminate\Notifications\Notifiable;
-use Modules\User\Enum\UserSpecialityType;
-use Modules\User\Traits\UserRelationTrait;
-use Modules\User\Traits\UserAttributeTrait;
+use Illuminate\Contracts\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Foundation\Auth\User as Authenticatable;
+use Illuminate\Notifications\Notifiable;
+use Illuminate\Support\Facades\Cache;
+use Laravel\Sanctum\HasApiTokens;
+use Modules\AppointmentSetting\app\Models\AppointmentSetting;
+use Modules\AppointmentUser\app\Models\AppointmentOnline;
+use Modules\AppointmentUser\Enum\AppointmentOnlineStatusEnum;
+use Modules\Chat\app\Models\Chat;
+use Modules\Front\app\Models\Province;
+use Modules\Place\app\Models\Place;
+use Modules\Setting\Enum\SettingKeyEnum;
 use Modules\Transaction\app\Models\Transaction;
 use Modules\User\Database\factories\UserFactory;
-use Illuminate\Contracts\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\Relations\HasMany;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Foundation\Auth\User as Authenticatable;
-use Modules\AppointmentUser\app\Models\AppointmentOnline;
-use Modules\AppointmentSetting\app\Models\AppointmentSetting;
-use Modules\AppointmentUser\Enum\AppointmentOnlineStatusEnum;
+use Modules\User\Enum\UserMetaEnum;
+use Modules\User\Enum\UserSpecialityType;
+use Modules\User\Traits\UserAttributeTrait;
+use Modules\User\Traits\UserRelationTrait;
+use Spatie\Permission\Models\Role;
+use Spatie\Permission\Traits\HasRoles;
+use Verta;
 
 /**
  * Modules\User\Entities\User
@@ -445,6 +446,19 @@ class User extends Authenticatable
     public function isPatient(): bool
     {
         if ($this->hasAnyRole('بیمار')) {
+            return true;
+        }
+        return false;
+    }
+    public function isNotRegistered(): bool
+    {
+        if (empty($this->firstName)) {
+            return true;
+        }
+        if (empty($this->lastName)) {
+            return true;
+        }
+        if (empty($this->national_code) &&  ((bool) setting(SettingKeyEnum::USER_REGISTER_NATIONAL_CODE_REQUIRED))) {
             return true;
         }
         return false;

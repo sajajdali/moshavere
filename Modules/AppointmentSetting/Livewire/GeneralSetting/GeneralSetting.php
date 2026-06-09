@@ -346,6 +346,7 @@ class GeneralSetting extends Component
             [
                 AppointmentSetting::STATUS                           => isset($this->form['payment']['status']) ? $this->form['payment']['status']  : false,
                 AppointmentSetting::NOT_PAYING_STATUS                => isset($this->form['payment']['notPayingStatus']) ?  $this->form['payment']['notPayingStatus']  : null,
+                AppointmentSetting::ADMIN_PANEL_PRICE                => isset($this->form['payment']['adminPanelPrice']) ?  $this->form['payment']['adminPanelPrice']  : null,
                 AppointmentSetting::ONLINE =>
                 [
                     AppointmentSetting::STATUS                       => isset($this->form['payment']['online']['status']) ? $this->form['payment']['online']['status'] : null,
@@ -536,6 +537,9 @@ class GeneralSetting extends Component
             }
             if (isset($apSet->detail[AppointmentSetting::PAYMENT][AppointmentSetting::NOT_PAYING_STATUS])) {
                 $this->form['payment']['notPayingStatus']  = $apSet->detail[AppointmentSetting::PAYMENT][AppointmentSetting::NOT_PAYING_STATUS];
+            }
+            if (isset($apSet->detail[AppointmentSetting::PAYMENT][AppointmentSetting::ADMIN_PANEL_PRICE])) {
+                $this->form['payment']['adminPanelPrice']  = $apSet->detail[AppointmentSetting::PAYMENT][AppointmentSetting::ADMIN_PANEL_PRICE];
             }
             if (isset($apSet->detail[AppointmentSetting::PAYMENT][AppointmentSetting::ONLINE])) {
                 $this->form['payment'][AppointmentSetting::ONLINE][AppointmentSetting::STATUS] = $apSet->detail[AppointmentSetting::PAYMENT][AppointmentSetting::ONLINE][AppointmentSetting::STATUS];

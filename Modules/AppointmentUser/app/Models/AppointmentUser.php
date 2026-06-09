@@ -27,6 +27,10 @@ class AppointmentUser extends Model
     const DETAIL_APPOINTMENT_VIA = 'appointment_via';
     const STORE_FROM_APPLICATION = 'store_from_application';
     const DETAIL_PAYMENT_PRICE = 'price';
+    const DETAIL_PAYMENT_PRICE_SOURCE = 'price_source';
+    const DETAIL_PAYMENT_SOURCE_GENERAL = 'general_price';
+    const DETAIL_PAYMENT_SOURCE_ADMIN_PANEL = 'admin_panel_price';
+    const DETAIL_PAYMENT_SETTING_SNAPSHOT = 'setting_snapshot';
     const DETAIL_QUESTION = 'question';
     const DETAIL_DESCRIPTION = 'description';
     const DETAIL_SOMEONE = 'someone';

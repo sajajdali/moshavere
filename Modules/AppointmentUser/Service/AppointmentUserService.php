@@ -802,10 +802,11 @@ class AppointmentUserService
             if ($paymentstatus['online']['force_payment']) {
                 $appointmentUserModel['status'] = AppointmentUserStatusEnum::STATUS_WAIT_PAYMENT;
             }
-            $detailDatabaseDB[AppointmentUser::DETAIL_PAYMENT] = [
-                'status' => true,
-                AppointmentUser::DETAIL_PAYMENT_PRICE => $paymentstatus['online']['price'],
-            ];
+            $detailDatabaseDB[AppointmentUser::DETAIL_PAYMENT] = $this->paymentDetailPayload(
+                $appointmentSetting,
+                $paymentstatus['online']['price'],
+                AppointmentUser::DETAIL_PAYMENT_SOURCE_GENERAL
+            );
         }
         if (
             $appointmentData->appointmentVia == AppointmentVia::SELF &&
@@ -824,17 +825,20 @@ class AppointmentUserService
             if ($paymentstatus['in_person']['force_payment']) {
                 $appointmentUserModel['status'] = AppointmentUserStatusEnum::STATUS_WAIT_PAYMENT;
             }
-            $detailDatabaseDB[AppointmentUser::DETAIL_PAYMENT] = [
-                'status' => true,
-                AppointmentUser::DETAIL_PAYMENT_PRICE => $paymentstatus['in_person']['price'],
-            ];
+            $detailDatabaseDB[AppointmentUser::DETAIL_PAYMENT] = $this->paymentDetailPayload(
+                $appointmentSetting,
+                $paymentstatus['in_person']['price'],
+                AppointmentUser::DETAIL_PAYMENT_SOURCE_GENERAL
+            );
         }
         if (isset($detail['wait_for_payment'])) {
             // force payment for secretery send link appointments
-            $detailDatabaseDB[AppointmentUser::DETAIL_PAYMENT] = [
-                'status' => true,
-                AppointmentUser::DETAIL_PAYMENT_PRICE => $paymentstatus['in_person']['price'],
-            ];
+            $adminPaymentPrice = $this->adminAppointmentPaymentPrice($appointmentSetting, $paymentstatus['in_person']['price']);
+            $detailDatabaseDB[AppointmentUser::DETAIL_PAYMENT] = $this->paymentDetailPayload(
+                $appointmentSetting,
+                $adminPaymentPrice['price'],
+                $adminPaymentPrice['source']
+            );
         }
 
         // detailDatabase
@@ -988,5 +992,53 @@ class AppointmentUserService
     {
         $hours = setting(SettingKeyEnum::APPOINTMENT_DEADLINE_VIA_ADMIN) == null ?   config('app.appointment_dedline') : setting(SettingKeyEnum::APPOINTMENT_DEADLINE_VIA_ADMIN);
         return   Carbon::now()->addHours((int)$hours)->toDateTimeString();
+    }
+
+    private function adminAppointmentPaymentPrice(AppointmentSetting $appointmentSetting, $fallbackPrice)
+    {
+        $price = str_replace(',', '', data_get(
+            $appointmentSetting->detail,
+            AppointmentSetting::PAYMENT . '.' . AppointmentSetting::ADMIN_PANEL_PRICE,
+            ''
+        ));
+
+        if ((int) $price > 0) {
+            return [
+                'price' => PriceResource::make(['price' => (int) $price]),
+                'source' => AppointmentUser::DETAIL_PAYMENT_SOURCE_ADMIN_PANEL,
+            ];
+        }
+
+        return [
+            'price' => $fallbackPrice,
+            'source' => AppointmentUser::DETAIL_PAYMENT_SOURCE_GENERAL,
+        ];
+    }
+
+    private function paymentDetailPayload(AppointmentSetting $appointmentSetting, $price, string $priceSource): array
+    {
+        return [
+            'status' => true,
+            AppointmentUser::DETAIL_PAYMENT_PRICE => $price,
+            AppointmentUser::DETAIL_PAYMENT_PRICE_SOURCE => $priceSource,
+            AppointmentUser::DETAIL_PAYMENT_SETTING_SNAPSHOT => [
+                'appointment_setting_id' => $appointmentSetting->id,
+                AppointmentSetting::STATUS => data_get($appointmentSetting->detail, AppointmentSetting::PAYMENT . '.' . AppointmentSetting::STATUS),
+                AppointmentSetting::NOT_PAYING_STATUS => data_get($appointmentSetting->detail, AppointmentSetting::PAYMENT . '.' . AppointmentSetting::NOT_PAYING_STATUS),
+                AppointmentSetting::ADMIN_PANEL_PRICE => data_get($appointmentSetting->detail, AppointmentSetting::PAYMENT . '.' . AppointmentSetting::ADMIN_PANEL_PRICE),
+                AppointmentSetting::IN_PERSON => [
+                    AppointmentSetting::STATUS => data_get($appointmentSetting->detail, AppointmentSetting::PAYMENT . '.' . AppointmentSetting::IN_PERSON . '.' . AppointmentSetting::STATUS),
+                    AppointmentSetting::PRICE => data_get($appointmentSetting->detail, AppointmentSetting::PAYMENT . '.' . AppointmentSetting::IN_PERSON . '.' . AppointmentSetting::PRICE),
+                ],
+                AppointmentSetting::ONLINE => [
+                    AppointmentSetting::STATUS => data_get($appointmentSetting->detail, AppointmentSetting::PAYMENT . '.' . AppointmentSetting::ONLINE . '.' . AppointmentSetting::STATUS),
+                    AppointmentSetting::PRICE => data_get($appointmentSetting->detail, AppointmentSetting::PAYMENT . '.' . AppointmentSetting::ONLINE . '.' . AppointmentSetting::PRICE),
+                ],
+                AppointmentSetting::VOIP => [
+                    AppointmentSetting::STATUS => data_get($appointmentSetting->detail, AppointmentSetting::PAYMENT . '.' . AppointmentSetting::VOIP . '.' . AppointmentSetting::STATUS),
+                    AppointmentSetting::PRICE => data_get($appointmentSetting->detail, AppointmentSetting::PAYMENT . '.' . AppointmentSetting::VOIP . '.' . AppointmentSetting::PRICE),
+                ],
+            ],
+        ];
     }
 }

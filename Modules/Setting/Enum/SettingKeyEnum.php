@@ -68,6 +68,9 @@ enum SettingKeyEnum: int implements EnumHasNameInterface, SettingTypeInterface, 
     case ENABLE_DOCTORS_MENU = 430;
     case ENABLE_CONTACT_US_MENU = 431;
     case ALLOW_MULTIPLE_APP_FROM_ADMIN_PANEL = 432;
+    case HOME_ALERT_STATUS = 433;
+    case HOME_ALERT_TITLE = 434;
+    case HOME_ALERT_DESCRIPTION = 435;
 
     // ABOUT US PAGE
     case ABOUT_US_FIRST_SECTION_TITLE = 23;
@@ -231,6 +234,9 @@ enum SettingKeyEnum: int implements EnumHasNameInterface, SettingTypeInterface, 
             self::ALLOW_MULTIPLE_APP_FROM_ADMIN_PANEL => 'اجازه ثبت نوبت در پنل منشی، برای ساعت هایی که از قبل یک نوبت ثبت شده در آن ساعت وجود دارد',
             self::APPOINTMENT_SHOW_DESCRIPTION_IN_APP_LIST => 'نمایش توضیحات مربوط به نوبت در صفحه ی لیست نوبت ها',
             self::SHOW_ABOUT_US_MENU_BUTTON => 'نمایش درباره ما در منو',
+            self::HOME_ALERT_STATUS => 'فعال بودن هشدار صفحه اصلی',
+            self::HOME_ALERT_TITLE => 'عنوان هشدار صفحه اصلی',
+            self::HOME_ALERT_DESCRIPTION => 'متن هشدار صفحه اصلی',
 
             // SMS
             self::SMS_API_TOKEN => 'توکن API پیامک',
@@ -411,6 +417,7 @@ enum SettingKeyEnum: int implements EnumHasNameInterface, SettingTypeInterface, 
             self::SMS_SENDER => SettingTypeEnum::SELECT,
             self::PAYMEN_ACTIVE_DRIVER => SettingTypeEnum::SELECT,
             self::APPOINTMENT_MORE_THAT_ONE_PER_DAY , self::HEADER1_SHOW_BUTTONS , self::HEADER1_SHOW_BUTTON1, self::HEADER1_SHOW_BUTTON2 , self::ENABLE_DOCTORS_MENU , self::ENABLE_CONTACT_US_MENU => SettingTypeEnum::CHECK,
+            self::HOME_ALERT_STATUS => SettingTypeEnum::CHECK,
             self::APPOINTMENT_SHOW_FALSE_STATUS_DAYS => SettingTypeEnum::CHECK,
             self::APPOINTMENT_DETAIL_PAYMENT_DESCRIPTION_STATUS => SettingTypeEnum::CHECK,
             self::ONILNE_SEND_ATUOMATIC_MESSAGE_STATUS => SettingTypeEnum::CHECK,
@@ -441,6 +448,7 @@ enum SettingKeyEnum: int implements EnumHasNameInterface, SettingTypeInterface, 
             self::CONTACTUS_FORM_ADDRESS => SettingTypeEnum::TEXTAREA,
             self::FOOTER_DESCRIPTION => SettingTypeEnum::TEXTAREA,
             self::APPOINTMENT_DETAIL_PAYMENT_DESCRIPTION_TEXT => SettingTypeEnum::TEXTAREA,
+            self::HOME_ALERT_DESCRIPTION => SettingTypeEnum::TEXTAREA,
 
             self::ABOUT_US_SECEND_SECTION_IMAGE,self::ABOUT_US_THIRD_SECTION_IMAGE,self::ABOUT_US_FOURTH_SECTION_IMAGE => SettingTypeEnum::IMAGE,
 
@@ -481,6 +489,7 @@ enum SettingKeyEnum: int implements EnumHasNameInterface, SettingTypeInterface, 
             self::PAYMENT_RULES_AND_CONDITION_STATUS => 'شرایط و قوانین پرداخت',
             self::LOGIN_WITHOUT_OTP => 'دارای حساسیت امنیتی',
             self::GO_TO_PAYMENT_DIRECTLY => 'تنظیمات UX',
+            self::HOME_ALERT_STATUS => 'نمایش پیغام در صفحه اصلی ',
             default => '' ,
         };
     }

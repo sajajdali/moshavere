@@ -46,3 +46,25 @@
         @include('front::components.homepage.faq')
     @endif
 </div>
+
+@if(
+    filter_var(setting(\Modules\Setting\Enum\SettingKeyEnum::HOME_ALERT_STATUS), FILTER_VALIDATE_BOOL) &&
+    (
+        setting(\Modules\Setting\Enum\SettingKeyEnum::HOME_ALERT_TITLE) ||
+        setting(\Modules\Setting\Enum\SettingKeyEnum::HOME_ALERT_DESCRIPTION)
+    )
+)
+    @push('scripts')
+        <script>
+            document.addEventListener('DOMContentLoaded', function() {
+                Swal.fire({
+                    icon: 'warning',
+                    title: @json(setting(\Modules\Setting\Enum\SettingKeyEnum::HOME_ALERT_TITLE) ?? 'توجه'),
+                    html: @json(nl2br(e(setting(\Modules\Setting\Enum\SettingKeyEnum::HOME_ALERT_DESCRIPTION) ?? ''))),
+                    confirmButtonText: 'متوجه شدم',
+                    confirmButtonColor: '#0070bb'
+                });
+            });
+        </script>
+    @endpush
+@endif

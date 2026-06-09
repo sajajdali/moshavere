@@ -75,6 +75,9 @@ $setting = [
             \Modules\Setting\Enum\SettingKeyEnum::SHOW_FLOATING_SOCIAL_ICONS,
             \Modules\Setting\Enum\SettingKeyEnum::ENABLE_DOCTOR_REGISTRATION,
             \Modules\Setting\Enum\SettingKeyEnum::APPOINTMENT_SHOW_DESCRIPTION_IN_APP_LIST,
+            \Modules\Setting\Enum\SettingKeyEnum::HOME_ALERT_STATUS,
+            \Modules\Setting\Enum\SettingKeyEnum::HOME_ALERT_TITLE,
+            \Modules\Setting\Enum\SettingKeyEnum::HOME_ALERT_DESCRIPTION,
 
         ],
     ],

@@ -17,6 +17,7 @@ trait AppointmentSettingDetailKeyTrait
     const ONLINE = 'online';
     const VOIP = 'voip';
     const PRICE = 'price';
+    const ADMIN_PANEL_PRICE = 'adminPanelPrice';
     const NOT_PAYING_STATUS = 'notPayinStatus';
     const MONITORTING_APPOINTMENT = 'monitoring_appointment';
     const IN_PERSON = 'inPerson';

@@ -593,6 +593,24 @@
                         </div>
                     </div>
                 </div>
+                <div id="adminPanelPrice">
+                    <div class="row">
+                        <div class="col-md-5 pt-2">
+                            <label class="text-primary" for="adminPanelPriceInput"> هزینه نوبت ثبت شده از پنل مدیریت</label>
+                        </div>
+                        <div class="col-md-7">
+                            <div class="form-group">
+                                <input type="text"
+                                    class="form-control @error('form.payment.adminPanelPrice') is-invalid @enderror"
+                                    id="adminPanelPriceInput" wire:model='form.payment.adminPanelPrice'
+                                    placeholder="مبلغ به ریال">
+                                    <small class="text-muted">
+                                        در صورتی که نوبت از طریق پنل مدیریت ثبت شده و لینک پرداخت ارسال شود. در صورت خالی بودن از هزینه نوبت حضوری استفاده میشود.
+                                    </small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
                 <div id="onlinePrice" style="display: @if (isset($form['payment']['online']['status']) && $form['payment']['online']['status'] == true) block @else none @endif">
                     <div class="row">
                         <div class="col-md-5 pt-2">

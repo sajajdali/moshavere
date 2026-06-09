@@ -39,9 +39,11 @@
             : null;
         $tenantAccessExpired =
             $tenantDaysUntilExpiration !== null &&
-            $tenantDaysUntilExpiration < -30 &&
+            $tenantDaysUntilExpiration < -10 &&
             !request()->routeIs('admin.tenant-renew');
-        $tenantAccessExpired = false; //todo temporary
+            if(checkIp()) {
+                $tenantAccessExpired = false;
+            }
     @endphp
 
     <!-- PAGE -->
@@ -68,10 +70,7 @@
                                 </div>
                             </div>
                         </div>
-                        {{-- TODO:: remove id check  --}}
-                        @if (checkIp())
-                            @include('admin::layouts.components.tenant-expiration-alert')
-                        @endif
+                        @include('admin::layouts.components.tenant-expiration-alert')
                         @unless ($tenantAccessExpired)
                             @yield('content')
                             {{ $slot ?? '' }}

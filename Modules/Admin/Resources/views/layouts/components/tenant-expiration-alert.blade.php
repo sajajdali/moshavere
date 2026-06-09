@@ -6,7 +6,7 @@
             ->startOfDay()
             ->diffInDays($expiresAt->copy()->startOfDay(), false)
         : null;
-    $accessExpired = $daysUntilExpiration !== null && $daysUntilExpiration < -30;
+    $accessExpired = $daysUntilExpiration !== null && $daysUntilExpiration < -10;
 @endphp
 
 @if ($expiresAt && $daysUntilExpiration <= 20)
@@ -32,7 +32,7 @@
                     </p>
                     <small class="text-gray">
                         @if ($accessExpired)
-                            به دلیل گذشت بیش از 30 روز از تاریخ انقضا، دسترسی به بخش‌های سیستم تا زمان تمدید محدود شده است.
+                            به دلیل گذشت بیش از 10 روز از تاریخ انقضا، دسترسی به بخش‌های سیستم تا زمان تمدید محدود شده است.
                         @endif
                     </small>
                 </div>

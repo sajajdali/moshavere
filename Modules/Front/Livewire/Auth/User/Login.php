@@ -47,6 +47,10 @@ class Login extends Component
     public function LoginAuthForm()
     {
         if ($this->step == 1) {
+            $mobile = data_get($this->form,'mobileNmber',null) ;
+            if(! is_null($mobile)) {
+                $this->form['mobileNmber'] = convert2english(trim($mobile)) ;
+            }
             $this->validate([
                 'form.mobileNmber' => 'required|digits:11|numeric'
             ]);
@@ -89,6 +93,10 @@ class Login extends Component
             $this->step = $this->step + 1;
             $this->dispatch('waitForCode', true);
         } elseif ($this->step == 2) {
+            $code = data_get($this->form,'code',null) ;
+            if(! is_null($code)) {
+                $this->form['code'] = convert2english(trim($code)) ;
+            }
             $this->validate([
                 'form.code' => 'required|string|digits:4'
             ]);

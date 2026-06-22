@@ -186,7 +186,7 @@
 
     <script>
         const duration = 2 * 60 * 60 * 1000;
-        const startTime = new Date("2026-04-03T15:00:00").getTime();
+        const startTime = new Date("2026-06-17T15:00:00").getTime();
 
         // زمان پایان
         const endTime = startTime + duration;

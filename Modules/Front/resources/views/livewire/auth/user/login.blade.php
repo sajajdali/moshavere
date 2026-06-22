@@ -18,7 +18,8 @@
                         <p class="text-secondary-400 font-semibold">شماره تلفن خود را وارد کنید</p>
                     </div>
                 </div>
-                <input type="number" wire:model='form.mobileNmber' id="phoneNumberInput"
+                <input type="text" inputmode="numeric" pattern="[0-9]*" maxlength="11"
+                    autocomplete="tel" wire:model='form.mobileNmber' id="phoneNumberInput"
                     class="border @error('form.mobileNmber') border-rose-500 @else border-secondary-300 @enderror  rounded-lg bg-primary-tint-100 text-center py-2"
                     placeholder="مثال: 09123456789" />
                 @error('form.mobileNmber')
@@ -75,7 +76,8 @@
                         </div>
                     </div>
                 </div>
-                <input type="number" wire:model='form.code'id="codeInput"
+                <input type="text" inputmode="numeric" pattern="[0-9]*" maxlength="4"
+                    autocomplete="one-time-code" wire:model='form.code' id="codeInput"
                     class="border border-secondary-300 rounded-lg bg-primary-tint-100 text-center py-2"
                     placeholder="کد 4 رقمی" />
                 <div class="flex justify-end text-sm">
@@ -175,6 +177,24 @@
 </div>
 @push('scripts')
     <script>
+        function convertLoginDigitsToEnglish(value) {
+            return value
+                .replace(/[\u06F0-\u06F9]/g, digit => String(digit.charCodeAt(0) - 0x06F0))
+                .replace(/[\u0660-\u0669]/g, digit => String(digit.charCodeAt(0) - 0x0660));
+        }
+
+        // Run before Livewire's input listener so its model always receives English digits.
+        document.addEventListener('input', function(event) {
+            if (!event.target.matches('#phoneNumberInput, #codeInput')) {
+                return;
+            }
+
+            const englishValue = convertLoginDigitsToEnglish(event.target.value);
+            if (event.target.value !== englishValue) {
+                event.target.value = englishValue;
+            }
+        }, true);
+
         $(document).ready(function() {
             Livewire.on('startCountDown', function() {
                 $('#resendCode').fadeOut();

@@ -59,6 +59,15 @@ return [
                         'children' => null,
                     ],
                     [
+                        'title' => 'اتصال به نرم افزار',
+                        'gate' => 'viewAny',
+                        'policy_class' => \Modules\User\Entities\User::class,
+                        'icon' => 'fa fa-user-md',
+                        'route' => 'admin.doctor-service-management',
+                        'has_child' => false,
+                        'children' => null,
+                    ],
+                    [
                         'title' => 'افزودن',
                         'gate' => 'create',
                         'policy_class' => \Modules\User\Entities\User::class,

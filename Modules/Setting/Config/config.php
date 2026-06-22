@@ -31,7 +31,18 @@ return [
                 'has_child' => false,
                 'children' => null
             ],
+            [
+                'title' => 'اتصال به نرم افزار',
+                'gate' => 'viewAny',
+                'policy_class' => \Modules\User\Entities\User::class,
+                'icon' => 'fa fa-plug',
+                'route' => 'admin.doctor-service-management',
+                'has_badge' => false,
+                'has_child' => false,
+                'children' => null,
+            ],
         ],
+
     ],
 
     'setting' => require_once __DIR__ . '/setting.php'

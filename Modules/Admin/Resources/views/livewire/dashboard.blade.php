@@ -108,7 +108,7 @@
                     <div class="card-body">
                         <div class="row">
                             <div class="col">
-                                <h3 class="mb-2 fw-semibold">{{number_format($this->fetchData['transactiontotal'])}}</h3>
+                                <h3 class="mb-2 fw-semibold">{{number_format(data_get($this->fetchData,'transactiontotal',0))}}</h3>
                                 <p class="text-muted fs-13 mb-0">مجموع پرداختی های امروز</p>
                                 <p class="text-muted mb-0 mt-2 fs-12">
                                     <span class="icn-box text-success fw-semibold fs-13 me-1">

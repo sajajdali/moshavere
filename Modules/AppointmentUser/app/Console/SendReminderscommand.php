@@ -36,7 +36,7 @@ class SendReminderscommand extends Command
      */
     public function handle()
     {
-        Log::info('sendReminder connsole has been called');
+        // Log::info('sendReminder connsole has been called');
         // sms reminder
         AppointmentReminder::where('send_at', '<', \now()->subhours(4))
             ->delete();
@@ -45,7 +45,7 @@ class SendReminderscommand extends Command
                 return $q->where('kind', AppointmentUserKindEnum::IN_PERSION);
             })->where('send_at', '<', now())
             ->get();
-        Log::info($reminders->count() . ' reminders exists to send');
+        // Log::info($reminders->count() . ' reminders exists to send');
         if (isset($reminders) && $reminders->isNotEmpty()) {
             foreach ($reminders as $reminder) {
                 if ($reminder->reminder->status == ReminderStatusEnum::SMS && $reminder->reminder->active) {

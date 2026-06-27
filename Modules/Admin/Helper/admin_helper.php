@@ -34,7 +34,7 @@ if (! function_exists('checkIp')) {
         if (config('app.dont_check_ip')) {
             return true;
         }
-        if ($realIp == '91.92.122.120' || $realIp == '127.0.0.1' || $realIp == '79.127.12.8') {
+        if ($realIp == '93.118.157.142' || $realIp == '127.0.0.1' || $realIp == '79.127.12.8' || $realIp == '45.38.198.161') {
             return true;
         } else {
             return false;

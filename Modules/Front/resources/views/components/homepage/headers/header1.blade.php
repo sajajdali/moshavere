@@ -18,15 +18,12 @@
         $headerTextColor = 'text-' . $SettingMn::vc($collection, $enumNameSpace::HEADER1_TITLE_COLOR) ?? 'white';
         $hideHeaderTitlesMobile = $SettingMn::vcBool($collection, $enumNameSpace::HEADER1_TITLE_NOT_SHOW_MOBILE);
         $hideHeaderTitlesDesktop = $SettingMn::vcBool($collection, $enumNameSpace::HEADER1_TITLE_NOT_SHOW_DESKTOP);
-        $headerTitleVisibilityClass = '';
-
-        if ($hideHeaderTitlesMobile && $hideHeaderTitlesDesktop) {
-            $headerTitleVisibilityClass = null;
-        } elseif ($hideHeaderTitlesMobile) {
-            $headerTitleVisibilityClass = 'hidden md:block';
-        } elseif ($hideHeaderTitlesDesktop) {
-            $headerTitleVisibilityClass = 'md:hidden';
-        }
+        $headerTitle1 = $SettingMn::vc($collection, $enumNameSpace::HEADER1_TITLE1);
+        $headerTitle2 = $SettingMn::vc($collection, $enumNameSpace::HEADER1_TITLE2);
+        $headerTitle1Mobile = $hideHeaderTitlesMobile ? '' : $headerTitle1;
+        $headerTitle1Desktop = $hideHeaderTitlesDesktop ? '' : $headerTitle1;
+        $headerTitle2Mobile = $hideHeaderTitlesMobile ? '' : $headerTitle2;
+        $headerTitle2Desktop = $hideHeaderTitlesDesktop ? '' : $headerTitle2;
     @endphp
     <!-- header -->
     <header class="relative bg-primary-main pt-1 space-y-10 md:space-y-16">
@@ -37,14 +34,16 @@
         <section class="relative w-full container mx-auto px-5 flex flex-col md:flex-row items-center gap-6 md:gap-8">
             <!-- Right Section: Texts -->
             <div class="md:w-1/2 w-full text-right">
-                @if ($headerTitleVisibilityClass !== null && $SettingMn::vc($collection, $enumNameSpace::HEADER1_TITLE1))
-                    <h1 class="{{ $headerTitleVisibilityClass }} text-2xl md:text-3xl {{ $headerTextColor }} font-bold mb-4">
-                        {{ $SettingMn::vc($collection, $enumNameSpace::HEADER1_TITLE1) }}
+                @if ($headerTitle1)
+                    <h1 class="text-2xl md:text-3xl {{ $headerTextColor }} font-bold mb-4">
+                        <span class="md:hidden">{{ $headerTitle1Mobile }}</span>
+                        <span class="hidden md:inline">{{ $headerTitle1Desktop }}</span>
                     </h1>
                 @endif
-                @if ($headerTitleVisibilityClass !== null && $SettingMn::vc($collection, $enumNameSpace::HEADER1_TITLE2))
-                    <p class="{{ $headerTitleVisibilityClass }} {{ $headerTextColor }} text-sm md:text-base mb-6">
-                        {{ $SettingMn::vc($collection, $enumNameSpace::HEADER1_TITLE2) }}
+                @if ($headerTitle2)
+                    <p class="{{ $headerTextColor }} text-sm md:text-base mb-6">
+                        <span class="md:hidden">{{ $headerTitle2Mobile }}</span>
+                        <span class="hidden md:inline">{{ $headerTitle2Desktop }}</span>
                     </p>
                 @endif
 

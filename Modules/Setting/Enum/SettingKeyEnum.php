@@ -71,7 +71,9 @@ enum SettingKeyEnum: int implements EnumHasNameInterface, SettingTypeInterface, 
     case HOME_ALERT_STATUS = 433;
     case HOME_ALERT_TITLE = 434;
     case HOME_ALERT_DESCRIPTION = 435;
-
+    case HEADER1_TITLE_COLOR = 436 ;
+    case HEADER1_TITLE_NOT_SHOW_DESKTOP = 437 ;
+    case HEADER1_TITLE_NOT_SHOW_MOBILE = 438 ;
     // ABOUT US PAGE
     case ABOUT_US_FIRST_SECTION_TITLE = 23;
     case ABOUT_US_FIRST_SECTION_DESCRIPTION = 24;
@@ -213,6 +215,7 @@ enum SettingKeyEnum: int implements EnumHasNameInterface, SettingTypeInterface, 
             self::HEADER1_IMAGE => 'عکس اصلی هدر',
             self::HEADER1_TITLE1 => 'تیتر اصلی هدر',
             self::HEADER1_TITLE2 => 'تیتر دوم هدر',
+            self::HEADER1_TITLE_COLOR => 'رنگ متن تیتر ها',
             self::HEADER1_SHOW_BUTTONS => 'نمایش کلید ها',
             self::HEADER1_SHOW_BUTTON1 => 'نمایش کلید اول',
             self::HEADER1_BUTTON_TITLE1 => 'تیتر کلید اول',
@@ -220,6 +223,10 @@ enum SettingKeyEnum: int implements EnumHasNameInterface, SettingTypeInterface, 
             self::HEADER1_SHOW_BUTTON2 => 'نمایش کلید دوم',
             self::HEADER1_BUTTON_TITLE2 => 'تیتر کلید دوم',
             self::HEADER1_BUTTON_HREF2 => 'لینک کلید دوم',
+            self::HEADER1_TITLE_NOT_SHOW_DESKTOP => 'عدم نمایش عنوان هدر در دستگاه های دکستاپ',
+            self::HEADER1_TITLE_NOT_SHOW_MOBILE => ' عدم نمایش عنوان هدر در دستگاه های موبایل',
+
+
             self::FOOTER_SAMANDEHI => 'نماد سامان دهی (لینک کامل درج شود)',
             self::APPOINTMENT_GALLERY_BODY => 'متن نمایش گالری پزشک',
             self::APPOINTMENT_ONLINE_DESCRPTION => 'برای نوبت های آنلاین ، توضیحات قبل از دریافت نوبت',
@@ -414,6 +421,7 @@ enum SettingKeyEnum: int implements EnumHasNameInterface, SettingTypeInterface, 
         return match ($this) {
             self::SITE_LOGO_URL , self::HEADER1_IMAGE => SettingTypeEnum::IMAGE,
             self::DEFAULT_EXERCISE_STATUS => SettingTypeEnum::SELECT,
+            self::HEADER1_TITLE_COLOR     => SettingTypeEnum::SELECT,
             self::SMS_SENDER => SettingTypeEnum::SELECT,
             self::PAYMEN_ACTIVE_DRIVER => SettingTypeEnum::SELECT,
             self::APPOINTMENT_MORE_THAT_ONE_PER_DAY , self::HEADER1_SHOW_BUTTONS , self::HEADER1_SHOW_BUTTON1, self::HEADER1_SHOW_BUTTON2 , self::ENABLE_DOCTORS_MENU , self::ENABLE_CONTACT_US_MENU => SettingTypeEnum::CHECK,
@@ -426,6 +434,7 @@ enum SettingKeyEnum: int implements EnumHasNameInterface, SettingTypeInterface, 
             self::APPOINTMENT_FOR_OTHERS_STATUS => SettingTypeEnum::CHECK,
             self::APPOINTMENT_DESCRIPTION_STATUS => SettingTypeEnum::CHECK,
             self::SECREYERY_SEND_LINK_FOR_APPOINTMENT => SettingTypeEnum::CHECK,
+            self::HEADER1_TITLE_NOT_SHOW_DESKTOP ,self::HEADER1_TITLE_NOT_SHOW_MOBILE=> SettingTypeEnum::CHECK,
             self::APPOINTMENT_STATUS => SettingTypeEnum::CHECK,
             self::ACTIVE_JIBIT => SettingTypeEnum::CHECK,
             self::PAYMENT_RULES_AND_CONDITION_STATUS => SettingTypeEnum::CHECK,
@@ -490,6 +499,7 @@ enum SettingKeyEnum: int implements EnumHasNameInterface, SettingTypeInterface, 
             self::LOGIN_WITHOUT_OTP => 'دارای حساسیت امنیتی',
             self::GO_TO_PAYMENT_DIRECTLY => 'تنظیمات UX',
             self::HOME_ALERT_STATUS => 'نمایش پیغام در صفحه اصلی ',
+            self::HEADER1_SHOW_BUTTON1 => 'کلید های روی هدر ',
             default => '' ,
         };
     }
@@ -511,6 +521,12 @@ enum SettingKeyEnum: int implements EnumHasNameInterface, SettingTypeInterface, 
                 'farazsms' => 'فراز',
                 'ippannel' => 'آی پی پنل',
                 'starpayam' => 'استار پیام',
+            ],
+            self::HEADER1_TITLE_COLOR => [
+                'dark' => 'مشکی',
+                'white' => 'سفید',
+                'blue-500' => 'آبی',
+                'brown' => 'قهوه ای',
             ],
             self::SUPPORT_USER_ROLE => User::adminSupportRoles(),
             self::PAYMEN_ACTIVE_DRIVER => [

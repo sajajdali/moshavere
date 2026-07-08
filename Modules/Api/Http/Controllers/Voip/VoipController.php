@@ -9,11 +9,16 @@ use Modules\User\Entities\User;
 use Illuminate\Routing\Controller;
 use Illuminate\Support\Facades\Cache;
 use Modules\Api\Trait\ApiHandlerTrait;
+use Modules\Front\app\Models\FeedBack;
 use Modules\Setting\Enum\SettingKeyEnum;
+use Modules\Transaction\Enum\TransactionPaidEnum;
+use Modules\Transaction\Enum\TransactionStatusEnum;
 use Modules\AppointmentUser\Enum\AppointmentVia;
 use Modules\AppointmentUser\Enum\model\UserModel;
+use Modules\AppointmentUser\app\Models\AppointmentUser;
 use Modules\AppointmentUser\Enum\model\AppointmentModel;
 use Modules\AppointmentUser\Enum\AppointmentUserKindEnum;
+use Modules\AppointmentUser\Enum\AppointmentUserStatusEnum;
 use Modules\AppointmentUser\Enum\AppointmentUserTypeEnum;
 use Modules\AppointmentUser\Enum\model\UserModelAppointment;
 use Modules\AppointmentSetting\app\Models\AppointmentSetting;
@@ -22,6 +27,432 @@ use Modules\Api\Http\Controllers\Appointment\AppointmentApiController;
 class VoipController extends Controller
 {
     use ApiHandlerTrait;
+
+    private const ERROR_APPOINTMENT_NOT_FOUND = 9;
+    private const ERROR_OPERATOR_NOT_FOUND = 31;
+    private const ERROR_WORKING_TIME_IS_OVER = 32;
+    private const ERROR_PAYMENT_APPOINTMENT_NOT_FOUND = 41;
+    private const ERROR_PAYMENT_NOT_ACTIVE = 42;
+    private const ERROR_PAYMENT_ALREADY_DONE = 43;
+
+    private const ERROR_TEXT = [
+        self::ERROR_APPOINTMENT_NOT_FOUND => 'نوبتی با شماره وارد شده یافت نشد',
+        self::ERROR_OPERATOR_NOT_FOUND => 'هیچ اپراتوری یافت نشد',
+        self::ERROR_WORKING_TIME_IS_OVER => 'زمان کاری منشی/اپراتور به اتمام رسیده',
+        self::ERROR_PAYMENT_APPOINTMENT_NOT_FOUND => 'نوبتی یافت نشد',
+        self::ERROR_PAYMENT_NOT_ACTIVE => 'پرداخت برای این نوبت فعال نیست',
+        self::ERROR_PAYMENT_ALREADY_DONE => 'پرداخت قبلا انجام شده است',
+    ];
+
+    public function checkDoctorAppointment(Request $request)
+    {
+        $doctor = User::findOrFail($request->get('doctorId'));
+
+        return $this->ok([
+            'status' => $doctor->appointmentSettings()->active()->exists(),
+        ]);
+    }
+
+    public function getAppointmentDoctors(Request $request)
+    {
+        $doctors = User::doctors_query()
+            ?->whereHas('appointmentSettings', fn ($query) => $query->active())
+            ->get()
+            ->map(fn (User $user) => [
+                'id' => $user->id,
+                'name' => trim($user->fullName) ?: $user->mobile,
+            ])
+            ->values()
+            ->all() ?? [];
+
+        return $this->ok([
+            'doctors' => $doctors,
+        ]);
+    }
+
+    public function getAppointmentOfficesAndParts(Request $request)
+    {
+        $doctor = User::findOrFail($request->get('doctorId'));
+        $result = [];
+
+        foreach ($doctor->appointmentSettings()->active()->with(['place', 'service'])->get() as $setting) {
+            $placeId = $setting->place_id ?? 0;
+
+            if (! isset($result[$placeId])) {
+                $result[$placeId] = [
+                    'appointmentOfficeId' => $setting->place_id,
+                    'appointmentOfficeName' => $setting->place?->title ?? 'عمومی',
+                    'appointmentParts' => [],
+                ];
+            }
+
+            $result[$placeId]['appointmentParts'][] = [
+                'appointmentPartId' => $setting->service_id,
+                'appointmentPartName' => $setting->service?->title ?? 'عمومی',
+                'multiSelectArea' => false,
+                'areas' => [],
+            ];
+        }
+
+        return $this->ok(array_values($result));
+    }
+
+    public function checkAppointment(Request $request)
+    {
+        $appointmentSetting = $this->findSettingFromOldRequest($request);
+        $status = $appointmentSetting?->checkActive() && (bool) data_get($appointmentSetting->detail, AppointmentSetting::VISIT_TYPE_INPERSON, true);
+
+        return $this->ok([
+            'status' => (bool) $status,
+            'message' => ! $status ? 'نوبت دهی برای این پزشک غیر فعال است' : null,
+        ]);
+    }
+
+    public function getAppointmentTimes(Request $request)
+    {
+        $appointmentSetting = $this->findSettingFromOldRequest($request);
+        if (! $appointmentSetting) {
+            return $this->ok([
+                'status' => false,
+                'error' => 'مشکلی در سیستم به وجود آمده است! لطفا با پشتیبانی تماس حاص فرمایید.',
+            ]);
+        }
+
+        $listDays = $this->appointmentList($appointmentSetting);
+
+        return $this->ok($this->oldTimesPayload($listDays, $request->get('timeFilter')));
+    }
+
+    public function getAppointmentUser(Request $request)
+    {
+        $appointmentUser = AppointmentUser::find($request->input('appointmentCode'));
+        if (! $appointmentUser) {
+            return $this->oldError(self::ERROR_APPOINTMENT_NOT_FOUND);
+        }
+
+        $nationalCode = $request->input('nationalCode');
+        if ($nationalCode && $appointmentUser->user?->national_code !== $nationalCode && $appointmentUser->user?->nationalCode !== $nationalCode) {
+            return $this->oldError(self::ERROR_APPOINTMENT_NOT_FOUND);
+        }
+
+        return $this->ok([
+            'status' => true,
+            'timestamp' => Carbon::parse($appointmentUser->date_visit, 'Asia/Tehran')->timestamp,
+            'active_payment_by_phone' => false,
+            'price' => data_get($appointmentUser->details, AppointmentUser::DETAIL_PAYMENT . '.' . AppointmentUser::DETAIL_PAYMENT_PRICE . '.int', 0),
+        ]);
+    }
+
+    public function cancelAppointmentUser(Request $request)
+    {
+        $appointmentUser = AppointmentUser::find($request->input('appointmentCode'));
+        if (! $appointmentUser) {
+            return $this->oldError(self::ERROR_APPOINTMENT_NOT_FOUND);
+        }
+
+        if ($appointmentUser->status !== AppointmentUserStatusEnum::STATUS_CANCEL) {
+            $appointmentUser->update([
+                'status' => AppointmentUserStatusEnum::STATUS_CANCEL,
+            ]);
+            $appointmentUser->setting?->runGenerateCacheJob($appointmentUser->date_visit);
+        }
+
+        return $this->ok([
+            'status' => true,
+        ]);
+    }
+
+    public function onlineVisit(Request $request)
+    {
+        $user = User::where('mobile', 'LIKE', '%' . $request->get('mobile') . '%')->first();
+        $returnCode = 2;
+        $dateVisitTimestamp = null;
+        $doctorId = null;
+        $res = [];
+        $appointmentUser = null;
+
+        if ($user) {
+            $activeAppointment = AppointmentUser::query()
+                ->where('user_id', $user->id)
+                ->where('kind', AppointmentUserKindEnum::ONLINE)
+                ->whereIn('status', [AppointmentUserStatusEnum::STATUS_SUCCESSFUL, AppointmentUserStatusEnum::STATUS_ATTENDED])
+                ->orderByDesc('date_visit')
+                ->first();
+
+            if ($activeAppointment) {
+                $dateVisit = Carbon::parse($activeAppointment->date_visit, 'Asia/Tehran');
+                $dateVisitTimestamp = $dateVisit->timestamp;
+                $endVisit = $dateVisit->copy()->setTimeFromTimeString($activeAppointment->end_time ?? $dateVisit->copy()->addMinutes(30)->toTimeString());
+
+                if (now('Asia/Tehran')->between($dateVisit, $endVisit)) {
+                    $returnCode = 3;
+                    $doctorId = $activeAppointment->doctor_id;
+                    $appointmentUser = $activeAppointment;
+                }
+            }
+
+            if ($returnCode === 2) {
+                $appointmentUser = AppointmentUser::query()
+                    ->where('user_id', $user->id)
+                    ->where('kind', AppointmentUserKindEnum::ONLINE)
+                    ->whereIn('status', [AppointmentUserStatusEnum::STATUS_SUCCESSFUL, AppointmentUserStatusEnum::STATUS_WAIT_PAYMENT])
+                    ->where('date_visit', '>', now('Asia/Tehran'))
+                    ->orderBy('date_visit')
+                    ->first();
+
+                if ($appointmentUser) {
+                    $returnCode = 1;
+                    $dateVisitTimestamp = Carbon::parse($appointmentUser->date_visit, 'Asia/Tehran')->timestamp;
+                    $timeDifference = $dateVisitTimestamp - time();
+
+                    if ($timeDifference > 86400) {
+                        $res = ['type' => 'day', 'day' => floor($timeDifference / 86400)];
+                    } elseif ($timeDifference > 3600) {
+                        $res = ['type' => 'hour', 'hour' => floor($timeDifference / 3600)];
+                    } else {
+                        $res = ['type' => 'minute', 'minute' => floor($timeDifference / 60)];
+                    }
+                }
+            }
+        }
+
+        return $this->ok([
+            'status' => true,
+            'code' => $returnCode,
+            'doctor_id' => $doctorId,
+            'appointment' => $appointmentUser,
+            'date_visit' => $dateVisitTimestamp,
+            'res' => $res,
+        ]);
+    }
+
+    public function connectToOperator(Request $request)
+    {
+        $operatorId = $request->input('operator_id');
+        $operator = User::find($operatorId);
+
+        if (! $operator || ! $operator->isOperator()) {
+            return $this->oldError(self::ERROR_OPERATOR_NOT_FOUND);
+        }
+
+        $hasActiveSetting = AppointmentSetting::query()
+            ->active()
+            ->where(function ($query) use ($operatorId) {
+                $query->whereJsonContains('detail->operators->ids', (string) $operatorId)
+                    ->orWhereJsonContains('detail->operators->ids', (int) $operatorId);
+            })
+            ->exists();
+
+        if (! $hasActiveSetting) {
+            return $this->oldError(self::ERROR_WORKING_TIME_IS_OVER);
+        }
+
+        return $this->ok([
+            'status' => true,
+        ]);
+    }
+
+    public function incomingCall(Request $request)
+    {
+        return $this->ok([
+            'status' => true,
+        ]);
+    }
+
+    public function paymentSendSecondPassword(Request $request)
+    {
+        $appointmentUser = AppointmentUser::find((int) $request->get('appointment_id'));
+        if (! $appointmentUser) {
+            return $this->oldError(self::ERROR_PAYMENT_APPOINTMENT_NOT_FOUND);
+        }
+
+        if ($appointmentUser->transaction?->status === TransactionStatusEnum::SUCCESSFUL) {
+            return $this->oldError(self::ERROR_PAYMENT_ALREADY_DONE);
+        }
+
+        return $this->oldError(self::ERROR_PAYMENT_NOT_ACTIVE);
+    }
+
+    public function paymentByVoip(Request $request)
+    {
+        $appointmentUser = AppointmentUser::find((int) $request->get('appointment_id'));
+        if (! $appointmentUser) {
+            return $this->oldError(self::ERROR_PAYMENT_APPOINTMENT_NOT_FOUND);
+        }
+
+        if (! data_get($appointmentUser->details, AppointmentUser::DETAIL_PAYMENT . '.status')) {
+            return $this->oldError(self::ERROR_PAYMENT_NOT_ACTIVE);
+        }
+
+        if ($appointmentUser->transaction?->status === TransactionStatusEnum::SUCCESSFUL) {
+            return $this->oldError(self::ERROR_PAYMENT_ALREADY_DONE);
+        }
+
+        $price = (int) data_get($appointmentUser->details, AppointmentUser::DETAIL_PAYMENT . '.' . AppointmentUser::DETAIL_PAYMENT_PRICE . '.int', 0);
+
+        $transaction = $appointmentUser->transaction()->updateOrCreate(
+            ['transactionable_id' => $appointmentUser->id],
+            [
+                'user_id' => $appointmentUser->user_id,
+                'transaction_code' => $appointmentUser->transaction?->transaction_code ?? \Modules\Transaction\app\Models\Transaction::generateTransactionCode(),
+                'status' => TransactionStatusEnum::SUCCESSFUL,
+                'paid_by' => TransactionPaidEnum::BY_ADMIN,
+                'cost' => $price,
+                'total_cost' => $price,
+                'detail' => [
+                    'source' => 'voip',
+                    'card_number' => $request->get('card_number'),
+                ],
+            ]
+        );
+
+        $appointmentUser->update([
+            'status' => AppointmentUserStatusEnum::STATUS_SUCCESSFUL,
+        ]);
+
+        return $this->ok([
+            'status' => true,
+            'message' => 'پرداخت با موفقیت ثبت شد',
+            'data' => [
+                'tracking_code' => $transaction->transaction_code,
+            ],
+        ]);
+    }
+
+    public function storeSurvey(Request $request)
+    {
+        $request->validate([
+            'file' => 'nullable|mimes:wav',
+        ]);
+
+        $appointmentUser = AppointmentUser::find($request->input('appointmentCode'));
+        if (! $appointmentUser) {
+            return $this->oldError(self::ERROR_APPOINTMENT_NOT_FOUND);
+        }
+
+        $filename = '';
+        if ($request->hasFile('file')) {
+            $file = $request->file('file');
+            $filename = time() . '.' . $file->getClientOriginalExtension();
+            if (! is_dir(public_path('uploads/voip'))) {
+                mkdir(public_path('uploads/voip'), 0755, true);
+            }
+            $file->move(public_path('uploads/voip'), $filename);
+        }
+
+        $details = $appointmentUser->details ?? [];
+        $details['SURVEY'] = [
+            'SURVEY' => $request->input('score'),
+            'SURVEY_FEEDBACK_FILE' => $filename,
+        ];
+        $appointmentUser->update([
+            'details' => $details,
+        ]);
+
+        if ($request->filled('score')) {
+            FeedBack::create([
+                'appointment_user_id' => $appointmentUser->id,
+                'question' => 1,
+                'answer' => $request->input('score'),
+            ]);
+        }
+
+        return $this->ok([
+            'status' => true,
+            'error' => $filename,
+        ]);
+    }
+
+    private function oldError(int $errorCode)
+    {
+        return $this->ok([
+            'status' => false,
+            'message' => self::ERROR_TEXT[$errorCode] ?? 'خطا',
+            'errorCode' => $errorCode,
+        ]);
+    }
+
+    private function findSettingFromOldRequest(Request $request): ?AppointmentSetting
+    {
+        $doctorId = $request->get('doctorId') ?? $request->get('doctor_id');
+        $placeId = $request->get('appointmentOfficeId') ?? $request->get('place_id') ?? $request->get('places_id');
+        $serviceId = $request->get('appointmentPartId') ?? $request->get('service_id') ?? $request->get('services_id');
+
+        if (! $doctorId) {
+            return null;
+        }
+
+        return AppointmentSetting::query()
+            ->active()
+            ->where('user_id', $doctorId)
+            ->when($placeId, fn ($query) => $query->where('place_id', $placeId))
+            ->when(! $placeId, fn ($query) => $query->whereNull('place_id'))
+            ->when($serviceId, fn ($query) => $query->where('service_id', $serviceId))
+            ->when(! $serviceId, fn ($query) => $query->whereNull('service_id'))
+            ->first()
+            ?? AppointmentSetting::query()
+                ->active()
+                ->where('user_id', $doctorId)
+                ->whereNull('place_id')
+                ->whereNull('service_id')
+                ->first();
+    }
+
+    private function appointmentList(AppointmentSetting $appointmentSetting): array
+    {
+        if (env('APPOINTMENT_SANDBOX') || config('app.without_cache')) {
+            Cache::forget('appointmentList.' . $appointmentSetting->id);
+        }
+
+        return Cache::rememberForever('appointmentList.' . $appointmentSetting->id, function () use ($appointmentSetting) {
+            $appointmentSetting->update(['updated_log_at' => now()]);
+
+            return app('AppointmentUserService')->listAppointments($appointmentSetting);
+        });
+    }
+
+    private function oldTimesPayload(array $data, ?string $timeFilter): array
+    {
+        $result = [];
+        $resultDays = 1;
+
+        foreach ($data['data'] as $year => $months) {
+            foreach ($months as $month => $days) {
+                foreach ($days as $day => $appointment) {
+                    if (($appointment['empty_appoints'] ?? 0) <= 0 || ($appointment['status'] ?? false) == false) {
+                        continue;
+                    }
+
+                    foreach ($appointment['times'] as $time) {
+                        if (! ($time['status'] ?? false) || ! isset($time['timestamp'])) {
+                            continue;
+                        }
+
+                        $hour = (int) Carbon::createFromTimestamp($time['timestamp'], 'Asia/Tehran')->format('H');
+                        $period = $hour < 12 ? 'am' : 'pm';
+
+                        if ($timeFilter && in_array($timeFilter, ['am', 'pm'], true) && $period !== $timeFilter) {
+                            continue;
+                        }
+
+                        $result['day' . $resultDays][$period]['times'][] = [
+                            'timestamp' => $time['timestamp'],
+                        ];
+                    }
+
+                    if (isset($result['day' . $resultDays])) {
+                        $resultDays++;
+                    }
+
+                    if ($resultDays > 10) {
+                        break 3;
+                    }
+                }
+            }
+        }
+
+        return $result;
+    }
 
     private function getListEmptyAppointment($data)
     {
@@ -124,11 +555,11 @@ class VoipController extends Controller
 
     public function storeAppointment(Request $request)
     {
-        $doctorId            = $request->get('doctor_id');
-        $visitDate           = $request->get('visit_date');
-        $mobile              = $request->get('user_mobile');
-        $placesId            = $request->get('place_id');
-        $servicesId          = $request->get('service_id');
+        $doctorId            = $request->get('doctor_id') ?? $request->get('doctorId');
+        $visitDate           = $request->get('visit_date') ?? $request->get('timestamp');
+        $mobile              = $request->get('user_mobile') ?? $request->get('mobile');
+        $placesId            = $request->get('place_id') ?? $request->get('places_id') ?? $request->get('appointmentOfficeId');
+        $servicesId          = $request->get('service_id') ?? $request->get('services_id') ?? $request->get('appointmentPartId');
         $operatorId          = $request->get('operator_id');
         $kindParameter       = $request->get('kind');
         $description         = $request->get('description');
@@ -140,6 +571,13 @@ class VoipController extends Controller
         }
 
         $doctor = User::find($doctorId);
+        if (! $doctor) {
+            return $this->requestException([
+                'status' => false,
+                'message' => 'پزشک یافت نشد.'
+            ]);
+        }
+
         $startDate = Carbon::createFromTimestamp($visitDate, 'Asia/Tehran');
         if ($startDate->isPast()) {
             return $this->requestException([
@@ -150,15 +588,22 @@ class VoipController extends Controller
 
         $appointmentSetting = $doctor->appointmentSettings()->active()
             ->when(isset($servicesId), function ($q) use ($servicesId) {
-                return $q->where('service_id', $servicesId)->orWhere('service_id', null);
-            })->when(!isset($servicesId), function ($q) {
-                return $q->whereNull('service_id')->orWhereNull('service_id');
+                return $q->where(function ($query) use ($servicesId) {
+                    $query->where('service_id', $servicesId)->orWhereNull('service_id');
+                });
+            })->when(! isset($servicesId), function ($q) {
+                return $q->whereNull('service_id');
             })->when(isset($placesId), function ($q) use ($placesId) {
-                return $q->where('place_id', $placesId)->orWhereNull('place_id');
+                return $q->where(function ($query) use ($placesId) {
+                    $query->where('place_id', $placesId)->orWhereNull('place_id');
+                });
             })->when(! isset($placesId), function ($q) {
                 return $q->whereNull('place_id');
             })->when(isset($operatorId), function ($q) use ($operatorId) {
-                return $q->whereNotNull('detail->ids')->whereJsonContains('detail->ids', $operatorId);
+                return $q->where(function ($query) use ($operatorId) {
+                    $query->whereJsonContains('detail->operators->ids', (string) $operatorId)
+                        ->orWhereJsonContains('detail->operators->ids', (int) $operatorId);
+                });
             })->first();
 
 
@@ -168,7 +613,7 @@ class VoipController extends Controller
                 'message' => 'تنظیمات مربوط به پزشک پیدا نشد ، بخش،مطب،یا اپراتور را بررسی کنید.'
             ]);
         }
-        $endDate = $startDate->addMinutes($appointmentSetting->time_for_visit);
+        $endDate = $startDate->copy()->addMinutes($appointmentSetting->time_for_visit);
         $user = User::where('mobile', 'LIKE', "%{$mobile}%")->first();
         if (!isset($user)) {
             $user  = User::create([
@@ -200,18 +645,24 @@ class VoipController extends Controller
             $oprator = null;
         }
         if (isset($kindParameter) && ! empty($kindParameter)) {
-            $kind = AppointmentUserKindEnum::tryFrom($kindParameter);
+            $kind = AppointmentUserKindEnum::tryFrom((int) $kindParameter);
         } else {
             $kind = AppointmentUserKindEnum::IN_PERSION;
         }
+        $kind ??= AppointmentUserKindEnum::IN_PERSION;
+
+        $serviceId = $servicesId ?? $appointmentSetting->service_id ?? $doctor->activeServices()->first()?->id;
+        $placeId = $placesId ?? $appointmentSetting->place_id ?? $doctor->activePlaces()->first()?->id;
+
         // appointment model
         $appointmentModel = new AppointmentModel(
             timestamp: $startDate->copy()->timestamp,
             appointmentVia: AppointmentVia::SELF,
             sendSmsToUser: true,
-            serviceId: $servicesId ?? $doctor->service->first(),
-            placeId: $placesId ?? $doctor->place->first(),
+            serviceId: $serviceId,
+            placeId: $placeId,
             agentId: $user->id,
+            operatorId: $oprator,
             kind: $kind,
             smsToDoctor: false,
             description: $description ??  '',
@@ -223,8 +674,8 @@ class VoipController extends Controller
 
         // sms Template
         if (
-            $appointmentSetting->detail[AppointmentSetting::PAYMENT][AppointmentSetting::STATUS] == true &&
-            $appointmentSetting->detail[AppointmentSetting::PAYMENT][AppointmentSetting::NOT_PAYING_STATUS] == 'dontSubmit'
+            data_get($appointmentSetting->detail, AppointmentSetting::PAYMENT . '.' . AppointmentSetting::STATUS) == true &&
+            data_get($appointmentSetting->detail, AppointmentSetting::PAYMENT . '.' . AppointmentSetting::NOT_PAYING_STATUS) == 'dontSubmit'
         ) {
             // if payment was active
             $detail['smsTemplate']      = setting(SettingKeyEnum::SMS_APPOINTMENT_WAITING_PAYMENT);
@@ -234,12 +685,22 @@ class VoipController extends Controller
 
         $storeAppointment = app('AppointmentUserService')->storeAppointment($appointmentSetting, $userModelAppointment, $appointmentModel, $detail);
         if ($storeAppointment['status']) {
+            $appointmentUser = AppointmentUser::find(data_get($storeAppointment, 'detail.appointment_user_id'));
+            $paymentIsActive = (bool) data_get($appointmentUser?->details, AppointmentUser::DETAIL_PAYMENT . '.status', false);
+            $paymentPrice = data_get($appointmentUser?->details, AppointmentUser::DETAIL_PAYMENT . '.' . AppointmentUser::DETAIL_PAYMENT_PRICE . '.int', 0);
+
             // generate cache
             $appointmentSetting->runGenerateCacheJob($startDate->toDateTimeString());
             return $this->ok(
                 [
                     'status' => true,
-                    'message' => 'نوبت با موفقیت ذخیره شد'
+                    'message' => 'نوبت با موفقیت ذخیره شد',
+                    'active_online_payment' => $paymentIsActive,
+                    'price' => $paymentPrice,
+                    'active_payment_by_phone' => false,
+                    'appointmentCode' => data_get($storeAppointment, 'detail.appointment_user_id'),
+                    'tracking_code' => data_get($storeAppointment, 'detail.tracking_code'),
+                    'payment_link' => data_get($storeAppointment, 'detail.payment_link'),
                 ]
             );
         } else {

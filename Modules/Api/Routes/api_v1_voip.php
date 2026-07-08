@@ -18,3 +18,19 @@ Route::prefix('voip')->group(function () {
 });
 // appointment
 
+Route::prefix('VoIP')->group(function () {
+    Route::get('doctor_appointment', [\Modules\Api\Http\Controllers\Voip\VoipController::class, 'checkDoctorAppointment']);
+    Route::get('appointment_doctors', [\Modules\Api\Http\Controllers\Voip\VoipController::class, 'getAppointmentDoctors']);
+    Route::get('appointment_offices_parts', [\Modules\Api\Http\Controllers\Voip\VoipController::class, 'getAppointmentOfficesAndParts']);
+    Route::get('check_appointment', [\Modules\Api\Http\Controllers\Voip\VoipController::class, 'checkAppointment']);
+    Route::get('appointment_times', [\Modules\Api\Http\Controllers\Voip\VoipController::class, 'getAppointmentTimes']);
+    Route::post('appointment', [\Modules\Api\Http\Controllers\Voip\VoipController::class, 'storeAppointment']);
+    Route::get('appointment_user', [\Modules\Api\Http\Controllers\Voip\VoipController::class, 'getAppointmentUser']);
+    Route::get('cancel_appointment_user', [\Modules\Api\Http\Controllers\Voip\VoipController::class, 'cancelAppointmentUser']);
+    Route::get('online_visit', [\Modules\Api\Http\Controllers\Voip\VoipController::class, 'onlineVisit']);
+    Route::get('connect_to_operator', [\Modules\Api\Http\Controllers\Voip\VoipController::class, 'connectToOperator']);
+    Route::get('incoming_call', [\Modules\Api\Http\Controllers\Voip\VoipController::class, 'incomingCall']);
+    Route::post('payment_send_second_password', [\Modules\Api\Http\Controllers\Voip\VoipController::class, 'paymentSendSecondPassword']);
+    Route::post('payment_by_voip', [\Modules\Api\Http\Controllers\Voip\VoipController::class, 'paymentByVoip']);
+    Route::post('store_survey', [\Modules\Api\Http\Controllers\Voip\VoipController::class, 'storeSurvey']);
+});

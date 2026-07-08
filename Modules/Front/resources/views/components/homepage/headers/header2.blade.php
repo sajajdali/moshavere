@@ -12,6 +12,7 @@
             $enumNameSpace::HEADER1_BUTTON_HREF1,
             $enumNameSpace::HEADER1_BUTTON_HREF2,
             $enumNameSpace::HEADER1_IMAGE,
+            $enumNameSpace::HEADER2_MOBILE_BACKGROUND_IMAGE,
             $enumNameSpace::HEADER1_TITLE_COLOR,
             $enumNameSpace::HEADER1_TITLE_NOT_SHOW_MOBILE,
             $enumNameSpace::HEADER1_TITLE_NOT_SHOW_DESKTOP,
@@ -25,13 +26,47 @@
         $headerTitle1Desktop = $hideHeaderTitlesDesktop ? '' : $headerTitle1;
         $headerTitle2Mobile = $hideHeaderTitlesMobile ? '' : $headerTitle2;
         $headerTitle2Desktop = $hideHeaderTitlesDesktop ? '' : $headerTitle2;
+        $headerDesktopBackground = $SettingMn::vc($collection, $enumNameSpace::HEADER1_IMAGE);
+        $headerMobileBackground = $SettingMn::vc($collection, $enumNameSpace::HEADER2_MOBILE_BACKGROUND_IMAGE);
+        $headerDesktopBackgroundUrl = assetStorage($headerDesktopBackground);
+        $headerMobileBackgroundUrl = $headerMobileBackground ? assetStorage($headerMobileBackground) : null;
+        $headerBackgroundStyles = "--header2-desktop-bg: url('{$headerDesktopBackgroundUrl}');";
+        $headerBackgroundStyles .= $headerMobileBackgroundUrl ? " --header2-mobile-bg: url('{$headerMobileBackgroundUrl}');" : '';
     @endphp
+    <style>
+        .header2 {
+            min-height: 300px;
+            background-color: transparent !important;
+            background-image: var(--header2-desktop-bg);
+            background-position: center top;
+            background-repeat: repeat;
+            background-size: cover;
+        }
+
+        .header2-content {
+            min-height: 300px;
+            padding-top: 48px;
+            padding-bottom: 48px;
+        }
+
+        @media (max-width: 767.98px) {
+            .header2 {
+                min-height: 360px;
+                background-image: var(--header2-mobile-bg, var(--header2-desktop-bg)) !important;
+                background-position: center top;
+            }
+
+            .header2-content {
+                min-height: 360px;
+                padding-top: 72px;
+                padding-bottom: 72px;
+            }
+        }
+    </style>
     <!-- header -->
-    <header class="relative bg-primary-main pt-1 space-y-10 md:space-y-16">
-        <!-- Background Pattern (Blue with SVG pattern) -->
-        <div class="absolute inset-0 bg-cover bg-repeat min-h-[300px]"
-             style="background-image: url({{ assetStorage($SettingMn::vc($collection, $enumNameSpace::HEADER1_IMAGE)) }});"></div>
-        <section class="relative w-full container mx-auto px-5 flex flex-col md:flex-row items-center gap-6 md:gap-8">
+    <header class="header2 relative bg-primary-main pt-1 space-y-10 md:space-y-16"
+            style="{{ $headerBackgroundStyles }}">
+        <section class="header2-content relative w-full container mx-auto px-5 flex flex-col md:flex-row items-center gap-6 md:gap-8">
             <!-- Right Section: Texts -->
             <div class="md:w-1/2 w-full text-right">
                 @if ($headerTitle1)

@@ -90,6 +90,7 @@ $setting = [
             \Modules\Setting\Enum\SettingKeyEnum::SHOW_ABOUT_US_MENU_BUTTON,
             \Modules\Setting\Enum\SettingKeyEnum::ACTIVE_HEADER,
             \Modules\Setting\Enum\SettingKeyEnum::HEADER1_IMAGE,
+            \Modules\Setting\Enum\SettingKeyEnum::HEADER2_MOBILE_BACKGROUND_IMAGE,
             \Modules\Setting\Enum\SettingKeyEnum::HEADER1_TITLE1,
             \Modules\Setting\Enum\SettingKeyEnum::HEADER1_TITLE2,
             \Modules\Setting\Enum\SettingKeyEnum::HEADER1_TITLE_COLOR,

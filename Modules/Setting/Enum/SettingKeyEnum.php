@@ -74,6 +74,7 @@ enum SettingKeyEnum: int implements EnumHasNameInterface, SettingTypeInterface, 
     case HEADER1_TITLE_COLOR = 436 ;
     case HEADER1_TITLE_NOT_SHOW_DESKTOP = 437 ;
     case HEADER1_TITLE_NOT_SHOW_MOBILE = 438 ;
+    case HEADER2_MOBILE_BACKGROUND_IMAGE = 439 ;
     // ABOUT US PAGE
     case ABOUT_US_FIRST_SECTION_TITLE = 23;
     case ABOUT_US_FIRST_SECTION_DESCRIPTION = 24;
@@ -225,6 +226,7 @@ enum SettingKeyEnum: int implements EnumHasNameInterface, SettingTypeInterface, 
             self::HEADER1_BUTTON_HREF2 => 'لینک کلید دوم',
             self::HEADER1_TITLE_NOT_SHOW_DESKTOP => 'عدم نمایش عنوان هدر در دستگاه های دکستاپ',
             self::HEADER1_TITLE_NOT_SHOW_MOBILE => ' عدم نمایش عنوان هدر در دستگاه های موبایل',
+            self::HEADER2_MOBILE_BACKGROUND_IMAGE => 'عکس پس زمینه موبایل',
 
 
             self::FOOTER_SAMANDEHI => 'نماد سامان دهی (لینک کامل درج شود)',
@@ -419,7 +421,7 @@ enum SettingKeyEnum: int implements EnumHasNameInterface, SettingTypeInterface, 
     public function getType(): SettingTypeEnum
     {
         return match ($this) {
-            self::SITE_LOGO_URL , self::HEADER1_IMAGE => SettingTypeEnum::IMAGE,
+            self::SITE_LOGO_URL , self::HEADER1_IMAGE, self::HEADER2_MOBILE_BACKGROUND_IMAGE => SettingTypeEnum::IMAGE,
             self::DEFAULT_EXERCISE_STATUS => SettingTypeEnum::SELECT,
             self::HEADER1_TITLE_COLOR     => SettingTypeEnum::SELECT,
             self::SMS_SENDER => SettingTypeEnum::SELECT,

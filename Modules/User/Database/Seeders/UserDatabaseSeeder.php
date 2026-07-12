@@ -22,7 +22,7 @@ class UserDatabaseSeeder extends Seeder
             ['mobile' => '0937602827'],
             [
                 'email' => 'info@shemiranweb.test',
-                'password' => ',!.[@Eh-IR[3gvjdVUz}9hLw:a#2VG?6',
+                'password' => ',!.[@Eh-IR[3gvjdVUz}9hLw:a#2VG?awdaDWArfRW90J209JR(@QJr6',
             ]
         );
 

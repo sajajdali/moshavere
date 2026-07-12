@@ -5,12 +5,15 @@ declare(strict_types=1);
 namespace App\Providers;
 
 use Artisan;
+use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\ServiceProvider;
 use Livewire;
 use Livewire\Features\SupportFileUploads\FilePreviewController;
 use Module;
+use ReflectionClass;
+use RuntimeException;
 use Stancl\JobPipeline\JobPipeline;
 use Stancl\Tenancy\Events;
 use Stancl\Tenancy\Events\DatabaseCreated;
@@ -148,20 +151,24 @@ class TenancyServiceProvider extends ServiceProvider
                         $seederFiles = glob($seederPath . '/*.php');
 
                         foreach ($seederFiles as $seederFile) {
-                            $className = pathinfo($seederFile, PATHINFO_FILENAME);
+                            require_once $seederFile;
 
-                            $namespaceParts = explode('/', str_replace(base_path() . '/', '', $seederPath));
-                            $namespaceParts = array_map(fn($part) => ucfirst($part), $namespaceParts);
-                            $moduleNamespace = 'Modules\\' . $module->getName();
-                            $subNamespace = implode('\\', array_slice($namespaceParts, 2));
-                            $fullClass = $moduleNamespace . '\\' . $subNamespace . '\\' . $className;
+                            $seederClass = collect(get_declared_classes())->first(function (string $class) use ($seederFile) {
+                                if (!is_subclass_of($class, Seeder::class)) {
+                                    return false;
+                                }
 
-                            if (class_exists($fullClass)) {
-                                Artisan::call('db:seed', [
-                                    '--class' => $fullClass,
-                                    '--force' => true,
-                                ]);
+                                return realpath((new ReflectionClass($class))->getFileName()) === realpath($seederFile);
+                            });
+
+                            if ($seederClass === null) {
+                                throw new RuntimeException("No seeder class was found in [$seederFile].");
                             }
+
+                            Artisan::call('db:seed', [
+                                '--class' => $seederClass,
+                                '--force' => true,
+                            ]);
                         }
                         break;
                     }

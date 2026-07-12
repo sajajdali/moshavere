@@ -21,12 +21,11 @@ class CreateTenant extends Command
         $id = trim((string) $this->ask('🔤 Enter Tenant ID (e.g. nobat1)'));
 
         $validator = Validator::make(['id' => $id], [
-            'id' => ['required', 'string', 'max:64', 'regex:/^[a-zA-Z0-9][a-zA-Z0-9_-]*$/'],
+            'id' => ['required', 'string', 'max:64'],
         ]);
 
         if ($validator->fails()) {
             $this->error('⛔ '.$validator->errors()->first('id'));
-
             return self::FAILURE;
         }
 

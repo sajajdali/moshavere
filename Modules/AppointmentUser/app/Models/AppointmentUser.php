@@ -17,6 +17,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Modules\AppointmentUser\Enum\AppointmentUserKindEnum;
 use Modules\AppointmentUser\Enum\AppointmentUserTypeEnum;
 use Modules\AppointmentUser\Enum\AppointmentUserStatusEnum;
+use Modules\AppointmentUser\Enum\AppointmentVia;
 use Modules\AppointmentSetting\app\Models\AppointmentSetting;
 use Modules\AppointmentSetting\app\Models\AppointmentSegmentItem;
 
@@ -25,6 +26,8 @@ class AppointmentUser extends Model
 
     use HasFactory, SoftDeletes, Notifiable;
     const DETAIL_APPOINTMENT_VIA = 'appointment_via';
+    const DETAIL_SURVEY = 'SURVEY';
+    const DETAIL_SURVEY_FEEDBACK_FILE = 'SURVEY_FEEDBACK_FILE';
     const STORE_FROM_APPLICATION = 'store_from_application';
     const DETAIL_PAYMENT_PRICE = 'price';
     const DETAIL_PAYMENT_PRICE_SOURCE = 'price_source';
@@ -70,6 +73,41 @@ class AppointmentUser extends Model
 
         // Insert the unique code into the "transaction" table
         return $uniqueCode;
+    }
+
+    public function appointmentVia(): ?AppointmentVia
+    {
+        $value = data_get($this->details, self::DETAIL_APPOINTMENT_VIA);
+
+        if ($value instanceof AppointmentVia) {
+            return $value;
+        }
+
+        return is_numeric($value) ? AppointmentVia::tryFrom((int) $value) : null;
+    }
+
+    public function isStoredFromVoip(): bool
+    {
+        return $this->appointmentVia() === AppointmentVia::VOIP;
+    }
+
+    public function surveyVoiceUrl(): ?string
+    {
+        $filename = data_get(
+            $this->details,
+            self::DETAIL_SURVEY . '.' . self::DETAIL_SURVEY_FEEDBACK_FILE
+        );
+
+        if (! is_string($filename) || trim($filename) === '') {
+            return null;
+        }
+
+        $filename = basename(str_replace('\\', '/', trim($filename)));
+        if (strtolower(pathinfo($filename, PATHINFO_EXTENSION)) !== 'wav') {
+            return null;
+        }
+
+        return url('uploads/voip/' . rawurlencode($filename));
     }
 
     public function service()

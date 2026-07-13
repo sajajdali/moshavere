@@ -448,9 +448,9 @@ class VoipController extends Controller
         }
 
         $details = $appointmentUser->details ?? [];
-        $details['SURVEY'] = [
-            'SURVEY' => $request->input('score'),
-            'SURVEY_FEEDBACK_FILE' => $filename,
+        $details[AppointmentUser::DETAIL_SURVEY] = [
+            AppointmentUser::DETAIL_SURVEY => $request->input('score'),
+            AppointmentUser::DETAIL_SURVEY_FEEDBACK_FILE => $filename,
         ];
         $appointmentUser->update([
             'details' => $details,

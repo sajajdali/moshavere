@@ -4,6 +4,8 @@ namespace Modules\Api\Providers;
 
 use Illuminate\Foundation\Support\Providers\RouteServiceProvider as ServiceProvider;
 use Illuminate\Support\Facades\Route;
+use Stancl\Tenancy\Middleware\InitializeTenancyByDomain;
+use Stancl\Tenancy\Middleware\PreventAccessFromCentralDomains;
 
 class RouteServiceProvider extends ServiceProvider
 {
@@ -58,7 +60,12 @@ class RouteServiceProvider extends ServiceProvider
             ->group(module_path('Api', '/Routes/api_v1_user.php'));
 
         Route::prefix('api/v1')
-            ->middleware(['api', 'basicAuth'])
+            ->middleware([
+                'api',
+                InitializeTenancyByDomain::class,
+                PreventAccessFromCentralDomains::class,
+                'basicAuth',
+            ])
             ->namespace($this->moduleNamespace)
             ->group(module_path('Api', '/Routes/api_v1_voip.php'));
     }

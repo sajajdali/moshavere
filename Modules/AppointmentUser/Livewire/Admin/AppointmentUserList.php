@@ -326,6 +326,7 @@ class AppointmentUserList extends Component
     {
         $this->fetchData['feedbacks'] = $appointmentUser->feedbacks;
         $this->fetchData['feedbackVoiceUrl'] = $appointmentUser->surveyVoiceUrl();
+        $this->fetchData['feedbackIsVoip'] = $appointmentUser->isStoredFromVoip();
         $this->dispatch('lunchFeedBackModal', true);
     }
     public function booted()

@@ -9,15 +9,24 @@
                 <div class="modal-body">
                     @if (isset($fetchData['feedbacks']))
                         @foreach ($fetchData['feedbacks'] as $feedback)
+                        @php
+                            $feedbackQuestion = Modules\Front\enum\FeedbackId::tryFrom((int) $feedback->question);
+                            $feedbackChoices = $feedbackQuestion?->getQuestionChoises() ?? [];
+                            $feedbackChoice = $feedbackChoices[$feedback->answer] ?? null;
+                        @endphp
                         <div class="row">
                             <div class="card">
                                 <div class="card-header">
                                     <p>
-                                        {{ Modules\Front\enum\FeedbackId::tryFrom($feedback->question)->getQuestion() }}</p>
+                                        {{ $feedbackQuestion?->getQuestion() ?? 'سوال نظرسنجی' }}</p>
 
                                 </div>
                                 <div class="card-body">
-                                    <p>{{ Modules\Front\enum\FeedbackId::tryFrom($feedback->question)->getQuestionChoises()[$feedback->answer] }}
+                                    @if ($fetchData['feedbackIsVoip'] ?? false)
+                                        <p class="mb-0">امتیاز ثبت شده: {{ $feedback->answer }}</p>
+                                    @else
+                                        <p class="mb-0">{{ $feedbackChoice ?? $feedback->answer }}</p>
+                                    @endif
                                 </div>
                             </div>
                             @if (! $loop->last)

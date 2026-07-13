@@ -612,7 +612,7 @@ class AppointmentUserService
 
         if (
             $appointmentData->kind == AppointmentUserKindEnum::IN_PERSION
-            && $appointmentData->appointmentVia == AppointmentVia::SELF && $dateAppointment->isPast()
+            && $appointmentData->appointmentVia->usesSelfServiceRules() && $dateAppointment->isPast()
         ) {
             return [
                 'status' => false,
@@ -645,7 +645,7 @@ class AppointmentUserService
 
         $detailDatabaseDB[AppointmentUser::USER_MODEL] = UserResource::make($userModelAppointment->userModel->user);
 
-        if ($appointmentData->kind == AppointmentUserKindEnum::IN_PERSION && $appointmentData->appointmentVia == AppointmentVia::SELF) {
+        if ($appointmentData->kind == AppointmentUserKindEnum::IN_PERSION && $appointmentData->appointmentVia->usesSelfServiceRules()) {
             $checkTimeAvailable = $this->isAppointmentTimeAvailable($dateAppointment->toTimeString(), $dateAppointment->copy()->addMinutes($appointmentSetting->time_for_visit)->toTimeString(), $dateAppointment->toDateString(), $appointmentSetting);
             if (!$checkTimeAvailable) {
                 //                return [
@@ -700,7 +700,7 @@ class AppointmentUserService
         // check for peyment
         if (
             $appointmentSetting->detail[AppointmentSetting::PAYMENT][AppointmentSetting::STATUS]
-            && $appointmentData->appointmentVia == AppointmentVia::SELF
+            && $appointmentData->appointmentVia->usesSelfServiceRules()
         ) {
             if ($appointmentData->kind == AppointmentUserKindEnum::IN_PERSION) {
                 if (
@@ -728,7 +728,7 @@ class AppointmentUserService
             isset($appointmentSetting->detail[AppointmentSetting::MONITORTING_APPOINTMENT]) &&
             $appointmentSetting->detail[AppointmentSetting::MONITORTING_APPOINTMENT] !== null &&
             $appointmentSetting->detail[AppointmentSetting::MONITORTING_APPOINTMENT] !== false &&
-            $appointmentData->appointmentVia == AppointmentVia::SELF
+            $appointmentData->appointmentVia->usesSelfServiceRules()
         ) {
             $status = AppointmentUserStatusEnum::STATUS_MONITORING;
         }
@@ -784,7 +784,7 @@ class AppointmentUserService
         $smsTemplate = setting(SettingKeyEnum::SMS_APPOINTMENT_RECEIVING_SUCCESSFUL);
         $dontSendPAymentSms = setting(SettingKeyEnum::DONT_SEND_SMS_FOR_PAYMENT_LINK);
         if (
-            $appointmentData->appointmentVia == AppointmentVia::SELF &&
+            $appointmentData->appointmentVia->usesSelfServiceRules() &&
             $appointmentData->kind == AppointmentUserKindEnum::ONLINE &&
             $paymentstatus['online']['status']
         ) {
@@ -794,7 +794,7 @@ class AppointmentUserService
             if (
                 isset($dontSendPAymentSms) &&
                 filter_var($dontSendPAymentSms, FILTER_VALIDATE_BOOL) &&
-                $appointmentData->appointmentVia == AppointmentVia::SELF
+                $appointmentData->appointmentVia->usesSelfServiceRules()
             ) {
                 $smsTemplate = null ;
             }
@@ -809,7 +809,7 @@ class AppointmentUserService
             );
         }
         if (
-            $appointmentData->appointmentVia == AppointmentVia::SELF &&
+            $appointmentData->appointmentVia->usesSelfServiceRules() &&
             $appointmentData->kind == AppointmentUserKindEnum::IN_PERSION &&
             $paymentstatus['in_person']['status']
         ) {
@@ -818,7 +818,7 @@ class AppointmentUserService
             if (
                 isset($dontSendPAymentSms) &&
                 filter_var($dontSendPAymentSms, FILTER_VALIDATE_BOOL) &&
-                $appointmentData->appointmentVia == AppointmentVia::SELF
+                $appointmentData->appointmentVia->usesSelfServiceRules()
             ) {
                 $smsTemplate = null ;
             }
@@ -890,13 +890,13 @@ class AppointmentUserService
 
         // create payment link
         if (
-            $appointmentData->appointmentVia == AppointmentVia::SELF &&
+            $appointmentData->appointmentVia->usesSelfServiceRules() &&
             $appointmentData->kind == AppointmentUserKindEnum::ONLINE &&
             $paymentstatus['online']['status']
         ) {
             $paymentLink = route('api.appointment.payment.create', $appointmentUser);
         } elseif (
-            $appointmentData->appointmentVia == AppointmentVia::SELF &&
+            $appointmentData->appointmentVia->usesSelfServiceRules() &&
             $appointmentData->kind == AppointmentUserKindEnum::ONLINE
         ) {
             // // send online first message
@@ -911,7 +911,7 @@ class AppointmentUserService
             }
         }
         if (
-            $appointmentData->appointmentVia == AppointmentVia::SELF &&
+            $appointmentData->appointmentVia->usesSelfServiceRules() &&
             $appointmentData->kind == AppointmentUserKindEnum::IN_PERSION &&
             $paymentstatus['in_person']['status']
         ) {

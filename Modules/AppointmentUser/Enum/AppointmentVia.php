@@ -9,6 +9,7 @@ enum AppointmentVia: int implements EnumHasNameInterface , EnumHasApiResultInter
     case SELF = 1;
     case BY_ADMIN = 2;
     case IMPORT_FROM = 3;
+    case VOIP = 4;
 
     public function getName(): string
     {
@@ -16,7 +17,13 @@ enum AppointmentVia: int implements EnumHasNameInterface , EnumHasApiResultInter
             self::SELF => 'توسط بیمار',
             self::BY_ADMIN => 'توسط ادمین',
             self::IMPORT_FROM => 'ایمپورت شده',
+            self::VOIP => 'از طریق ویپ',
         };
+    }
+
+    public function usesSelfServiceRules(): bool
+    {
+        return in_array($this, [self::SELF, self::VOIP], true);
     }
 
     public function apiResult(): array

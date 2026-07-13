@@ -772,7 +772,7 @@ class VoipController extends Controller
         // appointment model
         $appointmentModel = new AppointmentModel(
             timestamp: $startDate->copy()->timestamp,
-            appointmentVia: AppointmentVia::SELF,
+            appointmentVia: AppointmentVia::VOIP,
             sendSmsToUser: true,
             serviceId: $serviceId,
             placeId: $placeId,

@@ -544,7 +544,12 @@ class VoipController extends Controller
                             continue;
                         }
 
-                        $hour = (int) Carbon::createFromTimestamp($time['timestamp'], 'Asia/Tehran')->format('H');
+                        $appointmentTime = Carbon::createFromTimestamp((int) $time['timestamp'], 'Asia/Tehran');
+                        if ($appointmentTime->isPast()) {
+                            continue;
+                        }
+
+                        $hour = (int) $appointmentTime->format('H');
                         $period = $hour < 12 ? 'am' : 'pm';
 
                         if ($timeFilter && in_array($timeFilter, ['am', 'pm'], true) && $period !== $timeFilter) {

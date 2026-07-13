@@ -26,6 +26,20 @@
                         </div>
                         @endforeach
                     @endif
+                    @if (! empty($fetchData['feedbackVoiceUrl']))
+                        <div class="card mt-3">
+                            <div class="card-header">
+                                <p class="mb-0">صدای ضبط شده کاربر</p>
+                            </div>
+                            <div class="card-body">
+                                <audio class="w-100" controls preload="metadata"
+                                    aria-label="پخش صدای ضبط شده کاربر">
+                                    <source src="{{ $fetchData['feedbackVoiceUrl'] }}" type="audio/wav">
+                                    مرورگر شما امکان پخش صدا را ندارد.
+                                </audio>
+                            </div>
+                        </div>
+                    @endif
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">بستن</button>

@@ -325,6 +325,7 @@ class AppointmentUserList extends Component
     public function lunchFeedBackModal(AppointmentUser $appointmentUser)
     {
         $this->fetchData['feedbacks'] = $appointmentUser->feedbacks;
+        $this->fetchData['feedbackVoiceUrl'] = $appointmentUser->surveyVoiceUrl();
         $this->dispatch('lunchFeedBackModal', true);
     }
     public function booted()

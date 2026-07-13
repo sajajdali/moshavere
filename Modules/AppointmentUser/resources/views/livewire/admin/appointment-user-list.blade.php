@@ -387,7 +387,7 @@
                                                             type="checkbox" value="">
                                                     </label>
                                                     @can('appointment_user.feedBack')
-                                                        @if ($ap->feedbacks->isNotEmpty())
+                                                        @if ($ap->feedbacks->isNotEmpty() || $ap->surveyVoiceUrl())
                                                             <a wire:click='lunchFeedBackModal({{ $ap->id }})'
                                                                 href="#"><small class="badge bg-primary ">
                                                                     نظر سنجی
@@ -397,13 +397,15 @@
                                                 </div>
                                             </td>
                                             <td class="{{ $ap->type->getclass() }} d-flex flex-column">
-                                                {!! $ap->kind->getIcon() !!}
-                                                @if ($ap->isStoredFromVoip())
-                                                    <span class="text-primary" title="ثبت شده از طریق ویپ"
-                                                        aria-label="ثبت شده از طریق ویپ">
-                                                        <i class="fa fa-phone" aria-hidden="true"></i>
-                                                    </span>
-                                                @endif
+                                                <div class="d-flex align-items-center justify-content-center gap-2">
+                                                    {!! $ap->kind->getIcon() !!}
+                                                    @if ($ap->isStoredFromVoip())
+                                                        <span class="text-primary" title="ثبت شده از طریق ویپ"
+                                                            aria-label="ثبت شده از طریق ویپ">
+                                                            <i class="fa fa-phone fa-2x" aria-hidden="true"></i>
+                                                        </span>
+                                                    @endif
+                                                </div>
                                                 <a
                                                     @if ($ap->kind == \Modules\AppointmentUser\Enum\AppointmentUserKindEnum::ONLINE && $ap->online->isNotEmpty()) href="{{ route('admin.appointment_user.message.detail', ['onlineAppId' => $ap->online->first()?->id]) }}" @else href="" @endif>
                                                     <span
@@ -414,14 +416,6 @@
                                                         @endif
                                                     </span>
                                                 </a>
-                                                @if ($surveyVoiceUrl = $ap->surveyVoiceUrl())
-                                                    <audio class="mt-2" style="width: 200px; height: 32px;"
-                                                        controls preload="none"
-                                                        aria-label="پخش صدای ضبط شده کاربر">
-                                                        <source src="{{ $surveyVoiceUrl }}" type="audio/wav">
-                                                        مرورگر شما امکان پخش صدا را ندارد.
-                                                    </audio>
-                                                @endif
                                             </td>
                                             <td>
                                                 <div class="d-flex flex-column">

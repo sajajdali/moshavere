@@ -8,6 +8,7 @@ use Hekmatinasser\Verta\Verta;
 use Modules\User\Entities\User;
 use Illuminate\Routing\Controller;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Notification;
 use Modules\Api\Trait\ApiHandlerTrait;
 use Modules\Front\app\Models\FeedBack;
@@ -678,6 +679,14 @@ class VoipController extends Controller
         $operatorId          = $request->get('operator_id');
         $kindParameter       = $request->get('kind');
         $description         = $request->get('description');
+
+        Log::debug('VoIP store appointment request received', [
+            'method' => $request->method(),
+            'path' => $request->path(),
+            'ip' => $request->ip(),
+            'parameters' => $request->all(),
+        ]);
+
         if (empty($doctorId) || empty($visitDate) || empty($mobile)) {
             return $this->requestException([
                 'status' => false,

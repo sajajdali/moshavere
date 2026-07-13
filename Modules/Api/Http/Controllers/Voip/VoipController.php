@@ -597,21 +597,32 @@ class VoipController extends Controller
                     if ($appointment['empty_appoints'] <= 0 || $appointment['status'] == false) {
                         continue;
                     }
-                    $dayNumber = $appointment['day_number'];
+
+                    $availableTimes = [];
+                    foreach ($appointment['times'] ?? [] as $time) {
+                        if (! ($time['status'] ?? false) || ! isset($time['timestamp'])) {
+                            continue;
+                        }
+
+                        $appointmentTime = Carbon::createFromTimestamp((int) $time['timestamp'], 'Asia/Tehran');
+                        if ($appointmentTime->isPast()) {
+                            continue;
+                        }
+
+                        $availableTimes[] = ['timestamp' => $time['timestamp']];
+                    }
+
+                    if ($availableTimes === []) {
+                        continue;
+                    }
+
                     $DaysDisplayed++;
 
-                    if ($DaysDisplayed > 15) {
+                    if ($DaysDisplayed > $maxDay) {
                         break 3;
                     }
                     $dayCount++;
-
-                    if (count($appointment['times'])) {
-                        foreach ($appointment['times'] as $time) {
-                            if ($time['status']) {
-                                $result['day' . $dayCount]['times'][] = ['timestamp' => $time['timestamp']];
-                            }
-                        }
-                    }
+                    $result['day' . $dayCount]['times'] = $availableTimes;
                 }
             }
         }

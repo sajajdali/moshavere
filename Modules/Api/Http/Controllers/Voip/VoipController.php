@@ -77,9 +77,9 @@ class VoipController extends Controller
     public function getAppointmentDoctors(Request $request)
     {
         $doctors = User::doctors_query()
-            ?->whereHas('appointmentSettings', fn ($query) => $query->active())
+            ?->whereHas('appointmentSettings', fn($query) => $query->active())
             ->get()
-            ->map(fn (User $user) => [
+            ->map(fn(User $user) => [
                 'id' => $user->id,
                 'name' => trim($user->fullName) ?: $user->mobile,
             ])
@@ -501,17 +501,17 @@ class VoipController extends Controller
         return AppointmentSetting::query()
             ->active()
             ->where('user_id', $doctorId)
-            ->when($placeId, fn ($query) => $query->where('place_id', $placeId))
-            ->when(! $placeId, fn ($query) => $query->whereNull('place_id'))
-            ->when($serviceId, fn ($query) => $query->where('service_id', $serviceId))
-            ->when(! $serviceId, fn ($query) => $query->whereNull('service_id'))
+            ->when($placeId, fn($query) => $query->where('place_id', $placeId))
+            ->when(! $placeId, fn($query) => $query->whereNull('place_id'))
+            ->when($serviceId, fn($query) => $query->where('service_id', $serviceId))
+            ->when(! $serviceId, fn($query) => $query->whereNull('service_id'))
             ->first()
             ?? AppointmentSetting::query()
-                ->active()
-                ->where('user_id', $doctorId)
-                ->whereNull('place_id')
-                ->whereNull('service_id')
-                ->first();
+            ->active()
+            ->where('user_id', $doctorId)
+            ->whereNull('place_id')
+            ->whereNull('service_id')
+            ->first();
     }
 
     private function appointmentList(AppointmentSetting $appointmentSetting): array
@@ -679,13 +679,6 @@ class VoipController extends Controller
         $operatorId          = $request->get('operator_id');
         $kindParameter       = $request->get('kind');
         $description         = $request->get('description');
-
-        Log::debug('VoIP store appointment request received', [
-            'method' => $request->method(),
-            'path' => $request->path(),
-            'ip' => $request->ip(),
-            'parameters' => $request->all(),
-        ]);
 
         if (empty($doctorId) || empty($visitDate) || empty($mobile)) {
             return $this->requestException([

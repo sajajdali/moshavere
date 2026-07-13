@@ -18,14 +18,24 @@
             $enumNameSpace::HEADER1_TITLE_NOT_SHOW_DESKTOP,
         ])->get();
         $headerTextColor = 'text-' . $SettingMn::vc($collection, $enumNameSpace::HEADER1_TITLE_COLOR) ?? 'white';
-        $hideHeaderTitlesMobile = $SettingMn::vcBool($collection, $enumNameSpace::HEADER1_TITLE_NOT_SHOW_MOBILE);
-        $hideHeaderTitlesDesktop = $SettingMn::vcBool($collection, $enumNameSpace::HEADER1_TITLE_NOT_SHOW_DESKTOP);
+        $hideHeaderTitlesMobile = filter_var(
+            $SettingMn::vc($collection, $enumNameSpace::HEADER1_TITLE_NOT_SHOW_MOBILE),
+            FILTER_VALIDATE_BOOLEAN
+        );
+        $hideHeaderTitlesDesktop = filter_var(
+            $SettingMn::vc($collection, $enumNameSpace::HEADER1_TITLE_NOT_SHOW_DESKTOP),
+            FILTER_VALIDATE_BOOLEAN
+        );
+        // dd($hideHeaderTitlesMobile,$hideHeaderTitlesDesktop);
         $headerTitle1 = $SettingMn::vc($collection, $enumNameSpace::HEADER1_TITLE1);
         $headerTitle2 = $SettingMn::vc($collection, $enumNameSpace::HEADER1_TITLE2);
-        $headerTitle1Mobile = $hideHeaderTitlesMobile ? '' : $headerTitle1;
-        $headerTitle1Desktop = $hideHeaderTitlesDesktop ? '' : $headerTitle1;
-        $headerTitle2Mobile = $hideHeaderTitlesMobile ? '' : $headerTitle2;
-        $headerTitle2Desktop = $hideHeaderTitlesDesktop ? '' : $headerTitle2;
+        $headerTitlesVisibilityClass = match (true) {
+            $hideHeaderTitlesMobile && $hideHeaderTitlesDesktop => 'hidden',
+            $hideHeaderTitlesMobile => 'hidden md:block',
+            $hideHeaderTitlesDesktop => 'md:hidden',
+            default => '',
+        };
+        // dd($headerTitlesVisibilityClass);
         $headerDesktopBackground = $SettingMn::vc($collection, $enumNameSpace::HEADER1_IMAGE);
         $headerMobileBackground = $SettingMn::vc($collection, $enumNameSpace::HEADER2_MOBILE_BACKGROUND_IMAGE);
         $headerDesktopBackgroundUrl = assetStorage($headerDesktopBackground);
@@ -49,6 +59,12 @@
             padding-bottom: 48px;
         }
 
+        .header2-title {
+            text-shadow:
+                0 1px 2px rgba(0, 0, 0, 0.85),
+                0 3px 10px rgba(0, 0, 0, 0.55);
+        }
+
         @media (max-width: 767.98px) {
             .header2 {
                 min-height: 360px;
@@ -70,16 +86,14 @@
             <!-- Right Section: Texts -->
             <div class="md:w-1/2 w-full text-right">
                 @if ($headerTitle1)
-                    <h1 class="text-2xl md:text-3xl {{ $headerTextColor }} font-bold mb-4">
-                        <span class="md:hidden">{{ $headerTitle1Mobile }}</span>
-                        <span class="hidden md:inline">{{ $headerTitle1Desktop }}</span>
+                    <h1 class="header2-title text-2xl md:text-3xl {{ $headerTextColor }} font-bold mb-4 {{ $headerTitlesVisibilityClass }}">
+                        {{ $headerTitle1 }}
                     </h1>
                 @endif
 
                 @if ($headerTitle2)
-                    <p class="{{ $headerTextColor }} text-sm md:text-base mb-6">
-                        <span class="md:hidden">{{ $headerTitle2Mobile }}</span>
-                        <span class="hidden md:inline">{{ $headerTitle2Desktop }}</span>
+                    <p class="header2-title {{ $headerTextColor }} text-sm md:text-base mb-6 {{ $headerTitlesVisibilityClass }}">
+                        {{ $headerTitle2 }}
                     </p>
                 @endif
 

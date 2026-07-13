@@ -52,6 +52,7 @@ class Registration extends Component
     }
     public function completeUserInfo()
     {
+        $this->normalizeNationalCode();
         $this->validate();
         $this->user->first_name = $this->form['first_name'];
         $this->user->last_name = $this->form['last_name'];
@@ -70,6 +71,24 @@ class Registration extends Component
             return redirect()->intended($intendedUrl);
         }
         return redirect()->route('front.homePage');
+    }
+
+    private function normalizeNationalCode(): void
+    {
+        $nationalCode = data_get($this->form, 'national_code');
+
+        if ($nationalCode === null || $nationalCode === '') {
+            return;
+        }
+
+        $nationalCode = (string) convert2english(trim((string) $nationalCode));
+
+        // Restore a leading zero if a mobile keyboard/browser serialized it as a number.
+        if (preg_match('/^\d{1,10}$/', $nationalCode)) {
+            $nationalCode = str_pad($nationalCode, 10, '0', STR_PAD_LEFT);
+        }
+
+        $this->form['national_code'] = $nationalCode;
     }
     public function mount()
     {

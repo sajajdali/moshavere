@@ -54,7 +54,9 @@
                     <label for=""
                         class=" @if($fetchData['is_national_code_required']) after:content-['*'] @endif after:ml-0.5 after:text-red-500 block text-sm font-medium text-slate-700">کد
                         ملی </label>
-                    <input type="text" wire:model='form.national_code'
+                    <input type="text" inputmode="numeric" pattern="[0-9]*" maxlength="10"
+                        autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"
+                        wire:model='form.national_code'
                         class="w-full border @error('form.national_code') border-rose-500 @else  border-secondary-300 @enderror rounded-lg bg-primary-tint-100 py-2 px-3"
                         placeholder="کد ملی شما" />
                     @error('form.national_code')

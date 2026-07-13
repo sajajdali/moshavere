@@ -18,6 +18,7 @@ class UserProfileLivewire extends Component
 
     public function changePersonalInfo()
     {
+        $this->normalizeNationalCode();
         $this->validate([
             'form.first_name'        => 'required|string|max:225',
             'form.last_name'         => 'required|string|max:225',
@@ -36,6 +37,23 @@ class UserProfileLivewire extends Component
             $userMOdel->update(['email' => $this->form['email']]);
         }
         $this->dispatch('swalSuccess', true);
+    }
+
+    private function normalizeNationalCode(): void
+    {
+        $nationalCode = data_get($this->form, 'national_code');
+
+        if ($nationalCode === null || $nationalCode === '') {
+            return;
+        }
+
+        $nationalCode = (string) convert2english(trim((string) $nationalCode));
+
+        if (preg_match('/^\d{1,10}$/', $nationalCode)) {
+            $nationalCode = str_pad($nationalCode, 10, '0', STR_PAD_LEFT);
+        }
+
+        $this->form['national_code'] = $nationalCode;
     }
 
     public function removeFromFavarite($docId)

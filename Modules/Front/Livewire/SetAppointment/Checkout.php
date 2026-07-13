@@ -63,6 +63,8 @@ class Checkout extends Component
     }
     public function setAppointment()
     {
+        $this->normalizeOtherPatientNationalCode();
+
         if (setting(\Modules\Setting\Enum\SettingKeyEnum::APPOINTMENT_FOR_OTHERS_STATUS) &&  $this->form['app']['for'] === 'others') {
             $rules = [
                 'form.otherApp.first_name' => 'required|string|max:225',
@@ -93,6 +95,23 @@ class Checkout extends Component
             // register the appointment
             $this->storeAppointment();
         }
+    }
+
+    private function normalizeOtherPatientNationalCode(): void
+    {
+        $nationalCode = data_get($this->form, 'otherApp.national_code');
+
+        if ($nationalCode === null || $nationalCode === '') {
+            return;
+        }
+
+        $nationalCode = (string) convert2english(trim((string) $nationalCode));
+
+        if (preg_match('/^\d{1,10}$/', $nationalCode)) {
+            $nationalCode = str_pad($nationalCode, 10, '0', STR_PAD_LEFT);
+        }
+
+        $this->form['otherApp']['national_code'] = $nationalCode;
     }
     private function RegisterOtherAsUser()
     {

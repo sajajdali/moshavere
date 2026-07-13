@@ -90,7 +90,9 @@
                                             <p class="text-sm">اتباع هستم</p>
                                         </label>
                                     </div>
-                                    <input type="text" id="national_code" wire:model='form.otherApp.national_code'
+                                    <input type="text" inputmode="numeric" pattern="[0-9]*" maxlength="10"
+                                        autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"
+                                        id="national_code" wire:model='form.otherApp.national_code'
                                         class="w-full border   @error('form.otherApp.national_code')   border-rose-500 @else border-secondary-300  @enderror rounded-lg bg-primary-tint-100 py-2 px-3"
                                         placeholder="کد ملی شما" />
                                     <p class="text-[10px] text-red"></p>

@@ -77,7 +77,8 @@
                     </div>
                 </div>
                 <input type="text" inputmode="numeric" pattern="[0-9]*" maxlength="4"
-                    autocomplete="one-time-code" wire:model='form.code' id="codeInput"
+                    autocomplete="one-time-code" autocorrect="off" autocapitalize="off" spellcheck="false"
+                    wire:model='form.code' id="codeInput"
                     class="border border-secondary-300 rounded-lg bg-primary-tint-100 text-center py-2"
                     placeholder="کد 4 رقمی" />
                 <div class="flex justify-end text-sm">
@@ -252,8 +253,9 @@
 
                     if (content && content.code) {
                         const otpInput = document.getElementById('codeInput');
-                        otpInput.value = content.code;
-                        @this.set('form.code', content.code);
+                        const code = String(content.code).padStart(4, '0');
+                        otpInput.value = code;
+                        @this.set('form.code', code);
                         @this.LoginAuthForm();
                     }
                 } catch (err) {

@@ -95,7 +95,15 @@ class Login extends Component
         } elseif ($this->step == 2) {
             $code = data_get($this->form,'code',null) ;
             if(! is_null($code)) {
-                $this->form['code'] = convert2english(trim($code)) ;
+                $code = (string) convert2english(trim((string) $code));
+
+                // Some mobile OTP/autofill implementations serialize a code such as
+                // "0123" as the number 123. Restore the fixed-width OTP before validating.
+                if (preg_match('/^\d{1,4}$/', $code)) {
+                    $code = str_pad($code, 4, '0', STR_PAD_LEFT);
+                }
+
+                $this->form['code'] = $code;
             }
             $this->validate([
                 'form.code' => 'required|string|digits:4'

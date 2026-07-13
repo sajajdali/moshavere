@@ -26,6 +26,8 @@ $setting = [
             \Modules\Setting\Enum\SettingKeyEnum::SMS_FEEDBACK,
             \Modules\Setting\Enum\SettingKeyEnum::SMS_AFTER_REFUND,
             \Modules\Setting\Enum\SettingKeyEnum::SMS_FOR_SEND_MESSAGE_IN_CHATS,
+            \Modules\Setting\Enum\SettingKeyEnum::SMS_CUSTOM_LINK_TO_USER_TEMPLATE,
+            \Modules\Setting\Enum\SettingKeyEnum::SMS_CUSTOM_LINK_2_TO_USER_TEMPLATE,
 
         ],
     ],

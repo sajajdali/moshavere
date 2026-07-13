@@ -116,7 +116,9 @@ enum SettingKeyEnum: int implements EnumHasNameInterface, SettingTypeInterface, 
     case SMS_PARSSMS_REMINDER_TEXT = 84 ;
     case SMS_PRRSSMS_MONITORING_APP = 86 ;
     case SMS_PARSSMS_MONITORING_APPROVED_APP = 87 ;
+    case SMS_CUSTOM_LINK_TO_USER_TEMPLATE = 88;
     case SMS_PARSSMS_MONITORING_DIS_APPROVED_APP = 89 ;
+    case SMS_CUSTOM_LINK_2_TO_USER_TEMPLATE = 90;
     case SMS_PRSSMS_APPOINTMENT_WAITING_PAYMENT = 91 ;
     case SMS_FARAZ_LINE_NUMBER = 92 ;
     case DONT_SEND_SMS_FOR_PAYMENT_LINK = 168 ;
@@ -256,6 +258,8 @@ enum SettingKeyEnum: int implements EnumHasNameInterface, SettingTypeInterface, 
             self::SMS_AFTER_REFUND => 'نام الگوی پیامکی، بعد از استرداد وجه',
             self::SMS_FOR_SEND_MESSAGE_IN_CHATS => 'نام الگوی پیامکی، بعد از پاسخ دادن به چت',
             self::SMS_SET_APP_MONITORING => 'در صورت فعال بودن پایش نوبت، پیامک ثبت نوبت',
+            self::SMS_CUSTOM_LINK_TO_USER_TEMPLATE => 'نام الگوی پیامک ارسال لینک سفارشی به کاربران',
+            self::SMS_CUSTOM_LINK_2_TO_USER_TEMPLATE => 'نام الگوی پیامک لینک سفارشی ۲ به کاربران',
             self::SMS_SENDER => 'پنل ارسال کننده ی پیامک',
             self::SMS_FARAZ_LINE_NUMBER => 'شماره ارسال کننده پیامک',
 
@@ -387,6 +391,8 @@ enum SettingKeyEnum: int implements EnumHasNameInterface, SettingTypeInterface, 
              <br/> ۶ = ساعت نوبت
              <br/> ۷ = لینک جزئیات
              <br/> ۸ = شماره پیگیری.',
+            self::SMS_CUSTOM_LINK_TO_USER_TEMPLATE => 'پارامتر الگو: <br /> ۱ = عنوان سایت',
+            self::SMS_CUSTOM_LINK_2_TO_USER_TEMPLATE => 'پارامتر الگو: <br /> ۱ = عنوان سایت',
             default => ''
         };
     }
@@ -502,6 +508,7 @@ enum SettingKeyEnum: int implements EnumHasNameInterface, SettingTypeInterface, 
             self::GO_TO_PAYMENT_DIRECTLY => 'تنظیمات UX',
             self::HOME_ALERT_STATUS => 'نمایش پیغام در صفحه اصلی ',
             self::HEADER1_SHOW_BUTTON1 => 'کلید های روی هدر ',
+            self::SMS_CUSTOM_LINK_TO_USER_TEMPLATE => 'Voip',
             default => '' ,
         };
     }

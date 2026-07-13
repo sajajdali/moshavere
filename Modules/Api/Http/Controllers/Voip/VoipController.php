@@ -8,6 +8,7 @@ use Hekmatinasser\Verta\Verta;
 use Modules\User\Entities\User;
 use Illuminate\Routing\Controller;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Notification;
 use Modules\Api\Trait\ApiHandlerTrait;
 use Modules\Front\app\Models\FeedBack;
 use Modules\Setting\Enum\SettingKeyEnum;
@@ -23,6 +24,7 @@ use Modules\AppointmentUser\Enum\AppointmentUserTypeEnum;
 use Modules\AppointmentUser\Enum\model\UserModelAppointment;
 use Modules\AppointmentSetting\app\Models\AppointmentSetting;
 use Modules\Api\Http\Controllers\Appointment\AppointmentApiController;
+use Modules\User\app\Notifications\CustomLinkToUserSmsNotification;
 
 class VoipController extends Controller
 {
@@ -46,7 +48,25 @@ class VoipController extends Controller
 
     public function checkDoctorAppointment(Request $request)
     {
-        $doctor = User::findOrFail($request->get('doctorId'));
+        $doctorId = $request->input('doctorId');
+
+        if (blank($doctorId) || ! ctype_digit((string) $doctorId)) {
+            return $this->ok([
+                'status' => false,
+                'message' => 'شناسه پزشک معتبر نیست',
+                'errorCode' => 1,
+            ]);
+        }
+
+        $doctor = User::find((int) $doctorId);
+
+        if (! $doctor) {
+            return $this->ok([
+                'status' => false,
+                'message' => 'پزشک یافت نشد',
+                'errorCode' => 2,
+            ]);
+        }
 
         return $this->ok([
             'status' => $doctor->appointmentSettings()->active()->exists(),
@@ -319,6 +339,92 @@ class VoipController extends Controller
         ]);
     }
 
+    public function sendCustomLink(Request $request)
+    {
+        $request->merge([
+            'phone_number' => convert2english($request->input('phone_number')),
+        ]);
+
+        $validated = $request->validate([
+            'phone_number' => [
+                'bail',
+                'required',
+                'string',
+                function (string $attribute, mixed $value, \Closure $fail) {
+                    if (! checkMobileNumber($value)) {
+                        $fail('شماره موبایل وارد شده معتبر نیست.');
+                    }
+                },
+            ],
+        ]);
+
+        $template = setting(SettingKeyEnum::SMS_CUSTOM_LINK_TO_USER_TEMPLATE);
+        if (blank($template)) {
+            return $this->requestException([
+                'status' => false,
+                'message' => 'الگوی پیامک ارسال لینک سفارشی تنظیم نشده است.',
+            ]);
+        }
+
+        $phoneNumber = $this->normalizeMobileNumber($validated['phone_number']);
+
+        Notification::route('sms', $phoneNumber)->notify(
+            new CustomLinkToUserSmsNotification(
+                receptor: $phoneNumber,
+                template: $template,
+                siteTitle: (string) setting(SettingKeyEnum::SITE_TITLE),
+            )
+        );
+
+        return $this->ok([
+            'status' => true,
+            'message' => 'پیامک لینک سفارشی در صف ارسال قرار گرفت.',
+        ]);
+    }
+
+    public function sendCustomLink2(Request $request)
+    {
+        $request->merge([
+            'phone_number' => convert2english($request->input('phone_number')),
+        ]);
+
+        $validated = $request->validate([
+            'phone_number' => [
+                'bail',
+                'required',
+                'string',
+                function (string $attribute, mixed $value, \Closure $fail) {
+                    if (! checkMobileNumber($value)) {
+                        $fail('شماره موبایل وارد شده معتبر نیست.');
+                    }
+                },
+            ],
+        ]);
+
+        $template = setting(SettingKeyEnum::SMS_CUSTOM_LINK_2_TO_USER_TEMPLATE);
+        if (blank($template)) {
+            return $this->requestException([
+                'status' => false,
+                'message' => 'الگوی پیامک لینک سفارشی ۲ تنظیم نشده است.',
+            ]);
+        }
+
+        $phoneNumber = $this->normalizeMobileNumber($validated['phone_number']);
+
+        Notification::route('sms', $phoneNumber)->notify(
+            new CustomLinkToUserSmsNotification(
+                receptor: $phoneNumber,
+                template: $template,
+                siteTitle: (string) setting(SettingKeyEnum::SITE_TITLE),
+            )
+        );
+
+        return $this->ok([
+            'status' => true,
+            'message' => 'پیامک لینک سفارشی ۲ در صف ارسال قرار گرفت.',
+        ]);
+    }
+
     public function storeSurvey(Request $request)
     {
         $request->validate([
@@ -370,6 +476,15 @@ class VoipController extends Controller
             'message' => self::ERROR_TEXT[$errorCode] ?? 'خطا',
             'errorCode' => $errorCode,
         ]);
+    }
+
+    private function normalizeMobileNumber(string $phoneNumber): string
+    {
+        $phoneNumber = ltrim($phoneNumber, '+');
+
+        return str_starts_with($phoneNumber, '98')
+            ? '0' . substr($phoneNumber, 2)
+            : $phoneNumber;
     }
 
     private function findSettingFromOldRequest(Request $request): ?AppointmentSetting

@@ -32,5 +32,9 @@ Route::prefix('VoIP')->group(function () {
     Route::get('incoming_call', [\Modules\Api\Http\Controllers\Voip\VoipController::class, 'incomingCall']);
     Route::post('payment_send_second_password', [\Modules\Api\Http\Controllers\Voip\VoipController::class, 'paymentSendSecondPassword']);
     Route::post('payment_by_voip', [\Modules\Api\Http\Controllers\Voip\VoipController::class, 'paymentByVoip']);
+    Route::post('send_custom_link', [\Modules\Api\Http\Controllers\Voip\VoipController::class, 'sendCustomLink'])
+        ->name('api.voip.send_custom_link');
+    Route::post('send_custom_link_2', [\Modules\Api\Http\Controllers\Voip\VoipController::class, 'sendCustomLink2'])
+        ->name('api.voip.send_custom_link_2');
     Route::post('store_survey', [\Modules\Api\Http\Controllers\Voip\VoipController::class, 'storeSurvey']);
 });

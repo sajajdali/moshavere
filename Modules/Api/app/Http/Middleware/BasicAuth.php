@@ -13,20 +13,27 @@ class BasicAuth
      */
     public function handle(Request $request, Closure $next)
     {
-        $AUTH_USER = setting(SettingKeyEnum::VOIP_USERNAME);
-        $AUTH_PASS = setting(SettingKeyEnum::VOIP_PASSWORD);
-        header('Cache-Control: no-cache, must-revalidate, max-age=0');
-        $has_supplied_credentials = !(empty($_SERVER['PHP_AUTH_USER']) && empty($_SERVER['PHP_AUTH_PW']));
-        $is_not_authenticated = (
-            !$has_supplied_credentials ||
-            $_SERVER['PHP_AUTH_USER'] != $AUTH_USER ||
-            $_SERVER['PHP_AUTH_PW']   != $AUTH_PASS
-        );
-        if ($is_not_authenticated) {
-            header('HTTP/1.1 401 Authorization Required');
-            header('WWW-Authenticate: Basic realm="Access denied"');
-            exit;
+        $authUser = (string) setting(SettingKeyEnum::VOIP_USERNAME);
+        $authPassword = (string) setting(SettingKeyEnum::VOIP_PASSWORD);
+        $suppliedUser = (string) $request->getUser();
+        $suppliedPassword = (string) $request->getPassword();
+
+        if (
+            $suppliedUser === '' ||
+            $suppliedPassword === '' ||
+            ! hash_equals($authUser, $suppliedUser) ||
+            ! hash_equals($authPassword, $suppliedPassword)
+        ) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Unauthorized',
+                'errorCode' => 401,
+            ], 401, [
+                'Cache-Control' => 'no-cache, must-revalidate, max-age=0',
+                'WWW-Authenticate' => 'Basic realm="Access denied"',
+            ]);
         }
+
         return $next($request);
     }
 }

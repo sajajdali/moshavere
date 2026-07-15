@@ -28,12 +28,12 @@ class UserDatabaseSeeder extends Seeder
 
         $user->metas()->updateOrCreate(
             ['meta_key' => UserMetaEnum::FIRST_NAME],
-            ['meta_value' => 'مدیر']
+            ['meta_value' => 'پشتیبانی']
         );
 
         $user->metas()->updateOrCreate(
             ['meta_key' => UserMetaEnum::LAST_NAME],
-            ['meta_value' => 'کل']
+            ['meta_value' => 'نوبت دهی']
         );
 
         // Create roles

@@ -112,6 +112,7 @@ $setting = [
         'title' => 'نوبت دهی',
         'icon' => 'fa fa-fire',
         'settings' => [
+            \Modules\Setting\Enum\SettingKeyEnum::DISABLE_ONLINE_APPOINTMENT,
             \Modules\Setting\Enum\SettingKeyEnum::APPOINTMENT_STATUS,
             \Modules\Setting\Enum\SettingKeyEnum::APPOINTMENT_FOR_OTHERS_STATUS,
             \Modules\Setting\Enum\SettingKeyEnum::APPOINTMENT_MORE_THAT_ONE_PER_DAY,

@@ -2,6 +2,7 @@
 
 namespace Modules\Front\Traits;
 
+use App\Enum\ActiveEnum;
 use Illuminate\Support\Arr;
 use Modules\User\Entities\User;
 use Modules\Place\app\Models\Place;
@@ -82,7 +83,8 @@ trait SearchPage
 
                 $service = Service::find($this->fetchData['service_id']);
                 if (isset($service)) {
-                    $result['doctors'] =  $service->user;
+                    $this->fetchData['settApp']['service'] = $service->id;
+                    $result['doctors'] = $this->doctorsAvailableForService($service);
                     $this->fetchData['set_appointment_message'] = 'لطفا یکی از پزشکان مربوط به این بخش را انتخاب کنید!';
                 } else {
                     $this->fetchData['set_appointment_message'] = 'بخش مورد نظر یافت نشد!';
@@ -218,11 +220,26 @@ trait SearchPage
         if (!empty($service)) {
             $this->fetchData['settApp']['service'] = $service->id;
             $this->fetchData['set_appointment_message'] = 'لطفا پزشک مورد نظر را انتخاب کنید';
-            $result['doctors'] = $service->user;
+            $result['doctors'] = $this->doctorsAvailableForService($service);
             $this->query = null;
             $this->searchIn($result);
         }
     }
+
+    private function doctorsAvailableForService(Service $service): Collection
+    {
+        return $service->user()
+            ->whereNotExists(function ($query) use ($service) {
+                $query->selectRaw('1')
+                    ->from('appointment_settings')
+                    ->whereColumn('appointment_settings.user_id', 'users.id')
+                    ->where('appointment_settings.service_id', $service->id)
+                    ->where('appointment_settings.active', ActiveEnum::DEACTIVE->value)
+                    ->whereNull('appointment_settings.deleted_at');
+            })
+            ->get();
+    }
+
     public function placeSelected($place_id)
     {
         $place = Place::find($place_id);
@@ -239,13 +256,20 @@ trait SearchPage
     {
         $doc = User::find($doctor_id);
         if (isset($doc)) {
+            $selectedServiceId = data_get($this->fetchData, 'settApp.service')
+                ?? data_get($this->fetchData, 'service_id');
+
+            if ($selectedServiceId && isset($doc->active_appointment) && (int) $doc->active_appointment !== 1) {
+                return;
+            }
+
             $param['doctor_id'] = $doc->id;
             $param['doctor_name'] = str_replace(' ', '_', $doc->full_name);
             if (isset($this->fetchData['settApp']['place'])) {
                 $param['place_id'] = $this->fetchData['settApp']['place'];
             }
-            if (isset($this->fetchData['settApp']['service'])) {
-                $param['service_id'] = $this->fetchData['settApp']['service'];
+            if ($selectedServiceId) {
+                $param['service_id'] = $selectedServiceId;
             }
             return redirect()->route('front.doctor.profile', $param);
         }

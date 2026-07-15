@@ -75,6 +75,7 @@ enum SettingKeyEnum: int implements EnumHasNameInterface, SettingTypeInterface, 
     case HEADER1_TITLE_NOT_SHOW_DESKTOP = 437 ;
     case HEADER1_TITLE_NOT_SHOW_MOBILE = 438 ;
     case HEADER2_MOBILE_BACKGROUND_IMAGE = 439 ;
+    case DISABLE_ONLINE_APPOINTMENT = 440;
     // ABOUT US PAGE
     case ABOUT_US_FIRST_SECTION_TITLE = 23;
     case ABOUT_US_FIRST_SECTION_DESCRIPTION = 24;
@@ -229,6 +230,7 @@ enum SettingKeyEnum: int implements EnumHasNameInterface, SettingTypeInterface, 
             self::HEADER1_TITLE_NOT_SHOW_DESKTOP => 'عدم نمایش عنوان هدر در دستگاه های دکستاپ',
             self::HEADER1_TITLE_NOT_SHOW_MOBILE => ' عدم نمایش عنوان هدر در دستگاه های موبایل',
             self::HEADER2_MOBILE_BACKGROUND_IMAGE => 'عکس پس زمینه موبایل',
+            self::DISABLE_ONLINE_APPOINTMENT => 'غیر فعال سازی نوبت آنلاین',
 
 
             self::FOOTER_SAMANDEHI => 'نماد سامان دهی (لینک کامل درج شود)',
@@ -432,7 +434,7 @@ enum SettingKeyEnum: int implements EnumHasNameInterface, SettingTypeInterface, 
             self::HEADER1_TITLE_COLOR     => SettingTypeEnum::SELECT,
             self::SMS_SENDER => SettingTypeEnum::SELECT,
             self::PAYMEN_ACTIVE_DRIVER => SettingTypeEnum::SELECT,
-            self::APPOINTMENT_MORE_THAT_ONE_PER_DAY , self::HEADER1_SHOW_BUTTONS , self::HEADER1_SHOW_BUTTON1, self::HEADER1_SHOW_BUTTON2 , self::ENABLE_DOCTORS_MENU , self::ENABLE_CONTACT_US_MENU => SettingTypeEnum::CHECK,
+            self::APPOINTMENT_MORE_THAT_ONE_PER_DAY , self::HEADER1_SHOW_BUTTONS , self::HEADER1_SHOW_BUTTON1, self::HEADER1_SHOW_BUTTON2 , self::ENABLE_DOCTORS_MENU , self::ENABLE_CONTACT_US_MENU, self::DISABLE_ONLINE_APPOINTMENT => SettingTypeEnum::CHECK,
             self::HOME_ALERT_STATUS => SettingTypeEnum::CHECK,
             self::APPOINTMENT_SHOW_FALSE_STATUS_DAYS => SettingTypeEnum::CHECK,
             self::APPOINTMENT_DETAIL_PAYMENT_DESCRIPTION_STATUS => SettingTypeEnum::CHECK,

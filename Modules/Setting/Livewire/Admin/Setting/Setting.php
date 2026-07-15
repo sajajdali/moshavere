@@ -8,6 +8,7 @@ use Livewire\Attributes\Title;
 use Livewire\Attributes\Url;
 use Livewire\Component;
 use Livewire\WithFileUploads;
+use Modules\Setting\Enum\SettingKeyEnum;
 
 #[title('تنظیمات سایت')]
 class Setting extends Component
@@ -38,8 +39,8 @@ class Setting extends Component
         $this->section = $menuId;
         foreach ($setting as $key => $menu) {
             if ($key === $this->section) {
-                $this->options = $menu['settings'];
-                foreach ($menu['settings'] as $tmpSet) {
+                $this->options = $this->visibleSettings($menu['settings']);
+                foreach ($this->options as $tmpSet) {
                     $this->settingValues[$tmpSet->value] = \Modules\Setting\Entities\Setting::getOriginalVal($tmpSet->value);
                 }
             }
@@ -49,6 +50,10 @@ class Setting extends Component
     public function storeSetting()
     {
         foreach ($this->settingValues as $key => $value) {
+            if ((int) $key === SettingKeyEnum::DISABLE_ONLINE_APPOINTMENT->value && auth()->id() !== 1) {
+                continue;
+            }
+
             \Modules\Setting\Entities\Setting::setVal((int) $key, $value);
         }
         \Modules\Setting\Entities\Setting::reBuild();
@@ -75,9 +80,18 @@ class Setting extends Component
         $setting = \Modules\Setting\Entities\Setting::getSettingSections();
         foreach ($setting as $key => $menu) {
             if ($key === $this->section) {
-                $this->options = $menu['settings'];
+                $this->options = $this->visibleSettings($menu['settings']);
             }
         }
         return view('setting::livewire.admin.setting.setting');
+    }
+
+    private function visibleSettings(array $settings): array
+    {
+        return array_values(array_filter(
+            $settings,
+            fn (SettingKeyEnum $setting): bool => $setting !== SettingKeyEnum::DISABLE_ONLINE_APPOINTMENT
+                || auth()->id() === 1,
+        ));
     }
 }

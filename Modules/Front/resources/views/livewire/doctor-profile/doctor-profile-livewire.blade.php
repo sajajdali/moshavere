@@ -500,12 +500,6 @@
                     timer: 2000
                 });
             });
-            let placeName = @json(isset($form['place_name']));
-            let service = @json(isset($form['service']));
-
-            if (placeName || service) {
-                $('.appointment__modal').addClass('opened');
-            }
         });
     </script>
 @endpush

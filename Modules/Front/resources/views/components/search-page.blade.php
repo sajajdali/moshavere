@@ -192,6 +192,13 @@
                         @endif
                         @if ($forPart == 'doctors' && !empty($collection))
                             @foreach ($collection as $docIndex => $doctor)
+                                @php
+                                    $serviceIsSelected = data_get($fetchData, 'settApp.service')
+                                        ?? data_get($fetchData, 'service_id');
+                                    $doctorIsUnavailable = $serviceIsSelected
+                                        && isset($doctor->active_appointment)
+                                        && (int) $doctor->active_appointment !== 1;
+                                @endphp
                                 <div class="bg-white flex flex-col gap-5 rounded-lg p-4">
                                     <div class="flex flex-col sm:flex-row items-center justify-between gap-4">
                                         <div
@@ -207,6 +214,11 @@
                                                 </p>
                                             </div>
                                             <div class="flex flex-col items-end gap-4">
+                                                @if ($doctorIsUnavailable)
+                                                    <span class="rounded-full border border-red bg-red/10 px-4 py-2 text-sm font-semibold text-red">
+                                                        نوبت‌دهی این پزشک در حال حاضر غیرفعال است
+                                                    </span>
+                                                @endif
                                                 {{-- <div
                                                     class="flex items-center gap-3 bg-green/10 text-green rounded-full py-2 px-5">
                                                     <svg class="w-5 h-5" xmlns="http://www.w3.org/2000/svg">
@@ -220,14 +232,21 @@
                                         </div>
                                     </div>
                                     <div class="flex justify-end">
-                                        <a href="#" wire:click='getApp("{{ $doctor->id }}")'
-                                            class="btn__blue--round-full-between">
-                                            <span class="font-semibold">دریافت نوبت {{$doctor->speciality_type == 1 ? 'دکتر' : ''}}
-                                                {{ $doctor->full_name }}</span>
-                                            <svg class="w-6 h-6" xmlns="http://www.w3.org/2000/svg">
-                                                <use xlink:href="#sprite-chevron-left-circle" />
-                                            </svg>
-                                        </a>
+                                        @if ($doctorIsUnavailable)
+                                            <button type="button" disabled
+                                                class="cursor-not-allowed rounded-full bg-secondary-200 px-5 py-3 font-semibold text-secondary-400 opacity-70">
+                                                این پزشک در حال حاضر قابل انتخاب نیست
+                                            </button>
+                                        @else
+                                            <a href="#" wire:click='getApp("{{ $doctor->id }}")'
+                                                class="btn__blue--round-full-between">
+                                                <span class="font-semibold">دریافت نوبت {{$doctor->speciality_type == 1 ? 'دکتر' : ''}}
+                                                    {{ $doctor->full_name }}</span>
+                                                <svg class="w-6 h-6" xmlns="http://www.w3.org/2000/svg">
+                                                    <use xlink:href="#sprite-chevron-left-circle" />
+                                                </svg>
+                                            </a>
+                                        @endif
                                     </div>
                                 </div>
                             @endforeach

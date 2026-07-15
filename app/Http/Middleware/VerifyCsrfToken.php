@@ -14,5 +14,7 @@ class VerifyCsrfToken extends Middleware
     protected $except = [
         'appointment/detail/*',
         'admin/tenant/renew/callback',
+        'api/v1/VoIP/send_custom_link',
+        'api/v1/VoIP/send_custom_link_2',
     ];
 }

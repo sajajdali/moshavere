@@ -11,7 +11,6 @@ use Modules\Place\app\Models\Place;
 use Artesaos\SEOTools\Facades\JsonLd;
 use Modules\Front\app\Models\Comment;
 use Artesaos\SEOTools\Facades\SEOTools;
-use Modules\Service\app\Models\Service;
 use Modules\Setting\Enum\SettingKeyEnum;
 use Modules\Front\enum\CommentStatusEnum;
 use Modules\AppointmentSetting\app\Models\AppointmentSetting;
@@ -33,37 +32,50 @@ class DoctorProfileLivewire extends Component
     public function reserveAppointment($type = 'IN_PERSON')
     {
         $this->appointmentType = $type;
-        $place   =  data_get($this->form, 'place', null);
         $service =  data_get($this->form, 'service', null);
-        $activePlaceCount = $this->doc->activePlaces()->count();
+        $availablePlaces = $this->availablePlaces($service);
+        $activePlaceCount = $availablePlaces->count();
+        $availableServices = $this->availableServices();
         // check if doctor was not banned
         if ($this->isDocAvailable()) {
             // check for palce count
             if ($activePlaceCount > 1) {
-                // check if place has selected in route
-                if ($place) {
-                    $this->fetchData['places'] = $this->doc->activePlaces();
-                    $this->fetchData['modalStep'] = 1;
-                    if (isset($this->fetchData['services'])) {
-                        unset($this->fetchData['services']);
-                    }
-                    if (isset($this->fetchData['place'])) {
-                        unset($this->fetchData['place']);
-                    }
+                $this->fetchData['places'] = $availablePlaces;
+                $this->fetchData['modalStep'] = 1;
+                if (isset($this->fetchData['services'])) {
+                    unset($this->fetchData['services']);
                 }
+                if (isset($this->fetchData['place'])) {
+                    unset($this->fetchData['place']);
+                }
+
                 return  $this->lunchModal();
             } elseif ($activePlaceCount <= 1) {
                 // if ONE place exist
-                $place = $this->doc->activePlaces()->first();
-                $this->form['place_name'] = $place->title;
-                $this->form['place'] = $place->id;
-                // check for service count
-                if ($this->doc->activeServices()->count() <= 1) {
-                    $this->form['service'] = $this->doc->activeServices()->first()->id;
-                    $this->checkForOperator();
+                $place = $availablePlaces->first();
+                if (! $place) {
                     return;
                 }
-                $this->fetchData['services'] = $this->doc->activeServices();
+                $this->form['place_name'] = $place->title;
+                $this->form['place'] = $place->id;
+
+                if (! is_null($service)) {
+                    $this->fetchData['modalStep'] = 2;
+                    $nextStep = $this->serviceHasSelected();
+
+                    if (isset($this->fetchData['segments']) && $this->fetchData['segments']->isNotEmpty()) {
+                        return $this->lunchModal();
+                    }
+
+                    return $nextStep;
+                }
+
+                // check for service count
+                if ($availableServices->count() === 1) {
+                    $this->form['service'] = $availableServices->first()->id;
+                    return $this->checkForOperator();
+                }
+                $this->fetchData['services'] = $availableServices;
                 $this->fetchData['modalStep'] = 2;
                 return $this->lunchModal();
             }
@@ -103,14 +115,14 @@ class DoctorProfileLivewire extends Component
     {
         if (isset($place)) {
             $this->form['place_name']    = Place::find($place)?->title ?? '';
-            $this->fetchData['services'] = $this->doc->activeServices();
+            $this->fetchData['services'] = $this->availableServices();
             if (! is_null($service)) {
                 // user selected service on privous page
-                $this->serviceHasSelected();
+                $this->fetchData['modalStep'] = 2;
+                return $this->serviceHasSelected();
             } else {
-                $place = $this->doc->activePlaces()->first()->id;
-                if ($this->doc->activeServices()->count() <= 1) {
-                    $this->checkForOperator();
+                if ($this->fetchData['services']->count() === 1) {
+                    return $this->checkForOperator();
                 }
             }
             $this->fetchData['modalStep']++;
@@ -180,13 +192,12 @@ class DoctorProfileLivewire extends Component
             $operator = $this->fetchData['operators'] = AppointmentSetting::findOperators($app_setting);
             if (count($this->fetchData['operators']) > 1) {
                 $this->fetchData['modalStep'] = 3;
-                $this->lunchModal();
-                return;
+                return $this->lunchModal();
             }
             $operator = $operator->first();
         }
         $segments =  data_get($this->form, 'selectedSegmentForRoute');
-        $this->redirectToAppointmentDays(
+        return $this->redirectToAppointmentDays(
             $this->doc->id,
             $this->form['place'],
             $this->form['service'],
@@ -209,7 +220,7 @@ class DoctorProfileLivewire extends Component
                 }
                 $this->fetchData['segments'] = $segment->items()->where('display_on_site', true)->orderBy('priority')->get();
             } else {
-                $this->checkForOperator();
+                return $this->checkForOperator();
             }
         }
     }
@@ -221,7 +232,7 @@ class DoctorProfileLivewire extends Component
         if (isset($this->fetchData['place'])) {
             unset($this->fetchData['place']);
         }
-        $this->fetchData['places'] = $this->doc->activePlaces();
+        $this->fetchData['places'] = $this->availablePlaces(data_get($this->form, 'service'));
         $this->fetchData['modalStep'] = 1;
     }
     // check is user redirect to this page with service_id and place_id
@@ -233,27 +244,28 @@ class DoctorProfileLivewire extends Component
         }
         if (request()->has('service_id')) {
             $santetizeService = htmlspecialchars(request()->input('service_id'), ENT_QUOTES, 'UTF-8');
-            $this->form['service'] =  Service::where('active', ActiveEnum::ACTIVE)->firstWhere('id', $santetizeService)?->id ?? null;
+            $this->form['service'] = $this->availableServices()->firstWhere('id', $santetizeService)?->id;
         }
         if (request()->has('place_id')) {
             $santetizeService = htmlspecialchars(request()->input('place_id'), ENT_QUOTES, 'UTF-8');
-            $place = Place::where('active', ActiveEnum::ACTIVE)->where('id', $santetizeService)->first() ?? null;
+            $place = $this->availablePlaces(data_get($this->form, 'service'))
+                ->firstWhere('id', $santetizeService);
             if (isset($place) && !empty($place)) {
                 $this->form['place'] = $place->id;
                 $this->form['place_id'] = $place->id;
                 $this->form['place_name'] = $place->title;
-                $this->fetchData['services'] = $this->doc->activeServices();
+                $this->fetchData['services'] = $this->availableServices();
                 $this->fetchData['modalStep'] = 2;
             }
         }
         // service has selected
         if (isset($this->form['service']) && !isset($this->form['place_id'])) {
             $this->fetchData['modalStep'] = 1;
-            $this->fetchData['places'] = $this->doc->activePlaces();
+            $this->fetchData['places'] = $this->availablePlaces($this->form['service']);
         }
         if (isset($this->form['service']) && isset($this->form['place_id'])) {
-            $this->serviceHasSelected();
             $this->fetchData['modalStep'] = 2;
+            $this->serviceHasSelected();
         }
     }
     public function addComment()
@@ -366,11 +378,43 @@ class DoctorProfileLivewire extends Component
         // check if doctor active and has setting
         $status =  $this->doc->isDoctorActive();
         $hasSetting = AppointmentSetting::activeSetting()->where('user_id', $this->doc->id)->exists();
-        if ($status && $hasSetting) {
+        if ($status && $hasSetting && $this->availableServices()->isNotEmpty()) {
             return true;
         }
         return false;
     }
+
+    private function availableServices()
+    {
+        return $this->doc->services()
+            ->where('services.active', ActiveEnum::ACTIVE->value)
+            ->whereNotExists(function ($query) {
+                $query->selectRaw('1')
+                    ->from('appointment_settings')
+                    ->where('appointment_settings.user_id', $this->doc->id)
+                    ->whereColumn('appointment_settings.service_id', 'services.id')
+                    ->where('appointment_settings.active', ActiveEnum::DEACTIVE->value)
+                    ->whereNull('appointment_settings.deleted_at');
+            })
+            ->get();
+    }
+
+    private function availablePlaces($serviceId = null)
+    {
+        $places = $this->doc->places()
+            ->where('places.active', ActiveEnum::ACTIVE->value);
+
+        if ($serviceId && Place::whereHas('service', function ($query) use ($serviceId) {
+            $query->where('services.id', $serviceId);
+        })->exists()) {
+            $places->whereHas('service', function ($query) use ($serviceId) {
+                $query->where('services.id', $serviceId);
+            });
+        }
+
+        return $places->get();
+    }
+
     public function editservice()
     {
         unset($this->fetchData['segments']);

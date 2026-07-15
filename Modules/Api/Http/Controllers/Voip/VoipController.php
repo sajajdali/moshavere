@@ -139,6 +139,10 @@ class VoipController extends Controller
             ]);
         }
 
+        if (! $this->isVoipVisitActive($appointmentSetting)) {
+            return $this->ok([]);
+        }
+
         $listDays = $this->appointmentList($appointmentSetting);
 
         return $this->ok($this->oldTimesPayload($listDays, $request->get('timeFilter')));
@@ -527,6 +531,14 @@ class VoipController extends Controller
         });
     }
 
+    private function isVoipVisitActive(AppointmentSetting $appointmentSetting): bool
+    {
+        return filter_var(
+            data_get($appointmentSetting->detail, AppointmentSetting::VISIT_TYPE_VOIP, false),
+            FILTER_VALIDATE_BOOLEAN
+        );
+    }
+
     private function oldTimesPayload(array $data, ?string $timeFilter): array
     {
         $result = [];
@@ -665,6 +677,14 @@ class VoipController extends Controller
             return $this->requestException([
                 'status' => false,
                 'message' => 'هیچ اطلاعاتی یاف تشد'
+            ]);
+        }
+
+        if (! $this->isVoipVisitActive($appointmentSetting)) {
+            return $this->ok([
+                'doctor_selected' => $findAlterNateDoctor->id,
+                'appointment_setting_id' => $appointmentSetting->id,
+                'empty_times' => [],
             ]);
         }
 

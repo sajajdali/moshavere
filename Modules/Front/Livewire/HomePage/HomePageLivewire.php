@@ -125,6 +125,10 @@ class HomePageLivewire extends Component
             return redirect()->route('front.login.doctor');
         }
 
+        if (filter_var(setting(SettingKeyEnum::DISABLE_ONLINE_APPOINTMENT), FILTER_VALIDATE_BOOL)) {
+            return;
+        }
+
         $this->fetchData['service'] = Service::show()->mostViewedService();
 
         // Fetch doctors with dr_info_status set to true and order them by dr_info_order
@@ -145,6 +149,10 @@ class HomePageLivewire extends Component
     }
     public function render()
     {
+        if (filter_var(setting(SettingKeyEnum::DISABLE_ONLINE_APPOINTMENT), FILTER_VALIDATE_BOOL)) {
+            return view('front::livewire.home-page.voip-home-page-livewire');
+        }
+
         return view('front::livewire.home-page.home-page-livewire');
     }
 }

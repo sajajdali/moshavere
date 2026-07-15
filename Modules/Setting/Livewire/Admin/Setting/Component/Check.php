@@ -22,6 +22,10 @@ class Check extends Component
 
     public function Checkboxvalue()
     {
+        if ($this->meta === SettingKeyEnum::DISABLE_ONLINE_APPOINTMENT && auth()->id() !== 1) {
+            return;
+        }
+
         $this->dispatch('settingUpdateListener', settingKey: $this->meta->value, value: $this->checkboxvalue);
     }
 

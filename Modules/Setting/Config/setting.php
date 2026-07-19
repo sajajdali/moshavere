@@ -1,6 +1,14 @@
 <?php
 
 $setting = [
+    'appointment_management' => [
+        'title' => 'مدیریت نوبت دهی',
+        'icon' => 'fa fa-calendar-check-o',
+        'auth_user_id' => 1,
+        'settings' => [
+            \Modules\Setting\Enum\SettingKeyEnum::DISABLE_UI_FOR_VOIP_ONLY_APPOINTMENT,
+        ],
+    ],
     'sms' => [
         'title' => 'پیامک',
         'icon' => 'fa fa-mobile',
@@ -112,8 +120,8 @@ $setting = [
         'title' => 'نوبت دهی',
         'icon' => 'fa fa-fire',
         'settings' => [
-            \Modules\Setting\Enum\SettingKeyEnum::DISABLE_ONLINE_APPOINTMENT,
             \Modules\Setting\Enum\SettingKeyEnum::APPOINTMENT_STATUS,
+            \Modules\Setting\Enum\SettingKeyEnum::DISABLE_ONLINE_APPOINTMENT,
             \Modules\Setting\Enum\SettingKeyEnum::APPOINTMENT_FOR_OTHERS_STATUS,
             \Modules\Setting\Enum\SettingKeyEnum::APPOINTMENT_MORE_THAT_ONE_PER_DAY,
             \Modules\Setting\Enum\SettingKeyEnum::SHOW_FALSE_APPOINTMENT_STATUS,

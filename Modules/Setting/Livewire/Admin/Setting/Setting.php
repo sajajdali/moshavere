@@ -20,7 +20,7 @@ class Setting extends Component
 
     public ?array $menuSections = null;
 
-    public array $settingValues;
+    public array $settingValues = [];
 
 
     #[On('settingUpdateListener')]
@@ -38,7 +38,7 @@ class Setting extends Component
         $this->settingValues = [];
         $this->section = $menuId;
         foreach ($setting as $key => $menu) {
-            if ($key === $this->section) {
+            if ($key === $this->section && $this->sectionIsVisible($menu)) {
                 $this->options = $this->visibleSettings($menu['settings']);
                 foreach ($this->options as $tmpSet) {
                     $this->settingValues[$tmpSet->value] = \Modules\Setting\Entities\Setting::getOriginalVal($tmpSet->value);
@@ -50,7 +50,7 @@ class Setting extends Component
     public function storeSetting()
     {
         foreach ($this->settingValues as $key => $value) {
-            if ((int) $key === SettingKeyEnum::DISABLE_ONLINE_APPOINTMENT->value && auth()->id() !== 1) {
+            if ($this->isRestrictedSetting((int) $key) && auth()->id() !== 1) {
                 continue;
             }
 
@@ -66,6 +66,10 @@ class Setting extends Component
         $setting = \Modules\Setting\Entities\Setting::getSettingSections();
         $this->menuSections = [];
         foreach ($setting as $key => $menu) {
+            if (! $this->sectionIsVisible($menu)) {
+                continue;
+            }
+
             $this->menuSections[] = [
                 'id' => $key,
                 'title' => $menu['title'],
@@ -78,8 +82,9 @@ class Setting extends Component
     public function render()
     {
         $setting = \Modules\Setting\Entities\Setting::getSettingSections();
+        $this->options = [];
         foreach ($setting as $key => $menu) {
-            if ($key === $this->section) {
+            if ($key === $this->section && $this->sectionIsVisible($menu)) {
                 $this->options = $this->visibleSettings($menu['settings']);
             }
         }
@@ -90,8 +95,22 @@ class Setting extends Component
     {
         return array_values(array_filter(
             $settings,
-            fn (SettingKeyEnum $setting): bool => $setting !== SettingKeyEnum::DISABLE_ONLINE_APPOINTMENT
+            fn (SettingKeyEnum $setting): bool => ! $this->isRestrictedSetting($setting->value)
                 || auth()->id() === 1,
         ));
+    }
+
+    private function sectionIsVisible(array $section): bool
+    {
+        return ! isset($section['auth_user_id'])
+            || auth()->id() === (int) $section['auth_user_id'];
+    }
+
+    private function isRestrictedSetting(int $settingKey): bool
+    {
+        return in_array($settingKey, [
+            SettingKeyEnum::DISABLE_ONLINE_APPOINTMENT->value,
+            SettingKeyEnum::DISABLE_UI_FOR_VOIP_ONLY_APPOINTMENT->value,
+        ], true);
     }
 }

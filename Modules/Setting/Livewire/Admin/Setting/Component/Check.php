@@ -22,7 +22,10 @@ class Check extends Component
 
     public function Checkboxvalue()
     {
-        if ($this->meta === SettingKeyEnum::DISABLE_ONLINE_APPOINTMENT && auth()->id() !== 1) {
+        if (in_array($this->meta, [
+            SettingKeyEnum::DISABLE_ONLINE_APPOINTMENT,
+            SettingKeyEnum::DISABLE_UI_FOR_VOIP_ONLY_APPOINTMENT,
+        ], true) && auth()->id() !== 1) {
             return;
         }
 

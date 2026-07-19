@@ -4,6 +4,7 @@ namespace Modules\Front\app\Providers;
 
 use Illuminate\Support\Facades\Route;
 use Illuminate\Foundation\Support\Providers\RouteServiceProvider as ServiceProvider;
+use Modules\Front\app\Http\Middleware\RedirectToLoginForVoipOnlyAppointments;
 use Stancl\Tenancy\Middleware\InitializeTenancyByDomain;
 use Stancl\Tenancy\Middleware\PreventAccessFromCentralDomains;
 
@@ -62,6 +63,7 @@ class RouteServiceProvider extends ServiceProvider
             'web',
             InitializeTenancyByDomain::class,
             PreventAccessFromCentralDomains::class,
+            RedirectToLoginForVoipOnlyAppointments::class,
         ])
             ->group(file_exists($tenantRoutePath) ? $tenantRoutePath : $defaultRoutes);
     }

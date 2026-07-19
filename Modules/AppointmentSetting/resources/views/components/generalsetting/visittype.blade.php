@@ -10,7 +10,7 @@
     {{-- section --}}
     <hr style="opacity: 0.5">
     <div class="row">
-        @if ($errors->has('form.visitType.inPerson') || $errors->has('form.visitType.online'))
+        @if ($errors->has('form.visitType.inPerson') || $errors->has('form.visitType.online') || $errors->has('form.visitType.voip'))
             <div class="alert alert-danger" role="alert">
                 <p class="text-danger"><strong>خطا!!</strong> لطفا نوع ویزیت را تعیین کنید</p>
             </div>

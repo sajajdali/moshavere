@@ -109,7 +109,7 @@
             aria-labelledby="schedule-settings-tab" wire:ignore.self>
 
     {{-- visit Type Conditions  --}}
-    <div class="card shadow-sm custom-card-Setting @if ($errors->has('form.visitType.inPerson') || $errors->has('form.visitType.online')) border border-danger @endif">
+    <div class="card shadow-sm custom-card-Setting @if ($errors->has('form.visitType.inPerson') || $errors->has('form.visitType.online') || $errors->has('form.visitType.voip')) border border-danger @endif">
         @include('appointmentsetting::components.generalsetting.visittype')
     </div>
     {{-- End visit Type Conditions  --}}

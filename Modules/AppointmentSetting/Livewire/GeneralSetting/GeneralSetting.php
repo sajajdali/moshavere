@@ -212,8 +212,9 @@ class GeneralSetting extends Component
         }
         $rules  = [
             'form.timeFrame'                      => 'required',
-            'form.visitType.inPerson'             => 'required_without_all:form.visitType.online',
-            'form.visitType.online'               => 'required_without_all:form.visitType.inPerson',
+            'form.visitType.inPerson'             => 'required_without_all:form.visitType.online,form.visitType.voip',
+            'form.visitType.online'               => 'required_without_all:form.visitType.inPerson,form.visitType.voip',
+            'form.visitType.voip'                 => 'required_without_all:form.visitType.inPerson,form.visitType.online',
             'form.visitTime'                      => 'required',
             'form.minDayAvaialbe'                 => 'required|integer',
             'form.maxDayAvaialbe'                 => 'required|integer',

@@ -21,6 +21,7 @@ if (! function_exists('front_setting_array')) {
             \Modules\Setting\Enum\SettingKeyEnum::SHOW_FLOATING_SOCIAL_ICONS,
             \Modules\Setting\Enum\SettingKeyEnum::INSTAGRAM_ADDRESS,
             \Modules\Setting\Enum\SettingKeyEnum::WHATSAPP_ADDRESS,
+            \Modules\Setting\Enum\SettingKeyEnum::DISABLE_UI_FOR_VOIP_ONLY_APPOINTMENT,
             \Modules\Setting\Enum\SettingKeyEnum::DISABLE_FOOTER_DISPLAY,
             \Modules\Setting\Enum\SettingKeyEnum::FOOTER_DESCRIPTION,
             \Modules\Setting\Enum\SettingKeyEnum::TELEGRAM_ADDRESS,

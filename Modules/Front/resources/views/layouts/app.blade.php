@@ -72,13 +72,24 @@
 </head>
 
 <body class="rtl app sidebar-mini">
+    @php
+        $voipOnly = filter_var(
+            settingVfc(
+                $settingValues,
+                \Modules\Setting\Enum\SettingKeyEnum::DISABLE_UI_FOR_VOIP_ONLY_APPOINTMENT,
+            ),
+            FILTER_VALIDATE_BOOL,
+        );
+    @endphp
     <!-- Google Tag Manager (noscript) -->
     <noscript>
         <iframe src="https://www.googletagmanager.com/ns.html?id=GTM-PGHHCTPG" height="0" width="0"
             style="display:none;visibility:hidden"></iframe>
     </noscript>
     <!-- End Google Tag Manager (noscript) -->
-    @include('front::layouts.components.app-header', ['settingValues' => $settingValues])
+    @unless ($voipOnly)
+        @include('front::layouts.components.app-header', ['settingValues' => $settingValues])
+    @endunless
     <!-- Icons Fixed on Left Side -->
     @if (!disableUi())
         @if (settingVfc($settingValues, \Modules\Setting\Enum\SettingKeyEnum::SHOW_FLOATING_SOCIAL_ICONS))
@@ -126,7 +137,7 @@
     </div>
     <!-- page -->
 
-    @if (!settingVfc($settingValues, \Modules\Setting\Enum\SettingKeyEnum::DISABLE_FOOTER_DISPLAY))
+    @if (!$voipOnly && !settingVfc($settingValues, \Modules\Setting\Enum\SettingKeyEnum::DISABLE_FOOTER_DISPLAY))
         @include('front::layouts.components.footer', ['settingValues' => $settingValues])
     @endif
     @include('front::layouts.components.scripts')

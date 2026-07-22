@@ -10,6 +10,7 @@ trait AppointmentSettingDetailKeyTrait
     const VISIT_TYPE_VOIP = 'visit_type_voip';
     const VISIT_TYPE_ONLINE = 'visit_type_online';
     const MAX_AVAILABLE_APPOINTMENT_EACH_DAY = 'maxAvailabeAppointment-eachDay';
+    const MAX_EMPTY_APPOINTMENTS_SHOWN_PER_DAY = 'maxEmptyAppointmentsShownPerDay';
     const MAX_AVAILABLE_APPOINTMENT_TOTALL = 'maxAvailabeAppointment-totall';
     const MAX_AVAILABLE_APPOINTMENT_FOR_SECRETERY = 'maxAvailabeAppointmentForSecretery';
     const PAYMENT = 'payment';

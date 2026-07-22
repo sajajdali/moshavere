@@ -42,6 +42,10 @@ class GeneralSetting extends Component
         'specialDaydateValues',
         'specialDaytimeValues',
         'monitoring',
+        'emptyAppointmentDisplayLimit' => [
+            'status' => false,
+            'count' => null,
+        ],
         'accessibility' => [
             'dont_show_times' => [
                 'status' => false,
@@ -230,6 +234,7 @@ class GeneralSetting extends Component
             'form.payment.voip.price'             => 'required_if:form.payment.voip.status,true',
             'form.operators.ids'                  => 'required_if:form.operators.status,true',
             'form.openTime.time'                  => 'required_if:form.openTime.status,true',
+            'form.emptyAppointmentDisplayLimit.count' => 'required_if:form.emptyAppointmentDisplayLimit.status,true|integer|min:1',
         ];
         if (isset($this->form['maxAvailabeAppointment']['status']) && $this->form['maxAvailabeAppointment']['status'] == true) {
             if (isset($this->form['visitType']['online']) && $this->form['visitType']['online'] == true) {
@@ -266,6 +271,9 @@ class GeneralSetting extends Component
             if (isset($this->form['maxAvailabeAppointmentOnline'])) {
                 unset($this->form['maxAvailabeAppointmentOnline']);
             }
+        }
+        if (! data_get($this->form, 'emptyAppointmentDisplayLimit.status', false)) {
+            unset($this->form['emptyAppointmentDisplayLimit']['count']);
         }
         if (isset($this->form['monitoring']['status'])  && $this->form['monitoring']['status'] == false) {
             if (isset($this->form['monitoring']['hour'])) {
@@ -337,6 +345,9 @@ class GeneralSetting extends Component
             AppointmentSetting::VISIT_TYPE_VOIP                      => isset($this->form['visitType']['voip']) ? $this->form['visitType']['voip'] : null,
             AppointmentSetting::VISIT_TYPE_ONLINE                    => isset($this->form['visitType']['online']) ? $this->form['visitType']['online'] : null,
             AppointmentSetting::MAX_AVAILABLE_APPOINTMENT_EACH_DAY   => isset($this->form['maxAvailabeAppointment']['eachDay']) ? $this->form['maxAvailabeAppointment']['eachDay'] : null,
+            AppointmentSetting::MAX_EMPTY_APPOINTMENTS_SHOWN_PER_DAY => data_get($this->form, 'emptyAppointmentDisplayLimit.status', false)
+                ? data_get($this->form, 'emptyAppointmentDisplayLimit.count')
+                : null,
             AppointmentSetting::MAX_AVAILABLE_APPOINTMENT_FOR_SECRETERY     => isset($this->form['maxAvailabeAppointment']['ForSecretery']) ? $this->form['maxAvailabeAppointment']['ForSecretery'] : null,
             AppointmentSetting::MONITORTING_APPOINTMENT              => isset($this->form['monitoring']['hour']) ? $this->form['monitoring']['hour'] : null,
             AppointmentSetting::OPERATORS => [
@@ -510,6 +521,12 @@ class GeneralSetting extends Component
         $this->form['minDayAvaialbe']                    = $apSet->min_day_active;
         $this->form['maxDayAvaialbe']                    = $apSet->max_day_active;
         $this->form['maxAvailabeAppointment']['eachDay'] = $apSet->detail[AppointmentSetting::MAX_AVAILABLE_APPOINTMENT_EACH_DAY];
+        $emptyAppointmentDisplayLimit = data_get($apSet->detail, AppointmentSetting::MAX_EMPTY_APPOINTMENTS_SHOWN_PER_DAY);
+        $this->form['emptyAppointmentDisplayLimit']['status'] = is_numeric($emptyAppointmentDisplayLimit)
+            && (int) $emptyAppointmentDisplayLimit > 0;
+        $this->form['emptyAppointmentDisplayLimit']['count'] = $this->form['emptyAppointmentDisplayLimit']['status']
+            ? (int) $emptyAppointmentDisplayLimit
+            : null;
         $this->form['maxAvailabeAppointment']['ForSecretery'] = $apSet->detail[AppointmentSetting::MAX_AVAILABLE_APPOINTMENT_FOR_SECRETERY] ?? null;
         $this->form['cancel']['day']                     = $apSet->cancellation_by_user ?? null;
         $this->form['avtive']                            = $apSet->active == ActiveEnum::ACTIVE ? true : false;

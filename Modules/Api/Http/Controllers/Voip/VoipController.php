@@ -23,6 +23,7 @@ use Modules\AppointmentUser\Enum\AppointmentUserKindEnum;
 use Modules\AppointmentUser\Enum\AppointmentUserStatusEnum;
 use Modules\AppointmentUser\Enum\AppointmentUserTypeEnum;
 use Modules\AppointmentUser\Enum\model\UserModelAppointment;
+use Modules\AppointmentSetting\app\Enum\AppintmentSettingDayNumber;
 use Modules\AppointmentSetting\app\Models\AppointmentSetting;
 use Modules\Api\Http\Controllers\Appointment\AppointmentApiController;
 use Modules\User\app\Notifications\CustomLinkToUserSmsNotification;
@@ -145,7 +146,7 @@ class VoipController extends Controller
 
         $listDays = $this->appointmentList($appointmentSetting);
 
-        return $this->ok($this->oldTimesPayload($listDays, $request->get('timeFilter')));
+        return $this->ok($this->oldTimesPayload($listDays, $request->get('timeFilter'), $appointmentSetting));
     }
 
     public function getAppointmentUser(Request $request)
@@ -260,15 +261,17 @@ class VoipController extends Controller
             return $this->oldError(self::ERROR_OPERATOR_NOT_FOUND);
         }
 
-        $hasActiveSetting = AppointmentSetting::query()
-            ->active()
-            ->where(function ($query) use ($operatorId) {
-                $query->whereJsonContains('detail->operators->ids', (string) $operatorId)
-                    ->orWhereJsonContains('detail->operators->ids', (int) $operatorId);
-            })
+        $now = now('Asia/Tehran');
+        $dayNumber = AppintmentSettingDayNumber::getConstant(strtolower($now->format('l')))->value;
+        $currentTime = $now->format('H:i:s');
+
+        $isWithinWorkingTime = $operator->operatorTimes()
+            ->where('day_number', $dayNumber)
+            ->whereTime('start_at', '<=', $currentTime)
+            ->whereTime('end_at', '>=', $currentTime)
             ->exists();
 
-        if (! $hasActiveSetting) {
+        if (! $isWithinWorkingTime) {
             return $this->oldError(self::ERROR_WORKING_TIME_IS_OVER);
         }
 
@@ -539,10 +542,11 @@ class VoipController extends Controller
         );
     }
 
-    private function oldTimesPayload(array $data, ?string $timeFilter): array
+    private function oldTimesPayload(array $data, ?string $timeFilter, AppointmentSetting $appointmentSetting): array
     {
         $result = [];
         $resultDays = 1;
+        $emptyAppointmentDisplayLimit = $appointmentSetting->emptyAppointmentDisplayLimit();
 
         foreach ($data['data'] as $year => $months) {
             foreach ($months as $month => $days) {
@@ -551,6 +555,7 @@ class VoipController extends Controller
                         continue;
                     }
 
+                    $displayedEmptyAppointments = 0;
                     foreach ($appointment['times'] as $time) {
                         if (! ($time['status'] ?? false) || ! isset($time['timestamp'])) {
                             continue;
@@ -568,9 +573,14 @@ class VoipController extends Controller
                             continue;
                         }
 
+                        if ($emptyAppointmentDisplayLimit !== null && $displayedEmptyAppointments >= $emptyAppointmentDisplayLimit) {
+                            continue;
+                        }
+
                         $result['day' . $resultDays][$period]['times'][] = [
                             'timestamp' => $time['timestamp'],
                         ];
+                        $displayedEmptyAppointments++;
                     }
 
                     if (isset($result['day' . $resultDays])) {
@@ -587,7 +597,7 @@ class VoipController extends Controller
         return $result;
     }
 
-    private function getListEmptyAppointment($data)
+    private function getListEmptyAppointment($data, AppointmentSetting $appointmentSetting)
     {
         $report = $data['report'];
         $mainDaActive = $report['min_day_active'];
@@ -600,6 +610,7 @@ class VoipController extends Controller
         $maxDay = 15;
         $DaysDisplayed = 0;
         $dayCount = 0;
+        $emptyAppointmentDisplayLimit = $appointmentSetting->emptyAppointmentDisplayLimit();
         foreach ($data['data'] as $yeay => $day) {
             if ($yeay < $isYear) {
                 continue;
@@ -623,6 +634,10 @@ class VoipController extends Controller
 
                         $appointmentTime = Carbon::createFromTimestamp((int) $time['timestamp'], 'Asia/Tehran');
                         if ($appointmentTime->isPast()) {
+                            continue;
+                        }
+
+                        if ($emptyAppointmentDisplayLimit !== null && count($availableTimes) >= $emptyAppointmentDisplayLimit) {
                             continue;
                         }
 
@@ -700,7 +715,7 @@ class VoipController extends Controller
             [
                 'doctor_selected' => $findAlterNateDoctor->id,
                 'appointment_setting_id' => $appointmentSetting->id,
-                'empty_times' => $this->getListEmptyAppointment($listDays),
+                'empty_times' => $this->getListEmptyAppointment($listDays, $appointmentSetting),
             ]
         );
     }

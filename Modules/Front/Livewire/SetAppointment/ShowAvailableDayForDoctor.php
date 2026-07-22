@@ -150,6 +150,7 @@ class ShowAvailableDayForDoctor extends Component
         $maxDay = $this->fetchData['maxShowDay'];
         $DaysDisplayed = 0;
         $showFalseStatusDay = setting(SettingKeyEnum::APPOINTMENT_SHOW_FALSE_STATUS_DAYS) ;
+        $emptyAppointmentDisplayLimit = $this->fetchData['appointmentSetting']->emptyAppointmentDisplayLimit();
         // select the last active day
         $this->caculateLastActiveDay($listOfAppointment['data']);
 
@@ -197,6 +198,7 @@ class ShowAvailableDayForDoctor extends Component
                         break 3;
                     }
                     $DaysDisplayed++;
+                    $displayedEmptyAppointments = 0;
                     foreach ($appointment['times'] as $increment =>  $time) {
                         $checkIfTimePass = false;
                         if ($time['status']) {
@@ -209,6 +211,10 @@ class ShowAvailableDayForDoctor extends Component
                             }
                         }
                         if ($time['status'] && $checkIfTimePass) {
+                            if ($emptyAppointmentDisplayLimit !== null && $displayedEmptyAppointments >= $emptyAppointmentDisplayLimit) {
+                                continue;
+                            }
+
                             $result[$dayNumber][] = [
                                 'status' => true,
                                 'day_of_week_name'    =>  verta()->formatDifference(),
@@ -218,6 +224,7 @@ class ShowAvailableDayForDoctor extends Component
                                 'from' => substr($time['from'], 0, 5),
                                 'until' => substr($time['until'], 0, 5),
                             ];
+                            $displayedEmptyAppointments++;
                         } else {
                             if (setting(\Modules\Setting\Enum\SettingKeyEnum::SHOW_FALSE_APPOINTMENT_STATUS)) {
                                 $result[$dayNumber][] = [

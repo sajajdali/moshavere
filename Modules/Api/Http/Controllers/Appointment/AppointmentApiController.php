@@ -166,6 +166,7 @@ class AppointmentApiController extends Controller
         $minDayActive  = $appointmentSetting->min_day_active;
         $DaysDisplayed = 0;
         $firstTwoEmpty = [];
+        $emptyAppointmentDisplayLimit = $appointmentSetting->emptyAppointmentDisplayLimit();
         foreach ($data['data'] as $yeay => $day) {
             if ($yeay < $isYear) {
                 continue;
@@ -188,10 +189,15 @@ class AppointmentApiController extends Controller
                     if (carbon::parse($appointment['day_number_gmt'])->setTime('23', '59', '59')->copy()->subDays($minDayActive)->isPast()) {
                         continue;
                     }
+                    $displayedEmptyAppointments = 0;
                     foreach ($appointment['times'] as $time) {
 
 
                         if ($time['status']) {
+                            if ($emptyAppointmentDisplayLimit !== null && $displayedEmptyAppointments >= $emptyAppointmentDisplayLimit) {
+                                continue;
+                            }
+
                             $vertaDateTime = Verta::createTimestamp($time['timestamp']);
                             // Increment the counter
 
@@ -212,6 +218,7 @@ class AppointmentApiController extends Controller
                                 'from' => substr($time['from'], 0, -3),
                                 'until' => substr($time['until'], 0, -3),
                             ];
+                            $displayedEmptyAppointments++;
 
                             // If two matches are found, break out of the loop
                         } else {

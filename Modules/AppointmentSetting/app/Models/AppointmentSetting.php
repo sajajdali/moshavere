@@ -46,6 +46,18 @@ class AppointmentSetting extends Model
     {
         return $this->active == ActiveEnum::ACTIVE->value;
     }
+
+    public function emptyAppointmentDisplayLimit(): ?int
+    {
+        $limit = data_get($this->detail, self::MAX_EMPTY_APPOINTMENTS_SHOWN_PER_DAY);
+
+        if (! is_numeric($limit) || (int) $limit < 1) {
+            return null;
+        }
+
+        return (int) $limit;
+    }
+
     public function scopeActive(Builder $query): Builder
     {
         return $query->where('active', ActiveEnum::ACTIVE->value);

@@ -28,6 +28,7 @@
             'form.minDayAvaialbe',
             'form.maxDayAvaialbe',
             'form.maxAvailabeAppointment.*',
+            'form.emptyAppointmentDisplayLimit.*',
             'form.maxAvailabeAppointmentOnline',
             'form.cancel.*',
             'form.endAppointment.*',
@@ -318,6 +319,55 @@
                         </div>
                     </div>
                 @endif
+            </div>
+        </div>
+    </div>
+    {{-- empty appointment display limit --}}
+    <div class="card shadow-sm custom-card-Setting @error('form.emptyAppointmentDisplayLimit.count') border border-danger @enderror">
+        <div class="card-header border-bottom d-flex justify-content-between">
+            <h3 class="d-flex align-item-center">
+                <i class="fa fa-eye me-2 d-none d-sm-inline" aria-hidden="true"></i>
+                <span>محدودیت نمایش نوبت های هر روز</span>
+            </h3>
+            <div class="main-toggle-group d-sm-flex align-item-center ms-0">
+                <div class="toggle toggle-lg toggle-primary my-1 customCheckbox @if (data_get($form, 'emptyAppointmentDisplayLimit.status', false)) on @else off @endif"
+                    data-id="emptyAppointmentDisplayLimit.status" wire:ignore.self data-bs-toggle="collapse"
+                    href="#emptyAppointmentDisplayLimit" role="button"
+                    aria-expanded="{{ data_get($form, 'emptyAppointmentDisplayLimit.status', false) ? 'true' : 'false' }}"
+                    aria-controls="emptyAppointmentDisplayLimit">
+                    <span></span>
+                </div>
+            </div>
+        </div>
+        <div class="collapse @if (data_get($form, 'emptyAppointmentDisplayLimit.status', false)) show @endif"
+            id="emptyAppointmentDisplayLimit" wire:ignore.self>
+            <div class="card-body">
+                @error('form.emptyAppointmentDisplayLimit.count')
+                    <div class="alert alert-danger" role="alert">
+                        <p class="text-danger mb-0">تعداد نوبت‌های قابل نمایش در هر روز را با عددی بزرگ‌تر از صفر مشخص کنید.</p>
+                    </div>
+                @enderror
+                <div class="row">
+                    <div class="col-md-5 pt-2">
+                        <label class="text-primary" for="emptyAppointmentDisplayLimitCount">
+                            تعداد نوبت خالی قابل نمایش در هر روز
+                        </label>
+                    </div>
+                    <div class="col-md-7">
+                        <div class="input-group mb-3">
+                            <input type="number" min="1"
+                                class="form-control @error('form.emptyAppointmentDisplayLimit.count') is-invalid @enderror"
+                                id="emptyAppointmentDisplayLimitCount"
+                                wire:model="form.emptyAppointmentDisplayLimit.count">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text">عدد</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="d-flex mt-2">
+                        <p class="text-muted mb-0"><strong class="me-1">نکته!!</strong> تعداد نمایش نوبت خالی به بیمار در هر روز ، برای اینکه نوبت ها به ترتیب دریافت شوند.</p>
+                    </div>
+                </div>
             </div>
         </div>
     </div>

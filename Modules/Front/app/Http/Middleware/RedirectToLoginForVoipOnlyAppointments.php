@@ -17,7 +17,7 @@ class RedirectToLoginForVoipOnlyAppointments
         );
 
         if (! $voipOnly || $request->routeIs(
-            'front.login.user',
+            'front.login.doctor',
             'front.user.registration',
             'front.logout',
         )) {
@@ -25,7 +25,7 @@ class RedirectToLoginForVoipOnlyAppointments
         }
 
         if ($request->routeIs('front.homePage') || auth()->guest()) {
-            return redirect()->guest(route('front.login.user'));
+            return redirect()->guest(route('front.login.doctor'));
         }
 
         return $next($request);

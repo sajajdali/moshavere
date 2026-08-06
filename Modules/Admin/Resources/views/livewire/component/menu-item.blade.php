@@ -1,6 +1,12 @@
 <div>
     @foreach($item as $index => $innerItem)
-        @canany($innerItem['gate'],$innerItem['policy_class'])
+        @php
+            $isVisibleToUser = ! isset($innerItem['auth_user_id']) || auth()->id() === (int) $innerItem['auth_user_id'];
+            $isEnabled = ! isset($innerItem['setting_key'])
+                || filter_var(setting($innerItem['setting_key']), FILTER_VALIDATE_BOOLEAN);
+        @endphp
+        @if ($isVisibleToUser && $isEnabled)
+            @canany($innerItem['gate'],$innerItem['policy_class'])
             <a
                 class="{{ $aClassByDepth[$innerItem['has_child']][$depth] }} {{ (!$innerItem['has_child'] && $depth===0) ? 'hsa-link' : '' }}"
                 @if($depth===0 || $innerItem['has_child'])
@@ -28,6 +34,7 @@
                     <livewire:admin::component.menu-item :item="$innerItem['children']" :depth="$nextDepth"/>
                 </ul>
             @endif
-        @endcanany
+            @endcanany
+        @endif
     @endforeach
 </div>

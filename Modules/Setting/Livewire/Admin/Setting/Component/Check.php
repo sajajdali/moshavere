@@ -25,6 +25,7 @@ class Check extends Component
         if (in_array($this->meta, [
             SettingKeyEnum::DISABLE_ONLINE_APPOINTMENT,
             SettingKeyEnum::DISABLE_UI_FOR_VOIP_ONLY_APPOINTMENT,
+            SettingKeyEnum::VOIP_APPOINTMENT_STATUS,
         ], true) && auth()->id() !== 1) {
             return;
         }

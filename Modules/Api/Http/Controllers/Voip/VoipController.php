@@ -11,6 +11,7 @@ use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Notification;
 use Modules\Api\Trait\ApiHandlerTrait;
+use Modules\Api\app\Models\VoipIncoming;
 use Modules\Front\app\Models\FeedBack;
 use Modules\Setting\Enum\SettingKeyEnum;
 use Modules\Transaction\Enum\TransactionPaidEnum;
@@ -282,11 +283,16 @@ class VoipController extends Controller
 
     public function incomingCall(Request $request)
     {
+        if ($request->filled('incoming')) {
+            VoipIncoming::create([
+                'incoming' => (string) $request->input('incoming'),
+            ]);
+        }
+
         return $this->ok([
             'status' => true,
         ]);
     }
-
     public function paymentSendSecondPassword(Request $request)
     {
         $appointmentUser = AppointmentUser::find((int) $request->get('appointment_id'));

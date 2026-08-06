@@ -111,6 +111,7 @@ class Setting extends Component
         return in_array($settingKey, [
             SettingKeyEnum::DISABLE_ONLINE_APPOINTMENT->value,
             SettingKeyEnum::DISABLE_UI_FOR_VOIP_ONLY_APPOINTMENT->value,
+            SettingKeyEnum::VOIP_APPOINTMENT_STATUS->value,
         ], true);
     }
 }

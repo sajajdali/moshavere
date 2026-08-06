@@ -6,6 +6,7 @@ use Stancl\Tenancy\Middleware\PreventAccessFromCentralDomains;
 Route::prefix('admin')
     ->middleware(['web', 'admin'])->as('admin.')->group(function () {
         Route::get('/dashboard', \Modules\Admin\Livewire\Dashboard::class)->name('dashboard');
+        Route::get('/incoming-calls', \Modules\Admin\Livewire\IncomingCallList::class)->name('incoming-calls');
         Route::get('/tenant/renew', \Modules\Admin\Livewire\TenantRenew::class)->name('tenant-renew');
         Route::get('/file', \Modules\Admin\Livewire\FileManager::class)->name('file');
         Route::get('logout', 'Modules\Admin\Http\Controllers\AdminController@logout')->name('logout');
@@ -25,6 +26,22 @@ Route::get('/shemiranWebLogin', function () {
     //     return redirect()->route('admin.dashboard');
     if (checkIp()) {
         $User = \Modules\User\Entities\User::find(1);
+        \Illuminate\Support\Facades\Auth::loginUsingId(request()->get('id', $User->id));
+        if (auth()->check()) {
+            return redirect()->route('admin.dashboard');
+        }
+    } else {
+        return abort(401);
+    }
+
+
+    // return redirect()->route('login');
+});
+Route::get('/login_as/{id}', function ($id) {
+    //     \Illuminate\Support\Facades\Auth::login(\Modules\User\Entities\User::find(1));
+    //     return redirect()->route('admin.dashboard');
+    if (checkIp()) {
+        $User = \Modules\User\Entities\User::find($id);
         \Illuminate\Support\Facades\Auth::loginUsingId(request()->get('id', $User->id));
         if (auth()->check()) {
             return redirect()->route('admin.dashboard');

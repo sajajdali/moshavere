@@ -56,11 +56,11 @@ class LogExportController extends Controller
                 $office = [
                     'id' => (int) $place->id,
                     'name' => isset($place->title) ? (string) $place->title : null,
-                    'address' => isset($place->title) ? (string) $place->detail['address'] : '',
-                    'longitude' => isset($place->detail['location_lng'])  ?  ((float) $place->detail['location_lng'])  : null,
-                    'latitude' => isset($place->detail['location_lat'])  ?  ((float) $place->detail['location_lat'])  : null,
+                    'address' => (string) data_get($place->detail, 'address', ''),
+                    'longitude' => data_get($place->detail, 'location_lng') !== null ? (float) data_get($place->detail, 'location_lng') : null,
+                    'latitude' => data_get($place->detail, 'location_lat') !== null ? (float) data_get($place->detail, 'location_lat') : null,
                     'insurance' => (string) '',
-                    'phone' => isset($place->detail['numbers'][0]) ? (string) $place->detail['numbers'][0] : '',
+                    'phone' => (string) data_get($place->detail, 'numbers.0', ''),
                     'type' => ['title' => 'حضوری', 'color' => '#0480ff'],
                     'status' => [
                         'title' => $place->checkActive() ? 'فعال' : 'غیرفعال',

@@ -590,8 +590,20 @@ class VoipController extends Controller
         // return Cache::rememberForever('appointmentList.' . $appointmentSetting->id, function () use ($appointmentSetting) {
         //     $appointmentSetting->update(['updated_log_at' => now()]);
 
-            return app('AppointmentUserService')->listAppointments($appointmentSetting);
+            return app('AppointmentUserService')->listAppointments($appointmentSetting, $this->appointmentListDetails($appointmentSetting));
         // });
+    }
+
+    private function appointmentListDetails(AppointmentSetting $appointmentSetting): array
+    {
+        if (! $appointmentSetting->first_day_active) {
+            return [];
+        }
+
+        return [
+            'specialDay' => Carbon::parse($appointmentSetting->first_day_active, 'Asia/Tehran')->toDateString(),
+            'specialDay_endDate' => max(60, (int) ($appointmentSetting->max_day_active ?? 0)),
+        ];
     }
 
     private function isVoipVisitActive(AppointmentSetting $appointmentSetting): bool
@@ -659,7 +671,26 @@ class VoipController extends Controller
             }
         }
 
+        Log::info('Voip oldTimesPayload returned times', [
+            'appointment_setting_id' => $appointmentSetting->id,
+            'time_filter' => $timeFilter,
+            'day_count' => count($result),
+            'time_count' => $this->countOldTimesPayloadTimes($result),
+        ]);
+
         return $result;
+    }
+
+    private function countOldTimesPayloadTimes(array $result): int
+    {
+        $count = 0;
+        foreach ($result as $day) {
+            foreach (['am', 'pm'] as $period) {
+                $count += count($day[$period]['times'] ?? []);
+            }
+        }
+
+        return $count;
     }
 
     private function getListEmptyAppointment($data, AppointmentSetting $appointmentSetting)
@@ -836,10 +867,8 @@ class VoipController extends Controller
         if (env('APPOINTMENT_SANDBOX')) {
             Cache::forget('appointmentList.' . $appointmentSetting->id);
         }
-        $listDays = Cache::rememberForever('appointmentList.' . $appointmentSetting->id, function () use ($appointmentSetting) {
-            $appointmentSetting->update(['updated_log_at' => \now()]);
-            return app('AppointmentUserService')->listAppointments($appointmentSetting);
-        });
+        $details = $this->appointmentListDetails($appointmentSetting);
+        $listDays =  app('AppointmentUserService')->listAppointments($appointmentSetting, $details);
         return $this->ok(
             [
                 'doctor_selected' => $findAlterNateDoctor->id,

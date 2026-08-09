@@ -583,15 +583,15 @@ class VoipController extends Controller
 
     private function appointmentList(AppointmentSetting $appointmentSetting): array
     {
-        if (env('APPOINTMENT_SANDBOX') || config('app.without_cache')) {
-            Cache::forget('appointmentList.' . $appointmentSetting->id);
-        }
+        // if (env('APPOINTMENT_SANDBOX') || config('app.without_cache')) {
+        //     Cache::forget('appointmentList.' . $appointmentSetting->id);
+        // }
 
-        return Cache::rememberForever('appointmentList.' . $appointmentSetting->id, function () use ($appointmentSetting) {
-            $appointmentSetting->update(['updated_log_at' => now()]);
+        // return Cache::rememberForever('appointmentList.' . $appointmentSetting->id, function () use ($appointmentSetting) {
+        //     $appointmentSetting->update(['updated_log_at' => now()]);
 
             return app('AppointmentUserService')->listAppointments($appointmentSetting);
-        });
+        // });
     }
 
     private function isVoipVisitActive(AppointmentSetting $appointmentSetting): bool

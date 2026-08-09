@@ -10,8 +10,10 @@ use Illuminate\Routing\Controller;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Notification;
+use Illuminate\Support\Str;
 use Modules\Api\Trait\ApiHandlerTrait;
 use Modules\Api\app\Models\VoipIncoming;
+use Modules\Api\app\Models\VoipVoiceRecord;
 use Modules\Front\app\Models\FeedBack;
 use Modules\Setting\Enum\SettingKeyEnum;
 use Modules\Transaction\Enum\TransactionPaidEnum;
@@ -483,6 +485,57 @@ class VoipController extends Controller
         ]);
     }
 
+    public function storeVoiceRecord(Request $request)
+    {
+        $request->merge([
+            'incoming' => convert2english((string) $request->input('incoming')),
+        ]);
+
+        $validated = $request->validate([
+            'file' => 'required|file',
+            'incoming' => 'required|string|max:30',
+            'name' => 'nullable|string|max:255',
+        ]);
+
+        $incoming = $validated['incoming'];
+        $file = $request->file('file');
+        $directory = public_path('uploads/voip/voice_records');
+
+        if (! is_dir($directory)) {
+            mkdir($directory, 0755, true);
+        }
+
+        $extension = $file->getClientOriginalExtension();
+        $filename = now('Asia/Tehran')->format('YmdHis') . '_' . Str::random(16) . ($extension ? ".{$extension}" : '');
+        $file->move($directory, $filename);
+
+        $user = User::firstOrCreate(
+            ['mobile' => $incoming],
+            ['password' => User::generatePassword()]
+        );
+
+        $voiceRecord = VoipVoiceRecord::create([
+            'user_id' => $user->id,
+            'incoming' => $incoming,
+            'name' => $validated['name'] ?? null,
+            'file_path' => 'uploads/voip/voice_records/' . $filename,
+            'original_name' => $file->getClientOriginalName(),
+            'mime_type' => $file->getClientMimeType(),
+            'size' => $file->getSize(),
+        ]);
+
+        return $this->created([
+            'status' => true,
+            'message' => 'فایل صوتی با موفقیت ذخیره شد',
+            'data' => [
+                'voice_record_id' => $voiceRecord->id,
+                'user_id' => $user->id,
+                'incoming' => $incoming,
+                'file' => url($voiceRecord->file_path),
+            ],
+        ]);
+    }
+
     private function oldError(int $errorCode)
     {
         return $this->ok([
@@ -506,12 +559,11 @@ class VoipController extends Controller
         $doctorId = $request->get('doctorId') ?? $request->get('doctor_id');
         $placeId = $request->get('appointmentOfficeId') ?? $request->get('place_id') ?? $request->get('places_id');
         $serviceId = $request->get('appointmentPartId') ?? $request->get('service_id') ?? $request->get('services_id');
-
+        Log::info('place => ' . $request->get('appointmentOfficeId') . ' service => ' . $request->get('appointmentPartId'));
         if (! $doctorId) {
             return null;
         }
-
-        return AppointmentSetting::query()
+        $appointmentSetting =  AppointmentSetting::query()
             ->active()
             ->where('user_id', $doctorId)
             ->when($placeId, fn($query) => $query->where('place_id', $placeId))
@@ -525,6 +577,8 @@ class VoipController extends Controller
             ->whereNull('place_id')
             ->whereNull('service_id')
             ->first();
+        Log::info('appointmentSetting is ' . $appointmentSetting->id);
+        return $appointmentSetting;
     }
 
     private function appointmentList(AppointmentSetting $appointmentSetting): array
@@ -553,12 +607,17 @@ class VoipController extends Controller
         $result = [];
         $resultDays = 1;
         $emptyAppointmentDisplayLimit = $appointmentSetting->emptyAppointmentDisplayLimit();
+        $maxAvailableDate = $this->maxAvailableAppointmentDate($appointmentSetting);
 
         foreach ($data['data'] as $year => $months) {
             foreach ($months as $month => $days) {
                 foreach ($days as $day => $appointment) {
-                    if (($appointment['empty_appoints'] ?? 0) <= 0 || ($appointment['status'] ?? false) == false) {
+                    if (! $this->passesFrontEmptyAppointmentDayFilters($data, $appointment, $appointmentSetting)) {
                         continue;
+                    }
+
+                    if ($maxAvailableDate && Carbon::parse($appointment['day_number_gmt'], 'Asia/Tehran')->startOfDay()->gt($maxAvailableDate)) {
+                        break 3;
                     }
 
                     $displayedEmptyAppointments = 0;
@@ -568,7 +627,7 @@ class VoipController extends Controller
                         }
 
                         $appointmentTime = Carbon::createFromTimestamp((int) $time['timestamp'], 'Asia/Tehran');
-                        if ($appointmentTime->isPast()) {
+                        if (! $this->isFrontSelectableAppointmentTime($appointmentTime)) {
                             continue;
                         }
 
@@ -617,6 +676,7 @@ class VoipController extends Controller
         $DaysDisplayed = 0;
         $dayCount = 0;
         $emptyAppointmentDisplayLimit = $appointmentSetting->emptyAppointmentDisplayLimit();
+        $maxAvailableDate = $this->maxAvailableAppointmentDate($appointmentSetting);
         foreach ($data['data'] as $yeay => $day) {
             if ($yeay < $isYear) {
                 continue;
@@ -628,8 +688,12 @@ class VoipController extends Controller
                     if ($day < $isDay && $month < $isMonth && $yeay < $isYear) {
                         continue;
                     }
-                    if ($appointment['empty_appoints'] <= 0 || $appointment['status'] == false) {
+                    if (! $this->passesFrontEmptyAppointmentDayFilters($data, $appointment, $appointmentSetting)) {
                         continue;
+                    }
+
+                    if ($maxAvailableDate && Carbon::parse($appointment['day_number_gmt'], 'Asia/Tehran')->startOfDay()->gt($maxAvailableDate)) {
+                        break 3;
                     }
 
                     $availableTimes = [];
@@ -639,7 +703,7 @@ class VoipController extends Controller
                         }
 
                         $appointmentTime = Carbon::createFromTimestamp((int) $time['timestamp'], 'Asia/Tehran');
-                        if ($appointmentTime->isPast()) {
+                        if (! $this->isFrontSelectableAppointmentTime($appointmentTime)) {
                             continue;
                         }
 
@@ -665,6 +729,65 @@ class VoipController extends Controller
             }
         }
         return $result;
+    }
+
+    private function passesFrontEmptyAppointmentDayFilters(array $listOfAppointment, array $appointment, AppointmentSetting $appointmentSetting): bool
+    {
+        $mainDayActive = (int) ($listOfAppointment['report']['min_day_active'] ?? 0);
+        $appointmentDate = Carbon::parse($appointment['day_number_gmt'], 'Asia/Tehran')->startOfDay();
+        $minActiveDate = Carbon::now('Asia/Tehran')->addDays($mainDayActive)->startOfDay();
+
+        if ($appointmentDate->lt($minActiveDate)) {
+            return false;
+        }
+
+        if ($appointmentDate->lt(Carbon::now('Asia/Tehran')->startOfDay())) {
+            return false;
+        }
+
+        if (($appointment['empty_appoints'] ?? 0) <= 0 || ($appointment['status'] ?? false) == false || ($appointment['user_status'] ?? false) == false) {
+            return false;
+        }
+
+        $firstDayActive = $listOfAppointment['report']['first_day_active'] ?? $appointmentSetting->first_day_active;
+        if ($firstDayActive !== null && Carbon::parse($firstDayActive, 'Asia/Tehran')->startOfDay()->gt($appointmentDate)) {
+            return false;
+        }
+
+        return true;
+    }
+
+    private function maxAvailableAppointmentDate(AppointmentSetting $appointmentSetting): ?Carbon
+    {
+        if (! isset($appointmentSetting->max_day_active)) {
+            return null;
+        }
+
+        $now = Carbon::now('Asia/Tehran');
+        $maxAvailableDate = $now->copy()->startOfDay()->addDays((int) $appointmentSetting->max_day_active);
+        $openTime = data_get($appointmentSetting->detail, AppointmentSetting::OPEN_TIME, '00:00');
+
+        if (! empty($openTime)) {
+            try {
+                $openAt = $now->copy()->setTimeFromTimeString($openTime);
+                if ($now->lt($openAt)) {
+                    $maxAvailableDate->subDay();
+                }
+            } catch (\Throwable $exception) {
+                // Invalid stored time should not block appointments; keep the old midnight behavior.
+            }
+        }
+
+        return $maxAvailableDate;
+    }
+
+    private function isFrontSelectableAppointmentTime(Carbon $appointmentTime): bool
+    {
+        if ($appointmentTime->copy()->isToday()) {
+            return $appointmentTime->gt(Carbon::now('Asia/Tehran')->addMinutes(30));
+        }
+
+        return $appointmentTime->isFuture();
     }
 
     public function listDays(Request $request)

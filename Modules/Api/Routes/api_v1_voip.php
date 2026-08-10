@@ -37,4 +37,6 @@ Route::prefix('VoIP')->group(function () {
     Route::post('send_custom_link_2', [\Modules\Api\Http\Controllers\Voip\VoipController::class, 'sendCustomLink2'])
         ->name('api.voip.send_custom_link_2');
     Route::post('store_survey', [\Modules\Api\Http\Controllers\Voip\VoipController::class, 'storeSurvey']);
+    Route::post('voice_record', [\Modules\Api\Http\Controllers\Voip\VoipController::class, 'storeVoiceRecord'])
+        ->name('api.voip.voice_record');
 });

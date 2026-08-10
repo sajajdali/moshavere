@@ -78,6 +78,7 @@ enum SettingKeyEnum: int implements EnumHasNameInterface, SettingTypeInterface, 
     case DISABLE_ONLINE_APPOINTMENT = 440;
     case DISABLE_UI_FOR_VOIP_ONLY_APPOINTMENT = 441;
     case VOIP_APPOINTMENT_STATUS = 442;
+    case VOIP_VOICE_RECORD_STATUS = 443;
     // ABOUT US PAGE
     case ABOUT_US_FIRST_SECTION_TITLE = 23;
     case ABOUT_US_FIRST_SECTION_DESCRIPTION = 24;
@@ -235,6 +236,7 @@ enum SettingKeyEnum: int implements EnumHasNameInterface, SettingTypeInterface, 
             self::DISABLE_ONLINE_APPOINTMENT => 'غیر فعال سازی نوبت آنلاین',
             self::DISABLE_UI_FOR_VOIP_ONLY_APPOINTMENT => 'غیر فعال سازی ui برای بیماران ',
             self::VOIP_APPOINTMENT_STATUS => 'فعال سازی امکانات نوبت دهی تلفنی ',
+            self::VOIP_VOICE_RECORD_STATUS => 'نمایش پیغام های ضبط شده در منو',
 
 
             self::FOOTER_SAMANDEHI => 'نماد سامان دهی (لینک کامل درج شود)',
@@ -401,6 +403,7 @@ enum SettingKeyEnum: int implements EnumHasNameInterface, SettingTypeInterface, 
             self::SMS_CUSTOM_LINK_2_TO_USER_TEMPLATE => 'پارامتر الگو: <br /> ۱ = عنوان سایت',
             self::DISABLE_UI_FOR_VOIP_ONLY_APPOINTMENT => 'عدم نمایش صفحات سایت ، برای نوبت دهی هایی که فقط تلفنی میباشند',
             self::VOIP_APPOINTMENT_STATUS => 'نمایش تماس های ورودی در منو',
+            self::VOIP_VOICE_RECORD_STATUS => 'نمایش پیغام های ضبط شده در منو',
             default => ''
         };
     }
@@ -440,7 +443,7 @@ enum SettingKeyEnum: int implements EnumHasNameInterface, SettingTypeInterface, 
             self::HEADER1_TITLE_COLOR     => SettingTypeEnum::SELECT,
             self::SMS_SENDER => SettingTypeEnum::SELECT,
             self::PAYMEN_ACTIVE_DRIVER => SettingTypeEnum::SELECT,
-            self::APPOINTMENT_MORE_THAT_ONE_PER_DAY , self::HEADER1_SHOW_BUTTONS , self::HEADER1_SHOW_BUTTON1, self::HEADER1_SHOW_BUTTON2 , self::ENABLE_DOCTORS_MENU , self::ENABLE_CONTACT_US_MENU, self::DISABLE_ONLINE_APPOINTMENT, self::DISABLE_UI_FOR_VOIP_ONLY_APPOINTMENT, self::VOIP_APPOINTMENT_STATUS => SettingTypeEnum::CHECK,
+            self::APPOINTMENT_MORE_THAT_ONE_PER_DAY , self::HEADER1_SHOW_BUTTONS , self::HEADER1_SHOW_BUTTON1, self::HEADER1_SHOW_BUTTON2 , self::ENABLE_DOCTORS_MENU , self::ENABLE_CONTACT_US_MENU, self::DISABLE_ONLINE_APPOINTMENT, self::DISABLE_UI_FOR_VOIP_ONLY_APPOINTMENT, self::VOIP_APPOINTMENT_STATUS, self::VOIP_VOICE_RECORD_STATUS => SettingTypeEnum::CHECK,
             self::HOME_ALERT_STATUS => SettingTypeEnum::CHECK,
             self::APPOINTMENT_SHOW_FALSE_STATUS_DAYS => SettingTypeEnum::CHECK,
             self::APPOINTMENT_DETAIL_PAYMENT_DESCRIPTION_STATUS => SettingTypeEnum::CHECK,

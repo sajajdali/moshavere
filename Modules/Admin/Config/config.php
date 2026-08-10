@@ -55,6 +55,17 @@ return [
                 'has_child' => false,
                 'children' => null,
             ],
+            [
+                'title' => 'پیغام های ضبط شده',
+                'gate' => 'ADMIN_ACCESS',
+                'policy_class' => null,
+                'setting_key' => \Modules\Setting\Enum\SettingKeyEnum::VOIP_VOICE_RECORD_STATUS,
+                'icon' => 'fe fe-mic',
+                'route' => 'admin.voice-records',
+                'has_badge' => false,
+                'has_child' => false,
+                'children' => null,
+            ],
         ],
     ],
 ];

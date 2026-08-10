@@ -8,6 +8,7 @@ $setting = [
         'settings' => [
             \Modules\Setting\Enum\SettingKeyEnum::DISABLE_UI_FOR_VOIP_ONLY_APPOINTMENT,
             \Modules\Setting\Enum\SettingKeyEnum::VOIP_APPOINTMENT_STATUS,
+            \Modules\Setting\Enum\SettingKeyEnum::VOIP_VOICE_RECORD_STATUS,
         ],
     ],
     'sms' => [

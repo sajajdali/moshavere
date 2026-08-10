@@ -7,6 +7,7 @@ Route::prefix('admin')
     ->middleware(['web', 'admin'])->as('admin.')->group(function () {
         Route::get('/dashboard', \Modules\Admin\Livewire\Dashboard::class)->name('dashboard');
         Route::get('/incoming-calls', \Modules\Admin\Livewire\IncomingCallList::class)->name('incoming-calls');
+        Route::get('/voice-records', \Modules\Admin\Livewire\VoiceRecordList::class)->name('voice-records');
         Route::get('/tenant/renew', \Modules\Admin\Livewire\TenantRenew::class)->name('tenant-renew');
         Route::get('/file', \Modules\Admin\Livewire\FileManager::class)->name('file');
         Route::get('logout', 'Modules\Admin\Http\Controllers\AdminController@logout')->name('logout');

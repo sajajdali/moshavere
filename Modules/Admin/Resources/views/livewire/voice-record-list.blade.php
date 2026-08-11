@@ -31,32 +31,31 @@
                                 <tr>
                                     <th scope="col">#</th>
                                     <th scope="col">شماره تماس</th>
-                                    <th scope="col">نام</th>
                                     <th scope="col">فایل صوتی</th>
-                                    <th scope="col">حجم</th>
                                     <th scope="col">تاریخ دریافت</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 @forelse ($voiceRecords as $voiceRecord)
+                                    @php
+                                        $extension = strtolower(pathinfo($voiceRecord->file_path, PATHINFO_EXTENSION));
+                                        $audioType = match ($extension) {
+                                            'wav' => 'audio/wav',
+                                            'mp3' => 'audio/mpeg',
+                                            'ogg' => 'audio/ogg',
+                                            default => $voiceRecord->mime_type ?: 'audio/wav',
+                                        };
+                                    @endphp
                                     <tr>
                                         <td>{{ $voiceRecord->id }}</td>
                                         <td>{{ $voiceRecord->incoming }}</td>
-                                        <td>{{ $voiceRecord->name ?: '-' }}</td>
                                         <td>
                                             <audio controls preload="none" style="width: 240px; max-width: 100%;">
-                                                <source src="{{ url($voiceRecord->file_path) }}" type="{{ $voiceRecord->mime_type ?: 'audio/mpeg' }}">
+                                                <source src="{{ url($voiceRecord->file_path) }}" type="{{ $audioType }}">
                                             </audio>
                                             <div class="mt-2">
                                                 <a href="{{ url($voiceRecord->file_path) }}" target="_blank" download>دانلود فایل</a>
                                             </div>
-                                        </td>
-                                        <td>
-                                            @if($voiceRecord->size)
-                                                {{ number_format($voiceRecord->size / 1024, 1) }} KB
-                                            @else
-                                                -
-                                            @endif
                                         </td>
                                         <td>{{ verta($voiceRecord->created_at)->format('Y/m/d H:i') }}</td>
                                     </tr>

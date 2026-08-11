@@ -18,8 +18,7 @@ class VoiceRecordList extends Component
     public function mount(): void
     {
         abort_unless(
-            auth()->id() === 1
-            && filter_var(setting(SettingKeyEnum::VOIP_VOICE_RECORD_STATUS), FILTER_VALIDATE_BOOLEAN),
+            filter_var(setting(SettingKeyEnum::VOIP_VOICE_RECORD_STATUS), FILTER_VALIDATE_BOOLEAN),
             403,
         );
     }

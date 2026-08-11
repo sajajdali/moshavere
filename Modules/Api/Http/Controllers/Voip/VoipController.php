@@ -491,6 +491,13 @@ class VoipController extends Controller
             'incoming' => convert2english((string) $request->input('incoming')),
         ]);
 
+        Log::info('VOIP voice record store requested', [
+            'incoming' => $request->input('incoming'),
+            'name' => $request->input('name'),
+            'has_file' => $request->hasFile('file'),
+            'ip' => $request->ip(),
+        ]);
+
         $validated = $request->validate([
             'file' => 'required|file',
             'incoming' => 'required|string|max:30',
@@ -503,25 +510,54 @@ class VoipController extends Controller
 
         if (! is_dir($directory)) {
             mkdir($directory, 0755, true);
+
+            Log::info('VOIP voice record directory created', [
+                'directory' => $directory,
+            ]);
         }
 
         $extension = $file->getClientOriginalExtension();
         $filename = now('Asia/Tehran')->format('YmdHis') . '_' . Str::random(16) . ($extension ? ".{$extension}" : '');
+        $originalName = $file->getClientOriginalName();
+        $mimeType = $file->getClientMimeType();
+        $destinationPath = $directory . DIRECTORY_SEPARATOR . $filename;
+
+        Log::info('VOIP voice record validation passed', [
+            'incoming' => $incoming,
+            'original_name' => $originalName,
+            'mime_type' => $mimeType,
+            'filename' => $filename,
+        ]);
+
         $file->move($directory, $filename);
+        $fileSize = is_file($destinationPath) ? filesize($destinationPath) : null;
 
         $user = User::firstOrCreate(
             ['mobile' => $incoming],
             ['password' => User::generatePassword()]
         );
 
+        Log::info('VOIP voice record user resolved', [
+            'incoming' => $incoming,
+            'user_id' => $user->id,
+            'was_recently_created' => $user->wasRecentlyCreated,
+        ]);
+
         $voiceRecord = VoipVoiceRecord::create([
             'user_id' => $user->id,
             'incoming' => $incoming,
             'name' => $validated['name'] ?? null,
             'file_path' => 'uploads/voip/voice_records/' . $filename,
-            'original_name' => $file->getClientOriginalName(),
-            'mime_type' => $file->getClientMimeType(),
-            'size' => $file->getSize(),
+            'original_name' => $originalName,
+            'mime_type' => $mimeType,
+            'size' => $fileSize,
+        ]);
+
+        Log::info('VOIP voice record stored', [
+            'voice_record_id' => $voiceRecord->id,
+            'user_id' => $user->id,
+            'incoming' => $incoming,
+            'file_path' => $voiceRecord->file_path,
         ]);
 
         return $this->created([

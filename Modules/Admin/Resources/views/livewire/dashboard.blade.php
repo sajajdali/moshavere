@@ -32,16 +32,32 @@
             </div>
         @endif
         @can('admin.dashboard.appointments')
-            <div class="col-lg-6 col-sm-12 col-md-6 col-xl-3 mb-4 d-flex">
+            <div class="col-lg-12 col-sm-12 col-md-12 col-xl-6 mb-4 d-flex">
                 <div class="card dashboard-stat-card dashboard-stat-primary overflow-hidden border-0 shadow-sm h-100 w-100">
                     <div class="card-body">
-                        <div class="row align-items-center h-100">
-                            <div class="col">
+                        <div class="row align-items-center h-100 g-3 dashboard-today-card-row">
+                            <div class="col-xl-4 col-lg-4 col-md-12">
                                 <p class="text-muted fs-13 mb-2">نوبت های امروز</p>
-                                <h2 class="dashboard-stat-value mb-0 fw-semibold">{{ $fetchData['today_appointment'] ?? 0 }}</h2>
+                                <h2 class="dashboard-stat-value mb-0 fw-semibold">{{ number_format((float) data_get($fetchData, 'today_appointment', 0)) }}</h2>
                                 <small class="dashboard-stat-meta d-block mt-3 text-primary">نمای سریع وضعیت امروز</small>
                             </div>
-                            <div class="col col-auto top-icn dash">
+                            <div class="col-xl-6 col-lg-6 col-md-12">
+                                <div class="dashboard-mini-grid">
+                                    <div>
+                                        <span>۷ روز آینده</span>
+                                        <strong>{{ number_format((float) data_get($fetchData, 'appointment_insights.next_7_days', 0)) }}</strong>
+                                    </div>
+                                    <div>
+                                        <span>منتظر پرداخت</span>
+                                        <strong>{{ number_format((float) data_get($fetchData, 'appointment_insights.wait_payment', 0)) }}</strong>
+                                    </div>
+                                    <div>
+                                        <span>لغو امروز</span>
+                                        <strong>{{ number_format((float) data_get($fetchData, 'appointment_insights.today_cancel', 0)) }}</strong>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-xl-2 col-lg-2 d-none d-lg-flex top-icn dash justify-content-end">
                                 <div class="counter-icon bg-primary-transparent dash ms-auto">
                                     <i class="fa fa-calendar-check-o text-primary" aria-hidden="true"></i>
                                 </div>
@@ -457,6 +473,37 @@
             font-size: 12px;
         }
 
+        .dashboard-mini-grid {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 10px;
+        }
+
+        .dashboard-mini-grid > div {
+            padding: 10px;
+            border-radius: 8px;
+            background: #f4f7ff;
+            border: 1px solid #e1e8ff;
+            text-align: center;
+        }
+
+        .dashboard-mini-grid span {
+            display: block;
+            color: #6b7280;
+            font-size: 11.5px;
+            margin-bottom: 5px;
+            white-space: normal;
+            overflow-wrap: anywhere;
+            line-height: 1.6;
+        }
+
+        .dashboard-mini-grid strong {
+            display: block;
+            color: #3742a0;
+            font-size: 18px;
+            line-height: 1.2;
+        }
+
         .dashboard-panel-card > .card-header {
             min-height: 56px;
             padding-top: 0.85rem;
@@ -476,6 +523,16 @@
             .dashboard-metric-divider {
                 border-right: 1px solid #e9edf4;
                 border-left: 1px solid #e9edf4;
+            }
+
+            .dashboard-mini-grid {
+                grid-template-columns: repeat(3, minmax(0, 1fr));
+            }
+        }
+
+        @media (max-width: 575.98px) {
+            .dashboard-mini-grid {
+                grid-template-columns: 1fr;
             }
         }
     </style>

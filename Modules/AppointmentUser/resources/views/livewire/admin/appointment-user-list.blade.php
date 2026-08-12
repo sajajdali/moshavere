@@ -1,561 +1,324 @@
-<div>
+@php
+    $appointments = $this->handleSearch();
+    $hasFilters = collect($search)->contains(fn($value) => filled($value));
+    $selectedCount = collect(data_get($form, 'checkbox', []))->filter()->count();
+    $totalStats = $appointments->total();
+@endphp
+
+<div class="appointment-list-page" dir="rtl">
+    <style>
+        .side-app{background:#f4f6f8}
+        .appointment-list-page{min-height:100vh;background:#f4f6f8;padding:8px 0 32px;color:#101828;font-family:"yekanbakh-reg",Tahoma,sans-serif}
+        .appointment-shell{max-width:1560px;margin:0 auto;display:flex;flex-direction:column;gap:18px}
+        .appointment-topbar{display:flex;align-items:flex-end;justify-content:space-between;gap:24px;flex-wrap:wrap}
+        .appointment-breadcrumb{display:flex;align-items:center;gap:10px;font-size:12.5px;color:#98a2b3;margin-bottom:6px}
+        .appointment-title{margin:0;font-size:26px;font-weight:700;letter-spacing:0}
+        .appointment-subtitle{font-size:13.5px;color:#667085;margin-top:6px}
+        .appointment-actions{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+        .om-btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;height:42px;padding:0 16px;border-radius:10px;border:1px solid #d5dae1;background:#fff;color:#344054;font-size:13.5px;font-weight:500;cursor:pointer;line-height:1.2}
+        .om-btn:hover{background:#f9fafb;border-color:#b9c2cc;color:#344054;text-decoration:none}
+        .om-btn-primary{border-color:#0f766e;background:#0f766e;color:#fff;font-weight:600;box-shadow:0 1px 2px rgba(16,24,40,.08)}
+        .om-btn-primary:hover{background:#0b5c56;border-color:#0b5c56;color:#fff}
+        .om-btn-danger{border-color:#f0b2ab;color:#b42318}
+        .om-btn-danger:hover{background:#fef3f2;color:#b42318}
+        .appointment-card{background:#fff;border:1px solid #e6e8ec;border-radius:16px;box-shadow:0 1px 2px rgba(16,24,40,.04);overflow:hidden}
+        .appointment-toolbar{padding:16px 18px;display:flex;align-items:center;gap:12px;flex-wrap:wrap;border-bottom:1px solid #eef0f3}
+        .appointment-search{position:relative;flex:1;min-width:280px}
+        .appointment-search i{position:absolute;right:14px;top:50%;transform:translateY(-50%);color:#98a2b3;font-size:15px}
+        .appointment-search input,.appointment-filter-grid input,.appointment-filter-grid select{width:100%;height:40px;border:1px solid #d5dae1;border-radius:9px;background:#fff;padding:0 12px;font-size:13px;color:#101828;outline:none}
+        .appointment-search input{height:44px;border-radius:11px;background:#fbfcfd;padding-right:40px;font-size:13.5px}
+        .appointment-search input:focus,.appointment-filter-grid input:focus,.appointment-filter-grid select:focus{border-color:#0f766e;box-shadow:0 0 0 3px rgba(15,118,110,.10)}
+        .appointment-tabs{display:flex;align-items:center;gap:6px;padding:4px;background:#f2f4f7;border-radius:11px;flex-wrap:wrap}
+        .appointment-tab{height:34px;padding:0 14px;border-radius:8px;border:none;background:transparent;color:#667085;font-size:12.5px;font-weight:500}
+        .appointment-tab.active{background:#fff;color:#0f766e;font-weight:600;box-shadow:0 1px 2px rgba(16,24,40,.08)}
+        .appointment-advanced{padding:22px 18px;background:#fbfcfd;border-bottom:1px solid #eef0f3}
+        .appointment-filter-section{margin-bottom:22px}
+        .appointment-filter-heading{display:flex;align-items:center;gap:10px;margin-bottom:12px}
+        .appointment-filter-heading span{font-size:13px;font-weight:600;color:#0f766e}
+        .appointment-filter-heading:after{content:"";flex:1;height:1px;background:#e6e8ec}
+        .appointment-filter-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:12px}
+        .appointment-filter-grid label{display:flex;flex-direction:column;gap:6px;margin:0}
+        .appointment-filter-grid label span{font-size:12.5px;color:#475467;font-weight:500}
+        .appointment-selection{display:flex;align-items:center;gap:14px;padding:12px 18px;background:#eefaf8;border-bottom:1px solid #cdeae5}
+        .appointment-selection strong{font-size:13.5px;color:#0f5f59}
+        .appointment-table-wrap{overflow-x:auto}
+        .appointment-table{min-width:1480px}
+        .appointment-grid{display:grid;grid-template-columns:42px 58px minmax(170px,.9fr) 1.15fr 128px 1fr 1fr 118px 168px 120px 126px;align-items:center}
+        .appointment-head{padding:0 8px;background:#f9fafb;border-bottom:1px solid #e6e8ec;position:sticky;top:0;z-index:5}
+        .appointment-head>div{padding:10px 5px;font-size:12px;font-weight:600;color:#667085}
+        .appointment-row{padding:10px 8px;border-bottom:1px solid #eef0f3;background:#fff}
+        .appointment-row>div{padding:0 5px;min-width:0}
+        .om-avatar{width:36px;height:36px;flex:none;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:600;color:#fff;background:#0f766e}
+        .om-pill{display:inline-flex;align-items:center;gap:5px;font-size:11.5px;font-weight:500;padding:3px 9px;border-radius:20px;border:1px solid #d5dae1;background:#f9fafb;color:#475467;white-space:nowrap}
+        .om-status{display:inline-flex;align-items:center;justify-content:center;width:100%;font-size:12px;font-weight:600;padding:6px 10px;border-radius:8px}
+        .om-muted{font-size:11.5px;color:#667085}
+        .om-ellipsis{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+        .appointment-detail{padding:16px 20px 18px;background:#fbfcfd;border-bottom:1px solid #eef0f3;display:grid;grid-template-columns:2fr 1fr 1fr;gap:22px}
+        .appointment-footer{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:14px;padding:14px 18px;border-top:1px solid #eef0f3}
+        .pagination{margin:0}
+        @media (max-width: 1200px){.appointment-filter-grid{grid-template-columns:repeat(2,1fr)}}
+        @media (max-width: 768px){.appointment-list-page{padding:0 0 28px}.appointment-filter-grid{grid-template-columns:1fr}.appointment-actions{width:100%}.om-btn{flex:1}.appointment-title{font-size:22px}}
+    </style>
+
     <div wire:loading>
         <div class="loading-overlay d-flex align-items-center justify-content-center">
-            <div class="dimmer active">
-                <div class="spinner2">
-                    <div class="cube1" style="width: 20px; height: 20px;"></div>
-                    <div class="cube2" style="width: 20px; height: 20px;"></div>
-                </div>
+            <div class="dimmer active"><div class="spinner2"><div class="cube1" style="width:20px;height:20px;"></div><div class="cube2" style="width:20px;height:20px;"></div></div></div>
+        </div>
+    </div>
+
+    <div class="appointment-shell" wire:loading.class="op-0-3">
+        <div class="appointment-topbar">
+            <div>
+                <div class="appointment-breadcrumb"><span>پیشخوان</span><span>/</span><span>نوبت‌ها</span></div>
+                <h1 class="appointment-title">لیست نوبت‌های ثبت شده</h1>
+                <div class="appointment-subtitle">مدیریت و پیگیری نوبت‌های بیماران - نمایش {{ $appointments->firstItem() ?? 0 }} تا {{ $appointments->lastItem() ?? 0 }} از {{ $appointments->total() }} نوبت</div>
+            </div>
+            <div class="appointment-actions">
+                <button wire:loading.class="btn-loading bg-gray" wire:target="ExportData" wire:click="ExportData" class="om-btn" type="button">
+                    <i class="fa fa-download"></i><span>خروجی اکسل</span>
+                </button>
+                <button wire:loading.class="btn-loading bg-gray" wire:target="showTodayAppointments" wire:click="showTodayAppointments" class="om-btn" type="button">
+                    <i class="fa fa-calendar-day-o"></i><span>نوبت‌های امروز</span>
+                </button>
+                @can('appointment_user.addApp')
+                    <a href="{{ route('admin.appointment_user.addApp') }}" class="om-btn om-btn-primary"><i class="fa fa-plus"></i><span>افزودن نوبت</span></a>
+                @endcan
             </div>
         </div>
-    </div>
-    <div class="page-header">
-        <div>
-            <h1 class="page-title">لیست نوبت های ثبت شده</h1>
-        </div>
-        @can('appointment_user.addApp')
-            <a href="{{ route('admin.appointment_user.addApp') }}" class=" mt-3 mt-md-0 btn btn-primary"
-                aria-expanded="false" aria-controls="customDate">افزودن نوبت</a>
-        @endcan
-    </div>
-    @include('admin::layouts.components.alert')
-    @if (isset($msg) && !empty($msg))
-        <div class="col-md-12 alert alert-success fade show" role="alert">
-            <i class="fa fa-check-circle-o me-2" aria-hidden="true"></i>
-            {{ $msg }}
-        </div>
-    @endif
-    @error('exelError')
-        <div class="col-md-12 alert alert-danger fade show" role="alert">
-            <i class="fa fa-remove me-2" aria-hidden="true"></i>
-            {{ $message }}
-        </div>
-    @enderror
-    <div class="row row-sm" wire:key='{{ \uniqid() }}' wire:loading.class="op-0-3">
-        <div class="col-lg-12">
-            <div class="card custom-card">
-                <div class="card-header d-flex justify-content-between border-bottom">
-                    <h3 class="card-title">لیست نوبت های ثبت شده</h3>
-                    <div class="card-options">
-                        @can('[update,delete]', $this->handleSearch()->first())
-                            <div class="btn-group me-2 d-none " id="exutebtn">
-                                <button type="button" class="btn btn-success dropdown-toggle " data-bs-toggle="dropdown">
-                                    عملیات گروهی <span class="caret"></span>
-                                </button>
-                                <ul class="dropdown-menu pe-4" role="menu">
-                                    <li><a href="#" class="confirm_swal_alert w-100"
-                                            data-description="از کنسل کردن نوبت های انتخابی مطمعن هستید؟"
-                                            data-title="کنسل کردن" data-confirmbtn="بله کنسل شوند"
-                                            data-action="GroupCancel">کنسل کردن</a>
-                                    </li>
-                                </ul>
-                            </div>
-                        @endcan
-                        <button class="btn btn-primary" type="button" data-bs-toggle="collapse"
-                            data-bs-target="#advanceSearch" aria-expanded="false" aria-controls="advanceSearch">
-                            جست و جوی پیشرفته
-                        </button>
-                        @foreach ($search as $key => $value)
-                            @if ($value !== null)
-                                <button class="btn btn-secondary ms-2" wire:click="resetProperties" type="button"
-                                    data-bs-toggle="collapse" data-bs-target="#advanceSearch" aria-expanded="false"
-                                    aria-controls="advanceSearch"
-                                    wire:loading.class="bg-gray btn-loading disabled">نمایش همه نوبت ها
-                                </button>
-                                @break
 
-                            @endif
-                        @endforeach
-                    </div>
+        @include('admin::layouts.components.alert')
+        @if (isset($msg) && !empty($msg))
+            <div class="alert alert-success fade show" role="alert"><i class="fa fa-check-circle-o me-2"></i>{{ $msg }}</div>
+        @endif
+        @error('exelError')
+            <div class="alert alert-danger fade show" role="alert"><i class="fa fa-remove me-2"></i>{{ $message }}</div>
+        @enderror
 
+        <div class="appointment-card">
+            <div class="appointment-toolbar">
+                <div class="appointment-search">
+                    <i class="fa fa-search"></i>
+                    <input wire:model.live.debounce.600ms="search.user_mobile" placeholder="جست و جو بر اساس شماره موبایل..." type="text">
                 </div>
-                {{-- search cards --}}
-                <div class="card-body">
-                    <div class="mb-5 collapse
-                @if ($showcollaps) @foreach ($search as $key => $value)
-                    @if ($key == 'kind')
-                        @continue @endif
-                        @if ($value !== null) show @break @endif
-                    @endforeach "
-                        @endif
-                        id="advanceSearch" wire:ignore.self>
-                        <form class="form-horizontal example" autocomplete="off">
-                            <div class="row mb-5">
-                                <div class="col-12 col-md-3">
-                                    <h4 class="text-center text-primary text-start ms-1"><a data-bs-toggle="collapse"
-                                            href="#userDataCollaps" role="button" aria-expanded="false"
-                                            aria-controls="userDataCollaps" href="">
-                                            <i class="fa fa-user" aria-hidden="true"></i>
-                                            <span>مشخصات کاربر</span>
-                                        </a></h4>
-                                </div>
-                                <div class=" col-12 col-md-9">
-                                    <hr class="my-4">
-                                </div>
-                                <div class="collapse  show row" id="userDataCollaps">
-                                    <div class="col-md-6 form-group">
-                                        <label for="search-id" class=" form-label"><strong>ایدی</strong></label>
-                                        <input class="form-control" id="search-id" wire:model="search.user_id"
-                                            placeholder="ایدی کاربر مورد نظر" type="text">
+                <div class="appointment-tabs">
+                    <button class="appointment-tab {{ blank($search['AppointmentStatus']) ? 'active' : '' }}" wire:click="$set('search.AppointmentStatus', null)" type="button">همه <span>{{ $totalStats }}</span></button>
+                    <button class="appointment-tab {{ (string) $search['AppointmentStatus'] === (string) \Modules\AppointmentUser\Enum\AppointmentUserStatusEnum::STATUS_SUCCESSFUL->value ? 'active' : '' }}" wire:click="$set('search.AppointmentStatus', {{ \Modules\AppointmentUser\Enum\AppointmentUserStatusEnum::STATUS_SUCCESSFUL->value }})" type="button">تایید شده</button>
+                    <button class="appointment-tab {{ (string) $search['AppointmentStatus'] === (string) \Modules\AppointmentUser\Enum\AppointmentUserStatusEnum::STATUS_MONITORING->value ? 'active' : '' }}" wire:click="$set('search.AppointmentStatus', {{ \Modules\AppointmentUser\Enum\AppointmentUserStatusEnum::STATUS_MONITORING->value }})" type="button">در انتظار تایید</button>
+                    <button class="appointment-tab {{ (string) $search['AppointmentStatus'] === (string) \Modules\AppointmentUser\Enum\AppointmentUserStatusEnum::STATUS_CANCEL->value ? 'active' : '' }}" wire:click="$set('search.AppointmentStatus', {{ \Modules\AppointmentUser\Enum\AppointmentUserStatusEnum::STATUS_CANCEL->value }})" type="button">کنسل شده</button>
+                </div>
+                <button class="om-btn {{ $hasFilters ? 'om-btn-primary' : '' }}" type="button" data-bs-toggle="collapse" data-bs-target="#advanceSearch">
+                    <i class="fa fa-sliders"></i><span>جست و جوی پیشرفته</span>
+                </button>
+                @if ($hasFilters)
+                    <button class="om-btn" wire:click="resetProperties" type="button" wire:loading.class="bg-gray btn-loading disabled">نمایش همه نوبت‌ها</button>
+                @endif
+            </div>
 
-                                    </div>
-                                    <div class="col-md-6">
-                                        <label for="search-Username" class="form-label"><strong>نام</strong></label>
-                                        <input class="form-control" id="search-Username"
-                                            wire:model="search.user_first_name" placeholder="نام کاربر مورد نظر"
-                                            type="text">
-
-                                    </div>
-                                    <div class="col-md-6">
-                                        <label for="search-UserLname" class="form-label"><strong>نام
-                                                خانوادگی</strong></label>
-                                        <input class="form-control" id="search-UserLname"
-                                            wire:model="search.user_last_name" placeholder="نام خانوادگی کاربر مورد نظر"
-                                            type="text">
-
-                                    </div>
-                                    <div class="col-md-6">
-                                        <label for="search-UserMobile" class="form-label"><strong>شماره
-                                                موبایل</strong></label>
-                                        <input class="form-control" id="search-UserMobile" autocomplete="on"
-                                            wire:model="search.user_mobile" placeholder="شماره تماس" type="text">
-
-                                    </div>
-                                    <div class="col-md-12">
-                                        <label for="search-UserMobile" class="form-label"><strong>کد
-                                                ملی</strong></label>
-                                        <input class="form-control" id="search-UserMobile"
-                                            wire:model="search.national_code" placeholder="کد ملی کاربر"
-                                            type="text">
-
-                                    </div>
-                                </div>
+            <div class="collapse {{ $hasFilters ? 'show' : '' }}" id="advanceSearch" wire:ignore.self>
+                <div class="appointment-advanced">
+                    <form autocomplete="off">
+                        <div class="appointment-filter-section">
+                            <div class="appointment-filter-heading"><span>مشخصات کاربر</span></div>
+                            <div class="appointment-filter-grid">
+                                <label><span>آیدی کاربر</span><input wire:model="search.user_id" placeholder="آیدی کاربر" type="text"></label>
+                                <label><span>نام</span><input wire:model="search.user_first_name" placeholder="نام کاربر" type="text"></label>
+                                <label><span>نام خانوادگی</span><input wire:model="search.user_last_name" placeholder="نام خانوادگی" type="text"></label>
+                                <label><span>شماره موبایل</span><input wire:model="search.user_mobile" placeholder="شماره تماس" type="text"></label>
+                                <label><span>کد ملی</span><input wire:model="search.national_code" placeholder="کد ملی کاربر" type="text"></label>
                             </div>
-                            <div class="row my-5">
-                                <div class="col-12 col-md-3">
-                                    <h4 class="text-center text-primary text-start ms-1"><a data-bs-toggle="collapse"
-                                            href="#appointmentCollapsSearch" role="button" aria-expanded="false"
-                                            aria-controls="appointmentCollapsSearch">
-                                            <i class="fa fa-calendar-check-o" aria-hidden="true"></i>
-                                            <span>فیلتر نوبت</span>
-                                        </a></h4>
-                                </div>
-                                <div class="col-12 col-md-9">
-                                    <hr class="my-4">
-                                </div>
-                                <div class="collapse row
-                            @if (isset($search['appointment_date']) ||
-                                    isset($search['appointment_set_date']) ||
-                                    isset($search['kind']) ||
-                                    isset($search['appointment_id']) ||
-                                    isset($search['appointment_star_date']) ||
-                                    isset($search['appointment_operatorId']) ||
-                                    isset($search['appointment_end_date'])) ) show @endif"
-                                    id="appointmentCollapsSearch" wire:ignore.self>
-                                    <div class="col-md-6">
-                                        <label for="search-appointment_id"
-                                            class="form-label"><strong>ایدی</strong></label>
-                                        <input class="form-control" id="search-appointment_id"
-                                            wire:model="search.appointment_id" placeholder="آیدی نوبت"
-                                            type="text">
+                        </div>
 
-                                    </div>
-                                    <div class="col-md-6">
-                                        <label for="search-kind" class="form-label datePicker"><strong>نوع
-                                                نوبت</strong></label>
-                                        <select class="form-control" id="search-kind" wire:model="search.kind"
-                                            type="text">
-                                            <option value="">انتخاب کنید...</option>
-                                            @foreach (Modules\AppointmentUser\Enum\AppointmentUserKindEnum::cases() as $kindCase)
-                                                <option value="{{ $kindCase }}">
-                                                    {{ $kindCase->getName() }}
-                                                </option>
-                                            @endforeach
-                                        </select>
-
-                                    </div>
-                                    <div class="col-md-6">
-                                        <label for="search-appointment_date" class="form-label"><strong>زمان
-                                                نوبت</strong></label>
-                                        <input class="form-control" id="search-appointment_date" data-jdp
-                                            data-name="search.appointment_date" wire:model="search.appointment_date"
-                                            placeholder="زمانی که نوبت دریافت شده" type="text">
-
-                                    </div>
-                                    <div class="col-md-6">
-                                        <label for="search-id-appointment_set_date" class="form-label"><strong>زمان
-                                                ثبت
-                                                نوبت</strong></label>
-                                        <input class="form-control" id="search-appointment_set_date" data-jdp
-                                            data-name="search.appointment_set_date"
-                                            wire:model="search.appointment_set_date"
-                                            placeholder="زمانی که نوبت ثبت شده" type="text">
-
-                                    </div>
-                                    <div class="col-md-6">
-                                        <label for="search-id-appointment_star_date" class="form-label"><strong>تاریخ
-                                                شروع</strong></label>
-                                        <input class="form-control" id="search-appointment_star_date" data-jdp
-                                            data-name="search.appointment_star_date"
-                                            wire:model="search.appointment_star_date"
-                                            placeholder="نوبت های از این تاریخ به بعد" type="text">
-
-                                    </div>
-                                    <div class="col-md-6">
-                                        <label for="search-id-appointment_end_date" class="form-label"><strong>تاریخ
-                                                پایان</strong></label>
-                                        <input class="form-control" id="search-appointment_end_date" data-jdp
-                                            data-name="search.appointment_end_date"
-                                            wire:model="search.appointment_end_date"
-                                            placeholder="نوبت هایی ازین تاریخ به قبل" type="text">
-
-                                    </div>
-                                    <div class="col-md-6">
-                                        <label for="search-appStatusId" class="form-label datePicker"><strong>وضعیت
-                                                نوبت</strong></label>
-                                        <select class="form-control" id="search-appStatusId"
-                                            wire:model="search.AppointmentStatus" placeholder="نام ثبت نوبت"
-                                            type="text">
-                                            <option value="">انتخاب کنید...</option>
-                                            @foreach (Modules\AppointmentUser\Enum\AppointmentUserStatusEnum::cases() as $enumCase)
-                                                <option value="{{ $enumCase }}">
-                                                    {{ $enumCase->getName() }}
-                                                </option>
-                                            @endforeach
-                                        </select>
-
-                                    </div>
-                                    <div class="col-md-6">
-                                        <label for="search-docNumberId" class="form-label"><strong>شماره
-                                                پرونده</strong></label>
-                                        <input class="form-control" id="search-docNumberId"
-                                            wire:model="search.docNumber" placeholder="شماره پرونده کاربر"
-                                            type="text">
-
-                                    </div>
-                                    @if (!empty(\Modules\User\Entities\User::operators()))
-                                        <div class="col-md-6">
-                                            <label for="search-operator" class="form-label datePicker"><strong>اپراتور
-                                                    نوبت</strong></label>
-                                            <select class="form-control" id="search-operator"
-                                                wire:model="search.appointment_operatorId"
-                                                placeholder="وضعیت اپراتور نوبت" type="text">
-                                                <option value="">انتخاب کنید...</option>
-                                                <option value="0">بدون اپراتور</option>
-
-                                                @foreach (\Modules\User\Entities\User::operators() as $operators)
-                                                    <option value="{{ $operators->id }}">
-                                                        {{ $operators->fullName }}
-                                                    </option>
-                                                @endforeach
-                                            </select>
-                                        </div>
-                                    @endif
-                                </div>
-                            </div>
-                            <div class="row my-5">
-                                <div class="col-12 col-md-4">
-                                    <h4 class="text-center text-primary text-start ms-1"> <a type="button"
-                                            data-bs-toggle="collapse" data-bs-target="#settAppointmentCollaps"
-                                            aria-expanded="false" aria-controls="settAppointmentCollaps">
-                                            <i class="fa fa-user" aria-hidden="true"></i>
-                                            <span> ثبت کننده نوبت</span>
-                                        </a></h4>
-                                </div>
-                                <div class="col-12 col-md-8">
-                                    <hr class="my-4">
-                                </div>
-                                <div class="collapse row @if (isset($search['setterAppointment'])) show @endif"
-                                    id="settAppointmentCollaps">
-                                    <div class="col-md-12">
-                                        <div class="form-group">
-                                            <label class="form-label"><strong>ثبت کننده را انتخاب کنید</strong></label>
-                                            <select wire:model='search.setterAppointment'
-                                                class="form-control select2-show-search form-select"
-                                                data-id="setterAppointment" data-placeholder="انتخاب کنید..">
-                                                <option label="انتخاب کنید.."></option>
-                                                @if (isset($fetchData['appointmentSetter']))
-                                                    @foreach ($fetchData['appointmentSetter'] as $key => $role)
-                                                        <option value="{{ $role->id }}">{{ $role->name }}
-                                                        </option>
-                                                    @endforeach
-                                                @endif
-                                            </select>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="row my-5">
-                                <div class="col-12 col-md-3">
-                                    <h4 class="text-center text-primary text-start ms-1"><a data-bs-toggle="collapse"
-                                            href="#sectionCollaps" role="button" aria-expanded="false"
-                                            aria-controls="sectionCollaps">
-                                            <i class="fa fa-ambulance" aria-hidden="true"></i>
-                                            <span>فیلتر بخش</span>
-                                        </a></h4>
-                                </div>
-                                <div class="col-12 col-md-9">
-                                    <hr class="my-4">
-                                </div>
-                                <div class="collapse row" id="sectionCollaps">
-                                    <div class="row mb-4 ps-5">
-                                        <select class="form-control" id="search-section-statusId"
-                                            wire:model="search.section_status" placeholder="انتخاب کنید"
-                                            type="text">
-                                            <option value="">انتخاب کنید...</option>
-                                            @foreach ($fetchData['Services'] as $key => $service)
-                                                <option value="{{ $service->id }}">{{ $service->title }}</option>
-                                            @endforeach
-                                        </select>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="row my-5">
-                                <div class="col-12 col-md-3">
-                                    <h4 class="text-center text-primary text-start ms-1"><a data-bs-toggle="collapse"
-                                            href="#doctorSectionFillter" role="button" aria-expanded="false"
-                                            aria-controls="doctorSectionFillter">
-                                            <i class="fa fa-user-md" aria-hidden="true"></i>
-                                            <span>فیلتر پزشک</span>
-                                        </a></h4>
-                                </div>
-                                <div class="col-12 col-md-9">
-                                    <hr class="my-4">
-                                </div>
-                                <div class="collapse row @if (isset($search['Doc_id'])) show @endif"
-                                    id="doctorSectionFillter">
-                                    <div class="row mb-4 ps-5">
-                                        <div class="col-12">
-                                            <div class="form-group">
-                                                <label class="form-label"><strong>پزشک</strong></label>
-                                                <select wire:model='search.Doc_id' wire:igonre.self
-                                                    class="form-control select2-show-search form-select"
-                                                    data-id="Doc_id" data-placeholder="انتخاب کنید..">
-                                                    <option label="انتخاب کنید.."></option>
-                                                    @if (isset($fetchData['doctors']))
-                                                        @foreach ($fetchData['doctors'] as $doctor)
-                                                            <option value="{{ $doctor->id }}">
-                                                                {{ $doctor->fullName }}
-                                                            </option>
-                                                        @endforeach
-                                                    @endif
-                                                </select>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            <button class="btn btn-primary" type="button" wire:click="startSearch"
-                                wire:loading.class="bg-gray btn-loading disabled">جست و
-                                جو
-                            </button>
-                        </form>
-                    </div>
-                    <div class="table-responsive mb-3" style="min-height: 400px">
-                        <table class="table text-nowrap text-md-nowrap table-bordered text-center">
-                            <thead>
-                                <tr>
-                                    <th scope="col">#</th>
-                                    <th scope="col">انتخاب</th>
-                                    <th scope="col">نوع نوبت</th>
-                                    <th scope="col">نام کاربر</th>
-                                    <th scope="col">شماره موبایل</th>
-                                    <th scope="col">نام پزشک</th>
-                                    <th scope="col">ساعت نوبت</th>
-                                    <th scope="col">تاریخ نوبت</th>
-                                    <th scope="col">عملیات</th>
-                                    <th scope="col">ثبت شده توسط</th>
-                                    <th scope="col">بخش </th>
-                                    <th scope="col">تاریخ ثبت نوبت</th>
-                                    @if ($setting['show_description'])
-                                        <th scope="col">توضیحات</th>
-                                    @endif
-                                    <th scope="col">کد ملی</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                @if ($this->handleSearch()->isNotEmpty())
-                                    @foreach ($this->handleSearch() as $key => $ap)
-                                        <tr class="text-center {{ $ap->getColor() }}"
-                                            wire:key='appoimt_{{ $ap->id }}'>
-                                            <td>{{ $ap->id }}</td>
-                                            <td class="p-4 ">
-                                                <div class="d-flex flex-column">
-                                                    <label class="mt-1" for="checkbox-{{ $ap->id }}">
-                                                        <input wire:model='form.checkbox.{{ $ap->id }}'
-                                                            class="checkbox" id="checkbox-{{ $ap->id }}"
-                                                            type="checkbox" value="">
-                                                    </label>
-                                                    @can('appointment_user.feedBack')
-                                                        @if ($ap->feedbacks->isNotEmpty() || $ap->surveyVoiceUrl())
-                                                            <a wire:click='lunchFeedBackModal({{ $ap->id }})'
-                                                                href="#"><small class="badge bg-primary ">
-                                                                    نظر سنجی
-                                                                </small></a>
-                                                        @endif
-                                                    @endcan
-                                                </div>
-                                            </td>
-                                            <td class="{{ $ap->type->getclass() }} d-flex flex-column">
-                                                <div class="d-flex align-items-center justify-content-center gap-2">
-                                                    {!! $ap->kind->getIcon() !!}
-                                                    @if ($ap->isStoredFromVoip())
-                                                        <span class="text-primary" title="ثبت شده از طریق ویپ"
-                                                            aria-label="ثبت شده از طریق ویپ">
-                                                            <i class="fa fa-phone fa-2x" aria-hidden="true"></i>
-                                                        </span>
-                                                    @endif
-                                                </div>
-                                                <a
-                                                    @if ($ap->kind == \Modules\AppointmentUser\Enum\AppointmentUserKindEnum::ONLINE && $ap->online->isNotEmpty()) href="{{ route('admin.appointment_user.message.detail', ['onlineAppId' => $ap->online->first()?->id]) }}" @else href="" @endif>
-                                                    <span
-                                                        class="badge badge-sm {{ $ap->kind->getbadgeColor() }} rounded-pill">
-                                                        {{ $ap->kind->getName() }}
-                                                        @if ($ap->kind == \Modules\AppointmentUser\Enum\AppointmentUserKindEnum::ONLINE)
-                                                            {{ $ap->online->first()?->messages?->first()?->unReadedMessageCount() ?? 0 }}
-                                                        @endif
-                                                    </span>
-                                                </a>
-                                            </td>
-                                            <td>
-                                                <div class="d-flex flex-column">
-                                                    <span>
-                                                        <a href="{{route('admin.user.document',['user' => $ap->user->id])}}">
-                                                            {{ $ap->user?->full_name ?? 'کاربر حذف شده' }}
-                                                        </a>
-                                                    </span>
-                                                    @if (setting(\Modules\Setting\Enum\SettingKeyEnum::APPOINTMENT_USER_PERESENT_STATUS_REGISTRATION))
-                                                        {!! $ap->attendedStatus() !!}
-                                                    @endif
-                                                </div>
-                                            </td>
-                                            <td
-                                                @if ($ap->isAppForothers()) class="text-primary" data-bs-toggle="tooltip" data-bs-placement="top" title="نوبت برای شخص دیگری دریافت شده است و شماره شخص وارد نشده است!" @endif>
-                                                {{ $ap->user?->mobile ?? $ap->checkForRegisterForOthers() }}
-                                            </td>
-                                            <td>
-                                                <div class="d-flex flex-column">
-                                                    <span>{{ $ap->doctor?->full_name ?? 'پزشک حذف شده' }}</span>
-                                                    @if (
-                                                        $ap->setting?->detail[\Modules\AppointmentSetting\app\Models\AppointmentSetting::OPERATORS][
-                                                            \Modules\AppointmentSetting\app\Models\AppointmentSetting::STATUS
-                                                        ]
-                                                    )
-                                                        <span
-                                                            class="badge badge-sm bg-info">{{ $ap->operator?->full_name ?? 'بدون اپراتور' }}
-                                                        </span>
-                                                    @endif
-                                                </div>
-                                            </td>
-                                            <td>
-                                                @if ($ap->kind == \Modules\AppointmentUser\Enum\AppointmentUserKindEnum::IN_PERSION)
-                                                    {{ verta($ap->start_time)->format('H:i') }}
-                                                @else
-                                                    -
-                                                @endif
-                                            </td>
-                                            <td>{{ verta($ap->date_visit)->format('Y/m/d') }}</td>
-
-                                            <td>
-                                                @canany(['update', 'delete'], $ap)
-                                                    <div class="btn-group mt-2 mb-2">
-                                                        <button type="button"
-                                                            class="btn {{ $ap->status->getButtonColor() }} dropdown-toggle"
-                                                            data-bs-toggle="dropdown">
-                                                            {{ $ap->status->getName() }}
-                                                            <span class="caret"></span>
-                                                        </button>
-                                                        <ul class="dropdown-menu" role="menu">
-                                                            @include('appointmentuser::components.appointmentlist.operationbutton')
-                                                        </ul>
-                                                    </div>
-                                                @else
-                                                    <div class="btn-group mt-2 mb-2">
-                                                        <button type="button" class="btn btn-default dropdown-toggle"
-                                                            data-bs-toggle="dropdown">
-                                                            عملیات <span class="caret"></span>
-                                                        </button>
-                                                    </div>
-                                                @endcan
-                                            </td>
-                                            <td>
-                                                <div class="d-flex flex-column">
-                                                    @if ($ap->agent)
-                                                        <span> {{ $ap->agent->fullName }}</span>
-                                                    @else
-                                                        <span>خود کاربر</span>
-                                                    @endif
-                                                    @if ($ap->kind == \Modules\AppointmentUser\Enum\AppointmentUserKindEnum::ONLINE && $ap->hasAgent())
-                                                        <small class="badge bg-light rounded-pill">
-                                                            <span> {{ $ap->confirm_or_reject_by() }}</span>
-                                                        </small>
-                                                    @endif
-                                                </div>
-                                            </td>
-                                            <td>
-                                                <div class="d-flex flex-column">
-                                                    <span>
-                                                        {{ $ap->service?->title ?? 'سرویس حذف شده ' }}
-                                                    </span>
-                                                    @if ($ap->hasSegment())
-                                                        @foreach ($this->segmentData($ap->id) as $segments)
-                                                            <small>
-                                                                {{ $segments['title'] }}
-                                                            </small>
-                                                        @endforeach
-                                                    @endif
-                                                </div>
-                                            </td>
-                                            <td>
-                                                <div class="d-flex flex-column align-item-center">
-                                                    <span>
-                                                        {{ verta($ap->created_at)->format('Y/m/d') }}
-                                                    </span>
-                                                    <span>
-                                                        {{ verta($ap->created_at)->format('H:i') }}
-                                                    </span>
-                                                </div>
-                                            </td>
-                                            @if ($setting['show_description'])
-                                            <td style="white-space: normal; overflow-wrap: anywhere;">
-                                                {{ $ap->getAppDescription() }} {{$ap->getAppDescription()}}
-                                                </td>
-                                            @endif
-                                            <td>{{ $ap->user?->national_code ?? '---' }}</td>
-                                        </tr>
-                                    @endforeach
-                                @else
-                                    <tr wire:key='no-appointments'>
-                                        <td colspan="13">
-                                            <div class="alert alert-info alert-dismissible fade show" role="alert">
-                                                <strong>توجه!</strong> نوبتی یافت نشد
-                                                <a type="button" class="btn btn-info"
-                                                    href="{{ route('admin.appointment_user.addApp') }}">
-                                                    ثبت نوبت
-                                                </a>
-                                            </div>
-                                        </td>
-                                    </tr>
+                        <div class="appointment-filter-section">
+                            <div class="appointment-filter-heading"><span>فیلتر نوبت</span></div>
+                            <div class="appointment-filter-grid">
+                                <label><span>آیدی نوبت</span><input wire:model="search.appointment_id" placeholder="آیدی نوبت" type="text"></label>
+                                <label><span>نوع نوبت</span><select wire:model="search.kind"><option value="">همه انواع</option>@foreach (\Modules\AppointmentUser\Enum\AppointmentUserKindEnum::cases() as $kindCase)<option value="{{ $kindCase->value }}">{{ $kindCase->getName() }}</option>@endforeach</select></label>
+                                <label><span>وضعیت نوبت</span><select wire:model="search.AppointmentStatus"><option value="">همه وضعیت‌ها</option>@foreach (\Modules\AppointmentUser\Enum\AppointmentUserStatusEnum::cases() as $enumCase)<option value="{{ $enumCase->value }}">{{ $enumCase->getName() }}</option>@endforeach</select></label>
+                                <label><span>زمان نوبت</span><input data-jdp data-name="search.appointment_date" wire:model="search.appointment_date" placeholder="زمان نوبت" type="text"></label>
+                                <label><span>زمان ثبت نوبت</span><input data-jdp data-name="search.appointment_set_date" wire:model="search.appointment_set_date" placeholder="زمان ثبت" type="text"></label>
+                                <label><span>تاریخ شروع</span><input data-jdp data-name="search.appointment_star_date" wire:model="search.appointment_star_date" placeholder="از تاریخ" type="text"></label>
+                                <label><span>تاریخ پایان</span><input data-jdp data-name="search.appointment_end_date" wire:model="search.appointment_end_date" placeholder="تا تاریخ" type="text"></label>
+                                <label><span>شماره پرونده</span><input wire:model="search.docNumber" placeholder="شماره پرونده" type="text"></label>
+                                @if (!empty(\Modules\User\Entities\User::operators()))
+                                    <label><span>اپراتور نوبت</span><select wire:model="search.appointment_operatorId"><option value="">همه اپراتورها</option><option value="0">بدون اپراتور</option>@foreach (\Modules\User\Entities\User::operators() as $operators)<option value="{{ $operators->id }}">{{ $operators->fullName }}</option>@endforeach</select></label>
                                 @endif
-                            </tbody>
-                        </table>
-                    </div>
-                    <div class="d-flex justify-content-center">
-                        {{ $this->handleSearch()->links() }}
-                    </div>
+                                <label><span>ثبت کننده نوبت</span><select wire:model="search.setterAppointment"><option value="">انتخاب کنید...</option>@foreach (($fetchData['appointmentSetter'] ?? []) as $role)<option value="{{ $role->id }}">{{ $role->name }}</option>@endforeach</select></label>
+                            </div>
+                        </div>
+
+                        <div class="appointment-filter-section">
+                            <div class="appointment-filter-heading"><span>بخش و پزشک</span></div>
+                            <div class="appointment-filter-grid">
+                                <label><span>بخش / سرویس</span><select wire:model="search.section_status"><option value="">همه بخش‌ها</option>@foreach (($fetchData['Services'] ?? []) as $service)<option value="{{ $service->id }}">{{ $service->title }}</option>@endforeach</select></label>
+                                <label style="grid-column:span 2"><span>پزشک</span><select wire:model="search.Doc_id"><option value="">انتخاب کنید...</option>@foreach (($fetchData['doctors'] ?? []) as $doctor)<option value="{{ $doctor->id }}">{{ $doctor->fullName }}</option>@endforeach</select></label>
+                            </div>
+                        </div>
+
+                        <div class="d-flex align-items-center gap-2">
+                            <button class="om-btn om-btn-primary" type="button" wire:click="startSearch" wire:loading.class="bg-gray btn-loading disabled">اعمال فیلتر</button>
+                            <button class="om-btn" type="button" wire:click="resetProperties" wire:loading.class="bg-gray btn-loading disabled">نمایش همه نوبت‌ها</button>
+                        </div>
+                    </form>
                 </div>
             </div>
-            <div class="text-end">
-                <button wire:loading.class='btn-loading bg-gray' wire:target='ExportData' wire:click='ExportData'
-                    class="btn btn-info">دانلود خروجی اکسل</button>
+
+            @if ($selectedCount > 0)
+                <div class="appointment-selection">
+                    <strong>{{ $selectedCount }} نوبت انتخاب شده است</strong>
+                    <div class="flex-grow-1"></div>
+                    @canany(['update', 'delete'], $appointments->first())
+                        <button class="om-btn om-btn-danger confirm_swal_alert" data-description="از کنسل کردن نوبت های انتخابی مطمعن هستید؟" data-title="کنسل کردن" data-confirmbtn="بله کنسل شوند" data-action="GroupCancel" type="button">کنسل کردن گروهی</button>
+                    @endcanany
+                </div>
+            @endif
+
+            <div class="appointment-table-wrap">
+                <div class="appointment-table">
+                    <div class="appointment-grid appointment-head">
+                        <div><input type="checkbox" class="checkbox select-all-visible" style="width:16px;height:16px;accent-color:#0f766e"></div>
+                        <div>شناسه</div><div>کاربر</div><div>پزشک / اپراتور</div><div>زمان نوبت</div><div>بخش</div><div>ثبت شده توسط</div><div>تاریخ ثبت</div><div>وضعیت و عملیات</div><div>کد ملی</div><div>نوع نوبت</div>
+                    </div>
+
+                    @forelse ($appointments as $key => $ap)
+                        @php
+                            $palette = ['#0f766e','#5925dc','#b54708','#175cd3','#c11574','#067647'];
+                            $statusClass = match($ap->status) {
+                                \Modules\AppointmentUser\Enum\AppointmentUserStatusEnum::STATUS_SUCCESSFUL => 'background:#ecfdf3;color:#067647;border:1px solid #abefc6',
+                                \Modules\AppointmentUser\Enum\AppointmentUserStatusEnum::STATUS_PENDING,
+                                \Modules\AppointmentUser\Enum\AppointmentUserStatusEnum::STATUS_MONITORING,
+                                \Modules\AppointmentUser\Enum\AppointmentUserStatusEnum::STATUS_WAIT_PAYMENT => 'background:#fffaeb;color:#b54708;border:1px solid #fedf89',
+                                \Modules\AppointmentUser\Enum\AppointmentUserStatusEnum::STATUS_CANCEL,
+                                \Modules\AppointmentUser\Enum\AppointmentUserStatusEnum::STATUS_DISAPPROVED,
+                                \Modules\AppointmentUser\Enum\AppointmentUserStatusEnum::STATUS_ONILNE_CLOSED => 'background:#fef3f2;color:#b42318;border:1px solid #fecdca',
+                                default => 'background:#eff8ff;color:#175cd3;border:1px solid #b2ddff',
+                            };
+                            $kindClass = match($ap->kind) {
+                                \Modules\AppointmentUser\Enum\AppointmentUserKindEnum::IN_PERSION => 'background:#f0f9ff;color:#026aa2;border-color:#b9e6fe',
+                                \Modules\AppointmentUser\Enum\AppointmentUserKindEnum::ONLINE => 'background:#f4f3ff;color:#5925dc;border-color:#e3e0ff',
+                                default => 'background:#fdf2fa;color:#c11574;border-color:#fcceee',
+                            };
+                            $rowBackground = match($ap->status) {
+                                \Modules\AppointmentUser\Enum\AppointmentUserStatusEnum::STATUS_CANCEL => '#fff1f1',
+                                \Modules\AppointmentUser\Enum\AppointmentUserStatusEnum::STATUS_WAIT_PAYMENT => '#e9f3ff',
+                                default => $loop->odd ? '#f7fbff' : '#fff',
+                            };
+                        @endphp
+                        <div class="appointment-grid appointment-row" style="background:{{ $rowBackground }}" wire:key="appointment-row-{{ $ap->id }}">
+                            <div>
+                                <input wire:model="form.checkbox.{{ $ap->id }}" class="checkbox row-checkbox" id="checkbox-{{ $ap->id }}" type="checkbox" style="width:16px;height:16px;accent-color:#0f766e">
+                            </div>
+                            <div class="d-flex flex-column align-items-center gap-1">
+                                <span style="font-size:13px;font-weight:600;color:#344054">{{ $ap->id }}</span>
+                                @can('appointment_user.feedBack')
+                                    @if ($ap->feedbacks->isNotEmpty() || $ap->surveyVoiceUrl())
+                                        <a wire:click="lunchFeedBackModal({{ $ap->id }})" href="#"><span class="om-pill" style="background:#f4f3ff;color:#5925dc;border-color:#e3e0ff">نظرسنجی</span></a>
+                                    @endif
+                                @endcan
+                            </div>
+                            <div class="d-flex align-items-center" style="padding-right:2px;padding-left:2px">
+                                <div class="d-flex flex-column min-w-0">
+                                    <a class="om-ellipsis" href="{{ $ap->user ? route('admin.user.document', ['user' => $ap->user->id]) : '#' }}" style="font-size:13.5px;font-weight:600;color:#101828">{{ $ap->user?->full_name ?? 'کاربر حذف شده' }}</a>
+                                    <span class="om-muted" style="font-size:12.5px" dir="ltr">{{ $ap->user?->mobile ?? $ap->checkForRegisterForOthers() }}</span>
+                                    @if (
+                                        setting(\Modules\Setting\Enum\SettingKeyEnum::APPOINTMENT_USER_PERESENT_STATUS_REGISTRATION) &&
+                                            isset($ap->details[\Modules\AppointmentUser\app\Models\AppointmentUser::USRE_ATTENDED_STATUS])
+                                    )
+                                        <span>{!! $ap->attendedStatus() !!}</span>
+                                    @endif
+                                </div>
+                            </div>
+                            <div class="d-flex flex-column gap-1">
+                                <span class="om-ellipsis" style="font-size:13px;font-weight:500;color:#344054">{{ $ap->doctor?->full_name ?? 'پزشک حذف شده' }}</span>
+                                @if ($ap->operator)
+                                    <span class="om-muted">اپراتور: {{ $ap->operator->full_name }}</span>
+                                @endif
+                            </div>
+                            <div class="d-flex flex-column gap-1">
+                                <span style="font-size:14.5px;font-weight:700;color:#101828" dir="ltr">{{ verta($ap->date_visit)->format('Y/m/d') }}</span>
+                                <span class="om-muted" dir="ltr">{{ $ap->kind == \Modules\AppointmentUser\Enum\AppointmentUserKindEnum::IN_PERSION ? verta($ap->start_time)->format('H:i') : '-' }}</span>
+                            </div>
+                            <div class="d-flex flex-column gap-1">
+                                <span class="om-ellipsis" style="font-size:13px;color:#344054">{{ $ap->service?->title ?? 'سرویس حذف شده' }}</span>
+                                @if ($ap->hasSegment())
+                                    <span class="om-muted om-ellipsis">{{ collect($this->segmentData($ap->id))->pluck('title')->implode('، ') }}</span>
+                                @endif
+                            </div>
+                            <div class="d-flex flex-column gap-1">
+                                <span class="om-ellipsis" style="font-size:13px;color:#344054">{{ filled($ap->agent?->fullName) ? $ap->agent->fullName : 'خود کاربر' }}</span>
+                                @if ($ap->kind == \Modules\AppointmentUser\Enum\AppointmentUserKindEnum::ONLINE && $ap->hasAgent())
+                                    <span class="om-muted">{{ $ap->confirm_or_reject_by() }}</span>
+                                @endif
+                            </div>
+                            <div class="d-flex flex-column gap-1">
+                                <span style="font-size:12.5px;color:#344054" dir="ltr">{{ verta($ap->created_at)->format('Y/m/d') }}</span>
+                                <span class="om-muted" dir="ltr">{{ verta($ap->created_at)->format('H:i') }}</span>
+                            </div>
+                            <div class="d-flex align-items-center gap-2">
+                                @canany(['update', 'delete'], $ap)
+                                    <div class="btn-group w-100">
+                                        <button type="button" class="om-status dropdown-toggle" style="{{ $statusClass }}" data-bs-toggle="dropdown">{{ $ap->status->getName() }}</button>
+                                        <ul class="dropdown-menu" role="menu">@include('appointmentuser::components.appointmentlist.operationbutton')</ul>
+                                    </div>
+                                @else
+                                    <span class="om-status" style="{{ $statusClass }}">{{ $ap->status->getName() }}</span>
+                                @endcan
+                            </div>
+                            <div class="d-flex flex-column gap-1">
+                                <span dir="ltr" style="font-size:12.5px;color:#344054">{{ $ap->user?->national_code ?? '---' }}</span>
+                                @if ($ap->isAppForothers())
+                                    <span class="om-muted text-primary">برای شخص دیگر</span>
+                                @endif
+                            </div>
+                            <div class="d-flex flex-column align-items-start gap-1">
+                                @if ($ap->kind == \Modules\AppointmentUser\Enum\AppointmentUserKindEnum::IN_PERSION)
+                                    {!! $ap->kind->getIcon() !!}
+                                @else
+                                    <a @if ($ap->kind == \Modules\AppointmentUser\Enum\AppointmentUserKindEnum::ONLINE && $ap->online->isNotEmpty()) href="{{ route('admin.appointment_user.message.detail', ['onlineAppId' => $ap->online->first()?->id]) }}" @else href="#" @endif>
+                                        <span class="om-pill" style="{{ $kindClass }}">{!! $ap->kind->getIcon() !!} {{ $ap->kind->getName() }}</span>
+                                    </a>
+                                @endif
+                                @if ($ap->kind == \Modules\AppointmentUser\Enum\AppointmentUserKindEnum::ONLINE)
+                                    <span class="om-pill" style="background:#fffaeb;color:#b54708;border-color:#fedf89">{{ $ap->online->first()?->messages?->first()?->unReadedMessageCount() ?? 0 }} پیام خوانده نشده</span>
+                                @endif
+                                @if ($ap->isStoredFromVoip())
+                                    <span class="om-pill" style="background:#f0f9ff;color:#026aa2;border-color:#b9e6fe">ثبت از ویپ</span>
+                                @endif
+                            </div>
+                        </div>
+                        @if ($setting['show_description'])
+                            <div class="appointment-detail">
+                                <div><span class="om-muted d-block mb-1">توضیحات</span><span style="font-size:13px;color:#344054;line-height:1.9">{{ $ap->getAppDescription() ?: 'بدون توضیحات' }}</span></div>
+                                <div><span class="om-muted d-block mb-1">شماره پرونده</span><span dir="ltr">{{ $ap->user?->document_number ?? '---' }}</span></div>
+                                <div><span class="om-muted d-block mb-1">عملیات سریع</span><div class="d-flex gap-2 flex-wrap">@canany(['update', 'delete'], $ap)<button wire:click='editAppointment("{{ $ap->id }}")' class="om-btn" style="height:32px;padding:0 12px" type="button">ویرایش</button>@endcanany @if($ap->user)<a class="om-btn" style="height:32px;padding:0 12px" href="{{ route('admin.user.document', ['user' => $ap->user->id]) }}">پرونده کاربر</a>@endif</div></div>
+                            </div>
+                        @endif
+                    @empty
+                        <div style="padding:70px 20px;display:flex;flex-direction:column;align-items:center;gap:10px">
+                            <div style="width:52px;height:52px;border-radius:14px;background:#f2f4f7;display:flex;align-items:center;justify-content:center;font-size:22px;color:#98a2b3"><i class="fa fa-search"></i></div>
+                            <div style="font-size:15px;font-weight:600">نوبتی یافت نشد</div>
+                            <div style="font-size:13px;color:#667085">عبارت جست و جو یا فیلترها را تغییر دهید.</div>
+                            @can('appointment_user.addApp')
+                                <a class="om-btn om-btn-primary" href="{{ route('admin.appointment_user.addApp') }}">ثبت نوبت جدید</a>
+                            @endcan
+                        </div>
+                    @endforelse
+                </div>
+            </div>
+
+            <div class="appointment-footer">
+                <span style="font-size:13px;color:#667085">نمایش {{ $appointments->firstItem() ?? 0 }} تا {{ $appointments->lastItem() ?? 0 }} از {{ $appointments->total() }} نوبت</span>
+                <div style="justify-self:center">{{ $appointments->links() }}</div>
+                <div></div>
             </div>
         </div>
+
         <div>
             @include('appointmentuser::components.appointmentlist.disapprovemodal')
             @include('appointmentuser::components.appointmentlist.feedbackmodal')
         </div>
     </div>
 </div>
+
 @push('scripts')
     <script src="{{ admin_asset('plugins/sweet-alert/sweetalert.min.js') }}"></script>
     <script src="{{ admin_asset('plugins/sweet-alert/admin.sweetalert.js') }}"></script>
@@ -565,77 +328,42 @@
             function js() {
                 const iranianHolidays = @json(holidays_array());
                 jalaliDatepicker.startWatch({
-                    dayRendering: function(dayOptions, input) {
-                        const formatted =
-                            `${dayOptions.year}/${String(dayOptions.month).padStart(2, '0')}/${String(dayOptions.day).padStart(2, '0')}`;
-                        const isHoliday = iranianHolidays.includes(formatted);
-                        return {
-                            isHollyDay: isHoliday,
-                        };
+                    dayRendering: function(dayOptions) {
+                        const formatted = `${dayOptions.year}/${String(dayOptions.month).padStart(2, '0')}/${String(dayOptions.day).padStart(2, '0')}`;
+                        return { isHollyDay: iranianHolidays.includes(formatted) };
                     }
                 });
 
-                $('.checkbox').change(function() {
-                    if ($('.checkbox:checked').length > 0) {
-                        $('#exutebtn').removeClass('d-none');
-                        $('#exutebtn').fadeIn();
-                    } else {
-                        $('#exutebtn').fadeOut();
-                        $('#exutebtn').addClass('d-none');
-                    }
+                $('.select-all-visible').off('change').on('change', function() {
+                    $('.row-checkbox').prop('checked', $(this).is(':checked')).trigger('change');
                 });
                 $('.select2-show-search').select2();
-                $('body').on('change', '.select2-show-search', function() {
-                    var modelName = $(this).data('id');
-                    console.log('search.' + modelName);
-
-                    @this.set('search.' + modelName, $(this).val());
+                $('body').off('change.appointmentSelect2').on('change.appointmentSelect2', '.select2-show-search', function() {
+                    @this.set('search.' + $(this).data('id'), $(this).val());
                 });
-                $(document).on('input', '[data-jdp]', function() {
-                    let selectedDate = $(this).val();
-                    let seterValue = $(this).data('name');
-                    @this.set(seterValue, selectedDate);
+                $(document).off('input.appointmentDate').on('input.appointmentDate', '[data-jdp]', function() {
+                    @this.set($(this).data('name'), $(this).val());
                 });
             }
             js();
-            Livewire.on('loadJs', function() {
-                setTimeout(() => {
-                    js();
-                }, 500);
-            });
+            Livewire.on('loadJs', function() { setTimeout(js, 500); });
             Livewire.on('lunchModal', function() {
-                setTimeout(() => {
-                    var myModal = new bootstrap.Modal(document.getElementById(
-                        'resoanForDisapproveModal'), {
-                        keyboard: false
-                    });
-                    myModal.show();
+                setTimeout(function() {
+                    new bootstrap.Modal(document.getElementById('resoanForDisapproveModal'), { keyboard: false }).show();
                 }, 1000);
             });
             Livewire.on('lunchFeedBackModal', function() {
-                setTimeout(() => {
-                    var feedBackModal = new bootstrap.Modal(document.getElementById(
-                        'feedBackModal'), {
-                        keyboard: false
-                    });
-                    feedBackModal.show();
+                setTimeout(function() {
+                    new bootstrap.Modal(document.getElementById('feedBackModal'), { keyboard: false }).show();
                 }, 1000);
             });
             Livewire.on('dateFormatWrong', function() {
-                setTimeout(() => {
-                    $('html, body').animate({
-                        scrollTop: 0
-                    }, 100);
-                }, 50);
+                setTimeout(function() { $('html, body').animate({ scrollTop: 0 }, 100); }, 50);
             });
             Livewire.on('exelError', function() {
-                setTimeout(() => {
-                    swal("توجه!",
-                        "تعداد داده ها زیاد است! لطفا با استفاده از جست و جو تعداد داده ها را محدود کنید",
-                        "warning");
-                    $('html, body').animate({
-                        scrollTop: 0
-                    }, '50');
+                setTimeout(function() {
+                    swal("توجه!", "تعداد داده ها زیاد است! لطفا با استفاده از جست و جو تعداد داده ها را محدود کنید", "warning");
+                    $('html, body').animate({ scrollTop: 0 }, 50);
                 }, 1000);
             });
         });

@@ -1,4 +1,4 @@
-<div>
+<div wire:init="loadDashboardData">
 
     <div class="page-header">
         <div>
@@ -13,7 +13,16 @@
         </div>
     </div>
     @include('admin::layouts.components.alert')
-    <div class="row">
+    @unless($dashboardDataLoaded)
+    <div class="dashboard-local-loading">
+        <div class="dashboard-loading-card">
+            <div class="spinner-border text-primary" role="status"></div>
+            <span>در حال دریافت اطلاعات داشبورد...</span>
+        </div>
+    </div>
+    @else
+    <div class="dashboard-loaded-content">
+    <div class="row dashboard-stat-row">
         @if (! Gate::check('admin.dashboard.appointments') &&! Gate::check('admin.dashboard.payment') )
             <div class="col-12 mb-2">
                 <div class="alert alert-avatar alert-default alert-dismissible">
@@ -23,21 +32,18 @@
             </div>
         @endif
         @can('admin.dashboard.appointments')
-            <div class="col-lg-6 col-sm-12 col-md-6 col-xl-3">
-                <div class="card overflow-hidden">
+            <div class="col-lg-6 col-sm-12 col-md-6 col-xl-3 mb-4 d-flex">
+                <div class="card dashboard-stat-card dashboard-stat-primary overflow-hidden border-0 shadow-sm h-100 w-100">
                     <div class="card-body">
-                        <div class="row">
+                        <div class="row align-items-center h-100">
                             <div class="col">
-                                <h3 class="mb-2 fw-semibold">{{ $fetchData['today_appointment'] ?? 0 }}</h3>
-                                <p class="text-muted fs-13 mb-0">تعداد نوبت های امروز</p>
-                                <p class="text-muted mb-0 mt-2 fs-12">
-                                    <span class="icn-box text-success fw-semibold fs-13 me-1">
-
-                                </p>
+                                <p class="text-muted fs-13 mb-2">نوبت های امروز</p>
+                                <h2 class="dashboard-stat-value mb-0 fw-semibold">{{ $fetchData['today_appointment'] ?? 0 }}</h2>
+                                <small class="dashboard-stat-meta d-block mt-3 text-primary">نمای سریع وضعیت امروز</small>
                             </div>
                             <div class="col col-auto top-icn dash">
-                                <div class="counter-icon bg-primary dash ms-auto box-shadow-primary">
-                                    <i class="fa fa-calendar-check-o text-white" aria-hidden="true"></i>
+                                <div class="counter-icon bg-primary-transparent dash ms-auto">
+                                    <i class="fa fa-calendar-check-o text-primary" aria-hidden="true"></i>
                                 </div>
                             </div>
                         </div>
@@ -46,26 +52,21 @@
             </div>
             @if(auth()->user()->isAdmin())
             @isset($fetchData['shsms'])
-            <div class="col-lg-6 col-sm-12 col-md-6 col-xl-3">
-                <div class="card overflow-hidden">
+            <div class="col-lg-6 col-sm-12 col-md-6 col-xl-3 mb-4 d-flex">
+                <div class="card dashboard-stat-card dashboard-stat-secondary overflow-hidden border-0 shadow-sm h-100 w-100">
                     <div class="card-body">
-                        <div class="row">
+                        <div class="row align-items-center h-100">
                             <div class="col">
+                                <p class="text-muted fs-13 mb-2">اعتبار پیامک</p>
                                 <div class="d-flex align-items-center">
-                                    <h3 class="mb-2 fw-semibold">{{ $fetchData['shsms'] }} </h3>
+                                    <h3 class="dashboard-stat-value mb-0 fw-semibold">{{ is_numeric($fetchData['shsms']) ? number_format((float) $fetchData['shsms']) : $fetchData['shsms'] }} </h3>
                                     <small class="me-1">تومان</small>
                                 </div>
-                                <a href="https://shsms.ir" class="fs-13 mb-0">شارژ پنل پیامکی
-                                </a>
-                                <p class="text-muted mb-0 mt-2 fs-12">
-                                    <span class="icn-box text-danger fw-semibold fs-13 me-1">
-
-                                </p>
+                                <a href="https://shsms.ir" class="dashboard-stat-meta d-block mt-3 text-secondary">شارژ پنل پیامکی</a>
                             </div>
                             <div class="col col-auto top-icn dash">
-                                <div class="counter-icon bg-secondary dash ms-auto box-shadow-secondary">
-                                    {{-- <svg xmlns="http://www.w3.org/2000/svg" class="fill-white" enable-background="new 0 0 24 24" viewBox="0 0 24 24"><path d="M19.5,7H16V5.9169922c0-2.2091064-1.7908325-4-4-4s-4,1.7908936-4,4V7H4.5C4.4998169,7,4.4996338,7,4.4993896,7C4.2234497,7.0001831,3.9998169,7.223999,4,7.5V19c0.0018311,1.6561279,1.3438721,2.9981689,3,3h10c1.6561279-0.0018311,2.9981689-1.3438721,3-3V7.5c0-0.0001831,0-0.0003662,0-0.0006104C19.9998169,7.2234497,19.776001,6.9998169,19.5,7z M9,5.9169922c0-1.6568604,1.3431396-3,3-3s3,1.3431396,3,3V7H9V5.9169922z M19,19c-0.0014038,1.1040039-0.8959961,1.9985962-2,2H7c-1.1040039-0.0014038-1.9985962-0.8959961-2-2V8h3v2.5C8,10.776123,8.223877,11,8.5,11S9,10.776123,9,10.5V8h6v2.5c0,0.0001831,0,0.0003662,0,0.0005493C15.0001831,10.7765503,15.223999,11.0001831,15.5,11c0.0001831,0,0.0003662,0,0.0006104,0C15.7765503,10.9998169,16.0001831,10.776001,16,10.5V8h3V19z"/></svg> --}}
-                                    <i class="fa fa-spinner text-white" aria-hidden="true"></i>
+                                <div class="counter-icon bg-secondary-transparent dash ms-auto">
+                                    <i class="fa fa-commenting-o text-secondary" aria-hidden="true"></i>
                                 </div>
                             </div>
                         </div>
@@ -74,54 +75,20 @@
             </div>
             @endisset
             @endif
-            <div class="col-lg-6 col-sm-12 col-md-6 col-xl-3">
-                <div class="card overflow-hidden">
-                    <div class="card-body">
-                        <a href="{{route('admin.appointment_user.message.list')}}">
-                            <div class="row">
-                                <div class="col">
-                                    <h3 class="mb-2 fw-semibold">{{ $fetchData['new_online_messages'] }}</h3>
-                                    <p class="text-muted fs-13 mb-0">پیام های جدید</p>
-                                    <p class="text-muted mb-0 mt-2 fs-12">
-                                        <span class="icn-box text-success fw-semibold fs-13 me-1">
-
-                                    </p>
-                                </div>
-                                <div class="col col-auto top-icn dash">
-                                    <div class="counter-icon bg-info dash ms-auto box-shadow-info">
-                                        <svg xmlns="http://www.w3.org/2000/svg" class="fill-white"
-                                            enable-background="new 0 0 24 24" viewBox="0 0 24 24">
-                                            <path
-                                                d="M7.5,12C7.223877,12,7,12.223877,7,12.5v5.0005493C7.0001831,17.7765503,7.223999,18.0001831,7.5,18h0.0006104C7.7765503,17.9998169,8.0001831,17.776001,8,17.5v-5C8,12.223877,7.776123,12,7.5,12z M19,2H5C3.3438721,2.0018311,2.0018311,3.3438721,2,5v14c0.0018311,1.6561279,1.3438721,2.9981689,3,3h14c1.6561279-0.0018311,2.9981689-1.3438721,3-3V5C21.9981689,3.3438721,20.6561279,2.0018311,19,2z M21,19c-0.0014038,1.1040039-0.8959961,1.9985962-2,2H5c-1.1040039-0.0014038-1.9985962-0.8959961-2-2V5c0.0014038-1.1040039,0.8959961-1.9985962,2-2h14c1.1040039,0.0014038,1.9985962,0.8959961,2,2V19z M12,6c-0.276123,0-0.5,0.223877-0.5,0.5v11.0005493C11.5001831,17.7765503,11.723999,18.0001831,12,18h0.0006104c0.2759399-0.0001831,0.4995728-0.223999,0.4993896-0.5v-11C12.5,6.223877,12.276123,6,12,6z M16.5,10c-0.276123,0-0.5,0.223877-0.5,0.5v7.0005493C16.0001831,17.7765503,16.223999,18.0001831,16.5,18h0.0006104C16.7765503,17.9998169,17.0001831,17.776001,17,17.5v-7C17,10.223877,16.776123,10,16.5,10z" />
-                                        </svg>
-                                    </div>
-                                </div>
-                            </div>
-                        </a>
-                    </div>
-                </div>
-            </div>
         @endcan
         @can('admin.dashboard.payment')
-            <div class="col-lg-6 col-sm-12 col-md-6 col-xl-3">
-                <div class="card overflow-hidden">
+            <div class="col-lg-6 col-sm-12 col-md-6 col-xl-3 mb-4 d-flex">
+                <div class="card dashboard-stat-card dashboard-stat-warning overflow-hidden border-0 shadow-sm h-100 w-100">
                     <div class="card-body">
-                        <div class="row">
+                        <div class="row align-items-center h-100">
                             <div class="col">
-                                <h3 class="mb-2 fw-semibold">{{number_format(data_get($this->fetchData,'transactiontotal',0))}}</h3>
-                                <p class="text-muted fs-13 mb-0">مجموع پرداختی های امروز</p>
-                                <p class="text-muted mb-0 mt-2 fs-12">
-                                    <span class="icn-box text-success fw-semibold fs-13 me-1">
-
-                                </p>
+                                <p class="text-muted fs-13 mb-2">مجموع پرداختی های امروز</p>
+                                <h3 class="dashboard-stat-value mb-0 fw-semibold">{{ number_format((float) data_get($this->fetchData, 'transactiontotal', 0)) }}</h3>
+                                <small class="dashboard-stat-meta d-block mt-3 text-warning">تراکنش‌های موفق</small>
                             </div>
                             <div class="col col-auto top-icn dash">
-                                <div class="counter-icon bg-warning dash ms-auto box-shadow-warning">
-                                    <svg xmlns="http://www.w3.org/2000/svg" class="fill-white"
-                                        enable-background="new 0 0 24 24" viewBox="0 0 24 24">
-                                        <path
-                                            d="M9,10h2.5c0.276123,0,0.5-0.223877,0.5-0.5S11.776123,9,11.5,9H10V8c0-0.276123-0.223877-0.5-0.5-0.5S9,7.723877,9,8v1c-1.1045532,0-2,0.8954468-2,2s0.8954468,2,2,2h1c0.5523071,0,1,0.4476929,1,1s-0.4476929,1-1,1H7.5C7.223877,15,7,15.223877,7,15.5S7.223877,16,7.5,16H9v1.0005493C9.0001831,17.2765503,9.223999,17.5001831,9.5,17.5h0.0006104C9.7765503,17.4998169,10.0001831,17.276001,10,17v-1c1.1045532,0,2-0.8954468,2-2s-0.8954468-2-2-2H9c-0.5523071,0-1-0.4476929-1-1S8.4476929,10,9,10z M21.5,12H17V2.5c0.000061-0.0875244-0.0228882-0.1735229-0.0665283-0.2493896c-0.1375732-0.2393188-0.4431152-0.3217773-0.6824951-0.1842041l-3.2460327,1.8603516L9.7481079,2.0654297c-0.1536865-0.0878906-0.3424072-0.0878906-0.4960938,0l-3.256897,1.8613281L2.7490234,2.0664062C2.6731567,2.0227661,2.5871582,1.9998779,2.4996338,1.9998779C2.2235718,2.000061,1.9998779,2.223938,2,2.5v17c0.0012817,1.380188,1.119812,2.4987183,2.5,2.5H19c1.6561279-0.0018311,2.9981689-1.3438721,3-3v-6.5006104C21.9998169,12.2234497,21.776001,11.9998169,21.5,12z M4.5,21c-0.828064-0.0009155-1.4990845-0.671936-1.5-1.5V3.3623047l2.7412109,1.5712891c0.1575928,0.0872192,0.348877,0.0875854,0.5068359,0.0009766L9.5,3.0761719l3.2519531,1.8583984c0.157959,0.0866089,0.3492432,0.0862427,0.5068359-0.0009766L16,3.3623047V19c0.0008545,0.7719116,0.3010864,1.4684448,0.7803345,2H4.5z M21,19c0,1.1045532-0.8954468,2-2,2s-2-0.8954468-2-2v-6h4V19z" />
-                                    </svg>
+                                <div class="counter-icon bg-warning-transparent dash ms-auto">
+                                    <i class="fa fa-money text-warning" aria-hidden="true"></i>
                                 </div>
                             </div>
                         </div>
@@ -131,13 +98,24 @@
         @endcan
     </div>
     @can('admin.dashboard.appointments')
-        <div class="row">
-            <div class="col-md-6">
-                <div class="card overflow-hidden">
+        <div class="row align-items-stretch">
+            <div class="col-md-6 mb-4 d-flex">
+                <div class="card dashboard-panel-card overflow-hidden border-0 shadow-sm h-100 w-100">
                     <div class="card-body">
-                        <div class="card-header d-flex justify-content-between py-0">
-                            <span>نوبت های امروز</span>
-                            <a href="{{ route('admin.appointment_user.list') }}">مشاهده همه</a>
+                        <div class="card-header d-flex justify-content-center align-items-center py-1">
+                            <div class="d-flex align-items-center gap-2" wire:ignore>
+                                <button type="button" class="btn btn-link text-primary shadow-none border-0 fs-20 px-2"
+                                    wire:click="selectAdjacentAppointmentDate('previous')" title="نوبت قبلی">
+                                    <i class="fa fa-angle-left" aria-hidden="true"></i>
+                                </button>
+                                <input class="form-control text-center datePicker border-0 shadow-none fw-semibold fs-16"
+                                    id="dashboard-appointment-date" data-name="selectedAppointmentDate" data-jdp
+                                    wire:model="selectedAppointmentDate" type="text" style="max-width: 155px;">
+                                <button type="button" class="btn btn-link text-primary shadow-none border-0 fs-20 px-2"
+                                    wire:click="selectAdjacentAppointmentDate('next')" title="نوبت بعدی">
+                                    <i class="fa fa-angle-right" aria-hidden="true"></i>
+                                </button>
+                            </div>
                         </div>
                     </div>
                     <div class="card-body">
@@ -169,7 +147,7 @@
                                         <tr>
                                             <td colspan="100%" class="text-center">
                                                 <div class="alert alert-info">
-                                                    نوبتی برای امروز یافت نشد
+                                                    نوبتی برای تاریخ انتخابی یافت نشد
                                                     <a class="btn btn-success ms-2"
                                                         href="{{ route('admin.appointment_user.addApp') }}">ثبت نوبت</a>
                                                 </div>
@@ -185,27 +163,207 @@
                     </div>
                 </div>
             </div>
-            <div class="col-md-6" wire:ignore>
-                <div class="card">
+            <div class="col-md-6 mb-4 d-flex" wire:ignore>
+                <div class="card dashboard-panel-card border-0 shadow-sm h-100 w-100">
                     <div class="card-header border-bottom">
                         <h3 class="card-title">گزارش نوبت ها</h3>
                     </div>
                     <div class="card-body">
-                        <div class="chart-container">
-                            <canvas id="chartLine" class="h-275"></canvas>
+                        <div class="chart-container" style="height: 275px;">
+                            <canvas id="chartLine"></canvas>
                         </div>
                     </div>
                 </div>
             </div>
+        </div>
+        @if (!empty($fetchData['incoming_call_status']))
+            <div class="row">
+                <div class="col-12 mb-4" wire:ignore>
+                    <div class="card dashboard-panel-card overflow-hidden border-0 shadow-sm">
+                        <div class="card-header border-bottom d-flex justify-content-between align-items-center">
+                            <h3 class="card-title">تماس‌های ورودی</h3>
+                            <a href="{{ route('admin.incoming-calls') }}">جزئیات</a>
+                        </div>
+                        <div class="card-body">
+                            <div class="row align-items-center g-4">
+                                <div class="col-lg-4">
+                                    <div class="row text-center">
+                                        <div class="col-4">
+                                            <h3 class="mb-1 fw-semibold">{{ data_get($fetchData, 'incoming_calls.today', 0) }}</h3>
+                                            <p class="text-muted fs-12 mb-0">امروز</p>
+                                        </div>
+                                        <div class="col-4 dashboard-metric-divider">
+                                            <h3 class="mb-1 fw-semibold">{{ data_get($fetchData, 'incoming_calls.total', 0) }}</h3>
+                                            <p class="text-muted fs-12 mb-0">کل تماس‌ها</p>
+                                        </div>
+                                        <div class="col-4">
+                                            <h3 class="mb-1 fw-semibold fs-16">{{ data_get($fetchData, 'incoming_calls.latest') ?? '-' }}</h3>
+                                            <p class="text-muted fs-12 mb-0">آخرین شماره</p>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-lg-8">
+                                    <div class="chart-container" style="height: 190px;">
+                                        <canvas id="incomingCallsChart"></canvas>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        @endif
+        <div class="row align-items-stretch">
+            <div class="col-xl-8 col-lg-7 col-md-12 mb-4 d-flex">
+                <div class="card dashboard-panel-card overflow-hidden border-0 shadow-sm h-100 w-100">
+                    <div class="card-header border-bottom">
+                        <h3 class="card-title">نمای کلی نوبت‌ها</h3>
+                    </div>
+                    <div class="card-body">
+                        <div class="row g-3 mb-4">
+                            <div class="col-md-6">
+                                <div class="p-4 bg-primary br-7 text-white h-100">
+                                    <p class="mb-1 opacity-75">نوبت‌های ۷ روز آینده</p>
+                                    <div class="d-flex align-items-end justify-content-between">
+                                        <h2 class="mb-0 fw-semibold">{{ data_get($fetchData, 'appointment_insights.next_7_days', 0) }}</h2>
+                                        <i class="fa fa-calendar-plus-o fs-30 opacity-75" aria-hidden="true"></i>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="row g-3">
+                                    <div class="col-6">
+                                        <div class="p-3 bg-info-transparent br-7">
+                                            <h3 class="mb-1 fw-semibold">{{ data_get($fetchData, 'appointment_insights.wait_payment', 0) }}</h3>
+                                            <p class="text-muted fs-12 mb-0">منتظر پرداخت</p>
+                                        </div>
+                                    </div>
+                                    <div class="col-6">
+                                        <div class="p-3 bg-danger-transparent br-7">
+                                            <h3 class="mb-1 fw-semibold">{{ data_get($fetchData, 'appointment_insights.today_cancel', 0) }}</h3>
+                                            <p class="text-muted fs-12 mb-0">لغو امروز</p>
+                                        </div>
+                                    </div>
+                                    <div class="col-12">
+                                        <div class="p-3 bg-success-transparent br-7">
+                                            <div class="d-flex align-items-center justify-content-between">
+                                                <div>
+                                            <h3 class="mb-1 fw-semibold">{{ number_format((float) data_get($fetchData, 'appointment_insights.month_revenue', 0)) }}</h3>
+                                                    <p class="text-muted fs-12 mb-0">درآمد ماه</p>
+                                                </div>
+                                                <i class="fa fa-credit-card fs-24 text-success" aria-hidden="true"></i>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="chart-container" style="height: 275px;" wire:ignore>
+                            <canvas id="appointmentsWeekChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-xl-4 col-lg-5 col-md-12 mb-4 d-flex" wire:ignore>
+                <div class="card dashboard-panel-card overflow-hidden border-0 shadow-sm h-100 w-100">
+                    <div class="card-header border-bottom">
+                        <h3 class="card-title">وضعیت نوبت‌ها</h3>
+                    </div>
+                    <div class="card-body">
+                        <div class="chart-container" style="height: 350px;">
+                            <canvas id="appointmentStatusChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row align-items-stretch">
+            <div class="{{ Gate::check('admin.dashboard.payment') ? 'col-xl-7' : 'col-12' }} col-md-12 mb-4 d-flex">
+                <div class="card dashboard-panel-card overflow-hidden border-0 shadow-sm h-100 w-100">
+                    <div class="card-header border-bottom d-flex justify-content-between align-items-center">
+                        <h3 class="card-title">آخرین نوبت‌ها</h3>
+                        <a href="{{ route('admin.appointment_user.list') }}">همه نوبت‌ها</a>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table text-nowrap text-md-nowrap text-center mb-0">
+                                <thead>
+                                    <tr>
+                                        <th>#</th>
+                                        <th>بیمار</th>
+                                        <th>پزشک</th>
+                                        <th>تاریخ</th>
+                                        <th>وضعیت</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @forelse (data_get($fetchData, 'recent_appointments', collect()) as $appointment)
+                                        <tr>
+                                            <td>{{ $appointment->id }}</td>
+                                            <td>{{ $appointment->user?->fullName ?? '-' }}</td>
+                                            <td>{{ $appointment->doctor?->fullName ?? '-' }}</td>
+                                            <td>{{ verta($appointment->date_visit)->format('Y/m/d H:i') }}</td>
+                                            <td><span class="badge {{ $appointment->status->getBadgeColor() }}">{{ $appointment->status->getName() }}</span></td>
+                                        </tr>
+                                    @empty
+                                        <tr>
+                                            <td colspan="5"><div class="alert alert-info mb-0">نوبتی یافت نشد.</div></td>
+                                        </tr>
+                                    @endforelse
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            @can('admin.dashboard.payment')
+                <div class="col-xl-5 col-md-12 mb-4 d-flex">
+                    <div class="card dashboard-panel-card overflow-hidden border-0 shadow-sm h-100 w-100">
+                        <div class="card-header border-bottom">
+                            <h3 class="card-title">آخرین پرداخت‌ها</h3>
+                        </div>
+                        <div class="card-body">
+                            <div class="table-responsive">
+                                <table class="table text-nowrap text-md-nowrap text-center mb-0">
+                                    <thead>
+                                        <tr>
+                                            <th>#</th>
+                                            <th>کاربر</th>
+                                            <th>مبلغ</th>
+                                            <th>وضعیت</th>
+                                            <th>زمان</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @forelse (data_get($fetchData, 'recent_transactions', collect()) as $transaction)
+                                            <tr>
+                                                <td>{{ $transaction->id }}</td>
+                                                <td>{{ $transaction->user?->fullName ?? '-' }}</td>
+                                                <td>{{ number_format((float) $transaction->total_cost) }}</td>
+                                                <td><span class="badge {{ $transaction->status->badgeClass() }}">{{ $transaction->status->getName() }}</span></td>
+                                                <td>{{ verta($transaction->created_at)->format('Y/m/d H:i') }}</td>
+                                            </tr>
+                                        @empty
+                                            <tr>
+                                                <td colspan="5"><div class="alert alert-info mb-0">پرداختی یافت نشد.</div></td>
+                                            </tr>
+                                        @endforelse
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            @endcan
+        </div>
+        <div class="row">
             @can('user.approveDoc')
             @if (isset($fetchData['SelfRegistrationDoctors']) && $fetchData['SelfRegistrationDoctors']->isNotEmpty())
-            <div class="col-md-6">
-                <div class="card overflow-hidden">
-                    <div class="card-body">
-                        <div class="card-header d-flex justify-content-between py-0">
-                            <span>درخواست ثبت نام پزشک</span>
-                            <a href="{{ route('admin.user.index') }}">مشاهده همه</a>
-                        </div>
+            <div class="col-12 mb-4">
+                <div class="card dashboard-panel-card overflow-hidden border-0 shadow-sm">
+                    <div class="card-header border-bottom d-flex justify-content-between align-items-center">
+                        <h3 class="card-title">درخواست ثبت نام پزشک</h3>
+                        <a href="{{ route('admin.user.index') }}">مشاهده همه</a>
                     </div>
                     <div class="card-body">
                         <div class="table-responsive mb-3">
@@ -238,8 +396,90 @@
             @endcan
         </div>
     @endcan
+    </div>
+    @endunless
 
 </div>
+@push('styles')
+    <style>
+        .dashboard-local-loading {
+            min-height: 360px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .dashboard-loading-card {
+            min-width: 280px;
+            padding: 28px;
+            border: 1px solid #e9edf4;
+            border-radius: 10px;
+            background: #fff;
+            box-shadow: 0 4px 18px rgba(31, 45, 61, 0.08);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            color: #4b5563;
+            font-weight: 600;
+        }
+
+        .dashboard-stat-card {
+            --dashboard-accent: #6259ca;
+            position: relative;
+            min-height: 154px;
+            border-top: 3px solid var(--dashboard-accent) !important;
+            transition: transform 180ms ease, box-shadow 180ms ease;
+        }
+
+        .dashboard-stat-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 22px rgba(31, 45, 61, 0.1) !important;
+        }
+
+        .dashboard-stat-card .card-body {
+            padding: 1.35rem;
+        }
+
+        .dashboard-stat-primary { --dashboard-accent: #6259ca; }
+        .dashboard-stat-secondary { --dashboard-accent: #6c757d; }
+        .dashboard-stat-info { --dashboard-accent: #45aaf2; }
+        .dashboard-stat-warning { --dashboard-accent: #f7b731; }
+
+        .dashboard-stat-value {
+            min-height: 34px;
+            line-height: 1.25;
+            overflow-wrap: anywhere;
+        }
+
+        .dashboard-stat-meta {
+            min-height: 18px;
+            font-size: 12px;
+        }
+
+        .dashboard-panel-card > .card-header {
+            min-height: 56px;
+            padding-top: 0.85rem;
+            padding-bottom: 0.85rem;
+        }
+
+        .dashboard-panel-card .card-title {
+            margin-bottom: 0;
+        }
+
+        .dashboard-metric-divider {
+            border-right: 1px solid #e9edf4;
+            border-left: 1px solid #e9edf4;
+        }
+
+        @media (max-width: 991.98px) {
+            .dashboard-metric-divider {
+                border-right: 1px solid #e9edf4;
+                border-left: 1px solid #e9edf4;
+            }
+        }
+    </style>
+@endpush
 @section('scripts')
     {{-- @dd($chartData['mount']) --}}
     <!-- CHARTJS JS -->
@@ -248,39 +488,164 @@
     {{-- <script src="{{ asset('assets/admin/js/chart.js') }}"></script> --}}
     <script>
         $(document).ready(function() {
+            jalaliDatepicker.startWatch();
+            $(document).on('input', '#dashboard-appointment-date[data-jdp]', function() {
+                @this.set($(this).data('name'), $(this).val());
+            });
+
+            Livewire.on('dashboardAppointmentDateChanged', function(event) {
+                $('#dashboard-appointment-date').val(event.date);
+            });
+
+            var dashboardCharts = {
+                month: {!! json_encode(data_get($fetchData, 'chart.month', []), 256) !!},
+                successful: {!! json_encode(data_get($fetchData, 'chart.data.successful', [])) !!},
+                canceled: {!! json_encode(data_get($fetchData, 'chart.data.canceld', [])) !!},
+                incoming_labels: {!! json_encode(collect(data_get($fetchData, 'incoming_calls_chart', []))->pluck('label')->values(), 256) !!},
+                incoming_counts: {!! json_encode(collect(data_get($fetchData, 'incoming_calls_chart', []))->pluck('count')->values()) !!},
+                week_labels: {!! json_encode(collect(data_get($fetchData, 'appointments_week_chart', []))->pluck('label')->values(), 256) !!},
+                week_counts: {!! json_encode(collect(data_get($fetchData, 'appointments_week_chart', []))->pluck('count')->values()) !!},
+                status_labels: {!! json_encode(collect(data_get($fetchData, 'appointment_status_chart', []))->pluck('label')->values(), 256) !!},
+                status_counts: {!! json_encode(collect(data_get($fetchData, 'appointment_status_chart', []))->pluck('count')->values()) !!},
+            };
+
+            function initDashboardCharts(charts) {
+            charts = charts || dashboardCharts;
+            var lineCanvas = document.getElementById("chartLine");
+
             // LIne-Chart
-            var ctx = document.getElementById("chartLine").getContext('2d');
-            var myChart = new Chart(ctx, {
-                type: 'line',
-                data: {
-                    labels: {!! json_encode($fetchData['chart']['month'], 256) !!},
-                    datasets: [{
-                        label: 'موفق',
-                        data: {!! json_encode($fetchData['chart']['data']['successful']) !!},
-                        backgroundColor: 'transparent',
-                        borderColor: '#77bc21',
-                        borderWidth: 1,
-                        pointBackgroundColor: '#ffffff',
-                        pointRadius: 3
-                    }, {
-                        label: 'کنسل شده',
-                        data: {!! json_encode($fetchData['chart']['data']['canceld']) !!},
-                        backgroundColor: 'transparent',
-                        borderColor: '#e984b1',
-                        borderWidth: 1,
-                        pointBackgroundColor: '#ffffff',
-                        pointRadius: 3
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    legend: {
-                        labels: {
-                            fontColor: "#77778e"
+            if (lineCanvas) {
+                new Chart(lineCanvas.getContext('2d'), {
+                    type: 'line',
+                    data: {
+                        labels: charts.month || [],
+                        datasets: [{
+                            label: 'موفق',
+                            data: charts.successful || [],
+                            backgroundColor: 'transparent',
+                            borderColor: '#77bc21',
+                            borderWidth: 1,
+                            pointBackgroundColor: '#ffffff',
+                            pointRadius: 3
+                        }, {
+                            label: 'کنسل شده',
+                            data: charts.canceled || [],
+                            backgroundColor: 'transparent',
+                            borderColor: '#e984b1',
+                            borderWidth: 1,
+                            pointBackgroundColor: '#ffffff',
+                            pointRadius: 3
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        legend: {
+                            labels: {
+                                fontColor: "#77778e"
+                            }
                         }
                     }
-                }
+                });
+            }
+
+            var incomingCallsCanvas = document.getElementById("incomingCallsChart");
+            if (incomingCallsCanvas) {
+                new Chart(incomingCallsCanvas.getContext('2d'), {
+                    type: 'bar',
+                    data: {
+                        labels: charts.incoming_labels || [],
+                        datasets: [{
+                            label: 'تماس ورودی',
+                            data: charts.incoming_counts || [],
+                            backgroundColor: '#5e2dd8',
+                            borderColor: '#5e2dd8',
+                            borderWidth: 1
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        legend: {
+                            display: false
+                        },
+                        scales: {
+                            yAxes: [{
+                                ticks: {
+                                    beginAtZero: true,
+                                    precision: 0
+                                }
+                            }]
+                        }
+                    }
+                });
+            }
+
+            var appointmentsWeekCanvas = document.getElementById("appointmentsWeekChart");
+            if (appointmentsWeekCanvas) {
+                new Chart(appointmentsWeekCanvas.getContext('2d'), {
+                    type: 'bar',
+                    data: {
+                        labels: charts.week_labels || [],
+                        datasets: [{
+                            label: 'نوبت',
+                            data: charts.week_counts || [],
+                            backgroundColor: '#0dcd94',
+                            borderColor: '#0dcd94',
+                            borderWidth: 1
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        legend: {
+                            display: false
+                        },
+                        scales: {
+                            yAxes: [{
+                                ticks: {
+                                    beginAtZero: true,
+                                    precision: 0
+                                }
+                            }]
+                        }
+                    }
+                });
+            }
+
+            var appointmentStatusCanvas = document.getElementById("appointmentStatusChart");
+            if (appointmentStatusCanvas) {
+                new Chart(appointmentStatusCanvas.getContext('2d'), {
+                    type: 'doughnut',
+                    data: {
+                        labels: charts.status_labels || [],
+                        datasets: [{
+                            data: charts.status_counts || [],
+                            backgroundColor: ['#0dcd94', '#45aaf2', '#f82649', '#f7b731'],
+                            borderWidth: 0
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        legend: {
+                            position: 'bottom',
+                            labels: {
+                                fontColor: "#77778e"
+                            }
+                        }
+                    }
+                });
+            }
+            }
+
+            initDashboardCharts();
+            Livewire.on('dashboardDataLoaded', function() {
+                var event = arguments[0] || {};
+                dashboardCharts = event.charts || dashboardCharts;
+                setTimeout(function() {
+                    initDashboardCharts(dashboardCharts);
+                }, 100);
             });
         });
     </script>

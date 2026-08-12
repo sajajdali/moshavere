@@ -27,7 +27,7 @@
     @livewireStyles
 </head>
 
-<body class="rtl app sidebar-mini">
+<body class="rtl app sidebar-mini admin-menu-v2">
 
     @php
         $currentTenant = tenancy()->initialized ? tenant() : null;

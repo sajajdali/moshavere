@@ -8,8 +8,8 @@
 <script src="{{ admin_asset('plugins/bootstrap/js/popper.min.js') }}"></script>
 <script src="{{ admin_asset('plugins/bootstrap/js/bootstrap.min.js') }}"></script>
 
-<!-- SIDE-MENU JS -->
-<script src="{{ admin_asset('plugins/sidemenu/sidemenu.js') }}"></script>
+<!-- ADMIN MENU JS -->
+<script src="{{ admin_asset('js/admin-menu-v2.js') }}"></script>
 <!-- Perfect SCROLLBAR JS-->
 <script src="{{ admin_asset('plugins/p-scroll/perfect-scrollbar.js') }}"></script>
 <script src="{{ admin_asset('plugins/p-scroll/pscroll.js') }}"></script>

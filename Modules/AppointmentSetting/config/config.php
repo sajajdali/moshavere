@@ -104,20 +104,20 @@ return [
                 'has_child' => false,
                 'children' => null
             ],
-            [
-                'title' => 'پیام های نوبت آنلاین',
-                'gate' => 'appointment_user.message',
-                'policy_class' => null,
-                'icon' => 'fe fe-message-square',
-                'route' => 'admin.appointment_user.message.list',
-                'has_badge' => true,
-                'badge' => [
-                    'class' => \Modules\AppointmentUser\app\Models\AppointmentOnlineMessage::class,
-                    'type' => 'badge badge-sm bg-info badge-hide'
-                ],
-                'has_child' => false,
-                'children' => null
-            ],
+            // [
+            //     'title' => 'پیام های نوبت آنلاین',
+            //     'gate' => 'appointment_user.message',
+            //     'policy_class' => null,
+            //     'icon' => 'fe fe-message-square',
+            //     'route' => 'admin.appointment_user.message.list',
+            //     'has_badge' => true,
+            //     'badge' => [
+            //         'class' => \Modules\AppointmentUser\app\Models\AppointmentOnlineMessage::class,
+            //         'type' => 'badge badge-sm bg-info badge-hide'
+            //     ],
+            //     'has_child' => false,
+            //     'children' => null
+            // ],
         ],
     ],
 ];

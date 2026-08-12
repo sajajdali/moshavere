@@ -70,6 +70,13 @@ class AppointmentUserList extends Component
         ];
         $this->resetPage();
     }
+
+    public function showTodayAppointments()
+    {
+        $this->resetProperties();
+        $this->search['appointment_date'] = Verta::now()->format('Y/m/d');
+    }
+
     #[Computed]
     private function handleSearch($isExported = false)
     {

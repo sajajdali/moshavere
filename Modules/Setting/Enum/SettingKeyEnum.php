@@ -71,15 +71,15 @@ enum SettingKeyEnum: int implements EnumHasNameInterface, SettingTypeInterface, 
     case HOME_ALERT_STATUS = 433;
     case HOME_ALERT_TITLE = 434;
     case HOME_ALERT_DESCRIPTION = 435;
-    case HEADER1_TITLE_COLOR = 436 ;
-    case HEADER1_TITLE_NOT_SHOW_DESKTOP = 437 ;
-    case HEADER1_TITLE_NOT_SHOW_MOBILE = 438 ;
-    case HEADER2_MOBILE_BACKGROUND_IMAGE = 439 ;
+    case HEADER1_TITLE_COLOR = 436;
+    case HEADER1_TITLE_NOT_SHOW_DESKTOP = 437;
+    case HEADER1_TITLE_NOT_SHOW_MOBILE = 438;
+    case HEADER2_MOBILE_BACKGROUND_IMAGE = 439;
     case DISABLE_ONLINE_APPOINTMENT = 440;
     case DISABLE_UI_FOR_VOIP_ONLY_APPOINTMENT = 441;
     case VOIP_APPOINTMENT_STATUS = 442;
     case VOIP_VOICE_RECORD_STATUS = 443;
-    // ABOUT US PAGE
+        // ABOUT US PAGE
     case ABOUT_US_FIRST_SECTION_TITLE = 23;
     case ABOUT_US_FIRST_SECTION_DESCRIPTION = 24;
     case ABOUT_US_SECEND_SECTION_TITLE = 25;
@@ -113,19 +113,19 @@ enum SettingKeyEnum: int implements EnumHasNameInterface, SettingTypeInterface, 
     case SMS_SET_APP_MONITORING = 77;
     case CALL_LOGIN_TEMPLATE = 78;
     case SMS_PARSSMS_SENDER_NUMBER =  85;
-    case SMS_PARSSMS_LOGIN_TEXT = 80 ;
-    case SMS_PARSSMS_ADD_APPOINTMENT_TEXT = 81 ;
-    case SMS_PARSSMS_EDIT_APPOINTMENT_TEXT = 82 ;
-    case SMS_PARSSMS_CANCEL_APPOINTMENT_TEXT = 83 ;
-    case SMS_PARSSMS_REMINDER_TEXT = 84 ;
-    case SMS_PRRSSMS_MONITORING_APP = 86 ;
-    case SMS_PARSSMS_MONITORING_APPROVED_APP = 87 ;
+    case SMS_PARSSMS_LOGIN_TEXT = 80;
+    case SMS_PARSSMS_ADD_APPOINTMENT_TEXT = 81;
+    case SMS_PARSSMS_EDIT_APPOINTMENT_TEXT = 82;
+    case SMS_PARSSMS_CANCEL_APPOINTMENT_TEXT = 83;
+    case SMS_PARSSMS_REMINDER_TEXT = 84;
+    case SMS_PRRSSMS_MONITORING_APP = 86;
+    case SMS_PARSSMS_MONITORING_APPROVED_APP = 87;
     case SMS_CUSTOM_LINK_TO_USER_TEMPLATE = 88;
-    case SMS_PARSSMS_MONITORING_DIS_APPROVED_APP = 89 ;
+    case SMS_PARSSMS_MONITORING_DIS_APPROVED_APP = 89;
     case SMS_CUSTOM_LINK_2_TO_USER_TEMPLATE = 90;
-    case SMS_PRSSMS_APPOINTMENT_WAITING_PAYMENT = 91 ;
-    case SMS_FARAZ_LINE_NUMBER = 92 ;
-    case DONT_SEND_SMS_FOR_PAYMENT_LINK = 168 ;
+    case SMS_PRSSMS_APPOINTMENT_WAITING_PAYMENT = 91;
+    case SMS_FARAZ_LINE_NUMBER = 92;
+    case DONT_SEND_SMS_FOR_PAYMENT_LINK = 168;
 
 
         //payment
@@ -148,7 +148,7 @@ enum SettingKeyEnum: int implements EnumHasNameInterface, SettingTypeInterface, 
     case VOIP_USERNAME = 160;
     case VOIP_PASSWORD = 170;
 
-    // api
+        // api
     case ACTIVE_API = 180;
     case API_USERNAME = 181;
     case API_PASSWORD = 182;
@@ -160,23 +160,23 @@ enum SettingKeyEnum: int implements EnumHasNameInterface, SettingTypeInterface, 
     case CONTACTUS_FORM_ADDRESS = 214;
     case CONTACTUS_FORM_SUPPORT_EMAIL = 215;
 
-    // onlineApp
-    case ONILNE_SEND_ATUOMATIC_MESSAGE_STATUS = 350 ;
-    case ONILNE_SEND_ATUOMATIC_MESSAGE_MESSAGE = 351 ;
+        // onlineApp
+    case ONILNE_SEND_ATUOMATIC_MESSAGE_STATUS = 350;
+    case ONILNE_SEND_ATUOMATIC_MESSAGE_MESSAGE = 351;
 
-    // application
-    case APP_FULL_APPOINTMENT_HEADER = 352 ;
-    case APP_FULL_APPOINTMENT_BODY = 353 ;
+        // application
+    case APP_FULL_APPOINTMENT_HEADER = 352;
+    case APP_FULL_APPOINTMENT_BODY = 353;
 
-    // front menu
-    case SHOW_ABOUT_US_MENU_BUTTON = 354 ;
+        // front menu
+    case SHOW_ABOUT_US_MENU_BUTTON = 354;
 
-    // registration
-    case USER_REGISTER_NATIONAL_CODE_REQUIRED = 355 ;
+        // registration
+    case USER_REGISTER_NATIONAL_CODE_REQUIRED = 355;
     case LOGIN_WITHOUT_OTP = 357;
 
-    // jibi
-    case ACTIVE_JIBIT = 356 ;
+        // jibi
+    case ACTIVE_JIBIT = 356;
 
     public function isSupportCache(): bool
     {
@@ -369,7 +369,7 @@ enum SettingKeyEnum: int implements EnumHasNameInterface, SettingTypeInterface, 
     public function getDescription()
     {
         return match ($this) {
-            self::SMS_APPOINTMENT_RECEIVING_SUCCESSFUL,self::SMS_APPOINTMENT_AFTER_PAYMENT => 'پارامتر ها به ترتیب به شکل زیر باشد:
+            self::SMS_APPOINTMENT_RECEIVING_SUCCESSFUL, self::SMS_APPOINTMENT_AFTER_PAYMENT => 'پارامتر ها به ترتیب به شکل زیر باشد:
             <br />  ۱ = نام کاربر
              <br/> ۲ = نام خانوادگی کاربر
              <br/> ۳ = نام پزشک
@@ -378,6 +378,7 @@ enum SettingKeyEnum: int implements EnumHasNameInterface, SettingTypeInterface, 
              <br/> ۶ = ساعت نوبت
              <br/> ۷ = لینک جزئیات
              <br/> ۸ = شماره پیگیری
+             <br/> 9 = آیدی
              ',
             self::SMS_APPROVED_MONITORING_APPOINTMENT => 'در صورت فعال بودن پایش نوبت ، و تغییر وضعیت نوبت به در انتظار پرداخت(تایید نوبت) این پیامک برای کاربر ارسال میشود',
             self::INSTAGRAM_ADDRESS => 'آدرس باید به این صورت وارد شد https://www.instagram.com/shemiranweb/',
@@ -422,12 +423,13 @@ enum SettingKeyEnum: int implements EnumHasNameInterface, SettingTypeInterface, 
                 default => false
             };
         }
-        return false ;
+        return false;
     }
-    public function deactiveFeature():bool {
-        return match($this) {
-            self::ACTIVE_JIBIT => true ,
-            default => false ,
+    public function deactiveFeature(): bool
+    {
+        return match ($this) {
+            self::ACTIVE_JIBIT => true,
+            default => false,
         };
     }
     public function render(): string
@@ -438,12 +440,12 @@ enum SettingKeyEnum: int implements EnumHasNameInterface, SettingTypeInterface, 
     public function getType(): SettingTypeEnum
     {
         return match ($this) {
-            self::SITE_LOGO_URL , self::HEADER1_IMAGE, self::HEADER2_MOBILE_BACKGROUND_IMAGE => SettingTypeEnum::IMAGE,
+            self::SITE_LOGO_URL, self::HEADER1_IMAGE, self::HEADER2_MOBILE_BACKGROUND_IMAGE => SettingTypeEnum::IMAGE,
             self::DEFAULT_EXERCISE_STATUS => SettingTypeEnum::SELECT,
             self::HEADER1_TITLE_COLOR     => SettingTypeEnum::SELECT,
             self::SMS_SENDER => SettingTypeEnum::SELECT,
             self::PAYMEN_ACTIVE_DRIVER => SettingTypeEnum::SELECT,
-            self::APPOINTMENT_MORE_THAT_ONE_PER_DAY , self::HEADER1_SHOW_BUTTONS , self::HEADER1_SHOW_BUTTON1, self::HEADER1_SHOW_BUTTON2 , self::ENABLE_DOCTORS_MENU , self::ENABLE_CONTACT_US_MENU, self::DISABLE_ONLINE_APPOINTMENT, self::DISABLE_UI_FOR_VOIP_ONLY_APPOINTMENT, self::VOIP_APPOINTMENT_STATUS, self::VOIP_VOICE_RECORD_STATUS => SettingTypeEnum::CHECK,
+            self::APPOINTMENT_MORE_THAT_ONE_PER_DAY, self::HEADER1_SHOW_BUTTONS, self::HEADER1_SHOW_BUTTON1, self::HEADER1_SHOW_BUTTON2, self::ENABLE_DOCTORS_MENU, self::ENABLE_CONTACT_US_MENU, self::DISABLE_ONLINE_APPOINTMENT, self::DISABLE_UI_FOR_VOIP_ONLY_APPOINTMENT, self::VOIP_APPOINTMENT_STATUS, self::VOIP_VOICE_RECORD_STATUS => SettingTypeEnum::CHECK,
             self::HOME_ALERT_STATUS => SettingTypeEnum::CHECK,
             self::APPOINTMENT_SHOW_FALSE_STATUS_DAYS => SettingTypeEnum::CHECK,
             self::APPOINTMENT_DETAIL_PAYMENT_DESCRIPTION_STATUS => SettingTypeEnum::CHECK,
@@ -453,12 +455,12 @@ enum SettingKeyEnum: int implements EnumHasNameInterface, SettingTypeInterface, 
             self::APPOINTMENT_FOR_OTHERS_STATUS => SettingTypeEnum::CHECK,
             self::APPOINTMENT_DESCRIPTION_STATUS => SettingTypeEnum::CHECK,
             self::SECREYERY_SEND_LINK_FOR_APPOINTMENT => SettingTypeEnum::CHECK,
-            self::HEADER1_TITLE_NOT_SHOW_DESKTOP ,self::HEADER1_TITLE_NOT_SHOW_MOBILE=> SettingTypeEnum::CHECK,
+            self::HEADER1_TITLE_NOT_SHOW_DESKTOP, self::HEADER1_TITLE_NOT_SHOW_MOBILE => SettingTypeEnum::CHECK,
             self::APPOINTMENT_STATUS => SettingTypeEnum::CHECK,
             self::ACTIVE_JIBIT => SettingTypeEnum::CHECK,
             self::PAYMENT_RULES_AND_CONDITION_STATUS => SettingTypeEnum::CHECK,
             self::APPOINTMENT_USER_PERESENT_STATUS_REGISTRATION => SettingTypeEnum::CHECK,
-            self::SUPPORT_USER_ROLE , self::ACTIVE_HEADER => SettingTypeEnum::SELECT,
+            self::SUPPORT_USER_ROLE, self::ACTIVE_HEADER => SettingTypeEnum::SELECT,
             self::WEIGHT_CHART_DESCRIPTION_APP => SettingTypeEnum::TEXTAREA,
             self::APPOINTMENT_DESCRIPTION => SettingTypeEnum::TEXTAREA,
             self::APPOINTMENT_CANCEL_DESCRIPTION => SettingTypeEnum::TEXTAREA,
@@ -478,9 +480,9 @@ enum SettingKeyEnum: int implements EnumHasNameInterface, SettingTypeInterface, 
             self::APPOINTMENT_DETAIL_PAYMENT_DESCRIPTION_TEXT => SettingTypeEnum::TEXTAREA,
             self::HOME_ALERT_DESCRIPTION => SettingTypeEnum::TEXTAREA,
 
-            self::ABOUT_US_SECEND_SECTION_IMAGE,self::ABOUT_US_THIRD_SECTION_IMAGE,self::ABOUT_US_FOURTH_SECTION_IMAGE => SettingTypeEnum::IMAGE,
+            self::ABOUT_US_SECEND_SECTION_IMAGE, self::ABOUT_US_THIRD_SECTION_IMAGE, self::ABOUT_US_FOURTH_SECTION_IMAGE => SettingTypeEnum::IMAGE,
 
-            self::SMS_PRRSSMS_MONITORING_APP,self::SMS_PARSSMS_MONITORING_APPROVED_APP,self::SMS_PARSSMS_MONITORING_DIS_APPROVED_APP => SettingTypeEnum::TEXTAREA,
+            self::SMS_PRRSSMS_MONITORING_APP, self::SMS_PARSSMS_MONITORING_APPROVED_APP, self::SMS_PARSSMS_MONITORING_DIS_APPROVED_APP => SettingTypeEnum::TEXTAREA,
             self::SMS_PRSSMS_APPOINTMENT_WAITING_PAYMENT => SettingTypeEnum::TEXTAREA,
             self::ONILNE_SEND_ATUOMATIC_MESSAGE_MESSAGE => SettingTypeEnum::TEXTAREA,
             self::ABOUT_US_FIRST_SECTION_DESCRIPTION => SettingTypeEnum::TEXTAREA,
@@ -488,10 +490,10 @@ enum SettingKeyEnum: int implements EnumHasNameInterface, SettingTypeInterface, 
             self::ABOUT_US_THIRD_SECTION_DESCRIPTION => SettingTypeEnum::TEXTAREA,
             self::ABOUT_US_FOURTH_SECTION_DESCRIPTION => SettingTypeEnum::TEXTAREA,
             self::APP_FULL_APPOINTMENT_BODY => SettingTypeEnum::TEXTAREA,
-            self::APPOINTMENT_GALLERY_BODY, self::FOOTER_ENAMAD ,  self::FOOTER_SAMANDEHI => SettingTypeEnum::TEXTAREA,
-            self::SMS_PARSSMS_LOGIN_TEXT, self::SMS_PARSSMS_EDIT_APPOINTMENT_TEXT , self::SMS_PARSSMS_ADD_APPOINTMENT_TEXT, self::SMS_PARSSMS_CANCEL_APPOINTMENT_TEXT ,self::SMS_PARSSMS_REMINDER_TEXT => SettingTypeEnum::TEXTAREA,
+            self::APPOINTMENT_GALLERY_BODY, self::FOOTER_ENAMAD,  self::FOOTER_SAMANDEHI => SettingTypeEnum::TEXTAREA,
+            self::SMS_PARSSMS_LOGIN_TEXT, self::SMS_PARSSMS_EDIT_APPOINTMENT_TEXT, self::SMS_PARSSMS_ADD_APPOINTMENT_TEXT, self::SMS_PARSSMS_CANCEL_APPOINTMENT_TEXT, self::SMS_PARSSMS_REMINDER_TEXT => SettingTypeEnum::TEXTAREA,
             self::APPOINTMENT_ONLINE_DESCRPTION => SettingTypeEnum::TEXTAREA,
-            self::UI_NOW_SHOW_SEARCH_BAR , self::ACTIVE_API, self::ENABLE_CITY_SEARCH , self::ENABLE_LATEST_DOCTORS , self::ENABLE_HOME_FAQ , self::MOST_VIEWED_SECTIONS_ICONS_VIEW, self::ENABLE_MOST_VIEWED_SECTIONS , self::ENABLE_DOCTOR_REGISTRATION , self::SHOW_FLOATING_SOCIAL_ICONS , self::DISABLE_FOOTER_DISPLAY=> SettingTypeEnum::CHECK,
+            self::UI_NOW_SHOW_SEARCH_BAR, self::ACTIVE_API, self::ENABLE_CITY_SEARCH, self::ENABLE_LATEST_DOCTORS, self::ENABLE_HOME_FAQ, self::MOST_VIEWED_SECTIONS_ICONS_VIEW, self::ENABLE_MOST_VIEWED_SECTIONS, self::ENABLE_DOCTOR_REGISTRATION, self::SHOW_FLOATING_SOCIAL_ICONS, self::DISABLE_FOOTER_DISPLAY => SettingTypeEnum::CHECK,
             self::USER_REGISTER_NATIONAL_CODE_REQUIRED => SettingTypeEnum::CHECK,
             self::LOGIN_WITHOUT_OTP => SettingTypeEnum::CHECK,
             self::GO_TO_PAYMENT_DIRECTLY => SettingTypeEnum::CHECK,
@@ -500,7 +502,8 @@ enum SettingKeyEnum: int implements EnumHasNameInterface, SettingTypeInterface, 
         };
     }
 
-    public function separatorTitle() {
+    public function separatorTitle()
+    {
         return match ($this) {
             self::SMS_SENDER => 'تنظیمات ارسال کننده پیامک',
             self::SMS_API_LOGIN_TEMPLATE => 'ورود و ثبت نوبت',
@@ -520,7 +523,7 @@ enum SettingKeyEnum: int implements EnumHasNameInterface, SettingTypeInterface, 
             self::HOME_ALERT_STATUS => 'نمایش پیغام در صفحه اصلی ',
             self::HEADER1_SHOW_BUTTON1 => 'کلید های روی هدر ',
             self::SMS_CUSTOM_LINK_TO_USER_TEMPLATE => 'Voip',
-            default => '' ,
+            default => '',
         };
     }
     /**
@@ -551,9 +554,10 @@ enum SettingKeyEnum: int implements EnumHasNameInterface, SettingTypeInterface, 
             self::SUPPORT_USER_ROLE => User::adminSupportRoles(),
             self::PAYMEN_ACTIVE_DRIVER => [
                 'zrinpal' => 'زرین پال',
-                'parsian'=> 'پارسیان',
+                'parsian' => 'پارسیان',
                 'saman' => 'سامان',
-                'sep' => 'سپ'],
+                'sep' => 'سپ'
+            ],
             default => []
         };
     }

@@ -91,7 +91,8 @@ class AppointmentSmsNotification extends Notification implements ShouldQueue
                 $dateAppointment,
                 $hour,
                 $link,
-                $notifiable->tracking_code
+                $notifiable->tracking_code,
+                $notifiable->id
             ],
         ];
     }

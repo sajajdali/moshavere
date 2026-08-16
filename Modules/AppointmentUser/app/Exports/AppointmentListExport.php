@@ -34,7 +34,7 @@ class AppointmentListExport implements FromCollection, WithMapping, WithHeadings
             $app->id,
             $app->tracking_code,
             $app->status->getName(),
-            isset($app->details[AppointmentUser::DETAIL_APPOINTMENT_VIA]) ? User::find($app->details[AppointmentUser::DETAIL_APPOINTMENT_VIA])->full_name : 'بیمار',
+            isset($app->details[AppointmentUser::DETAIL_APPOINTMENT_VIA]) ? User::find($app->details[AppointmentUser::DETAIL_APPOINTMENT_VIA])?->full_name ?? '-' : 'بیمار',
             $app->user->full_name,
             $app->user->mobile,
             $app->user->document_number ?? '---',

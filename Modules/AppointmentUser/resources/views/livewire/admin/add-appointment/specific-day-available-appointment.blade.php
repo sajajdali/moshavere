@@ -244,9 +244,11 @@
         </div>
     </div>
     <livewire:appointmentuser::admin.add-appointment.modal.service-and-doctor-modal :appId="$fetchData['appId']" :appTime="$fetchData['time']"
-        :serviceId="$fetchData['service']->id" :placeId="$fetchData['place']" :segmentId="$fetchData['segment']" />
+        :serviceId="$fetchData['service']->id" :placeId="$fetchData['place']" :segmentId="$fetchData['segment']"
+        :key="'change-doctor-service-'.$fetchData['appId'].'-'.$fetchData['service']->id.'-'.$fetchData['place']" />
     <livewire:appointmentuser::admin.add-appointment.modal.specific-day-appointment-registration-modal :appId="$fetchData['appId']"
-        :appTime="$fetchData['time']" :serviceId="$fetchData['service']->id" :placeId="$fetchData['place']->id" :segmentId="$fetchData['segment']" />
+        :appTime="$fetchData['time']" :serviceId="$fetchData['service']->id" :placeId="$fetchData['place']" :segmentId="$fetchData['segment']"
+        :key="'register-appointment-'.$fetchData['appId'].'-'.$fetchData['service']->id.'-'.$fetchData['place']" />
     <div>
         @include('appointmentuser::components.appointmentlist.disapprovemodal')
     </div>

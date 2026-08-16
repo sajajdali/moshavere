@@ -188,22 +188,25 @@ class SpecificDayAvailableAppointment extends Component
     }
 
     #[On('docHasChange')]
-    public function RebiuldCacheDataWithDoctorId($appId)
+    public function RebiuldCacheDataWithDoctorId($appId, $serviceId = null, $placeId = null)
     {
         $app = AppointmentSetting::find($appId);
-        if (env('APPOINTMENT_SANDBOX')) {
-            Cache::forget('appointmentList.' . $app->id);
+        if (! $app) {
+            return;
         }
-        if (config('app.without_cache')) {
-            $this->fetchData['RawlistOfAppointment']  = app('AppointmentUserService')->listAppointments($app);
-        } else {
-            $this->fetchData['RawlistOfAppointment']  = Cache::rememberForever('appointmentList.' . $app->id, function () use ($app) {
-                $app->update(['updated_log_at' => \now()]);
-                return app('AppointmentUserService')->listAppointments($app);
-            });
+
+        $service = Service::find($serviceId) ?? $app->service;
+        $parameters = [
+            'serviceId' => $service?->id,
+            'placeId' => $placeId ?? $app->place_id,
+            'appId' => $app->id,
+            'date' => verta($this->fetchData['selectedDate'])->format('Y-m-d'),
+        ];
+        if (!empty($this->fetchData['segment'])) {
+            $parameters['segmentItemId'] = $this->fetchData['segment'];
         }
-        // dd($this->fetchData['RawlistOfAppointment']);
-        $this->fetchData['listOfAppointment'] = $this->listOfAppointment($this->fetchData['RawlistOfAppointment']);
+
+        return redirect()->route('admin.appointment.add.specificday', $parameters);
     }
     public function passTimeToRegisterAppointmentModal($from, $until)
     {

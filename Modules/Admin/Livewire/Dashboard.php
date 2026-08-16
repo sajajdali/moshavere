@@ -25,6 +25,8 @@ class Dashboard extends Component
     public array $fetchData = [];
     public string $selectedAppointmentDate;
     public bool $dashboardDataLoaded = false;
+    public string $appointmentSortPriority = 'service';
+    public string $appointmentTimeSortDirection = 'asc';
 
     public function mount()
     {
@@ -191,6 +193,18 @@ class Dashboard extends Component
         }
     }
 
+    public function sortAppointmentsByTime(): void
+    {
+        if ($this->appointmentSortPriority === 'time') {
+            $this->appointmentTimeSortDirection = $this->appointmentTimeSortDirection === 'asc' ? 'desc' : 'asc';
+        } else {
+            $this->appointmentSortPriority = 'time';
+            $this->appointmentTimeSortDirection = 'asc';
+        }
+
+        $this->resetPage();
+    }
+
     private function selectedAppointmentDateCarbon()
     {
         try {
@@ -205,10 +219,23 @@ class Dashboard extends Component
     public function render()
     {
         if ($this->dashboardDataLoaded) {
-            $today_app =  AppointmentUser::DoctorPermittion()
-                ->whereDate('date_visit', $this->selectedAppointmentDateCarbon())
-                ->orderBy('date_visit')
-                ->paginate(10);
+            $todayAppQuery =  AppointmentUser::DoctorPermittion()
+                ->with(['user', 'service'])
+                ->whereDate('date_visit', $this->selectedAppointmentDateCarbon());
+
+            if ($this->appointmentSortPriority === 'time') {
+                $todayAppQuery
+                    ->orderBy('date_visit', $this->appointmentTimeSortDirection)
+                    ->orderByRaw('service_id IS NULL')
+                    ->orderBy('service_id');
+            } else {
+                $todayAppQuery
+                    ->orderByRaw('service_id IS NULL')
+                    ->orderBy('service_id')
+                    ->orderBy('date_visit');
+            }
+
+            $today_app = $todayAppQuery->paginate(10);
         } else {
             $today_app = new LengthAwarePaginator([], 0, 10);
         }

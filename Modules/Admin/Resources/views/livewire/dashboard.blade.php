@@ -141,8 +141,21 @@
                                     <tr>
                                         <th scope="col">#</th>
                                         <th scope="col">نام</th>
+                                        <th scope="col">بخش</th>
                                         <th scope="col">وضعیت</th>
-                                        <th scope="col">ساعت</th>
+                                        <th scope="col">
+                                            <button type="button"
+                                                class="btn btn-link p-0 text-decoration-none text-reset fw-semibold"
+                                                wire:click="sortAppointmentsByTime">
+                                                ساعت
+                                                @if ($appointmentSortPriority === 'time')
+                                                    <i class="fa {{ $appointmentTimeSortDirection === 'asc' ? 'fa-arrow-up' : 'fa-arrow-down' }} ms-1 text-primary"
+                                                        aria-hidden="true"></i>
+                                                @else
+                                                    <i class="fa fa-sort ms-1 text-muted" aria-hidden="true"></i>
+                                                @endif
+                                            </button>
+                                        </th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -151,6 +164,7 @@
                                             <tr class="text-center table-success">
                                                 <td>{{ $app->id }}</td>
                                                 <td>{{ $app->user->fullName }}</td>
+                                                <td>{{ $app->service?->title ?? '-' }}</td>
                                                 <td>
                                                     <span
                                                         class="badge {{ $app->status->getBadgeColor() }}">{{ $app->status->getName() }}</span>

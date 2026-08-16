@@ -56,7 +56,7 @@ class ServiceAndDoctorModal extends Component
         $this->form['service_id'] = $this->form['service'];
         $this->form['doctor_id'] = $this->docSection->id;
         if ($this->fetchData['places']->isNotEmpty() && $this->fetchData['places']->count() == 1) {
-            return  $this->selectplace($this->fetchData['places']->first());
+            return  $this->selectplace($this->fetchData['places']->first()->id);
         } else {
             $this->step = 3;
         }
@@ -80,7 +80,7 @@ class ServiceAndDoctorModal extends Component
         if (!empty($special_setting_for_appointment)) {
             $this->form['app_id'] = $special_setting_for_appointment->id;
             $this->dispatch('closeModal', true);
-            $this->dispatch('docHasChange', appId: $this->form['app_id']);
+            $this->dispatch('docHasChange', appId: $this->form['app_id'], serviceId: $this->form['service_id'], placeId: $this->form['place_id']);
         } else {
             return redirect()->route('admin.appointment_user.addApp')->with('error', 'تنظیمات حضور یافت نشد');
         }

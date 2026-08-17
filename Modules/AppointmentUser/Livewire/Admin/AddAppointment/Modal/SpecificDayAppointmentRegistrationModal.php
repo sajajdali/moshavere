@@ -100,7 +100,7 @@ class SpecificDayAppointmentRegistrationModal extends Component
                 $this->checkForAvaiableOperator();
                 $this->step = 3;
             } else {
-                $this->storeAppointmentByAdmin();
+                return $this->storeAppointmentByAdmin();
             }
         } elseif ($this->step == 3) {
             return $this->storeAppointmentByAdmin();
@@ -198,14 +198,13 @@ class SpecificDayAppointmentRegistrationModal extends Component
             if (setting(\Modules\Setting\Enum\SettingKeyEnum::ALLOW_MULTIPLE_APP_FROM_ADMIN_PANEL)) {
                 $is_time_free = $this->IsthisTimeAvaialable($from->toTimeString(), $until->toTimeString());
                 if ($is_time_free) {
-                    $this->storeApp();
+                    return $this->storeApp();
                 } else {
                     $this->step = 4;
                 }
             } else {
-                $this->storeApp();
+                return $this->storeApp();
             }
-            $this->render();
         }
     }
     private function storeApp()

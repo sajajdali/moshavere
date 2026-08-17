@@ -364,6 +364,7 @@
                     </div>
                     <div>
                         <button type="button" class="btn btn-success" wire:click='numberSet'
+                            wire:loading.attr='disabled' wire:target='numberSet'
                             wire:loading.class='btn-loading bg-gray'>
                             @if ($step == 1)
                                 ادامه

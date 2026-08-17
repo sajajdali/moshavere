@@ -60,7 +60,6 @@ class SpecificDayAvailableAppointment extends Component
         // array_column($this->fetchData['listOfAppointment'] , 'date')
         $this->dispatch('loadJs', true);
         $this->dateHasBeenChange();
-        $this->render();
     }
     public function previousDay()
     {
@@ -73,7 +72,6 @@ class SpecificDayAvailableAppointment extends Component
         }
         $this->dispatch('loadJs', true);
         $this->dateHasBeenChange();
-        $this->render();
     }
     public function nextDay()
     {
@@ -86,7 +84,6 @@ class SpecificDayAvailableAppointment extends Component
         }
         $this->dispatch('loadJs', true);
         $this->dateHasBeenChange();
-        $this->render();
     }
     public function RecreatelistOfAppointment()
     {

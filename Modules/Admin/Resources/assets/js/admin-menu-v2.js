@@ -47,6 +47,8 @@
             $desktopIcon.toggleClass('fa-bars', !collapsed);
             $desktopIcon.toggleClass('fa-bars-staggered', collapsed);
 
+            hideTooltip();
+
             if (collapsed) {
                 closeSubmenus();
             }

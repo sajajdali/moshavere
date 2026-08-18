@@ -36,6 +36,9 @@
         <li class="nav-item {{ $innerItem['has_child'] ? 'admin-menu-parent' : '' }}">
             <a
                 class="nav-link admin-menu-link {{ $depth === 0 ? 'side-menu__item' : 'admin-submenu-link' }} {{ (!$innerItem['has_child'] && $depth === 0) ? 'hsa-link' : '' }}"
+                @if($depth === 0)
+                    data-title="{{ $innerItem['title'] }}"
+                @endif
                 @if($innerItem['has_child'])
                     data-bs-toggle="collapse"
                     href="#{{ $submenuId }}"

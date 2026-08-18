@@ -10,7 +10,7 @@
             <div class="dropdown profile-1 admin-mobile-profile d-lg-none">
                 <a href="#" data-bs-toggle="dropdown" class="nav-link leading-none d-flex animate"
                     aria-label="نمایش منوی کاربر" aria-expanded="false">
-                    <img src="{{ auth()->user()?->avatar }}" alt="{{ auth()->user()?->full_name }}"
+                    <img src="{{ auth()->user()?->getUserAvatar() }}" alt="{{ auth()->user()?->full_name }}"
                         class="avatar profile-user brround cover-image">
                 </a>
                 <div class="dropdown-menu dropdown-menu-end dropdown-menu-arrow">
@@ -21,9 +21,8 @@
                 </div>
             </div>
 
-            <a class="logo-horizontal"  href="{{ route('admin.dashboard') }}">
-                <img src="{{ setting(Modules\Setting\Enum\SettingKeyEnum::SITE_LOGO_URL) }}" class="header-brand-img desktop-logo" alt="{{ setting(Modules\Setting\Enum\SettingKeyEnum::SITE_TITLE) }}">
-                <img src="{{ setting(Modules\Setting\Enum\SettingKeyEnum::SITE_LOGO_URL) }}" class="header-brand-img light-logo1" alt="{{ setting(Modules\Setting\Enum\SettingKeyEnum::SITE_TITLE) }}">
+            <a class="logo-horizontal" href="{{ route('admin.dashboard') }}">
+                {{ setting(Modules\Setting\Enum\SettingKeyEnum::SITE_TITLE) }}
             </a>
             <!-- LOGO -->
             <div class="d-flex order-lg-2 ms-auto header-right-icons">
@@ -68,7 +67,7 @@
                                 <a href="#" data-bs-toggle="dropdown"
                                     class="nav-link pe-2 leading-none d-flex animate">
                                     <span>
-                                        <img src="{{ auth()->user()?->avatar }}" alt="profile-user"
+                                        <img src="{{ auth()->user()?->getUserAvatar() }}" alt="profile-user"
                                             class="avatar  profile-user brround cover-image">
                                     </span>
                                     <div class="text-center p-1 d-flex d-lg-none-max">

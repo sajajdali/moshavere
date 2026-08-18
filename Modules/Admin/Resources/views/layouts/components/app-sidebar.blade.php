@@ -4,9 +4,6 @@
 <aside class="app-sidebar sidebar" id="adminSidebar" aria-label="منوی اصلی">
     <div class="sidebar-brand">
         <a href="{{ route('admin.dashboard') }}" class="sidebar-brand-link">
-            <span class="sidebar-brand-mark">
-                <img src="{{ setting(Modules\Setting\Enum\SettingKeyEnum::SITE_LOGO_URL) }}" alt="{{ setting(Modules\Setting\Enum\SettingKeyEnum::SITE_TITLE) }}">
-            </span>
             <span class="sidebar-brand-text">{{ setting(Modules\Setting\Enum\SettingKeyEnum::SITE_TITLE) }}</span>
         </a>
     </div>

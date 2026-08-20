@@ -60,33 +60,50 @@
                                             </div>
                                         </span>
                                     </button>
-                                    @if ($counter['saturday'] > 1)
-                                        <button type="button" data-bs-toggle="tooltip" data-bs-placement="top"
-                                            title="حذف کردن بازه ی زمانی" wire:click="removeCounter('saturday')"
-                                            class="btn btn-danger rounded-pill text-center">
-                                            <span wire:loading.remove wire:target="removeCounter('saturday')">
-                                                <i class="fa fa-minus" aria-hidden="true"></i> <span>حذف بازه
-                                                    زمانی</span>
-                                            </span>
-                                            <span wire:loading wire:target="removeCounter('saturday')">
-                                                <div class="spinner-border spinner-border-sm" role="status">
-                                                </div>
-                                            </span>
-                                        </button>
-                                    @endif
+                                    <button type="button" data-bs-toggle="tooltip" data-bs-placement="top"
+                                        title="کپی این روز به سایر روزها (به جز جمعه)"
+                                        wire:click="cloneDayToOthers('saturday')"
+                                        class="btn btn-outline-primary rounded-pill text-center">
+                                        <span wire:loading.remove wire:target="cloneDayToOthers('saturday')">
+                                            <i class="fa fa-copy" aria-hidden="true"></i>
+                                            <span class="ms-1">کپی به سایر روزها</span>
+                                        </span>
+                                        <span wire:loading wire:target="cloneDayToOthers('saturday')">
+                                            <div class="spinner-border spinner-border-sm" role="status">
+                                            </div>
+                                        </span>
+                                    </button>
                                 </div>
                             </div>
                             @for ($i = 0; $i < $counter['saturday']; $i++)
-                                <div class="row">
-                                    <div class="col-12 col-md-6">
+                                <div class="row align-items-end">
+                                    <div class="col-12 col-md-5">
                                         <label for="input-time" class="form-label">از ساعت</label>
                                         <input wire:model='form.timeFrame.saturday.{{ $i }}.start'
                                             type="time" wire:ignore.self class="form-control" id="input-time">
                                     </div>
-                                    <div class="col-12 col-md-6"> <label for="input-label" class="form-label">تا
+                                    <div class="col-12 col-md-5"> <label for="input-label" class="form-label">تا
                                             ساعت:</label>
                                         <input wire:model='form.timeFrame.saturday.{{ $i }}.end'
                                             type="time" wire:ignore.self class="form-control" id="input-time">
+                                    </div>
+                                    <div class="col-12 col-md-2 mb-3">
+                                        @if ($counter['saturday'] > 1)
+                                            <button type="button" data-bs-toggle="tooltip" data-bs-placement="top"
+                                                title="حذف این بازه ی زمانی"
+                                                wire:click="removeTimeRow('saturday', {{ $i }})"
+                                                class="btn btn-danger rounded-pill text-center">
+                                                <span wire:loading.remove
+                                                    wire:target="removeTimeRow('saturday', {{ $i }})">
+                                                    <i class="fa fa-minus" aria-hidden="true"></i>
+                                                </span>
+                                                <span wire:loading
+                                                    wire:target="removeTimeRow('saturday', {{ $i }})">
+                                                    <div class="spinner-border spinner-border-sm" role="status">
+                                                    </div>
+                                                </span>
+                                            </button>
+                                        @endif
                                     </div>
                                 </div>
                             @endfor
@@ -138,33 +155,50 @@
                                             </div>
                                         </span>
                                     </button>
-                                    @if ($counter['sunday'] > 1)
-                                        <button type="button" data-bs-toggle="tooltip" data-bs-placement="top"
-                                            title="حذف کردن بازه ی زمانی" wire:click="removeCounter('sunday')"
-                                            class="btn btn-danger rounded-pill text-center">
-                                            <span wire:loading.remove wire:target="removeCounter('sunday')">
-                                                <i class="fa fa-minus" aria-hidden="true"></i> <span>حذف بازه
-                                                    زمانی</span>
-                                            </span>
-                                            <span wire:loading wire:target="removeCounter('sunday')">
-                                                <div class="spinner-border spinner-border-sm" role="status">
-                                                </div>
-                                            </span>
-                                        </button>
-                                    @endif
+                                    <button type="button" data-bs-toggle="tooltip" data-bs-placement="top"
+                                        title="کپی این روز به سایر روزها (به جز جمعه)"
+                                        wire:click="cloneDayToOthers('sunday')"
+                                        class="btn btn-outline-primary rounded-pill text-center">
+                                        <span wire:loading.remove wire:target="cloneDayToOthers('sunday')">
+                                            <i class="fa fa-copy" aria-hidden="true"></i>
+                                            <span class="ms-1">کپی به سایر روزها</span>
+                                        </span>
+                                        <span wire:loading wire:target="cloneDayToOthers('sunday')">
+                                            <div class="spinner-border spinner-border-sm" role="status">
+                                            </div>
+                                        </span>
+                                    </button>
                                 </div>
                             </div>
                             @for ($i = 0; $i < $counter['sunday']; $i++)
-                                <div class="row">
-                                    <div class="col-12 col-md-6">
+                                <div class="row align-items-end">
+                                    <div class="col-12 col-md-5">
                                         <label for="input-time" class="form-label">از ساعت</label>
                                         <input wire:model='form.timeFrame.sunday.{{ $i }}.start'
                                             type="time" wire:ignore.self class="form-control" id="input-time">
                                     </div>
-                                    <div class="col-12 col-md-6"> <label for="input-label" class="form-label">تا
+                                    <div class="col-12 col-md-5"> <label for="input-label" class="form-label">تا
                                             ساعت:</label>
                                         <input wire:model='form.timeFrame.sunday.{{ $i }}.end'
                                             type="time" wire:ignore.self class="form-control" id="input-time">
+                                    </div>
+                                    <div class="col-12 col-md-2 mb-3">
+                                        @if ($counter['sunday'] > 1)
+                                            <button type="button" data-bs-toggle="tooltip" data-bs-placement="top"
+                                                title="حذف این بازه ی زمانی"
+                                                wire:click="removeTimeRow('sunday', {{ $i }})"
+                                                class="btn btn-danger rounded-pill text-center">
+                                                <span wire:loading.remove
+                                                    wire:target="removeTimeRow('sunday', {{ $i }})">
+                                                    <i class="fa fa-minus" aria-hidden="true"></i>
+                                                </span>
+                                                <span wire:loading
+                                                    wire:target="removeTimeRow('sunday', {{ $i }})">
+                                                    <div class="spinner-border spinner-border-sm" role="status">
+                                                    </div>
+                                                </span>
+                                            </button>
+                                        @endif
                                     </div>
                                 </div>
                             @endfor
@@ -217,33 +251,50 @@
                                             </div>
                                         </span>
                                     </button>
-                                    @if ($counter['monday'] > 1)
-                                        <button type="button" data-bs-toggle="tooltip" data-bs-placement="top"
-                                            title="حذف کردن بازه ی زمانی" wire:click="removeCounter('monday')"
-                                            class="btn btn-danger rounded-pill text-center">
-                                            <span wire:loading.remove wire:target="removeCounter('monday')">
-                                                <i class="fa fa-minus" aria-hidden="true"></i> <span>حذف بازه
-                                                    زمانی</span>
-                                            </span>
-                                            <span wire:loading wire:target="removeCounter('monday')">
-                                                <div class="spinner-border spinner-border-sm" role="status">
-                                                </div>
-                                            </span>
-                                        </button>
-                                    @endif
+                                    <button type="button" data-bs-toggle="tooltip" data-bs-placement="top"
+                                        title="کپی این روز به سایر روزها (به جز جمعه)"
+                                        wire:click="cloneDayToOthers('monday')"
+                                        class="btn btn-outline-primary rounded-pill text-center">
+                                        <span wire:loading.remove wire:target="cloneDayToOthers('monday')">
+                                            <i class="fa fa-copy" aria-hidden="true"></i>
+                                            <span class="ms-1">کپی به سایر روزها</span>
+                                        </span>
+                                        <span wire:loading wire:target="cloneDayToOthers('monday')">
+                                            <div class="spinner-border spinner-border-sm" role="status">
+                                            </div>
+                                        </span>
+                                    </button>
                                 </div>
                             </div>
                             @for ($i = 0; $i < $counter['monday']; $i++)
-                                <div class="row">
-                                    <div class="col-12 col-md-6">
+                                <div class="row align-items-end">
+                                    <div class="col-12 col-md-5">
                                         <label for="input-time" class="form-label">از ساعت</label>
                                         <input wire:model='form.timeFrame.monday.{{ $i }}.start'
                                             type="time" wire:ignore.self class="form-control" id="input-time">
                                     </div>
-                                    <div class="col-12 col-md-6"> <label for="input-label" class="form-label">تا
+                                    <div class="col-12 col-md-5"> <label for="input-label" class="form-label">تا
                                             ساعت:</label>
                                         <input wire:model='form.timeFrame.monday.{{ $i }}.end'
                                             type="time" wire:ignore.self class="form-control" id="input-time">
+                                    </div>
+                                    <div class="col-12 col-md-2 mb-3">
+                                        @if ($counter['monday'] > 1)
+                                            <button type="button" data-bs-toggle="tooltip" data-bs-placement="top"
+                                                title="حذف این بازه ی زمانی"
+                                                wire:click="removeTimeRow('monday', {{ $i }})"
+                                                class="btn btn-danger rounded-pill text-center">
+                                                <span wire:loading.remove
+                                                    wire:target="removeTimeRow('monday', {{ $i }})">
+                                                    <i class="fa fa-minus" aria-hidden="true"></i>
+                                                </span>
+                                                <span wire:loading
+                                                    wire:target="removeTimeRow('monday', {{ $i }})">
+                                                    <div class="spinner-border spinner-border-sm" role="status">
+                                                    </div>
+                                                </span>
+                                            </button>
+                                        @endif
                                     </div>
                                 </div>
                             @endfor
@@ -295,33 +346,50 @@
                                             </div>
                                         </span>
                                     </button>
-                                    @if ($counter['tuesday'] > 1)
-                                        <button type="button" data-bs-toggle="tooltip" data-bs-placement="top"
-                                            title="حذف کردن بازه ی زمانی" wire:click="removeCounter('tuesday')"
-                                            class="btn btn-danger rounded-pill text-center">
-                                            <span wire:loading.remove wire:target="removeCounter('tuesday')">
-                                                <i class="fa fa-minus" aria-hidden="true"></i> <span>حذف بازه
-                                                    زمانی</span>
-                                            </span>
-                                            <span wire:loading wire:target="removeCounter('tuesday')">
-                                                <div class="spinner-border spinner-border-sm" role="status">
-                                                </div>
-                                            </span>
-                                        </button>
-                                    @endif
+                                    <button type="button" data-bs-toggle="tooltip" data-bs-placement="top"
+                                        title="کپی این روز به سایر روزها (به جز جمعه)"
+                                        wire:click="cloneDayToOthers('tuesday')"
+                                        class="btn btn-outline-primary rounded-pill text-center">
+                                        <span wire:loading.remove wire:target="cloneDayToOthers('tuesday')">
+                                            <i class="fa fa-copy" aria-hidden="true"></i>
+                                            <span class="ms-1">کپی به سایر روزها</span>
+                                        </span>
+                                        <span wire:loading wire:target="cloneDayToOthers('tuesday')">
+                                            <div class="spinner-border spinner-border-sm" role="status">
+                                            </div>
+                                        </span>
+                                    </button>
                                 </div>
                             </div>
                             @for ($i = 0; $i < $counter['tuesday']; $i++)
-                                <div class="row">
-                                    <div class="col-12 col-md-6">
+                                <div class="row align-items-end">
+                                    <div class="col-12 col-md-5">
                                         <label for="input-time" class="form-label">از ساعت</label>
                                         <input wire:model='form.timeFrame.tuesday.{{ $i }}.start'
                                             type="time" wire:ignore.self class="form-control" id="input-time">
                                     </div>
-                                    <div class="col-12 col-md-6"> <label for="input-label" class="form-label">تا
+                                    <div class="col-12 col-md-5"> <label for="input-label" class="form-label">تا
                                             ساعت:</label>
                                         <input wire:model='form.timeFrame.tuesday.{{ $i }}.end'
                                             type="time" wire:ignore.self class="form-control" id="input-time">
+                                    </div>
+                                    <div class="col-12 col-md-2 mb-3">
+                                        @if ($counter['tuesday'] > 1)
+                                            <button type="button" data-bs-toggle="tooltip" data-bs-placement="top"
+                                                title="حذف این بازه ی زمانی"
+                                                wire:click="removeTimeRow('tuesday', {{ $i }})"
+                                                class="btn btn-danger rounded-pill text-center">
+                                                <span wire:loading.remove
+                                                    wire:target="removeTimeRow('tuesday', {{ $i }})">
+                                                    <i class="fa fa-minus" aria-hidden="true"></i>
+                                                </span>
+                                                <span wire:loading
+                                                    wire:target="removeTimeRow('tuesday', {{ $i }})">
+                                                    <div class="spinner-border spinner-border-sm" role="status">
+                                                    </div>
+                                                </span>
+                                            </button>
+                                        @endif
                                     </div>
                                 </div>
                             @endfor
@@ -373,33 +441,50 @@
                                             </div>
                                         </span>
                                     </button>
-                                    @if ($counter['wednesday'] > 1)
-                                        <button type="button" data-bs-toggle="tooltip" data-bs-placement="top"
-                                            title="حذف کردن بازه ی زمانی" wire:click="removeCounter('wednesday')"
-                                            class="btn btn-danger rounded-pill text-center">
-                                            <span wire:loading.remove wire:target="removeCounter('wednesday')">
-                                                <i class="fa fa-minus" aria-hidden="true"></i> <span>حذف بازه
-                                                    زمانی</span>
-                                            </span>
-                                            <span wire:loading wire:target="removeCounter('wednesday')">
-                                                <div class="spinner-border spinner-border-sm" role="status">
-                                                </div>
-                                            </span>
-                                        </button>
-                                    @endif
+                                    <button type="button" data-bs-toggle="tooltip" data-bs-placement="top"
+                                        title="کپی این روز به سایر روزها (به جز جمعه)"
+                                        wire:click="cloneDayToOthers('wednesday')"
+                                        class="btn btn-outline-primary rounded-pill text-center">
+                                        <span wire:loading.remove wire:target="cloneDayToOthers('wednesday')">
+                                            <i class="fa fa-copy" aria-hidden="true"></i>
+                                            <span class="ms-1">کپی به سایر روزها</span>
+                                        </span>
+                                        <span wire:loading wire:target="cloneDayToOthers('wednesday')">
+                                            <div class="spinner-border spinner-border-sm" role="status">
+                                            </div>
+                                        </span>
+                                    </button>
                                 </div>
                             </div>
                             @for ($i = 0; $i < $counter['wednesday']; $i++)
-                                <div class="row">
-                                    <div class="col-12 col-md-6">
+                                <div class="row align-items-end">
+                                    <div class="col-12 col-md-5">
                                         <label for="input-time" class="form-label">از ساعت</label>
                                         <input wire:model='form.timeFrame.wednesday.{{ $i }}.start'
                                             type="time" wire:ignore.self class="form-control" id="input-time">
                                     </div>
-                                    <div class="col-12 col-md-6"> <label for="input-label" class="form-label">تا
+                                    <div class="col-12 col-md-5"> <label for="input-label" class="form-label">تا
                                             ساعت:</label>
                                         <input wire:model='form.timeFrame.wednesday.{{ $i }}.end'
                                             type="time" wire:ignore.self class="form-control" id="input-time">
+                                    </div>
+                                    <div class="col-12 col-md-2 mb-3">
+                                        @if ($counter['wednesday'] > 1)
+                                            <button type="button" data-bs-toggle="tooltip" data-bs-placement="top"
+                                                title="حذف این بازه ی زمانی"
+                                                wire:click="removeTimeRow('wednesday', {{ $i }})"
+                                                class="btn btn-danger rounded-pill text-center">
+                                                <span wire:loading.remove
+                                                    wire:target="removeTimeRow('wednesday', {{ $i }})">
+                                                    <i class="fa fa-minus" aria-hidden="true"></i>
+                                                </span>
+                                                <span wire:loading
+                                                    wire:target="removeTimeRow('wednesday', {{ $i }})">
+                                                    <div class="spinner-border spinner-border-sm" role="status">
+                                                    </div>
+                                                </span>
+                                            </button>
+                                        @endif
                                     </div>
                                 </div>
                             @endfor
@@ -451,33 +536,50 @@
                                             </div>
                                         </span>
                                     </button>
-                                    @if ($counter['thursday'] > 1)
-                                        <button type="button" data-bs-toggle="tooltip" data-bs-placement="top"
-                                            title="حذف کردن بازه ی زمانی" wire:click="removeCounter('thursday')"
-                                            class="btn btn-danger rounded-pill text-center">
-                                            <span wire:loading.remove wire:target="removeCounter('thursday')">
-                                                <i class="fa fa-minus" aria-hidden="true"></i> <span>حذف بازه
-                                                    زمانی</span>
-                                            </span>
-                                            <span wire:loading wire:target="removeCounter('thursday')">
-                                                <div class="spinner-border spinner-border-sm" role="status">
-                                                </div>
-                                            </span>
-                                        </button>
-                                    @endif
+                                    <button type="button" data-bs-toggle="tooltip" data-bs-placement="top"
+                                        title="کپی این روز به سایر روزها (به جز جمعه)"
+                                        wire:click="cloneDayToOthers('thursday')"
+                                        class="btn btn-outline-primary rounded-pill text-center">
+                                        <span wire:loading.remove wire:target="cloneDayToOthers('thursday')">
+                                            <i class="fa fa-copy" aria-hidden="true"></i>
+                                            <span class="ms-1">کپی به سایر روزها</span>
+                                        </span>
+                                        <span wire:loading wire:target="cloneDayToOthers('thursday')">
+                                            <div class="spinner-border spinner-border-sm" role="status">
+                                            </div>
+                                        </span>
+                                    </button>
                                 </div>
                             </div>
                             @for ($i = 0; $i < $counter['thursday']; $i++)
-                                <div class="row">
-                                    <div class="col-12 col-md-6">
+                                <div class="row align-items-end">
+                                    <div class="col-12 col-md-5">
                                         <label for="input-time" class="form-label">از ساعت</label>
                                         <input wire:model='form.timeFrame.thursday.{{ $i }}.start'
                                             type="time" wire:ignore.self class="form-control" id="input-time">
                                     </div>
-                                    <div class="col-12 col-md-6"> <label for="input-label" class="form-label">تا
+                                    <div class="col-12 col-md-5"> <label for="input-label" class="form-label">تا
                                             ساعت:</label>
                                         <input wire:model='form.timeFrame.thursday.{{ $i }}.end'
                                             type="time" wire:ignore.self class="form-control" id="input-time">
+                                    </div>
+                                    <div class="col-12 col-md-2 mb-3">
+                                        @if ($counter['thursday'] > 1)
+                                            <button type="button" data-bs-toggle="tooltip" data-bs-placement="top"
+                                                title="حذف این بازه ی زمانی"
+                                                wire:click="removeTimeRow('thursday', {{ $i }})"
+                                                class="btn btn-danger rounded-pill text-center">
+                                                <span wire:loading.remove
+                                                    wire:target="removeTimeRow('thursday', {{ $i }})">
+                                                    <i class="fa fa-minus" aria-hidden="true"></i>
+                                                </span>
+                                                <span wire:loading
+                                                    wire:target="removeTimeRow('thursday', {{ $i }})">
+                                                    <div class="spinner-border spinner-border-sm" role="status">
+                                                    </div>
+                                                </span>
+                                            </button>
+                                        @endif
                                     </div>
                                 </div>
                             @endfor
@@ -529,33 +631,37 @@
                                             </div>
                                         </span>
                                     </button>
-                                    @if ($counter['friday'] > 1)
-                                        <button type="button" data-bs-toggle="tooltip" data-bs-placement="top"
-                                            title="حذف کردن بازه ی زمانی" wire:click="removeCounter('friday')"
-                                            class="btn btn-danger rounded-pill text-center">
-                                            <span wire:loading.remove wire:target="removeCounter('friday')">
-                                                <i class="fa fa-minus" aria-hidden="true"></i> <span>حذف بازه
-                                                    زمانی</span>
-                                            </span>
-                                            <span wire:loading wire:target="removeCounter('friday')">
-                                                <div class="spinner-border spinner-border-sm" role="status">
-                                                </div>
-                                            </span>
-                                        </button>
-                                    @endif
                                 </div>
                             </div>
                             @for ($i = 0; $i < $counter['friday']; $i++)
-                                <div class="row">
-                                    <div class="col-12 col-md-6">
+                                <div class="row align-items-end">
+                                    <div class="col-12 col-md-5">
                                         <label for="input-time" class="form-label">از ساعت</label>
                                         <input wire:model='form.timeFrame.friday.{{ $i }}.start'
                                             type="time" wire:ignore.self class="form-control" id="input-time">
                                     </div>
-                                    <div class="col-12 col-md-6"> <label for="input-label" class="form-label">تا
+                                    <div class="col-12 col-md-5"> <label for="input-label" class="form-label">تا
                                             ساعت:</label>
                                         <input wire:model='form.timeFrame.friday.{{ $i }}.end'
                                             type="time" wire:ignore.self class="form-control" id="input-time">
+                                    </div>
+                                    <div class="col-12 col-md-2 mb-3">
+                                        @if ($counter['friday'] > 1)
+                                            <button type="button" data-bs-toggle="tooltip" data-bs-placement="top"
+                                                title="حذف این بازه ی زمانی"
+                                                wire:click="removeTimeRow('friday', {{ $i }})"
+                                                class="btn btn-danger rounded-pill text-center">
+                                                <span wire:loading.remove
+                                                    wire:target="removeTimeRow('friday', {{ $i }})">
+                                                    <i class="fa fa-minus" aria-hidden="true"></i>
+                                                </span>
+                                                <span wire:loading
+                                                    wire:target="removeTimeRow('friday', {{ $i }})">
+                                                    <div class="spinner-border spinner-border-sm" role="status">
+                                                    </div>
+                                                </span>
+                                            </button>
+                                        @endif
                                     </div>
                                 </div>
                             @endfor

@@ -168,15 +168,39 @@ class GeneralSetting extends Component
         $this->counter[$day] = $this->counter[$day] + 1;
         $this->render();
     }
-    public function removeCounter($day)
+    public function cloneDayToOthers($day)
     {
-        $this->counter[$day] = $this->counter[$day] - 1;
-        if (isset($this->form['timeFrame'][$day]) && ($this->counter[$day] + 1) == count($this->form['timeFrame'][$day])) {
-            array_pop($this->form['timeFrame'][$day]);
+        $targetDays = array_filter(
+            array_keys($this->counter),
+            fn($dayName) => $dayName !== $day && $dayName !== 'friday' && data_get($this->form, "visitType.$dayName", false)
+        );
+        foreach ($targetDays as $targetDay) {
+            if (isset($this->form['timeFrame'][$day])) {
+                $this->form['timeFrame'][$targetDay] = $this->form['timeFrame'][$day];
+            } else {
+                unset($this->form['timeFrame'][$targetDay]);
+            }
+            $this->counter[$targetDay] = $this->counter[$day];
+            if (isset($this->form['specialVisitTime'][$day])) {
+                $this->form['specialVisitTime'][$targetDay] = $this->form['specialVisitTime'][$day];
+            } else {
+                unset($this->form['specialVisitTime'][$targetDay]);
+            }
         }
         $this->render();
     }
-
+    public function removeTimeRow($day, $index)
+    {
+        if ($this->counter[$day] <= 1) {
+            return;
+        }
+        if (isset($this->form['timeFrame'][$day])) {
+            unset($this->form['timeFrame'][$day][$index]);
+            $this->form['timeFrame'][$day] = array_values($this->form['timeFrame'][$day]);
+        }
+        $this->counter[$day] = $this->counter[$day] - 1;
+        $this->render();
+    }
     public function validateSpecialdate()
     {
         $specialDayRules = [];
@@ -469,7 +493,7 @@ class GeneralSetting extends Component
         $appointment_setting_times = [];
         foreach ($this->form['timeFrame'] as $dayName => $timeFrameForEachDay) {
             foreach ($timeFrameForEachDay as $key => $timeFrame) {
-                if (isset($this->form['visitType'][$dayName]) && $this->form['visitType'][$dayName] == 'ture') {
+                if (data_get($this->form, "visitType.$dayName", false)) {
                     $appointment_setting_times[] = [
                         'day_number' => AppintmentSettingDayNumber::getConstant($dayName),
                         'start_at'  => $timeFrame['start'],

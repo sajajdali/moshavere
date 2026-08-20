@@ -911,7 +911,8 @@
             $('.customCheckbox').on('click', function() {
                 var id = $(this).data('id');
                 var inp = $(this);
-                @this.set('form.' + id, $(this).hasClass('on'));
+                var isDayToggle = id.indexOf('visitType.') === 0 && id !== 'visitType.status';
+                @this.set('form.' + id, $(this).hasClass('on'), !isDayToggle);
                 ChangePricesDisplay(id, inp);
             });
 

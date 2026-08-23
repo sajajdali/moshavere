@@ -607,7 +607,7 @@ class VoipController extends Controller
 
         return [
             'completeDays' => true,
-            'specialDay' => Carbon::parse($appointmentSetting->first_day_active, 'Asia/Tehran')->toDateString(),
+            'specialDays' => Carbon::parse($appointmentSetting->first_day_active, 'Asia/Tehran')->toDateString(),
             'numberDays' => max(60, (int) ($appointmentSetting->max_day_active ?? 0)),
         ];
     }

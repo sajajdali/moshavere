@@ -16,7 +16,12 @@
             <div class="card custom-card">
                 <div class="card-header border-bottom">
                     <h3 class="card-title">فهرست تماس‌های ورودی</h3>
-                    
+                    <div class="card-options">
+                        <button type="button" class="btn btn-success btn-sm" wire:click="ExportData" wire:loading.attr="disabled">
+                            <i class="fa fa-file-excel-o"></i>
+                            خروجی اکسل
+                        </button>
+                    </div>
                 </div>
                 <div class="card-body">
                     <div class="row mb-4">

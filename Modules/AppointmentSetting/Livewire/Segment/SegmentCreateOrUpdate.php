@@ -49,6 +49,7 @@ class SegmentCreateOrUpdate extends Component
             // items
         } else {
             $this->form['items'][0]['display_on_site'] = 1;
+            $this->form['items'][0]['priority'] = 1;
         }
     }
 
@@ -58,6 +59,7 @@ class SegmentCreateOrUpdate extends Component
         ++$this->form['count_items'];
         $counter = $this->form['count_items'];
         $this->form['items'][$counter]['display_on_site'] = 1;
+        $this->form['items'][$counter]['priority'] = $counter + 1;
 
     }
 
@@ -84,8 +86,8 @@ class SegmentCreateOrUpdate extends Component
             $listId = collect($this->form['items'])->pluck('id');
             $this->appointmentSegment->items()->whereNotIn('id', $listId)->delete();
             foreach ($this->form['items'] as $item) {
-                if($item['price'] == ""){
-                    $item['price'] = null;
+                if (empty($item['price'])) {
+                    $item['price'] = 0;
                 }
                 if (isset($item['id'])){
                     unset($item['created_at']);
@@ -99,7 +101,13 @@ class SegmentCreateOrUpdate extends Component
         } else {
             $this->appointmentSegment = AppointmentSegment::create($segmentCreateOrUpdate);
             $message = 'تنظیمات با موفقیت اضافه شد';
-            $this->appointmentSegment->items()->createMany($this->form['items'] );
+            $items = collect($this->form['items'])->map(function ($item) {
+                if (empty($item['price'])) {
+                    $item['price'] = 0;
+                }
+                return $item;
+            })->all();
+            $this->appointmentSegment->items()->createMany($items);
         }
         return redirect()->route('admin.appointment.segment.list')->with('success', $message);
 

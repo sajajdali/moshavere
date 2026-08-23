@@ -77,8 +77,11 @@
         <div class="card-header border-bottom d-flex justify-content-between">
             <h4>بخش ها با تنظیمات <strong>اختصاصی</strong></h4>
             <button class="btn btn-info" type="button" data-bs-toggle="modal" data-bs-target="#ServiceAndPlaceModal">
-                <i class="fa fa-plus fa-xl" aria-hidden="true"></i>
-                افزودن بخش با تنظیمات اختصاصی</button>
+                <div class="d-flex">
+                    <i class="fa fa-plus fa-lg me-2 mt-3" aria-hidden="true"></i>
+                    <span>افزودن بخش با تنظیمات اختصاصی</span>
+                </div>
+            </button>
         </div>
         {{-- TODO::customize special time --}}
         <div class="card-body">
@@ -99,14 +102,14 @@
                                             <button type="button" class="btn btn-info my-2 my-sm-0 loading-btn"
                                                 wire:click='editSpecialSection({{ $specialAppSetting->id }})'>
                                                 <div class="d-flex">
-                                                    <i class="fa fa-cogs fa-lg me-2 mt-1" aria-hidden="true"></i>
+                                                    <i class="fa fa-cogs fa-lg me-2 mt-3" aria-hidden="true"></i>
                                                     <span>ویرایش تنظیمات این بخش</span>
                                                 </div>
                                             </button>
                                             <button class="btn btn-danger delete_confirm_alert loading-btn"
                                                 data-label="تنظیمات اختصاصی" data-id="{{ $specialAppSetting->id }}">
                                                 <div class="d-flex">
-                                                    <i class="fa fa-trash-o fa-lg me-2 mt-1 " aria-hidden="true"></i>
+                                                    <i class="fa fa-trash-o fa-lg me-2 mt-3 " aria-hidden="true"></i>
                                                     <span>حذف تنظیم اختصاصی</span>
                                                 </div>
                                             </button>

@@ -10,6 +10,10 @@ class VoipVoiceRecord extends Model
 {
     protected $guarded = ['id'];
 
+    protected $casts = [
+        'listened_at' => 'datetime',
+    ];
+
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);

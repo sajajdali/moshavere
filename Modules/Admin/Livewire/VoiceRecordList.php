@@ -28,6 +28,30 @@ class VoiceRecordList extends Component
         $this->resetPage();
     }
 
+    public function markAsListened(int $voiceRecordId): void
+    {
+        VoipVoiceRecord::whereKey($voiceRecordId)
+            ->whereNull('listened_at')
+            ->update(['listened_at' => now()]);
+    }
+
+    public function delete(int $voiceRecordId): void
+    {
+        $voiceRecord = VoipVoiceRecord::find($voiceRecordId);
+
+        if (! $voiceRecord) {
+            return;
+        }
+
+        $absolutePath = public_path($voiceRecord->file_path);
+
+        if (is_file($absolutePath)) {
+            @unlink($absolutePath);
+        }
+
+        $voiceRecord->delete();
+    }
+
     public function render()
     {
         return view('admin::livewire.voice-record-list', [

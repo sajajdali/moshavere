@@ -50,16 +50,16 @@
                                         };
                                         $listened = ! is_null($voiceRecord->listened_at);
                                     @endphp
-                                    <tr wire:key="voice-record-{{ $voiceRecord->id }}" @class(['table-warning' => ! $listened])>
+                                    <tr wire:key="voice-record-{{ $voiceRecord->id }}" @class(['border-start border-4 border-warning' => ! $listened])>
                                         <td>{{ $voiceRecord->id }}</td>
                                         <td>
                                             @if ($listened)
-                                                <span class="badge bg-success-transparent">
+                                                <span class="badge bg-success">
                                                     <i class="ri-check-double-line me-1"></i>شنیده شده
                                                 </span>
                                                 <div class="small text-muted mt-1">{{ verta($voiceRecord->listened_at)->format('Y/m/d H:i') }}</div>
                                             @else
-                                                <span class="badge bg-warning-transparent">
+                                                <span class="badge bg-warning text-dark">
                                                     <i class="ri-time-line me-1"></i>شنیده نشده
                                                 </span>
                                             @endif
@@ -78,11 +78,11 @@
                                         <td>
                                             <div class="d-flex flex-column gap-1 align-items-stretch">
                                                 @unless ($listened)
-                                                    <button type="button" class="btn btn-sm btn-success-light" wire:click="markAsListened({{ $voiceRecord->id }})" wire:loading.attr="disabled">
+                                                    <button type="button" class="btn btn-sm btn-outline-success" wire:click="markAsListened({{ $voiceRecord->id }})" wire:loading.attr="disabled">
                                                         <i class="ri-check-line me-1"></i>علامت‌گذاری شنیده شد
                                                     </button>
                                                 @endunless
-                                                <button type="button" class="btn btn-sm btn-danger-light" wire:click="delete({{ $voiceRecord->id }})" wire:confirm="آیا از حذف این پیغام صوتی مطمئن هستید؟" wire:loading.attr="disabled">
+                                                <button type="button" class="btn btn-sm btn-outline-danger" wire:click="delete({{ $voiceRecord->id }})" wire:confirm="آیا از حذف این پیغام صوتی مطمئن هستید؟" wire:loading.attr="disabled">
                                                     <i class="ri-delete-bin-line me-1"></i>حذف
                                                 </button>
                                             </div>

@@ -46,6 +46,10 @@
         .appointment-grid{display:grid;grid-template-columns:42px 58px minmax(170px,.9fr) 1.15fr 128px 1fr 1fr 118px 168px 120px 126px;align-items:center}
         .appointment-head{padding:0 8px;background:#f9fafb;border-bottom:1px solid #e6e8ec;position:sticky;top:0;z-index:5}
         .appointment-head>div{padding:10px 5px;font-size:12px;font-weight:600;color:#667085}
+        .th-sortable{cursor:pointer;user-select:none;display:flex;align-items:center;gap:4px}
+        .th-sortable:hover{color:#0f766e}
+        .th-sort-arrow{font-size:10px;color:#c8cdd4;transition:color .15s}
+        .th-sortable.active .th-sort-arrow{color:#0f766e}
         .appointment-row{padding:10px 8px;border-bottom:1px solid #eef0f3;background:#fff}
         .appointment-row>div{padding:0 5px;min-width:0}
         .om-avatar{width:36px;height:36px;flex:none;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:600;color:#fff;background:#0f766e}
@@ -176,7 +180,16 @@
                 <div class="appointment-table">
                     <div class="appointment-grid appointment-head">
                         <div><input type="checkbox" class="checkbox select-all-visible" style="width:16px;height:16px;accent-color:#0f766e"></div>
-                        <div>شناسه</div><div>کاربر</div><div>پزشک / اپراتور</div><div>زمان نوبت</div><div>بخش</div><div>ثبت شده توسط</div><div>تاریخ ثبت</div><div>وضعیت و عملیات</div><div>کد ملی</div><div>نوع نوبت</div>
+                        <div class="th-sortable {{ $sortField === 'id' ? 'active' : '' }}" wire:click="sortBy('id')">شناسه <i class="fa {{ $sortField === 'id' ? ($sortDirection === 'asc' ? 'fa-arrow-up' : 'fa-arrow-down') : 'fa-arrows-v' }} th-sort-arrow"></i></div>
+                        <div>کاربر</div>
+                        <div>پزشک / اپراتور</div>
+                        <div class="th-sortable {{ $sortField === 'date_visit' ? 'active' : '' }}" wire:click="sortBy('date_visit')">زمان نوبت <i class="fa {{ $sortField === 'date_visit' ? ($sortDirection === 'asc' ? 'fa-arrow-up' : 'fa-arrow-down') : 'fa-arrows-v' }} th-sort-arrow"></i></div>
+                        <div class="th-sortable {{ $sortField === 'service_id' ? 'active' : '' }}" wire:click="sortBy('service_id')">بخش <i class="fa {{ $sortField === 'service_id' ? ($sortDirection === 'asc' ? 'fa-arrow-up' : 'fa-arrow-down') : 'fa-arrows-v' }} th-sort-arrow"></i></div>
+                        <div>ثبت شده توسط</div>
+                        <div class="th-sortable {{ $sortField === 'created_at' ? 'active' : '' }}" wire:click="sortBy('created_at')">تاریخ ثبت <i class="fa {{ $sortField === 'created_at' ? ($sortDirection === 'asc' ? 'fa-arrow-up' : 'fa-arrow-down') : 'fa-arrows-v' }} th-sort-arrow"></i></div>
+                        <div class="th-sortable {{ $sortField === 'status' ? 'active' : '' }}" wire:click="sortBy('status')">وضعیت و عملیات <i class="fa {{ $sortField === 'status' ? ($sortDirection === 'asc' ? 'fa-arrow-up' : 'fa-arrow-down') : 'fa-arrows-v' }} th-sort-arrow"></i></div>
+                        <div>کد ملی</div>
+                        <div class="th-sortable {{ $sortField === 'kind' ? 'active' : '' }}" wire:click="sortBy('kind')">نوع نوبت <i class="fa {{ $sortField === 'kind' ? ($sortDirection === 'asc' ? 'fa-arrow-up' : 'fa-arrow-down') : 'fa-arrows-v' }} th-sort-arrow"></i></div>
                     </div>
 
                     @forelse ($appointments as $key => $ap)

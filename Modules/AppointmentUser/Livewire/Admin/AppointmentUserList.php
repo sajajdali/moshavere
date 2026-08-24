@@ -45,6 +45,31 @@ class AppointmentUserList extends Component
     public array $form = [];
     public bool $showcollaps = true;
     public ?string $msg = null;
+    #[Url]
+    public string $sortField = 'date_visit';
+    #[Url]
+    public string $sortDirection = 'desc';
+    public array $sortableColumns = [
+        'id'          => 'شناسه',
+        'date_visit'  => 'زمان نوبت',
+        'service_id'  => 'بخش',
+        'created_at'  => 'تاریخ ثبت',
+        'status'      => 'وضعیت',
+        'kind'        => 'نوع نوبت',
+    ];
+    public function sortBy($field)
+    {
+        if (! array_key_exists($field, $this->sortableColumns)) {
+            return;
+        }
+        if ($this->sortField === $field) {
+            $this->sortDirection = $this->sortDirection === 'asc' ? 'desc' : 'asc';
+        } else {
+            $this->sortField = $field;
+            $this->sortDirection = 'asc';
+        }
+        $this->resetPage();
+    }
     public function startSearch()
     {
         $this->showcollaps = true;
@@ -287,13 +312,23 @@ class AppointmentUserList extends Component
                 $q->where('agent_id', auth()->user()->id);
             });
         }
+        $applySort = function ($query) {
+            if ($this->sortField === 'date_visit') {
+                return $query->orderByRaw('DATE(date_visit) ' . $this->sortDirection . ', TIME(date_visit) ' . $this->sortDirection);
+            }
+            if (array_key_exists($this->sortField, $this->sortableColumns)) {
+                return $query->orderBy($this->sortField, $this->sortDirection);
+            }
+            return $query->orderByRaw('DATE(date_visit) DESC, TIME(date_visit) ASC');
+        };
+
         if ($isExported) {
             if (collect($this->search)->each(fn($item) => $item != null)) {
-                return  $appointments = $query->orderByRaw('DATE(date_visit) DESC, TIME(date_visit) ASC')->get();
+                return  $appointments = $applySort($query)->get();
             }
-            return $appointments =  $query->orderByRaw('DATE(date_visit) DESC, TIME(date_visit) ASC')->get();
+            return $appointments =  $applySort($query)->get();
         }
-        $appointments = $query->orderByRaw('DATE(date_visit) DESC, TIME(date_visit) ASC')->paginate(10);
+        $appointments = $applySort($query)->paginate(10);
         return $appointments;
     }
     public function ExportData()

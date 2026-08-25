@@ -9,6 +9,7 @@ use Modules\User\Entities\User;
 use Modules\Service\app\Models\Service;
 use Modules\Reminder\app\Models\Reminder;
 use Modules\Reminder\Enum\ReminderStatusEnum;
+use Modules\Reminder\app\Jobs\RegenerateAppointmentRemindersJob;
 
 class UpdateOrCreate extends Component
 {
@@ -134,6 +135,7 @@ class UpdateOrCreate extends Component
                     $this->fetchData['reminder']->update(array_merge($model, ['reminderable_type' => null, 'reminderable_id' => null]));
                 }
             }
+            RegenerateAppointmentRemindersJob::dispatch($this->fetchData['reminder']->id);
         } else {
             if (isset($service)) {
                 $service->reminder()->create($model);

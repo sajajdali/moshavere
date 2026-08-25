@@ -9,6 +9,7 @@ use Livewire\Attributes\On;
 use Livewire\Attributes\Url;
 use Modules\Reminder\app\Models\Reminder;
 use Modules\Reminder\Enum\ReminderStatusEnum;
+use Modules\Reminder\app\Models\AppointmentReminder;
 
 class ReminderList extends Component
 {
@@ -30,6 +31,7 @@ class ReminderList extends Component
     #[On('delete')]
     public function delete(Reminder $model)
     {
+        AppointmentReminder::where('reminder_id', $model->id)->delete();
         $model->delete();
         return redirect()->route('admin.reminder.list')->with('success', 'تخصص با موفقیت حذف شد.');
     }

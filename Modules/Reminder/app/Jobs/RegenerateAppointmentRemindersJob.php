@@ -13,6 +13,7 @@ use Modules\Reminder\app\Models\Reminder;
 use Modules\Reminder\app\Models\AppointmentReminder;
 use Modules\AppointmentUser\app\Models\AppointmentUser;
 use Modules\AppointmentUser\Enum\AppointmentUserKindEnum;
+use Modules\AppointmentUser\Enum\AppointmentUserStatusEnum;
 
 class RegenerateAppointmentRemindersJob implements ShouldQueue
 {
@@ -43,6 +44,7 @@ class RegenerateAppointmentRemindersJob implements ShouldQueue
 
             AppointmentUser::query()
                 ->where('kind', AppointmentUserKindEnum::IN_PERSION)
+                ->where('status', AppointmentUserStatusEnum::STATUS_SUCCESSFUL)
                 ->where('date_visit', '>', now())
                 ->when(!empty($doctors), function ($q) use ($doctors) {
                     $q->whereIn('doctor_id', $doctors);

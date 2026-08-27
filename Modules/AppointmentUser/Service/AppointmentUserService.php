@@ -373,7 +373,7 @@ class AppointmentUserService
                                     } else {
                                         $dayOutput['times'][] = [
                                             'status'    => !$currentDate->isPast(),
-                                            'timestamp' => $startDate->copy()->timestamp, // preserved
+                                            'timestamp' => $currentDate->copy()->setTime($startTime->hour, $startTime->minute)->timestamp,
                                             'from'      => $startTime->copy()->toTimeString(),
                                             'until'     => $startTime->copy()->addMinutes($timeForVisit)->toTimeString(),
                                         ];

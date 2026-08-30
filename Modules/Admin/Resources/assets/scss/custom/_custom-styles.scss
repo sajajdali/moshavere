@@ -16,6 +16,9 @@
 .jdp-months svg {
     fill: black !important;
 }
+jdp-container {
+    z-index: 99999 !important;
+}
 .collapse:not(.show) {
     display: none;
     background: $white;

@@ -143,7 +143,9 @@
     myCollapsible.addEventListener('hide.bs.collapse', function() {
         @this.set('searchPanel', '');
     })
-    jalaliDatepicker.startWatch();
+    jalaliDatepicker.startWatch({
+        zIndex: 99999
+    });
     $(document).on('input', '[data-jdp]', function() {
         let selectedDate = $(this).val();
         let seterValue = $(this).data('name');

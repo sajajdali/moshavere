@@ -279,7 +279,9 @@
             });
 
             function js() {
-                jalaliDatepicker.startWatch();
+                jalaliDatepicker.startWatch({
+                    zIndex: 99999
+                });
                 $(document).on('input', '[data-jdp]', function() {
                     let selectedDate = $(this).val();
                     let seterValue = $(this).data('name');

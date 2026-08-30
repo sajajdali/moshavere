@@ -341,6 +341,7 @@
             function js() {
                 const iranianHolidays = @json(holidays_array());
                 jalaliDatepicker.startWatch({
+                    zIndex: 99999,
                     dayRendering: function(dayOptions) {
                         const formatted = `${dayOptions.year}/${String(dayOptions.month).padStart(2, '0')}/${String(dayOptions.day).padStart(2, '0')}`;
                         return { isHollyDay: iranianHolidays.includes(formatted) };

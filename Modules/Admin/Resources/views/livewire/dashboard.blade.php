@@ -559,7 +559,9 @@
     {{-- <script src="{{ asset('assets/admin/js/chart.js') }}"></script> --}}
     <script>
         $(document).ready(function() {
-            jalaliDatepicker.startWatch();
+            jalaliDatepicker.startWatch({
+                zIndex: 99999
+            });
             $(document).on('input', '#dashboard-appointment-date[data-jdp]', function() {
                 @this.set($(this).data('name'), $(this).val());
             });

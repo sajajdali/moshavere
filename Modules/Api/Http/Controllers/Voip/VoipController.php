@@ -894,6 +894,7 @@ class VoipController extends Controller
         $operatorId          = $request->get('operator_id');
         $kindParameter       = $request->get('kind');
         $description         = $request->get('description');
+        $nationalCode        = $request->get('nationalCode') ?? $request->get('national_code');
 
         if (empty($doctorId) || empty($visitDate) || empty($mobile)) {
             return $this->requestException([
@@ -961,9 +962,10 @@ class VoipController extends Controller
             user: $user,
             firstName: $user->first_name,
             lastName: $user->last_name,
+            nationalCode: $nationalCode,
         );
         // full user model
-        $userModelAppointment = new UserModelAppointment(userModel: $mainUser, forHimself: $foHimself, userSomeoneModel: $someoneModel);
+        $userModelAppointment = new UserModelAppointment(userModel: $mainUser, forHimself: $foHimself, userSomeoneModel: $someoneModel, needToUpdate: true);
 
         //check if operator
         if (isset($operatorId) && !empty($operatorId)) {

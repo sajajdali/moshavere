@@ -46,6 +46,9 @@ class AppointmentStatusController extends Controller
             ]);
         }
 
+        $now = Carbon::now('Asia/Tehran');
+        $today = $now->toDateString();
+
         $appointments = AppointmentUser::query()
             ->with(['user:id,mobile', 'doctor:id'])
             ->whereHas('user', function ($query) use ($phone) {
@@ -57,18 +60,22 @@ class AppointmentStatusController extends Controller
                 AppointmentUserStatusEnum::STATUS_SUCCESSFUL->value,
             ])
             ->whereNotNull('date_visit')
-            ->where('date_visit', '>=', now('Asia/Tehran'))
+            ->whereDate('date_visit', '>=', $today)
             ->orderBy('date_visit')
             ->get();
 
-        $today = Carbon::now('Asia/Tehran')->toDateString();
         $extensions = ConsultationPractitioner::whereIn('user_id', $appointments->pluck('doctor_id')->filter())
             ->pluck('extension', 'user_id');
-        $now = Carbon::now('Asia/Tehran');
         $items = $appointments->map(function (AppointmentUser $appointment) use ($today, $extensions, $now) {
             $date = Carbon::parse($appointment->date_visit, 'Asia/Tehran');
             $start = $date->copy();
             $end = $date->copy()->setTimeFromTimeString($appointment->end_time ?: $date->copy()->addMinutes(30)->format('H:i:s'));
+            if ($end->lt($start)) {
+                $end->addDay();
+            }
+            if ($end->lt($now)) {
+                return null;
+            }
             $inWindow = $now->betweenIncluded($start, $end);
 
             return [
@@ -84,7 +91,7 @@ class AppointmentStatusController extends Controller
                 'doctor_extension' => $extensions->get($appointment->doctor_id),
                 'status' => $appointment->status->value,
             ];
-        })->values();
+        })->filter()->values();
 
         return $this->ok([
             'status' => true,

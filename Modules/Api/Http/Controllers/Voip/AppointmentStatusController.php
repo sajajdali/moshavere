@@ -64,14 +64,22 @@ class AppointmentStatusController extends Controller
         $today = Carbon::now('Asia/Tehran')->toDateString();
         $extensions = ConsultationPractitioner::whereIn('user_id', $appointments->pluck('doctor_id')->filter())
             ->pluck('extension', 'user_id');
-        $items = $appointments->map(function (AppointmentUser $appointment) use ($today, $extensions) {
+        $now = Carbon::now('Asia/Tehran');
+        $items = $appointments->map(function (AppointmentUser $appointment) use ($today, $extensions, $now) {
             $date = Carbon::parse($appointment->date_visit, 'Asia/Tehran');
+            $start = $date->copy();
+            $end = $date->copy()->setTimeFromTimeString($appointment->end_time ?: $date->copy()->addMinutes(30)->format('H:i:s'));
+            $inWindow = $now->betweenIncluded($start, $end);
 
             return [
                 'appointment_code' => $appointment->id,
                 'tracking_code' => $appointment->tracking_code,
                 'date_visit' => $date->toIso8601String(),
+                'start_time' => $start->format('H:i:s'),
+                'end_time' => $end->format('H:i:s'),
                 'is_today' => $date->toDateString() === $today,
+                'is_time_for_appointment' => $inWindow,
+                'can_connect' => $inWindow,
                 'doctor_id' => $appointment->doctor_id,
                 'doctor_extension' => $extensions->get($appointment->doctor_id),
                 'status' => $appointment->status->value,
@@ -83,6 +91,8 @@ class AppointmentStatusController extends Controller
             'error_code' => $items->isNotEmpty() ? VoipResponseCode::SUCCESS : VoipResponseCode::APPOINTMENT_NOT_FOUND,
             'has_appointment' => $items->isNotEmpty(),
             'has_appointment_today' => $items->contains('is_today', true),
+            'is_time_for_appointment' => $items->contains('is_time_for_appointment', true),
+            'can_connect' => $items->contains('can_connect', true),
             'message' => $items->isNotEmpty() ? 'نوبت آینده وجود دارد.' : 'نوبت آینده‌ای برای این شماره وجود ندارد.',
             'appointments' => $items,
         ]);

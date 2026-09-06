@@ -64,6 +64,7 @@ class RouteServiceProvider extends ServiceProvider
                 'api',
                 InitializeTenancyByDomain::class,
                 PreventAccessFromCentralDomains::class,
+                \Modules\Api\app\Http\Middleware\LogVoipRequest::class,
                 'basicAuth',
             ])
             ->namespace($this->moduleNamespace)

@@ -8,6 +8,7 @@ use Illuminate\Routing\Controller;
 use Modules\Api\Trait\ApiHandlerTrait;
 use Modules\AppointmentUser\app\Models\AppointmentUser;
 use Modules\AppointmentUser\Enum\AppointmentUserStatusEnum;
+use Modules\OnlineConsultation\Models\ConsultationPractitioner;
 
 /**
  * Endpoints used by the VoIP integration are kept separate from booking APIs.
@@ -61,7 +62,9 @@ class AppointmentStatusController extends Controller
             ->get();
 
         $today = Carbon::now('Asia/Tehran')->toDateString();
-        $items = $appointments->map(function (AppointmentUser $appointment) use ($today) {
+        $extensions = ConsultationPractitioner::whereIn('user_id', $appointments->pluck('doctor_id')->filter())
+            ->pluck('extension', 'user_id');
+        $items = $appointments->map(function (AppointmentUser $appointment) use ($today, $extensions) {
             $date = Carbon::parse($appointment->date_visit, 'Asia/Tehran');
 
             return [
@@ -70,6 +73,7 @@ class AppointmentStatusController extends Controller
                 'date_visit' => $date->toIso8601String(),
                 'is_today' => $date->toDateString() === $today,
                 'doctor_id' => $appointment->doctor_id,
+                'doctor_extension' => $extensions->get($appointment->doctor_id),
                 'status' => $appointment->status->value,
             ];
         })->values();

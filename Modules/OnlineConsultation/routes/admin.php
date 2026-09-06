@@ -3,6 +3,7 @@
 use Illuminate\Support\Facades\Route;
 use Modules\OnlineConsultation\Http\Controllers\ConsultationController;
 use Modules\OnlineConsultation\Http\Controllers\PractitionerController;
+use Modules\OnlineConsultation\Http\Controllers\VoipLogController;
 
 Route::get('/', [ConsultationController::class, 'dashboard'])->name('dashboard');
 Route::get('/settings', [ConsultationController::class, 'settings'])->name('settings');
@@ -12,3 +13,4 @@ Route::get('/practitioners/create', [PractitionerController::class, 'create'])->
 Route::post('/practitioners', [PractitionerController::class, 'store'])->name('practitioners.store');
 Route::get('/practitioners/{practitioner}/edit', [PractitionerController::class, 'edit'])->whereNumber('practitioner')->name('practitioners.edit');
 Route::put('/practitioners/{practitioner}', [PractitionerController::class, 'update'])->whereNumber('practitioner')->name('practitioners.update');
+Route::get('/voip-logs', [VoipLogController::class, 'index'])->name('voip.logs');

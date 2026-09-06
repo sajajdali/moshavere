@@ -95,8 +95,11 @@ class Setting extends Component
     {
         return array_values(array_filter(
             $settings,
-            fn (SettingKeyEnum $setting): bool => ! $this->isRestrictedSetting($setting->value)
-                || auth()->id() === 1,
+            fn (SettingKeyEnum $setting): bool => ($setting !== SettingKeyEnum::VOIP_SERVER_ADDRESS
+                || (class_exists(\Modules\OnlineConsultation\Support\ConsultationAccess::class)
+                    && \Modules\OnlineConsultation\Support\ConsultationAccess::enabled()))
+                && (! $this->isRestrictedSetting($setting->value)
+                || auth()->id() === 1),
         ));
     }
 

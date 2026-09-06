@@ -1,4 +1,5 @@
 <div>
+    @includeIf('onlineconsultation::appointment-entry')
     <div wire:loading>
         <div class="loading-overlay d-flex align-item-center justify-content-center">
             <div class="spinner-border text-primary" role="status">

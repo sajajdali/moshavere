@@ -320,7 +320,32 @@
                                         </div>
                                     </div>
                                 </div>
-                                <div class="col-12 text-end">
+                                @if(\Modules\OnlineConsultation\Support\ConsultationAccess::enabled())
+                                <div class="col-12 mt-4">
+                                    <div class="card border-primary shadow-sm">
+                                        <div class="card-header bg-primary text-white d-flex align-items-center gap-2">
+                                            <i class="fa-solid fa-headset" aria-hidden="true"></i>
+                                            <h3 class="card-title mb-0 text-white">تنظیمات مشاور آنلاین</h3>
+                                        </div>
+                                        <div class="card-body">
+                                            <div class="form-check form-switch mb-3 d-flex align-items-center gap-3" style="padding-right: 0;">
+                                                <input class="form-check-input" type="checkbox" role="switch" id="onlineConsultant" wire:model.live="onlineConsultant">
+                                                <label class="form-check-label fw-bold" style="margin-right: 10px;" for="onlineConsultant">مشاور آنلاین است</label>
+                                            </div>
+                                            <small class="text-muted d-block mb-3">با فعال‌کردن این گزینه، این پزشک در داشبورد مشاوره آنلاین قرار می‌گیرد.</small>
+                                            @if($onlineConsultant)
+                                                <div class="row g-3 border-top pt-3">
+                                                    <div class="col-md-6"><label class="form-label" for="consultationExtension">داخلی <span class="text-danger">*</span></label><input class="form-control" id="consultationExtension" wire:model="consultationExtension" inputmode="numeric" dir="ltr" placeholder="مثلاً ۲۰۱"></div>
+                                                    <div class="col-12"><div class="alert alert-light border mb-0"><i class="fa-solid fa-circle-info text-primary me-1" aria-hidden="true"></i>آدرس سرور ویپ از بخش <a href="{{ route('admin.consultation.settings') }}" target="_blank" rel="noopener">تنظیمات VoIP مشاوره آنلاین</a> خوانده می‌شود و برای همه مشاوران سایت اعمال می‌شود. برای تغییر آن، همان‌جا ویرایش کنید.</div></div>
+                                                    <div class="col-md-6"><label class="form-label" for="consultationVoipUsername">یوزر ویپ</label><input class="form-control" id="consultationVoipUsername" wire:model="consultationVoipUsername" dir="ltr"></div>
+                                                    <div class="col-md-6"><label class="form-label" for="consultationVoipSecret">پسورد ویپ</label><input class="form-control" id="consultationVoipSecret" type="password" wire:model="consultationVoipSecret" dir="ltr" autocomplete="new-password" placeholder="برای حفظ پسورد قبلی خالی بگذارید"></div>
+                                                </div>
+                                            @endif
+                                        </div>
+                                    </div>
+                                </div>
+                                @endif
+                                <div class="col-12 text-end mt-4">
                                     <button wire:click='storeDocInfo' wire:loading.class='btn-loading btn-gray'
                                         class="btn btn-success">ذخیره اطلاعات</button>
                                 </div>

@@ -1,4 +1,5 @@
 <div>
+    @includeIf('onlineconsultation::appointment-entry')
     <div class="page-header mb-5">
         <div>
             <h1 class="page-title">تنظیمات زمان های حضور</h1>

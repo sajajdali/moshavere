@@ -19,10 +19,10 @@ return [
      *
      * Only relevant if you're using the domain or subdomain identification middleware.
      */
-    'central_domains' => [
-        'central.test',
-        'appointment.shemiranweb.com',
-    ],
+    'central_domains' => array_filter(array_map('trim', explode(',', env(
+        'CENTRAL_DOMAINS',
+        'central.test,appointment.shemiranweb.com'
+    )))),
 
 
 
@@ -209,6 +209,7 @@ return [
             base_path('Modules/Transaction/database/migrations/tenant'),
             base_path('Modules/Absence/database/migrations/tenant'),
             base_path('Modules/Api/Database/Migrations/tenant'),
+            base_path('Modules/OnlineConsultation/database/migrations/tenant'),
         ],
         '--realpath' => true,
     ],

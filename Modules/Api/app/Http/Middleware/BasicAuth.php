@@ -5,6 +5,7 @@ namespace Modules\Api\app\Http\Middleware;
 use Closure;
 use Illuminate\Http\Request;
 use Modules\Setting\Enum\SettingKeyEnum;
+use Modules\Api\Http\Controllers\Voip\VoipResponseCode;
 
 class BasicAuth
 {
@@ -26,8 +27,8 @@ class BasicAuth
         ) {
             return response()->json([
                 'status' => false,
+                'error_code' => VoipResponseCode::UNAUTHORIZED,
                 'message' => 'Unauthorized',
-                'errorCode' => 401,
             ], 401, [
                 'Cache-Control' => 'no-cache, must-revalidate, max-age=0',
                 'WWW-Authenticate' => 'Basic realm="Access denied"',

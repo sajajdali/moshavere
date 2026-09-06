@@ -9,6 +9,8 @@ use Illuminate\Support\Facades\Cache;
 use Modules\Service\app\Models\Service;
 use Modules\User\Enum\UserSpecialityType;
 use Modules\Speciality\app\Models\Speciality;
+use Modules\OnlineConsultation\Models\ConsultationPractitioner;
+use Modules\OnlineConsultation\Support\ConsultationAccess;
 
 class UpdateOrCreate extends Component
 {
@@ -16,9 +18,32 @@ class UpdateOrCreate extends Component
     public User $user;
     public array $form;
     public array $fetchData = [];
+    public bool $onlineConsultant = false;
+    public string $consultationExtension = '';
+    public string $consultationVoipUsername = '';
+    public string $consultationVoipSecret = '';
 
     public function storeDocInfo()
     {
+        if (ConsultationAccess::enabled()) {
+            $profile = ConsultationPractitioner::firstOrNew(['user_id' => $this->user->id]);
+            if ($this->onlineConsultant) {
+                $profile->fill([
+                    'display_name' => $profile->display_name ?: $this->user->fullName,
+                    'kind' => $profile->kind ?: 'doctor',
+                    'active' => true,
+                    'availability' => $profile->availability ?: 'offline',
+                    'extension' => $this->consultationExtension ?: null,
+                    'sip_username' => $this->consultationVoipUsername ?: null,
+                ])->save();
+                if ($this->consultationVoipSecret !== '') {
+                    $profile->sip_secret = $this->consultationVoipSecret;
+                    $profile->save();
+                }
+            } elseif ($profile->exists) {
+                $profile->update(['active' => false, 'app_access' => false, 'availability' => 'offline']);
+            }
+        }
         if (isset($this->form['specility'])) {
             $r =  $this->user->specialities()->sync(array_values($this->form['specility']));
         }
@@ -185,6 +210,12 @@ class UpdateOrCreate extends Component
             $this->authorize('update', $user);
             $this->isEdited = true;
             $this->user = $user;
+            if (ConsultationAccess::enabled()) {
+                $profile = ConsultationPractitioner::where('user_id', $user->id)->first();
+                $this->onlineConsultant = (bool) ($profile?->active);
+                $this->consultationExtension = (string) ($profile?->extension ?? '');
+                $this->consultationVoipUsername = (string) ($profile?->sip_username ?? '');
+            }
         }
         $this->fillTheInputs();
         if ($this->user->services->isNotEmpty()) {

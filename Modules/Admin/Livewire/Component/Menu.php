@@ -12,6 +12,9 @@ class Menu extends Component
     {
         $modules = \Module::allEnabled();
         foreach ($modules as $module) {
+            if ($module->getName() === 'OnlineConsultation' && !\Modules\OnlineConsultation\Support\ConsultationAccess::enabled()) {
+                continue;
+            }
             $menu = config($module->getLowerName().'.menu') ?? [];
             if (is_array($menu) && count($menu) > 0) {
                 $this->menuItems[] = $menu;
@@ -200,6 +203,9 @@ class Menu extends Component
             'تنظیماتاپ' => ['fa-mobile-screen', 'icon-settings'],
             'تنظیماتپرداخت' => ['fa-credit-card', 'icon-money'],
             'تنظیماتعمومی' => ['fa-sliders', 'icon-settings'],
+            'داشبوردمشاوره' => ['fa-headset', 'icon-online'],
+            'پزشکان و کارشناسان' => ['fa-user-doctor', 'icon-doctor'],
+            'تنظیماتمشاوره' => ['fa-sliders', 'icon-settings'],
             'تنظیماتهدر' => ['fa-heading', 'icon-settings'],
             'ثبتنامبیماران' => ['fa-user-plus', 'icon-member'],
             'درخواستهایمشاوره' => ['fa-headset', 'icon-feedback'],

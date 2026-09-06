@@ -54,7 +54,10 @@ class RouteServiceProvider extends ServiceProvider
     protected function maplivewireRoutes(): void
     {
         $host = request()->getHost();
-        $tenantId = \App\Models\Domain::where('domain' , $host)->first()?->tenant_id;
+        $tenantId = null;
+        if (! app()->runningInConsole()) {
+            $tenantId = \App\Models\Domain::where('domain', $host)->first()?->tenant_id;
+        }
 
         $tenantRoutePath = module_path('Front', 'Tenants/'.$tenantId.'/routes/livewire.php');
         $defaultRoutes = module_path('Front', '/routes/livewire.php');

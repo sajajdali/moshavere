@@ -31,6 +31,9 @@ class RoleCreateOrUpdate extends Component
         $permissions = [];
         $modules = \Module::allEnabled();
         foreach ($modules as $module) {
+            if ($module->getName() === 'OnlineConsultation' && !\Modules\OnlineConsultation\Support\ConsultationAccess::enabled()) {
+                continue;
+            }
             $modulePermissions = config($module->getLowerName().'.permission') ?? [];
             if (is_array($modulePermissions) && count($modulePermissions) > 0) {
                 $permissions[] = $modulePermissions;

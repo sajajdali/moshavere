@@ -180,6 +180,7 @@ $setting = [
         'title' => 'تنظیمات Voip',
         'icon' => 'fa fa-phone',
         'settings' => [
+            \Modules\Setting\Enum\SettingKeyEnum::VOIP_SERVER_ADDRESS,
             \Modules\Setting\Enum\SettingKeyEnum::VOIP_USERNAME,
             \Modules\Setting\Enum\SettingKeyEnum::VOIP_PASSWORD,
         ],

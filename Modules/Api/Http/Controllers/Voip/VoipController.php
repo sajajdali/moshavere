@@ -59,7 +59,7 @@ class VoipController extends Controller
             return $this->ok([
                 'status' => false,
                 'message' => 'شناسه پزشک معتبر نیست',
-                'errorCode' => 1,
+                'error_code' => 1,
             ]);
         }
 
@@ -69,7 +69,7 @@ class VoipController extends Controller
             return $this->ok([
                 'status' => false,
                 'message' => 'پزشک یافت نشد',
-                'errorCode' => 2,
+                'error_code' => 2,
             ]);
         }
 
@@ -546,7 +546,7 @@ class VoipController extends Controller
         return $this->ok([
             'status' => false,
             'message' => self::ERROR_TEXT[$errorCode] ?? 'خطا',
-            'errorCode' => $errorCode,
+            'error_code' => $errorCode,
         ]);
     }
 

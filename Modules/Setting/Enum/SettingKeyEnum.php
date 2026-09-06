@@ -147,6 +147,7 @@ enum SettingKeyEnum: int implements EnumHasNameInterface, SettingTypeInterface, 
     case WEIGHT_CHART_DESCRIPTION_APP = 120;
     case VOIP_USERNAME = 160;
     case VOIP_PASSWORD = 170;
+    case VOIP_SERVER_ADDRESS = 171;
 
         // api
     case ACTIVE_API = 180;
@@ -318,6 +319,7 @@ enum SettingKeyEnum: int implements EnumHasNameInterface, SettingTypeInterface, 
             // voip
             self::VOIP_USERNAME => 'نام کاربری برای API ',
             self::VOIP_PASSWORD => 'کلمه عبور برای API ',
+            self::VOIP_SERVER_ADDRESS => 'آدرس سرور ویپ',
 
 
             // api

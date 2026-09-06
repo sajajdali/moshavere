@@ -113,6 +113,8 @@ class UserDatabaseSeeder extends Seeder
         ];
 
         $doctorPermissions = [
+            'ADMIN_ACCESS',
+            'DOCTOR',
             'appointment_user.own',
             'AppointmentSetting.own',
             'absence.own',

@@ -1,0 +1,10 @@
+{
+    "name": "OnlineConsultation",
+    "alias": "onlineconsultation",
+    "description": "مشاوره آنلاین صوتی",
+    "priority": 0,
+    "providers": [
+        "Modules\\OnlineConsultation\\Providers\\OnlineConsultationServiceProvider"
+    ],
+    "files": []
+}

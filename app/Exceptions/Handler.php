@@ -17,6 +17,8 @@ class Handler extends ExceptionHandler
         'current_password',
         'password',
         'password_confirmation',
+        'voip_secret',
+        'sip_secret',
     ];
 
     /**
@@ -24,7 +26,7 @@ class Handler extends ExceptionHandler
      */
     public function render($request, Throwable $exception)
     {
-        if ($exception instanceof NotFoundHttpException) {
+        if ($exception instanceof NotFoundHttpException && !$request->expectsJson()) {
             return response()->view('front::errors.404', [], 404);
         }
 

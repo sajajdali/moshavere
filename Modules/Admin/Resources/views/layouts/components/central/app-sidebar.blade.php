@@ -28,6 +28,11 @@
 
 
             <ul class="side-menu is-expanded" style="margin-left: 0px; margin-right: 0px;">
+                @if(\Module::isEnabled('OnlineConsultation'))
+                @can('SUPER_ADMIN')
+                <li class="slide"><a class="side-menu__item" href="{{ route('central.consultation.index') }}"><i class="side-menu__icon fe fe-phone"></i><span class="side-menu__label">ماژول مشاوره آنلاین</span></a></li>
+                @endcan
+                @endif
                 <!--[if BLOCK]><![endif]-->                            <!--[if BLOCK]><![endif]-->
                 <li class="active is-expanded">
                     <h3>مدیریت</h3>

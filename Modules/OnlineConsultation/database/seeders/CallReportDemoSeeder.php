@@ -10,6 +10,7 @@ use Modules\OnlineConsultation\Models\AppointmentCallLog;
 use Modules\OnlineConsultation\Models\ConsultationPractitioner;
 use Modules\OnlineConsultation\Models\ConsultationSmsDelivery;
 use Modules\OnlineConsultation\Services\AppointmentBillingService;
+use Modules\OnlineConsultation\Support\ConsultationAccess;
 use Modules\User\Entities\User;
 use Modules\User\Enum\UserMetaEnum;
 
@@ -17,6 +18,12 @@ class CallReportDemoSeeder extends Seeder
 {
     public function run(): void
     {
+        if (! ConsultationAccess::enabled()) {
+            $this->command?->warn('Online consultation is disabled or its tenant schema is incomplete; demo data was skipped.');
+
+            return;
+        }
+
         $people = [
             'patient_1' => ['09000001001', 'سارا', 'احمدی'],
             'patient_2' => ['09000001002', 'علی', 'رضایی'],

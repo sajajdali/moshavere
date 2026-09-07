@@ -135,6 +135,11 @@ class ConsultationTest extends TestCase
     {
         $data = ConsultationSetting::current()->toArray();
         unset($data['id'], $data['created_at'], $data['updated_at']);
+        unset(
+            $data['duration_minutes'], $data['buffer_minutes'], $data['advance_hours'],
+            $data['booking_horizon_days'], $data['cancellation_hours'],
+            $data['capacity_per_slot'], $data['default_fee']
+        );
         $data = array_replace($data, [
             'booking_enabled' => '0', 'app_enabled' => '1', 'allow_transfer' => '0',
             'recording_requested' => '0', 'consent_required' => '1', 'voip_secret' => 'secret-value',

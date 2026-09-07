@@ -50,7 +50,7 @@ class AppointmentStatusController extends Controller
         $today = $now->toDateString();
 
         $appointments = AppointmentUser::query()
-            ->with(['user:id,mobile', 'doctor:id'])
+            ->with(['user:id,mobile', 'doctor:id,mobile'])
             ->whereHas('user', function ($query) use ($phone) {
                 // The last ten digits make local 09..., +989..., and 00989... forms match.
                 $query->whereRaw("REPLACE(REPLACE(REPLACE(REPLACE(mobile, '+', ''), ' ', ''), '-', ''), '(', '') LIKE ?", ['%'.$phone])
@@ -78,7 +78,8 @@ class AppointmentStatusController extends Controller
             }
             $inWindow = $now->betweenIncluded($start, $end);
 
-            return [
+            $item = [
+                'appointment_id' => $appointment->id,
                 'appointment_code' => $appointment->id,
                 'tracking_code' => $appointment->tracking_code,
                 'date_visit' => $date->toIso8601String(),
@@ -91,7 +92,18 @@ class AppointmentStatusController extends Controller
                 'doctor_extension' => $extensions->get($appointment->doctor_id),
                 'status' => $appointment->status->value,
             ];
+            // The practitioner's private mobile is exposed only during the active
+            // appointment window, so VoIP can fall back to it if the extension fails.
+            if ($inWindow) {
+                $item['doctor_mobile'] = $appointment->doctor?->mobile;
+            }
+
+            return $item;
         })->filter()->values();
+
+        // VoIP can use the top-level value directly. When more than one appointment
+        // exists, prefer the currently connectable one, then the nearest future one.
+        $selectedAppointment = $items->firstWhere('can_connect', true) ?? $items->first();
 
         return $this->ok([
             'status' => true,
@@ -100,6 +112,9 @@ class AppointmentStatusController extends Controller
             'has_appointment_today' => $items->contains('is_today', true),
             'is_time_for_appointment' => $items->contains('is_time_for_appointment', true),
             'can_connect' => $items->contains('can_connect', true),
+            'appointment_id' => $selectedAppointment['appointment_id'] ?? null,
+            'doctor_extension' => $selectedAppointment['doctor_extension'] ?? null,
+            'doctor_mobile' => ($selectedAppointment['can_connect'] ?? false) ? ($selectedAppointment['doctor_mobile'] ?? null) : null,
             'message' => $items->isNotEmpty() ? 'نوبت آینده وجود دارد.' : 'نوبت آینده‌ای برای این شماره وجود ندارد.',
             'appointments' => $items,
         ]);

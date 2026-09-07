@@ -16,7 +16,7 @@ class UserWallet extends Model
      * The attributes that are mass assignable.
      */
     protected $guarded = ['id'];
-    protected $casts = ['type' => UserWalletTypeEnum::class];
+    protected $casts = ['type' => UserWalletTypeEnum::class, 'detail' => 'array'];
 
     public function user()
     {

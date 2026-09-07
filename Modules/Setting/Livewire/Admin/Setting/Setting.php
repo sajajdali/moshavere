@@ -49,6 +49,23 @@ class Setting extends Component
 
     public function storeSetting()
     {
+        foreach ([
+            SettingKeyEnum::CONSULT_SMS_PATIENT_FIRST_MINUTES,
+            SettingKeyEnum::CONSULT_SMS_PATIENT_SECOND_MINUTES,
+            SettingKeyEnum::CONSULT_SMS_PATIENT_FINAL_MINUTES,
+            SettingKeyEnum::CONSULT_SMS_PRACTITIONER_REMINDER_MINUTES,
+        ] as $key) {
+            $value = $this->settingValues[$key->value] ?? null;
+            if ($value !== null && filter_var($value, FILTER_VALIDATE_INT, ['options' => ['min_range' => 0, 'max_range' => 10080]]) === false) {
+                $this->addError('settingValues.'.$key->value, $key->getName().' باید عدد صحیح باشد.');
+                return;
+            }
+        }
+        $dailyTime = $this->settingValues[SettingKeyEnum::CONSULT_SMS_PRACTITIONER_DAILY_TIME->value] ?? null;
+        if ($dailyTime !== null && preg_match('/^(?:[01]\d|2[0-3]):[0-5]\d$/', (string) $dailyTime) !== 1) {
+            $this->addError('settingValues.'.SettingKeyEnum::CONSULT_SMS_PRACTITIONER_DAILY_TIME->value, 'ساعت گزارش پایان روز باید با قالب HH:MM وارد شود.');
+            return;
+        }
         foreach ($this->settingValues as $key => $value) {
             if ($this->isRestrictedSetting((int) $key) && auth()->id() !== 1) {
                 continue;

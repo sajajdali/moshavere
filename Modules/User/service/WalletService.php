@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Services;
+namespace Modules\User\service;
 
 use Exception;
 use Illuminate\Support\Facades\DB;
@@ -171,7 +171,7 @@ class WalletService
     }
 }
 
-// $wallet = app(\App\Services\WalletService::class)->credit(
+// $wallet = app(\Modules\User\service\WalletService::class)->credit(
 //     user: $user,
 //     amount: 100,
 //     type: 'credit',
@@ -179,11 +179,11 @@ class WalletService
 //     detail: ['provider' => 'providerX', 'raw' => $payload]
 // );
 
-// $wallet = app(\App\Services\WalletService::class)->debit(
+// $wallet = app(\Modules\User\service\WalletService::class)->debit(
 //     user: $user,
 //     amount: 50,
 //     type: 'purchase',
 //     idempotencyKey: 'order:987',
 //     detail: ['order_id' => 987]
 // );
-// $balance = app(\App\Services\WalletService::class)->balance($user);
+// $balance = app(\Modules\User\service\WalletService::class)->balance($user);

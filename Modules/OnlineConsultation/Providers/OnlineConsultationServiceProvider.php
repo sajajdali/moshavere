@@ -7,6 +7,9 @@ use Illuminate\Support\ServiceProvider;
 use Modules\OnlineConsultation\Http\Middleware\EnsureConsultationEnabled;
 use Stancl\Tenancy\Middleware\InitializeTenancyByDomain;
 use Stancl\Tenancy\Middleware\PreventAccessFromCentralDomains;
+use Modules\AppointmentUser\app\Models\AppointmentUser;
+use Modules\OnlineConsultation\Services\AppointmentBillingService;
+use Modules\OnlineConsultation\Console\DispatchConsultationSms;
 
 class OnlineConsultationServiceProvider extends ServiceProvider
 {
@@ -17,7 +20,11 @@ class OnlineConsultationServiceProvider extends ServiceProvider
 
     public function boot(): void
     {
+        if ($this->app->runningInConsole()) $this->commands([DispatchConsultationSms::class]);
         $this->loadViewsFrom(__DIR__.'/../resources/views', 'onlineconsultation');
+        AppointmentUser::created(function (AppointmentUser $appointment) {
+            if (tenancy()->initialized) app(AppointmentBillingService::class)->ensure($appointment);
+        });
         $this->app->booted(function () {
             $tenant = [InitializeTenancyByDomain::class, PreventAccessFromCentralDomains::class];
             Route::middleware(array_merge(['web'], $tenant, ['auth', 'admin', EnsureConsultationEnabled::class, 'can:ONLINE_CONSULTATION_MANAGE']))

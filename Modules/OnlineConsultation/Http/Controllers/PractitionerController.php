@@ -11,8 +11,6 @@ use Modules\User\Entities\User;
 
 class PractitionerController extends Controller
 {
-    public const DAYS = ['شنبه', 'یکشنبه', 'دوشنبه', 'سه‌شنبه', 'چهارشنبه', 'پنجشنبه', 'جمعه'];
-
     public function index(Request $request)
     {
         $search = $request->validate(['search' => 'nullable|string|max:100'])['search'] ?? '';
@@ -53,7 +51,7 @@ class PractitionerController extends Controller
         $accounts = $account === '' ? collect() : User::where('mobile', 'like', '%'.$account.'%')->limit(10)->get();
 
         return view('onlineconsultation::practitioner-form', [
-            'person' => $person, 'selectedUser' => $selectedUser, 'days' => self::DAYS,
+            'person' => $person, 'selectedUser' => $selectedUser,
             'accounts' => $accounts, 'account' => $account,
         ]);
     }
@@ -79,20 +77,16 @@ class PractitionerController extends Controller
             'user_id' => ['required', 'integer', Rule::exists('users', 'id'), Rule::unique('consultation_practitioners', 'user_id')->ignore($person?->id)],
             'display_name' => 'required|string|max:255',
             'kind' => ['required', Rule::in(['doctor', 'expert'])],
-            'specialty' => 'nullable|string|max:255', 'active' => 'required|boolean',
+            'active' => 'required|boolean',
             'app_access' => 'required|boolean',
             'availability' => ['required', Rule::in(['ready', 'busy', 'offline'])],
             'extension' => ['nullable', 'regex:/^[0-9]{1,20}$/', Rule::unique('consultation_practitioners', 'extension')->ignore($person?->id)],
             'sip_username' => 'nullable|string|max:255', 'sip_secret' => 'nullable|string|max:1024',
             'clear_sip_secret' => 'sometimes|boolean',
             'fee' => 'nullable|integer|min:0|max:1000000000',
+            'hourly_rate' => 'nullable|required_if:active,1|integer|min:0|max:1000000000',
             'duration_minutes' => 'nullable|integer|min:5|max:180',
             'notes' => 'nullable|string|max:3000',
-            'weekly_schedule' => 'required|array:0,1,2,3,4,5,6|size:7',
-            'weekly_schedule.*' => 'required|array:enabled,start,end',
-            'weekly_schedule.*.enabled' => 'required|boolean',
-            'weekly_schedule.*.start' => 'nullable|required_if:weekly_schedule.*.enabled,1|date_format:H:i',
-            'weekly_schedule.*.end' => 'nullable|required_if:weekly_schedule.*.enabled,1|date_format:H:i|after:weekly_schedule.*.start',
         ], [], ['user_id' => 'شناسه کاربر', 'extension' => 'داخلی', 'display_name' => 'نام نمایشی']);
         // An existing consultation profile must remain attached to its original account.
         if ($person && (int) $data['user_id'] !== (int) $person->user_id) {
@@ -108,9 +102,6 @@ class PractitionerController extends Controller
             $data['availability'] = 'offline';
             $data['app_access'] = false;
         }
-        ksort($data['weekly_schedule'], SORT_NUMERIC);
-        $data['weekly_schedule'] = array_values($data['weekly_schedule']);
-
         return $data;
     }
 }

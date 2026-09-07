@@ -22,12 +22,17 @@ class UpdateOrCreate extends Component
     public string $consultationExtension = '';
     public string $consultationVoipUsername = '';
     public string $consultationVoipSecret = '';
+    public string $consultationHourlyRate = '';
 
     public function storeDocInfo()
     {
         if (ConsultationAccess::enabled()) {
             $profile = ConsultationPractitioner::firstOrNew(['user_id' => $this->user->id]);
             if ($this->onlineConsultant) {
+                $this->validate([
+                    'consultationExtension' => ['required', 'regex:/^[0-9]{1,20}$/'],
+                    'consultationHourlyRate' => ['required', 'integer', 'min:0', 'max:1000000000'],
+                ], [], ['consultationExtension' => 'داخلی', 'consultationHourlyRate' => 'هزینه یک ساعت مشاوره']);
                 $profile->fill([
                     'display_name' => $profile->display_name ?: $this->user->fullName,
                     'kind' => $profile->kind ?: 'doctor',
@@ -35,6 +40,7 @@ class UpdateOrCreate extends Component
                     'availability' => $profile->availability ?: 'offline',
                     'extension' => $this->consultationExtension ?: null,
                     'sip_username' => $this->consultationVoipUsername ?: null,
+                    'hourly_rate' => (int) $this->consultationHourlyRate,
                 ])->save();
                 if ($this->consultationVoipSecret !== '') {
                     $profile->sip_secret = $this->consultationVoipSecret;
@@ -215,6 +221,7 @@ class UpdateOrCreate extends Component
                 $this->onlineConsultant = (bool) ($profile?->active);
                 $this->consultationExtension = (string) ($profile?->extension ?? '');
                 $this->consultationVoipUsername = (string) ($profile?->sip_username ?? '');
+                $this->consultationHourlyRate = (string) ($profile?->hourly_rate ?? '');
             }
         }
         $this->fillTheInputs();

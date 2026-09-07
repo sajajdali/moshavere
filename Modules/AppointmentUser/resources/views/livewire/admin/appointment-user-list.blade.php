@@ -286,7 +286,15 @@
                                 @if ($ap->kind == \Modules\AppointmentUser\Enum\AppointmentUserKindEnum::IN_PERSION)
                                     {!! $ap->kind->getIcon() !!}
                                 @else
-                                    <a @if ($ap->kind == \Modules\AppointmentUser\Enum\AppointmentUserKindEnum::ONLINE && $ap->online->isNotEmpty()) href="{{ route('admin.appointment_user.message.detail', ['onlineAppId' => $ap->online->first()?->id]) }}" @else href="#" @endif>
+                                    <a
+                                        @if ($ap->kind == \Modules\AppointmentUser\Enum\AppointmentUserKindEnum::VOIP)
+                                            href="{{ route('admin.consultation.call-reports.appointment', $ap) }}"
+                                        @elseif ($ap->kind == \Modules\AppointmentUser\Enum\AppointmentUserKindEnum::ONLINE && $ap->online->isNotEmpty())
+                                            href="{{ route('admin.appointment_user.message.detail', ['onlineAppId' => $ap->online->first()?->id]) }}"
+                                        @else
+                                            href="#"
+                                        @endif
+                                    >
                                         <span class="om-pill" style="{{ $kindClass }}">{!! $ap->kind->getIcon() !!} {{ $ap->kind->getName() }}</span>
                                     </a>
                                 @endif

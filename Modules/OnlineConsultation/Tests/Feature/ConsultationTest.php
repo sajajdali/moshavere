@@ -5,8 +5,12 @@ namespace Modules\OnlineConsultation\Tests\Feature;
 use App\Models\Tenant;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\Str;
 use Modules\OnlineConsultation\Models\ConsultationPractitioner;
 use Modules\OnlineConsultation\Models\ConsultationSetting;
+use Modules\OnlineConsultation\Services\AppointmentBillingService;
+use Modules\AppointmentUser\app\Models\AppointmentUser;
+use Modules\User\App\Models\UserWallet;
 use Modules\User\Entities\User;
 use Spatie\Permission\Models\Permission;
 use Spatie\Permission\PermissionRegistrar;
@@ -28,9 +32,16 @@ class ConsultationTest extends TestCase
             'database/migrations/2023_08_02_073105_create_users_table.php',
             'database/migrations/2023_08_02_073110_create_user_metas_table.php',
             'database/migrations/2024_01_30_115541_create_permission_tables.php',
+            'Modules/AppointmentUser/database/migrations/tenant/2024_03_19_094623_create_appointment_users_table.php',
             'Modules/OnlineConsultation/database/migrations/tenant/2026_09_06_000001_create_online_consultation_tables.php',
+            'Modules/User/Database/Migrations/tenant/2026_02_23_181827_create_user_wallets_table.php',
+            'Modules/OnlineConsultation/database/migrations/tenant/2026_09_07_000004_create_appointment_call_logs_table.php',
+            'Modules/OnlineConsultation/database/migrations/tenant/2026_09_07_000005_create_appointment_billing_records.php',
         ] as $path) {
             (require base_path($path))->up();
+        }
+        foreach (['appointment_settings', 'services', 'places', 'transactions'] as $table) {
+            Schema::create($table, fn ($blueprint) => $blueprint->id());
         }
         app(PermissionRegistrar::class)->forgetCachedPermissions();
         Permission::findOrCreate('SUPER_ADMIN', 'web');
@@ -56,7 +67,7 @@ class ConsultationTest extends TestCase
             'user_id' => $this->manager->id, 'display_name' => 'کارشناس آزمون', 'kind' => 'expert',
             'active' => '1', 'app_access' => '1', 'availability' => 'ready', 'extension' => '201',
             'sip_secret' => 'private-test-secret',
-            'weekly_schedule' => array_fill(0, 7, ['enabled' => '1', 'start' => '09:00', 'end' => '17:00']),
+            'hourly_rate' => '1000000',
         ], $overrides);
     }
 
@@ -74,11 +85,8 @@ class ConsultationTest extends TestCase
         $this->assertNull(session()->getOldInput('sip_secret'));
     }
 
-    public function test_invalid_schedule_and_account_reassignment_are_rejected(): void
+    public function test_account_reassignment_is_rejected(): void
     {
-        $data = $this->profile();
-        $data['weekly_schedule'][0]['end'] = '08:00';
-        $this->post('/admin/online-consultation/practitioners', $data)->assertSessionHasErrors('weekly_schedule.0.end');
         $this->post('/admin/online-consultation/practitioners', $this->profile())->assertSessionHasNoErrors();
         $person = ConsultationPractitioner::firstOrFail();
         $other = User::create(['password' => 'test-password']);
@@ -168,13 +176,59 @@ class ConsultationTest extends TestCase
         $this->assertFalse((bool) (new Tenant(['id' => 'new-site']))->online_consultation_enabled);
     }
 
-    public function test_enabled_schedule_requires_times_and_a_complete_week(): void
+    public function test_practitioner_form_does_not_update_specialty_or_weekly_schedule(): void
     {
-        $data = $this->profile();
-        $data['weekly_schedule'][0]['start'] = '';
-        $this->post('/admin/online-consultation/practitioners', $data)->assertSessionHasErrors('weekly_schedule.0.start');
-        $data = $this->profile();
-        unset($data['weekly_schedule'][6]);
-        $this->post('/admin/online-consultation/practitioners', $data)->assertSessionHasErrors('weekly_schedule');
+        $this->post('/admin/online-consultation/practitioners', $this->profile([
+            'specialty' => 'نباید ذخیره شود',
+            'weekly_schedule' => [['enabled' => '1', 'start' => '09:00', 'end' => '17:00']],
+        ]))->assertSessionHasNoErrors();
+
+        $person = ConsultationPractitioner::firstOrFail();
+        $this->assertNull($person->specialty);
+        $this->assertNull($person->weekly_schedule);
     }
+
+    public function test_final_confirmation_atomically_credits_wallet_locks_calculation_and_records_actor(): void
+    {
+        $this->assertSame(333000, app(AppointmentBillingService::class)->amountForMinutes(1000000, 20));
+        $this->assertSame(667000, app(AppointmentBillingService::class)->amountForMinutes(1000000, 40));
+        $this->post('/admin/online-consultation/practitioners', $this->profile())->assertSessionHasNoErrors();
+        $patient = User::create(['mobile' => '09120000002', 'password' => 'test-password']);
+        $appointment = AppointmentUser::withoutEvents(fn () => AppointmentUser::create([
+            'user_id' => $patient->id, 'doctor_id' => $this->manager->id,
+            'status' => 1, 'type' => 1, 'kind' => 3, 'date_visit' => now()->subHour(),
+            'start_time' => '10:00:00', 'end_time' => '11:00:00', 'tracking_code' => 'FINAL-REFUND-TEST',
+        ]));
+        $billing = app(AppointmentBillingService::class)->ensure($appointment);
+
+        $this->put('/admin/online-consultation/billing/'.$billing->id.'/approve', [
+            'approved_unused_minutes' => 30, 'reason' => 'تأیید نهایی تست',
+        ])->assertSessionHasNoErrors()->assertRedirect();
+
+        $billing->refresh();
+        $wallet = UserWallet::firstOrFail();
+        $this->assertSame('completed', $billing->refund_status);
+        $this->assertSame(500000, (int) $billing->refunded_amount);
+        $this->assertSame($wallet->id, $billing->wallet_transaction_id);
+        $this->assertSame($this->manager->id, $billing->approved_by);
+        $this->assertSame($appointment->id, data_get($wallet->detail, 'appointment_id'));
+        $this->assertSame('FINAL-REFUND-TEST', data_get($wallet->detail, 'appointment_tracking_code'));
+        $this->assertSame($this->manager->id, data_get($wallet->detail, 'confirmed_by'));
+        $this->assertSame(-30, data_get($wallet->detail, 'minute_difference'));
+        $this->assertTrue(data_get($wallet->detail, 'minutes_changed_by_practitioner'));
+        $audit = $billing->audits()->where('action', 'practitioner_adjusted_refund')->firstOrFail();
+        $this->assertStringContainsString('پزشک', $audit->reason);
+        $this->assertStringContainsString('30 دقیقه کاهش', $audit->reason);
+
+        $this->put('/admin/online-consultation/billing/'.$billing->id.'/approve', [
+            'approved_unused_minutes' => 40, 'reason' => 'درخواست تکراری',
+        ])->assertSessionHasNoErrors();
+        $this->assertSame(1, UserWallet::count());
+        $this->assertSame(30, (int) $billing->fresh()->approved_unused_minutes);
+
+        $this->post('/admin/online-consultation/billing/'.$billing->id.'/correct', [
+            'corrected_unused_minutes' => 20, 'reason' => 'اصلاح تستی', 'request_token' => (string) Str::uuid(),
+        ])->assertForbidden();
+    }
+
 }

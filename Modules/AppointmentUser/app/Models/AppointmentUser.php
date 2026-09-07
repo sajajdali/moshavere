@@ -278,6 +278,16 @@ class AppointmentUser extends Model
     {
         return $this->belongsTo(User::class, 'operator_id');
     }
+
+    public function callLogs()
+    {
+        return $this->hasMany(\Modules\OnlineConsultation\Models\AppointmentCallLog::class, 'appointment_id');
+    }
+
+    public function billingRecord()
+    {
+        return $this->hasOne(\Modules\OnlineConsultation\Models\AppointmentBillingRecord::class, 'appointment_id');
+    }
     public function segmentItems()
     {
         return $this->hasMany(AppointmentSegmentItem::class);

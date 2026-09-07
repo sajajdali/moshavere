@@ -1,6 +1,14 @@
 @extends('admin::layouts.app')
 @include('onlineconsultation::styles')
 @section('content')
+<div class="oc-page-loader" id="oc-page-loader" aria-hidden="true" aria-live="polite">
+    <div class="oc-loader-card" role="status">
+        <div class="oc-loader-visual"><span></span><span></span><span></span><i class="fa-solid fa-headset" aria-hidden="true"></i></div>
+        <strong>در حال آماده‌سازی اطلاعات</strong>
+        <small>لطفاً چند لحظه صبر کنید…</small>
+        <div class="oc-loader-progress"><span></span></div>
+    </div>
+</div>
 <div class="oc-module">
     <header class="oc-header">
         <div class="oc-heading">
@@ -14,8 +22,8 @@
         @yield('consultation-header-actions')
     </header>
     <nav class="oc-tabs" aria-label="بخش‌های مشاوره آنلاین">
-        @foreach(['dashboard' => ['داشبورد', 'fa-chart-line'], 'practitioners' => ['پزشکان و کارشناسان', 'fa-user-doctor'], 'settings' => ['تنظیمات مشاوره', 'fa-sliders']] as $key => [$label, $icon])
-            <a class="oc-tab" href="{{ route('admin.consultation.'.$key) }}" @if(request()->routeIs('admin.consultation.'.$key.'*')) aria-current="page" @endif>
+        @foreach(['dashboard' => ['داشبورد', 'fa-chart-line', 'dashboard*'], 'consultants-dashboard.index' => ['داشبورد مشاوران تلفنی', 'fa-headset', 'consultants-dashboard.*'], 'practitioners' => ['پزشکان و کارشناسان', 'fa-user-doctor', 'practitioners*'], 'call-reports.index' => ['گزارش تماس‌ها', 'fa-chart-column', 'call-reports.*'], 'sms-deliveries.index' => ['گزارش پیامک‌ها', 'fa-comment-sms', 'sms-deliveries.*'], 'settings' => ['تنظیمات مشاوره', 'fa-sliders', 'settings*']] as $key => [$label, $icon, $active])
+            <a class="oc-tab" href="{{ route('admin.consultation.'.$key) }}" @if(request()->routeIs('admin.consultation.'.$active)) aria-current="page" @endif>
                 <i class="fa-solid {{ $icon }}" aria-hidden="true"></i><span>{{ $label }}</span>
             </a>
         @endforeach
@@ -32,3 +40,28 @@
     @yield('consultation-content')
 </div>
 @endsection
+@push('scripts')
+<script>
+(function () {
+    const loader = document.getElementById('oc-page-loader');
+    if (!loader) return;
+    const show = () => { loader.classList.add('is-visible'); loader.setAttribute('aria-hidden', 'false'); document.body.classList.add('oc-is-loading'); };
+    const hide = () => { loader.classList.remove('is-visible'); loader.setAttribute('aria-hidden', 'true'); document.body.classList.remove('oc-is-loading'); };
+
+    document.addEventListener('click', function (event) {
+        const link = event.target.closest('.oc-module a[href]');
+        if (!link || event.defaultPrevented || event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
+        const href = link.getAttribute('href');
+        if (!href || href.startsWith('#') || href.startsWith('javascript:') || link.target === '_blank' || link.hasAttribute('download') || href.includes('/export')) return;
+        show();
+    });
+    document.addEventListener('submit', function (event) {
+        if (!event.target.closest('.oc-module') || event.defaultPrevented || event.submitter?.name === 'export') return;
+        show();
+    });
+    window.addEventListener('pageshow', hide);
+    window.addEventListener('load', hide);
+    window.addEventListener('beforeunload', show);
+})();
+</script>
+@endpush

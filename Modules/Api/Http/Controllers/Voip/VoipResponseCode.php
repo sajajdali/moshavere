@@ -11,6 +11,7 @@ final class VoipResponseCode
     public const UNAUTHORIZED = 1401;
     public const VALIDATION_ERROR = 1400;
     public const SERVER_ERROR = 1500;
+    public const INVALID_CALL_LOG = 2001;
 
     private function __construct() {}
 }

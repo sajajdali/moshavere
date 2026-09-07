@@ -19,6 +19,7 @@ Route::prefix('voip')->group(function () {
 // appointment
 
 Route::prefix('VoIP')->group(function () {
+    Route::post('call_log', [\Modules\Api\Http\Controllers\Voip\CallLogController::class, 'store'])->name('api.voip.call_log');
     // وضعیت نوبت بیمار بر اساس شماره تماس؛ احراز هویت از middleware مشترک VoIP انجام می‌شود.
     Route::get('appointment_status', [\Modules\Api\Http\Controllers\Voip\AppointmentStatusController::class, 'show'])
         ->name('api.voip.appointment_status');

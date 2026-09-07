@@ -179,6 +179,23 @@ enum SettingKeyEnum: int implements EnumHasNameInterface, SettingTypeInterface, 
         // jibi
     case ACTIVE_JIBIT = 356;
 
+    // Automatic consultation SMS
+    case CONSULT_SMS_PATIENT_FIRST_ACTIVE = 500;
+    case CONSULT_SMS_PATIENT_FIRST_TEMPLATE = 501;
+    case CONSULT_SMS_PATIENT_FIRST_MINUTES = 502;
+    case CONSULT_SMS_PATIENT_SECOND_ACTIVE = 503;
+    case CONSULT_SMS_PATIENT_SECOND_TEMPLATE = 504;
+    case CONSULT_SMS_PATIENT_SECOND_MINUTES = 505;
+    case CONSULT_SMS_PATIENT_FINAL_ACTIVE = 506;
+    case CONSULT_SMS_PATIENT_FINAL_TEMPLATE = 507;
+    case CONSULT_SMS_PATIENT_FINAL_MINUTES = 508;
+    case CONSULT_SMS_PRACTITIONER_REMINDER_ACTIVE = 509;
+    case CONSULT_SMS_PRACTITIONER_REMINDER_TEMPLATE = 510;
+    case CONSULT_SMS_PRACTITIONER_REMINDER_MINUTES = 511;
+    case CONSULT_SMS_PRACTITIONER_DAILY_ACTIVE = 512;
+    case CONSULT_SMS_PRACTITIONER_DAILY_TEMPLATE = 513;
+    case CONSULT_SMS_PRACTITIONER_DAILY_TIME = 514;
+
     public function isSupportCache(): bool
     {
         return match ($this) {
@@ -363,6 +380,21 @@ enum SettingKeyEnum: int implements EnumHasNameInterface, SettingTypeInterface, 
 
             //JIBIT
             self::ACTIVE_JIBIT => 'فعال سازی اعتبار جیبیت',
+            self::CONSULT_SMS_PATIENT_FIRST_ACTIVE => 'فعال‌بودن یادآوری اول بیمار',
+            self::CONSULT_SMS_PATIENT_FIRST_TEMPLATE => 'نام قالب یادآوری اول مشاوره',
+            self::CONSULT_SMS_PATIENT_FIRST_MINUTES => 'فاصله ارسال یادآوری اول (دقیقه قبل)',
+            self::CONSULT_SMS_PATIENT_SECOND_ACTIVE => 'فعال‌بودن یادآوری دوم بیمار',
+            self::CONSULT_SMS_PATIENT_SECOND_TEMPLATE => 'نام قالب یادآوری دوم مشاوره',
+            self::CONSULT_SMS_PATIENT_SECOND_MINUTES => 'فاصله ارسال یادآوری دوم (دقیقه قبل)',
+            self::CONSULT_SMS_PATIENT_FINAL_ACTIVE => 'فعال‌بودن یادآوری نهایی بیمار',
+            self::CONSULT_SMS_PATIENT_FINAL_TEMPLATE => 'نام قالب یادآوری نهایی مشاوره',
+            self::CONSULT_SMS_PATIENT_FINAL_MINUTES => 'فاصله ارسال یادآوری نهایی (دقیقه قبل)',
+            self::CONSULT_SMS_PRACTITIONER_REMINDER_ACTIVE => 'فعال‌بودن یادآوری نوبت مشاور',
+            self::CONSULT_SMS_PRACTITIONER_REMINDER_TEMPLATE => 'نام قالب یادآوری نزدیک‌شدن نوبت مشاور',
+            self::CONSULT_SMS_PRACTITIONER_REMINDER_MINUTES => 'فاصله ارسال یادآوری مشاور (دقیقه قبل)',
+            self::CONSULT_SMS_PRACTITIONER_DAILY_ACTIVE => 'فعال‌بودن گزارش پایان روز مشاور',
+            self::CONSULT_SMS_PRACTITIONER_DAILY_TEMPLATE => 'نام قالب گزارش پایان روز مشاور',
+            self::CONSULT_SMS_PRACTITIONER_DAILY_TIME => 'ساعت ارسال گزارش پایان روز',
 
             default => ''
         };
@@ -407,6 +439,11 @@ enum SettingKeyEnum: int implements EnumHasNameInterface, SettingTypeInterface, 
             self::DISABLE_UI_FOR_VOIP_ONLY_APPOINTMENT => 'عدم نمایش صفحات سایت ، برای نوبت دهی هایی که فقط تلفنی میباشند',
             self::VOIP_APPOINTMENT_STATUS => 'نمایش تماس های ورودی در منو',
             self::VOIP_VOICE_RECORD_STATUS => 'نمایش پیغام های ضبط شده در منو',
+            self::CONSULT_SMS_PATIENT_FIRST_TEMPLATE, self::CONSULT_SMS_PATIENT_FIRST_MINUTES => 'این پیامک سه ساعت قبل از زمان شروع مشاوره برای بیمار ارسال می‌شود.',
+            self::CONSULT_SMS_PATIENT_SECOND_TEMPLATE, self::CONSULT_SMS_PATIENT_SECOND_MINUTES => 'این پیامک یک ساعت قبل از زمان شروع مشاوره برای بیمار ارسال می‌شود.',
+            self::CONSULT_SMS_PATIENT_FINAL_TEMPLATE, self::CONSULT_SMS_PATIENT_FINAL_MINUTES => 'این پیامک پانزده دقیقه قبل از زمان شروع مشاوره برای بیمار ارسال می‌شود.',
+            self::CONSULT_SMS_PRACTITIONER_REMINDER_TEMPLATE, self::CONSULT_SMS_PRACTITIONER_REMINDER_MINUTES => 'این پیامک پانزده دقیقه قبل از شروع هر نوبت برای مشاور ارسال می‌شود.',
+            self::CONSULT_SMS_PRACTITIONER_DAILY_TEMPLATE, self::CONSULT_SMS_PRACTITIONER_DAILY_TIME => 'این پیامک در پایان روز برای مشاور ارسال می‌شود و خلاصه عملکرد و نوبت‌های همان روز را نمایش می‌دهد.',
             default => ''
         };
     }
@@ -500,6 +537,7 @@ enum SettingKeyEnum: int implements EnumHasNameInterface, SettingTypeInterface, 
             self::LOGIN_WITHOUT_OTP => SettingTypeEnum::CHECK,
             self::GO_TO_PAYMENT_DIRECTLY => SettingTypeEnum::CHECK,
             self::DONT_SEND_SMS_FOR_PAYMENT_LINK => SettingTypeEnum::CHECK,
+            self::CONSULT_SMS_PATIENT_FIRST_ACTIVE, self::CONSULT_SMS_PATIENT_SECOND_ACTIVE, self::CONSULT_SMS_PATIENT_FINAL_ACTIVE, self::CONSULT_SMS_PRACTITIONER_REMINDER_ACTIVE, self::CONSULT_SMS_PRACTITIONER_DAILY_ACTIVE => SettingTypeEnum::CHECK,
             default => SettingTypeEnum::TEXT
         };
     }
@@ -525,6 +563,11 @@ enum SettingKeyEnum: int implements EnumHasNameInterface, SettingTypeInterface, 
             self::HOME_ALERT_STATUS => 'نمایش پیغام در صفحه اصلی ',
             self::HEADER1_SHOW_BUTTON1 => 'کلید های روی هدر ',
             self::SMS_CUSTOM_LINK_TO_USER_TEMPLATE => 'Voip',
+            self::CONSULT_SMS_PATIENT_FIRST_ACTIVE => 'یادآوری اول بیمار · گیرنده: بیمار',
+            self::CONSULT_SMS_PATIENT_SECOND_ACTIVE => 'یادآوری دوم بیمار · گیرنده: بیمار',
+            self::CONSULT_SMS_PATIENT_FINAL_ACTIVE => 'یادآوری نهایی بیمار · گیرنده: بیمار',
+            self::CONSULT_SMS_PRACTITIONER_REMINDER_ACTIVE => 'یادآوری هر نوبت · گیرنده: مشاور',
+            self::CONSULT_SMS_PRACTITIONER_DAILY_ACTIVE => 'گزارش پایان روز · گیرنده: مشاور',
             default => '',
         };
     }

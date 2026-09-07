@@ -6,6 +6,17 @@
     </a>
 </li>
 @endif
+@if (
+    $ap->kind == \Modules\AppointmentUser\Enum\AppointmentUserKindEnum::VOIP &&
+        \Illuminate\Support\Facades\Route::has('admin.consultation.call-reports.appointment')
+)
+    <li>
+        <a href="{{ route('admin.consultation.call-reports.appointment', $ap) }}">
+            <i class="fa fa-list-alt" aria-hidden="true"></i>
+            جزئیات مشاوره تلفنی
+        </a>
+    </li>
+@endif
 @if ($ap->status == Modules\AppointmentUser\Enum\AppointmentUserStatusEnum::STATUS_PENDING)
     <li>
         <a wire:click='ApproveOnlineAppointment({{ $ap->id }})' href="#" data-label="ویرایش">
@@ -103,7 +114,11 @@
     @endif
     @if (
         $ap->status == Modules\AppointmentUser\Enum\AppointmentUserStatusEnum::STATUS_SUCCESSFUL &&
-            $ap->details[\Modules\AppointmentUser\app\Models\AppointmentUser::DETAIL_PAYMENT]['status']
+            data_get(
+                $ap->details,
+                \Modules\AppointmentUser\app\Models\AppointmentUser::DETAIL_PAYMENT.'.status',
+                false
+            )
     )
         <li>
             <a data-description="ایا میخواهید مبلغ پرداختی را استرداد کنیید؟" data-title="استرداد وجه"

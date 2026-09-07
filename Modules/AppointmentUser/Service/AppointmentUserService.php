@@ -5,7 +5,6 @@ namespace Modules\AppointmentUser\Service;
 use App\Event;
 use Carbon\Carbon;
 use App\Enum\RouteEnum;
-use App\Models\ShortLink;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Cache;
 use Modules\Service\app\Models\Service;
@@ -688,10 +687,7 @@ class AppointmentUserService
 
     private function makeShortLink($appointmentUser)
     {
-        $appointmentUser->shortLink()->create([
-            'link_code' => ShortLink::generateShortLinkCode(),
-            'link_url'  => route('front.setAppointment.detail', ['tracking_code' => $appointmentUser->tracking_code]),
-        ]);
+        $appointmentUser->ensureShortLink();
     }
 
     private function insertOnlineAppointment(AppointmentUser $appointmentUser): appointmentOnline

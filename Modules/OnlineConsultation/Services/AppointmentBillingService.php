@@ -12,11 +12,21 @@ use Modules\OnlineConsultation\Models\AppointmentBillingRecord;
 use Modules\OnlineConsultation\Models\AppointmentBillingAdjustment;
 use Modules\OnlineConsultation\Models\ConsultationPractitioner;
 use Modules\User\Entities\User;
+use Modules\OnlineConsultation\Support\ConsultationAccess;
 
 class AppointmentBillingService
 {
     public function ensure(AppointmentUser $appointment): ?AppointmentBillingRecord
     {
+        if (! ConsultationAccess::schemaReady([
+            'consultation_practitioners',
+            'appointment_call_logs',
+            'appointment_billing_records',
+            'appointment_billing_audits',
+        ])) {
+            return null;
+        }
+
         $profile = ConsultationPractitioner::where('user_id', $appointment->doctor_id)->first();
         if (! $profile || ! $appointment->user_id || ! $appointment->doctor_id) return null;
 

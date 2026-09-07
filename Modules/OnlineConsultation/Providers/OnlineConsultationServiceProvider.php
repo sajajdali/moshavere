@@ -10,6 +10,7 @@ use Stancl\Tenancy\Middleware\PreventAccessFromCentralDomains;
 use Modules\AppointmentUser\app\Models\AppointmentUser;
 use Modules\OnlineConsultation\Services\AppointmentBillingService;
 use Modules\OnlineConsultation\Console\DispatchConsultationSms;
+use Modules\OnlineConsultation\Support\ConsultationAccess;
 
 class OnlineConsultationServiceProvider extends ServiceProvider
 {
@@ -23,7 +24,13 @@ class OnlineConsultationServiceProvider extends ServiceProvider
         if ($this->app->runningInConsole()) $this->commands([DispatchConsultationSms::class]);
         $this->loadViewsFrom(__DIR__.'/../resources/views', 'onlineconsultation');
         AppointmentUser::created(function (AppointmentUser $appointment) {
-            if (tenancy()->initialized) app(AppointmentBillingService::class)->ensure($appointment);
+            if (ConsultationAccess::enabled()) {
+                try {
+                    app(AppointmentBillingService::class)->ensure($appointment);
+                } catch (\Throwable $exception) {
+                    report($exception);
+                }
+            }
         });
         $this->app->booted(function () {
             $tenant = [InitializeTenancyByDomain::class, PreventAccessFromCentralDomains::class];

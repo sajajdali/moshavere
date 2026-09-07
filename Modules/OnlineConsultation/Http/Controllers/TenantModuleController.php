@@ -5,8 +5,8 @@ namespace Modules\OnlineConsultation\Http\Controllers;
 use App\Http\Controllers\Controller;
 use App\Models\Tenant;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Schema;
 use Illuminate\Validation\ValidationException;
+use Modules\OnlineConsultation\Support\ConsultationAccess;
 
 class TenantModuleController extends Controller
 {
@@ -20,9 +20,7 @@ class TenantModuleController extends Controller
         $data = $request->validate(['enabled' => ['required', 'boolean']]);
         $tenant = Tenant::findOrFail($tenantId);
         if ($data['enabled']) {
-            $ready = $tenant->run(fn () => collect([
-                'consultation_settings', 'consultation_practitioners', 'consultations', 'consultation_calls',
-            ])->every(fn ($table) => Schema::hasTable($table)));
+            $ready = $tenant->run(fn () => ConsultationAccess::schemaReady());
             if (! $ready) {
                 throw ValidationException::withMessages([
                     'enabled' => 'جدول‌های مشاوره برای این سایت نصب نشده‌اند. ابتدا مهاجرت‌های ماژول را برای سایت اجرا کنید.',

@@ -32,11 +32,16 @@ class ConsultationTest extends TestCase
             'database/migrations/2023_08_02_073105_create_users_table.php',
             'database/migrations/2023_08_02_073110_create_user_metas_table.php',
             'database/migrations/2024_01_30_115541_create_permission_tables.php',
+            'Modules/Setting/Database/Migrations/tenant/2022_11_30_062449_create_settings_table.php',
             'Modules/AppointmentUser/database/migrations/tenant/2024_03_19_094623_create_appointment_users_table.php',
+            'database/migrations/tenant/2024_03_29_160521_create_short_links_table.php',
             'Modules/OnlineConsultation/database/migrations/tenant/2026_09_06_000001_create_online_consultation_tables.php',
+            'Modules/OnlineConsultation/database/migrations/tenant/2026_09_06_000003_create_voip_request_logs_table.php',
             'Modules/User/Database/Migrations/tenant/2026_02_23_181827_create_user_wallets_table.php',
             'Modules/OnlineConsultation/database/migrations/tenant/2026_09_07_000004_create_appointment_call_logs_table.php',
             'Modules/OnlineConsultation/database/migrations/tenant/2026_09_07_000005_create_appointment_billing_records.php',
+            'Modules/OnlineConsultation/database/migrations/tenant/2026_09_07_000006_create_appointment_billing_adjustments.php',
+            'Modules/OnlineConsultation/database/migrations/tenant/2026_09_07_000007_create_consultation_sms_deliveries.php',
         ] as $path) {
             (require base_path($path))->up();
         }
@@ -69,6 +74,32 @@ class ConsultationTest extends TestCase
             'sip_secret' => 'private-test-secret',
             'hourly_rate' => '1000000',
         ], $overrides);
+    }
+
+    public function test_missing_consultation_schema_does_not_break_appointment_or_short_link_creation(): void
+    {
+        Schema::drop('consultation_sms_deliveries');
+        $patient = User::create(['mobile' => '09120000009', 'password' => 'test-password']);
+
+        $appointment = AppointmentUser::create([
+            'user_id' => $patient->id,
+            'doctor_id' => $this->manager->id,
+            'status' => 1,
+            'type' => 1,
+            'kind' => 1,
+            'date_visit' => now()->addHour(),
+            'start_time' => '10:00:00',
+            'end_time' => '10:30:00',
+            'tracking_code' => 'NO-CONSULTATION-SCHEMA',
+        ]);
+
+        $this->assertDatabaseHas('appointment_users', ['id' => $appointment->id]);
+        $this->assertStringContainsString('/s/', $appointment->shortLinkUrl(false));
+        $this->assertDatabaseHas('short_links', [
+            'shortlinkable_id' => $appointment->id,
+            'shortlinkable_type' => AppointmentUser::class,
+        ]);
+        $this->assertDatabaseCount('appointment_billing_records', 0);
     }
 
     public function test_practitioner_creation_encrypts_secrets_and_validates_duplicate_extensions(): void

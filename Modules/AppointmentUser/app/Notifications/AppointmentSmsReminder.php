@@ -57,7 +57,7 @@ class AppointmentSmsReminder extends Notification
                     ReminderParametersEnum::VISIT_TIME      => verta($notifiable->date_visit)->format('H:i'),
                     ReminderParametersEnum::SERVICE_NAME    => $notifiable->service->title,
                     ReminderParametersEnum::DOCTOR_NAME     => $notifiable->doctor->fullName,
-                    ReminderParametersEnum::LINK            => url('/s/' . $notifiable->shortLink->link_code),
+                    ReminderParametersEnum::LINK            => $notifiable->shortLinkUrl(false),
                     default => '',
                 };
             }

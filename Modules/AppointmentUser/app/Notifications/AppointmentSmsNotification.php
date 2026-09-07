@@ -65,7 +65,7 @@ class AppointmentSmsNotification extends Notification implements ShouldQueue
         $lastName = $notifiable->user?->last_name;
         $serviceName = $notifiable->service?->title;
 
-        $link = tenant_url('/s/' . $notifiable->shortLink->link_code);
+        $link = $notifiable->shortLinkUrl();
 
         $dateAppointment = dateFormatSimlpe($notifiable->date_visit);
         $hour = substr($notifiable->start_time, 0, -3);

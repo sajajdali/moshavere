@@ -12,6 +12,7 @@ use Modules\OnlineConsultation\Models\ConsultationSmsDelivery;
 use Modules\OnlineConsultation\Services\ConsultantDashboardService;
 use Modules\Setting\Entities\Setting;
 use Modules\Setting\Enum\SettingKeyEnum;
+use Modules\OnlineConsultation\Support\ConsultationAccess;
 
 class DispatchConsultationSms extends Command
 {
@@ -21,6 +22,10 @@ class DispatchConsultationSms extends Command
 
     public function handle(ConsultantDashboardService $dashboard): int
     {
+        if (! ConsultationAccess::enabled()) {
+            return self::SUCCESS;
+        }
+
         foreach ($this->appointmentRules() as $type => $rule) {
             if (! $this->enabled($rule['active']) || blank($template = Setting::v($rule['template']))) {
                 continue;

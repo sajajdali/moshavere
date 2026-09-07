@@ -145,6 +145,27 @@ class AppointmentUser extends Model
         return $this->morphOne(ShortLink::class, 'shortlinkable');
     }
 
+    public function ensureShortLink(): ShortLink
+    {
+        $shortLink = $this->shortLink()->first();
+
+        if ($shortLink) {
+            return $shortLink;
+        }
+
+        return $this->shortLink()->create([
+            'link_code' => ShortLink::generateShortLinkCode(),
+            'link_url' => route('front.setAppointment.detail', ['tracking_code' => $this->tracking_code]),
+        ]);
+    }
+
+    public function shortLinkUrl(bool $tenantUrl = true): string
+    {
+        $path = '/s/'.$this->ensureShortLink()->link_code;
+
+        return $tenantUrl ? tenant_url($path) : url($path);
+    }
+
     public function getColor()
     {
 

@@ -5,6 +5,7 @@ namespace Modules\Api\app\Http\Middleware;
 use Closure;
 use Illuminate\Http\Request;
 use Modules\OnlineConsultation\Models\VoipRequestLog;
+use Modules\OnlineConsultation\Support\ConsultationAccess;
 
 class LogVoipRequest
 {
@@ -14,16 +15,22 @@ class LogVoipRequest
         $response = $next($request);
         $payload = $response->getData(true);
 
-        VoipRequestLog::create([
-            'method' => $request->method(),
-            'path' => '/'.$request->path(),
-            'phone' => $request->input('phone') ?: $request->input('mobile'),
-            'client_ip' => $request->ip(),
-            'response_status' => $response->getStatusCode(),
-            'error_code' => data_get($payload, 'error_code'),
-            'duration_ms' => (int) round((microtime(true) - $started) * 1000),
-            'user_agent' => $request->userAgent(),
-        ]);
+        if (ConsultationAccess::schemaReady(['voip_request_logs'])) {
+            try {
+                VoipRequestLog::create([
+                    'method' => $request->method(),
+                    'path' => '/'.$request->path(),
+                    'phone' => $request->input('phone') ?: $request->input('mobile'),
+                    'client_ip' => $request->ip(),
+                    'response_status' => $response->getStatusCode(),
+                    'error_code' => data_get($payload, 'error_code'),
+                    'duration_ms' => (int) round((microtime(true) - $started) * 1000),
+                    'user_agent' => $request->userAgent(),
+                ]);
+            } catch (\Throwable $exception) {
+                report($exception);
+            }
+        }
 
         return $response;
     }

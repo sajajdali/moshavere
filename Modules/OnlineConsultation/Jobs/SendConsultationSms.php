@@ -12,6 +12,7 @@ use Modules\AppointmentUser\Enum\AppointmentUserKindEnum;
 use Modules\AppointmentUser\Enum\AppointmentUserStatusEnum;
 use Modules\OnlineConsultation\Models\ConsultationSmsDelivery;
 use Modules\OnlineConsultation\Notifications\AutomaticConsultationSms;
+use Modules\OnlineConsultation\Support\ConsultationAccess;
 
 class SendConsultationSms implements ShouldQueue
 {
@@ -27,6 +28,9 @@ class SendConsultationSms implements ShouldQueue
     {
         if ($this->tenantId && ! tenancy()->initialized) {
             tenancy()->initialize($this->tenantId);
+        }
+        if (! ConsultationAccess::enabled()) {
+            return;
         }
         $delivery = ConsultationSmsDelivery::with('appointment')->findOrFail($this->deliveryId);
         if ($delivery->status === 'sent') {
@@ -56,6 +60,9 @@ class SendConsultationSms implements ShouldQueue
     {
         if ($this->tenantId && ! tenancy()->initialized) {
             tenancy()->initialize($this->tenantId);
+        }
+        if (! ConsultationAccess::schemaReady(['consultation_sms_deliveries'])) {
+            return;
         }
         ConsultationSmsDelivery::whereKey($this->deliveryId)->where('status', '!=', 'sent')->update([
             'status' => 'failed',

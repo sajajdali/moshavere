@@ -111,7 +111,7 @@ class SendReminderscommand extends Command
                 ReminderParametersEnum::VISIT_TIME      => verta($notifReminder->appointmentUser->date_visit)->format('H:i'),
                 ReminderParametersEnum::SERVICE_NAME    => $notifReminder->appointmentUser->service->title,
                 ReminderParametersEnum::DOCTOR_NAME     => $notifReminder->appointmentUser->doctor->fullName,
-                ReminderParametersEnum::LINK            => url('/s/' . $notifReminder->appointmentUser->shortLink->link_code),
+                ReminderParametersEnum::LINK            => $notifReminder->appointmentUser->shortLinkUrl(false),
                 default => '',
             };
         }

@@ -62,66 +62,6 @@ class ListOfAvailableDay extends Component
         $this->dispatch('show-loading', true);
         return redirect()->route('admin.appointment.add.specificday', $parameters);
     }
-    private function findFirstTreeAppointment($listOfAppointment)
-    {
-
-        $firstTwoEmpty = [];
-        $report = $listOfAppointment['report'];
-        $mainDaActive = $report['min_day_active'];
-
-        $isDay   = verta()->addDays($mainDaActive)->day;
-        $isMonth = verta()->addDays($mainDaActive)->month;
-        $isYear  = verta()->addDays($mainDaActive)->year;
-
-        $result = [];
-        $maxDay = 6;
-        $DaysDisplayed = 0;
-        foreach ($listOfAppointment['data'] as $yeay => $day) {
-            if ($yeay < $isYear) {
-                continue;
-            }
-            foreach ($day as $month => $appointments) {
-
-                foreach ($appointments as $day => $appointment) {
-
-                    if ($day < $isDay && $month < $isMonth && $yeay < $isYear) {
-                        continue;
-                    }
-                    if ($appointment['empty_appoints'] <= 0 || $appointment['status'] == false) {
-                        continue;
-                    }
-                    $dayNumber = $appointment['day_number_gmt'];
-                    $DaysDisplayed++;
-
-                    if ($DaysDisplayed > $maxDay) {
-                        break 3;
-                    }
-                    foreach ($appointment['times'] as $time) {
-                        if ($time['status']) {
-                            // Increment the counter
-                            $result[$dayNumber][] = [
-                                'status' => true,
-                                'time_stamp' => $time['timestamp'],
-                                'from' => $time['from'],
-                                'until' => $time['until'],
-                            ];
-                            if (count($firstTwoEmpty) < 2) {
-                                $vertaDateTime = Verta::createTimestamp($time['timestamp']);
-                                $firstTwoEmpty[] = [
-                                    'persian_date' => $vertaDateTime->format('ساعت H روز l m/d'),
-                                    'time_stamp' => $time['timestamp'],
-                                    'from' => $time['from'],
-                                    'until' => $time['until'],
-                                ];
-                            }
-                            // If two matches are found, break out of the loop
-                        }
-                    }
-                }
-            }
-        }
-        return $result;
-    }
     public function mount($doctorId, $sectionId, $placeId)
     {
         $segmentItemId   =  request()->get('segmentItemId', null);
@@ -153,37 +93,12 @@ class ListOfAvailableDay extends Component
                 return redirect()->route('admin.appointment.doctor.list');
             }
         }
-        if (env('APPOINTMENT_SANDBOX')) {
-            Cache::forget('appointmentList.' . $appointmentSetting->id);
+        $details = [];
+        if ($segmentItemId != null) {
+            $details['segment_time'] = $this->fethData['segment_time'];
         }
-        if (app()->environment('local')) {
-            $details = [];
-            if ($segmentItemId != null) {
-                $details['segment_time'] =  $this->fethData['segment_time'];
-            }
-            $listOfAppointment = app('AppointmentUserService')->listAppointments($appointmentSetting, $details);
-        } else {
-            $details = [];
-            if ($segmentItemId != null) {
-                $details['segment_time'] =  $this->fethData['segment_time'];
-                if (config('app.without_cache')) {
-                    $listOfAppointment = app('AppointmentUserService')->listAppointments($appointmentSetting, $details);
-                } else {
-                    $listOfAppointment = Cache::rememberForever('appointmentList.' . $appointmentSetting->id . '-' . $this->fethData['segment_time'], function () use ($appointmentSetting, $details) {
-                        return  app('AppointmentUserService')->listAppointments($appointmentSetting, $details);
-                    });
-                }
-            } else {
-                if (config('app.without_cache')) {
-                    $listOfAppointment = app('AppointmentUserService')->listAppointments($appointmentSetting, $details);
-                } else {
-                    $listOfAppointment = Cache::rememberForever('appointmentList.' . $appointmentSetting->id, function () use ($appointmentSetting, $details) {
-                        return  app('AppointmentUserService')->listAppointments($appointmentSetting, $details);
-                    });
-                }
-            }
-        }
-        $this->fethData['firstTreeAvailableAppointment'] =  $this->findFirstTreeAppointment($listOfAppointment);
+        $this->fethData['firstTreeAvailableAppointment'] = app('AppointmentUserService')
+            ->nearestAvailableDays($appointmentSetting, $details);
         $this->fethData['appointmentSetting'] = $appointmentSetting->id;
     }
     public function render()

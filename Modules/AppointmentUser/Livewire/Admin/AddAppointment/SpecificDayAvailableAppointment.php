@@ -43,54 +43,45 @@ class SpecificDayAvailableAppointment extends Component
     {
         // if date has been change , this functio would be call
         $this->fetchData['selectedDate']      =  Verta::parse($this->form['changeDate'])->tocarbon();
-        $firstDateINList = data_get($this->fetchData['listOfAppointment'], '0.date');
-        if ($firstDateINList) {
-            $start_date_in_list = carbon::parse($this->fetchData['listOfAppointment'][0]['date']);
-            $end_date_in_list = carbon::parse($this->fetchData['listOfAppointment'][count($this->fetchData['listOfAppointment']) - 1]['date']);
-        } else {
-            $start_date_in_list = null;
-            $end_date_in_list = null;
-            $this->RecreatelistOfAppointment();
-        }
-        if ((! is_null($start_date_in_list) && !$this->fetchData['selectedDate']->gt($start_date_in_list)) &&
-            (! is_null($end_date_in_list) && ! $this->fetchData['selectedDate']->lte($end_date_in_list))
-        ) {
-            $this->RecreatelistOfAppointment();
-        }
-        // array_column($this->fetchData['listOfAppointment'] , 'date')
+        $this->RecreatelistOfAppointment();
         $this->dispatch('loadJs', true);
         $this->dateHasBeenChange();
     }
     public function previousDay()
     {
-        if (isset($this->fetchData['showingAppointmentIndex']) && !array_key_exists(($this->fetchData['showingAppointmentIndex'] - 1), $this->fetchData['listOfAppointment'])) {
-            $this->RecreatelistOfAppointment();
-        } else {
-            $privous_array = $this->fetchData['listOfAppointment'][($this->fetchData['showingAppointmentIndex'] - 1)];
-            $privous_array_date = Carbon::parse($privous_array['date']);
-            $this->fetchData['selectedDate'] = $privous_array_date;
-        }
-        $this->dispatch('loadJs', true);
-        $this->dateHasBeenChange();
+        $this->moveToScheduledDay(-1);
     }
     public function nextDay()
     {
-        if (isset($this->fetchData['showingAppointmentIndex']) && !array_key_exists(($this->fetchData['showingAppointmentIndex'] + 1), $this->fetchData['listOfAppointment'])) {
-            $this->RecreatelistOfAppointment();
-        } else {
-            $next_array = $this->fetchData['listOfAppointment'][($this->fetchData['showingAppointmentIndex'] + 1)];
-            $next_array_array_date = Carbon::parse($next_array['date']);
-            $this->fetchData['selectedDate'] = $next_array_array_date;
+        $this->moveToScheduledDay(1);
+    }
+    private function moveToScheduledDay(int $direction): void
+    {
+        $date = app('AppointmentUserService')->adjacentScheduledDay(
+            $this->fetchData['appointmentSetting'], $this->fetchData['selectedDate'], $direction
+        );
+        if (!$date) {
+            $this->fetchData['navigationMessage'] = 'روز دیگری با تنظیمات حضور فعال در این جهت یافت نشد.';
+            return;
         }
-        $this->dispatch('loadJs', true);
+        $this->fetchData['selectedDate'] = $date;
+        $this->RecreatelistOfAppointment();
         $this->dateHasBeenChange();
     }
     public function RecreatelistOfAppointment()
     {
+        unset($this->fetchData['navigationMessage']);
+        $this->form['changeDate'] = verta($this->fetchData['selectedDate'])->format('Y/m/d');
         $app = $this->fetchData['appointmentSetting'];
+        $details = ['specialDays' => $this->fetchData['selectedDate']->toDateString()];
+        if (isset($this->fetchData['segment_time'])) {
+            $details['segment_time'] = $this->fetchData['segment_time'];
+        }
         $newListTimes = app('AppointmentUserService')
-            ->listAppointments($app, ['specialDays' => $this->fetchData['selectedDate']->toDateString()]);
+            ->listAppointments($app, $details);
+        $this->fetchData['RawlistOfAppointment'] = $newListTimes;
         $this->fetchData['listOfAppointment'] =  $this->listOfAppointment($newListTimes);
+        unset($this->fetchData['showingAppointmentIndex']);
         foreach ($this->fetchData['listOfAppointment'] as $index => $avaiableTimes) {
             if ($avaiableTimes['date'] == $this->fetchData['selectedDate']->format('Y-m-d')) {
                 $this->fetchData['showingAppointmentIndex'] = $index;
@@ -106,13 +97,8 @@ class SpecificDayAvailableAppointment extends Component
                 return $avaiableTimes['times'];
             }
         }
-        if (!isset($this->fetchData['showingAppointmentIndex'])) {
-            $this->fetchData['showingAppointmentIndex'] = 5;
-        }
-        // when selected date is not exist in log date range
-        // $app = $this->fetchData['appointmentSetting'];
-        // $newListTimes = app('AppointmentUserService')->listAppointments($app, ['specialDay' => $this->fetchData['selectedDate']->toDateString()]);
-        // return $this->listOfAppointment($newListTimes)[0]['times'];
+        unset($this->fetchData['showingAppointmentIndex']);
+        return [];
     }
     private function listOfAppointment($listOfAppointment)
     {
@@ -364,43 +350,7 @@ class SpecificDayAvailableAppointment extends Component
         } else {
             $this->fetchData['time'] = null;
         }
-        if (env('APPOINTMENT_SANDBOX')) {
-            Cache::forget('appointmentList.' . $app->id);
-        }
-        if (app()->environment('local')) {
-            $details = [];
-            if ($segmentItemId != null) {
-                $details['segment_time'] =  $this->fetchData['segment_time'];
-                $details['specialDay'] =   $this->fetchData['selectedDate']->toDateString();
-            }
-            $this->fetchData['RawlistOfAppointment'] =  app('AppointmentUserService')->listAppointments($app, $details);
-        } else {
-            $details = [];
-            $details['specialDays'] = $this->fetchData['selectedDate']->toDateString();
-            if (config('app.without_cache')) {
-                if ($segmentItemId != null) {
-                    $details['segment_time'] =  $this->fetchData['segment_time'];
-                    $this->fetchData['RawlistOfAppointment']  = app('AppointmentUserService')->listAppointments($app, $details);
-                } else {
-                    $this->fetchData['RawlistOfAppointment']  =  app('AppointmentUserService')->listAppointments($app, $details);
-                }
-            } else {
-                if ($segmentItemId != null) {
-                    $details['segment_time'] =  $this->fetchData['segment_time'];
-                    $this->fetchData['RawlistOfAppointment']  = Cache::rememberForever('appointmentList.' . $app->id . '-' . $this->fetchData['segment_time'], function () use ($app, $details) {
-                        $app->update(['updated_log_at' => \now()]);
-                        return app('AppointmentUserService')->listAppointments($app, $details);
-                    });
-                } else {
-                    $this->fetchData['RawlistOfAppointment']  = Cache::rememberForever('appointmentList.' . $app->id, function () use ($app, $details) {
-                        $app->update(['updated_log_at' => \now()]);
-                        return app('AppointmentUserService')->listAppointments($app, $details);
-                    });
-                }
-            }
-        }
-
-        $this->fetchData['listOfAppointment'] = $this->listOfAppointment($this->fetchData['RawlistOfAppointment']);
+        $this->RecreatelistOfAppointment();
         // if user want to change the date of specific apppointment
         if (request()->has('tracking_code')) {
             $this->edited['status'] = true;

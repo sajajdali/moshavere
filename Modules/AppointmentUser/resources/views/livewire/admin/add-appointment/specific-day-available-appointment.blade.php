@@ -29,14 +29,16 @@
             <div class="card custom-card">
                 <div class="card-header d-flex justify-content-between border-bottom">
                     <div>
-                        <button class="btn btn-light" wire:click='previousDay' data-bs-toggle="tooltip"
+                        <button type="button" class="btn btn-light" wire:click='previousDay' wire:loading.attr="disabled" data-bs-toggle="tooltip"
                             data-bs-placement="top" title="روز قبل">
                             <i class="fa fa-arrow-right" aria-hidden="true"></i>
                         </button>
                         <input class="text-center" type="text" id="currentDate" data-jdp data-name="form.changeDate"
-                            value="{{ verta($fetchData['selectedDate'])->format('Y/m/d') }}"
+                            wire:key="appointment-date-{{ $fetchData['selectedDate']->format('Y-m-d') }}"
+                            wire:model="form.changeDate"
+                            value="{{ $form['changeDate'] }}"
                             style="max-width: fit-content">
-                        <button class="btn btn-light" wire:click='nextDay'>
+                        <button type="button" class="btn btn-light" wire:click='nextDay' wire:loading.attr="disabled">
                             <i class="fa fa-arrow-left" aria-hidden="true" data-bs-toggle="tooltip"
                                 data-bs-placement="top" title="روز بعد"></i>
                         </button>
@@ -52,6 +54,9 @@
                     @endif
                 </div>
                 <div class="card-body">
+                    @if (!empty($fetchData['navigationMessage']))
+                        <div class="alert alert-info" role="status">{{ $fetchData['navigationMessage'] }}</div>
+                    @endif
                     <div class="spinner-border text-primary position-absolute top-50 start-50 " role="status"
                         wire:loading>
                     </div>
@@ -68,7 +73,7 @@
                                     <th class="text-center">عملیات</th>
                                 </tr>
                             </thead>
-                            <tbody>
+                            <tbody wire:key="appointment-times-{{ $fetchData['selectedDate']->format('Y-m-d') }}">
                                 @if (!empty($this->ShowListOfAppointmentForSpecificDay()))
                                     @foreach ($this->ShowListOfAppointmentForSpecificDay() as $key => $eachTime)
                                         @if ($loop->first)
@@ -232,9 +237,13 @@
                                         @endif
                                     @endforeach
                                 @else
-                                    <div class="alert alert-avatar alert-warning alert-dismissible">
-                                        زمان حضور برای این تاریخ تعیین نشده است!!
-                                    </div>
+                                    <tr>
+                                        <td colspan="6">
+                                            <div class="alert alert-avatar alert-warning alert-dismissible">
+                                                زمان حضور برای این تاریخ تعیین نشده است!!
+                                            </div>
+                                        </td>
+                                    </tr>
                                 @endif
                             </tbody>
                         </table>
@@ -287,7 +296,7 @@
                         };
                     }
                 });
-                $(document).on('input', '[data-jdp]', function() {
+                $(document).off('input.appointmentDay', '#currentDate').on('input.appointmentDay', '#currentDate', function() {
                     let selectedDate = $(this).val();
                     let seterValue = $(this).data('name');
                     @this.set(seterValue, selectedDate);
@@ -305,11 +314,6 @@
                     });
                     myModal.show();
                 }, 1000);
-            });
-            Livewire.on('loadJs', function() {
-                setTimeout(() => {
-                    addJs();
-                }, 500);
             });
             if ({{ $fetchData['showRegisterModal'] }}) {
                 @this.dateHasBeenChange();

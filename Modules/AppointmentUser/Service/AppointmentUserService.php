@@ -87,13 +87,123 @@ class AppointmentUserService
         ];
     }
 
+    public function adjacentScheduledDay(AppointmentSetting $setting, Carbon $selectedDate, int $direction): ?Carbon
+    {
+        if ($setting->active !== \App\Enum\ActiveEnum::ACTIVE) {
+            return null;
+        }
+
+        $weeklyDays = [];
+        $specialDates = [];
+        foreach ($setting->times()->get() as $time) {
+            $active = $time->start_at < $time->end_at;
+            if ($time->special_date) {
+                $date = Carbon::parse($time->special_date)->toDateString();
+                $specialDates[$date] = ($specialDates[$date] ?? false) || $active;
+            } elseif ($active) {
+                $weeklyDays[] = $time->day_number->value;
+            }
+        }
+
+        $absences = $setting->user->absence()
+            ->when($setting->service_id, fn($q) => $q->where(fn($q) => $q
+                ->where('service_id', $setting->service_id)->orWhereNull('service_id')))
+            ->when($setting->place_id, fn($q) => $q->where(fn($q) => $q
+                ->where('place_id', $setting->place_id)->orWhereNull('place_id')))
+            ->get(['start_at', 'end_at'])
+            ->map(fn($absence) => [
+                'start' => Carbon::parse($absence->start_at)->toDateString(),
+                'end' => Carbon::parse($absence->end_at)->toDateString(),
+            ])->all();
+        $holidays = Event::where('is_holiday', '1')->pluck('date')
+            ->mapWithKeys(fn($date) => [Carbon::parse($date)->toDateString() => true])->all();
+
+        return (new AppointmentScheduleNavigator(array_unique($weeklyDays), $specialDates, $absences, $holidays))
+            ->adjacent($selectedDate, $direction, $setting->last_day_active);
+    }
+
+    public function nearestAvailableDays(AppointmentSetting $setting, array $details = [], int $limit = 6): array
+    {
+        $result = [];
+        $start = Carbon::today();
+        $searchEnd = $this->nearestAppointmentSearchEnd($setting, $limit);
+
+        // Read fresh, non-overlapping batches; the normal calendar cache covers only 60 days.
+        while ($limit > 0 && $start->lte($searchEnd)) {
+            $end = $start->copy()->addDays(60)->min($searchEnd);
+            $list = $this->listAppointments($setting, array_merge($details, [
+                'range_start' => $start->toDateString(),
+                'range_end' => $end->toDateString(),
+            ]));
+
+            foreach ($list['data'] ?? [] as $months) {
+                foreach ($months as $days) {
+                    foreach ($days as $day) {
+                        if (!$day['status'] || $day['empty_appoints'] <= 0) {
+                            continue;
+                        }
+                        $times = [];
+                        foreach ($day['times'] as $time) {
+                            if ($time['status'] && $time['timestamp'] >= Carbon::now()->timestamp) {
+                                $times[] = [
+                                    'status' => true,
+                                    'time_stamp' => $time['timestamp'],
+                                    'from' => $time['from'],
+                                    'until' => $time['until'],
+                                ];
+                            }
+                        }
+                        if ($times) {
+                            $result[$day['day_number_gmt']] = $times;
+                            if (count($result) >= $limit) {
+                                return $result;
+                            }
+                        }
+                    }
+                }
+            }
+            $start = $end->copy()->addDay();
+        }
+
+        return $result;
+    }
+
+    protected function nearestAppointmentSearchEnd(AppointmentSetting $setting, int $limit): Carbon
+    {
+        if ($setting->last_day_active) {
+            return Carbon::parse($setting->last_day_active)->startOfDay();
+        }
+
+        // After the last dated exception, six weekly cycles suffice to find six
+        // dates if the recurring schedule can fit a visit. This also terminates
+        // for empty schedules or shifts shorter than the requested visit.
+        $latest = Carbon::today();
+        $dates = [
+            $setting->times()->max('special_date'),
+            $setting->user->absence()->max('end_at'),
+            AppointmentUser::where('doctor_id', $setting->user_id)
+                ->where('kind', AppointmentUserKindEnum::IN_PERSION)->max('date_visit'),
+            Event::where('is_holiday', '1')->max('date'),
+        ];
+        foreach ($dates as $date) {
+            if ($date) {
+                $latest = $latest->max(Carbon::parse($date)->startOfDay());
+            }
+        }
+
+        return $latest->addWeeks(max(1, $limit));
+    }
+
     public function listAppointments(AppointmentSetting $appointmentSetting, array $details = [])
     {
         // -----------------------------
         // 1) Resolve date range (unchanged behavior)
         // -----------------------------
         $specialDaySelected = false;
-        if (array_key_exists('specialDay', $details)) {
+        if (isset($details['range_start'], $details['range_end'])) {
+            $startDate = Carbon::parse($details['range_start'])->startOfDay();
+            $endDate = Carbon::parse($details['range_end'])->startOfDay();
+        } elseif (array_key_exists('specialDay', $details)) {
             $specialDaySelected = true;
             $startDate = Carbon::parse($details['specialDay']);
             $endDate   = $startDate->copy()->addDays($details['specialDay_endDate'] ?? 60); // = specialDay + (endDate|60)
@@ -129,7 +239,7 @@ class AppointmentUserService
             ->when($checkForInterface == false && $appointmentSetting->service_id != null, function ($q) use ($appointmentSetting) {
                 return $q->where('service_id', $appointmentSetting->service_id);
             })
-            ->whereBetween('date_visit', [$startDate, $endDate])
+            ->whereBetween('date_visit', [$startDate, $endDate->copy()->endOfDay()])
             ->orderBy('date_visit')
             ->orderBy('start_time')
             ->get(['id', 'date_visit', 'start_time', 'end_time', 'type', 'status']); // select only what we use

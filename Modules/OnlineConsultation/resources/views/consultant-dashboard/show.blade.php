@@ -51,13 +51,15 @@ $statCards=[
 <section class="oc-panel"><div class="oc-panel-header"><h2 class="oc-panel-title">نوبت‌ها</h2><span>{{ verta($from)->format('Y/m/d') }} تا {{ verta($to)->format('Y/m/d') }}</span></div>
 <div class="oc-table-wrap"><table class="oc-table oc-clickable-table"><thead><tr><th>نوبت / بیمار</th><th>زمان و مدت</th><th>تلاش بیمار / مشاور</th><th>پاسخ / بی‌پاسخ</th><th>مکالمه / باقی‌مانده</th><th>وضعیت و علت</th><th>مالی</th><th>آخرین تماس</th></tr></thead><tbody>
 @forelse($items as $a)
-@php
-    $d = $a->dashboard;
-    $paidAmount = (int) ($a->billingRecord?->total_paid_amount ?? 0);
-    $effectiveRefund = (int) ($a->billingRecord?->refunded_amount ?? 0)
-        + (int) ($a->billingRecord?->adjustments?->sum('amount_change') ?? 0);
-    $consultantIncome = max(0, $paidAmount - $effectiveRefund);
-@endphp
+@php($d = array_replace([
+    'alert' => false, 'reserved_minutes' => 0, 'patient_attempts' => 0,
+    'practitioner_attempts' => 0, 'answered' => 0, 'unanswered' => 0,
+    'talk_seconds' => 0, 'remaining_minutes' => 0, 'status' => 'pending',
+    'reason' => null, 'financial' => 'unsettled', 'last_call_at' => null,
+], (array) ($a->dashboard ?? [])))
+@php($paidAmount = (int) ($a->billingRecord?->total_paid_amount ?? 0))
+@php($effectiveRefund = (int) ($a->billingRecord?->refunded_amount ?? 0) + (int) ($a->billingRecord?->adjustments?->sum('amount_change') ?? 0))
+@php($consultantIncome = max(0, $paidAmount - $effectiveRefund))
 <tr class="{{ $d['alert']?'oc-row-danger':'' }}" data-href="{{ route('admin.consultation.call-reports.appointment',$a) }}"><td><strong>#{{ $a->tracking_code?:$a->id }}</strong><span class="oc-cell-sub">{{ $a->user?->fullName?:'—' }}</span><span class="oc-cell-sub oc-ltr">{{ $a->user?->mobile?:'—' }}</span></td><td>{{ verta($a->date_visit)->format('Y/m/d H:i') }}<span class="oc-cell-sub">{{ $d['reserved_minutes'] }} دقیقه</span></td><td>{{ $d['patient_attempts'] }} / {{ $d['practitioner_attempts'] }}</td><td>{{ $d['answered'] }} / <span class="oc-text-danger">{{ $d['unanswered'] }}</span></td><td class="oc-ltr">{{ $duration($d['talk_seconds']) }}<span class="oc-cell-sub">{{ $d['remaining_minutes'] }} دقیقه باقی‌مانده</span></td><td><span class="oc-badge {{ $d['alert']?'oc-badge-danger':'' }}">{{ $labels[$d['status']]??$d['status'] }}</span>@if($d['reason'])<span class="oc-cell-sub oc-text-danger">{{ $d['reason'] }}</span>@endif</td><td><span class="oc-badge">{{ $financial[$d['financial']] }}</span><span class="oc-cell-sub">پرداخت بیمار: {{ number_format($paidAmount) }} تومان</span><span class="oc-cell-sub">بازگشت به بیمار: {{ number_format($effectiveRefund) }} تومان</span><span class="oc-cell-sub oc-consultant-income">درآمد مشاور: {{ number_format($consultantIncome) }} تومان</span>@if($a->billingRecord && (int) $a->billingRecord->approved_unused_minutes !== (int) $a->billingRecord->system_unused_minutes) @php($minuteChange = (int) $a->billingRecord->approved_unused_minutes - (int) $a->billingRecord->system_unused_minutes)<span class="oc-cell-sub oc-financial-adjustment"><i class="fa-solid fa-user-doctor"></i> {{ (int) $a->billingRecord->approved_by === (int) $a->doctor_id ? 'پزشک' : 'مدیر' }} {{ abs($minuteChange) }} دقیقه {{ $minuteChange > 0 ? 'اضافه' : 'کم' }} کرده@if($a->billingRecord->approver) · {{ $a->billingRecord->approver->fullName }}@endif</span>@endif</td><td>{{ $d['last_call_at']?verta($d['last_call_at'])->format('Y/m/d H:i:s'):'—' }}</td></tr>
 @empty <tr><td colspan="8"><div class="oc-empty"><h3>نوبتی مطابق فیلترها پیدا نشد</h3></div></td></tr>@endforelse
 </tbody></table></div></section>

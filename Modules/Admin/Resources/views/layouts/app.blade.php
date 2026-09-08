@@ -70,7 +70,9 @@
                                 </div>
                             </div>
                         </div>
-                        @include('admin::layouts.components.tenant-expiration-alert')
+                        @if ($tenantAccessExpired)
+                            @include('admin::layouts.components.tenant-expiration-alert')
+                        @endif
                         @unless ($tenantAccessExpired)
                             @yield('content')
                             {{ $slot ?? '' }}

@@ -2,6 +2,7 @@
 
 namespace Modules\Admin\Livewire;
 use App\Models\TenantRenewTransaction;
+use App\Models\CentralSetting;
 use Livewire\Attributes\Locked;
 use Livewire\Attributes\Title;
 use Livewire\Component;
@@ -9,12 +10,18 @@ use Modules\Transaction\Enum\TransactionPaidEnum;
 use Modules\Transaction\Enum\TransactionStatusEnum;
 use Stancl\Tenancy\Database\Models\Domain;
 
-#[Title('تمدید هزینه هاست، سرور و پشتیبانی')]
+#[Title('تمدید هزینه سرور و پشتیبانی')]
 class TenantRenew extends Component
 {
 
     #[Locked]
     public int $totalCost = 7500000;
+
+    #[Locked]
+    public int $supportCost = 0;
+
+    #[Locked]
+    public int $serverCost = 0;
 
     public ?string $paymentUrl = null;
 
@@ -22,7 +29,11 @@ class TenantRenew extends Component
 
     public function mount(): void
     {
-        $this->totalCost = config('app.tenant_renew_cost');
+        $settings = CentralSetting::current();
+        $currentTenant = tenant();
+        $this->supportCost = $currentTenant->support_renew_cost ?? $settings->support_renew_cost;
+        $this->serverCost = $currentTenant->server_renew_cost ?? $settings->server_renew_cost;
+        $this->totalCost = $this->supportCost + $this->serverCost;
         $this->transactionResult = session('tenant_renew_result') ?? $this->getTransactionResultFromRequest();
     }
 
@@ -46,6 +57,9 @@ class TenantRenew extends Component
                 : now()->addYear(),
             'detail' => [
                 'description' => $description,
+                'support_cost' => $this->supportCost,
+                'server_cost' => $this->serverCost,
+                'total_cost' => $amount,
             ],
         ]);
         // dd($this->bankRoute($transaction));

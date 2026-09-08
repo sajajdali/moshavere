@@ -31,6 +31,9 @@ class RoleCreateOrUpdate extends Component
         $permissions = [];
         $modules = \Module::allEnabled();
         foreach ($modules as $module) {
+            if (! \App\Support\TenantModuleAccess::enabled($module->getName())) {
+                continue;
+            }
             if ($module->getName() === 'OnlineConsultation' && !\Modules\OnlineConsultation\Support\ConsultationAccess::enabled()) {
                 continue;
             }

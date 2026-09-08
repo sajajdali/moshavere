@@ -14,6 +14,24 @@ use Modules\AppointmentUser\Enum\AppointmentOnlineStatusEnum;
 use Modules\AppointmentUser\Enum\AppointmentOnlineMessageSeenEnum;
 use Modules\AppointmentUser\Enum\AppointmentOnlineMessageTypeEnum;
 
+Route::get('/support-expired', function () {
+    $tenantId = \App\Models\Domain::query()->where('domain', request()->getHost())->value('tenant_id');
+    $expiredTenant = $tenantId ? \App\Models\Tenant::findOrFail($tenantId) : null;
+
+    abort_if($expiredTenant === null, 404);
+
+    return view('support-expired', compact('expiredTenant'));
+})->name('tenant.support-expired');
+
+Route::get('/site-disabled', function () {
+    $tenantId = \App\Models\Domain::query()->where('domain', request()->getHost())->value('tenant_id');
+    $disabledTenant = $tenantId ? \App\Models\Tenant::findOrFail($tenantId) : null;
+
+    abort_if($disabledTenant === null || ! $disabledTenant->disabled, 404);
+
+    return view('site-disabled', compact('disabledTenant'));
+})->name('tenant.site-disabled');
+
 /*
 |--------------------------------------------------------------------------
 | Web Routes

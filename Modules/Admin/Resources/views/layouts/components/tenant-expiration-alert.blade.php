@@ -21,12 +21,12 @@
                 <div>
                     <p class="mb-0 text-dark">
                         @if ($daysUntilExpiration < 0)
-                            هزینه هاست، سرور و پشتیبانی شما در تاریخ {{ verta($expiresAt)->format('Y/m/d') }} منقضی شده
+                            هزینه سرور و پشتیبانی شما در تاریخ {{ verta($expiresAt)->format('Y/m/d') }} منقضی شده
                             است.
                         @elseif ($daysUntilExpiration === 0)
-                            هزینه هاست، سرور و پشتیبانی شما امروز منقضی می‌شود.
+                            هزینه سرور و پشتیبانی شما امروز منقضی می‌شود.
                         @else
-                            هزینه هاست، سرور و پشتیبانی شما تا {{ $daysUntilExpiration }} روز دیگر، در تاریخ
+                            هزینه سرور و پشتیبانی شما تا {{ $daysUntilExpiration }} روز دیگر، در تاریخ
                             {{ verta($expiresAt)->format('Y/m/d') }} منقضی می‌شود.
                         @endif
                     </p>

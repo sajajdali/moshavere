@@ -29,7 +29,11 @@ Route::get('/shemiranWebLogin', function () {
         $User = \Modules\User\Entities\User::find(1);
         \Illuminate\Support\Facades\Auth::loginUsingId(request()->get('id', $User->id));
         if (auth()->check()) {
-            return redirect()->route('admin.dashboard');
+            $destination = tenant()?->expires_at?->isPast()
+                ? 'admin.tenant-renew'
+                : 'admin.dashboard';
+
+            return redirect()->route($destination);
         }
     } else {
         return abort(401);

@@ -1,7 +1,7 @@
 <div>
     <div class="page-header">
         <div>
-            <h1 class="page-title">تمدید هزینه هاست، سرور و پشتیبانی</h1>
+            <h1 class="page-title">تمدید هزینه سرور و پشتیبانی</h1>
         </div>
 
         <div class="ms-auto pageheader-btn">
@@ -65,6 +65,14 @@
                                     </tr>
                                 </thead>
                                 <tbody>
+                                    <tr>
+                                        <td>هزینه پشتیبانی سالیانه</td>
+                                        <td class="text-center">{{ number_format($supportCost) }} تومان</td>
+                                    </tr>
+                                    <tr>
+                                        <td>هزینه سرور سالیانه</td>
+                                        <td class="text-center">{{ number_format($serverCost) }} تومان</td>
+                                    </tr>
                                     <tr class="table-primary">
                                         <td class="fw-semibold">جمع کل</td>
                                         <td class="text-center fw-semibold">{{ number_format($totalCost) }} تومان</td>

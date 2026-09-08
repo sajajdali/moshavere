@@ -13,6 +13,7 @@
         </div>
     </div>
     @include('admin::layouts.components.alert')
+    @include('admin::layouts.components.tenant-support-summary')
     @unless($dashboardDataLoaded)
     <div class="dashboard-local-loading">
         <div class="dashboard-loading-card">

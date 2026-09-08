@@ -13,13 +13,17 @@ class Tenant extends BaseTenant implements TenantWithDatabase
     use HasDatabase, HasDomains;
 
     protected $casts = [
+        'support_started_at' => 'datetime',
         'expires_at' => 'datetime',
+        'support_renew_cost' => 'integer',
+        'server_renew_cost' => 'integer',
     ];
 
     protected static function booted(): void
     {
         static::creating(function (Tenant $tenant) {
             $tenant->expires_at ??= now()->addYear();
+            $tenant->support_started_at ??= now();
         });
     }
 
@@ -27,7 +31,11 @@ class Tenant extends BaseTenant implements TenantWithDatabase
     {
         return [
             'id',
+            'support_started_at',
             'expires_at',
+            'support_renew_cost',
+            'server_renew_cost',
+            'disabled_message',
         ];
     }
 

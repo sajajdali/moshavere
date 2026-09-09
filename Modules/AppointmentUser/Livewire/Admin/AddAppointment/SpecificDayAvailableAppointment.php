@@ -10,6 +10,7 @@ use Modules\User\Entities\User;
 use Livewire\Attributes\Computed;
 use Illuminate\Support\Facades\Cache;
 use Hekmatinasser\Verta\Facades\Verta;
+use Modules\Place\app\Models\Place;
 use Modules\Service\app\Models\Service;
 use Modules\Setting\Enum\SettingKeyEnum;
 use Modules\AppointmentUser\app\Models\AppointmentUser;
@@ -307,7 +308,8 @@ class SpecificDayAvailableAppointment extends Component
     {
         $app = AppointmentSetting::find(request()->route('appId'));
         $this->fetchData['service'] = Service::find(request()->route('serviceId'));
-        $this->fetchData['place'] = request()->route('placeId');
+        $place = request()->route('placeId');
+        $this->fetchData['place'] = (int) ($place instanceof Place ? $place->getKey() : $place);
         $segmentItemId   =  request()->get('segmentItemId', null);
         $this->fetchData['doc'] = $app->user;
         $this->fetchData['appId'] = $app->id;

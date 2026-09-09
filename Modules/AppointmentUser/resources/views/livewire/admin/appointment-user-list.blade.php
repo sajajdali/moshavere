@@ -276,7 +276,7 @@
                             </div>
                             <div class="d-flex flex-column gap-1">
                                 <span style="font-size:14.5px;font-weight:700;color:#101828" dir="ltr">{{ verta($ap->date_visit)->format('Y/m/d') }}</span>
-                                <span class="om-muted d-inline-flex align-items-center gap-1" style="direction:ltr">
+                                <span class="om-muted d-flex align-items-center justify-content-center gap-1 w-100" style="direction:ltr">
                                     <bdi dir="ltr">{{ filled($ap->start_time) ? substr($ap->start_time, 0, 5) : '--:--' }}</bdi>
                                     <span dir="rtl">تا</span>
                                     <bdi dir="ltr">{{ filled($ap->end_time) ? substr($ap->end_time, 0, 5) : '--:--' }}</bdi>

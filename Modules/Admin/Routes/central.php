@@ -3,16 +3,11 @@
 use Stancl\Tenancy\Middleware\InitializeTenancyByDomain;
 use Stancl\Tenancy\Middleware\PreventAccessFromCentralDomains;
 
+Route::redirect('/', '/centralLogin')->name('central.home');
 
-Route::get('/centralLogin', function () {
-//    $tenantDb = DB::connection()->getDatabaseName();
-    $User = \Modules\User\Entities\User::find(1);
-    \Illuminate\Support\Facades\Auth::loginUsingId(request()->get('id', $User->id));
-    //     if (auth()->check()) {
-
-    return redirect()->route('central.dashboard');
-
-});
+Route::get('/centralLogin', \Modules\Admin\Livewire\Login::class)
+    ->middleware('web')
+    ->name('central.login');
 Route::prefix('central')
     ->middleware(['web', 'admin','prevent-tenant'])->as('central.')->group(function () {
         Route::get('dashboard', \Modules\Admin\Livewire\Central\CentralDashboard::class)->name('dashboard');

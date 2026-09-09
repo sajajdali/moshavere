@@ -23,6 +23,7 @@ class RouteServiceProvider extends ServiceProvider
     public function boot(): void
     {
         parent::boot();
+        $this->bindingModel();
     }
 
     /**
@@ -34,7 +35,6 @@ class RouteServiceProvider extends ServiceProvider
 
         $this->mapWebRoutes();
         $this->mapLivewireRoutes();
-        $this->bindingModel();
     }
     public function bindingModel() : void {
         Route::model('place',Place::class);

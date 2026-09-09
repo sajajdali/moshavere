@@ -27,6 +27,7 @@ class RouteServiceProvider extends ServiceProvider
     public function boot(): void
     {
         parent::boot();
+        $this->bindingModel();
     }
 
     /**
@@ -38,7 +39,6 @@ class RouteServiceProvider extends ServiceProvider
     {
         $this->mapAdminRoutes();
         $this->mapCentralRoutes();
-        $this->bindingModel();
 
     }
     protected function centralDomains(): array

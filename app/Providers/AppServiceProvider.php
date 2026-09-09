@@ -23,6 +23,14 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        $isCentralRequest = ! $this->app->runningInConsole()
+            && in_array(request()->getHost(), config('tenancy.central_domains', []), true);
+        $appScheme = parse_url(config('app.url'), PHP_URL_SCHEME);
+
+        if ($isCentralRequest && $appScheme) {
+            \Illuminate\Support\Facades\URL::forceScheme($appScheme);
+        }
+
         \Event::listen(TenancyBootstrapped::class, function () {
             $tenantId = tenant('id');
 

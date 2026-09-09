@@ -7,6 +7,8 @@ use App\Enum\ActiveEnum;
 use Illuminate\Validation\Rule;
 use Modules\User\Entities\User;
 use Hekmatinasser\Verta\Facades\Verta;
+use Modules\Place\app\Models\Place;
+use Modules\Service\app\Models\Service;
 use Modules\AppointmentUser\app\Jobs\CacheJob;
 use Modules\AppointmentSetting\app\Models\AppointmentSegment;
 use Modules\AppointmentSetting\app\Models\AppointmentSetting;
@@ -681,13 +683,20 @@ class GeneralSetting extends Component
     }
     public function mount()
     {
-        $this->fetchData['user']            =  request()->route('user');
-        $this->fetchData['service_id']      =  request()->route('service');
-        $this->fetchData['place']           =  request()->route('place');
+        $routeUser = request()->route('user');
+        $routeService = request()->route('service');
+        $routePlace = request()->route('place');
+
+        $this->fetchData['user'] = $routeUser instanceof User
+            ? $routeUser
+            : User::find($routeUser);
+        $this->fetchData['service_id'] = $routeService instanceof Service
+            ? $routeService->getKey()
+            : $routeService;
+        $this->fetchData['place'] = $routePlace instanceof Place
+            ? $routePlace->getKey()
+            : $routePlace;
         $this->fetchData['operator']        = User::operators();
-        if (isset($this->fetchData['place'])) {
-            $this->fetchData['place'] =   $this->fetchData['place']->id;
-        }
         if (!empty($this->fetchData['user'])) {
             $this->fetchData['doctor'] =  $this->fetchData['user'];
         } else {

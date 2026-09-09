@@ -270,7 +270,7 @@ class SpecificDayAppointmentRegistrationModal extends Component
             appointmentVia: AppointmentVia::BY_ADMIN,
             sendSmsToUser: $sms_status,
             serviceId: $this->serviceId ?? $this->fetchData['service']?->id,
-            placeId: $this->placeId->id,
+            placeId: $this->placeId,
             agentId: auth()->user()->id,
             operatorId: $oprator,
             kind: isset($this->form['kind']) ? $this->form['kind'] : null,

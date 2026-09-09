@@ -65,11 +65,15 @@ class ListOfAvailableDay extends Component
     public function mount($doctorId, $sectionId, $placeId)
     {
         $segmentItemId   =  request()->get('segmentItemId', null);
-        $this->fethData['service'] = $sectionId;
-        $this->fethData['doctor']  = $doctorId;
-        $this->fethData['place']   = $placeId;
+        $doctor = $doctorId instanceof User ? $doctorId : User::findOrFail($doctorId);
+        $service = $sectionId instanceof Service ? $sectionId : Service::findOrFail($sectionId);
+        $place = $placeId instanceof Place ? $placeId : Place::findOrFail($placeId);
 
-        $appointmentSetting = AppointmentSetting::SpecialOrGeneralSetting($doctorId->id, $sectionId->id, $placeId->id);
+        $this->fethData['service'] = $service;
+        $this->fethData['doctor']  = $doctor;
+        $this->fethData['place']   = $place;
+
+        $appointmentSetting = AppointmentSetting::SpecialOrGeneralSetting($doctor->id, $service->id, $place->id);
 
         // redirect user if setting dosent exist
         if (empty($appointmentSetting)) {

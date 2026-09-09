@@ -5,7 +5,7 @@
             <!-- CONTAINER OPEN -->
             <div class="col col-login mx-auto text-center">
                 <a href="{{url('index')}}" class="text-center">
-                    <img src="{{asset('assets/images/brand/logo.png')}}" class="header-brand-img" alt="">
+                    <img src="{{ admin_asset('images/brand/logo.png') }}" class="header-brand-img" alt="">
                 </a>
             </div>
             <div class="container-login100">

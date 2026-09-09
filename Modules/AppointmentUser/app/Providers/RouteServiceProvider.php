@@ -26,6 +26,7 @@ class RouteServiceProvider extends ServiceProvider
     public function boot(): void
     {
         parent::boot();
+        $this->bindingModel();
     }
 
     /**
@@ -36,7 +37,6 @@ class RouteServiceProvider extends ServiceProvider
         $this->mapApiRoutes();
         $this->mapWebRoutes();
         $this->mapAdminRoutes();
-        $this->bindingModel();
     }
 
     /**

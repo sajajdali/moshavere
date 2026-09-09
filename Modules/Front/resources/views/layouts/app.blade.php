@@ -11,12 +11,12 @@
     <meta name="author" content="شمیران وب">
     <meta name="keywords" content="{{ setting(Modules\Setting\Enum\SettingKeyEnum::SITE_TITLE) }}">
     <!-- Favicon -->
-    <link rel="apple-touch-icon" sizes="76x76" href="{{ front_asset('/assets/images/favicon/apple-touch-icon.png') }}">
+    <link rel="apple-touch-icon" sizes="76x76" href="{{ asset('default/admin/favicon/apple-touch-icon.png') }}">
     <link rel="icon" type="image/png" sizes="32x32"
-        href="{{ front_asset('/assets/images/favicon/favicon-32x32.png') }}">
+        href="{{ asset('default/admin/favicon/favicon-32x32.png') }}">
     <link rel="icon" type="image/png" sizes="16x16"
-        href="{{ front_asset('/assets/images/favicon/favicon-16x16.png') }}">
-    <link rel="manifest" href="{{ front_asset('/assets/images/favicon/site.webmanifest') }}">
+        href="{{ asset('default/admin/favicon/favicon-16x16.png') }}">
+    <link rel="manifest" href="{{ asset('default/admin/favicon/site.webmanifest') }}">
     <meta name="msapplication-TileColor" content="#ffffff">
     <meta name="theme-color" content="#ffffff">
     <!-- TITLE -->

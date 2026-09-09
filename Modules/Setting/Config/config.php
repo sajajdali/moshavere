@@ -45,5 +45,5 @@ return [
 
     ],
 
-    'setting' => require_once __DIR__ . '/setting.php'
+    'setting' => require __DIR__ . '/setting.php'
 ];

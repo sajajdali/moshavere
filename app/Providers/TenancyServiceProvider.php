@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Providers;
 
+use App\Http\Middleware\InitializeTenancyForNonCentralDomain;
 use Artisan;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Event;
@@ -42,14 +43,10 @@ class TenancyServiceProvider extends ServiceProvider
         $this->makeTenancyMiddlewareHighestPriority();
 
         Livewire::setUpdateRoute(function ($handle) {
-            $middleware = ['web'];
-
-            if (!in_array(request()->getHost(), config('tenancy.central_domains', []))) {
-                $middleware[] = \Stancl\Tenancy\Middleware\InitializeTenancyByDomain::class;
-                $middleware[] = \Stancl\Tenancy\Middleware\PreventAccessFromCentralDomains::class;
-            }
-
-            return Route::post('/livewire/update', $handle)->middleware($middleware);
+            return Route::post('/livewire/update', $handle)->middleware([
+                'web',
+                InitializeTenancyForNonCentralDomain::class,
+            ]);
         });
 
         FilePreviewController::$middleware = ['web', 'universal', InitializeTenancyByDomain::class];

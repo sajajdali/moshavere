@@ -25,10 +25,10 @@ class Login extends Component
     public function mount()
     {
         if (auth()->check() && auth()->user()->can('ADMIN_ACCESS')) {
-            return redirect()->route('admin.dashboard');
+            return redirect()->to($this->dashboardUrl());
         }
         if (auth()->check()) {
-            return redirect()->route('admin.dashboard');
+            return redirect()->to($this->dashboardUrl());
         }
     }
 
@@ -43,7 +43,7 @@ class Login extends Component
         //     ->verify($this->recaptcha, request()->ip());
         // if ($resp->isSuccess()) {
             if (auth()->attempt(['mobile' => $this->mobile, 'password' => $this->password], true)) {
-                return redirect()->route('admin.dashboard');
+                return redirect()->to($this->dashboardUrl());
             }
             $this->message = 'ایمیل یا رمز عبور اشتباه است';
         // } else {
@@ -55,5 +55,23 @@ class Login extends Component
     public function render()
     {
         return view('admin::livewire.login');
+    }
+
+    private function dashboardRoute(): string
+    {
+        return in_array(request()->getHost(), config('tenancy.central_domains', []), true)
+            ? 'central.dashboard'
+            : 'admin.dashboard';
+    }
+
+    private function dashboardUrl(): string
+    {
+        $route = $this->dashboardRoute();
+
+        if ($route === 'central.dashboard') {
+            return rtrim(config('app.url'), '/') . route($route, [], false);
+        }
+
+        return route($route);
     }
 }

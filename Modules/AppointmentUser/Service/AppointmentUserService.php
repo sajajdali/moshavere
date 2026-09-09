@@ -180,8 +180,7 @@ class AppointmentUserService
         $dates = [
             $setting->times()->max('special_date'),
             $setting->user->absence()->max('end_at'),
-            AppointmentUser::where('doctor_id', $setting->user_id)
-                ->where('kind', AppointmentUserKindEnum::IN_PERSION)->max('date_visit'),
+            AppointmentUser::where('doctor_id', $setting->user_id)->max('date_visit'),
             Event::where('is_holiday', '1')->max('date'),
         ];
         foreach ($dates as $date) {
@@ -234,9 +233,8 @@ class AppointmentUserService
         // Appointments -> pre-group by Y-m-d for O(1) day lookups
         $appointments = AppointmentUser::query()
             ->where('doctor_id', $doctorId)
-            ->where('kind', AppointmentUserKindEnum::IN_PERSION)
-            ->when($checkForInterface == false && $appointmentSetting->service_id != null, function ($q) use ($appointmentSetting) {
-                return $q->where('service_id', $appointmentSetting->service_id);
+            ->when($checkForInterface == false, function ($q) use ($appointmentSetting) {
+                return $q->where('appointment_setting_id', $appointmentSetting->id);
             })
             ->whereBetween('date_visit', [$startDate, $endDate->copy()->endOfDay()])
             ->orderBy('date_visit')

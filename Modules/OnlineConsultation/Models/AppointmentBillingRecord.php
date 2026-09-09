@@ -4,7 +4,7 @@ namespace Modules\OnlineConsultation\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Modules\AppointmentUser\app\Models\AppointmentUser;
-use Modules\User\App\Models\UserWallet;
+use Modules\User\app\Models\UserWallet;
 use Modules\User\Entities\User;
 
 class AppointmentBillingRecord extends Model

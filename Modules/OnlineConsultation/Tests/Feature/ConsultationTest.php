@@ -10,7 +10,7 @@ use Modules\OnlineConsultation\Models\ConsultationPractitioner;
 use Modules\OnlineConsultation\Models\ConsultationSetting;
 use Modules\OnlineConsultation\Services\AppointmentBillingService;
 use Modules\AppointmentUser\app\Models\AppointmentUser;
-use Modules\User\App\Models\UserWallet;
+use Modules\User\app\Models\UserWallet;
 use Modules\User\Entities\User;
 use Spatie\Permission\Models\Permission;
 use Spatie\Permission\PermissionRegistrar;

@@ -5,7 +5,7 @@ namespace Modules\User\service;
 use Exception;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
-use Modules\User\App\Models\UserWallet;
+use Modules\User\app\Models\UserWallet;
 use Modules\User\Entities\User;
 
 class WalletService

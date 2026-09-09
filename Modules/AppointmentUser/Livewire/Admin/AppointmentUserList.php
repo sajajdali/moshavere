@@ -2,6 +2,9 @@
 
 namespace Modules\AppointmentUser\Livewire\Admin;
 
+use Carbon\Carbon;
+use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
+use Illuminate\Support\Facades\DB;
 use Livewire\Component;
 use Livewire\Attributes\On;
 use Livewire\Attributes\Url;
@@ -15,14 +18,16 @@ use Hekmatinasser\Verta\Facades\Verta;
 use Modules\Service\app\Models\Service;
 use Illuminate\Support\Facades\Validator;
 use Modules\AppointmentUser\app\Models\AppointmentUser;
+use Modules\AppointmentUser\app\Notifications\AppointmentSmsNotification;
 use Modules\AppointmentUser\Traits\OprationButtonsTrait;
 use Modules\AppointmentUser\Enum\AppointmentUserKindEnum;
 use Modules\AppointmentUser\Enum\AppointmentUserStatusEnum;
 use Modules\AppointmentUser\app\Exports\AppointmentListExport;
+use Modules\Setting\Enum\SettingKeyEnum;
 
 class AppointmentUserList extends Component
 {
-    use WithPagination, OprationButtonsTrait;
+    use AuthorizesRequests, WithPagination, OprationButtonsTrait;
     #[Url]
     public array $search = [
         'user_id'              => null,
@@ -43,6 +48,14 @@ class AppointmentUserList extends Component
     public array $fetchData = [];
     public array $setting = [];
     public array $form = [];
+    public array $quickTimeEdit = [
+        'appointment_id' => null,
+        'date' => null,
+        'start_time' => null,
+        'end_time' => null,
+        'send_sms' => false,
+    ];
+    public array $quickTimeEditMeta = [];
     public bool $showcollaps = true;
     public ?string $msg = null;
     #[Url]
@@ -102,11 +115,96 @@ class AppointmentUserList extends Component
         $this->search['appointment_date'] = Verta::now()->format('Y/m/d');
     }
 
+    public function openQuickTimeEdit(int $appointmentId): void
+    {
+        $appointment = AppointmentUser::with(['user', 'doctor'])->findOrFail($appointmentId);
+        $this->authorize('update', $appointment);
+
+        $this->resetValidation();
+        $this->quickTimeEdit = [
+            'appointment_id' => $appointment->id,
+            'date' => verta($appointment->date_visit)->format('Y/m/d'),
+            'start_time' => substr((string) $appointment->start_time, 0, 5),
+            'end_time' => substr((string) $appointment->end_time, 0, 5),
+            'send_sms' => false,
+        ];
+        $this->quickTimeEditMeta = [
+            'patient' => $appointment->user?->full_name ?? 'کاربر حذف شده',
+            'doctor' => $appointment->doctor?->full_name ?? 'پزشک حذف شده',
+            'tracking_code' => $appointment->tracking_code,
+        ];
+
+        $this->dispatch('openQuickTimeEditModal');
+    }
+
+    public function saveQuickTimeEdit(): void
+    {
+        $validated = $this->validate([
+            'quickTimeEdit.appointment_id' => ['required', 'integer'],
+            'quickTimeEdit.date' => ['required', 'string'],
+            'quickTimeEdit.start_time' => ['required', 'date_format:H:i'],
+            'quickTimeEdit.end_time' => ['required', 'date_format:H:i', 'after:quickTimeEdit.start_time'],
+            'quickTimeEdit.send_sms' => ['boolean'],
+        ], [
+            'quickTimeEdit.date.required' => 'تاریخ نوبت را انتخاب کنید.',
+            'quickTimeEdit.start_time.required' => 'ساعت شروع را وارد کنید.',
+            'quickTimeEdit.start_time.date_format' => 'فرمت ساعت شروع صحیح نیست.',
+            'quickTimeEdit.end_time.required' => 'ساعت پایان را وارد کنید.',
+            'quickTimeEdit.end_time.date_format' => 'فرمت ساعت پایان صحیح نیست.',
+            'quickTimeEdit.end_time.after' => 'ساعت پایان باید بعد از ساعت شروع باشد.',
+        ]);
+
+        try {
+            $date = Verta::parse($validated['quickTimeEdit']['date'])->toCarbon();
+        } catch (\Throwable) {
+            $this->addError('quickTimeEdit.date', 'تاریخ انتخاب‌شده معتبر نیست.');
+
+            return;
+        }
+
+        $appointment = AppointmentUser::findOrFail($validated['quickTimeEdit']['appointment_id']);
+        $this->authorize('update', $appointment);
+
+        $startTime = $validated['quickTimeEdit']['start_time'];
+        $endTime = $validated['quickTimeEdit']['end_time'];
+        [$hour, $minute] = array_map('intval', explode(':', $startTime));
+        $oldDate = $appointment->date_visit->copy();
+
+        DB::transaction(function () use ($appointment, $date, $hour, $minute, $startTime, $endTime): void {
+            $appointment->update([
+                'date_visit' => Carbon::instance($date)->setTime($hour, $minute)->toDateTimeString(),
+                'start_time' => $startTime . ':00',
+                'end_time' => $endTime . ':00',
+            ]);
+        });
+
+        $appointment->refresh();
+        $appointment->setting?->runGenerateCacheJob(specialDayConvert($oldDate));
+        if (! $appointment->date_visit->isSameDay($oldDate)) {
+            $appointment->setting?->runGenerateCacheJob(specialDayConvert($appointment->date_visit));
+        }
+
+        $smsQueued = false;
+        if ($validated['quickTimeEdit']['send_sms']) {
+            $smsTemplate = setting(SettingKeyEnum::SMS_APPOINTMENT_TIME_UPDATE);
+            if (filled($smsTemplate) && filled($appointment->user?->mobile)) {
+                $appointment->notify(new AppointmentSmsNotification($smsTemplate));
+                $smsQueued = true;
+            }
+        }
+
+        $this->msg = match (true) {
+            $smsQueued => 'زمان نوبت با موفقیت تغییر کرد و پیامک تغییر زمان در صف ارسال قرار گرفت.',
+            $validated['quickTimeEdit']['send_sms'] => 'زمان نوبت تغییر کرد؛ اما قالب پیامک یا شماره موبایل بیمار در دسترس نبود.',
+            default => 'زمان نوبت با موفقیت تغییر کرد.',
+        };
+        $this->dispatch('closeQuickTimeEditModal');
+        $this->dispatch('loadJs');
+    }
+
     #[Computed]
     private function handleSearch($isExported = false)
     {
-        $this->msg = '';
-        $this->resetErrorBag();
         $permisstion_check = auth()->user();
         $query = AppointmentUser::query();
         $searchCriteria = [

@@ -42,6 +42,12 @@
         .appointment-selection{display:flex;align-items:center;gap:14px;padding:12px 18px;background:#eefaf8;border-bottom:1px solid #cdeae5}
         .appointment-selection strong{font-size:13.5px;color:#0f5f59}
         .appointment-table-wrap{overflow-x:auto}
+        .appointment-card.has-open-operation,.appointment-table-wrap.has-open-operation{overflow:visible}
+        .appointment-row.operation-is-open{position:relative;z-index:20}
+        .appointment-row .dropdown-menu{z-index:1090;min-width:230px;border:1px solid #e4e7ec;border-radius:11px;padding:6px;box-shadow:0 14px 32px rgba(16,24,40,.16)}
+        .appointment-row .dropdown-menu li a{display:flex;align-items:center;gap:9px;padding:8px 10px;border-radius:7px;color:#344054;font-size:12.5px;white-space:nowrap}
+        .appointment-row .dropdown-menu li a:hover{background:#f2f4f7;text-decoration:none}
+        .appointment-row .dropdown-menu li a i{width:16px;text-align:center}
         .appointment-table{min-width:1480px}
         .appointment-grid{display:grid;grid-template-columns:42px 58px minmax(170px,.9fr) 1.15fr 128px 1fr 1fr 118px 168px 120px 126px;align-items:center}
         .appointment-head{padding:0 8px;background:#f9fafb;border-bottom:1px solid #e6e8ec;position:sticky;top:0;z-index:5}
@@ -59,6 +65,28 @@
         .om-ellipsis{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
         .appointment-detail{padding:16px 20px 18px;background:#fbfcfd;border-bottom:1px solid #eef0f3;display:grid;grid-template-columns:2fr 1fr 1fr;gap:22px}
         .appointment-footer{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:14px;padding:14px 18px;border-top:1px solid #eef0f3}
+        .quick-time-modal .modal-content{border:0;border-radius:20px;overflow:hidden;box-shadow:0 24px 60px rgba(16,24,40,.22)}
+        .quick-time-modal .modal-header{padding:20px 22px;border-bottom:1px solid #eef0f3;background:linear-gradient(135deg,#f0fdfa 0%,#fff 72%)}
+        .quick-time-modal .modal-title-wrap{display:flex;align-items:center;gap:12px}
+        .quick-time-modal .modal-icon{width:42px;height:42px;border-radius:12px;display:flex;align-items:center;justify-content:center;background:#0f766e;color:#fff;font-size:18px;box-shadow:0 8px 18px rgba(15,118,110,.2)}
+        .quick-time-modal .modal-title{font-size:17px;font-weight:700;color:#101828;margin:0}
+        .quick-time-modal .modal-subtitle{font-size:12.5px;color:#667085;margin-top:3px}
+        .quick-time-modal .modal-body{padding:22px}
+        .quick-time-summary{display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:12px 14px;margin-bottom:18px;border-radius:12px;background:#f8fafc;border:1px solid #eaecf0}
+        .quick-time-summary span{display:block;font-size:11.5px;color:#98a2b3;margin-bottom:3px}
+        .quick-time-summary strong{font-size:13px;color:#344054;font-weight:600}
+        .quick-time-field{display:flex;flex-direction:column;gap:7px}
+        .quick-time-field label{font-size:12.5px;font-weight:600;color:#344054;margin:0}
+        .quick-time-field input{width:100%;height:46px;border:1px solid #d0d5dd;border-radius:10px;padding:0 13px;background:#fff;color:#101828;font-size:14px;outline:none}
+        .quick-time-field input:focus{border-color:#0f766e;box-shadow:0 0 0 3px rgba(15,118,110,.1)}
+        .quick-time-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:14px}
+        .quick-time-warning{display:flex;gap:10px;align-items:flex-start;margin-top:16px;padding:12px 14px;border:1px solid #fedf89;border-radius:11px;background:#fffaeb;color:#93370d;font-size:12.5px;line-height:1.8}
+        .quick-time-sms{display:flex;align-items:center;gap:12px;margin-top:14px;padding:13px 14px;border:1px solid #d1e9ff;border-radius:11px;background:#f5fbff;cursor:pointer}
+        .quick-time-sms input{width:18px;height:18px;accent-color:#0f766e;flex:none}
+        .quick-time-sms strong{display:block;color:#1849a9;font-size:13px}
+        .quick-time-sms small{display:block;color:#475467;font-size:11.5px;margin-top:2px}
+        .quick-time-modal .modal-footer{padding:16px 22px;border-top:1px solid #eef0f3;background:#fbfcfd;gap:8px}
+        .quick-time-error{font-size:11.5px;color:#d92d20;margin-top:1px}
         .pagination{margin:0}
         @media (max-width: 1200px){.appointment-filter-grid{grid-template-columns:repeat(2,1fr)}}
         @media (max-width: 768px){.appointment-list-page{padding:0 0 28px}.appointment-filter-grid{grid-template-columns:1fr}.appointment-actions{width:100%}.om-btn{flex:1}.appointment-title{font-size:22px}}
@@ -248,7 +276,11 @@
                             </div>
                             <div class="d-flex flex-column gap-1">
                                 <span style="font-size:14.5px;font-weight:700;color:#101828" dir="ltr">{{ verta($ap->date_visit)->format('Y/m/d') }}</span>
-                                <span class="om-muted" dir="ltr">{{ $ap->kind == \Modules\AppointmentUser\Enum\AppointmentUserKindEnum::IN_PERSION ? verta($ap->start_time)->format('H:i') : '-' }}</span>
+                                <span class="om-muted" dir="ltr">
+                                    {{ filled($ap->start_time) ? substr($ap->start_time, 0, 5) : '--:--' }}
+                                    تا
+                                    {{ filled($ap->end_time) ? substr($ap->end_time, 0, 5) : '--:--' }}
+                                </span>
                             </div>
                             <div class="d-flex flex-column gap-1">
                                 <span class="om-ellipsis" style="font-size:13px;color:#344054">{{ $ap->service?->title ?? 'سرویس حذف شده' }}</span>
@@ -269,8 +301,8 @@
                             <div class="d-flex align-items-center gap-2">
                                 @canany(['update', 'delete'], $ap)
                                     <div class="btn-group w-100">
-                                        <button type="button" class="om-status dropdown-toggle" style="{{ $statusClass }}" data-bs-toggle="dropdown">{{ $ap->status->getName() }}</button>
-                                        <ul class="dropdown-menu" role="menu">@include('appointmentuser::components.appointmentlist.operationbutton')</ul>
+                                        <button type="button" class="om-status dropdown-toggle" style="{{ $statusClass }}" data-bs-toggle="dropdown" data-bs-boundary="viewport">{{ $ap->status->getName() }}</button>
+                                        <ul class="dropdown-menu dropdown-menu-end" role="menu">@include('appointmentuser::components.appointmentlist.operationbutton', ['quickTimeEditEnabled' => true])</ul>
                                     </div>
                                 @else
                                     <span class="om-status" style="{{ $statusClass }}">{{ $ap->status->getName() }}</span>
@@ -336,6 +368,7 @@
         <div>
             @include('appointmentuser::components.appointmentlist.disapprovemodal')
             @include('appointmentuser::components.appointmentlist.feedbackmodal')
+            @include('appointmentuser::components.appointmentlist.quicktimeeditmodal')
         </div>
     </div>
 </div>
@@ -368,7 +401,33 @@
                 });
             }
             js();
+            $(document).off('show.bs.dropdown.appointmentOperations hidden.bs.dropdown.appointmentOperations')
+                .on('show.bs.dropdown.appointmentOperations', '.appointment-row .btn-group', function() {
+                    $(this).closest('.appointment-row').addClass('operation-is-open');
+                    $(this).closest('.appointment-table-wrap').addClass('has-open-operation');
+                    $(this).closest('.appointment-card').addClass('has-open-operation');
+                })
+                .on('hidden.bs.dropdown.appointmentOperations', '.appointment-row .btn-group', function() {
+                    $(this).closest('.appointment-row').removeClass('operation-is-open');
+                    $(this).closest('.appointment-table-wrap').removeClass('has-open-operation');
+                    $(this).closest('.appointment-card').removeClass('has-open-operation');
+                });
             Livewire.on('loadJs', function() { setTimeout(js, 500); });
+            Livewire.on('openQuickTimeEditModal', function() {
+                setTimeout(function() {
+                    const modalElement = document.getElementById('quickTimeEditModal');
+                    if (modalElement) {
+                        bootstrap.Modal.getOrCreateInstance(modalElement, { keyboard: false }).show();
+                        js();
+                    }
+                }, 100);
+            });
+            Livewire.on('closeQuickTimeEditModal', function() {
+                const modalElement = document.getElementById('quickTimeEditModal');
+                if (modalElement) {
+                    bootstrap.Modal.getOrCreateInstance(modalElement).hide();
+                }
+            });
             Livewire.on('lunchModal', function() {
                 setTimeout(function() {
                     new bootstrap.Modal(document.getElementById('resoanForDisapproveModal'), { keyboard: false }).show();

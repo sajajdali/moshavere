@@ -1,3 +1,19 @@
+@if ($quickTimeEditEnabled ?? false)
+    @can('update', $ap)
+        @if (! in_array($ap->status, [
+            Modules\AppointmentUser\Enum\AppointmentUserStatusEnum::STATUS_CANCEL,
+            Modules\AppointmentUser\Enum\AppointmentUserStatusEnum::STATUS_DISAPPROVED,
+        ], true))
+            <li>
+                <a wire:click.prevent="openQuickTimeEdit({{ $ap->id }})" href="#">
+                    <i class="fa fa-clock-o text-primary" aria-hidden="true"></i>
+                    ویرایش سریع زمان
+                </a>
+            </li>
+        @endif
+    @endcan
+@endif
+
 @if ($ap->status == Modules\AppointmentUser\Enum\AppointmentUserStatusEnum::STATUS_WAIT_PAYMENT)
 <li>
     <a wire:click='resendPaymentSms({{ $ap->id }})' href="#" data-label="ویرایش">

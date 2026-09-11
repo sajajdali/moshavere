@@ -5,13 +5,14 @@
 <a class="oc-btn oc-btn-primary" href="{{ route('admin.consultation.practitioners.create') }}"><i class="fa-solid fa-plus" aria-hidden="true"></i>افزودن پزشک / کارشناس</a>
 @endsection
 @section('consultation-content')
-<div class="oc-notice"><i class="fa-solid fa-circle-info" aria-hidden="true"></i><p>اتصال تماس به سرور ویپ هنوز راه‌اندازی نشده است. تنظیمات و اعضا را آماده کنید؛ وضعیت آماده / مشغول فعلاً دستی است.</p></div>
+<div class="oc-notice"><i class="fa-solid fa-circle-info" aria-hidden="true"></i><p>درخواست تماس مشاور به endpoint تنظیم‌شده ارسال می‌شود؛ شماره‌گیری بیمار، پخش پیام و اتصال داخلی را سرور PBX انجام می‌دهد. وضعیت آماده / مشغول فعلاً دستی است.</p></div>
 <div class="oc-stack">
     <div class="oc-stats">
         @foreach([
             ['مشاوره‌های امروز', $todayCount, 'fa-calendar-check', ''],
             ['آماده پاسخ‌گویی', $readyCount, 'fa-user-check', 'oc-stat-green'],
             ['تماس‌های جاری', $activeCalls, 'fa-phone-volume', 'oc-stat-purple'],
+            ['عدم حضور تأییدشده امروز', $patientNoShowCount, 'fa-user-xmark', 'oc-stat-orange'],
             ['بی‌پاسخ‌های امروز', $missedCalls, 'fa-phone-slash', 'oc-stat-orange'],
         ] as [$label, $value, $icon, $tone])
             <div class="oc-panel oc-stat {{ $tone }}"><div class="oc-stat-icon"><i class="fa-solid {{ $icon }}" aria-hidden="true"></i></div><div><span>{{ $label }}</span><strong>{{ $value }}</strong></div></div>
@@ -23,7 +24,7 @@
             <div class="oc-inline">
                 <span class="oc-badge {{ $settings->app_enabled ? 'oc-badge-success' : '' }}">اپلیکیشن: {{ $settings->app_enabled ? 'فعال' : 'غیرفعال' }}</span>
                 <span class="oc-badge {{ $settings->booking_enabled ? 'oc-badge-success' : '' }}">تنظیم رزرو: {{ $settings->booking_enabled ? 'فعال' : 'غیرفعال' }}</span>
-                <span class="oc-badge oc-badge-warning">اتصال ویپ: راه‌اندازی نشده</span>
+                <span class="oc-badge {{ $settings->voip_host ? 'oc-badge-success' : 'oc-badge-warning' }}">درخواست تماس: {{ $settings->voip_host ? 'آماده ارسال' : 'نیازمند آدرس سرور' }}</span>
             </div>
             <a class="oc-btn" href="{{ route('admin.consultation.practitioners') }}">مدیریت پزشکان و کارشناسان<i class="fa-solid fa-arrow-left" aria-hidden="true"></i></a>
         </div></div>
@@ -41,7 +42,7 @@
                 </tbody></table>
             </div>
         @endif
-        @if($consultations->hasPages())<div class="oc-pagination">{{ $consultations->links() }}</div>@endif
+        {{ $consultations->links('onlineconsultation::components.pagination') }}
     </section>
 </div>
 @endsection

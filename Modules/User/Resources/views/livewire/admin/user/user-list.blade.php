@@ -224,6 +224,13 @@
                                                                 عملیات <span class="caret"></span>
                                                             </button>
                                                             <ul class="dropdown-menu" role="menu">
+                                                                @can('viewReport', $user)
+                                                                    <li>
+                                                                        <a href="{{ route('admin.user.report', $user) }}">
+                                                                            <i class="fa fa-line-chart me-1"></i> گزارش جامع کاربر
+                                                                        </a>
+                                                                    </li>
+                                                                @endcan
                                                                 @can('update', $user)
                                                                     <li>
                                                                         @unless ($user->id === 1)
@@ -272,12 +279,11 @@
                                                             </ul>
                                                         </div>
                                                     @else
-                                                        <div class="btn-group mt-2 mb-2">
-                                                            <button type="button" class="btn btn-default dropdown-toggle"
-                                                                data-bs-toggle="dropdown">
-                                                                عملیات <span class="caret"></span>
-                                                            </button>
-                                                        </div>
+                                                        @can('viewReport', $user)
+                                                            <a class="btn btn-outline-primary mt-2 mb-2" href="{{ route('admin.user.report', $user) }}">
+                                                                <i class="fa fa-line-chart me-1"></i> گزارش جامع
+                                                            </a>
+                                                        @endcan
                                                     @endcanany
                                                 </td>
                                             </tr>

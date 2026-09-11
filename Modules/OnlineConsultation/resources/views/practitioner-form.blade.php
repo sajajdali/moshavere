@@ -61,7 +61,8 @@
         @include('onlineconsultation::field', ['name' => 'sip_secret', 'label' => 'رمز SIP', 'type' => 'password', 'help' => 'برای حفظ رمز قبلی، خالی بگذارید.'])
         <div class="oc-secret"><span class="oc-help">رمز ذخیره‌شده: {{ $person->getRawOriginal('sip_secret') ? 'دارد' : 'ندارد' }}</span><label class="oc-check" for="clear_sip_secret"><input class="oc-check-input" id="clear_sip_secret" type="checkbox" name="clear_sip_secret" value="1" @checked(old('clear_sip_secret'))><span class="oc-check-title">حذف رمز ذخیره‌شده</span></label></div>
         @include('onlineconsultation::field', ['name' => 'fee', 'label' => 'تعرفه اختصاصی (تومان)', 'type' => 'number', 'min' => 0, 'max' => 1000000000, 'help' => 'خالی بگذارید تا تعرفه پیش‌فرض سایت استفاده شود.'])
-        @include('onlineconsultation::field', ['name' => 'hourly_rate', 'label' => 'هزینه یک ساعت مشاوره (تومان)', 'type' => 'number', 'min' => 0, 'max' => 1000000000, 'help' => 'این نرخ هنگام ثبت نوبت Snapshot می‌شود و تغییرات بعدی روی نوبت‌های قبلی اثر ندارد.'])
+        @include('onlineconsultation::field', ['name' => 'hourly_rate', 'label' => 'مبلغ یک ساعت برای مراجعه‌کننده (تومان)', 'type' => 'number', 'min' => 0, 'max' => 1000000000, 'help' => 'مبنای مبلغ ویزیت و بازگشت وجه بیمار؛ هنگام ثبت نوبت Snapshot می‌شود.'])
+        @include('onlineconsultation::field', ['name' => 'payout_hourly_rate', 'label' => 'حق‌الزحمه یک ساعت کارشناس (تومان)', 'type' => 'number', 'min' => 0, 'max' => 1000000000, 'help' => 'مبنای سهم کارشناس از زمان مکالمه مالی؛ باید جدا از تعرفه مراجعه‌کننده ثبت شود.'])
         @include('onlineconsultation::field', ['name' => 'duration_minutes', 'label' => 'مدت اختصاصی جلسه (دقیقه)', 'type' => 'number', 'min' => 5, 'max' => 180, 'help' => 'خالی بگذارید تا مدت پیش‌فرض سایت استفاده شود.'])
         </div></div>
     </section>

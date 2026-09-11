@@ -15,7 +15,7 @@ class ConsultationPractitioner extends Model
     protected $casts = [
         'active' => 'boolean', 'app_access' => 'boolean',
         'sip_secret' => 'encrypted', 'weekly_schedule' => 'array',
-        'hourly_rate' => 'integer',
+        'hourly_rate' => 'integer', 'payout_hourly_rate' => 'integer',
     ];
 
     public function user()

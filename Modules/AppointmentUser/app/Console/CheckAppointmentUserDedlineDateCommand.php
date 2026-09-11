@@ -3,6 +3,7 @@
 namespace Modules\AppointmentUser\app\Console;
 
 use Illuminate\Console\Command;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Modules\Setting\Enum\SettingKeyEnum;
 use Symfony\Component\Console\Input\InputOption;
@@ -37,21 +38,54 @@ class CheckAppointmentUserDedlineDateCommand extends Command
     public function handle()
     {
 
-        $appointmentsToDelete = AppointmentUser::whereNotNull('deadline_at')
+        $appointmentIds = AppointmentUser::where('status', AppointmentUserStatusEnum::STATUS_WAIT_PAYMENT->value)
+            ->where('details->payment->status', true)
+            ->whereNotNull('deadline_at')
             ->where('deadline_at', '<', \now())
-            ->get();
-        if ($appointmentsToDelete->isNotEmpty()) {
-            $appointmentsToDelete->each(function ($appointment) {
-                if ($appointment->status == AppointmentUserStatusEnum::STATUS_WAIT_PAYMENT) {
-                    $smsTemplate = setting(SettingKeyEnum::SMS_APPOINTMENT_REMOVAL_WHEN_NON_PAYMENT);
-                    if (isset($smsTemplate)) {
-                        $appointment->notify(new AppointmentSmsNotification($smsTemplate));
-                    }
+            ->pluck('id');
+
+        $deletedCount = 0;
+        foreach ($appointmentIds as $appointmentId) {
+            $appointment = DB::transaction(function () use ($appointmentId) {
+                $appointment = AppointmentUser::whereKey($appointmentId)
+                    ->where('status', AppointmentUserStatusEnum::STATUS_WAIT_PAYMENT->value)
+                    ->where('details->payment->status', true)
+                    ->whereNotNull('deadline_at')
+                    ->where('deadline_at', '<', \now())
+                    ->lockForUpdate()
+                    ->first();
+
+                if (! $appointment) {
+                    return null;
                 }
+
+                $appointment->loadMissing('setting');
                 $appointment->delete();
-                Log::info($appointment->id . 'has been deleted');
+
+                return $appointment;
             });
-            Log::info($appointmentsToDelete->count() . 'appointmentUser has been deleted');
+
+            if (! $appointment) {
+                continue;
+            }
+
+            $deletedCount++;
+            $smsTemplate = setting(SettingKeyEnum::SMS_APPOINTMENT_REMOVAL_WHEN_NON_PAYMENT);
+            if (isset($smsTemplate)) {
+                try {
+                    $appointment->notify(new AppointmentSmsNotification($smsTemplate));
+                } catch (\Throwable $exception) {
+                    report($exception);
+                }
+            }
+            if ($appointment->setting && $appointment->date_visit) {
+                $appointment->setting->runGenerateCacheJob(specialDayConvert($appointment->date_visit));
+            }
+            Log::info($appointment->id . ' has been deleted after its payment deadline expired');
+        }
+
+        if ($deletedCount > 0) {
+            Log::info($deletedCount . ' appointmentUsers have been deleted after payment expiration');
         } else {
             Log::info('no appointment with deadline to delete');
         }

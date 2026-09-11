@@ -27,7 +27,7 @@ class ConsultantDashboardController extends Controller
         $previousDate = verta($from->copy()->subDay())->format('Y/m/d');
         $nextDate = verta($from->copy()->addDay())->format('Y/m/d');
         $practitioners = ConsultationPractitioner::with('user')->where('active', true)->orderBy('display_name')->get();
-        $appointments = $service->query($from, $to)->with(['callLogs', 'billingRecord.adjustments', 'billingRecord.approver'])->get()->groupBy('doctor_id');
+        $appointments = $service->query($from, $to)->with(['callLogs', 'billingRecord.adjustments', 'billingRecord.approver', 'consultationCase'])->get()->groupBy('doctor_id');
         $rows = $practitioners->map(fn ($profile) => ['profile' => $profile, 'stats' => $service->stats($appointments->get($profile->user_id, collect()))]);
 
         return view('onlineconsultation::consultant-dashboard.index', compact('rows', 'mode', 'selectedDate', 'selectedMonth', 'selectedYear', 'selectedMonthNumber', 'monthOptions', 'monthNames', 'years', 'previousDate', 'nextDate', 'from', 'to'));
@@ -45,7 +45,7 @@ class ConsultantDashboardController extends Controller
         $filters['month'] = $filters['month'] ?? verta()->format('Y/m');
         [$from, $to] = $service->period($filters['period'], $filters['period'] === 'month' ? $filters['month'] : ($filters['from'] ?? null), $filters['to'] ?? null);
         $monthOptions = $service->monthOptions();
-        $all = $service->query($from, $to, $practitioner->user_id)->with(['user', 'doctor', 'callLogs', 'billingRecord.adjustments', 'billingRecord.approver'])->latest('date_visit')->get()->map(fn ($a) => $service->decorate($a));
+        $all = $service->query($from, $to, $practitioner->user_id)->with(['user', 'doctor', 'callLogs', 'billingRecord.adjustments', 'billingRecord.approver', 'consultationCase'])->latest('date_visit')->get()->map(fn ($a) => $service->decorate($a));
         $stats = $service->stats($all);
         $items = $all->filter(function ($a) use ($filters) {
             $d = $a->dashboard;
@@ -94,7 +94,7 @@ class ConsultantDashboardController extends Controller
     {
         $period = $request->input('period', 'today');
         [$from, $to] = $service->period($period, $period === 'month' ? $request->input('month') : $request->input('from'), $request->input('to'));
-        $items = $service->query($from, $to)->with(['user', 'doctor', 'callLogs', 'billingRecord.adjustments'])->get()->map(fn ($a) => $service->decorate($a));
+        $items = $service->query($from, $to)->with(['user', 'doctor', 'callLogs', 'billingRecord.adjustments', 'consultationCase'])->get()->map(fn ($a) => $service->decorate($a));
 
         return $this->csv($items, 'مرکز');
     }
@@ -104,9 +104,9 @@ class ConsultantDashboardController extends Controller
         return response()->streamDownload(function () use ($items) {
             $out = fopen('php://output', 'w');
             fwrite($out, "\xEF\xBB\xBF");
-            fputcsv($out, ['کد نوبت', 'مشاور', 'بیمار', 'موبایل', 'زمان نوبت', 'وضعیت', 'علت', 'تماس بیمار', 'تماس مشاور', 'پاسخ', 'بی‌پاسخ', 'مکالمه (ثانیه)', 'پرداخت', 'بازگشت']);
+            fputcsv($out, ['کد نوبت', 'مشاور', 'بیمار', 'موبایل', 'زمان نوبت', 'وضعیت', 'علت', 'تماس بیمار', 'تماس مشاور', 'پاسخ', 'بی‌پاسخ در زمان نوبت', 'تماس زودهنگام', 'مکالمه (ثانیه)', 'پرداخت', 'بازگشت']);
             foreach ($items as $a) {
-                fputcsv($out, [$a->tracking_code ?: $a->id, $a->doctor?->fullName, $a->user?->fullName, $a->user?->mobile, $a->date_visit, $a->dashboard['status'], $a->dashboard['reason'], $a->dashboard['patient_attempts'], $a->dashboard['practitioner_attempts'], $a->dashboard['answered'], $a->dashboard['unanswered'], $a->dashboard['talk_seconds'], $a->billingRecord?->total_paid_amount, $a->billingRecord?->refunded_amount]);
+                fputcsv($out, [$a->tracking_code ?: $a->id, $a->doctor?->fullName, $a->user?->fullName, $a->user?->mobile, $a->date_visit, $a->dashboard['status'], $a->dashboard['reason'], $a->dashboard['patient_attempts'], $a->dashboard['practitioner_attempts'], $a->dashboard['answered'], $a->dashboard['unanswered'], $a->dashboard['early_calls'], $a->dashboard['talk_seconds'], $a->billingRecord?->total_paid_amount, $a->billingRecord?->refunded_amount]);
             }
             fclose($out);
         }, 'consultation-report-'.now()->format('Ymd-His').'.csv', ['Content-Type' => 'text/csv; charset=UTF-8']);

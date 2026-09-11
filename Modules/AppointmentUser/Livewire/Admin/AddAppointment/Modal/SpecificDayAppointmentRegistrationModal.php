@@ -5,23 +5,18 @@ namespace Modules\AppointmentUser\Livewire\Admin\AddAppointment\Modal;
 use Carbon\Carbon;
 use Livewire\Component;
 use Livewire\Attributes\On;
-use Matrix\Operators\Operator;
 use Modules\User\Entities\User;
 use Modules\User\Enum\UserMetaEnum;
-use Illuminate\Support\Facades\Cache;
 use Hekmatinasser\Verta\Facades\Verta;
-use Modules\Absence\app\Models\Absence;
 use Modules\Service\app\Models\Service;
 use Modules\Setting\Enum\SettingKeyEnum;
 use Modules\AppointmentUser\Enum\AppointmentVia;
 use Modules\AppointmentUser\Enum\model\UserModel;
-use Modules\AppointmentUser\app\Models\AppointmentUser;
 use Modules\AppointmentUser\Enum\model\AppointmentModel;
 use Modules\AppointmentUser\Enum\AppointmentUserKindEnum;
 use Modules\AppointmentUser\Enum\AppointmentUserTypeEnum;
 use Modules\AppointmentUser\Enum\model\UserModelAppointment;
 use Modules\AppointmentSetting\app\Models\AppointmentSetting;
-use Modules\AppointmentSetting\app\Enum\AppintmentSettingPaymentStatus;
 
 class SpecificDayAppointmentRegistrationModal extends Component
 {
@@ -32,7 +27,7 @@ class SpecificDayAppointmentRegistrationModal extends Component
         "last_name" => null,
         "appType" => 'main_app',
         "smsType" => 'send',
-        "kind" => AppointmentUserKindEnum::IN_PERSION,
+        "kind" => null,
     ];
     // "appType" => keys : main , subMainApp ;
     public array $fetchData = [];
@@ -44,16 +39,26 @@ class SpecificDayAppointmentRegistrationModal extends Component
     public $appDate;
     public $segmentId;
 
+    private function defaultForm(): array
+    {
+        return [
+            'number' => null,
+            'document' => null,
+            'document_number' => null,
+            'first_name' => null,
+            'last_name' => null,
+            'appType' => 'main_app',
+            'smsType' => 'send',
+            'kind' => count($this->fetchData['appointment_kinds'] ?? []) === 1
+                ? $this->fetchData['appointment_kinds'][0]['value']
+                : null,
+            'registerWithoutPayment' => ($this->fetchData['payment_link_enabled'] ?? false) ? true : null,
+        ];
+    }
+
     public function dismisModal()
     {
-        $this->form = [
-            "number" => null,
-            "document" => null,
-            "first_name" => null,
-            "last_name" => null,
-            "appType" => true,
-            "smsType" => true,
-        ];
+        $this->form = $this->defaultForm();
         if (isset($this->fetchData['user'])) {
             unset($this->fetchData['user']);
         }
@@ -66,18 +71,20 @@ class SpecificDayAppointmentRegistrationModal extends Component
     }
     public function privousStep()
     {
+        if ($this->step === 3) {
+            $this->step = 2;
 
-        $this->form = [
-            "number" => null,
-            "document" => null,
-            "first_name" => null,
-            "last_name" => null,
-            "appType" => 'main_app',
-            "smsType" => 'send',
-        ];
+            return;
+        }
+
         if (isset($this->fetchData['user'])) {
             unset($this->fetchData['user']);
         }
+        unset($this->fetchData['tempUser']);
+        $this->form['first_name'] = null;
+        $this->form['last_name'] = null;
+        $this->form['document'] = null;
+        $this->form['document_number'] = null;
         $this->step = 1;
     }
     public function numberSet()
@@ -86,18 +93,23 @@ class SpecificDayAppointmentRegistrationModal extends Component
         if ($this->step == 1) {
             $this->findeOrCreateUser();
         } elseif ($this->step == 2) {
-            $this->validate([
+            $rules = [
                 'form.first_name' => 'required',
                 'form.last_name' => 'required',
                 'form.time.from' => 'required',
                 'form.time.until' => 'required',
-            ]);
+            ];
+
+            if (count($this->fetchData['appointment_kinds'] ?? []) > 1) {
+                $rules['form.kind'] = 'required|in:'.implode(',', array_column($this->fetchData['appointment_kinds'], 'value'));
+            }
+
+            $this->validate($rules);
 
             if (!isset($this->fetchData['user'])) {
                 $this->createUser();
             }
             if (isset($this->fetchData['operators'])) {
-                $this->checkForAvaiableOperator();
                 $this->step = 3;
             } else {
                 return $this->storeAppointmentByAdmin();
@@ -105,13 +117,20 @@ class SpecificDayAppointmentRegistrationModal extends Component
         } elseif ($this->step == 3) {
             return $this->storeAppointmentByAdmin();
         } elseif ($this->step == 4) {
-            $this->storeApp();
-            $this->step = 1;
-            $this->form = [
-                "number" => null,
-                "document" => null,
-            ];
+            return $this->storeApp();
         }
+    }
+
+    public static function normalizeMobileNumber(string $number): string
+    {
+        $number = strtr($number, [
+            '۰' => '0', '۱' => '1', '۲' => '2', '۳' => '3', '۴' => '4',
+            '۵' => '5', '۶' => '6', '۷' => '7', '۸' => '8', '۹' => '9',
+            '٠' => '0', '١' => '1', '٢' => '2', '٣' => '3', '٤' => '4',
+            '٥' => '5', '٦' => '6', '٧' => '7', '٨' => '8', '٩' => '9',
+        ]);
+
+        return preg_replace('/[^0-9]/', '', $number) ?? '';
     }
 
     #[On('dateHasBeenChange')]
@@ -133,6 +152,10 @@ class SpecificDayAppointmentRegistrationModal extends Component
     }
     private function findeOrCreateUser()
     {
+        if (filled($this->form['number'] ?? null)) {
+            $this->form['number'] = self::normalizeMobileNumber((string) $this->form['number']);
+        }
+
         $this->validate([
             'form.number' => 'required_if:form.document_number,null|digits:11|nullable',
             'form.document_number' => 'required_if:form.number,null',
@@ -166,10 +189,20 @@ class SpecificDayAppointmentRegistrationModal extends Component
     private function fillUserInputs()
     {
         if (isset($this->fetchData['user'])) {
-            $this->form['document']   =  $this->fetchData['user']->document_number;
-            $this->form['first_name'] =  $this->fetchData['user']->first_name;
-            $this->form['last_name']  =  $this->fetchData['user']->last_name;
+            $user = $this->fetchData['user'];
+            $this->form['document'] = $this->loadedMetaValue($user, UserMetaEnum::DOCUMENT_NUMBER);
+            $this->form['document_number'] = $this->form['document'];
+            $this->form['first_name'] = $this->loadedMetaValue($user, UserMetaEnum::FIRST_NAME);
+            $this->form['last_name'] = $this->loadedMetaValue($user, UserMetaEnum::LAST_NAME);
         }
+    }
+
+    private function loadedMetaValue(User $user, UserMetaEnum $metaKey): ?string
+    {
+        return $user->metas
+            ->where('meta_key', $metaKey)
+            ->last()
+            ?->meta_value;
     }
     #[On('time')]
     public function setTime($from, $until)
@@ -213,25 +246,18 @@ class SpecificDayAppointmentRegistrationModal extends Component
         if ((setting(SettingKeyEnum::SECREYERY_SEND_LINK_FOR_APPOINTMENT) != null  &&
             isset($this->form['registerWithoutPayment']) &&  $this->form['registerWithoutPayment'] != 'false')) {
             if (setting(SettingKeyEnum::SMS_APPOINTMENT_WAITING_PAYMENT) == null) {
-                $this->addError('form.registerWithoutPayment', true);
+                return $this->addError('form.registerWithoutPayment', 'قالب پیامک ارسال لینک پرداخت تعریف نشده است.');
             }
         }
         $user = $this->fetchData['user'];
         $appointmentSetting = AppointmentSetting::findOrFail($this->appId);
-        //check for appointment kind
+        $availableKinds = self::resolveAvailableKinds($appointmentSetting->detail ?? []);
+        $kind = count($availableKinds) === 1
+            ? $availableKinds[0]
+            : AppointmentUserKindEnum::tryFrom((int) ($this->form['kind'] ?? 0));
 
-        if ($appointmentSetting->detail[AppointmentSetting::VISIT_TYPE_ONLINE] && $appointmentSetting->detail[AppointmentSetting::VISIT_TYPE_INPERSON]) {
-            if (!isset($this->form['kind']) || empty($this->form['kind'])) {
-                return $this->addError('AppKind', 'لطفا نوع نوبت را انتخاب کنید');
-            }
-        } else {
-            if ($appointmentSetting->detail[AppointmentSetting::VISIT_TYPE_ONLINE]) {
-                $this->form['kind'] = AppointmentUserKindEnum::ONLINE;
-            } elseif ($appointmentSetting->detail[AppointmentSetting::VISIT_TYPE_INPERSON]) {
-                $this->form['kind'] = AppointmentUserKindEnum::IN_PERSION;
-            } else {
-                $this->form['kind'] = AppointmentUserKindEnum::VOIP;
-            }
+        if (!$kind || !in_array($kind, $availableKinds, true)) {
+            return $this->addError('form.kind', 'لطفاً نوع نوبت را انتخاب کنید.');
         }
 
         // If he wants to take the appointmnet for someone else
@@ -241,8 +267,8 @@ class SpecificDayAppointmentRegistrationModal extends Component
         // main user data
         $mainUser = new UserModel(
             user: $user,
-            firstName: $user->first_name,
-            lastName: $user->last_name,
+            firstName: $this->form['first_name'],
+            lastName: $this->form['last_name'],
         );
         if (isset($this->appTime)) {
             $start_visit_time = explode(':', $this->appTime);
@@ -273,7 +299,7 @@ class SpecificDayAppointmentRegistrationModal extends Component
             placeId: $this->placeId,
             agentId: auth()->user()->id,
             operatorId: $oprator,
-            kind: isset($this->form['kind']) ? $this->form['kind'] : null,
+            kind: $kind,
             smsToDoctor: true,
             description: isset($this->form['description']) ? $this->form['description'] : '',
             type: $appointment_type,
@@ -305,14 +331,7 @@ class SpecificDayAppointmentRegistrationModal extends Component
     public function closeModal()
     {
         $this->dispatch('closeModal', true);
-        $this->form = [
-            "number" => null,
-            "document" => null,
-            "first_name" => null,
-            "last_name" => null,
-            "appType" => true,
-            "smsType" => true,
-        ];
+        $this->form = $this->defaultForm();
         unset($this->fetchData['user']);
     }
     public function messages()
@@ -324,90 +343,56 @@ class SpecificDayAppointmentRegistrationModal extends Component
             'form.first_name.required' => 'وارد کردن نام الزامی است',
             'form.last_name.required' => 'وارد کردن نام خانوادگی الزامی است',
             'form.time.from.required' => 'زمان نوبت به درستی انتخاب نشده است!',
+            'form.time.until.required' => 'زمان پایان نوبت به درستی انتخاب نشده است!',
+            'form.kind.required' => 'لطفاً نوع نوبت را انتخاب کنید.',
+            'form.kind.in' => 'نوع نوبت انتخاب‌شده معتبر نیست.',
         ];
     }
-    private function checkForAvaiableOperator()
+
+    public static function resolveAvailableKinds(array $detail): array
     {
-        // $selected_date_visit = (Verta::parse($this->appDate)->toCarbon());
-        // if (isset($this->appTime)) {
-        //     $start_visit_time = explode(':', $this->appTime);
-        // }
-        // $start_visit_time = explode(':', $this->form['time']['from']);
-        // $appTime = Verta::parse($this->appDate)->tocarbon()->setTime($start_visit_time[0], $start_visit_time[1])->toTimeString();
-        // $untilTimeString = $this->form['time']['until'];
-        // if ($untilTimeString) {
-        //     $endTime = Carbon::createFromTimeString($untilTimeString)->toTimeString();
-        // } else {
-        //     $endTime = Carbon::parse($appTime)->addMinutes($this->fetchData['app']->time_for_visit)->toTimeString();
-        // }
+        $kinds = [];
 
-        // $this->fetchData['appointmentUser_with_operator'] = AppointmentUser::whereNotNull('operator_id')
-        //     ->whereDate('date_visit', $selected_date_visit)
-        //     ->where(function ($query) use ($appTime, $endTime) {
-        //         // Check if the new appointment starts during an existing appointment
-        //         $query->where(function ($query) use ($appTime) {
-        //             $query->whereTime('start_time', '<=', $appTime)
-        //                 ->whereTime('end_time', '>', $appTime);
-        //         })
-        //             // Check if the new appointment ends during an existing appointment
-        //             ->orWhere(function ($query) use ($endTime) {
-        //                 $query->whereTime('start_time', '<', $endTime)
-        //                     ->whereTime('end_time', '>=', $endTime);
-        //             })
-        //             // Check if the new appointment completely overlaps an existing appointment
-        //             ->orWhere(function ($query) use ($appTime, $endTime) {
-        //                 $query->whereTime('start_time', '>=', $appTime)
-        //                     ->whereTime('end_time', '<=', $endTime);
-        //             });
-        //     })
-        //     ->get();
+        if (filter_var(data_get($detail, AppointmentSetting::VISIT_TYPE_INPERSON, false), FILTER_VALIDATE_BOOLEAN)) {
+            $kinds[] = AppointmentUserKindEnum::IN_PERSION;
+        }
+        if (filter_var(data_get($detail, AppointmentSetting::VISIT_TYPE_VOIP, false), FILTER_VALIDATE_BOOLEAN)) {
+            $kinds[] = AppointmentUserKindEnum::VOIP;
+        }
+        if (filter_var(data_get($detail, AppointmentSetting::VISIT_TYPE_ONLINE, false), FILTER_VALIDATE_BOOLEAN)) {
+            $kinds[] = AppointmentUserKindEnum::ONLINE;
+        }
 
+        // Older appointment settings represented VOIP by leaving both legacy flags off.
+        if ($kinds === [] && !array_key_exists(AppointmentSetting::VISIT_TYPE_VOIP, $detail)) {
+            $kinds[] = AppointmentUserKindEnum::VOIP;
+        }
 
-        // // todo::HERE
-        // //check for operator Absence
-        // $absence_of_operators = Absence::whereIn('user_id', array_keys($this->fetchData['operators']))
-        //     ->whereDate('start_at', '<=', $selected_date_visit)
-        //     ->whereDate('end_at', '>=', $selected_date_visit)
-        //     ->pluck('user_id')
-        //     ->toArray();
-
-        // $existing_operators = [];
-        // if ($this->fetchData['appointmentUser_with_operator']->isNotEmpty()) {
-        //     foreach ($this->fetchData['appointmentUser_with_operator'] as $appointmentUser) {
-        //         $existing_operators[] = $appointmentUser->operator_id;
-        //     }
-        // }
-        // // todo::HERE
-
-
-        // // Merge existing operators with absent operators
-        // $all_existing_or_absent_operators = array_merge($existing_operators, $absence_of_operators);
-
-        // if (!empty($all_existing_or_absent_operators)) {
-
-        //     $operatorsToDeleteFlipped = array_flip($all_existing_or_absent_operators);
-        //     $filteredOperators = array_diff_key($this->fetchData['operators'], $operatorsToDeleteFlipped);
-        //     return $this->fetchData['operators'] = $filteredOperators;
-        // }
-        return $this->fetchData['operators'] = User::operators()->mapWithKeys(fn($item) => [$item->id => $item->fullName])->toArray();
+        return $kinds;
     }
 
     public function mount()
     {
+        $this->fetchData['document_number_enabled'] = (bool) setting(SettingKeyEnum::APPOINTMENT_SET_APPOINTMENT_WITH_DOCUMENT_NUMBER);
+        $this->fetchData['payment_link_enabled'] = (bool) setting(SettingKeyEnum::SECREYERY_SEND_LINK_FOR_APPOINTMENT);
+
         if (isset($this->appId)) {
-            $app =  AppointmentSetting::find($this->appId);
-            $this->fetchData['app_kind'] =
-                [
-                    'online'    => isset($app->detail[AppointmentSetting::VISIT_TYPE_INPERSON]) ? $app->detail[AppointmentSetting::VISIT_TYPE_INPERSON] : false,
-                    'in_person' => isset($app->detail[AppointmentSetting::VISIT_TYPE_ONLINE])   ? $app->detail[AppointmentSetting::VISIT_TYPE_ONLINE]   : false,
-                ];
-            if ($app->detail[AppointmentSetting::VISIT_TYPE_ONLINE] || $app->detail[AppointmentSetting::VISIT_TYPE_INPERSON]) {
-                if ($app->detail[AppointmentSetting::VISIT_TYPE_INPERSON]) {
-                    $this->form['kind'] = AppointmentUserKindEnum::IN_PERSION;
-                } else {
-                    $this->form['kind'] = AppointmentUserKindEnum::ONLINE;
-                }
-            }
+            $app = AppointmentSetting::findOrFail($this->appId);
+            $availableKinds = self::resolveAvailableKinds($app->detail ?? []);
+            $kindPresentation = [
+                AppointmentUserKindEnum::IN_PERSION->value => ['icon' => 'fa-user-md', 'hint' => 'مراجعه به مطب', 'class' => 'in-person'],
+                AppointmentUserKindEnum::VOIP->value => ['icon' => 'fa-phone', 'hint' => 'تماس تلفنی (ویپ)', 'class' => 'voip'],
+                AppointmentUserKindEnum::ONLINE->value => ['icon' => 'fa-laptop', 'hint' => 'گفت‌وگوی آنلاین', 'class' => 'online'],
+            ];
+            $this->fetchData['appointment_kinds'] = array_map(
+                fn (AppointmentUserKindEnum $kind) => [
+                    'value' => $kind->value,
+                    'name' => $kind === AppointmentUserKindEnum::VOIP ? 'تلفنی (ویپ)' : $kind->getName(),
+                    ...$kindPresentation[$kind->value],
+                ],
+                $availableKinds
+            );
+            $this->form['kind'] = count($availableKinds) === 1 ? $availableKinds[0]->value : null;
             $this->fetchData['app'] = $app;
         }
         if (isset($this->appTime) && !empty($this->appTime)) {
@@ -430,16 +415,24 @@ class SpecificDayAppointmentRegistrationModal extends Component
         if (isset($this->serviceId)) {
             $this->fetchData['service'] = Service::find($this->serviceId);
         }
-        if (setting(SettingKeyEnum::SECREYERY_SEND_LINK_FOR_APPOINTMENT)) {
+        if ($this->fetchData['payment_link_enabled']) {
             $this->form['registerWithoutPayment'] = true;
         }
-        if ($app->detail[AppointmentSetting::OPERATORS][AppointmentSetting::STATUS] == true) {
-            foreach ($app->detail[AppointmentSetting::OPERATORS][AppointmentSetting::IDS] as $key => $user_id) {
-                $userName  = User::find($user_id)?->fullName ?? null;
-                $userid    =  User::find($user_id)?->id     ?? null;
-                if (!empty($userid)) {
-                    $this->fetchData['operators'][$userid] = $userName;
-                }
+        if ((bool) data_get($app->detail, AppointmentSetting::OPERATORS.'.'.AppointmentSetting::STATUS, false)) {
+            $operatorIds = array_filter((array) data_get($app->detail, AppointmentSetting::OPERATORS.'.'.AppointmentSetting::IDS, []));
+            $operators = User::query()
+                ->whereIn('id', $operatorIds)
+                ->get()
+                ->mapWithKeys(fn (User $user) => [
+                    $user->id => trim(
+                        $this->loadedMetaValue($user, UserMetaEnum::FIRST_NAME).' '.
+                        $this->loadedMetaValue($user, UserMetaEnum::LAST_NAME)
+                    ),
+                ])
+                ->toArray();
+
+            if ($operators !== []) {
+                $this->fetchData['operators'] = $operators;
             }
         }
     }

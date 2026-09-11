@@ -4,8 +4,15 @@ namespace Modules\Api\Http\Controllers\Voip;
 
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
+use Illuminate\Support\Facades\Schema;
 use Modules\Api\Trait\ApiHandlerTrait;
+use Modules\AppointmentUser\app\Models\AppointmentUser;
+use Modules\Front\app\Models\FeedBack;
 use Modules\OnlineConsultation\Models\AppointmentCallLog;
+use Modules\OnlineConsultation\Models\AppointmentConsultantHangup;
+use Modules\OnlineConsultation\Models\AppointmentConsultantNoAnswer;
+use Modules\OnlineConsultation\Models\AppointmentCallbackRequest;
+use Modules\OnlineConsultation\Support\ConsultationAccess;
 use Modules\OnlineConsultation\Services\AppointmentBillingService;
 
 class CallLogController extends Controller
@@ -19,8 +26,19 @@ class CallLogController extends Controller
 
     public function store(Request $request)
     {
-        $validator = validator($request->all(), [
+        $payload = $request->all();
+        if (! array_key_exists('survey_score', $payload)) {
+            $nestedScore = data_get($payload, 'additional_data.survey_score')
+                ?? data_get($payload, 'additional_data.score')
+                ?? data_get($payload, 'additional_data.rating');
+            if ($nestedScore !== null) {
+                $payload['survey_score'] = $nestedScore;
+            }
+        }
+
+        $validator = validator($payload, [
             'call_id' => ['required', 'string', 'max:100'],
+            'request_id' => ['nullable', 'string', 'max:120'],
             'appointment_id' => ['nullable', 'integer', 'exists:appointment_users,id'],
             'patient_phone' => ['required', 'string', 'max:40'],
             'operator_id' => ['nullable', 'integer', 'exists:users,id'],
@@ -37,27 +55,132 @@ class CallLogController extends Controller
             'hangup_cause' => ['nullable', 'integer', 'min:0'], 'responded_by' => ['nullable', 'string', 'max:255'],
             'direction' => ['nullable', 'string', 'in:INBOUND,OUTBOUND'],
             'additional_data' => ['nullable', 'array'], 'attempts' => ['nullable', 'array'],
+            'survey_score' => ['nullable', 'integer', 'between:1,5'],
+            'score' => ['nullable', 'integer', 'between:1,5'],
+            'rating' => ['nullable', 'integer', 'between:1,5'],
         ]);
         if ($validator->fails()) {
             return $this->badRequest(['status' => false, 'error_code' => VoipResponseCode::INVALID_CALL_LOG, 'message' => 'اطلاعات گزارش تماس نامعتبر است.', 'errors' => $validator->errors()->toArray()]);
         }
         $data = $validator->validated();
-        $data['raw_payload'] = $request->all();
-        $data['is_update'] = AppointmentCallLog::where('call_id', $data['call_id'])->exists();
-        $data['destination'] = $data['connected_destination'] ?? $data['primary_extension'] ?? null;
-        $isUpdate = $data['is_update'];
-        unset($data['is_update']);
-        $log = AppointmentCallLog::updateOrCreate(['call_id' => $data['call_id']], $data);
-        if ($log->appointment_id) {
-            $billing = app(AppointmentBillingService::class)->ensure($log->appointment);
-            if ($billing) app(AppointmentBillingService::class)->refresh($billing);
+        $callbackRequestId = $data['request_id'] ?? data_get($data, 'additional_data.request_id');
+        unset($data['request_id']);
+        if ($callbackRequestId !== null) {
+            $data['additional_data'] = array_merge($data['additional_data'] ?? [], ['request_id' => $callbackRequestId]);
         }
-        return $this->ok([
-            'status' => true,
-            'error_code' => VoipResponseCode::SUCCESS,
-            'message' => $isUpdate ? 'گزارش تماس به‌روزرسانی شد.' : 'گزارش تماس با موفقیت ثبت شد.',
-            'call_id' => $log->call_id,
-            'appointment_id' => $log->appointment_id,
-        ]);
+        $surveyScore = $this->surveyScore($data);
+        unset($data['survey_score'], $data['score'], $data['rating']);
+        if ($surveyScore !== null) {
+            $data['additional_data'] = array_merge($data['additional_data'] ?? [], [
+                'survey_score' => $surveyScore,
+            ]);
+        }
+        $data['raw_payload'] = $request->all();
+        return \Illuminate\Support\Facades\DB::transaction(function () use ($data, $surveyScore, $callbackRequestId) {
+            if (! empty($data['appointment_id'])) {
+                AppointmentUser::lockForUpdate()->findOrFail($data['appointment_id']);
+            }
+            $existingLog = AppointmentCallLog::where('call_id', $data['call_id'])->first();
+            if ($existingLog) {
+                $data['additional_data'] = array_merge(
+                    $existingLog->additional_data ?? [],
+                    $data['additional_data'] ?? []
+                );
+                $surveyScore ??= $existingLog->surveyScore();
+            }
+            $consultantHangup = AppointmentConsultantHangup::where('call_id', $data['call_id'])->first();
+            if ($consultantHangup) {
+                // The explicit consultant-hangup endpoint takes precedence over a
+                // generic or incorrectly attributed PBX hangup value.
+                $data['disconnected_by'] = 'DOCTOR';
+                $data['ended_at'] = $consultantHangup->hung_up_at;
+            }
+            $data['destination'] = $data['connected_destination'] ?? $data['primary_extension'] ?? null;
+            $isUpdate = $existingLog !== null;
+            $log = AppointmentCallLog::updateOrCreate(['call_id' => $data['call_id']], $data);
+            if ($callbackRequestId && ConsultationAccess::schemaReady(['appointment_callback_requests'])) {
+                AppointmentCallbackRequest::where('request_id', $callbackRequestId)
+                    ->when($log->appointment_id, fn ($query, $appointmentId) => $query->where('appointment_id', $appointmentId))
+                    ->update(['call_id' => $log->call_id, 'final_call_received_at' => now()]);
+            }
+            if ($log->isEarlyCall()) {
+                // A pre-appointment attempt is informational, never a consultant
+                // no-answer incident, even if events arrive out of order.
+                AppointmentConsultantNoAnswer::where('call_id', $log->call_id)->delete();
+            }
+            $consultantHangup = AppointmentConsultantHangup::where('call_id', $log->call_id)->first();
+            if ($consultantHangup && ($log->disconnected_by !== 'DOCTOR' || ! $log->ended_at?->equalTo($consultantHangup->hung_up_at))) {
+                $log->forceFill([
+                    'disconnected_by' => 'DOCTOR',
+                    'ended_at' => $consultantHangup->hung_up_at,
+                ])->save();
+            }
+            if ($log->appointment_id) {
+                $case = $log->appointment->consultationCase;
+                if ($case?->state === 'PATIENT_NO_SHOW' && ($log->direction !== 'OUTBOUND' || $log->final_result === 'ANSWERED' || $log->answered_at || $log->talk_duration_seconds > 0)) {
+                    $case->events()->firstOrCreate([
+                        'action' => 'NO_SHOW_CALL_RECEIVED',
+                        'reason' => 'گزارش تماس '.$log->call_id.' پس از ثبت عدم حضور دریافت شد؛ بررسی اعتراض و تطبیق زمان تماس الزامی است. مبالغ تسویه خودکار تغییر نکردند.',
+                    ], ['snapshot' => ['call_id' => $log->call_id, 'call_entered_at' => $log->call_entered_at?->toIso8601String(), 'final_result' => $log->final_result, 'received_at' => now()->toIso8601String()]]);
+                }
+                $this->syncAppointmentSurvey($log->appointment_id, $surveyScore);
+                $billing = app(AppointmentBillingService::class)->ensure($log->appointment);
+                if ($billing) app(AppointmentBillingService::class)->refresh($billing);
+            }
+            return $this->ok([
+                'status' => true,
+                'error_code' => VoipResponseCode::SUCCESS,
+                'message' => $isUpdate ? 'گزارش تماس به‌روزرسانی شد.' : 'گزارش تماس با موفقیت ثبت شد.',
+                'call_id' => $log->call_id,
+                'request_id' => $callbackRequestId,
+                'appointment_id' => $log->appointment_id,
+                'final_result' => $log->final_result,
+                'disconnected_by' => $log->disconnected_by,
+                'answered_at' => $log->answered_at?->toIso8601String(),
+                'ended_at' => $log->ended_at?->toIso8601String(),
+                'talk_duration_seconds' => (int) $log->talk_duration_seconds,
+                'connection_type' => $log->connection_type,
+                'connection_attempts_count' => count($log->attempts ?? []),
+                'consultant_hangup_recorded' => $log->consultantHangup()->exists(),
+                'survey_score' => $log->surveyScore(),
+            ]);
+        });
+    }
+
+    private function surveyScore(array $data): ?int
+    {
+        foreach (['survey_score', 'score', 'rating', 'additional_data.survey_score', 'additional_data.score', 'additional_data.rating'] as $key) {
+            $value = data_get($data, $key);
+            if ($value !== null) {
+                return (int) $value;
+            }
+        }
+
+        return null;
+    }
+
+    private function syncAppointmentSurvey(int $appointmentId, ?int $surveyScore): void
+    {
+        if ($surveyScore === null) {
+            return;
+        }
+
+        $appointment = AppointmentUser::find($appointmentId);
+        if (! $appointment) {
+            return;
+        }
+
+        $details = $appointment->details ?? [];
+        $survey = (array) data_get($details, AppointmentUser::DETAIL_SURVEY, []);
+        $survey[AppointmentUser::DETAIL_SURVEY] = $surveyScore;
+        $details[AppointmentUser::DETAIL_SURVEY] = $survey;
+        $appointment->update(['details' => $details]);
+
+        if (Schema::hasTable('feedbacks')) {
+            FeedBack::updateOrCreate(
+                ['appointment_user_id' => $appointmentId, 'question' => 1],
+                ['answer' => $surveyScore]
+            );
+        }
     }
 }

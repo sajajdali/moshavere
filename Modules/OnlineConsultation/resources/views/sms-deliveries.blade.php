@@ -3,5 +3,40 @@
 @section('consultation-description','وضعیت ارسال، تلاش مجدد و خطاهای پیامک‌های بیمار و مشاور')
 @section('consultation-content')
 @php($types=['patient_first_reminder'=>'یادآوری اول بیمار','patient_second_reminder'=>'یادآوری دوم بیمار','patient_final_reminder'=>'یادآوری نهایی بیمار','practitioner_appointment_reminder'=>'یادآوری نوبت مشاور','practitioner_daily_report'=>'گزارش پایان روز مشاور'])
-<section class="oc-panel"><div class="oc-panel-header"><form class="oc-inline" method="GET"><label for="status">وضعیت:</label><select class="oc-input" id="status" name="status" onchange="this.form.submit()"><option value="">همه</option>@foreach(['pending'=>'در انتظار','retrying'=>'تلاش مجدد','sent'=>'ارسال‌شده','failed'=>'ناموفق','skipped'=>'ارسال‌نشده'] as $v=>$l)<option value="{{ $v }}" @selected($status===$v)>{{ $l }}</option>@endforeach</select></form></div><div class="oc-table-wrap"><table class="oc-table"><thead><tr><th>زمان برنامه‌ریزی</th><th>نوع</th><th>نوبت</th><th>گیرنده</th><th>قالب</th><th>ارسال واقعی</th><th>وضعیت</th><th>تلاش</th><th>پاسخ / خطا</th></tr></thead><tbody>@forelse($deliveries as $item)<tr><td>{{ verta($item->scheduled_at)->format('Y/m/d H:i:s') }}</td><td>{{ $types[$item->type]??$item->type }}</td><td>{{ $item->appointment_id?'#'.($item->appointment?->tracking_code?:$item->appointment_id):'گزارش روزانه' }}</td><td class="oc-ltr">{{ $item->recipient }}</td><td>{{ $item->template }}</td><td>{{ $item->sent_at?verta($item->sent_at)->format('Y/m/d H:i:s'):'—' }}</td><td><span class="oc-badge {{ $item->status==='failed'?'oc-badge-danger':'' }}">{{ ['pending'=>'در انتظار','retrying'=>'تلاش مجدد','sent'=>'ارسال‌شده','failed'=>'ناموفق','skipped'=>'ارسال‌نشده'][$item->status]??$item->status }}</span></td><td>{{ $item->attempts }}</td><td>{{ $item->error_message?:$item->provider_response?:'—' }}</td></tr>@empty<tr><td colspan="9"><div class="oc-empty"><h3>هنوز ارسالی ثبت نشده است</h3></div></td></tr>@endforelse</tbody></table></div>@if($deliveries->hasPages())<div class="oc-pagination">{{ $deliveries->links() }}</div>@endif</section>
+<section class="oc-panel">
+    <div class="oc-panel-header">
+        <form class="oc-inline" method="GET">
+            <label for="status">وضعیت:</label>
+            <select class="oc-input" id="status" name="status" onchange="this.form.submit()">
+                <option value="">همه</option>
+                @foreach(['pending'=>'در انتظار','retrying'=>'تلاش مجدد','sent'=>'ارسال‌شده','failed'=>'ناموفق','skipped'=>'ارسال‌نشده'] as $v=>$l)
+                    <option value="{{ $v }}" @selected($status===$v)>{{ $l }}</option>
+                @endforeach
+            </select>
+        </form>
+    </div>
+    <div class="oc-table-wrap">
+        <table class="oc-table">
+            <thead><tr><th>زمان برنامه‌ریزی</th><th>نوع</th><th>نوبت</th><th>گیرنده</th><th>قالب</th><th>ارسال واقعی</th><th>وضعیت</th><th>تلاش</th><th>پاسخ / خطا</th></tr></thead>
+            <tbody>
+                @forelse($deliveries as $item)
+                    <tr>
+                        <td>{{ verta($item->scheduled_at)->format('Y/m/d H:i:s') }}</td>
+                        <td>{{ $types[$item->type]??$item->type }}</td>
+                        <td>{{ $item->appointment_id?'#'.($item->appointment?->tracking_code?:$item->appointment_id):'گزارش روزانه' }}</td>
+                        <td class="oc-ltr">{{ $item->recipient }}</td>
+                        <td>{{ $item->template }}</td>
+                        <td>{{ $item->sent_at?verta($item->sent_at)->format('Y/m/d H:i:s'):'—' }}</td>
+                        <td><span class="oc-badge {{ $item->status==='failed'?'oc-badge-danger':'' }}">{{ ['pending'=>'در انتظار','retrying'=>'تلاش مجدد','sent'=>'ارسال‌شده','failed'=>'ناموفق','skipped'=>'ارسال‌نشده'][$item->status]??$item->status }}</span></td>
+                        <td>{{ $item->attempts }}</td>
+                        <td>{{ $item->error_message?:$item->provider_response?:'—' }}</td>
+                    </tr>
+                @empty
+                    <tr><td colspan="9"><div class="oc-empty"><h3>هنوز ارسالی ثبت نشده است</h3></div></td></tr>
+                @endforelse
+            </tbody>
+        </table>
+    </div>
+    {{ $deliveries->links('onlineconsultation::components.pagination') }}
+</section>
 @endsection

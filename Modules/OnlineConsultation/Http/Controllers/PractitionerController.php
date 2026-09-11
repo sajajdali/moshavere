@@ -7,6 +7,8 @@ use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\ValidationException;
 use Modules\OnlineConsultation\Models\ConsultationPractitioner;
+use Modules\OnlineConsultation\Models\AppointmentBillingRecord;
+use Modules\OnlineConsultation\Services\AppointmentBillingService;
 use Modules\User\Entities\User;
 
 class PractitionerController extends Controller
@@ -63,10 +65,22 @@ class PractitionerController extends Controller
         return redirect()->route('admin.consultation.practitioners.edit', $person)->with('success', 'پزشک / کارشناس اضافه شد.');
     }
 
-    public function update(Request $request, int $practitioner)
+    public function update(Request $request, int $practitioner, AppointmentBillingService $billingService)
     {
         $person = ConsultationPractitioner::findOrFail($practitioner);
         $person->update($this->validated($request, $person));
+
+        // Older appointments have a zero payout snapshot until the manager defines the expert's rate.
+        if ((int) $person->payout_hourly_rate > 0) {
+            AppointmentBillingRecord::where('practitioner_id', $person->user_id)
+                ->where('payout_hourly_rate_snapshot', 0)
+                ->chunkById(100, function ($records) use ($person, $billingService) {
+                    foreach ($records as $record) {
+                        $record->update(['payout_hourly_rate_snapshot' => (int) $person->payout_hourly_rate]);
+                        $billingService->refresh($record);
+                    }
+                });
+        }
 
         return redirect()->route('admin.consultation.practitioners.edit', $person)->with('success', 'اطلاعات و دسترسی‌ها ذخیره شد.');
     }
@@ -85,9 +99,10 @@ class PractitionerController extends Controller
             'clear_sip_secret' => 'sometimes|boolean',
             'fee' => 'nullable|integer|min:0|max:1000000000',
             'hourly_rate' => 'nullable|required_if:active,1|integer|min:0|max:1000000000',
+            'payout_hourly_rate' => 'nullable|required_if:active,1|integer|min:0|max:1000000000|lte:hourly_rate',
             'duration_minutes' => 'nullable|integer|min:5|max:180',
             'notes' => 'nullable|string|max:3000',
-        ], [], ['user_id' => 'شناسه کاربر', 'extension' => 'داخلی', 'display_name' => 'نام نمایشی']);
+        ], [], ['user_id' => 'شناسه کاربر', 'extension' => 'داخلی', 'display_name' => 'نام نمایشی', 'hourly_rate' => 'مبلغ ساعتی مراجعه‌کننده', 'payout_hourly_rate' => 'حق‌الزحمه ساعتی کارشناس']);
         // An existing consultation profile must remain attached to its original account.
         if ($person && (int) $data['user_id'] !== (int) $person->user_id) {
             throw ValidationException::withMessages(['user_id' => 'حساب متصل به این پروفایل قابل تغییر نیست.']);

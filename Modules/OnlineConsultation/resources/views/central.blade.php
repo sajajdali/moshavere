@@ -19,7 +19,7 @@
                 </tbody></table>
             </div>
         @endif
-        @if($tenants->hasPages())<div class="oc-pagination">{{ $tenants->links() }}</div>@endif
+        {{ $tenants->links('onlineconsultation::components.pagination') }}
     </section>
 </div>
 @endsection

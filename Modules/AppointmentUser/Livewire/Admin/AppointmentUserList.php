@@ -207,6 +207,7 @@ class AppointmentUserList extends Component
     {
         $permisstion_check = auth()->user();
         $query = AppointmentUser::query();
+        if (\Modules\OnlineConsultation\Support\ConsultationAccess::schemaReady(['appointment_consultation_cases'])) $query->with('consultationCase');
         $searchCriteria = [
             'permition' => [
                 'condition' => ! $permisstion_check->isAdmin(),

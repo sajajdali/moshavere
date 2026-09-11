@@ -22,6 +22,12 @@ Route::prefix('VoIP')->group(function () {
     Route::post('call_log', [\Modules\Api\Http\Controllers\Voip\CallLogController::class, 'store'])
         ->middleware(\Modules\OnlineConsultation\Http\Middleware\EnsureConsultationEnabled::class)
         ->name('api.voip.call_log');
+    Route::post('consultant_hangup', [\Modules\Api\Http\Controllers\Voip\ConsultantHangupController::class, 'store'])
+        ->middleware(\Modules\OnlineConsultation\Http\Middleware\EnsureConsultationEnabled::class)
+        ->name('api.voip.consultant_hangup');
+    Route::post('consultant_no_answer', [\Modules\Api\Http\Controllers\Voip\ConsultantNoAnswerController::class, 'store'])
+        ->middleware(\Modules\OnlineConsultation\Http\Middleware\EnsureConsultationEnabled::class)
+        ->name('api.voip.consultant_no_answer');
     // وضعیت نوبت بیمار بر اساس شماره تماس؛ احراز هویت از middleware مشترک VoIP انجام می‌شود.
     Route::get('appointment_status', [\Modules\Api\Http\Controllers\Voip\AppointmentStatusController::class, 'show'])
         ->middleware(\Modules\OnlineConsultation\Http\Middleware\EnsureConsultationEnabled::class)

@@ -21,4 +21,9 @@ class ConsultationSmsDelivery extends Model
     {
         return $this->belongsTo(User::class, 'practitioner_id');
     }
+
+    public function reminderRule()
+    {
+        return $this->belongsTo(ConsultationSmsReminderRule::class, 'reminder_rule_id');
+    }
 }

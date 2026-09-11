@@ -2,7 +2,7 @@
 @section('consultation-title', 'تنظیمات مشاوره آنلاین')
 @section('consultation-description', 'تنظیم نوبت‌دهی، دسترسی اپلیکیشن و اتصال ویپ')
 @section('consultation-content')
-<div class="oc-notice"><i class="fa-solid fa-circle-info" aria-hidden="true"></i><p>اتصال تماس هنوز راه‌اندازی نشده است. این تنظیمات برای آماده‌سازی سرویس ذخیره می‌شوند.</p></div>
+<div class="oc-notice"><i class="fa-solid fa-circle-info" aria-hidden="true"></i><p>درخواست تماس مشاور به مسیر ثابت <bdi class="oc-ltr">/api/v1/VoIP/request_call</bdi> روی آدرس سرور VoIP ارسال می‌شود و فقط پاسخ HTTP 202 موفق است.</p></div>
 @php($record = $settings)
 <form method="POST" action="{{ route('admin.consultation.settings.save') }}" class="oc-stack">
     @csrf @method('PUT')
@@ -19,7 +19,7 @@
         <div class="oc-panel-header"><div><h2 class="oc-panel-title"><i class="fa-solid fa-network-wired" aria-hidden="true"></i>تنظیمات VoIP</h2><p class="oc-subtitle">آدرس این بخش مرجع همه مشاوران سایت است و در فرم پزشک قابل ویرایش نیست.</p></div></div>
         <div class="oc-panel-body"><div class="oc-grid">
         @include('onlineconsultation::field', ['name' => 'voip_driver', 'label' => 'نوع سرور', 'options' => ['unconfigured' => 'هنوز مشخص نشده', 'asterisk' => 'Asterisk', 'issabel' => 'Issabel', 'freepbx' => 'FreePBX', 'other' => 'سایر'], 'required' => true])
-        @include('onlineconsultation::field', ['name' => 'voip_host', 'label' => 'آدرس سرور', 'direction' => 'ltr', 'help' => 'دامنه یا IP، بدون http:// و مسیر'])
+        @include('onlineconsultation::field', ['name' => 'voip_host', 'label' => 'آدرس سرور', 'direction' => 'ltr', 'help' => 'نمونه: http://rokhvanak.ir:2214 — مسیر /api/v1/VoIP/request_call خودکار اضافه می‌شود.'])
         @include('onlineconsultation::field', ['name' => 'voip_port', 'label' => 'پورت SIP', 'type' => 'number', 'min' => 1, 'max' => 65535, 'required' => true])
         @include('onlineconsultation::field', ['name' => 'voip_transport', 'label' => 'پروتکل انتقال', 'options' => ['tls' => 'TLS', 'tcp' => 'TCP', 'udp' => 'UDP'], 'required' => true])
         @include('onlineconsultation::field', ['name' => 'voip_username', 'label' => 'نام کاربری اتصال', 'direction' => 'ltr'])
@@ -34,6 +34,7 @@
         @include('onlineconsultation::field', ['name' => 'queue_number', 'label' => 'شماره صف', 'direction' => 'ltr'])
         @include('onlineconsultation::field', ['name' => 'ring_timeout_seconds', 'label' => 'مهلت زنگ‌خوردن (ثانیه)', 'type' => 'number', 'min' => 10, 'max' => 180, 'required' => true])
         @include('onlineconsultation::field', ['name' => 'max_attempts', 'label' => 'حداکثر تلاش تماس', 'type' => 'number', 'min' => 1, 'max' => 5, 'required' => true])
+        @include('onlineconsultation::field', ['name' => 'ignored_short_call_minutes', 'label' => 'حد تماس کوتاه / حداقل مکالمه معتبر (دقیقه)', 'type' => 'number', 'min' => 0, 'max' => 30, 'required' => true, 'help' => 'مدت کمتر یا مساوی این حد، تماس کوتاه است و قطع مشاور هشدار محسوب می‌شود؛ مدت بیشتر از آن، مشاوره انجام‌شده و پایان عادی تماس است. این تماس‌های کوتاه از زمان مالی نیز حذف می‌شوند. پیش‌فرض: ۶ دقیقه.'])
         @include('onlineconsultation::checkbox', ['name' => 'allow_transfer', 'label' => 'اجازه انتقال تماس'])
         @include('onlineconsultation::checkbox', ['name' => 'recording_requested', 'label' => 'درخواست ضبط مکالمه', 'help' => 'پس از اتصال سرویس و دریافت رضایت طرفین'])
         @include('onlineconsultation::checkbox', ['name' => 'consent_required', 'label' => 'الزام رضایت طرفین برای ضبط'])

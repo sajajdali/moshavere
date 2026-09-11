@@ -10,7 +10,21 @@ use Modules\User\Entities\User;
 class AppointmentBillingRecord extends Model
 {
     protected $guarded = ['id'];
-    protected $casts = ['approved_at' => 'datetime'];
+    protected $casts = [
+        'approved_at' => 'datetime',
+        'hourly_rate_snapshot' => 'integer',
+        'payout_hourly_rate_snapshot' => 'integer',
+        'reserved_minutes' => 'integer',
+        'raw_answered_talk_seconds' => 'integer',
+        'ignored_talk_seconds' => 'integer',
+        'answered_talk_seconds' => 'integer',
+        'total_paid_amount' => 'integer',
+        'used_amount' => 'integer',
+        'suggested_refund_amount' => 'integer',
+        'refunded_amount' => 'integer',
+        'practitioner_earned_amount' => 'integer',
+        'platform_profit_amount' => 'integer',
+    ];
 
     public function appointment() { return $this->belongsTo(AppointmentUser::class); }
     public function patient() { return $this->belongsTo(User::class, 'patient_id'); }

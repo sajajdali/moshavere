@@ -61,6 +61,9 @@
         .om-avatar{width:36px;height:36px;flex:none;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:600;color:#fff;background:#0f766e}
         .om-pill{display:inline-flex;align-items:center;gap:5px;font-size:11.5px;font-weight:500;padding:3px 9px;border-radius:20px;border:1px solid #d5dae1;background:#f9fafb;color:#475467;white-space:nowrap}
         .om-status{display:inline-flex;align-items:center;justify-content:center;width:100%;font-size:12px;font-weight:600;padding:6px 10px;border-radius:8px}
+        .payment-expiry{display:flex;align-items:center;justify-content:center;gap:5px;width:100%;margin-top:5px;padding:5px 7px;border-radius:7px;background:#fff7e6;border:1px solid #fedf89;color:#93370d;font-size:10.5px;font-weight:600;line-height:1.45;text-align:center}
+        .payment-expiry i{font-size:11px;flex:none}
+        .payment-expiry.is-expired{background:#fef3f2;border-color:#fecdca;color:#b42318}
         .om-muted{font-size:11.5px;color:#667085}
         .om-ellipsis{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
         .appointment-detail{padding:16px 20px 18px;background:#fbfcfd;border-bottom:1px solid #eef0f3;display:grid;grid-template-columns:2fr 1fr 1fr;gap:22px}
@@ -243,6 +246,11 @@
                                 \Modules\AppointmentUser\Enum\AppointmentUserStatusEnum::STATUS_WAIT_PAYMENT => '#e9f3ff',
                                 default => $loop->odd ? '#f7fbff' : '#fff',
                             };
+                            $userDocumentRoute = $ap->user
+                                ? ($ap->kind === \Modules\AppointmentUser\Enum\AppointmentUserKindEnum::VOIP
+                                    ? route('admin.user.report', ['user' => $ap->user->id])
+                                    : route('admin.user.document', ['user' => $ap->user->id]))
+                                : '#';
                         @endphp
                         <div class="appointment-grid appointment-row" style="background:{{ $rowBackground }}" wire:key="appointment-row-{{ $ap->id }}">
                             <div>
@@ -258,7 +266,7 @@
                             </div>
                             <div class="d-flex align-items-center" style="padding-right:2px;padding-left:2px">
                                 <div class="d-flex flex-column min-w-0">
-                                    <a class="om-ellipsis" href="{{ $ap->user ? route('admin.user.document', ['user' => $ap->user->id]) : '#' }}" style="font-size:13.5px;font-weight:600;color:#101828">{{ $ap->user?->full_name ?? 'کاربر حذف شده' }}</a>
+                                    <a class="om-ellipsis" href="{{ $userDocumentRoute }}" style="font-size:13.5px;font-weight:600;color:#101828">{{ $ap->user?->full_name ?? 'کاربر حذف شده' }}</a>
                                     <span class="om-muted" style="font-size:12.5px" dir="ltr">{{ $ap->user?->mobile ?? $ap->checkForRegisterForOthers() }}</span>
                                     @if (
                                         setting(\Modules\Setting\Enum\SettingKeyEnum::APPOINTMENT_USER_PERESENT_STATUS_REGISTRATION) &&
@@ -298,15 +306,29 @@
                                 <span style="font-size:12.5px;color:#344054" dir="ltr">{{ verta($ap->created_at)->format('Y/m/d') }}</span>
                                 <span class="om-muted" dir="ltr">{{ verta($ap->created_at)->format('H:i') }}</span>
                             </div>
-                            <div class="d-flex align-items-center gap-2">
-                                @canany(['update', 'delete'], $ap)
-                                    <div class="btn-group w-100">
-                                        <button type="button" class="om-status dropdown-toggle" style="{{ $statusClass }}" data-bs-toggle="dropdown" data-bs-boundary="viewport">{{ $ap->status->getName() }}</button>
-                                        <ul class="dropdown-menu dropdown-menu-end" role="menu">@include('appointmentuser::components.appointmentlist.operationbutton', ['quickTimeEditEnabled' => true])</ul>
-                                    </div>
-                                @else
-                                    <span class="om-status" style="{{ $statusClass }}">{{ $ap->status->getName() }}</span>
-                                @endcan
+                            <div class="d-flex flex-column align-items-center gap-1">
+                                <div class="d-flex align-items-center gap-2 w-100">
+                                    @if($ap->hasFinalizedPatientNoShow())<span class="om-pill" style="color:#b42318">عدم حضور بیمار · تسویه کامل</span>@endif
+                                    @if($ap->hasCompletedPhoneConsultation())<span class="om-pill" style="background:#ecfdf3;color:#067647;border-color:#abefc6">مشاوره تمام شده</span>@endif
+                                    @canany(['update', 'delete'], $ap)
+                                        <div class="btn-group w-100">
+                                            <button type="button" class="om-status dropdown-toggle" style="{{ $statusClass }}" data-bs-toggle="dropdown" data-bs-boundary="viewport">{{ $ap->status->getName() }}</button>
+                                            <ul class="dropdown-menu dropdown-menu-end" role="menu">@include('appointmentuser::components.appointmentlist.operationbutton', ['quickTimeEditEnabled' => true])</ul>
+                                        </div>
+                                    @else
+                                        <span class="om-status" style="{{ $statusClass }}">{{ $ap->status->getName() }}</span>
+                                    @endcan
+                                </div>
+                                @if (
+                                    $ap->status === \Modules\AppointmentUser\Enum\AppointmentUserStatusEnum::STATUS_WAIT_PAYMENT
+                                    && data_get($ap->details, \Modules\AppointmentUser\app\Models\AppointmentUser::DETAIL_PAYMENT . '.status') === true
+                                    && $ap->deadline_at
+                                )
+                                    <span class="payment-expiry" data-payment-deadline="{{ $ap->deadline_at->getTimestampMs() }}">
+                                        <i class="fa fa-clock-o"></i>
+                                        <span>در حال محاسبه زمان باقی‌مانده...</span>
+                                    </span>
+                                @endif
                             </div>
                             <div class="d-flex flex-column gap-1">
                                 <span dir="ltr" style="font-size:12.5px;color:#344054">{{ $ap->user?->national_code ?? '---' }}</span>
@@ -342,7 +364,7 @@
                             <div class="appointment-detail">
                                 <div><span class="om-muted d-block mb-1">توضیحات</span><span style="font-size:13px;color:#344054;line-height:1.9">{{ $ap->getAppDescription() ?: 'بدون توضیحات' }}</span></div>
                                 <div><span class="om-muted d-block mb-1">شماره پرونده</span><span dir="ltr">{{ $ap->user?->document_number ?? '---' }}</span></div>
-                                <div><span class="om-muted d-block mb-1">عملیات سریع</span><div class="d-flex gap-2 flex-wrap">@canany(['update', 'delete'], $ap)<button wire:click='editAppointment("{{ $ap->id }}")' class="om-btn" style="height:32px;padding:0 12px" type="button">ویرایش</button>@endcanany @if($ap->user)<a class="om-btn" style="height:32px;padding:0 12px" href="{{ route('admin.user.document', ['user' => $ap->user->id]) }}">پرونده کاربر</a>@endif</div></div>
+                                <div><span class="om-muted d-block mb-1">عملیات سریع</span><div class="d-flex gap-2 flex-wrap">@canany(['update', 'delete'], $ap)<button wire:click='editAppointment("{{ $ap->id }}")' class="om-btn" style="height:32px;padding:0 12px" type="button">ویرایش</button>@endcanany @if($ap->user)<a class="om-btn" style="height:32px;padding:0 12px" href="{{ $userDocumentRoute }}">{{ $ap->kind === \Modules\AppointmentUser\Enum\AppointmentUserKindEnum::VOIP ? 'گزارش جامع کاربر' : 'پرونده کاربر' }}</a>@endif</div></div>
                             </div>
                         @endif
                     @empty
@@ -379,6 +401,31 @@
     <script src="{{ admin_asset('plugins/select2/select2.full.min.js') }}"></script>
     <script>
         $(document).ready(function() {
+            function updatePaymentCountdowns() {
+                const now = Date.now();
+
+                document.querySelectorAll('[data-payment-deadline]').forEach(function(element) {
+                    const deadline = Number(element.dataset.paymentDeadline);
+                    const label = element.querySelector('span');
+                    const remainingSeconds = Math.max(0, Math.ceil((deadline - now) / 1000));
+
+                    if (remainingSeconds <= 0) {
+                        element.classList.add('is-expired');
+                        label.textContent = 'مهلت پرداخت تمام شده؛ در صف حذف است';
+                        return;
+                    }
+
+                    const hours = Math.floor(remainingSeconds / 3600);
+                    const minutes = Math.floor((remainingSeconds % 3600) / 60);
+                    const seconds = remainingSeconds % 60;
+                    const parts = [];
+                    if (hours) parts.push(hours.toLocaleString('fa-IR') + ' ساعت');
+                    if (minutes || hours) parts.push(minutes.toLocaleString('fa-IR') + ' دقیقه');
+                    parts.push(seconds.toLocaleString('fa-IR') + ' ثانیه');
+                    label.textContent = 'تا ' + parts.join(' و ') + ' دیگر حذف می‌شود';
+                });
+            }
+
             function js() {
                 const iranianHolidays = @json(holidays_array());
                 jalaliDatepicker.startWatch({
@@ -399,8 +446,11 @@
                 $(document).off('input.appointmentDate').on('input.appointmentDate', '[data-jdp]', function() {
                     @this.set($(this).data('name'), $(this).val());
                 });
+                updatePaymentCountdowns();
             }
             js();
+            window.clearInterval(window.appointmentPaymentCountdownTimer);
+            window.appointmentPaymentCountdownTimer = window.setInterval(updatePaymentCountdowns, 1000);
             $(document).off('show.bs.dropdown.appointmentOperations hidden.bs.dropdown.appointmentOperations')
                 .on('show.bs.dropdown.appointmentOperations', '.appointment-row .btn-group', function() {
                     $(this).closest('.appointment-row').addClass('operation-is-open');

@@ -9,6 +9,7 @@ use Modules\Api\Trait\ApiHandlerTrait;
 use Modules\AppointmentUser\app\Models\AppointmentUser;
 use Modules\AppointmentUser\Enum\AppointmentUserStatusEnum;
 use Modules\OnlineConsultation\Models\ConsultationPractitioner;
+use Modules\OnlineConsultation\Models\ConsultationSetting;
 
 /**
  * Endpoints used by the VoIP integration are kept separate from booking APIs.
@@ -48,9 +49,11 @@ class AppointmentStatusController extends Controller
 
         $now = Carbon::now('Asia/Tehran');
         $today = $now->toDateString();
+        $ignoredShortCallMinutes = max(0, (int) ConsultationSetting::current()->ignored_short_call_minutes);
+        $ignoredShortCallSeconds = $ignoredShortCallMinutes * 60;
 
         $appointments = AppointmentUser::query()
-            ->with(['user:id,mobile', 'doctor:id,mobile'])
+            ->with(['user:id,mobile', 'doctor:id,mobile', 'consultationCase'])
             ->whereHas('user', function ($query) use ($phone) {
                 // The last ten digits make local 09..., +989..., and 00989... forms match.
                 $query->whereRaw("REPLACE(REPLACE(REPLACE(REPLACE(mobile, '+', ''), ' ', ''), '-', ''), '(', '') LIKE ?", ['%'.$phone])
@@ -66,7 +69,7 @@ class AppointmentStatusController extends Controller
 
         $extensions = ConsultationPractitioner::whereIn('user_id', $appointments->pluck('doctor_id')->filter())
             ->pluck('extension', 'user_id');
-        $items = $appointments->map(function (AppointmentUser $appointment) use ($today, $extensions, $now) {
+        $items = $appointments->map(function (AppointmentUser $appointment) use ($today, $extensions, $now, $ignoredShortCallMinutes, $ignoredShortCallSeconds) {
             $date = Carbon::parse($appointment->date_visit, 'Asia/Tehran');
             $start = $date->copy();
             $end = $date->copy()->setTimeFromTimeString($appointment->end_time ?: $date->copy()->addMinutes(30)->format('H:i:s'));
@@ -77,6 +80,7 @@ class AppointmentStatusController extends Controller
                 return null;
             }
             $inWindow = $now->betweenIncluded($start, $end);
+            $consultationCompleted = $appointment->consultationCase?->isClosed() ?? false;
 
             $item = [
                 'appointment_id' => $appointment->id,
@@ -87,14 +91,19 @@ class AppointmentStatusController extends Controller
                 'end_time' => $end->format('H:i:s'),
                 'is_today' => $date->toDateString() === $today,
                 'is_time_for_appointment' => $inWindow,
-                'can_connect' => $inWindow,
+                'can_connect' => $inWindow && ! $consultationCompleted,
+                'consultation_completed' => $consultationCompleted,
+                'consultation_status' => $appointment->consultationCase?->state ?? 'OPEN',
+                'consultation_completed_at' => $appointment->consultationCase?->completed_at?->toIso8601String(),
+                'ignored_short_call_minutes' => $ignoredShortCallMinutes,
+                'ignored_short_call_seconds' => $ignoredShortCallSeconds,
                 'doctor_id' => $appointment->doctor_id,
                 'doctor_extension' => $extensions->get($appointment->doctor_id),
                 'status' => $appointment->status->value,
             ];
             // The practitioner's private mobile is exposed only during the active
             // appointment window, so VoIP can fall back to it if the extension fails.
-            if ($inWindow) {
+            if ($inWindow && ! $consultationCompleted) {
                 $item['doctor_mobile'] = $appointment->doctor?->mobile;
             }
 
@@ -104,18 +113,29 @@ class AppointmentStatusController extends Controller
         // VoIP can use the top-level value directly. When more than one appointment
         // exists, prefer the currently connectable one, then the nearest future one.
         $selectedAppointment = $items->firstWhere('can_connect', true) ?? $items->first();
+        $selectedCompleted = (bool) ($selectedAppointment['consultation_completed'] ?? false);
+        $responseCode = $items->isEmpty()
+            ? VoipResponseCode::APPOINTMENT_NOT_FOUND
+            : ($selectedCompleted ? VoipResponseCode::CONSULTATION_COMPLETED : VoipResponseCode::SUCCESS);
 
         return $this->ok([
             'status' => true,
-            'error_code' => $items->isNotEmpty() ? VoipResponseCode::SUCCESS : VoipResponseCode::APPOINTMENT_NOT_FOUND,
+            'error_code' => $responseCode,
             'has_appointment' => $items->isNotEmpty(),
             'has_appointment_today' => $items->contains('is_today', true),
             'is_time_for_appointment' => $items->contains('is_time_for_appointment', true),
             'can_connect' => $items->contains('can_connect', true),
+            'consultation_completed' => $selectedCompleted,
+            'consultation_status' => $selectedAppointment['consultation_status'] ?? null,
+            'consultation_completed_at' => $selectedAppointment['consultation_completed_at'] ?? null,
             'appointment_id' => $selectedAppointment['appointment_id'] ?? null,
             'doctor_extension' => $selectedAppointment['doctor_extension'] ?? null,
             'doctor_mobile' => ($selectedAppointment['can_connect'] ?? false) ? ($selectedAppointment['doctor_mobile'] ?? null) : null,
-            'message' => $items->isNotEmpty() ? 'نوبت آینده وجود دارد.' : 'نوبت آینده‌ای برای این شماره وجود ندارد.',
+            'ignored_short_call_minutes' => $ignoredShortCallMinutes,
+            'ignored_short_call_seconds' => $ignoredShortCallSeconds,
+            'message' => $selectedCompleted
+                ? 'مشاوره تمام شده است و اتصال مجدد مجاز نیست.'
+                : ($items->isNotEmpty() ? 'نوبت آینده وجود دارد.' : 'نوبت آینده‌ای برای این شماره وجود ندارد.'),
             'appointments' => $items,
         ]);
     }

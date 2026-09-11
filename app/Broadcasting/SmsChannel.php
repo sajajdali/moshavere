@@ -95,21 +95,23 @@ class SmsChannel
                 // }
                 try {
                     if (isset($data['type']) && $data['type'] == 2) {
-                        \Illuminate\Support\Facades\Http::withToken($apiToken)->get('https://shsms.ir/api/v1/call', $condition);
+                        $response = \Illuminate\Support\Facades\Http::withToken($apiToken)->get('https://shsms.ir/api/v1/call', $condition);
                     } else {
-                        \Illuminate\Support\Facades\Http::withToken($apiToken)->get('https://shsms.ir/api/v1/sendms', $condition);
+                        $response = \Illuminate\Support\Facades\Http::withToken($apiToken)->get('https://shsms.ir/api/v1/sendms', $condition);
+                    }
+                    if (! $response->successful()) {
+                        throw new \RuntimeException('SHSMS request failed with HTTP '.$response->status());
                     }
                 } catch (\Throwable $th) {
                     Log::error('shsms has issue:' .  $th->getMessage());
-                } catch (\Exception $e) {
-                    Log::error('shsms has issue:' .  $e->getMessage());
+                    throw $th;
                 }
             }
         }
     }
     private function sendWithStarPayam($apiToken, $data, $settings): void
     {
-        $findSmsText =  $this->findSmsText($data['template'], $settings);
+        $findSmsText =  $this->resolveSmsText($data, $settings);
         $finalText = $this->paramToText($findSmsText, $data['params']);
         try {
             $payload = [
@@ -125,9 +127,11 @@ class SmsChannel
                     'payload' => $payload,
                     'response' => $response->body(),
                 ]);
+                throw new \RuntimeException('StarPayam request failed with HTTP '.$response->status());
             }
         } catch (\Throwable $e) {
             Log::error('starPayam Exception: ' . $e->getMessage());
+            throw $e;
         }
     }
     private function sendWithIpPanel($apiToken, $data, $settings): void
@@ -158,9 +162,11 @@ class SmsChannel
                     'payload' => $payload,
                     'response' => $response->body(),
                 ]);
+                throw new \RuntimeException('IPPANEL request failed with HTTP '.$response->status());
             }
         } catch (\Exception $e) {
             Log::error('IPPANEL exception: ' . $e->getMessage());
+            throw $e;
         }
     }
     private function normalizeIpPanelMobile(?string $mobile): ?string
@@ -223,7 +229,7 @@ class SmsChannel
     private function sendWithParsSms($apiToken, $data, $settings): void
     {
         try {
-            $findSmsText =  $this->findSmsText($data['template'], $settings);
+            $findSmsText =  $this->resolveSmsText($data, $settings);
             $finalText = $this->paramToText($findSmsText, $data['params']);
             $r = \Illuminate\Support\Facades\Http::withHeader('apiKey', $apiToken)
                 ->post('http://api.ghasedaksms.com/v2/sms/send/simple', [
@@ -231,18 +237,22 @@ class SmsChannel
                     'message' => $finalText,
                     'receptor' => $data['receptor'],
                 ]);
+            if (! $r->successful()) {
+                throw new \RuntimeException('Pars SMS request failed with HTTP '.$r->status());
+            }
         } catch (\Exception $e) {
             Log::error('pars sms send error', [
                 'error message' => $e->getMessage(),
                 'error line' => $e->getTrace(),
             ]);
+            throw $e;
         }
         return;
     }
     private function sendWithFarrazSms($apiToken, $data, $settings)
     {
         try {
-            $findSmsText =  $this->findSmsText($data['template'], $settings);
+            $findSmsText =  $this->resolveSmsText($data, $settings);
             $finalText = $this->paramToText($findSmsText, $data['params']);
             $r = \Illuminate\Support\Facades\Http::withHeader('apiKey', $apiToken)
                 ->post('https://api.iranpayamak.com/ws/v1/sms/simple', [
@@ -250,11 +260,15 @@ class SmsChannel
                     'text'           => $finalText,
                     'recipients'     => [$data['receptor']],
                 ]);
+            if (! $r->successful()) {
+                throw new \RuntimeException('Faraz SMS request failed with HTTP '.$r->status());
+            }
         } catch (\Exception $e) {
             Log::error('farzSms send error', [
                 'error message' => $e->getMessage(),
                 'error line'    => $e->getTrace(),
             ]);
+            throw $e;
         }
         return;
     }
@@ -275,6 +289,12 @@ class SmsChannel
             $this->getSettingValue($settings, SettingKeyEnum::SMS_APPOINTMENT_WAITING_PAYMENT)         => $this->getSettingValue($settings, SettingKeyEnum::SMS_PRSSMS_APPOINTMENT_WAITING_PAYMENT),
             default => '',
         };
+    }
+    private function resolveSmsText(array $data, $settings): ?string
+    {
+        return filled($data['message'] ?? null)
+            ? $data['message']
+            : $this->findSmsText($data['template'] ?? null, $settings);
     }
     public function paramToText($msg, $params)
     {

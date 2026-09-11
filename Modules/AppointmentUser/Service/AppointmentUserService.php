@@ -638,46 +638,30 @@ class AppointmentUserService
     }
     public function paymentstatus(AppointmentSetting $appointmentSetting)
     {
-        //TODO::change this function for VOIP and inPerson Payment
-        $deadLineDelete = null;
-        $onlineStatusPayment = false;
-        $onlineForcePayment = false;
-        $onlinePrice = null;
-
         $detail = $appointmentSetting['detail'];
-        if (isset($detail['payment']) && isset($detail['payment']['online']) && $detail['payment']['online']['status']) {
-            $onlineStatusPayment = true;
-            if (isset($detail['payment']['online']['notPayinStatus']) && $detail['payment']['online']['notPayinStatus'] == AppointmentSetting::DETAIL_PAYMENT_NOT_PAY_STATUS_DONT_SUBMIT) {
-                $deadLineDelete = Carbon::now()->addHours(4)->toDateTimeString();
-                $onlineForcePayment = true;
-            }
-            $onlinePrice = $detail['payment']['online']['price'];
-        }
-        $inPersonStatusPayment = false;
-        $inPersonForcePayment = false;
-        $inPersonPrice = null;
-        if (isset($detail['payment']) && isset($detail['payment']['inPerson']) && $detail['payment']['inPerson']['status']) {
-            $inPersonStatusPayment = true;
-            if (isset($detail['payment']['online']['notPayinStatus']) && $detail['payment']['online']['notPayinStatus'] == AppointmentSetting::DETAIL_PAYMENT_NOT_PAY_STATUS_DONT_SUBMIT) {
-                $deadLineDelete = Carbon::now()->addMinutes(30)->toDateTimeString();
-                $inPersonForcePayment = true;
-            }
-            $inPersonPrice = $detail['payment']['inPerson']['price'];
-        }
-        return [
-            'online' => [
-                'status' => $onlineStatusPayment,
-                'deadline' => $deadLineDelete,
-                'force_payment' => $onlineForcePayment,
-                'price' => $onlinePrice > 0 ? PriceResource::make(['price' => $onlinePrice]) : null,
-            ],
-            'in_person' => [
-                'status' => $inPersonStatusPayment,
-                'deadline' => $deadLineDelete,
-                'force_payment' => $inPersonForcePayment,
-                'price' => $inPersonPrice > 0 ? PriceResource::make(['price' => $inPersonPrice]) : null,
-            ]
+        $paymentEnabled = (bool) data_get($detail, AppointmentSetting::PAYMENT . '.' . AppointmentSetting::STATUS, false);
+        $forcePayment = data_get($detail, AppointmentSetting::PAYMENT . '.' . AppointmentSetting::NOT_PAYING_STATUS)
+            === AppointmentSetting::DETAIL_PAYMENT_NOT_PAY_STATUS_DONT_SUBMIT;
+        $paymentFor = function (string $type) use ($detail, $paymentEnabled, $forcePayment): array {
+            $enabled = $paymentEnabled && (bool) data_get(
+                $detail,
+                AppointmentSetting::PAYMENT . '.' . $type . '.' . AppointmentSetting::STATUS,
+                false
+            );
+            $price = data_get($detail, AppointmentSetting::PAYMENT . '.' . $type . '.' . AppointmentSetting::PRICE);
 
+            return [
+                'status' => $enabled,
+                'deadline' => $enabled ? Carbon::now()->addHour()->toDateTimeString() : null,
+                'force_payment' => $enabled && $forcePayment,
+                'price' => $enabled && $price > 0 ? PriceResource::make(['price' => $price]) : null,
+            ];
+        };
+
+        return [
+            'online' => $paymentFor(AppointmentSetting::ONLINE),
+            'in_person' => $paymentFor(AppointmentSetting::IN_PERSON),
+            'voip' => $paymentFor(AppointmentSetting::VOIP),
         ];
     }
 
@@ -806,7 +790,13 @@ class AppointmentUserService
             $appointmentSetting->detail[AppointmentSetting::PAYMENT][AppointmentSetting::STATUS]
             && $appointmentData->appointmentVia->usesSelfServiceRules()
         ) {
-            if ($appointmentData->kind == AppointmentUserKindEnum::IN_PERSION) {
+            if ($appointmentData->appointmentVia === AppointmentVia::VOIP) {
+                if (
+                    data_get($appointmentSetting->detail, AppointmentSetting::PAYMENT . '.' . AppointmentSetting::VOIP . '.' . AppointmentSetting::STATUS) == true
+                ) {
+                    $status = AppointmentUserStatusEnum::STATUS_WAIT_PAYMENT;
+                }
+            } elseif ($appointmentData->kind == AppointmentUserKindEnum::IN_PERSION) {
                 if (
                     $appointmentSetting->detail[AppointmentSetting::PAYMENT][AppointmentSetting::IN_PERSON][AppointmentSetting::STATUS] == true
                 ) {
@@ -889,6 +879,7 @@ class AppointmentUserService
         $dontSendPAymentSms = setting(SettingKeyEnum::DONT_SEND_SMS_FOR_PAYMENT_LINK);
         if (
             $appointmentData->appointmentVia->usesSelfServiceRules() &&
+            $appointmentData->appointmentVia !== AppointmentVia::VOIP &&
             $appointmentData->kind == AppointmentUserKindEnum::ONLINE &&
             $paymentstatus['online']['status']
         ) {
@@ -902,7 +893,6 @@ class AppointmentUserService
             ) {
                 $smsTemplate = null ;
             }
-            $appointmentUserModel['deadline_at'] = $paymentstatus['online']['deadline'];
             if ($paymentstatus['online']['force_payment']) {
                 $appointmentUserModel['status'] = AppointmentUserStatusEnum::STATUS_WAIT_PAYMENT;
             }
@@ -914,6 +904,7 @@ class AppointmentUserService
         }
         if (
             $appointmentData->appointmentVia->usesSelfServiceRules() &&
+            $appointmentData->appointmentVia !== AppointmentVia::VOIP &&
             $appointmentData->kind == AppointmentUserKindEnum::IN_PERSION &&
             $paymentstatus['in_person']['status']
         ) {
@@ -935,6 +926,25 @@ class AppointmentUserService
                 AppointmentUser::DETAIL_PAYMENT_SOURCE_GENERAL
             );
         }
+        if (
+            $appointmentData->appointmentVia === AppointmentVia::VOIP &&
+            $paymentstatus['voip']['status']
+        ) {
+            $needToPayment = true;
+            $smsTemplate = setting(SettingKeyEnum::SMS_APPOINTMENT_WAITING_PAYMENT);
+            if (
+                isset($dontSendPAymentSms) &&
+                filter_var($dontSendPAymentSms, FILTER_VALIDATE_BOOL)
+            ) {
+                $smsTemplate = null;
+            }
+            $appointmentUserModel['status'] = AppointmentUserStatusEnum::STATUS_WAIT_PAYMENT;
+            $detailDatabaseDB[AppointmentUser::DETAIL_PAYMENT] = $this->paymentDetailPayload(
+                $appointmentSetting,
+                $paymentstatus['voip']['price'],
+                AppointmentUser::DETAIL_PAYMENT_SOURCE_GENERAL
+            );
+        }
         if (isset($detail['wait_for_payment'])) {
             // force payment for secretery send link appointments
             $adminPaymentPrice = $this->adminAppointmentPaymentPrice($appointmentSetting, $paymentstatus['in_person']['price']);
@@ -943,6 +953,14 @@ class AppointmentUserService
                 $adminPaymentPrice['price'],
                 $adminPaymentPrice['source']
             );
+        }
+
+        if (
+            $appointmentData->appointmentVia->usesSelfServiceRules()
+            && $appointmentUserModel['status'] === AppointmentUserStatusEnum::STATUS_WAIT_PAYMENT
+            && data_get($detailDatabaseDB, AppointmentUser::DETAIL_PAYMENT . '.status') === true
+        ) {
+            $appointmentUserModel['deadline_at'] = Carbon::now()->addHour()->toDateTimeString();
         }
 
         // detailDatabase
@@ -995,12 +1013,14 @@ class AppointmentUserService
         // create payment link
         if (
             $appointmentData->appointmentVia->usesSelfServiceRules() &&
+            $appointmentData->appointmentVia !== AppointmentVia::VOIP &&
             $appointmentData->kind == AppointmentUserKindEnum::ONLINE &&
             $paymentstatus['online']['status']
         ) {
             $paymentLink = route('api.appointment.payment.create', $appointmentUser);
         } elseif (
             $appointmentData->appointmentVia->usesSelfServiceRules() &&
+            $appointmentData->appointmentVia !== AppointmentVia::VOIP &&
             $appointmentData->kind == AppointmentUserKindEnum::ONLINE
         ) {
             // // send online first message
@@ -1016,8 +1036,15 @@ class AppointmentUserService
         }
         if (
             $appointmentData->appointmentVia->usesSelfServiceRules() &&
+            $appointmentData->appointmentVia !== AppointmentVia::VOIP &&
             $appointmentData->kind == AppointmentUserKindEnum::IN_PERSION &&
             $paymentstatus['in_person']['status']
+        ) {
+            $paymentLink = route('api.appointment.payment.create', $appointmentUser);
+        }
+        if (
+            $appointmentData->appointmentVia === AppointmentVia::VOIP &&
+            $paymentstatus['voip']['status']
         ) {
             $paymentLink = route('api.appointment.payment.create', $appointmentUser);
         }

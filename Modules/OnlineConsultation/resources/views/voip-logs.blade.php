@@ -9,5 +9,5 @@
 @if($logs->isEmpty())<div class="oc-empty"><i class="fa-solid fa-phone-slash"></i><h3>لاگی پیدا نشد</h3><p>درخواست‌های API ویپ پس از دریافت، در این فهرست نمایش داده می‌شوند.</p></div>@else
 <div class="oc-table-wrap" role="region" aria-label="لاگ درخواست‌های ویپ" tabindex="0"><table class="oc-table"><thead><tr><th>زمان</th><th>شماره</th><th>مسیر</th><th>کد نتیجه</th><th>پاسخ</th><th>زمان پاسخ</th><th>IP</th></tr></thead><tbody>
 @foreach($logs as $log)<tr><td><bdi>{{ verta($log->created_at)->format('Y/m/d H:i:s') }}</bdi></td><td><bdi>{{ $log->phone ?: '—' }}</bdi></td><td><bdi>{{ $log->method }} {{ $log->path }}</bdi></td><td><span class="oc-badge {{ $log->error_code === 0 ? 'oc-badge-success' : '' }}">{{ $log->error_code ?? '—' }}</span></td><td>{{ $log->response_status ?: '—' }}</td><td>{{ $log->duration_ms !== null ? $log->duration_ms.' ms' : '—' }}</td><td><bdi>{{ $log->client_ip ?: '—' }}</bdi></td></tr>@endforeach
-</tbody></table></div><div class="oc-pagination">{{ $logs->links() }}</div>@endif</section>
+</tbody></table></div>{{ $logs->links('onlineconsultation::components.pagination') }}@endif</section>
 @endsection

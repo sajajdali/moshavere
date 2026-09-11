@@ -19,6 +19,16 @@ class UserPolicy
         return $user->hasPermissionTo('user.create');
     }
 
+    public function viewReport(User $userAdmin, User $user): bool
+    {
+        if ($userAdmin->hasPermissionTo('user')) {
+            return true;
+        }
+
+        return $userAdmin->hasPermissionTo('user.own')
+            && $userAdmin->my()->whereKey($user->getKey())->exists();
+    }
+
     public function delete(User $userAdmin, User $user): bool
     {
         if ($userAdmin->hasPermissionTo('user.delete') && $userAdmin->hasPermissionTo('user')) {

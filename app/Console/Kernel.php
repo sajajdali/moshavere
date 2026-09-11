@@ -56,9 +56,14 @@ class Kernel extends ConsoleKernel
         $schedule->call(function () {
             tenancy()->runForMultiple(null, function ($tenant) {
                 Artisan::call('appointment:check-deadLine');
+            });
+        })->name('appointment-payment-expiration')->everyMinute()->withoutOverlapping();
+
+        $schedule->call(function () {
+            tenancy()->runForMultiple(null, function ($tenant) {
                 Artisan::call('appointment:sendReminders');
             });
-        })->everyFifteenMinutes();
+        })->name('appointment-reminders')->everyFifteenMinutes()->withoutOverlapping();
 
         $schedule->call(function () {
             tenancy()->runForMultiple(null, fn () => Artisan::call('consultation:dispatch-sms'));

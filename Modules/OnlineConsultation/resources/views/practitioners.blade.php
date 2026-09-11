@@ -37,6 +37,6 @@
             </tbody></table>
         </div>
     @endif
-    @if($people->hasPages())<div class="oc-pagination">{{ $people->links() }}</div>@endif
+    {{ $people->links('onlineconsultation::components.pagination') }}
 </section>
 @endsection

@@ -5,6 +5,15 @@
                 {{ $isEdited ? 'ویرایش کاربر' : 'افزودن کاربر جدید' }}
             </h1>
         </div>
+        @if($isEdited && $user)
+            @can('viewReport', $user)
+                <div class="ms-auto pageheader-btn">
+                    <a href="{{ route('admin.user.report', $user) }}" class="btn btn-azure">
+                        <i class="fa fa-line-chart me-1"></i> گزارش جامع کاربر
+                    </a>
+                </div>
+            @endcan
+        @endif
     </div>
 
     @include('admin::layouts.components.alert')

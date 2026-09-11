@@ -11,6 +11,9 @@ use Modules\AppointmentUser\app\Models\AppointmentUser;
 use Modules\OnlineConsultation\Services\AppointmentBillingService;
 use Modules\OnlineConsultation\Console\DispatchConsultationSms;
 use Modules\OnlineConsultation\Support\ConsultationAccess;
+use Modules\OnlineConsultation\Services\ConsultationReminderScheduler;
+use Modules\OnlineConsultation\Models\AppointmentCallLog;
+use Modules\OnlineConsultation\Models\AppointmentBillingRecord;
 
 class OnlineConsultationServiceProvider extends ServiceProvider
 {
@@ -32,6 +35,33 @@ class OnlineConsultationServiceProvider extends ServiceProvider
                 }
             }
         });
+        AppointmentUser::saved(function (AppointmentUser $appointment) {
+            if (ConsultationAccess::enabled()) {
+                try {
+                    app(ConsultationReminderScheduler::class)->syncAppointment($appointment);
+                } catch (\Throwable $exception) {
+                    report($exception);
+                }
+            }
+        });
+        AppointmentUser::deleted(function (AppointmentUser $appointment) {
+            try {
+                app(ConsultationReminderScheduler::class)->cancelPendingForAppointment($appointment->id, 'نوبت حذف شده است.');
+            } catch (\Throwable $exception) {
+                report($exception);
+            }
+        });
+        $refreshCallBilling = function (AppointmentCallLog $callLog) {
+            if (! $callLog->appointment_id || ! ConsultationAccess::enabled()) return;
+            try {
+                $record = AppointmentBillingRecord::where('appointment_id', $callLog->appointment_id)->first();
+                if ($record) app(AppointmentBillingService::class)->refresh($record);
+            } catch (\Throwable $exception) {
+                report($exception);
+            }
+        };
+        AppointmentCallLog::saved($refreshCallBilling);
+        AppointmentCallLog::deleted($refreshCallBilling);
         $this->app->booted(function () {
             $tenant = [InitializeTenancyByDomain::class, PreventAccessFromCentralDomains::class];
             Route::middleware(array_merge(['web'], $tenant, ['auth', 'admin', EnsureConsultationEnabled::class, 'can:ONLINE_CONSULTATION_MANAGE']))

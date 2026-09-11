@@ -7,7 +7,12 @@ use Illuminate\Notifications\Notification;
 
 class AutomaticConsultationSms extends Notification
 {
-    public function __construct(private readonly string $template, private readonly string $recipient, private readonly array $params) {}
+    public function __construct(
+        private readonly string $template,
+        private readonly string $recipient,
+        private readonly array $params,
+        private readonly ?string $message = null,
+    ) {}
 
     public function via(): array
     {
@@ -16,6 +21,6 @@ class AutomaticConsultationSms extends Notification
 
     public function toArray(): array
     {
-        return ['template' => $this->template, 'receptor' => $this->recipient, 'params' => $this->params];
+        return ['template' => $this->template, 'receptor' => $this->recipient, 'params' => $this->params, 'message' => $this->message];
     }
 }

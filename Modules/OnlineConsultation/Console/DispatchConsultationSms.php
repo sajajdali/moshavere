@@ -3,13 +3,11 @@
 namespace Modules\OnlineConsultation\Console;
 
 use Illuminate\Console\Command;
-use Modules\AppointmentUser\app\Models\AppointmentUser;
-use Modules\AppointmentUser\Enum\AppointmentUserKindEnum;
-use Modules\AppointmentUser\Enum\AppointmentUserStatusEnum;
 use Modules\OnlineConsultation\Jobs\SendConsultationSms;
 use Modules\OnlineConsultation\Models\ConsultationPractitioner;
 use Modules\OnlineConsultation\Models\ConsultationSmsDelivery;
 use Modules\OnlineConsultation\Services\ConsultantDashboardService;
+use Modules\OnlineConsultation\Services\ConsultationReminderScheduler;
 use Modules\Setting\Entities\Setting;
 use Modules\Setting\Enum\SettingKeyEnum;
 use Modules\OnlineConsultation\Support\ConsultationAccess;
@@ -20,29 +18,14 @@ class DispatchConsultationSms extends Command
 
     protected $description = 'Create and dispatch due automatic consultation SMS messages';
 
-    public function handle(ConsultantDashboardService $dashboard): int
+    public function handle(ConsultantDashboardService $dashboard, ConsultationReminderScheduler $reminders): int
     {
         if (! ConsultationAccess::enabled()) {
             return self::SUCCESS;
         }
 
-        foreach ($this->appointmentRules() as $type => $rule) {
-            if (! $this->enabled($rule['active']) || blank($template = Setting::v($rule['template']))) {
-                continue;
-            }
-            $minutes = max(0, (int) (Setting::v($rule['minutes']) ?? $rule['default']));
-            AppointmentUser::with(['user', 'doctor'])->whereIn('kind', [AppointmentUserKindEnum::ONLINE->value, AppointmentUserKindEnum::VOIP->value])
-                ->whereNotIn('status', [AppointmentUserStatusEnum::STATUS_CANCEL->value, AppointmentUserStatusEnum::STATUS_DISAPPROVED->value])
-                ->whereBetween('date_visit', [now()->addMinutes($minutes)->subMinute(), now()->addMinutes($minutes)->addMinute()])->chunkById(100, function ($appointments) use ($type, $rule, $minutes, $template) {
-                    foreach ($appointments as $appointment) {
-                        $recipient = $rule['recipient'] === 'patient' ? $appointment->user?->mobile : $appointment->doctor?->mobile;
-                        $this->create($type, $appointment->id, $appointment->doctor_id, $recipient, $template, $appointment->date_visit->copy()->subMinutes($minutes), [
-                            $rule['recipient'] === 'patient' ? $appointment->user?->fullName : $appointment->doctor?->fullName,
-                            verta($appointment->date_visit)->format('Y/m/d H:i'), $appointment->tracking_code ?: $appointment->id,
-                        ]);
-                    }
-                });
-        }
+        $reminders->syncDueCandidates();
+        $reminders->dispatchDue();
         $this->dispatchDailyReports($dashboard);
 
         return self::SUCCESS;
@@ -71,7 +54,7 @@ class DispatchConsultationSms extends Command
     private function create(string $type, ?int $appointmentId, ?int $practitionerId, ?string $recipient, string $template, $scheduledAt, array $params, ?string $scope = null): void
     {
         $key = implode(':', [$type, $appointmentId ?: $practitionerId, $scope ?: 'appointment']);
-        $delivery = ConsultationSmsDelivery::firstOrCreate(['deduplication_key' => $key], ['appointment_id' => $appointmentId, 'practitioner_id' => $practitionerId, 'type' => $type, 'recipient' => $recipient ?: '', 'template' => $template, 'scheduled_at' => $scheduledAt, 'payload' => ['params' => $params]]);
+        $delivery = ConsultationSmsDelivery::firstOrCreate(['deduplication_key' => $key], ['appointment_id' => $appointmentId, 'practitioner_id' => $practitionerId, 'type' => $type, 'recipient_type' => 'practitioner', 'rule_title' => 'گزارش پایان روز مشاور', 'recipient' => $recipient ?: '', 'template' => $template, 'scheduled_at' => $scheduledAt, 'payload' => ['params' => $params]]);
         if ($delivery->wasRecentlyCreated) {
             SendConsultationSms::dispatch($delivery->id, tenant()?->getTenantKey());
         }
@@ -82,13 +65,4 @@ class DispatchConsultationSms extends Command
         return (bool) Setting::v($key);
     }
 
-    private function appointmentRules(): array
-    {
-        return [
-            'patient_first_reminder' => ['active' => SettingKeyEnum::CONSULT_SMS_PATIENT_FIRST_ACTIVE, 'template' => SettingKeyEnum::CONSULT_SMS_PATIENT_FIRST_TEMPLATE, 'minutes' => SettingKeyEnum::CONSULT_SMS_PATIENT_FIRST_MINUTES, 'default' => 180, 'recipient' => 'patient'],
-            'patient_second_reminder' => ['active' => SettingKeyEnum::CONSULT_SMS_PATIENT_SECOND_ACTIVE, 'template' => SettingKeyEnum::CONSULT_SMS_PATIENT_SECOND_TEMPLATE, 'minutes' => SettingKeyEnum::CONSULT_SMS_PATIENT_SECOND_MINUTES, 'default' => 60, 'recipient' => 'patient'],
-            'patient_final_reminder' => ['active' => SettingKeyEnum::CONSULT_SMS_PATIENT_FINAL_ACTIVE, 'template' => SettingKeyEnum::CONSULT_SMS_PATIENT_FINAL_TEMPLATE, 'minutes' => SettingKeyEnum::CONSULT_SMS_PATIENT_FINAL_MINUTES, 'default' => 15, 'recipient' => 'patient'],
-            'practitioner_appointment_reminder' => ['active' => SettingKeyEnum::CONSULT_SMS_PRACTITIONER_REMINDER_ACTIVE, 'template' => SettingKeyEnum::CONSULT_SMS_PRACTITIONER_REMINDER_TEMPLATE, 'minutes' => SettingKeyEnum::CONSULT_SMS_PRACTITIONER_REMINDER_MINUTES, 'default' => 15, 'recipient' => 'practitioner'],
-        ];
-    }
 }

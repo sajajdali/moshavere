@@ -57,8 +57,59 @@ class AppointmentUser extends Model
         'status' => AppointmentUserStatusEnum::class,
         'date_visit' => 'datetime',
         'visited_at' => 'datetime',
+        'deadline_at' => 'datetime',
         'details' => 'json',
     ];
+
+    public function hasFinalizedPatientNoShow(): bool
+    {
+        return \Modules\OnlineConsultation\Support\ConsultationAccess::schemaReady(['appointment_consultation_cases'])
+            && $this->consultationCase?->state === 'PATIENT_NO_SHOW';
+    }
+
+    public function hasCompletedPhoneConsultation(): bool
+    {
+        return $this->kind === AppointmentUserKindEnum::VOIP
+            && \Modules\OnlineConsultation\Support\ConsultationAccess::schemaReady(['appointment_consultation_cases'])
+            && $this->consultationCase?->state === \Modules\OnlineConsultation\Models\AppointmentConsultationCase::STATE_COMPLETED;
+    }
+
+    public function save(array $options = [])
+    {
+        if (! $this->exists || ! $this->isDirty(['status', 'kind', 'user_id', 'doctor_id', 'date_visit', 'start_time', 'end_time'])) {
+            return parent::save($options);
+        }
+        // Serialize cancellation/rescheduling against final attendance and financial confirmation.
+        return \Illuminate\Support\Facades\DB::transaction(function () use ($options) {
+            static::withTrashed()->lockForUpdate()->findOrFail($this->getKey());
+            return parent::save($options);
+        });
+    }
+
+    public function delete()
+    {
+        if (! $this->exists) return parent::delete();
+        return \Illuminate\Support\Facades\DB::transaction(function () {
+            static::withTrashed()->lockForUpdate()->findOrFail($this->getKey());
+            $this->unsetRelation('consultationCase');
+            return parent::delete();
+        });
+    }
+
+    protected static function booted(): void
+    {
+        static::updating(function (self $appointment) {
+            if ($appointment->isDirty(['status', 'kind', 'user_id', 'doctor_id', 'date_visit', 'start_time', 'end_time'])
+                && $appointment->fresh()?->hasFinalizedPatientNoShow()) {
+                throw \Illuminate\Validation\ValidationException::withMessages(['appointment' => 'این نوبت بابت عدم حضور بیمار تسویه قطعی شده است؛ تغییر مشخصات، زمان یا لغو آن مجاز نیست.']);
+            }
+        });
+        static::deleting(function (self $appointment) {
+            if ($appointment->hasFinalizedPatientNoShow()) {
+                throw \Illuminate\Validation\ValidationException::withMessages(['appointment' => 'نوبت تسویه‌شده بابت عدم حضور بیمار برای حفظ سوابق مالی قابل حذف نیست.']);
+            }
+        });
+    }
 
     public function setting()
     {
@@ -128,6 +179,21 @@ class AppointmentUser extends Model
     public function doctor()
     {
         return $this->belongsTo(User::class, 'doctor_id', 'id');
+    }
+
+    public function consultationSmsDeliveries()
+    {
+        return $this->hasMany(\Modules\OnlineConsultation\Models\ConsultationSmsDelivery::class, 'appointment_id');
+    }
+
+    public function consultationCase()
+    {
+        return $this->hasOne(\Modules\OnlineConsultation\Models\AppointmentConsultationCase::class, 'appointment_id');
+    }
+
+    public function consultationReports()
+    {
+        return $this->hasMany(\Modules\OnlineConsultation\Models\AppointmentConsultationReport::class, 'appointment_id')->latest();
     }
 
     public function agent()

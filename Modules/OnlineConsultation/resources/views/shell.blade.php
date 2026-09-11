@@ -22,7 +22,7 @@
         @yield('consultation-header-actions')
     </header>
     <nav class="oc-tabs" aria-label="بخش‌های مشاوره آنلاین">
-        @foreach(['dashboard' => ['داشبورد', 'fa-chart-line', 'dashboard*'], 'consultants-dashboard.index' => ['داشبورد مشاوران تلفنی', 'fa-headset', 'consultants-dashboard.*'], 'practitioners' => ['پزشکان و کارشناسان', 'fa-user-doctor', 'practitioners*'], 'call-reports.index' => ['گزارش تماس‌ها', 'fa-chart-column', 'call-reports.*'], 'sms-deliveries.index' => ['گزارش پیامک‌ها', 'fa-comment-sms', 'sms-deliveries.*'], 'settings' => ['تنظیمات مشاوره', 'fa-sliders', 'settings*']] as $key => [$label, $icon, $active])
+        @foreach(['dashboard' => ['داشبورد', 'fa-chart-line', 'dashboard*'], 'consultants-dashboard.index' => ['داشبورد مشاوران تلفنی', 'fa-headset', 'consultants-dashboard.*'], 'financial-report.index' => ['گزارش جامع مالی', 'fa-coins', 'financial-report.*'], 'practitioners' => ['پزشکان و کارشناسان', 'fa-user-doctor', 'practitioners*'], 'call-reports.index' => ['گزارش تماس‌ها', 'fa-chart-column', 'call-reports.*'], 'sms-reminders.index' => ['یادآوری پیامکی', 'fa-comment-sms', 'sms-reminders.*'], 'settings' => ['تنظیمات مشاوره', 'fa-sliders', 'settings*']] as $key => [$label, $icon, $active])
             <a class="oc-tab" href="{{ route('admin.consultation.'.$key) }}" @if(request()->routeIs('admin.consultation.'.$active)) aria-current="page" @endif>
                 <i class="fa-solid {{ $icon }}" aria-hidden="true"></i><span>{{ $label }}</span>
             </a>

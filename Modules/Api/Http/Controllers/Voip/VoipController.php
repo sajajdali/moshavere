@@ -444,6 +444,8 @@ class VoipController extends Controller
     public function storeSurvey(Request $request)
     {
         $request->validate([
+            'appointmentCode' => 'required|integer',
+            'score' => 'nullable|integer|between:1,5',
             'file' => 'nullable|mimes:wav',
         ]);
 
@@ -472,11 +474,10 @@ class VoipController extends Controller
         ]);
 
         if ($request->filled('score')) {
-            FeedBack::create([
-                'appointment_user_id' => $appointmentUser->id,
-                'question' => 1,
-                'answer' => $request->input('score'),
-            ]);
+            FeedBack::updateOrCreate(
+                ['appointment_user_id' => $appointmentUser->id, 'question' => 1],
+                ['answer' => (int) $request->input('score')]
+            );
         }
 
         return $this->ok([
@@ -582,7 +583,12 @@ class VoipController extends Controller
             ->whereNull('place_id')
             ->whereNull('service_id')
             ->first();
-        Log::info('appointmentSetting is ' . $appointmentSetting->id);
+        Log::info('appointmentSetting lookup completed', [
+            'appointment_setting_id' => $appointmentSetting?->id,
+            'doctor_id' => $doctorId,
+            'place_id' => $placeId,
+            'service_id' => $serviceId,
+        ]);
         return $appointmentSetting;
     }
 

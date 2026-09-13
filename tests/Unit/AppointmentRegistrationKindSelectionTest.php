@@ -77,4 +77,19 @@ class AppointmentRegistrationKindSelectionTest extends TestCase
 
         $this->assertSame([AppointmentUserKindEnum::VOIP], $kinds);
     }
+
+    public function test_payment_choice_is_enabled_only_for_the_selected_paid_kind(): void
+    {
+        $detail = [AppointmentSetting::PAYMENT => [
+            AppointmentSetting::STATUS => true,
+            AppointmentSetting::IN_PERSON => [AppointmentSetting::STATUS => true],
+            AppointmentSetting::VOIP => [AppointmentSetting::STATUS => false],
+        ]];
+
+        $this->assertTrue(SpecificDayAppointmentRegistrationModal::isPaymentEnabledForKind($detail, AppointmentUserKindEnum::IN_PERSION));
+        $this->assertFalse(SpecificDayAppointmentRegistrationModal::isPaymentEnabledForKind($detail, AppointmentUserKindEnum::VOIP));
+
+        $detail[AppointmentSetting::PAYMENT][AppointmentSetting::STATUS] = false;
+        $this->assertFalse(SpecificDayAppointmentRegistrationModal::isPaymentEnabledForKind($detail, AppointmentUserKindEnum::IN_PERSION));
+    }
 }

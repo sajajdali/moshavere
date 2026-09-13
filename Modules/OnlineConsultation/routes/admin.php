@@ -11,6 +11,7 @@ use Modules\OnlineConsultation\Http\Controllers\ConsultationReminderController;
 use Modules\OnlineConsultation\Http\Controllers\ConsultationCaseController;
 use Modules\OnlineConsultation\Http\Controllers\ConsultantFinancialReportController;
 use Modules\OnlineConsultation\Http\Controllers\ConsultationCallbackController;
+use Modules\OnlineConsultation\Http\Controllers\AppointmentAlternatePhoneController;
 
 Route::get('/', [ConsultationController::class, 'dashboard'])->name('dashboard');
 Route::get('/settings', [ConsultationController::class, 'settings'])->name('settings');
@@ -32,9 +33,12 @@ Route::post('/sms-reminders', [ConsultationReminderController::class, 'store'])-
 Route::put('/sms-reminders/{rule}', [ConsultationReminderController::class, 'update'])->whereNumber('rule')->name('sms-reminders.update');
 Route::delete('/sms-reminders/{rule}', [ConsultationReminderController::class, 'destroy'])->whereNumber('rule')->name('sms-reminders.destroy');
 Route::get('/call-reports/appointments/{appointment}', [CallReportController::class, 'appointment'])->whereNumber('appointment')->withTrashed()->name('call-reports.appointment');
+Route::put('/call-reports/appointments/{appointment}/time', [CallReportController::class, 'updateAppointmentTime'])->whereNumber('appointment')->name('call-reports.appointment-time.update');
 Route::post('/call-reports/appointments/{appointment}/callback', [ConsultationCallbackController::class, 'store'])->whereNumber('appointment')->name('callback.store');
 Route::post('/call-reports/appointments/{appointment}/reports', [ConsultationCaseController::class, 'storeReport'])->whereNumber('appointment')->name('case.reports.store');
 Route::post('/call-reports/appointments/{appointment}/note', [ConsultationCaseController::class, 'storeNote'])->whereNumber('appointment')->name('case.note.store');
+Route::post('/call-reports/appointments/{appointment}/alternate-phones', [AppointmentAlternatePhoneController::class, 'store'])->whereNumber('appointment')->name('alternate-phones.store');
+Route::delete('/call-reports/appointments/{appointment}/alternate-phones/{alternatePhone}', [AppointmentAlternatePhoneController::class, 'destroy'])->whereNumber(['appointment', 'alternatePhone'])->name('alternate-phones.destroy');
 Route::post('/call-reports/appointments/{appointment}/complete', [ConsultationCaseController::class, 'complete'])->whereNumber('appointment')->name('case.complete');
 Route::post('/call-reports/appointments/{appointment}/reopen', [ConsultationCaseController::class, 'reopen'])->whereNumber('appointment')->name('case.reopen');
 Route::get('/call-reports/calls/{callLog}', [CallReportController::class, 'call'])->whereNumber('callLog')->name('call-reports.call');

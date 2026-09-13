@@ -144,7 +144,7 @@ class CallReportDemoSeeder extends Seeder
         }
         $todayRefunded = $todayRefunded?->fresh();
         $todayEffectiveRefund = (int) ($todayRefunded?->refunded_amount ?? 0) + (int) ($todayRefunded?->adjustments()->sum('amount_change') ?? 0);
-        $todayRoundedRefund = $billingService->amountForMinutes((int) ($todayRefunded?->hourly_rate_snapshot ?? 0), 20);
+        $todayRoundedRefund = $billingService->refundForUnusedMinutes((int) ($todayRefunded?->total_paid_amount ?? 0), (int) ($todayRefunded?->reserved_minutes ?? 0), 20);
         if ($todayRefunded?->refund_status === 'completed' && $todayEffectiveRefund !== $todayRoundedRefund) {
             $billingService->correctCompletedRefund(
                 $todayRefunded, 20, $users['doctor_1'],
@@ -159,7 +159,7 @@ class CallReportDemoSeeder extends Seeder
             }
             $effectiveMinutes = (int) ($demoBilling->adjustments()->latest('id')->value('corrected_unused_minutes') ?? $demoBilling->approved_unused_minutes);
             $effectiveAmount = (int) $demoBilling->refunded_amount + (int) $demoBilling->adjustments()->sum('amount_change');
-            $roundedAmount = $billingService->amountForMinutes((int) $demoBilling->hourly_rate_snapshot, $effectiveMinutes);
+            $roundedAmount = $billingService->refundForUnusedMinutes((int) $demoBilling->total_paid_amount, (int) $demoBilling->reserved_minutes, $effectiveMinutes);
             if ($effectiveAmount !== $roundedAmount) {
                 $billingService->correctCompletedRefund(
                     $demoBilling, $effectiveMinutes, User::findOrFail($demoBilling->practitioner_id),

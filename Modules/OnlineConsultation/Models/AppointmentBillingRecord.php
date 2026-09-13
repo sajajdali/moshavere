@@ -17,6 +17,8 @@ class AppointmentBillingRecord extends Model
         'reserved_minutes' => 'integer',
         'raw_answered_talk_seconds' => 'integer',
         'ignored_talk_seconds' => 'integer',
+        'connection_overhead_minutes_snapshot' => 'integer',
+        'billable_talk_seconds' => 'integer',
         'answered_talk_seconds' => 'integer',
         'total_paid_amount' => 'integer',
         'used_amount' => 'integer',

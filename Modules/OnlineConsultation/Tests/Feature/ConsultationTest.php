@@ -64,6 +64,7 @@ class ConsultationTest extends TestCase
             'Modules/OnlineConsultation/database/migrations/tenant/2026_09_10_000012_add_note_to_appointment_consultation_cases.php',
             'Modules/OnlineConsultation/database/migrations/tenant/2026_09_10_000013_add_financial_split_to_consultation_billing.php',
             'Modules/OnlineConsultation/database/migrations/tenant/2026_09_11_000014_create_appointment_callback_requests_table.php',
+            'Modules/OnlineConsultation/database/migrations/tenant/2026_09_12_000016_create_appointment_alternate_phones_table.php',
         ] as $path) {
             (require base_path($path))->up();
         }
@@ -454,8 +455,8 @@ class ConsultationTest extends TestCase
         Http::fake(['https://calls.example.test/api/v1/VoIP/request_call' => Http::response(['message' => 'queued'], 202)]);
         ConsultationSetting::current()->update([
             'voip_host' => 'https://calls.example.test',
-            'voip_username' => null,
-            'voip_secret' => null,
+            'voip_username' => 'api-user',
+            'voip_secret' => 'api-password',
         ]);
         $appointment = $this->noShowAppointment();
 
@@ -469,7 +470,9 @@ class ConsultationTest extends TestCase
             ->assertSee('201');
         $this->post($url)->assertSessionHasNoErrors()->assertSessionHas('success');
 
-        Http::assertSent(fn ($request) => $request->url() === 'https://calls.example.test/api/v1/VoIP/request_call' && $request->data() === [
+        Http::assertSent(fn ($request) => $request->url() === 'https://calls.example.test/api/v1/VoIP/request_call'
+            && $request->hasHeader('Authorization', 'Basic '.base64_encode('api-user:api-password'))
+            && $request->data() === [
             'appointment_id' => $appointment->id,
             'patient_phone' => '09125550123',
             'advisor_extension' => '201',
@@ -487,7 +490,7 @@ class ConsultationTest extends TestCase
             ->assertOk()->assertSee('appointment-'.$appointment->id.'-callback-1')->assertSee('پذیرفته شد');
     }
 
-    public function test_patient_callback_appears_after_five_minutes_only_when_patient_has_not_called(): void
+    public function test_patient_callback_remains_available_after_five_minutes_even_when_patient_has_called(): void
     {
         Http::fake(['https://calls.example.test/api/v1/VoIP/request_call' => Http::response(['message' => 'queued'], 202)]);
         ConsultationSetting::current()->update(['voip_host' => 'https://calls.example.test']);
@@ -518,17 +521,21 @@ class ConsultationTest extends TestCase
         ]);
         $this->get($pageUrl)
             ->assertOk()
-            ->assertSee('بیمار پس از شروع نوبت تماس گرفته است')
-            ->assertDontSee($callbackUrl, false);
-        $this->post($callbackUrl)->assertSessionHasErrors('callback');
-        Http::assertNothingSent();
+            ->assertSee('تماس اتوماتیک')
+            ->assertSee($callbackUrl, false);
+        $this->post($callbackUrl)->assertSessionHasNoErrors();
+        Http::assertSentCount(1);
         $this->travelBack();
     }
 
     public function test_failed_consultant_callback_is_logged_with_the_server_error(): void
     {
         Http::fake(['https://calls.example.test/api/v1/VoIP/request_call' => Http::response(['message' => 'PBX unavailable'], 503)]);
-        ConsultationSetting::current()->update(['voip_host' => 'https://calls.example.test']);
+        ConsultationSetting::current()->update([
+            'voip_host' => 'https://calls.example.test',
+            'voip_username' => 'api-user',
+            'voip_secret' => 'api-password',
+        ]);
         $appointment = $this->noShowAppointment();
 
         $this->post('/admin/online-consultation/call-reports/appointments/'.$appointment->id.'/callback')
@@ -539,6 +546,49 @@ class ConsultationTest extends TestCase
             'status' => AppointmentCallbackRequest::STATUS_FAILED,
             'http_status' => 503,
         ]);
+    }
+
+    public function test_consultant_callback_is_not_sent_without_complete_basic_auth_settings(): void
+    {
+        Http::fake();
+        ConsultationSetting::current()->update([
+            'voip_host' => 'http://rokhvanak.ir:2214/',
+            'voip_username' => 'sajjad',
+            'voip_secret' => null,
+        ]);
+        $appointment = $this->noShowAppointment();
+
+        $this->post('/admin/online-consultation/call-reports/appointments/'.$appointment->id.'/callback')
+            ->assertSessionHasErrors('callback');
+
+        Http::assertNothingSent();
+        $this->assertDatabaseHas('appointment_callback_requests', [
+            'appointment_id' => $appointment->id,
+            'endpoint' => 'http://rokhvanak.ir:2214/api/v1/VoIP/request_call',
+            'status' => AppointmentCallbackRequest::STATUS_FAILED,
+            'http_status' => null,
+        ]);
+        $this->assertStringContainsString('Basic Auth', session('errors')->first('callback'));
+    }
+
+    public function test_consultant_callback_uses_existing_general_voip_basic_auth_settings(): void
+    {
+        Http::fake(['http://rokhvanak.ir:2214/api/v1/VoIP/request_call' => Http::response(['queued' => true], 202)]);
+        ConsultationSetting::current()->update([
+            'voip_host' => 'http://rokhvanak.ir:2214/',
+            'voip_username' => null,
+            'voip_secret' => null,
+        ]);
+        \Modules\Setting\Entities\Setting::setVal(\Modules\Setting\Enum\SettingKeyEnum::VOIP_USERNAME->value, 'sajjad');
+        \Modules\Setting\Entities\Setting::setVal(\Modules\Setting\Enum\SettingKeyEnum::VOIP_PASSWORD->value, 'server-password');
+        $appointment = $this->noShowAppointment();
+
+        $this->post('/admin/online-consultation/call-reports/appointments/'.$appointment->id.'/callback')
+            ->assertSessionHasNoErrors()
+            ->assertSessionHas('success');
+
+        Http::assertSent(fn ($request) => $request->url() === 'http://rokhvanak.ir:2214/api/v1/VoIP/request_call'
+            && $request->hasHeader('Authorization', 'Basic '.base64_encode('sajjad:server-password')));
     }
 
     public function test_consultant_callback_accepts_only_http_202_and_does_not_follow_redirects(): void
@@ -698,6 +748,7 @@ class ConsultationTest extends TestCase
             'user_id' => $patient->id, 'doctor_id' => $this->manager->id,
             'status' => 1, 'type' => 1, 'kind' => 3, 'date_visit' => now()->subHour(),
             'start_time' => '10:00:00', 'end_time' => '11:00:00', 'tracking_code' => 'FINAL-REFUND-TEST',
+            'details' => [AppointmentUser::DETAIL_PAYMENT => [AppointmentUser::DETAIL_PAYMENT_PRICE => ['int' => 1000000]]],
         ]));
         $billing = app(AppointmentBillingService::class)->ensure($appointment);
 
@@ -743,6 +794,7 @@ class ConsultationTest extends TestCase
             'user_id' => $patient->id, 'doctor_id' => $this->manager->id,
             'status' => 1, 'type' => 1, 'kind' => 3, 'date_visit' => now()->subHour(),
             'start_time' => '10:00:00', 'end_time' => '11:00:00', 'tracking_code' => 'SPLIT-TEST',
+            'details' => [AppointmentUser::DETAIL_PAYMENT => [AppointmentUser::DETAIL_PAYMENT_PRICE => ['int' => 1000000]]],
         ]));
         foreach ([1800, 360] as $index => $seconds) {
             AppointmentCallLog::create([
@@ -761,10 +813,12 @@ class ConsultationTest extends TestCase
 
         $this->assertSame(2160, $billing->raw_answered_talk_seconds);
         $this->assertSame(360, $billing->ignored_talk_seconds);
-        $this->assertSame(1800, $billing->answered_talk_seconds);
-        $this->assertSame(500000, $billing->suggested_refund_amount);
-        $this->assertSame(300000, $billing->practitioner_earned_amount);
-        $this->assertSame(200000, $billing->platform_profit_amount);
+        $this->assertSame(2160, $billing->answered_talk_seconds);
+        $this->assertSame(2520, $billing->billable_talk_seconds);
+        $this->assertSame(6, $billing->connection_overhead_minutes_snapshot);
+        $this->assertSame(300000, $billing->suggested_refund_amount);
+        $this->assertSame(420000, $billing->practitioner_earned_amount);
+        $this->assertSame(280000, $billing->platform_profit_amount);
     }
 
     public function test_cancelled_appointment_is_excluded_and_cannot_be_refunded_while_pending_money_is_not_final_income(): void
@@ -776,6 +830,7 @@ class ConsultationTest extends TestCase
             'status' => AppointmentUserStatusEnum::STATUS_SUCCESSFUL->value,
             'type' => 1, 'kind' => 3, 'date_visit' => now()->subHour(),
             'start_time' => '10:00:00', 'end_time' => '11:00:00', 'tracking_code' => 'CANCELLED-FINANCE-TEST',
+            'details' => [AppointmentUser::DETAIL_PAYMENT => [AppointmentUser::DETAIL_PAYMENT_PRICE => ['int' => 1000000]]],
         ]));
         $billing = app(AppointmentBillingService::class)->ensure($appointment);
 
@@ -798,6 +853,43 @@ class ConsultationTest extends TestCase
         $this->get('/admin/online-consultation/call-reports')->assertOk()->assertDontSee('CANCELLED-FINANCE-TEST');
     }
 
+    public function test_fixed_alternate_phone_is_validated_unique_and_attached_one_at_a_time(): void
+    {
+        $first = $this->noShowAppointment();
+        $secondPatient = User::create(['mobile' => '09121112222', 'password' => 'test-password']);
+        $second = AppointmentUser::withoutEvents(fn () => AppointmentUser::create([
+            'user_id' => $secondPatient->id, 'doctor_id' => $this->manager->id,
+            'status' => 1, 'type' => 1, 'kind' => 3, 'date_visit' => now(),
+            'start_time' => '12:00:00', 'end_time' => '12:30:00', 'tracking_code' => 'ALT-PHONE-2',
+        ]));
+
+        $url = '/admin/online-consultation/call-reports/appointments/'.$first->id.'/alternate-phones';
+        $this->post($url, ['alternate_phone' => '09121234567'])->assertSessionHasErrors('alternate_phone');
+        $this->post($url, ['alternate_phone' => '0211234567'])->assertSessionHasErrors('alternate_phone');
+        $this->postJson($url, ['alternate_phone' => '۰۲۱۱۲۳۴۵۶۷۸'])
+            ->assertCreated()
+            ->assertJsonPath('phone.number', '02112345678')
+            ->assertJsonStructure(['message', 'phone' => ['id', 'number', 'creator', 'created_at', 'delete_url']]);
+        $this->assertDatabaseHas('appointment_alternate_phones', [
+            'appointment_id' => $first->id, 'patient_id' => $first->user_id, 'phone' => '02112345678',
+        ]);
+        $samePatientAppointment = AppointmentUser::withoutEvents(fn () => AppointmentUser::create([
+            'user_id' => $first->user_id, 'doctor_id' => $this->manager->id,
+            'status' => 1, 'type' => 1, 'kind' => 3, 'date_visit' => now()->addDay(),
+            'start_time' => '15:00:00', 'end_time' => '15:30:00', 'tracking_code' => 'ALT-PHONE-SAME-PATIENT',
+        ]));
+        $this->get('/admin/online-consultation/call-reports/appointments/'.$samePatientAppointment->id)
+            ->assertOk()->assertSee('02112345678');
+
+        $this->post('/admin/online-consultation/call-reports/appointments/'.$second->id.'/alternate-phones', [
+            'alternate_phone' => '02112345678',
+        ])->assertSessionHasErrors('alternate_phone');
+        $this->assertSame(1, \Modules\OnlineConsultation\Models\AppointmentAlternatePhone::count());
+
+        $this->get('/admin/online-consultation/call-reports/appointments/'.$first->id)
+            ->assertOk()->assertSee('شماره‌های ثابت بیمار')->assertSee('02112345678');
+    }
+
     public function test_practitioner_can_report_complete_and_reopen_a_consultation_case(): void
     {
         $patient = User::create(['mobile' => '09124445566', 'password' => 'test-password']);
@@ -811,6 +903,10 @@ class ConsultationTest extends TestCase
         $this->get('/admin/online-consultation/call-reports/appointments/'.$appointment->id)
             ->assertOk()
             ->assertSee('تاریخ و ساعت گزارش')
+            ->assertSee('data-bs-target="#complete-consultation-modal"', false)
+            ->assertSee('id="complete-consultation-modal"', false)
+            ->assertSee('هنوز امکان اتمام مشاوره وجود ندارد')
+            ->assertDontSee('id="complete-consultation-submit"', false)
             ->assertSee('value="'.verta(now('Asia/Tehran'))->format('Y/m/d').'"', false)
             ->assertSee('value="'.now('Asia/Tehran')->format('H:i').'"', false);
 
@@ -831,6 +927,11 @@ class ConsultationTest extends TestCase
             'appointment_id' => $appointment->id, 'author_id' => $this->manager->id,
             'outcome' => 'FOLLOW_UP_REQUIRED', 'subject' => 'نیاز به بررسی مجدد',
         ]);
+        $this->get('/admin/online-consultation/call-reports/appointments/'.$appointment->id)
+            ->assertOk()
+            ->assertSee('id="complete-consultation-modal"', false)
+            ->assertSee('id="complete-consultation-submit"', false)
+            ->assertDontSee('هنوز امکان اتمام مشاوره وجود ندارد');
         $storedFollowUp = \Modules\OnlineConsultation\Models\AppointmentConsultationReport::firstOrFail()->follow_up_at;
         $this->assertSame(
             Verta::parse('1405/06/25')->toCarbon()->setTime(14, 30)->format('Y-m-d H:i'),

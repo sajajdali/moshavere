@@ -29,6 +29,7 @@
         .appointment-search input{height:44px;border-radius:11px;background:#fbfcfd;padding-right:40px;font-size:13.5px}
         .appointment-search input:focus,.appointment-filter-grid input:focus,.appointment-filter-grid select:focus{border-color:#0f766e;box-shadow:0 0 0 3px rgba(15,118,110,.10)}
         .appointment-tabs{display:flex;align-items:center;gap:6px;padding:4px;background:#f2f4f7;border-radius:11px;flex-wrap:wrap}
+        .voip-followup-filter select{height:42px;min-width:205px;border:1px solid #fdb022;border-radius:10px;padding:0 11px;background:#fffaeb;color:#93370d;font-size:12.5px;font-weight:600;outline:none}
         .appointment-tab{height:34px;padding:0 14px;border-radius:8px;border:none;background:transparent;color:#667085;font-size:12.5px;font-weight:500}
         .appointment-tab.active{background:#fff;color:#0f766e;font-weight:600;box-shadow:0 1px 2px rgba(16,24,40,.08)}
         .appointment-advanced{padding:22px 18px;background:#fbfcfd;border-bottom:1px solid #eef0f3}
@@ -57,10 +58,26 @@
         .th-sort-arrow{font-size:10px;color:#c8cdd4;transition:color .15s}
         .th-sortable.active .th-sort-arrow{color:#0f766e}
         .appointment-row{padding:10px 8px;border-bottom:1px solid #eef0f3;background:#fff}
+        .appointment-row.is-voip-incomplete{box-shadow:inset -4px 0 #f79009;background:#fffbeb!important}.appointment-row.is-voip-critical{box-shadow:inset -5px 0 #d92d20;background:#fff4f2!important}
         .appointment-row>div{padding:0 5px;min-width:0}
         .om-avatar{width:36px;height:36px;flex:none;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:600;color:#fff;background:#0f766e}
         .om-pill{display:inline-flex;align-items:center;gap:5px;font-size:11.5px;font-weight:500;padding:3px 9px;border-radius:20px;border:1px solid #d5dae1;background:#f9fafb;color:#475467;white-space:nowrap}
         .om-status{display:inline-flex;align-items:center;justify-content:center;width:100%;font-size:12px;font-weight:600;padding:6px 10px;border-radius:8px}
+        .om-appointment-state{display:flex;flex-direction:column;align-items:stretch;gap:7px;width:100%}
+        .om-status-main{position:relative;min-height:34px;border-radius:10px!important;box-shadow:0 1px 2px rgba(16,24,40,.05);gap:7px}
+        .om-status-main i{font-size:12px}
+        .om-status-main.dropdown-toggle:after{position:absolute;left:10px;margin:0}
+        .om-state-meta{display:flex;align-items:center;justify-content:center;gap:5px;flex-wrap:wrap}
+        .om-state-chip{display:inline-flex;align-items:center;gap:5px;min-height:25px;padding:3px 8px;border:1px solid transparent;border-radius:8px;font-size:10.5px;font-weight:600;line-height:1.2;white-space:nowrap}
+        .om-state-chip i{font-size:10px}
+        .om-state-chip-completed{background:#ecfdf3;color:#067647;border-color:#abefc6}
+        .om-state-chip-survey{background:#f4f3ff;color:#5925dc;border-color:#d9d6fe;cursor:pointer}
+        .om-state-chip-survey:hover{background:#ebe9fe;color:#4a1fb8;text-decoration:none}
+        button.om-state-chip{font-family:inherit}
+        .om-state-chip-consultation{background:#eef8ff;color:#026aa2;border-color:#b9e6fe;cursor:pointer}
+        .om-state-chip-consultation:hover{background:#e0f2fe;color:#075985}
+        .om-state-chip-noshow{background:#fef3f2;color:#b42318;border-color:#fecdca}
+        .om-state-chip-financial-done{background:#ecfdf3;color:#067647;border-color:#abefc6}.om-state-chip-action-needed{background:#fff1f0;color:#b42318;border-color:#fda29b}.om-state-chip-action-needed i{font-size:11px}
         .payment-expiry{display:flex;align-items:center;justify-content:center;gap:5px;width:100%;margin-top:5px;padding:5px 7px;border-radius:7px;background:#fff7e6;border:1px solid #fedf89;color:#93370d;font-size:10.5px;font-weight:600;line-height:1.45;text-align:center}
         .payment-expiry i{font-size:11px;flex:none}
         .payment-expiry.is-expired{background:#fef3f2;border-color:#fecdca;color:#b42318}
@@ -141,6 +158,7 @@
                     <button class="appointment-tab {{ (string) $search['AppointmentStatus'] === (string) \Modules\AppointmentUser\Enum\AppointmentUserStatusEnum::STATUS_MONITORING->value ? 'active' : '' }}" wire:click="$set('search.AppointmentStatus', {{ \Modules\AppointmentUser\Enum\AppointmentUserStatusEnum::STATUS_MONITORING->value }})" type="button">در انتظار تایید</button>
                     <button class="appointment-tab {{ (string) $search['AppointmentStatus'] === (string) \Modules\AppointmentUser\Enum\AppointmentUserStatusEnum::STATUS_CANCEL->value ? 'active' : '' }}" wire:click="$set('search.AppointmentStatus', {{ \Modules\AppointmentUser\Enum\AppointmentUserStatusEnum::STATUS_CANCEL->value }})" type="button">کنسل شده</button>
                 </div>
+                <div class="voip-followup-filter"><select wire:model.live="search.voip_followup_status" aria-label="فیلتر پیگیری نوبت‌های ویپ"><option value="">همه وضعیت‌های پیگیری ویپ</option><option value="incomplete_any">نیازمند پیگیری (تسویه یا اتمام)</option><option value="both_missing">تسویه و اتمام هر دو انجام نشده</option><option value="settlement_missing">محاسبه و تسویه انجام نشده</option><option value="completion_missing">اتمام ویزیت انجام نشده</option><option value="completed_both">تسویه و اتمام کامل شده</option></select></div>
                 <button class="om-btn {{ $hasFilters ? 'om-btn-primary' : '' }}" type="button" data-bs-toggle="collapse" data-bs-target="#advanceSearch">
                     <i class="fa fa-sliders"></i><span>جست و جوی پیشرفته</span>
                 </button>
@@ -246,23 +264,28 @@
                                 \Modules\AppointmentUser\Enum\AppointmentUserStatusEnum::STATUS_WAIT_PAYMENT => '#e9f3ff',
                                 default => $loop->odd ? '#f7fbff' : '#fff',
                             };
+                            $appointmentEnd = $ap->date_visit?->copy()->setTimeFromTimeString($ap->end_time ?: $ap->date_visit->format('H:i:s'));
+                            if ($appointmentEnd && $ap->start_time && $ap->end_time && $ap->end_time <= $ap->start_time) $appointmentEnd->addDay();
+                            $isPastVoip = $ap->kind === \Modules\AppointmentUser\Enum\AppointmentUserKindEnum::VOIP
+                                && $appointmentEnd?->isPast()
+                                && !in_array($ap->status, [\Modules\AppointmentUser\Enum\AppointmentUserStatusEnum::STATUS_CANCEL, \Modules\AppointmentUser\Enum\AppointmentUserStatusEnum::STATUS_DISAPPROVED], true);
+                            $financialDone = $ap->billingRecord?->refund_status === 'completed';
+                            $visitDone = $ap->consultationCase?->isClosed() ?? false;
+                            $voipAttentionClass = $isPastVoip && !$financialDone && !$visitDone
+                                ? 'is-voip-critical'
+                                : ($isPastVoip && (!$financialDone || !$visitDone) ? 'is-voip-incomplete' : '');
                             $userDocumentRoute = $ap->user
                                 ? ($ap->kind === \Modules\AppointmentUser\Enum\AppointmentUserKindEnum::VOIP
                                     ? route('admin.user.report', ['user' => $ap->user->id])
                                     : route('admin.user.document', ['user' => $ap->user->id]))
                                 : '#';
                         @endphp
-                        <div class="appointment-grid appointment-row" style="background:{{ $rowBackground }}" wire:key="appointment-row-{{ $ap->id }}">
+                        <div class="appointment-grid appointment-row {{ $voipAttentionClass }}" style="background:{{ $rowBackground }}" wire:key="appointment-row-{{ $ap->id }}">
                             <div>
                                 <input wire:model="form.checkbox.{{ $ap->id }}" class="checkbox row-checkbox" id="checkbox-{{ $ap->id }}" type="checkbox" style="width:16px;height:16px;accent-color:#0f766e">
                             </div>
                             <div class="d-flex flex-column align-items-center gap-1">
                                 <span style="font-size:13px;font-weight:600;color:#344054">{{ $ap->id }}</span>
-                                @can('appointment_user.feedBack')
-                                    @if ($ap->feedbacks->isNotEmpty() || $ap->surveyVoiceUrl())
-                                        <a wire:click="lunchFeedBackModal({{ $ap->id }})" href="#"><span class="om-pill" style="background:#f4f3ff;color:#5925dc;border-color:#e3e0ff">نظرسنجی</span></a>
-                                    @endif
-                                @endcan
                             </div>
                             <div class="d-flex align-items-center" style="padding-right:2px;padding-left:2px">
                                 <div class="d-flex flex-column min-w-0">
@@ -306,19 +329,34 @@
                                 <span style="font-size:12.5px;color:#344054" dir="ltr">{{ verta($ap->created_at)->format('Y/m/d') }}</span>
                                 <span class="om-muted" dir="ltr">{{ verta($ap->created_at)->format('H:i') }}</span>
                             </div>
-                            <div class="d-flex flex-column align-items-center gap-1">
-                                <div class="d-flex align-items-center gap-2 w-100">
-                                    @if($ap->hasFinalizedPatientNoShow())<span class="om-pill" style="color:#b42318">عدم حضور بیمار · تسویه کامل</span>@endif
-                                    @if($ap->hasCompletedPhoneConsultation())<span class="om-pill" style="background:#ecfdf3;color:#067647;border-color:#abefc6">مشاوره تمام شده</span>@endif
+                            <div class="om-appointment-state">
+                                <div class="w-100">
                                     @canany(['update', 'delete'], $ap)
                                         <div class="btn-group w-100">
-                                            <button type="button" class="om-status dropdown-toggle" style="{{ $statusClass }}" data-bs-toggle="dropdown" data-bs-boundary="viewport">{{ $ap->status->getName() }}</button>
+                                            <button type="button" class="om-status om-status-main dropdown-toggle" style="{{ $statusClass }}" data-bs-toggle="dropdown" data-bs-boundary="viewport"><i class="fa {{ $ap->status === \Modules\AppointmentUser\Enum\AppointmentUserStatusEnum::STATUS_SUCCESSFUL ? 'fa-check-circle' : 'fa-circle-o' }}"></i>{{ $ap->status->getName() }}</button>
                                             <ul class="dropdown-menu dropdown-menu-end" role="menu">@include('appointmentuser::components.appointmentlist.operationbutton', ['quickTimeEditEnabled' => true])</ul>
                                         </div>
                                     @else
-                                        <span class="om-status" style="{{ $statusClass }}">{{ $ap->status->getName() }}</span>
+                                        <span class="om-status om-status-main" style="{{ $statusClass }}"><i class="fa {{ $ap->status === \Modules\AppointmentUser\Enum\AppointmentUserStatusEnum::STATUS_SUCCESSFUL ? 'fa-check-circle' : 'fa-circle-o' }}"></i>{{ $ap->status->getName() }}</span>
                                     @endcan
                                 </div>
+                                @if($ap->kind === \Modules\AppointmentUser\Enum\AppointmentUserKindEnum::VOIP || $ap->hasFinalizedPatientNoShow() || $ap->hasCompletedPhoneConsultation() || (auth()->user()->can('appointment_user.feedBack') && ($ap->feedbacks->isNotEmpty() || $ap->surveyVoiceUrl())))
+                                    <div class="om-state-meta">
+                                        @if($ap->hasFinalizedPatientNoShow())<span class="om-state-chip om-state-chip-noshow"><i class="fa fa-user-times"></i>عدم حضور · تسویه کامل</span>@endif
+                                        @if($ap->hasCompletedPhoneConsultation())<span class="om-state-chip om-state-chip-completed"><i class="fa fa-check"></i>مشاوره پایان یافته</span>@endif
+                                        @can('appointment_user.feedBack')
+                                            @if ($ap->feedbacks->isNotEmpty() || $ap->surveyVoiceUrl())
+                                                <button type="button" class="om-state-chip om-state-chip-survey" wire:click="lunchFeedBackModal({{ $ap->id }})"><i class="fa fa-star"></i>مشاهده نظرسنجی</button>
+                                            @endif
+                                        @endcan
+                                        @if($ap->kind === \Modules\AppointmentUser\Enum\AppointmentUserKindEnum::VOIP)
+                                            <button type="button" class="om-state-chip om-state-chip-consultation" wire:click="openConsultationSummary({{ $ap->id }})"><i class="fa fa-eye"></i>جزئیات مشاوره</button>
+                                            @if($financialDone)<span class="om-state-chip om-state-chip-financial-done"><i class="fa fa-credit-card"></i>تسویه شده</span>@elseif($isPastVoip)<span class="om-state-chip om-state-chip-action-needed"><i class="fa fa-exclamation-circle"></i>تسویه نشده</span>@endif
+                                            @if(!$visitDone && $isPastVoip)<span class="om-state-chip om-state-chip-action-needed"><i class="fa fa-lock-open"></i>اتمام نزده</span>@endif
+                                        @endif
+                                    </div>
+                                @endif
+                                <div class="om-state-meta"><button type="button" class="om-state-chip" style="background:#ecfdf3;color:#067647;border-color:#a6f4c5" wire:click="openFinancialSummary({{ $ap->id }})" wire:loading.attr="disabled" wire:target="openFinancialSummary({{ $ap->id }})"><i class="fa fa-credit-card"></i>وضعیت مالی</button></div>
                                 @if (
                                     $ap->status === \Modules\AppointmentUser\Enum\AppointmentUserStatusEnum::STATUS_WAIT_PAYMENT
                                     && data_get($ap->details, \Modules\AppointmentUser\app\Models\AppointmentUser::DETAIL_PAYMENT . '.status') === true
@@ -390,6 +428,8 @@
         <div>
             @include('appointmentuser::components.appointmentlist.disapprovemodal')
             @include('appointmentuser::components.appointmentlist.feedbackmodal')
+            @include('appointmentuser::components.appointmentlist.consultationsummarymodal')
+            @include('appointmentuser::components.appointmentlist.financialsummarymodal')
             @include('appointmentuser::components.appointmentlist.quicktimeeditmodal')
         </div>
     </div>
@@ -485,8 +525,27 @@
             });
             Livewire.on('lunchFeedBackModal', function() {
                 setTimeout(function() {
-                    new bootstrap.Modal(document.getElementById('feedBackModal'), { keyboard: false }).show();
-                }, 1000);
+                    const modalElement = document.getElementById('feedBackModal');
+                    if (modalElement && window.bootstrap) {
+                        bootstrap.Modal.getOrCreateInstance(modalElement, { keyboard: true }).show();
+                    }
+                }, 120);
+            });
+            Livewire.on('openConsultationSummaryModal', function() {
+                setTimeout(function() {
+                    const modalElement = document.getElementById('consultationSummaryModal');
+                    if (modalElement && window.bootstrap) {
+                        bootstrap.Modal.getOrCreateInstance(modalElement, { keyboard: true }).show();
+                    }
+                }, 120);
+            });
+            Livewire.on('openFinancialSummaryModal', function() {
+                setTimeout(function() {
+                    const modalElement = document.getElementById('financialSummaryModal');
+                    if (modalElement && window.bootstrap) {
+                        bootstrap.Modal.getOrCreateInstance(modalElement, { keyboard: true }).show();
+                    }
+                }, 120);
             });
             Livewire.on('dateFormatWrong', function() {
                 setTimeout(function() { $('html, body').animate({ scrollTop: 0 }, 100); }, 50);

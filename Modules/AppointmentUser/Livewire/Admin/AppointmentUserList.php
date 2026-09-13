@@ -44,6 +44,7 @@ class AppointmentUserList extends Component
         'section_status'       => null,
         'Doc_id'               => null,
         'kind'                 => null,
+        'voip_followup_status' => null,
     ];
     public array $fetchData = [];
     public array $setting = [];
@@ -56,6 +57,8 @@ class AppointmentUserList extends Component
         'send_sms' => false,
     ];
     public array $quickTimeEditMeta = [];
+    public array $consultationSummary = [];
+    public array $financialSummary = [];
     public bool $showcollaps = true;
     public ?string $msg = null;
     #[Url]
@@ -105,6 +108,7 @@ class AppointmentUserList extends Component
             'Doc_id'               => null,
             'AppointmentStatus'    => null,
             'kind'                 => null,
+            'voip_followup_status' => null,
         ];
         $this->resetPage();
     }
@@ -207,7 +211,9 @@ class AppointmentUserList extends Component
     {
         $permisstion_check = auth()->user();
         $query = AppointmentUser::query();
-        if (\Modules\OnlineConsultation\Support\ConsultationAccess::schemaReady(['appointment_consultation_cases'])) $query->with('consultationCase');
+        if (\Modules\OnlineConsultation\Support\ConsultationAccess::schemaReady(['appointment_consultation_cases', 'appointment_billing_records'])) {
+            $query->with(['consultationCase', 'billingRecord']);
+        }
         $searchCriteria = [
             'permition' => [
                 'condition' => ! $permisstion_check->isAdmin(),
@@ -401,6 +407,24 @@ class AppointmentUserList extends Component
                 $query->when($condition, $callback);
             }
         }
+        if (filled($this->search['voip_followup_status'] ?? null)) {
+            $query->where('kind', AppointmentUserKindEnum::VOIP)
+                ->whereRaw('TIMESTAMP(DATE(date_visit), COALESCE(end_time, TIME(date_visit))) < ?', [now()->toDateTimeString()]);
+            $missingSettlement = fn ($q) => $q->whereDoesntHave('billingRecord')
+                ->orWhereHas('billingRecord', fn ($billing) => $billing->where('refund_status', '!=', 'completed'));
+            $missingCompletion = fn ($q) => $q->whereDoesntHave('consultationCase')
+                ->orWhereHas('consultationCase', fn ($case) => $case->where('state', 'OPEN'));
+            match ($this->search['voip_followup_status']) {
+                'settlement_missing' => $query->where($missingSettlement),
+                'completion_missing' => $query->where($missingCompletion),
+                'both_missing' => $query->where($missingSettlement)->where($missingCompletion),
+                'incomplete_any' => $query->where(fn ($q) => $q->where($missingSettlement)->orWhere($missingCompletion)),
+                'completed_both' => $query
+                    ->whereHas('billingRecord', fn ($billing) => $billing->where('refund_status', 'completed'))
+                    ->whereHas('consultationCase', fn ($case) => $case->whereIn('state', ['COMPLETED', 'PATIENT_NO_SHOW'])),
+                default => null,
+            };
+        }
         if (auth()->user()->can('appointment_user.online') && auth()->user()->cannot('appointment_user.list')) {
             $query->where(function ($q) {
                 $q->where('kind', AppointmentUserKindEnum::ONLINE);
@@ -469,6 +493,106 @@ class AppointmentUserList extends Component
         $this->fetchData['feedbackVoiceUrl'] = $appointmentUser->surveyVoiceUrl();
         $this->fetchData['feedbackIsVoip'] = $appointmentUser->isStoredFromVoip();
         $this->dispatch('lunchFeedBackModal', true);
+    }
+
+    public function openConsultationSummary(int $appointmentId): void
+    {
+        $appointment = AppointmentUser::with(['user', 'doctor', 'consultationCase', 'callLogs', 'billingRecord.adjustments'])
+            ->findOrFail($appointmentId);
+
+        abort_unless($appointment->kind === AppointmentUserKindEnum::VOIP, 404);
+
+        $calls = $appointment->callLogs;
+        $answered = $calls->where('final_result', 'ANSWERED');
+        $unanswered = $calls->filter(fn ($call) => $call->countsAsUnanswered());
+        $lastCall = $calls->sortByDesc('call_entered_at')->first();
+        $talkSeconds = (int) $calls->sum('talk_duration_seconds');
+        $billing = app(\Modules\OnlineConsultation\Services\AppointmentBillingService::class)->ensure($appointment)
+            ?? $appointment->billingRecord;
+        $billing?->loadMissing('adjustments');
+        $effectiveRefund = $billing?->refund_status === 'completed'
+            ? max(0, (int) $billing->refunded_amount + (int) $billing->adjustments->sum('amount_change'))
+            : (int) ($billing?->suggested_refund_amount ?? 0);
+
+        $this->consultationSummary = [
+            'id' => $appointment->id,
+            'tracking_code' => $appointment->tracking_code ?: $appointment->id,
+            'patient' => $appointment->user?->full_name ?? 'کاربر حذف شده',
+            'doctor' => $appointment->doctor?->full_name ?? 'پزشک حذف شده',
+            'date' => $appointment->date_visit ? verta($appointment->date_visit)->format('Y/m/d H:i') : '—',
+            'completed' => $appointment->hasCompletedPhoneConsultation(),
+            'answered' => $answered->isNotEmpty(),
+            'calls_count' => $calls->count(),
+            'answered_count' => $answered->count(),
+            'unanswered_count' => $unanswered->count(),
+            'early_count' => $calls->filter(fn ($call) => $call->isEarlyCall())->count(),
+            'talk_duration' => sprintf('%02d:%02d:%02d', intdiv($talkSeconds, 3600), intdiv($talkSeconds % 3600, 60), $talkSeconds % 60),
+            'last_call_at' => $lastCall?->call_entered_at ? verta($lastCall->call_entered_at)->format('Y/m/d H:i:s') : '—',
+            'financial_calculated' => $billing?->refund_status === 'completed',
+            'financial_status' => $billing?->refund_status === 'completed' ? 'تسویه مالی انجام شده' : 'محاسبه مالی تکمیل نشده',
+            'appointment_amount' => (int) ($billing?->total_paid_amount ?? 0),
+            'refund_amount' => $effectiveRefund,
+            'practitioner_amount' => (int) ($billing?->practitioner_earned_amount ?? 0),
+            'platform_amount' => (int) ($billing?->platform_profit_amount ?? 0),
+            'details_url' => route('admin.consultation.call-reports.appointment', $appointment),
+        ];
+
+        $this->dispatch('openConsultationSummaryModal');
+    }
+
+    public function openFinancialSummary(int $appointmentId): void
+    {
+        $appointment = AppointmentUser::with(['user', 'doctor', 'transaction', 'billingRecord.adjustments'])
+            ->findOrFail($appointmentId);
+
+        $billing = $appointment->billingRecord;
+        if (in_array($appointment->kind, [AppointmentUserKindEnum::VOIP, AppointmentUserKindEnum::ONLINE], true)) {
+            $billing = app(\Modules\OnlineConsultation\Services\AppointmentBillingService::class)->ensure($appointment) ?? $billing;
+            $billing?->loadMissing('adjustments');
+        }
+
+        $appointmentAmount = (int) ($billing?->total_paid_amount
+            ?: data_get($appointment->details, AppointmentUser::DETAIL_PAYMENT.'.'.AppointmentUser::DETAIL_PAYMENT_PRICE.'.int', 0)
+            ?: $appointment->transaction?->total_cost
+            ?: $appointment->transaction?->cost
+            ?: 0);
+        $effectiveRefund = $billing
+            ? max(0, (int) $billing->refunded_amount + (int) $billing->adjustments->sum('amount_change'))
+            : 0;
+        $refundAmount = $billing?->refund_status === 'completed'
+            ? $effectiveRefund
+            : (int) ($billing?->suggested_refund_amount ?? 0);
+        $financialState = match (true) {
+            $billing?->refund_status === 'completed' => 'تسویه نهایی‌شده',
+            $billing?->refund_status === 'approved' => 'محاسبه تأییدشده؛ در انتظار واریز',
+            $billing !== null => 'در انتظار محاسبه و تأیید',
+            $appointment->status === AppointmentUserStatusEnum::STATUS_WAIT_PAYMENT => 'در انتظار پرداخت بیمار',
+            $appointment->status === AppointmentUserStatusEnum::STATUS_SUCCESSFUL => 'پرداخت / ثبت نوبت تأیید شده',
+            default => 'فاقد تسویه مالی',
+        };
+
+        $this->financialSummary = [
+            'appointment_id' => $appointment->id,
+            'tracking_code' => $appointment->tracking_code ?: $appointment->id,
+            'patient' => $appointment->user?->full_name ?? 'کاربر حذف شده',
+            'doctor' => $appointment->doctor?->full_name ?? 'پزشک حذف شده',
+            'state' => $financialState,
+            'settled' => $billing?->refund_status === 'completed',
+            'appointment_amount' => $appointmentAmount,
+            'used_amount' => (int) ($billing?->used_amount ?? $appointmentAmount),
+            'refund_amount' => $refundAmount,
+            'refund_label' => $billing?->refund_status === 'completed' ? 'مبلغ برگشتی قطعی' : 'مبلغ برگشتی پیشنهادی',
+            'net_amount' => max(0, $appointmentAmount - $refundAmount),
+            'practitioner_amount' => (int) ($billing?->practitioner_earned_amount ?? 0),
+            'platform_amount' => (int) ($billing?->platform_profit_amount ?? 0),
+            'reserved_minutes' => (int) ($billing?->reserved_minutes ?? 0),
+            'used_minutes' => $billing ? max(0, (int) $billing->reserved_minutes - (int) $billing->system_unused_minutes) : 0,
+            'details_url' => $appointment->kind === AppointmentUserKindEnum::VOIP
+                ? route('admin.consultation.call-reports.appointment', $appointment)
+                : null,
+        ];
+
+        $this->dispatch('openFinancialSummaryModal');
     }
     public function booted()
     {

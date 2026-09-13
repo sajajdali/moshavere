@@ -28,6 +28,7 @@ return new class extends Migration
             $t->string('voip_transport')->default('tls');
             $t->string('voip_username')->nullable();
             $t->text('voip_secret')->nullable();
+            $t->text('voip_call_token')->nullable();
             $t->string('outbound_caller_id', 30)->nullable();
             $t->string('queue_number', 20)->nullable();
             $t->unsignedSmallInteger('ring_timeout_seconds')->default(30);

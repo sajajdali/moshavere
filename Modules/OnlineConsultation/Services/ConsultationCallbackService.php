@@ -36,14 +36,6 @@ class ConsultationCallbackService
             ];
         }
 
-        if ($this->patientHasCalledSinceStart($appointment, $start)) {
-            return [
-                'available' => false,
-                'available_at' => $availableAt,
-                'reason' => 'بیمار پس از شروع نوبت تماس گرفته است؛ تماس خودکار با بیمار فعال نیست.',
-            ];
-        }
-
         return ['available' => true, 'available_at' => $availableAt, 'reason' => null];
     }
 
@@ -56,6 +48,7 @@ class ConsultationCallbackService
 
         $settings = ConsultationSetting::current();
         $endpoint = $this->callbackEndpoint((string) $settings->voip_host);
+        $token = trim((string) $settings->voip_call_token);
         $phone = $this->normalizeIranianMobile((string) $appointment->user?->mobile);
         $extension = trim((string) $practitioner->extension);
 
@@ -88,6 +81,9 @@ class ConsultationCallbackService
         if (! filter_var($endpoint, FILTER_VALIDATE_URL) || ! in_array(parse_url($endpoint, PHP_URL_SCHEME), ['http', 'https'], true)) {
             $this->recordRejected($callback, 'آدرس کامل HTTP یا HTTPS سرور درخواست تماس در تنظیمات VoIP ثبت نشده است.');
         }
+        if ($token === '') {
+            $this->recordRejected($callback, 'توکن تماس اتوماتیک در تنظیمات مشاوره ثبت نشده است.');
+        }
         if (! preg_match('/^09\d{9}$/', $phone)) {
             $this->recordRejected($callback, 'شماره موبایل بیمار برای درخواست تماس معتبر نیست.');
         }
@@ -97,10 +93,8 @@ class ConsultationCallbackService
 
         $started = microtime(true);
         try {
-            $request = Http::acceptJson()->asJson()->withoutRedirecting()->connectTimeout(5)->timeout(20);
-            if (filled($settings->voip_username) || filled($settings->voip_secret)) {
-                $request = $request->withBasicAuth((string) $settings->voip_username, (string) $settings->voip_secret);
-            }
+            $request = Http::withHeaders(['X-Call-Fire-Key' => $token])
+                ->acceptJson()->asJson()->withoutRedirecting()->connectTimeout(5)->timeout(20);
             $response = $request->post($endpoint, $callback->request_payload);
             $body = Str::limit($response->body(), 10000, '');
             $accepted = $response->status() === 202;
@@ -175,30 +169,4 @@ class ConsultationCallbackService
         return $scheme.'://'.$host.$port.'/api/v1/VoIP/request_call';
     }
 
-    private function patientHasCalledSinceStart(AppointmentUser $appointment, Carbon $start): bool
-    {
-        $now = now('Asia/Tehran');
-        $patientDirection = fn ($query) => $query->whereNull('direction')->orWhere('direction', '<>', 'OUTBOUND');
-
-        $linkedCallExists = $appointment->callLogs()
-            ->where($patientDirection)
-            ->where(function ($query) use ($start, $now) {
-                $query->whereBetween('call_entered_at', [$start, $now])
-                    ->orWhere(function ($query) {
-                        $query->whereNull('call_entered_at')->where('appointment_state', 'IN_APPOINTMENT_TIME');
-                    });
-            })->exists();
-
-        if ($linkedCallExists) return true;
-
-        $phone = $this->normalizeIranianMobile((string) $appointment->user?->mobile);
-        if (! preg_match('/^09\d{9}$/', $phone)) return false;
-        $phoneSuffix = substr($phone, -10);
-
-        return \Modules\OnlineConsultation\Models\AppointmentCallLog::whereNull('appointment_id')
-            ->where($patientDirection)
-            ->whereBetween('call_entered_at', [$start, $now])
-            ->get(['patient_phone'])
-            ->contains(fn ($call) => substr($this->normalizeIranianMobile((string) $call->patient_phone), -10) === $phoneSuffix);
-    }
 }

@@ -947,7 +947,12 @@ class AppointmentUserService
         }
         if (isset($detail['wait_for_payment'])) {
             // force payment for secretery send link appointments
-            $adminPaymentPrice = $this->adminAppointmentPaymentPrice($appointmentSetting, $paymentstatus['in_person']['price']);
+            $paymentType = match ($appointmentData->kind) {
+                AppointmentUserKindEnum::ONLINE => 'online',
+                AppointmentUserKindEnum::VOIP => 'voip',
+                default => 'in_person',
+            };
+            $adminPaymentPrice = $this->adminAppointmentPaymentPrice($appointmentSetting, $paymentstatus[$paymentType]['price']);
             $detailDatabaseDB[AppointmentUser::DETAIL_PAYMENT] = $this->paymentDetailPayload(
                 $appointmentSetting,
                 $adminPaymentPrice['price'],
@@ -961,6 +966,11 @@ class AppointmentUserService
             && data_get($detailDatabaseDB, AppointmentUser::DETAIL_PAYMENT . '.status') === true
         ) {
             $appointmentUserModel['deadline_at'] = Carbon::now()->addHour()->toDateTimeString();
+        }
+
+        if (isset($detail['wait_for_payment'])) {
+            $needToPayment = true;
+            $smsTemplate = $detail['smsTemplate'];
         }
 
         // detailDatabase
@@ -1046,6 +1056,9 @@ class AppointmentUserService
             $appointmentData->appointmentVia === AppointmentVia::VOIP &&
             $paymentstatus['voip']['status']
         ) {
+            $paymentLink = route('api.appointment.payment.create', $appointmentUser);
+        }
+        if (isset($detail['wait_for_payment'])) {
             $paymentLink = route('api.appointment.payment.create', $appointmentUser);
         }
         if ($status == AppointmentUserStatusEnum::STATUS_MONITORING) {

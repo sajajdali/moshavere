@@ -176,6 +176,11 @@ class AppointmentUser extends Model
         return $this->belongsTo(User::class);
     }
 
+    public function alternatePhones()
+    {
+        return $this->hasMany(\Modules\OnlineConsultation\Models\AppointmentAlternatePhone::class, 'patient_id', 'user_id');
+    }
+
     public function doctor()
     {
         return $this->belongsTo(User::class, 'doctor_id', 'id');

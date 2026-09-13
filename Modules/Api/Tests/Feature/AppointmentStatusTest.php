@@ -103,6 +103,14 @@ class AppointmentStatusTest extends TestCase
             $table->text('reopen_reason')->nullable();
             $table->timestamps();
         });
+        Schema::create('appointment_alternate_phones', function ($table) {
+            $table->id();
+            $table->foreignId('appointment_id');
+            $table->foreignId('patient_id');
+            $table->string('phone', 11)->unique();
+            $table->foreignId('created_by')->nullable();
+            $table->timestamps();
+        });
         Schema::create('consultation_settings', function ($table) {
             $table->id();
             $table->unsignedTinyInteger('ignored_short_call_minutes')->default(6);
@@ -168,6 +176,48 @@ class AppointmentStatusTest extends TestCase
         $this->assertSame(360, $payload['ignored_short_call_seconds']);
         $this->assertSame(6, $payload['appointments'][0]['ignored_short_call_minutes']);
         $this->assertSame(360, $payload['appointments'][0]['ignored_short_call_seconds']);
+    }
+
+    public function test_registered_landline_resolves_all_appointments_of_its_patient(): void
+    {
+        Carbon::setTestNow(Carbon::parse('2026-09-06 22:12:00', 'Asia/Tehran'));
+        DB::table('users')->insert([
+            ['id' => 1, 'mobile' => '09122978167', 'password' => 'test', 'created_at' => now(), 'updated_at' => now()],
+            ['id' => 2, 'mobile' => '09120000000', 'password' => 'test', 'created_at' => now(), 'updated_at' => now()],
+        ]);
+        DB::table('appointment_users')->insert([
+            'id' => 45, 'user_id' => 1, 'doctor_id' => 2, 'tracking_code' => 'LANDLINE-1', 'status' => 1,
+            'date_visit' => '2026-09-06 22:00:00', 'start_time' => '22:00:00', 'end_time' => '23:00:00',
+            'created_at' => now(), 'updated_at' => now(),
+        ]);
+        DB::table('appointment_users')->insert([
+            'id' => 46, 'user_id' => 1, 'doctor_id' => 2, 'tracking_code' => 'LANDLINE-FUTURE', 'status' => 1,
+            'date_visit' => '2026-09-07 18:00:00', 'start_time' => '18:00:00', 'end_time' => '18:30:00',
+            'created_at' => now(), 'updated_at' => now(),
+        ]);
+        DB::table('appointment_alternate_phones')->insert([
+            'appointment_id' => 45, 'patient_id' => 1, 'phone' => '02112345678',
+            'created_at' => now(), 'updated_at' => now(),
+        ]);
+        DB::table('consultation_practitioners')->insert([
+            'user_id' => 2, 'extension' => '102', 'created_at' => now(), 'updated_at' => now(),
+        ]);
+
+        $payload = (new AppointmentStatusController())->show(
+            Request::create('/api/v1/VoIP/appointment_status', 'GET', ['phone' => '02112345678'])
+        )->getData(true);
+
+        $this->assertTrue($payload['has_appointment']);
+        $this->assertTrue($payload['can_connect']);
+        $this->assertSame(45, $payload['appointment_id']);
+        $this->assertSame('102', $payload['doctor_extension']);
+        $this->assertCount(2, $payload['appointments']);
+
+        $localNumberPayload = (new AppointmentStatusController())->show(
+            Request::create('/api/v1/VoIP/appointment_status', 'GET', ['phone' => '12345678'])
+        )->getData(true);
+        $this->assertTrue($localNumberPayload['has_appointment']);
+        $this->assertSame(45, $localNumberPayload['appointment_id']);
     }
 
     public function test_doctor_mobile_is_hidden_before_the_appointment_window(): void

@@ -53,7 +53,7 @@ class ConsultationAccess
     private const REQUIRED_COLUMNS = [
         'consultation_settings' => ['ignored_short_call_minutes'],
         'consultation_practitioners' => ['voip_host', 'hourly_rate', 'payout_hourly_rate'],
-        'appointment_billing_records' => ['payout_hourly_rate_snapshot', 'raw_answered_talk_seconds', 'ignored_talk_seconds', 'practitioner_earned_amount', 'platform_profit_amount'],
+        'appointment_billing_records' => ['payout_hourly_rate_snapshot', 'raw_answered_talk_seconds', 'ignored_talk_seconds', 'connection_overhead_minutes_snapshot', 'billable_talk_seconds', 'practitioner_earned_amount', 'platform_profit_amount'],
         'consultation_sms_deliveries' => ['reminder_rule_id', 'recipient_type', 'rule_title'],
         'appointment_consultation_cases' => ['appointment_note', 'note_author_id', 'note_author_role', 'note_created_at'],
     ];

@@ -39,6 +39,7 @@ class ConsultationController extends Controller
 
     public function saveSettings(Request $request, AppointmentBillingService $billingService)
     {
+        $settings = ConsultationSetting::current();
         $data = $request->validate([
             'booking_enabled' => 'required|boolean', 'app_enabled' => 'required|boolean',
             'timezone' => 'required|timezone',
@@ -47,29 +48,37 @@ class ConsultationController extends Controller
             'voip_host' => ['nullable', 'url:http,https', 'max:255'],
             'voip_port' => 'required|integer|min:1|max:65535',
             'voip_transport' => ['required', Rule::in(['tls', 'tcp', 'udp'])],
-            'voip_username' => 'nullable|string|max:255',
-            'voip_secret' => 'nullable|string|max:1024',
-            'clear_voip_secret' => 'sometimes|boolean',
+            'voip_call_token' => [
+                'nullable',
+                Rule::requiredIf(fn () => $request->filled('voip_host')
+                    && ! $request->boolean('clear_voip_call_token')
+                    && ! $settings->getRawOriginal('voip_call_token')),
+                'string',
+                'max:1024',
+            ],
+            'clear_voip_call_token' => 'sometimes|boolean',
             'outbound_caller_id' => ['nullable', 'regex:/^\+?[0-9]{3,20}$/'],
             'queue_number' => ['nullable', 'regex:/^[0-9]{1,20}$/'],
             'ring_timeout_seconds' => 'required|integer|min:10|max:180',
             'max_attempts' => 'required|integer|min:1|max:5',
             'ignored_short_call_minutes' => 'required|integer|min:0|max:30',
+            'connection_overhead_minutes' => 'required|integer|min:0|max:60',
             'allow_transfer' => 'required|boolean',
             'recording_requested' => 'required|boolean',
             'consent_required' => 'required|boolean|required_if:recording_requested,1|accepted_if:recording_requested,1',
             'patient_instructions' => 'nullable|string|max:3000',
-        ], [], [
+        ], [
+            'voip_call_token.required' => 'برای آدرس سرور VoIP، توکن تماس اتوماتیک الزامی است.',
+        ], [
             'voip_host' => 'آدرس سرور ویپ',
             'consent_required' => 'رضایت برای ضبط',
         ]);
-        if ($request->boolean('clear_voip_secret')) {
-            $data['voip_secret'] = null;
-        } elseif (! $request->filled('voip_secret')) {
-            unset($data['voip_secret']);
+        if ($request->boolean('clear_voip_call_token')) {
+            $data['voip_call_token'] = null;
+        } elseif (! $request->filled('voip_call_token')) {
+            unset($data['voip_call_token']);
         }
-        unset($data['clear_voip_secret']);
-        $settings = ConsultationSetting::current();
+        unset($data['clear_voip_call_token']);
         $thresholdChanged = (int) $settings->ignored_short_call_minutes !== (int) $data['ignored_short_call_minutes'];
         $settings->update($data);
         if ($thresholdChanged) {

@@ -97,12 +97,10 @@ class PractitionerController extends Controller
             'extension' => ['nullable', 'regex:/^[0-9]{1,20}$/', Rule::unique('consultation_practitioners', 'extension')->ignore($person?->id)],
             'sip_username' => 'nullable|string|max:255', 'sip_secret' => 'nullable|string|max:1024',
             'clear_sip_secret' => 'sometimes|boolean',
-            'fee' => 'nullable|integer|min:0|max:1000000000',
-            'hourly_rate' => 'nullable|required_if:active,1|integer|min:0|max:1000000000',
-            'payout_hourly_rate' => 'nullable|required_if:active,1|integer|min:0|max:1000000000|lte:hourly_rate',
+            'payout_hourly_rate' => 'nullable|required_if:active,1|integer|min:0|max:1000000000',
             'duration_minutes' => 'nullable|integer|min:5|max:180',
             'notes' => 'nullable|string|max:3000',
-        ], [], ['user_id' => 'شناسه کاربر', 'extension' => 'داخلی', 'display_name' => 'نام نمایشی', 'hourly_rate' => 'مبلغ ساعتی مراجعه‌کننده', 'payout_hourly_rate' => 'حق‌الزحمه ساعتی کارشناس']);
+        ], [], ['user_id' => 'شناسه کاربر', 'extension' => 'داخلی', 'display_name' => 'نام نمایشی', 'payout_hourly_rate' => 'هزینه ساعتی مشاور']);
         // An existing consultation profile must remain attached to its original account.
         if ($person && (int) $data['user_id'] !== (int) $person->user_id) {
             throw ValidationException::withMessages(['user_id' => 'حساب متصل به این پروفایل قابل تغییر نیست.']);

@@ -106,10 +106,14 @@ class ConsultantFinancialReportService
         $resultCounts = $calls->groupBy(fn ($call) => $call->isEarlyCall() ? 'EARLY_CALL' : ($call->final_result ?: 'UNKNOWN'))->map->count()->sortDesc()->all();
         $rawTalkSeconds = (int) $billing->sum('raw_answered_talk_seconds');
         $ignoredTalkSeconds = (int) $billing->sum('ignored_talk_seconds');
-        $talkSeconds = (int) $billing->sum('answered_talk_seconds');
+        $validTalkSeconds = (int) $billing->sum('answered_talk_seconds');
+        $talkSeconds = (int) $billing->sum('billable_talk_seconds');
+        $overheadMinutes = (int) $billing->sum('connection_overhead_minutes_snapshot');
         if ($billing->isEmpty()) {
             $rawTalkSeconds = (int) $answered->sum('talk_duration_seconds');
             $talkSeconds = $rawTalkSeconds;
+            $validTalkSeconds = $rawTalkSeconds;
+            $overheadMinutes = 0;
         }
         $practitionerIncome = (int) $settledBilling->sum('practitioner_earned_amount');
         $platformProfit = (int) $settledBilling->sum('platform_profit_amount');
@@ -140,6 +144,8 @@ class ConsultantFinancialReportService
             'diverted_total_seconds' => (int) $diverted->sum('total_duration_seconds'),
             'raw_talk_seconds' => $rawTalkSeconds,
             'ignored_talk_seconds' => $ignoredTalkSeconds,
+            'valid_talk_seconds' => $validTalkSeconds,
+            'connection_overhead_minutes' => $overheadMinutes,
             'talk_seconds' => $talkSeconds,
             'talk_minutes' => (int) ceil($talkSeconds / 60),
             'ring_seconds' => (int) $calls->sum('ring_duration_seconds'),

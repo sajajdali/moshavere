@@ -3,10 +3,14 @@
 namespace Modules\OnlineConsultation\Http\Controllers;
 
 use App\Http\Controllers\Controller;
+use Carbon\Carbon;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Http\Request;
 use Illuminate\Validation\ValidationException;
+use Modules\AppointmentUser\app\Notifications\AppointmentSmsNotification;
 use Modules\AppointmentUser\app\Models\AppointmentUser;
 use Modules\AppointmentUser\Enum\AppointmentUserStatusEnum;
+use Modules\Setting\Enum\SettingKeyEnum;
 use Modules\OnlineConsultation\Models\AppointmentCallLog;
 use Modules\OnlineConsultation\Models\AppointmentConsultantHangup;
 use Modules\OnlineConsultation\Models\AppointmentConsultantNoAnswer;
@@ -165,6 +169,14 @@ class CallReportController extends Controller
     {
         $shortCallThresholdSeconds = max(0, (int) ConsultationSetting::current()->ignored_short_call_minutes) * 60;
         $appointment->load(['user', 'doctor.consultationPractitioner']);
+        $alternatePhonesAvailable = ConsultationAccess::schemaReady(['appointment_alternate_phones']);
+        if ($alternatePhonesAvailable) {
+            $appointment->load('alternatePhones.creator');
+        } else {
+            // Keep appointment details available during a rolling deployment,
+            // before the tenant migration for alternate phones has completed.
+            $appointment->setRelation('alternatePhones', collect());
+        }
         $query = AppointmentCallLog::where('appointment_id', $appointment->id);
         $allCalls = (clone $query)->get();
         $stats = [
@@ -204,13 +216,77 @@ class CallReportController extends Controller
         $canEditCase = ! $appointment->trashed()
             && ((int) request()->user()->id === (int) $appointment->doctor_id || request()->user()->can('SUPER_ADMIN'));
         $callbackAvailability = $callbackService->availability($appointment);
+        $showCallbackAction = $canEditCase
+            && $appointment->kind === \Modules\AppointmentUser\Enum\AppointmentUserKindEnum::VOIP
+            && $appointment->status !== AppointmentUserStatusEnum::STATUS_CANCEL
+            && $consultationCase->state === 'OPEN';
         $canRequestCallback = $callbackAvailable && $canEditCase
             && $appointment->kind === \Modules\AppointmentUser\Enum\AppointmentUserKindEnum::VOIP
             && $appointment->status !== AppointmentUserStatusEnum::STATUS_CANCEL
             && $consultationCase->state === 'OPEN'
             && $callbackAvailability['available'];
 
-        return view('onlineconsultation::call-reports.appointment', compact('appointment', 'calls', 'hangupIncidents', 'noAnswerIncidents', 'callbackRequests', 'stats', 'billing', 'consultationCase', 'previousConsultationReports', 'outcomes', 'canEditCase', 'canRequestCallback', 'callbackAvailability', 'callbackAvailable', 'shortCallThresholdSeconds'));
+        return view('onlineconsultation::call-reports.appointment', compact('appointment', 'calls', 'hangupIncidents', 'noAnswerIncidents', 'callbackRequests', 'stats', 'billing', 'consultationCase', 'previousConsultationReports', 'outcomes', 'canEditCase', 'canRequestCallback', 'showCallbackAction', 'callbackAvailability', 'callbackAvailable', 'alternatePhonesAvailable', 'shortCallThresholdSeconds'));
+    }
+
+    public function updateAppointmentTime(Request $request, AppointmentUser $appointment)
+    {
+        abort_if($appointment->trashed(), 404);
+        $this->authorize('update', $appointment);
+
+        $data = $request->validate([
+            'date' => ['required', 'string'],
+            'start_time' => ['required', 'date_format:H:i'],
+            'end_time' => ['required', 'date_format:H:i', 'after:start_time'],
+            'send_sms' => ['nullable', 'boolean'],
+        ], [
+            'date.required' => 'تاریخ نوبت را انتخاب کنید.',
+            'start_time.required' => 'ساعت شروع را وارد کنید.',
+            'start_time.date_format' => 'فرمت ساعت شروع صحیح نیست.',
+            'end_time.required' => 'ساعت پایان را وارد کنید.',
+            'end_time.date_format' => 'فرمت ساعت پایان صحیح نیست.',
+            'end_time.after' => 'ساعت پایان باید بعد از ساعت شروع باشد.',
+        ]);
+
+        try {
+            $date = \Verta::parse($data['date'])->toCarbon();
+        } catch (\Throwable) {
+            throw ValidationException::withMessages(['date' => 'تاریخ انتخاب‌شده معتبر نیست.']);
+        }
+
+        [$hour, $minute] = array_map('intval', explode(':', $data['start_time']));
+        $oldDate = $appointment->date_visit->copy();
+
+        DB::transaction(function () use ($appointment, $date, $hour, $minute, $data): void {
+            $appointment->update([
+                'date_visit' => Carbon::instance($date)->setTime($hour, $minute)->toDateTimeString(),
+                'start_time' => $data['start_time'].':00',
+                'end_time' => $data['end_time'].':00',
+            ]);
+        });
+
+        $appointment->refresh();
+        $appointment->setting?->runGenerateCacheJob(specialDayConvert($oldDate));
+        if (! $appointment->date_visit->isSameDay($oldDate)) {
+            $appointment->setting?->runGenerateCacheJob(specialDayConvert($appointment->date_visit));
+        }
+
+        $smsQueued = false;
+        if ($request->boolean('send_sms')) {
+            $smsTemplate = setting(SettingKeyEnum::SMS_APPOINTMENT_TIME_UPDATE);
+            if (filled($smsTemplate) && filled($appointment->user?->mobile)) {
+                $appointment->notify(new AppointmentSmsNotification($smsTemplate));
+                $smsQueued = true;
+            }
+        }
+
+        $message = match (true) {
+            $smsQueued => 'زمان نوبت با موفقیت تغییر کرد و پیامک تغییر زمان در صف ارسال قرار گرفت.',
+            $request->boolean('send_sms') => 'زمان نوبت تغییر کرد؛ اما قالب پیامک یا شماره موبایل بیمار در دسترس نبود.',
+            default => 'زمان نوبت با موفقیت تغییر کرد.',
+        };
+
+        return back()->with('success', $message);
     }
 
     public function call(AppointmentCallLog $callLog)

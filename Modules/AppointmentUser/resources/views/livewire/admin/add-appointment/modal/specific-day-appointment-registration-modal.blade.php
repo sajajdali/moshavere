@@ -71,7 +71,7 @@
 
                     @if ($step === 1)
                         <div class="lookup-icon"><i class="fa fa-user-plus"></i></div>
-                        <div class="text-center mb-4"><strong class="d-block mb-1">جست‌وجوی مراجعه‌کننده</strong><span class="field-hint">با شماره موبایل سریع‌تر جست‌وجو کنید</span></div>
+                        <div class="text-center mb-4"><strong class="d-block mb-1">جست‌وجوی مراجعه‌کننده</strong><span class="field-hint">برای ثبت نوبت، شماره موبایل بیمار الزامی است</span></div>
                         <div class="appointment-card">
                             <label for="appointment_mobile" class="form-label fw-bold">شماره موبایل</label>
                             <div class="mobile-field" x-data>
@@ -93,8 +93,8 @@
                             @error('form.number')<span class="error-message">{{ $message }}</span>@enderror
 
                             @if ($fetchData['document_number_enabled'] ?? false)
-                                <div class="d-flex align-items-center gap-3 my-3"><hr class="flex-grow-1 m-0"><span class="field-hint">یا</span><hr class="flex-grow-1 m-0"></div>
-                                <label for="appointment_document" class="form-label fw-bold">شماره پرونده</label>
+                                <div class="d-flex align-items-center gap-3 my-3"><hr class="flex-grow-1 m-0"><span class="field-hint">اطلاعات تکمیلی</span><hr class="flex-grow-1 m-0"></div>
+                                <label for="appointment_document" class="form-label fw-bold">شماره پرونده <span class="field-hint">(اختیاری)</span></label>
                                 <input type="text" inputmode="numeric" autocomplete="off" class="form-control @error('form.document_number') is-invalid @enderror" id="appointment_document" wire:model="form.document_number" placeholder="شماره پرونده را وارد کنید">
                                 @error('form.document_number')<span class="error-message">{{ $message }}</span>@enderror
                             @endif
@@ -112,7 +112,7 @@
                                 <div class="kind-grid">
                                     @foreach ($fetchData['appointment_kinds'] as $kind)
                                         <div>
-                                            <input class="choice-input" type="radio" wire:model="form.kind" value="{{ $kind['value'] }}" name="appointment_kind" id="appointment_kind_{{ $kind['value'] }}">
+                                            <input class="choice-input" type="radio" wire:model.live="form.kind" value="{{ $kind['value'] }}" name="appointment_kind" id="appointment_kind_{{ $kind['value'] }}">
                                             <label class="choice-card" for="appointment_kind_{{ $kind['value'] }}">
                                                 <span class="choice-icon"><i class="fa {{ $kind['icon'] }}"></i></span>
                                                 <span class="choice-copy"><strong>{{ $kind['name'] }}</strong><small>{{ $kind['hint'] }}</small></span>
@@ -124,6 +124,18 @@
                             </div>
                         @elseif (count($fetchData['appointment_kinds'] ?? []) === 1)
                             <div class="selected-kind"><i class="fa {{ $fetchData['appointment_kinds'][0]['icon'] }}"></i>این نوبت به‌صورت <strong>{{ $fetchData['appointment_kinds'][0]['name'] }}</strong> ثبت می‌شود.</div>
+                        @endif
+
+                        @if ($this->paymentEnabledForSelectedKind())
+                            <div class="appointment-card">
+                                <div class="section-title"><span class="section-icon"><i class="fa fa-credit-card"></i></span>نحوه ثبت نوبت</div>
+                                <p class="field-hint mb-3">پرداخت آنلاین برای این نوع نوبت فعال است؛ یکی از حالت‌های زیر را انتخاب کنید.</p>
+                                @error('form.payment_registration')<div class="alert alert-danger py-2">{{ $message }}</div>@enderror
+                                <div class="option-grid two">
+                                    <div><input class="choice-input" type="radio" wire:model="form.payment_registration" value="confirmed" name="payment_registration" id="payment_confirmed"><label class="choice-card" for="payment_confirmed"><span class="choice-icon"><i class="fa fa-check-circle"></i></span><span class="choice-copy"><strong>ثبت نوبت تأییدشده</strong><small>نوبت بدون نیاز به پرداخت بیمار قطعی می‌شود.</small></span></label></div>
+                                    <div><input class="choice-input" type="radio" wire:model="form.payment_registration" value="payment_link" name="payment_registration" id="payment_link"><label class="choice-card" for="payment_link"><span class="choice-icon"><i class="fa fa-credit-card"></i></span><span class="choice-copy"><strong>ارسال لینک پرداخت</strong><small>نوبت تا پایان مهلت پرداخت رزرو می‌ماند.</small></span></label></div>
+                                </div>
+                            </div>
                         @endif
 
                         <div class="appointment-card">
@@ -167,20 +179,11 @@
                                     <div><input class="choice-input" type="radio" wire:model="form.appType" value="in_between" name="appointment_type" id="appointment_between"><label class="choice-card" for="appointment_between"><span class="choice-icon"><i class="fa fa-random"></i></span><span class="choice-copy"><strong>بین مریض</strong></span></label></div>
                                 </div>
 
-                                @if ($fetchData['payment_link_enabled'] ?? false)
-                                    <label class="form-label">وضعیت پرداخت</label>
-                                    @error('form.registerWithoutPayment')<div class="alert alert-danger py-2">قالب پیامک ارسال لینک پرداخت تعریف نشده است.</div>@enderror
-                                    <div class="option-grid two">
-                                        <div><input class="choice-input" type="radio" wire:model="form.registerWithoutPayment" value="true" name="payment_status" id="payment_link"><label class="choice-card" for="payment_link"><span class="choice-icon"><i class="fa fa-credit-card"></i></span><span class="choice-copy"><strong>ارسال لینک پرداخت</strong></span></label></div>
-                                        <div><input class="choice-input" type="radio" wire:model="form.registerWithoutPayment" value="false" name="payment_status" id="payment_skip"><label class="choice-card" for="payment_skip"><span class="choice-icon"><i class="fa fa-check"></i></span><span class="choice-copy"><strong>ثبت بدون پرداخت</strong></span></label></div>
-                                    </div>
-                                @else
-                                    <label class="form-label">ارسال پیامک</label>
-                                    <div class="option-grid two">
-                                        <div><input class="choice-input" type="radio" wire:model="form.smsType" value="send" name="sms_status" id="sms_send"><label class="choice-card" for="sms_send"><span class="choice-icon"><i class="fa fa-comment"></i></span><span class="choice-copy"><strong>ارسال شود</strong></span></label></div>
-                                        <div><input class="choice-input" type="radio" wire:model="form.smsType" value="unsend" name="sms_status" id="sms_skip"><label class="choice-card" for="sms_skip"><span class="choice-icon"><i class="fa fa-ban"></i></span><span class="choice-copy"><strong>ارسال نشود</strong></span></label></div>
-                                    </div>
-                                @endif
+                                <label class="form-label">ارسال پیامک</label>
+                                <div class="option-grid two">
+                                    <div><input class="choice-input" type="radio" wire:model="form.smsType" value="send" name="sms_status" id="sms_send"><label class="choice-card" for="sms_send"><span class="choice-icon"><i class="fa fa-comment"></i></span><span class="choice-copy"><strong>ارسال شود</strong></span></label></div>
+                                    <div><input class="choice-input" type="radio" wire:model="form.smsType" value="unsend" name="sms_status" id="sms_skip"><label class="choice-card" for="sms_skip"><span class="choice-icon"><i class="fa fa-ban"></i></span><span class="choice-copy"><strong>ارسال نشود</strong></span></label></div>
+                                </div>
                                 <label for="appointment_description" class="form-label mt-3">توضیحات <span class="field-hint">(اختیاری)</span></label>
                                 <textarea class="form-control" id="appointment_description" rows="2" wire:model="form.description"></textarea>
                             </div>

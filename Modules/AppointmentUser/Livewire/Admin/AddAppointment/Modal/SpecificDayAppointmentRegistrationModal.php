@@ -52,7 +52,7 @@ class SpecificDayAppointmentRegistrationModal extends Component
             'kind' => count($this->fetchData['appointment_kinds'] ?? []) === 1
                 ? $this->fetchData['appointment_kinds'][0]['value']
                 : null,
-            'registerWithoutPayment' => ($this->fetchData['payment_link_enabled'] ?? false) ? true : null,
+            'payment_registration' => null,
         ];
     }
 
@@ -103,8 +103,17 @@ class SpecificDayAppointmentRegistrationModal extends Component
             if (count($this->fetchData['appointment_kinds'] ?? []) > 1) {
                 $rules['form.kind'] = 'required|in:'.implode(',', array_column($this->fetchData['appointment_kinds'], 'value'));
             }
+            if ($this->paymentEnabledForSelectedKind()) {
+                $rules['form.payment_registration'] = 'required|in:confirmed,payment_link';
+            }
 
             $this->validate($rules);
+
+            if ($this->paymentEnabledForSelectedKind()
+                && ($this->form['payment_registration'] ?? null) === 'payment_link'
+                && blank(setting(SettingKeyEnum::SMS_APPOINTMENT_WAITING_PAYMENT))) {
+                return $this->addError('form.payment_registration', 'قالب پیامک ارسال لینک پرداخت تعریف نشده است.');
+            }
 
             if (!isset($this->fetchData['user'])) {
                 $this->createUser();
@@ -157,8 +166,7 @@ class SpecificDayAppointmentRegistrationModal extends Component
         }
 
         $this->validate([
-            'form.number' => 'required_if:form.document_number,null|digits:11|nullable',
-            'form.document_number' => 'required_if:form.number,null',
+            'form.number' => ['required', 'digits:11'],
         ]);
         if (isset($this->form['number'])) {
             $user = User::where('mobile', $this->form['number'])->first();
@@ -242,13 +250,6 @@ class SpecificDayAppointmentRegistrationModal extends Component
     }
     private function storeApp()
     {
-        //check if payment is active and sms template exist for it
-        if ((setting(SettingKeyEnum::SECREYERY_SEND_LINK_FOR_APPOINTMENT) != null  &&
-            isset($this->form['registerWithoutPayment']) &&  $this->form['registerWithoutPayment'] != 'false')) {
-            if (setting(SettingKeyEnum::SMS_APPOINTMENT_WAITING_PAYMENT) == null) {
-                return $this->addError('form.registerWithoutPayment', 'قالب پیامک ارسال لینک پرداخت تعریف نشده است.');
-            }
-        }
         $user = $this->fetchData['user'];
         $appointmentSetting = AppointmentSetting::findOrFail($this->appId);
         $availableKinds = self::resolveAvailableKinds($appointmentSetting->detail ?? []);
@@ -258,6 +259,15 @@ class SpecificDayAppointmentRegistrationModal extends Component
 
         if (!$kind || !in_array($kind, $availableKinds, true)) {
             return $this->addError('form.kind', 'لطفاً نوع نوبت را انتخاب کنید.');
+        }
+
+        $paymentEnabled = self::isPaymentEnabledForKind($appointmentSetting->detail ?? [], $kind);
+        if ($paymentEnabled && !in_array($this->form['payment_registration'] ?? null, ['confirmed', 'payment_link'], true)) {
+            return $this->addError('form.payment_registration', 'نحوه ثبت نوبت را انتخاب کنید.');
+        }
+        if ($paymentEnabled && ($this->form['payment_registration'] ?? null) === 'payment_link'
+            && blank(setting(SettingKeyEnum::SMS_APPOINTMENT_WAITING_PAYMENT))) {
+            return $this->addError('form.payment_registration', 'قالب پیامک ارسال لینک پرداخت تعریف نشده است.');
         }
 
         // If he wants to take the appointmnet for someone else
@@ -313,7 +323,7 @@ class SpecificDayAppointmentRegistrationModal extends Component
         if (isset($this->segmentId) && $this->segmentId != null) {
             $detail['segments_ids'] = $this->segmentId;
         }
-        if (setting(SettingKeyEnum::SECREYERY_SEND_LINK_FOR_APPOINTMENT) != null && isset($this->form['registerWithoutPayment']) && $this->form['registerWithoutPayment'] == 'true') {
+        if ($paymentEnabled && ($this->form['payment_registration'] ?? null) === 'payment_link') {
             $detail['smsTemplate']      = setting(SettingKeyEnum::SMS_APPOINTMENT_WAITING_PAYMENT);
             $detail['wait_for_payment'] = true;
         }
@@ -337,15 +347,16 @@ class SpecificDayAppointmentRegistrationModal extends Component
     public function messages()
     {
         return [
-            'form.number.required_if' => 'لطفا یکی از فیلد ها را تکمیل کنید',
+            'form.number.required' => 'وارد کردن شماره موبایل الزامی است.',
             'form.number.digits' => 'شماره موبایل صحیح نیست!',
-            'form.document_number.required_if' => 'لطفا یکی از فیلد ها را تکمیل کنید',
             'form.first_name.required' => 'وارد کردن نام الزامی است',
             'form.last_name.required' => 'وارد کردن نام خانوادگی الزامی است',
             'form.time.from.required' => 'زمان نوبت به درستی انتخاب نشده است!',
             'form.time.until.required' => 'زمان پایان نوبت به درستی انتخاب نشده است!',
             'form.kind.required' => 'لطفاً نوع نوبت را انتخاب کنید.',
             'form.kind.in' => 'نوع نوبت انتخاب‌شده معتبر نیست.',
+            'form.payment_registration.required' => 'نحوه ثبت نوبت را انتخاب کنید.',
+            'form.payment_registration.in' => 'نحوه ثبت نوبت معتبر نیست.',
         ];
     }
 
@@ -371,11 +382,35 @@ class SpecificDayAppointmentRegistrationModal extends Component
         return $kinds;
     }
 
+    public static function isPaymentEnabledForKind(array $detail, AppointmentUserKindEnum|int|string|null $kind): bool
+    {
+        if (! $kind instanceof AppointmentUserKindEnum) {
+            $kind = AppointmentUserKindEnum::tryFrom((int) $kind);
+        }
+        if (! $kind || !filter_var(data_get($detail, AppointmentSetting::PAYMENT.'.'.AppointmentSetting::STATUS, false), FILTER_VALIDATE_BOOLEAN)) {
+            return false;
+        }
+
+        $paymentType = match ($kind) {
+            AppointmentUserKindEnum::IN_PERSION => AppointmentSetting::IN_PERSON,
+            AppointmentUserKindEnum::VOIP => AppointmentSetting::VOIP,
+            AppointmentUserKindEnum::ONLINE => AppointmentSetting::ONLINE,
+        };
+
+        return filter_var(data_get($detail, AppointmentSetting::PAYMENT.'.'.$paymentType.'.'.AppointmentSetting::STATUS, false), FILTER_VALIDATE_BOOLEAN);
+    }
+
+    public function paymentEnabledForSelectedKind(): bool
+    {
+        return self::isPaymentEnabledForKind(
+            data_get($this->fetchData, 'app.detail', []),
+            $this->form['kind'] ?? null,
+        );
+    }
+
     public function mount()
     {
         $this->fetchData['document_number_enabled'] = (bool) setting(SettingKeyEnum::APPOINTMENT_SET_APPOINTMENT_WITH_DOCUMENT_NUMBER);
-        $this->fetchData['payment_link_enabled'] = (bool) setting(SettingKeyEnum::SECREYERY_SEND_LINK_FOR_APPOINTMENT);
-
         if (isset($this->appId)) {
             $app = AppointmentSetting::findOrFail($this->appId);
             $availableKinds = self::resolveAvailableKinds($app->detail ?? []);
@@ -414,9 +449,6 @@ class SpecificDayAppointmentRegistrationModal extends Component
         }
         if (isset($this->serviceId)) {
             $this->fetchData['service'] = Service::find($this->serviceId);
-        }
-        if ($this->fetchData['payment_link_enabled']) {
-            $this->form['registerWithoutPayment'] = true;
         }
         if ((bool) data_get($app->detail, AppointmentSetting::OPERATORS.'.'.AppointmentSetting::STATUS, false)) {
             $operatorIds = array_filter((array) data_get($app->detail, AppointmentSetting::OPERATORS.'.'.AppointmentSetting::IDS, []));

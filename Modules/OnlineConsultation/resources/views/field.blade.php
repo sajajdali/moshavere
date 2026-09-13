@@ -8,7 +8,7 @@
         </select>
     @else
         <input class="oc-input" id="{{ $name }}" name="{{ $name }}" type="{{ $type ?? 'text' }}"
-            value="{{ ($type ?? '') === 'password' ? '' : old($name, $record->$name) }}"
+            value="{{ ($type ?? '') === 'password' && !($showPasswordValue ?? false) ? '' : old($name, $record->$name) }}"
             dir="{{ $direction ?? (in_array($type ?? '', ['number', 'password']) ? 'ltr' : 'rtl') }}"
             aria-invalid="{{ $errors->has($name) ? 'true' : 'false' }}" aria-describedby="{{ $name }}-hint"
             @if(($type ?? '') === 'password') autocomplete="new-password" @endif

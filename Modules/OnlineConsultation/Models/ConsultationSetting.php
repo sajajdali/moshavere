@@ -3,18 +3,20 @@
 namespace Modules\OnlineConsultation\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Modules\Setting\Enum\SettingKeyEnum;
 
 class ConsultationSetting extends Model
 {
     protected $guarded = ['id'];
 
-    protected $hidden = ['voip_secret'];
+    protected $hidden = ['voip_secret', 'voip_call_token'];
 
     protected $casts = [
-        'voip_secret' => 'encrypted', 'booking_enabled' => 'boolean',
+        'voip_secret' => 'encrypted', 'voip_call_token' => 'encrypted', 'booking_enabled' => 'boolean',
         'app_enabled' => 'boolean', 'recording_requested' => 'boolean',
         'consent_required' => 'boolean', 'allow_transfer' => 'boolean',
         'ignored_short_call_minutes' => 'integer',
+        'connection_overhead_minutes' => 'integer',
     ];
 
     public static function current(): self
@@ -25,6 +27,7 @@ class ConsultationSetting extends Model
             'capacity_per_slot' => 1, 'default_fee' => 0, 'timezone' => 'Asia/Tehran',
             'ring_timeout_seconds' => 30, 'max_attempts' => 2,
             'ignored_short_call_minutes' => 6,
+            'connection_overhead_minutes' => 6,
             'connection_method' => 'operator', 'voip_driver' => 'unconfigured',
             'voip_port' => 5061, 'voip_transport' => 'tls',
         ]);
@@ -33,5 +36,15 @@ class ConsultationSetting extends Model
             $settings->voip_host = filter_var($legacyAddress, FILTER_VALIDATE_URL) ? $legacyAddress : null;
         }
         return $settings;
+    }
+
+    public function resolvedVoipUsername(): string
+    {
+        return trim((string) ($this->voip_username ?: setting(SettingKeyEnum::VOIP_USERNAME)));
+    }
+
+    public function resolvedVoipSecret(): string
+    {
+        return (string) ($this->voip_secret ?: setting(SettingKeyEnum::VOIP_PASSWORD));
     }
 }

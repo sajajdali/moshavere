@@ -5,6 +5,7 @@ namespace Modules\Api\Http\Controllers\Voip;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
+use Illuminate\Support\Facades\Schema;
 use Modules\Api\Trait\ApiHandlerTrait;
 use Modules\AppointmentUser\app\Models\AppointmentUser;
 use Modules\AppointmentUser\Enum\AppointmentUserStatusEnum;
@@ -51,13 +52,19 @@ class AppointmentStatusController extends Controller
         $today = $now->toDateString();
         $ignoredShortCallMinutes = max(0, (int) ConsultationSetting::current()->ignored_short_call_minutes);
         $ignoredShortCallSeconds = $ignoredShortCallMinutes * 60;
+        $alternatePatientId = $this->alternatePhonePatientId($phone);
 
         $appointments = AppointmentUser::query()
             ->with(['user:id,mobile', 'doctor:id,mobile', 'consultationCase'])
-            ->whereHas('user', function ($query) use ($phone) {
-                // The last ten digits make local 09..., +989..., and 00989... forms match.
-                $query->whereRaw("REPLACE(REPLACE(REPLACE(REPLACE(mobile, '+', ''), ' ', ''), '-', ''), '(', '') LIKE ?", ['%'.$phone])
-                    ->orWhereRaw("REPLACE(REPLACE(REPLACE(REPLACE(mobile, '+', ''), ' ', ''), '-', ''), '(', '') LIKE ?", ['%'.ltrim($phone, '0')]);
+            ->where(function ($query) use ($phone, $alternatePatientId) {
+                $query->whereHas('user', function ($query) use ($phone) {
+                    // The last ten digits make local 09..., +989..., and 00989... forms match.
+                    $query->whereRaw("REPLACE(REPLACE(REPLACE(REPLACE(mobile, '+', ''), ' ', ''), '-', ''), '(', '') LIKE ?", ['%'.$phone])
+                        ->orWhereRaw("REPLACE(REPLACE(REPLACE(REPLACE(mobile, '+', ''), ' ', ''), '-', ''), '(', '') LIKE ?", ['%'.ltrim($phone, '0')]);
+                });
+                if ($alternatePatientId !== null) {
+                    $query->orWhere('user_id', $alternatePatientId);
+                }
             })
             ->whereIn('status', [
                 AppointmentUserStatusEnum::STATUS_SUCCESSFUL->value,
@@ -148,7 +155,27 @@ class AppointmentStatusController extends Controller
         } elseif (str_starts_with($digits, '98')) {
             $digits = substr($digits, 2);
         }
+        // Tehran landlines arrive from the PBX as the eight-digit subscriber
+        // number. Restore the province prefix before doing an exact lookup.
+        if (strlen($digits) === 8) {
+            $digits = '021'.$digits;
+        }
 
         return ltrim($digits, '0') === '' ? '' : ltrim($digits, '0');
+    }
+
+    private function alternatePhonePatientId(string $phone): ?int
+    {
+        if (! Schema::hasTable('appointment_alternate_phones')) return null;
+
+        $query = \Modules\OnlineConsultation\Models\AppointmentAlternatePhone::query();
+        if (strlen($phone) !== 10) {
+            return null;
+        }
+        $query->where('phone', '0'.$phone);
+
+        $patientIds = $query->pluck('patient_id')->unique()->values();
+
+        return $patientIds->count() === 1 ? (int) $patientIds->first() : null;
     }
 }

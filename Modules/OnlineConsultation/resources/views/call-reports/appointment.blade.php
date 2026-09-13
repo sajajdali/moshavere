@@ -9,15 +9,111 @@
     $reportDefaultNow = now('Asia/Tehran');
     $reportDefaultDate = verta($reportDefaultNow)->format('Y/m/d');
     $reportDefaultTime = $reportDefaultNow->format('H:i');
+    $normalizeCallerPhone = function ($value) {
+        $digits = preg_replace('/\D+/', '', convert2english((string) $value)) ?? '';
+        if (str_starts_with($digits, '0098')) $digits = '0'.substr($digits, 4);
+        elseif (str_starts_with($digits, '98')) $digits = '0'.substr($digits, 2);
+        if (strlen($digits) === 8) $digits = '021'.$digits;
+        return $digits;
+    };
+    $patientMobile = $normalizeCallerPhone($appointment->user?->mobile);
+    $patientLandlines = $appointment->alternatePhones->pluck('phone')->map($normalizeCallerPhone)->all();
+    $consultationStart = $appointment->date_visit?->copy()->timezone('Asia/Tehran');
+    if ($consultationStart && filled($appointment->start_time)) {
+        $consultationStart->setTimeFromTimeString($appointment->start_time);
+    }
+    $consultationEnd = $consultationStart?->copy();
+    if ($consultationEnd && filled($appointment->end_time)) {
+        $consultationEnd->setTimeFromTimeString($appointment->end_time);
+        if ($consultationEnd->lte($consultationStart)) $consultationEnd->addDay();
+    } elseif ($consultationEnd) {
+        $consultationEnd->addMinutes(max(1, (int) ($billing?->reserved_minutes ?? 30)));
+    }
 @endphp
 <div class="oc-stack oc-appointment-page">
     @if($appointment->trashed())<div class="oc-notice oc-notice-warning"><i class="fa-solid fa-box-archive"></i><p>این نوبت حذف شده و پرونده آن فقط برای مشاهده سوابق باز شده است؛ امکان ثبت یا تغییر گزارش وجود ندارد.</p></div>@endif
-    <section class="oc-panel"><div class="oc-panel-header"><h2 class="oc-panel-title"><i class="fa-solid fa-calendar-check"></i>مشخصات نوبت</h2></div><div class="oc-panel-body oc-detail-grid">
+    <section class="oc-panel"><div class="oc-panel-header"><h2 class="oc-panel-title"><i class="fa-solid fa-calendar-check"></i>مشخصات نوبت</h2>
+        @if(!$appointment->trashed() && request()->user()->can('update', $appointment))
+        <button type="button" class="oc-btn oc-btn-primary" data-bs-toggle="modal" data-bs-target="#quick-time-edit-modal"><i class="fa-solid fa-clock"></i>ویرایش سریع ساعت و زمان</button>
+        @endif
+    </div><div class="oc-panel-body oc-detail-grid">
         <div><span>بیمار</span><strong>{{ $appointment->user?->fullName ?: '—' }}</strong><small class="oc-ltr">{{ $appointment->user?->mobile ?: '—' }}</small></div>
         <div><span>پزشک / کارشناس</span><strong>{{ $appointment->doctor?->fullName ?: '—' }}</strong></div>
         <div><span>زمان نوبت</span><strong>@if($appointment->date_visit)<bdi>{{ verta($appointment->date_visit)->format('Y/m/d H:i') }}</bdi>@else—@endif</strong></div>
         <div><span>کد پیگیری</span><strong>{{ $appointment->tracking_code ?: '—' }}</strong></div>
     </div></section>
+
+    @if($consultationStart && $consultationEnd)
+    <section class="oc-consultation-clock" id="consultation-clock"
+        data-start="{{ $consultationStart->getTimestampMs() }}"
+        data-end="{{ $consultationEnd->getTimestampMs() }}"
+        data-end-label="{{ $consultationEnd->format('H:i') }}"
+        data-server-now="{{ now('Asia/Tehran')->getTimestampMs() }}">
+        <div class="oc-clock-glow"></div>
+        <div class="oc-clock-head">
+            <div class="oc-clock-brand"><span class="oc-clock-icon"><i class="fa-solid fa-hourglass-half"></i></span><div><small>زمان‌بندی مشاوره</small><h2 id="consultation-clock-title">در حال محاسبه زمان نوبت…</h2></div></div>
+            <span class="oc-clock-live" id="consultation-clock-badge"><i></i><span>در حال بررسی</span></span>
+        </div>
+        <div class="oc-clock-body">
+            <div class="oc-clock-message"><strong id="consultation-clock-message">لطفاً چند لحظه صبر کنید</strong><span id="consultation-clock-description">زمان دقیق بر اساس ساعت رسمی سرور محاسبه می‌شود.</span></div>
+            <div class="oc-countdown" id="consultation-countdown" aria-live="polite">
+                <div><strong data-unit="days">۰</strong><span>روز</span></div><b>:</b>
+                <div><strong data-unit="hours">۰۰</strong><span>ساعت</span></div><b>:</b>
+                <div><strong data-unit="minutes">۰۰</strong><span>دقیقه</span></div><b>:</b>
+                <div><strong data-unit="seconds">۰۰</strong><span>ثانیه</span></div>
+            </div>
+            <div class="oc-clock-ended" id="consultation-clock-ended" hidden><i class="fa-solid fa-circle-check"></i><div><small>بازه مشاوره پایان یافته است</small><strong><bdi>{{ verta($consultationEnd)->format('Y/m/d H:i') }}</bdi></strong></div></div>
+        </div>
+        <div class="oc-clock-progress"><span id="consultation-clock-progress"></span></div>
+        <div class="oc-clock-times">
+            <div><span class="oc-clock-time-icon is-start"><i class="fa-solid fa-play"></i></span><p><small>شروع مشاوره</small><strong><bdi>{{ verta($consultationStart)->format('Y/m/d') }}</bdi> · <bdi>{{ $consultationStart->format('H:i') }}</bdi></strong></p></div>
+            <span class="oc-clock-route"><i class="fa-solid fa-chevron-left"></i></span>
+            <div><span class="oc-clock-time-icon is-end"><i class="fa-solid fa-flag-checkered"></i></span><p><small>پایان مشاوره</small><strong><bdi>{{ verta($consultationEnd)->format('Y/m/d') }}</bdi> · <bdi>{{ $consultationEnd->format('H:i') }}</bdi></strong></p></div>
+        </div>
+    </section>
+    @endif
+
+    @if(!$appointment->trashed() && request()->user()->can('update', $appointment))
+    <div class="modal fade" id="quick-time-edit-modal" tabindex="-1" aria-labelledby="quick-time-edit-title" aria-hidden="true"><div class="modal-dialog modal-dialog-centered"><div class="modal-content oc-billing-modal" dir="rtl">
+        <form method="POST" action="{{ route('admin.consultation.call-reports.appointment-time.update', $appointment) }}">@csrf @method('PUT')
+            <input type="hidden" name="quick_time_edit" value="1">
+            <div class="modal-header"><h2 class="modal-title" id="quick-time-edit-title"><i class="fa-solid fa-clock"></i> ویرایش سریع زمان نوبت</h2><button type="button" class="btn-close ms-0" data-bs-dismiss="modal" aria-label="بستن"></button></div>
+            <div class="modal-body oc-stack">
+                <div class="oc-case-confirm-summary"><span>بیمار <strong>{{ $appointment->user?->fullName ?: '—' }}</strong></span><span>پزشک <strong>{{ $appointment->doctor?->fullName ?: '—' }}</strong></span></div>
+                <div class="oc-field"><label class="oc-label" for="quick-time-date">تاریخ جدید</label><div class="oc-date-field"><i class="fa-regular fa-calendar"></i><input class="oc-input" id="quick-time-date" name="date" type="text" data-jdp inputmode="numeric" autocomplete="off" value="{{ old('date', verta($appointment->date_visit)->format('Y/m/d')) }}" placeholder="مثلاً ۱۴۰۵/۰۶/۱۸" required></div>@error('date')<small class="oc-error">{{ $message }}</small>@enderror</div>
+                <div class="oc-form-grid"><div class="oc-field"><label class="oc-label" for="quick-time-start">ساعت شروع</label><input class="oc-input oc-ltr" id="quick-time-start" name="start_time" type="time" value="{{ old('start_time', substr((string) $appointment->start_time, 0, 5)) }}" required>@error('start_time')<small class="oc-error">{{ $message }}</small>@enderror</div><div class="oc-field"><label class="oc-label" for="quick-time-end">ساعت پایان</label><input class="oc-input oc-ltr" id="quick-time-end" name="end_time" type="time" value="{{ old('end_time', substr((string) $appointment->end_time, 0, 5)) }}" required>@error('end_time')<small class="oc-error">{{ $message }}</small>@enderror</div></div>
+                <div class="oc-notice oc-notice-warning"><i class="fa-solid fa-triangle-exclamation"></i><p>در صورت ویرایش از این قسمت، تداخل نوبت‌ها در نظر گرفته نمی‌شود.</p></div>
+                <label class="oc-check"><input type="checkbox" name="send_sms" value="1" @checked(old('send_sms'))><span><strong>ارسال پیامک تغییر زمان</strong><small class="oc-cell-sub">پیامک با همان سناریو و مشخصات تعریف‌شده در تنظیمات سیستم ارسال می‌شود.</small></span></label>
+            </div>
+            <div class="modal-footer"><button type="button" class="oc-btn" data-bs-dismiss="modal">انصراف</button><button type="submit" class="oc-btn oc-btn-primary"><i class="fa-solid fa-check"></i>ثبت زمان جدید</button></div>
+        </form>
+    </div></div></div>
+    @endif
+
+    <details class="oc-panel oc-alternate-phones" id="alternate-phones-panel" @if($errors->has('alternate_phone')) open @endif>
+        <summary class="oc-panel-header"><div><h2 class="oc-panel-title"><i class="fa-solid fa-phone"></i>شماره‌های ثابت بیمار</h2><p class="oc-help">مانند شماره موبایل؛ قابل استفاده برای همه نوبت‌های این بیمار</p></div><span class="oc-count-badge" id="alternate-phone-count">{{ $appointment->alternatePhones->count() }}</span></summary>
+        <div class="oc-panel-body oc-stack">
+            @if(!$alternatePhonesAvailable)
+            <div class="oc-notice oc-notice-warning"><i class="fa-solid fa-triangle-exclamation"></i><p>این بخش پس از اجرای migration دیتابیس فعال می‌شود. سایر امکانات جزئیات نوبت در دسترس است.</p></div>
+            @else
+            <div class="oc-notice"><i class="fa-solid fa-circle-info"></i><p>هر شماره را جداگانه ثبت کنید. شماره باید دقیقاً ۱۱ رقم، ثابت و همراه با صفر و پیش‌شماره استان باشد؛ مثل <bdi class="oc-ltr">02112345678</bdi>. این شماره به حساب بیمار متصل می‌شود و در تمام نوبت‌های فعلی و آینده او مانند موبایل شناسایی می‌شود.</p></div>
+            <div class="oc-case-history oc-alternate-phone-list" id="alternate-phone-list" @if($appointment->alternatePhones->isEmpty()) hidden @endif>
+                @foreach($appointment->alternatePhones as $alternatePhone)
+                <div class="oc-alternate-phone-row" data-phone-id="{{ $alternatePhone->id }}">
+                    <div><strong class="oc-ltr"><bdi>{{ $alternatePhone->phone }}</bdi></strong><small class="oc-cell-sub">ثبت‌کننده: {{ $alternatePhone->creator?->fullName ?: '—' }} · <bdi>{{ verta($alternatePhone->created_at)->format('Y/m/d H:i') }}</bdi></small></div>
+                    @if($canEditCase)<button class="oc-btn oc-btn-small oc-btn-danger alternate-phone-delete" type="button" data-delete-url="{{ route('admin.consultation.alternate-phones.destroy', [$appointment, $alternatePhone]) }}"><i class="fa-solid fa-trash"></i>حذف</button>@endif
+                </div>
+                @endforeach
+            </div>
+            <div class="oc-empty" id="alternate-phone-empty" @if($appointment->alternatePhones->isNotEmpty()) hidden @endif><i class="fa-solid fa-phone-slash"></i><h3>شماره ثابتی برای این بیمار ثبت نشده است</h3></div>
+            @if($canEditCase)
+            <form method="POST" action="{{ route('admin.consultation.alternate-phones.store', $appointment) }}" class="oc-alternate-phone-form" id="alternate-phone-form">@csrf
+                <label class="oc-label" for="alternate-phone">شماره ثابت جدید</label><div class="oc-alternate-phone-controls"><input class="oc-input oc-ltr" id="alternate-phone" name="alternate_phone" value="{{ old('alternate_phone') }}" inputmode="numeric" autocomplete="tel" maxlength="11" pattern="0[1-8][0-9]{9}" placeholder="02112345678" required><button class="oc-btn oc-btn-primary" id="alternate-phone-submit" type="submit"><i class="fa-solid fa-plus"></i><span>افزودن</span></button></div><small class="oc-error" id="alternate-phone-error" @if(!$errors->has('alternate_phone')) hidden @endif>{{ $errors->first('alternate_phone') }}</small><div class="oc-notice oc-notice-success" id="alternate-phone-success" role="status" hidden><i class="fa-solid fa-circle-check"></i><p></p></div>
+            </form>
+            @endif
+            @endif
+        </div>
+    </details>
 
     <section class="oc-panel oc-case-panel">
         <div class="oc-case-hero {{ $consultationCase->isClosed() ? 'is-completed' : 'is-open' }}">
@@ -26,11 +122,11 @@
             @if($canEditCase)
                 @if($consultationCase->state === 'OPEN')
                 @if($canRequestCallback)
-                <button type="button" class="oc-btn oc-btn-primary" data-bs-toggle="modal" data-bs-target="#callback-request-modal"><i class="fa-solid fa-phone-volume"></i>ثبت تماس</button>
-                @elseif($callbackAvailable && $appointment->kind === \Modules\AppointmentUser\Enum\AppointmentUserKindEnum::VOIP && $appointment->status !== \Modules\AppointmentUser\Enum\AppointmentUserStatusEnum::STATUS_CANCEL)
-                <span class="oc-cell-sub">{{ $callbackAvailability['reason'] }}</span>
+                <button type="button" class="oc-btn oc-btn-primary" data-bs-toggle="modal" data-bs-target="#callback-request-modal"><i class="fa-solid fa-phone-volume"></i>تماس اتوماتیک</button>
+                @elseif($showCallbackAction)
+                <span class="oc-callback-unavailable"><button type="button" class="oc-btn" disabled><i class="fa-solid fa-phone-volume"></i>تماس اتوماتیک</button><small>{{ $callbackAvailable ? $callbackAvailability['reason'] : 'زیرساخت ثبت تماس اتوماتیک هنوز فعال نشده است.' }}</small></span>
                 @endif
-                <button type="button" class="oc-btn oc-btn-danger" data-bs-toggle="modal" data-bs-target="#complete-consultation-modal" @disabled($consultationCase->reports->isEmpty()) title="{{ $consultationCase->reports->isEmpty() ? 'ابتدا حداقل یک گزارش ثبت کنید' : 'اتمام و مسدودکردن اتصال مجدد' }}"><i class="fa-solid fa-lock"></i>اتمام مشاوره</button>
+                <button type="button" class="oc-btn oc-btn-danger" data-bs-toggle="modal" data-bs-target="#complete-consultation-modal" title="{{ $consultationCase->reports->isEmpty() ? 'برای اتمام باید حداقل یک گزارش ثبت شده باشد' : 'اتمام و مسدودکردن اتصال مجدد' }}"><i class="fa-solid fa-lock"></i>اتمام مشاوره</button>
                 @if($appointment->kind === \Modules\AppointmentUser\Enum\AppointmentUserKindEnum::VOIP)
                 <button type="button" class="oc-btn oc-btn-danger" data-bs-toggle="modal" data-bs-target="#patient-no-show-modal">عدم حضور بیمار</button>
                 @endif
@@ -138,12 +234,23 @@
     @if($stats['last_call_at'])<div class="oc-notice"><i class="fa-solid fa-clock-rotate-left"></i><p>آخرین تماس این نوبت در <strong><bdi>{{ verta($stats['last_call_at'])->format('Y/m/d H:i:s') }}</bdi></strong> ثبت شده است.</p></div>@endif
     @if($callbackRequests->isNotEmpty())
     <section class="oc-panel"><div class="oc-panel-header"><div><h2 class="oc-panel-title"><i class="fa-solid fa-phone-volume"></i>تاریخچه درخواست تماس مشاور</h2><p class="oc-help">زمان کلیک مشاور و نتیجه ارسال به سرور مستقل از گزارش نهایی تماس نگهداری می‌شود.</p></div><span class="oc-count-badge">{{ $callbackRequests->count() }}</span></div><div class="oc-table-wrap"><table class="oc-table"><thead><tr><th>زمان دقیق درخواست</th><th>شناسه درخواست</th><th>بیمار / داخلی</th><th>درخواست‌کننده</th><th>نتیجه ارسال</th><th>پاسخ سرور</th><th>زمان پاسخ</th></tr></thead><tbody>
-    @foreach($callbackRequests as $callback)<tr class="{{ $callback->status === 'FAILED' ? 'oc-row-danger' : '' }}"><td><bdi>{{ verta($callback->requested_at)->format('Y/m/d H:i:s') }}</bdi></td><td class="oc-ltr">{{ $callback->request_id }}@if($callback->callLog)<small class="oc-cell-sub"><a href="{{ route('admin.consultation.call-reports.call', $callback->callLog) }}">تماس {{ $callback->call_id }}</a></small>@endif</td><td><bdi class="oc-ltr">{{ $callback->patient_phone }}</bdi><small class="oc-cell-sub oc-ltr">داخلی {{ $callback->advisor_extension }}</small></td><td>{{ $callback->requester?->fullName ?: 'کاربر حذف‌شده' }}</td><td><span class="oc-badge {{ $callback->status === 'ACCEPTED' ? 'oc-badge-success' : ($callback->status === 'FAILED' ? 'oc-badge-danger' : 'oc-badge-warning') }}">{{ ['ACCEPTED'=>'پذیرفته شد','FAILED'=>'ناموفق','PENDING'=>'در حال ارسال'][$callback->status] ?? $callback->status }}</span><small class="oc-cell-sub">HTTP {{ $callback->http_status ?: '—' }}</small>@if($callback->final_call_received_at)<small class="oc-cell-sub oc-text-success">گزارش نهایی تماس دریافت شد</small>@endif</td><td>{{ $callback->error_message ?: (data_get($callback->response_payload, 'message') ?: ($callback->response_body ?: '—')) }}</td><td class="oc-ltr">{{ $callback->duration_ms !== null ? $callback->duration_ms.' ms' : '—' }}</td></tr>@endforeach
+    @foreach($callbackRequests as $callback)
+        @php
+            $responseJson = $callback->response_payload;
+            if (is_string($responseJson)) { $responseJson = json_decode($responseJson, true); }
+            if (!is_array($responseJson) && is_string($callback->response_body)) {
+                $decodedBody = json_decode($callback->response_body, true);
+                $responseJson = is_array($decodedBody) ? $decodedBody : null;
+            }
+        @endphp
+        <tr class="{{ $callback->status === 'FAILED' ? 'oc-row-danger' : '' }}"><td><bdi>{{ verta($callback->requested_at)->format('Y/m/d H:i:s') }}</bdi></td><td class="oc-ltr">{{ $callback->request_id }}@if($callback->callLog)<small class="oc-cell-sub"><a href="{{ route('admin.consultation.call-reports.call', $callback->callLog) }}">تماس {{ $callback->call_id }}</a></small>@endif</td><td><bdi class="oc-ltr">{{ $callback->patient_phone }}</bdi><small class="oc-cell-sub oc-ltr">داخلی {{ $callback->advisor_extension }}</small></td><td>{{ $callback->requester?->fullName ?: 'کاربر حذف‌شده' }}</td><td><span class="oc-badge {{ $callback->status === 'ACCEPTED' ? 'oc-badge-success' : ($callback->status === 'FAILED' ? 'oc-badge-danger' : 'oc-badge-warning') }}">{{ ['ACCEPTED'=>'پذیرفته شد','FAILED'=>'ناموفق','PENDING'=>'در حال ارسال'][$callback->status] ?? $callback->status }}</span><small class="oc-cell-sub">HTTP {{ $callback->http_status ?: '—' }}</small>@if($callback->final_call_received_at)<small class="oc-cell-sub oc-text-success">گزارش نهایی تماس دریافت شد</small>@endif</td><td>@if($responseJson)<button type="button" class="oc-btn oc-btn-small callback-response-btn" data-response-b64="{{ base64_encode(json_encode($responseJson, JSON_UNESCAPED_UNICODE)) }}" data-request-id="{{ $callback->request_id }}"><i class="fa-solid fa-code"></i> مشاهده پاسخ JSON</button>@else{{ $callback->error_message ?: (data_get($callback->response_payload, 'message') ?: ($callback->response_body ?: '—')) }}@endif</td><td class="oc-ltr">{{ $callback->duration_ms !== null ? $callback->duration_ms.' ms' : '—' }}</td></tr>
+    @endforeach
     </tbody></table></div></section>
     @endif
+    <div class="modal fade" id="callback-response-modal" tabindex="-1" aria-labelledby="callback-response-title" aria-hidden="true"><div class="modal-dialog modal-dialog-centered modal-lg"><div class="modal-content oc-billing-modal" dir="rtl"><div class="modal-header"><h2 class="modal-title" id="callback-response-title"><i class="fa-solid fa-code"></i> پاسخ سرور درخواست تماس</h2><button type="button" class="btn-close ms-0" data-bs-dismiss="modal" aria-label="بستن"></button></div><div class="modal-body"><p class="oc-help" id="callback-response-request-id"></p><pre id="callback-response-content" dir="ltr" style="white-space:pre-wrap;word-break:break-word;max-height:60vh;overflow:auto;background:#101827;color:#dbeafe;border-radius:10px;padding:18px;text-align:left"></pre></div></div></div></div>
     @if($billing)
     @php
-        $usedMinutes = min($billing->reserved_minutes, (int) ceil($billing->answered_talk_seconds / 60));
+        $usedMinutes = min($billing->reserved_minutes, (int) ceil($billing->billable_talk_seconds / 60));
         $effectiveRefund = $billing->refund_status === 'completed'
             ? max(0, (int) $billing->refunded_amount + (int) $billing->adjustments->sum('amount_change'))
             : (int) $billing->suggested_refund_amount;
@@ -154,20 +261,18 @@
         $billingStatus = ['pending'=>'در انتظار تأیید','approved'=>'تأییدشده','completed'=>($consultationCase->state === 'PATIENT_NO_SHOW' ? 'تسویه کامل بابت عدم حضور بیمار' : 'تسویه نهایی‌شده')][$billing->refund_status] ?? $billing->refund_status;
     @endphp
     <section class="oc-panel oc-finance-panel" id="consultation-billing">
-        <div class="oc-panel-header"><div><h2 class="oc-panel-title"><i class="fa-solid fa-wallet"></i>محاسبه مالی و بازگشت وجه</h2><p class="oc-help">مبالغ براساس نرخ ثبت‌شده در زمان نوبت محاسبه می‌شوند.</p></div><span class="oc-badge {{ $billing->refund_status === 'completed' ? 'oc-badge-success' : 'oc-badge-warning' }}">{{ $billingStatus }}</span></div>
+        <div class="oc-panel-header"><div><h2 class="oc-panel-title"><i class="fa-solid fa-wallet"></i>محاسبه مالی و بازگشت وجه</h2><p class="oc-help">بازگشت وجه متناسب با مبلغ واقعی همین نوبت و مدت رزروشده محاسبه می‌شود؛ نرخ عمومی بیمار در این محاسبه دخالتی ندارد.</p></div><span class="oc-badge {{ $billing->refund_status === 'completed' ? 'oc-badge-success' : 'oc-badge-warning' }}">{{ $billingStatus }}</span></div>
         <div class="oc-panel-body">
             <div class="oc-finance-grid">
                 @foreach([
                     ['مدت رزروشده',$billing->reserved_minutes.' دقیقه'],
-                    ['مکالمه خام',$duration($billing->raw_answered_talk_seconds)],
-                    ['زمان حذف‌شده (تماس کوتاه)',$duration($billing->ignored_talk_seconds)],
-                    ['مکالمه مالی',$usedMinutes.' دقیقه ('.$duration($billing->answered_talk_seconds).')'],
-                    ['زمان باقی‌مانده سیستمی',$billing->system_unused_minutes.' دقیقه'],
-                    ['زمان باقی‌مانده نهایی',$effectiveUnusedMinutes.' دقیقه'],
+                    ['مجموع مکالمه پاسخ‌داده‌شده',$duration($billing->answered_talk_seconds)],
+                    ['زمان سربار اتصال و مکالمه (دقیقه)',(int)($billing->connection_overhead_minutes_snapshot ?? 0).' دقیقه (مقدار ذخیره‌شده این نوبت)'],
+                    ['زمان مالی مؤثر',$usedMinutes.' دقیقه ('.$duration($billing->billable_talk_seconds).')'],
+                    ['زمان باقی‌مانده قابل بازگشت',$effectiveUnusedMinutes.' دقیقه'],
                     ['زمان نهایی مشمول سهم',$settledUsedMinutes.' دقیقه'],
-                    ['نرخ ساعتی مراجعه‌کننده',number_format($billing->hourly_rate_snapshot).' تومان'],
-                    ['نرخ ساعتی سهم کارشناس',number_format($billing->payout_hourly_rate_snapshot).' تومان'],
-                    ['مبلغ ویزیت',number_format($billing->total_paid_amount).' تومان'],
+                    ['هزینه ساعتی مشاور',number_format($billing->payout_hourly_rate_snapshot).' تومان'],
+                    ['مبلغ واقعی همین نوبت',number_format($billing->total_paid_amount).' تومان'],
                     ['مبلغ نهایی مصرف‌شده',number_format($billing->used_amount).' تومان'],
                     [$billing->refund_status === 'completed' ? 'هزینه برگشتی قطعی' : 'هزینه برگشتی پیشنهادی',number_format($effectiveRefund).' تومان'],
                     ['خالص پس از بازگشت',number_format((int)$billing->total_paid_amount - $effectiveRefund).' تومان'],
@@ -188,7 +293,7 @@
                 <button class="oc-btn oc-btn-primary" type="button" data-bs-toggle="modal" data-bs-target="#billing-confirmation-modal"><i class="fa-solid fa-calculator"></i>تأیید محاسبه و واریز</button>
             </div>
             @else
-                <div class="oc-refund-complete"><i class="fa-solid fa-circle-check"></i><div><strong>{{ $consultationCase->state === 'PATIENT_NO_SHOW' ? 'عدم حضور بیمار: تسویه کامل ثبت شد و هیچ مبلغی به کیف پول بازنگشت.' : 'محاسبه نهایی قفل شد؛ مبلغ بازگشت به کیف پول: '.number_format($billing->refunded_amount).' تومان.' }}</strong><p>ثبت‌کننده: {{ $billing->approver?->fullName ?: '—' }} (#{{ $billing->approved_by ?: '—' }}) · زمان: <bdi>{{ $billing->approved_at ? verta($billing->approved_at)->format('Y/m/d H:i:s') : '—' }}</bdi> · نوبت: #{{ $appointment->id }} / {{ $appointment->tracking_code ?: 'بدون کد پیگیری' }} · تراکنش کیف پول: {{ $billing->wallet_transaction_id ? '#'.$billing->wallet_transaction_id : 'بدون تراکنش (مبلغ صفر)' }}</p>@if($billing->walletTransaction)<p>موجودی قبل: {{ number_format($billing->walletTransaction->balance_before) }} تومان · موجودی بعد: {{ number_format($billing->walletTransaction->balance_after) }} تومان</p>@endif</div></div>
+                <div class="oc-refund-complete"><i class="fa-solid fa-circle-check"></i><div><strong>{{ $consultationCase->state === 'PATIENT_NO_SHOW' ? 'عدم حضور بیمار: تسویه کامل ثبت شد و هیچ مبلغی به کیف پول بازنگشت.' : 'محاسبه نهایی قفل شد؛ مبلغ بازگشت به کیف پول: '.number_format($billing->refunded_amount).' تومان.' }}</strong><p>مبنای ثبت‌شده: مبلغ نوبت {{ number_format($billing->total_paid_amount) }} تومان · زمان سربار اتصال و مکالمه: {{ (int)($billing->connection_overhead_minutes_snapshot ?? 0) }} دقیقه · مدت رزرو: {{ $billing->reserved_minutes }} دقیقه.</p><p>ثبت‌کننده: {{ $billing->approver?->fullName ?: '—' }} (#{{ $billing->approved_by ?: '—' }}) · زمان: <bdi>{{ $billing->approved_at ? verta($billing->approved_at)->format('Y/m/d H:i:s') : '—' }}</bdi> · نوبت: #{{ $appointment->id }} / {{ $appointment->tracking_code ?: 'بدون کد پیگیری' }} · تراکنش کیف پول: {{ $billing->wallet_transaction_id ? '#'.$billing->wallet_transaction_id : 'بدون تراکنش (مبلغ صفر)' }}</p>@if($billing->walletTransaction)<p>موجودی قبل: {{ number_format($billing->walletTransaction->balance_before) }} تومان · موجودی بعد: {{ number_format($billing->walletTransaction->balance_after) }} تومان</p>@endif</div></div>
                 @php($effectiveMinutes = $billing->adjustments->last()?->corrected_unused_minutes ?? $billing->approved_unused_minutes)
                 @can('SUPER_ADMIN')
                 @if($consultationCase->state !== 'PATIENT_NO_SHOW')
@@ -210,10 +315,11 @@
                     <div class="oc-finance-grid oc-confirmation-grid">
                         <div><span>بیمار</span><strong>{{ $appointment->user?->fullName ?: '—' }}</strong></div>
                         <div><span>نوبت / کد پیگیری</span><strong>#{{ $appointment->id }} · {{ $appointment->tracking_code ?: '—' }}</strong></div>
-                        <div><span>هزینه نوبت</span><strong>{{ number_format($billing->total_paid_amount) }} تومان</strong></div>
-                        <div><span>نرخ ساعتی مراجعه‌کننده</span><strong>{{ number_format($billing->hourly_rate_snapshot) }} تومان</strong></div>
-                        <div><span>نرخ ساعتی سهم کارشناس</span><strong>{{ number_format($billing->payout_hourly_rate_snapshot) }} تومان</strong></div>
-                        <div><span>زمان واقعی مکالمه مالی</span><strong>{{ $usedMinutes }} دقیقه</strong></div>
+                        <div><span>مبلغ واقعی همین نوبت</span><strong>{{ number_format($billing->total_paid_amount) }} تومان</strong></div>
+                        <div><span>هزینه ساعتی مشاور</span><strong>{{ number_format($billing->payout_hourly_rate_snapshot) }} تومان</strong></div>
+                        <div><span>مجموع مکالمه پاسخ‌داده‌شده</span><strong>{{ $duration($billing->answered_talk_seconds) }}</strong></div>
+                        <div><span>زمان سربار اتصال و مکالمه (دقیقه)</span><strong>{{ (int)($billing->connection_overhead_minutes_snapshot ?? 0) }} دقیقه</strong></div>
+                        <div><span>زمان مالی مؤثر</span><strong>{{ $usedMinutes }} دقیقه</strong></div>
                         <div><span>زمان نهایی مشمول سهم</span><strong id="modal-settled-used-minutes">{{ $settledUsedMinutes }} دقیقه</strong></div>
                         <div><span>زمان باقی‌مانده سیستم</span><strong>{{ $billing->system_unused_minutes }} دقیقه</strong></div>
                         <div><span>مبلغ واریزی به بیمار</span><strong id="modal-refund-amount">{{ number_format($billing->suggested_refund_amount) }} تومان</strong></div>
@@ -235,14 +341,14 @@
     @endif
 
     @if($billing->audits->isNotEmpty())
-    <section class="oc-panel"><div class="oc-panel-header"><h2 class="oc-panel-title"><i class="fa-solid fa-clock-rotate-left"></i>سابقه حسابرسی مالی</h2></div><div class="oc-table-wrap"><table class="oc-table"><thead><tr><th>زمان</th><th>عملیات</th><th>کاربر</th><th>زمان سیستمی</th><th>زمان تأییدشده</th><th>مبلغ</th><th>توضیحات</th></tr></thead><tbody>@foreach($billing->audits as $audit)<tr><td><bdi>{{ verta($audit->created_at)->format('Y/m/d H:i:s') }}</bdi></td><td>{{ ['patient_no_show_settled'=>'تسویه کامل بابت عدم حضور بیمار','snapshot_created'=>'ایجاد Snapshot مالی','usage_recalculated'=>'محاسبه مجدد مکالمه','minutes_approved'=>'تأیید زمان','wallet_refunded'=>'بازگشت به کیف پول','refund_confirmed'=>'تأیید نهایی و واریز کیف پول','practitioner_adjusted_refund'=>'تغییر زمان توسط پزشک و واریز','admin_adjusted_refund'=>'تغییر زمان توسط مدیر و واریز','refund_corrected'=>'اصلاح مستقل بازگشت'][$audit->action] ?? $audit->action }}</td><td>{{ $audit->actor?->fullName ?: 'سیستم' }}@if($audit->actor_id)<small class="oc-cell-sub">#{{ $audit->actor_id }}</small>@endif</td><td>{{ $audit->system_unused_minutes }} دقیقه</td><td>{{ $audit->approved_unused_minutes }} دقیقه</td><td>{{ number_format($audit->amount) }} تومان</td><td>{{ $audit->reason ?: '—' }}</td></tr>@endforeach</tbody></table></div></section>
+    <section class="oc-panel"><div class="oc-panel-header"><h2 class="oc-panel-title"><i class="fa-solid fa-clock-rotate-left"></i>سابقه حسابرسی مالی</h2></div><div class="oc-table-wrap"><table class="oc-table"><thead><tr><th>زمان</th><th>عملیات</th><th>کاربر</th><th>سربار ذخیره‌شده</th><th>زمان مالی مؤثر</th><th>زمان سیستمی</th><th>زمان تأییدشده</th><th>مبلغ</th><th>توضیحات</th></tr></thead><tbody>@foreach($billing->audits as $audit)<tr><td><bdi>{{ verta($audit->created_at)->format('Y/m/d H:i:s') }}</bdi></td><td>{{ ['patient_no_show_settled'=>'تسویه کامل بابت عدم حضور بیمار','snapshot_created'=>'ایجاد Snapshot مالی','usage_recalculated'=>'محاسبه مجدد مکالمه','minutes_approved'=>'تأیید زمان','wallet_refunded'=>'بازگشت به کیف پول','refund_confirmed'=>'تأیید نهایی و واریز کیف پول','practitioner_adjusted_refund'=>'تغییر زمان توسط پزشک و واریز','admin_adjusted_refund'=>'تغییر زمان توسط مدیر و واریز','refund_corrected'=>'اصلاح مستقل بازگشت'][$audit->action] ?? $audit->action }}</td><td>{{ $audit->actor?->fullName ?: 'سیستم' }}@if($audit->actor_id)<small class="oc-cell-sub">#{{ $audit->actor_id }}</small>@endif</td><td>{{ (int)data_get($audit->snapshot, 'connection_overhead_minutes_snapshot', 0) }} دقیقه</td><td>{{ (int)ceil((int)data_get($audit->snapshot, 'billable_talk_seconds', 0) / 60) }} دقیقه</td><td>{{ $audit->system_unused_minutes }} دقیقه</td><td>{{ $audit->approved_unused_minutes }} دقیقه</td><td>{{ number_format($audit->amount) }} تومان</td><td>{{ $audit->reason ?: '—' }}</td></tr>@endforeach</tbody></table></div></section>
     @endif
     @if($billing->adjustments->isNotEmpty())
     <section class="oc-panel"><div class="oc-panel-header"><h2 class="oc-panel-title"><i class="fa-solid fa-scale-balanced"></i>اصلاحات پس از بازگشت وجه</h2></div><div class="oc-table-wrap"><table class="oc-table"><thead><tr><th>زمان</th><th>دقایق قبلی</th><th>دقایق اصلاح‌شده</th><th>تغییر مبلغ</th><th>ثبت‌کننده</th><th>دلیل</th><th>تراکنش کیف پول</th></tr></thead><tbody>@foreach($billing->adjustments as $adjustment)<tr><td><bdi>{{ verta($adjustment->created_at)->format('Y/m/d H:i:s') }}</bdi></td><td>{{ $adjustment->previous_unused_minutes }}</td><td>{{ $adjustment->corrected_unused_minutes }}</td><td class="{{ $adjustment->amount_change > 0 ? 'oc-text-success' : 'oc-text-danger' }}">{{ $adjustment->amount_change > 0 ? '+' : '' }}{{ number_format($adjustment->amount_change) }} تومان</td><td>{{ $adjustment->actor?->fullName ?: '—' }}</td><td>{{ $adjustment->reason }}</td><td>#{{ $adjustment->wallet_transaction_id }}</td></tr>@endforeach</tbody></table></div></section>
     @endif
     @endif
     <section class="oc-panel"><div class="oc-panel-header"><h2 class="oc-panel-title"><i class="fa-solid fa-list-ul"></i>تمام تماس‌های این نوبت</h2></div>
-    @if($calls->isEmpty())<div class="oc-empty"><i class="fa-solid fa-phone-slash"></i><h3>تماسی ثبت نشده است</h3></div>@else<div class="oc-table-wrap"><table class="oc-table"><thead><tr><th>زمان ورود تماس</th><th>نوع تماس</th><th>نتیجه</th><th>پاسخ‌گو</th><th>مقصد</th><th>رویداد مشاور</th><th>انتظار</th><th>زنگ‌خوردن</th><th>مکالمه</th><th>مدت کل</th><th></th></tr></thead><tbody>
+    @if($calls->isEmpty())<div class="oc-empty"><i class="fa-solid fa-phone-slash"></i><h3>تماسی ثبت نشده است</h3></div>@else<div class="oc-table-wrap"><table class="oc-table"><thead><tr><th>زمان ورود تماس</th><th>نوع تماس</th><th>شماره تماس‌گیرنده</th><th>نتیجه</th><th>پاسخ‌گو</th><th>مقصد</th><th>رویداد مشاور</th><th>انتظار</th><th>زنگ‌خوردن</th><th>مکالمه</th><th>مدت کل</th><th></th></tr></thead><tbody>
     @foreach($calls as $call)
         @php($early = $call->isEarlyCall())
         @php($missedInWindow = $call->countsAsUnanswered())
@@ -250,13 +356,30 @@
         @php($completedHangup = ! $early && $call->isCompletedConsultantHangup($shortCallThresholdSeconds))
         @php($activeNoAnswer = $call->occurredDuringAppointment() && $call->consultantNoAnswer)
         @php($patientHangup = ! $early && $call->wasDisconnectedByPatient())
-        <tr class="{{ ($activeHangup || $activeNoAnswer) ? 'oc-row-danger' : '' }}"><td><bdi>{{ $call->call_entered_at ? verta($call->call_entered_at)->format('Y/m/d H:i:s') : '—' }}</bdi><small class="oc-cell-sub oc-ltr">شناسه فنی تماس: {{ $call->call_id }}</small></td><td>@if($call->direction === 'OUTBOUND')<span class="oc-badge oc-badge-success"><i class="fa-solid fa-arrow-up-right-from-square"></i> خروجی؛ درخواست مشاور</span>@elseif($call->direction === 'INBOUND')<span class="oc-badge"><i class="fa-solid fa-arrow-down"></i> ورودی؛ تماس بیمار</span>@else<span class="oc-badge">جهت نامشخص</span>@endif @if(data_get($call->additional_data, 'request_id'))<small class="oc-cell-sub oc-ltr">{{ data_get($call->additional_data, 'request_id') }}</small>@endif</td><td><span class="oc-badge oc-badge-{{ $callPresentation::tone($call, $shortCallThresholdSeconds) }}">{{ $callPresentation::label($call, $shortCallThresholdSeconds) }}</span>@if($call->surveyScore() !== null)<small class="oc-cell-sub oc-text-warning"><i class="fa-solid fa-star" aria-hidden="true"></i> امتیاز نظرسنجی: {{ $call->surveyScore() }} از ۵</small>@endif</td><td>{{ $call->operator?->fullName ?: ($call->responded_by ?: '—') }}</td><td class="oc-ltr">{{ $call->connected_destination ?: ($call->primary_extension ?: '—') }}</td><td>@if($early)<strong>خارج از بازه نوبت</strong><small class="oc-cell-sub">در آمار بی‌پاسخ محاسبه نشده</small>@elseif($completedHangup)<strong class="oc-text-success">مشاوره انجام شد</strong><small class="oc-cell-sub">پایان عادی توسط مشاور · بیشتر از حد {{ $shortCallThresholdSeconds / 60 }} دقیقه</small>@elseif($activeHangup)<strong class="oc-text-danger">تماس کوتاه؛ قطع توسط مشاور</strong><small class="oc-cell-sub">{{ $call->consultantHangup->hangup_via === 'PHONE' ? 'از تلفن' : 'از سافت‌فون' }} · <bdi>{{ verta($call->consultantHangup->hung_up_at)->format('Y/m/d H:i:s') }}</bdi></small>@elseif($activeNoAnswer)<strong class="oc-text-danger">پاسخ نداد</strong><small class="oc-cell-sub"><bdi>{{ verta($call->consultantNoAnswer->no_answer_at)->format('Y/m/d H:i:s') }}</bdi></small>@elseif($patientHangup)<strong class="oc-text-success">پایان تماس توسط بیمار</strong><small class="oc-cell-sub">بدون رویداد قطع مشاور</small>@elseif($missedInWindow)<strong>پاسخ داده نشد</strong><small class="oc-cell-sub">نتیجه خام VoIP: {{ $call->final_result }}</small>@else—@endif</td><td class="oc-ltr">{{ $duration($call->wait_duration_seconds) }}</td><td class="oc-ltr">{{ $duration($call->ring_duration_seconds) }}</td><td class="oc-ltr"><strong>{{ $duration($call->talk_duration_seconds) }}</strong></td><td class="oc-ltr">{{ $duration($call->total_duration_seconds) }}</td><td><a class="oc-btn oc-btn-small" href="{{ route('admin.consultation.call-reports.call', $call) }}">همه جزئیات</a></td></tr>
+        @php($normalizedCaller = $normalizeCallerPhone($call->patient_phone))
+        @php($callerKind = $normalizedCaller === $patientMobile ? 'mobile' : (in_array($normalizedCaller, $patientLandlines, true) ? 'landline' : 'other'))
+        <tr class="{{ ($activeHangup || $activeNoAnswer) ? 'oc-row-danger' : '' }}"><td><bdi>{{ $call->call_entered_at ? verta($call->call_entered_at)->format('Y/m/d H:i:s') : '—' }}</bdi><small class="oc-cell-sub oc-ltr">شناسه فنی تماس: {{ $call->call_id }}</small></td><td>@if($call->direction === 'OUTBOUND')<span class="oc-badge oc-badge-success"><i class="fa-solid fa-arrow-up-right-from-square"></i> خروجی؛ درخواست مشاور</span>@elseif($call->direction === 'INBOUND')<span class="oc-badge"><i class="fa-solid fa-arrow-down"></i> ورودی؛ تماس بیمار</span>@else<span class="oc-badge">جهت نامشخص</span>@endif @if(data_get($call->additional_data, 'request_id'))<small class="oc-cell-sub oc-ltr">{{ data_get($call->additional_data, 'request_id') }}</small>@endif</td><td><strong class="oc-ltr"><bdi>{{ $call->patient_phone ?: '—' }}</bdi></strong><small class="oc-cell-sub">{{ $callerKind === 'mobile' ? 'موبایل اصلی بیمار' : ($callerKind === 'landline' ? 'شماره ثابت بیمار' : 'شماره اعلام‌شده توسط VoIP') }}</small>@if($callerKind === 'landline' && $normalizedCaller !== $call->patient_phone)<small class="oc-cell-sub oc-ltr">شماره کامل: {{ $normalizedCaller }}</small>@endif</td><td><span class="oc-badge oc-badge-{{ $callPresentation::tone($call, $shortCallThresholdSeconds) }}">{{ $callPresentation::label($call, $shortCallThresholdSeconds) }}</span>@if($call->surveyScore() !== null)<small class="oc-cell-sub oc-text-warning"><i class="fa-solid fa-star" aria-hidden="true"></i> امتیاز نظرسنجی: {{ $call->surveyScore() }} از ۵</small>@endif</td><td>{{ $call->operator?->fullName ?: ($call->responded_by ?: '—') }}</td><td class="oc-ltr">{{ $call->connected_destination ?: ($call->primary_extension ?: '—') }}</td><td>@if($early)<strong>خارج از بازه نوبت</strong><small class="oc-cell-sub">در آمار بی‌پاسخ محاسبه نشده</small>@elseif($completedHangup)<strong class="oc-text-success">مشاوره انجام شد</strong><small class="oc-cell-sub">پایان عادی توسط مشاور · بیشتر از حد {{ $shortCallThresholdSeconds / 60 }} دقیقه</small>@elseif($activeHangup)<strong class="oc-text-danger">تماس کوتاه؛ قطع توسط مشاور</strong><small class="oc-cell-sub">{{ $call->consultantHangup->hangup_via === 'PHONE' ? 'از تلفن' : 'از سافت‌فون' }} · <bdi>{{ verta($call->consultantHangup->hung_up_at)->format('Y/m/d H:i:s') }}</bdi></small>@elseif($activeNoAnswer)<strong class="oc-text-danger">پاسخ نداد</strong><small class="oc-cell-sub"><bdi>{{ verta($call->consultantNoAnswer->no_answer_at)->format('Y/m/d H:i:s') }}</bdi></small>@elseif($patientHangup)<strong class="oc-text-success">پایان تماس توسط بیمار</strong><small class="oc-cell-sub">بدون رویداد قطع مشاور</small>@elseif($missedInWindow)<strong>پاسخ داده نشد</strong><small class="oc-cell-sub">نتیجه خام VoIP: {{ $call->final_result }}</small>@else—@endif</td><td class="oc-ltr">{{ $duration($call->wait_duration_seconds) }}</td><td class="oc-ltr">{{ $duration($call->ring_duration_seconds) }}</td><td class="oc-ltr"><strong>{{ $duration($call->talk_duration_seconds) }}</strong></td><td class="oc-ltr">{{ $duration($call->total_duration_seconds) }}</td><td><a class="oc-btn oc-btn-small" href="{{ route('admin.consultation.call-reports.call', $call) }}">همه جزئیات</a></td></tr>
     @endforeach
     </tbody></table></div>{{ $calls->links('onlineconsultation::components.pagination') }} @endif</section>
 
     @if($canEditCase)
-        @if($consultationCase->state === 'OPEN' && $consultationCase->reports->isNotEmpty())
-        <div class="modal fade" id="complete-consultation-modal" tabindex="-1" aria-labelledby="complete-consultation-title" aria-hidden="true"><div class="modal-dialog modal-dialog-centered"><div class="modal-content oc-billing-modal" dir="rtl"><form method="POST" action="{{ route('admin.consultation.case.complete', $appointment) }}" id="complete-consultation-form">@csrf<div class="modal-header"><h2 class="modal-title" id="complete-consultation-title"><i class="fa-solid fa-lock"></i> تأیید اتمام مشاوره</h2><button type="button" class="btn-close ms-0" data-bs-dismiss="modal" aria-label="بستن"></button></div><div class="modal-body"><div class="oc-alert"><i class="fa-solid fa-triangle-exclamation"></i><p>پس از اتمام، API وضعیت «مشاوره تمام شده» برمی‌گرداند و تماس VoIP دیگر به مشاور وصل نمی‌شود.</p></div><div class="oc-case-confirm-summary"><span>نوبت <strong>#{{ $appointment->tracking_code ?: $appointment->id }}</strong></span><span>تعداد گزارش‌ها <strong>{{ $consultationCase->reports->count() }}</strong></span></div><label class="oc-final-confirm"><input type="checkbox" name="completion_confirmed" value="1" id="completion-confirmed" required><span>گزارش‌ها را بررسی کردم و اتمام قطعی این مشاوره و مسدودشدن اتصال مجدد را تأیید می‌کنم.</span></label></div><div class="modal-footer"><button type="button" class="oc-btn" data-bs-dismiss="modal">انصراف</button><button class="oc-btn oc-btn-danger" id="complete-consultation-submit" type="submit" disabled><i class="fa-solid fa-lock"></i>تأیید و اتمام مشاوره</button></div></form></div></div></div>
+        @if($consultationCase->state === 'OPEN')
+        <div class="modal fade" id="complete-consultation-modal" tabindex="-1" aria-labelledby="complete-consultation-title" aria-hidden="true"><div class="modal-dialog modal-dialog-centered"><div class="modal-content oc-billing-modal" dir="rtl"><form method="POST" action="{{ route('admin.consultation.case.complete', $appointment) }}" id="complete-consultation-form">@csrf<div class="modal-header"><h2 class="modal-title" id="complete-consultation-title"><i class="fa-solid fa-lock"></i> تأیید اتمام مشاوره</h2><button type="button" class="btn-close ms-0" data-bs-dismiss="modal" aria-label="بستن"></button></div><div class="modal-body">
+            @if($consultationCase->reports->isEmpty())
+            <div class="oc-notice oc-notice-warning"><i class="fa-solid fa-file-circle-plus"></i><p><strong>هنوز امکان اتمام مشاوره وجود ندارد.</strong><br>ابتدا حداقل یک گزارش برای این نوبت ثبت کنید؛ سپس دوباره «اتمام مشاوره» را انتخاب کنید.</p></div>
+            @else
+            <div class="oc-alert"><i class="fa-solid fa-triangle-exclamation"></i><p>پس از اتمام، API وضعیت «مشاوره تمام شده» برمی‌گرداند و تماس VoIP دیگر به مشاور وصل نمی‌شود.</p></div><div class="oc-case-confirm-summary"><span>نوبت <strong>#{{ $appointment->tracking_code ?: $appointment->id }}</strong></span><span>تعداد گزارش‌ها <strong>{{ $consultationCase->reports->count() }}</strong></span></div><label class="oc-final-confirm"><input type="checkbox" name="completion_confirmed" value="1" id="completion-confirmed" required><span>گزارش‌ها را بررسی کردم و اتمام قطعی این مشاوره و مسدودشدن اتصال مجدد را تأیید می‌کنم.</span></label>
+            @endif
+        </div><div class="modal-footer"><button type="button" class="oc-btn" data-bs-dismiss="modal">{{ $consultationCase->reports->isEmpty() ? 'متوجه شدم' : 'انصراف' }}</button>@if($consultationCase->reports->isNotEmpty())<button class="oc-btn oc-btn-danger" id="complete-consultation-submit" type="submit" disabled><i class="fa-solid fa-lock"></i>تأیید و اتمام مشاوره</button>@endif</div></form></div></div></div>
+        @if($billing?->refund_status === 'completed')
+        <div class="modal fade" id="settled-not-completed-modal" tabindex="-1" aria-labelledby="settled-not-completed-title" aria-hidden="true" data-bs-backdrop="static">
+            <div class="modal-dialog modal-dialog-centered"><div class="modal-content oc-billing-modal" dir="rtl">
+                <div class="modal-header"><h2 class="modal-title" id="settled-not-completed-title"><i class="fa-solid fa-circle-exclamation oc-text-warning"></i> اتمام ویزیت فراموش شده است</h2><button type="button" class="btn-close ms-0" data-bs-dismiss="modal" aria-label="بستن"></button></div>
+                <div class="modal-body"><div class="oc-notice oc-notice-warning" style="margin:0"><i class="fa-solid fa-wallet"></i><p><strong>تسویه این نوبت انجام شده، اما هنوز «اتمام مشاوره» را ثبت نکرده‌اید.</strong><br>برای نهایی‌شدن پرونده و جلوگیری از اتصال مجدد تماس، حتماً اتمام ویزیت را انجام دهید.</p></div>@if($consultationCase->reports->isEmpty())<p class="oc-help" style="margin-top:16px">پیش از اتمام، باید حداقل یک گزارش مشاوره ثبت کنید.</p>@endif</div>
+                <div class="modal-footer"><button type="button" class="oc-btn" data-bs-dismiss="modal">بعداً انجام می‌دهم</button><button type="button" class="oc-btn oc-btn-danger" id="settled-complete-action"><i class="fa-solid {{ $consultationCase->reports->isEmpty() ? 'fa-file-circle-plus' : 'fa-lock' }}"></i>{{ $consultationCase->reports->isEmpty() ? 'ثبت گزارش و اتمام' : 'همین حالا اتمام ویزیت' }}</button></div>
+            </div></div>
+        </div>
+        @endif
         @elseif($consultationCase->state === 'COMPLETED')
         <div class="modal fade" id="reopen-consultation-modal" tabindex="-1" aria-labelledby="reopen-consultation-title" aria-hidden="true"><div class="modal-dialog modal-dialog-centered"><div class="modal-content oc-billing-modal" dir="rtl"><form method="POST" action="{{ route('admin.consultation.case.reopen', $appointment) }}" id="reopen-consultation-form">@csrf<div class="modal-header"><h2 class="modal-title" id="reopen-consultation-title"><i class="fa-solid fa-lock-open"></i> بازکردن مجدد پرونده</h2><button type="button" class="btn-close ms-0" data-bs-dismiss="modal" aria-label="بستن"></button></div><div class="modal-body"><div class="oc-notice oc-notice-warning"><i class="fa-solid fa-circle-info"></i><p>با بازگشایی، امکان ثبت گزارش جدید و اتصال VoIP در بازه معتبر نوبت دوباره فعال می‌شود. این عملیات در تاریخچه باقی می‌ماند.</p></div><div class="oc-field"><label class="oc-label" for="reopen-reason">دلیل بازگشایی</label><textarea class="oc-input" id="reopen-reason" name="reopen_reason" minlength="5" maxlength="2000" rows="4" required>{{ old('reopen_reason') }}</textarea></div><label class="oc-final-confirm"><input type="checkbox" name="reopen_confirmed" value="1" id="reopen-confirmed" required><span>بازگشایی این پرونده و فعال‌شدن مجدد آن را تأیید می‌کنم.</span></label></div><div class="modal-footer"><button type="button" class="oc-btn" data-bs-dismiss="modal">انصراف</button><button class="oc-btn oc-btn-primary" id="reopen-consultation-submit" type="submit" disabled><i class="fa-solid fa-lock-open"></i>تأیید بازگشایی</button></div></form></div></div></div>
         @endif
@@ -266,6 +389,188 @@
 @push('scripts')
 <script>
 document.addEventListener('DOMContentLoaded', function () {
+    const consultationClock = document.getElementById('consultation-clock');
+    if (consultationClock) {
+        const startAt = Number(consultationClock.dataset.start);
+        const endAt = Number(consultationClock.dataset.end);
+        const serverNowAtLoad = Number(consultationClock.dataset.serverNow);
+        const browserNowAtLoad = Date.now();
+        const title = document.getElementById('consultation-clock-title');
+        const badge = document.getElementById('consultation-clock-badge');
+        const message = document.getElementById('consultation-clock-message');
+        const description = document.getElementById('consultation-clock-description');
+        const countdown = document.getElementById('consultation-countdown');
+        const ended = document.getElementById('consultation-clock-ended');
+        const progress = document.getElementById('consultation-clock-progress');
+        const number = new Intl.NumberFormat('fa-IR', { useGrouping: false });
+        const pad = value => number.format(value).padStart(2, '۰');
+        const units = Object.fromEntries(Array.from(countdown.querySelectorAll('[data-unit]')).map(el => [el.dataset.unit, el]));
+        const endTime = consultationClock.dataset.endLabel;
+        let currentState = '';
+
+        function splitDuration(milliseconds) {
+            const totalSeconds = Math.max(0, Math.floor(milliseconds / 1000));
+            return {
+                days: Math.floor(totalSeconds / 86400),
+                hours: Math.floor((totalSeconds % 86400) / 3600),
+                minutes: Math.floor((totalSeconds % 3600) / 60),
+                seconds: totalSeconds % 60,
+                totalMinutes: Math.max(0, Math.ceil(totalSeconds / 60)),
+            };
+        }
+        function renderCounter(duration) {
+            units.days.textContent = number.format(duration.days);
+            units.hours.textContent = pad(duration.hours);
+            units.minutes.textContent = pad(duration.minutes);
+            units.seconds.textContent = pad(duration.seconds);
+        }
+        function readable(duration) {
+            if (duration.days > 0) return `${number.format(duration.days)} روز و ${number.format(duration.hours)} ساعت و ${number.format(duration.minutes)} دقیقه`;
+            if (duration.hours > 0) return `${number.format(duration.hours)} ساعت و ${number.format(duration.minutes)} دقیقه`;
+            return `${number.format(duration.minutes)} دقیقه و ${number.format(duration.seconds)} ثانیه`;
+        }
+        function setState(state) {
+            if (state === currentState) return;
+            currentState = state;
+            consultationClock.classList.toggle('is-live', state === 'live');
+            consultationClock.classList.toggle('is-ended', state === 'ended');
+            countdown.hidden = state === 'ended';
+            ended.hidden = state !== 'ended';
+        }
+        function updateClock() {
+            const nowAt = serverNowAtLoad + (Date.now() - browserNowAtLoad);
+            if (nowAt < startAt) {
+                setState('waiting');
+                const remaining = splitDuration(startAt - nowAt);
+                renderCounter(remaining);
+                title.textContent = 'شمارش معکوس تا شروع مشاوره';
+                badge.querySelector('span').textContent = 'در انتظار شروع';
+                message.textContent = `${readable(remaining)} تا نوبت باقی مانده است`;
+                description.textContent = 'در زمان تعیین‌شده، وضعیت این کارت به‌صورت خودکار به «در حال مشاوره» تغییر می‌کند.';
+                progress.style.width = '0%';
+            } else if (nowAt < endAt) {
+                setState('live');
+                const remaining = splitDuration(endAt - nowAt);
+                renderCounter(remaining);
+                title.textContent = 'مشاوره در حال برگزاری است';
+                badge.querySelector('span').textContent = 'اکنون در زمان مشاوره';
+                message.textContent = `اکنون تا ساعت ${endTime} در زمان مشاوره هستید`;
+                description.textContent = `از زمان مشاوره شما ${readable(remaining)} باقی مانده است.`;
+                progress.style.width = `${Math.min(100, Math.max(0, ((nowAt - startAt) / (endAt - startAt)) * 100))}%`;
+            } else {
+                setState('ended');
+                title.textContent = 'زمان مشاوره به پایان رسیده است';
+                badge.querySelector('span').textContent = 'پایان یافته';
+                message.textContent = `بازه مشاوره در ساعت ${endTime} به پایان رسید`;
+                description.textContent = 'ساعت پایان ثبت‌شده این نوبت در بخش مقابل نمایش داده شده است.';
+                progress.style.width = '100%';
+            }
+        }
+        updateClock();
+        window.setInterval(updateClock, 1000);
+    }
+    const alternatePanel = document.getElementById('alternate-phones-panel');
+    const alternateForm = document.getElementById('alternate-phone-form');
+    const alternateInput = document.getElementById('alternate-phone');
+    const alternateSubmit = document.getElementById('alternate-phone-submit');
+    const alternateList = document.getElementById('alternate-phone-list');
+    const alternateEmpty = document.getElementById('alternate-phone-empty');
+    const alternateCount = document.getElementById('alternate-phone-count');
+    const alternateError = document.getElementById('alternate-phone-error');
+    const alternateSuccess = document.getElementById('alternate-phone-success');
+    const csrfToken = alternateForm?.querySelector('input[name="_token"]')?.value;
+    const setAlternateCount = () => {
+        if (alternateCount && alternateList) alternateCount.textContent = alternateList.querySelectorAll('.oc-alternate-phone-row').length;
+    };
+    const buildAlternatePhoneRow = function (phone) {
+        const row = document.createElement('div');
+        row.className = 'oc-alternate-phone-row';
+        row.dataset.phoneId = phone.id;
+        const info = document.createElement('div');
+        const number = document.createElement('strong');
+        number.className = 'oc-ltr';
+        number.textContent = phone.number;
+        const meta = document.createElement('small');
+        meta.className = 'oc-cell-sub';
+        meta.textContent = 'ثبت‌کننده: ' + phone.creator + ' · ' + phone.created_at;
+        info.append(number, meta);
+        const remove = document.createElement('button');
+        remove.type = 'button';
+        remove.className = 'oc-btn oc-btn-small oc-btn-danger alternate-phone-delete';
+        remove.dataset.deleteUrl = phone.delete_url;
+        remove.innerHTML = '<i class="fa-solid fa-trash"></i>حذف';
+        row.append(info, remove);
+        return row;
+    };
+    if (alternateForm) {
+        alternateForm.addEventListener('submit', async function (event) {
+            event.preventDefault();
+            alternatePanel.open = true;
+            alternateError.hidden = true;
+            alternateSuccess.hidden = true;
+            alternateSubmit.disabled = true;
+            alternateSubmit.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i><span>در حال بررسی…</span>';
+            try {
+                const response = await fetch(alternateForm.action, {
+                    method: 'POST', body: new FormData(alternateForm), credentials: 'same-origin',
+                    headers: { 'Accept': 'application/json', 'X-Requested-With': 'XMLHttpRequest' }
+                });
+                const payload = await response.json();
+                if (!response.ok) throw payload;
+                alternateList.appendChild(buildAlternatePhoneRow(payload.phone));
+                alternateList.hidden = false;
+                alternateEmpty.hidden = true;
+                alternateInput.value = '';
+                alternateSuccess.querySelector('p').textContent = payload.message;
+                alternateSuccess.hidden = false;
+                setAlternateCount();
+            } catch (payload) {
+                alternateError.textContent = payload?.errors?.alternate_phone?.[0] || payload?.message || 'ثبت شماره انجام نشد. دوباره تلاش کنید.';
+                alternateError.hidden = false;
+                alternateInput.focus();
+            } finally {
+                alternateSubmit.disabled = false;
+                alternateSubmit.innerHTML = '<i class="fa-solid fa-plus"></i><span>افزودن</span>';
+            }
+        });
+    }
+    alternateList?.addEventListener('click', async function (event) {
+        const button = event.target.closest('.alternate-phone-delete');
+        if (!button || !confirm('این شماره از حساب بیمار و تمام نوبت‌هایش حذف شود؟')) return;
+        button.disabled = true;
+        try {
+            const response = await fetch(button.dataset.deleteUrl, {
+                method: 'DELETE', credentials: 'same-origin',
+                headers: { 'Accept': 'application/json', 'X-Requested-With': 'XMLHttpRequest', 'X-CSRF-TOKEN': csrfToken }
+            });
+            const payload = await response.json();
+            if (!response.ok) throw payload;
+            button.closest('.oc-alternate-phone-row').remove();
+            setAlternateCount();
+            if (!alternateList.querySelector('.oc-alternate-phone-row')) {
+                alternateList.hidden = true;
+                alternateEmpty.hidden = false;
+            }
+            alternateSuccess.querySelector('p').textContent = payload.message;
+            alternateSuccess.hidden = false;
+        } catch (payload) {
+            button.disabled = false;
+            alternateError.textContent = payload?.message || 'حذف شماره انجام نشد.';
+            alternateError.hidden = false;
+        }
+    });
+    const responseModal = document.getElementById('callback-response-modal');
+    const responseContent = document.getElementById('callback-response-content');
+    const responseRequestId = document.getElementById('callback-response-request-id');
+    document.querySelectorAll('.callback-response-btn').forEach(function (button) {
+        button.addEventListener('click', function () {
+            let payload = button.dataset.responseB64 ? atob(button.dataset.responseB64) : '';
+            try { payload = JSON.parse(payload); } catch (e) { /* داده از قبل رشته‌ای است */ }
+            responseRequestId.textContent = 'شناسه درخواست: ' + (button.dataset.requestId || '—');
+            responseContent.textContent = typeof payload === 'string' ? payload : JSON.stringify(payload, null, 2);
+            if (window.bootstrap) bootstrap.Modal.getOrCreateInstance(responseModal).show();
+        });
+    });
     if (window.jalaliDatepicker) {
         const iranianHolidays = @json(holidays_array());
         jalaliDatepicker.startWatch({
@@ -276,6 +581,30 @@ document.addEventListener('DOMContentLoaded', function () {
             }
         });
     }
+    @if(old('quick_time_edit'))
+    if (window.bootstrap) bootstrap.Modal.getOrCreateInstance(document.getElementById('quick-time-edit-modal')).show();
+    @endif
+    @if($canEditCase && $consultationCase->state === 'OPEN' && $billing?->refund_status === 'completed')
+    const settlementReminderElement = document.getElementById('settled-not-completed-modal');
+    const settlementReminder = window.bootstrap && settlementReminderElement
+        ? bootstrap.Modal.getOrCreateInstance(settlementReminderElement)
+        : null;
+    if (settlementReminder) settlementReminder.show();
+    document.getElementById('settled-complete-action')?.addEventListener('click', function () {
+        @if($consultationCase->reports->isEmpty())
+        settlementReminderElement.addEventListener('hidden.bs.modal', function () {
+            document.getElementById('consultation-report-form')?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            document.getElementById('outcome')?.focus({ preventScroll: true });
+        }, { once: true });
+        settlementReminder?.hide();
+        @else
+        settlementReminderElement.addEventListener('hidden.bs.modal', function () {
+            bootstrap.Modal.getOrCreateInstance(document.getElementById('complete-consultation-modal')).show();
+        }, { once: true });
+        settlementReminder?.hide();
+        @endif
+    });
+    @endif
     const reportText = document.getElementById('report-text');
     const reportCount = document.getElementById('report-char-count');
     if (reportText && reportCount) {
@@ -312,7 +641,6 @@ document.addEventListener('DOMContentLoaded', function () {
     const consentBox = document.getElementById('billing-final-consent-box');
     const consentError = document.getElementById('billing-consent-error');
     const submit = document.getElementById('billing-final-submit');
-    const hourlyRate = {{ (int) $billing->hourly_rate_snapshot }};
     const total = {{ (int) $billing->total_paid_amount }};
     const payoutHourlyRate = {{ (int) $billing->payout_hourly_rate_snapshot }};
     const reservedMinutes = {{ (int) $billing->reserved_minutes }};
@@ -320,7 +648,7 @@ document.addEventListener('DOMContentLoaded', function () {
     const format = new Intl.NumberFormat('fa-IR');
     function updateCalculation() {
         const value = Math.max(0, Math.min(reservedMinutes, Number(minutes.value) || 0));
-        const refundAmount = Math.min(total, Math.round((hourlyRate * value) / 60000) * 1000);
+        const refundAmount = reservedMinutes > 0 ? Math.min(total, Math.round(((total * value / reservedMinutes) / 1000)) * 1000) : 0;
         const netAfterRefund = Math.max(0, total - refundAmount);
         const settledUsedMinutes = Math.max(0, reservedMinutes - value);
         const practitionerEarned = Math.min(netAfterRefund, Math.round((payoutHourlyRate * settledUsedMinutes) / 60000) * 1000);
@@ -352,7 +680,7 @@ document.addEventListener('DOMContentLoaded', function () {
     });
     updateCalculation();
     @if($errors->hasAny(['approved_unused_minutes', 'reason', 'refund']))
-    bootstrap.Modal.getOrCreateInstance(document.getElementById('billing-confirmation-modal')).show();
+    if (window.bootstrap) bootstrap.Modal.getOrCreateInstance(document.getElementById('billing-confirmation-modal')).show();
     @endif
 });
 </script>

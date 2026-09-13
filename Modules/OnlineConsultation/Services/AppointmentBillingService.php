@@ -8,12 +8,14 @@ use Illuminate\Validation\ValidationException;
 use Modules\AppointmentUser\app\Models\AppointmentUser;
 use Modules\AppointmentUser\Enum\AppointmentUserKindEnum;
 use Modules\AppointmentUser\Enum\AppointmentUserStatusEnum;
+use Modules\AppointmentSetting\app\Models\AppointmentSetting;
 use Modules\OnlineConsultation\Models\AppointmentBillingRecord;
 use Modules\OnlineConsultation\Models\AppointmentBillingAdjustment;
 use Modules\OnlineConsultation\Models\ConsultationPractitioner;
 use Modules\OnlineConsultation\Models\ConsultationSetting;
 use Modules\User\Entities\User;
 use Modules\OnlineConsultation\Support\ConsultationAccess;
+use Modules\Transaction\Enum\TransactionStatusEnum;
 
 class AppointmentBillingService
 {
@@ -45,21 +47,30 @@ class AppointmentBillingService
         if (! $profile || ! $appointment->user_id || ! $appointment->doctor_id) return null;
 
         $reserved = $this->reservedMinutes($appointment, $profile->duration_minutes);
-        $rate = (int) ($profile->hourly_rate ?? $profile->fee ?? 0);
         $payoutRate = (int) ($profile->payout_hourly_rate ?? 0);
         $type = $this->type($appointment);
-        $explicitPaid = (int) data_get($appointment->details, AppointmentUser::DETAIL_PAYMENT.'.'.AppointmentUser::DETAIL_PAYMENT_PRICE.'.int', 0);
-        $paid = $explicitPaid;
-        if ($paid === 0 && $type !== 'in_person') $paid = $this->amountForMinutes($rate, $reserved);
+        $hasExplicitAmount = $this->hasExplicitAppointmentAmount($appointment);
+        $paid = $this->appointmentPaidAmount($appointment);
+        $overheadMinutes = max(0, (int) ConsultationSetting::current()->connection_overhead_minutes);
 
         $record = AppointmentBillingRecord::firstOrCreate(['appointment_id' => $appointment->id], [
             'patient_id' => $appointment->user_id, 'practitioner_id' => $appointment->doctor_id,
-            'consultation_type' => $type, 'hourly_rate_snapshot' => $rate,
+            'consultation_type' => $type, 'hourly_rate_snapshot' => 0,
             'payout_hourly_rate_snapshot' => $payoutRate,
+            'connection_overhead_minutes_snapshot' => $overheadMinutes,
             'reserved_minutes' => $reserved, 'total_paid_amount' => $paid,
         ]);
-        if (! $record->wasRecentlyCreated && $record->refund_status !== 'completed' && $explicitPaid > 0 && (int) $record->total_paid_amount !== $explicitPaid) {
-            $record->total_paid_amount = $explicitPaid;
+        $mayRepairLegacyAmount = $hasExplicitAmount
+            || (int) $record->hourly_rate_snapshot > 0
+            || (int) $record->total_paid_amount <= 0;
+        if (! $record->wasRecentlyCreated && $record->refund_status !== 'completed' && $mayRepairLegacyAmount && $paid > 0 && (int) $record->total_paid_amount !== $paid) {
+            $record->total_paid_amount = $paid;
+            // Zero marks that the obsolete practitioner/patient rate is no longer the source.
+            $record->hourly_rate_snapshot = 0;
+            $record->save();
+        }
+        if (! $record->wasRecentlyCreated && $record->refund_status !== 'completed' && $record->connection_overhead_minutes_snapshot === null) {
+            $record->connection_overhead_minutes_snapshot = $overheadMinutes;
             $record->save();
         }
         $record = $this->refresh($record);
@@ -107,14 +118,20 @@ class AppointmentBillingService
         $ignoredTalk = $thresholdSeconds > 0
             ? (int) $answeredCalls->where('talk_duration_seconds', '<=', $thresholdSeconds)->sum('talk_duration_seconds')
             : 0;
-        $talk = max(0, $rawTalk - $ignoredTalk);
-        $usedMinutes = min($record->reserved_minutes, (int) ceil($talk / 60));
+        // Short calls remain classified for operational reporting, but every answered
+        // second is included in the financial calculation.
+        $talk = $rawTalk;
+        $overheadMinutes = max(0, (int) ($record->connection_overhead_minutes_snapshot ?? 0));
+        $billableTalk = $talk > 0
+            ? min((int) $record->reserved_minutes * 60, $talk + ($overheadMinutes * 60))
+            : 0;
+        $usedMinutes = min($record->reserved_minutes, (int) ceil($billableTalk / 60));
         $unused = max(0, $record->reserved_minutes - $usedMinutes);
         $isCompleted = $record->refund_status === 'completed';
         $approved = ($isCompleted || $record->approved_by || filled($record->adjustment_reason))
             ? min((int) $record->approved_unused_minutes, (int) $record->reserved_minutes)
             : $unused;
-        $suggestedRefund = min((int) $record->total_paid_amount, $this->amountForMinutes($record->hourly_rate_snapshot, $approved));
+        $suggestedRefund = $this->refundForUnusedMinutes((int) $record->total_paid_amount, (int) $record->reserved_minutes, $approved);
         $effectiveRefund = $isCompleted
             ? max(0, (int) $record->refunded_amount + (int) $record->adjustments()->sum('amount_change'))
             : $suggestedRefund;
@@ -137,11 +154,10 @@ class AppointmentBillingService
         $values = [
             'raw_answered_talk_seconds' => $rawTalk,
             'ignored_talk_seconds' => $ignoredTalk,
+            'billable_talk_seconds' => $billableTalk,
             'answered_talk_seconds' => $talk,
             'system_unused_minutes' => $unused,
-            'used_amount' => $record->consultation_type === 'in_person'
-                ? min((int) $record->total_paid_amount, $this->amountForMinutes($record->hourly_rate_snapshot, $usedMinutes))
-                : $netAfterRefund,
+            'used_amount' => $netAfterRefund,
             'practitioner_earned_amount' => $practitionerEarned,
             'platform_profit_amount' => $netAfterRefund - $practitionerEarned,
         ];
@@ -167,7 +183,7 @@ class AppointmentBillingService
             if ($record->refund_status === 'completed') throw ValidationException::withMessages(['approved_unused_minutes' => 'بازگشت وجه انجام شده و این رکورد دیگر قابل تغییر نیست.']);
             if ($minutes > $record->reserved_minutes) throw ValidationException::withMessages(['approved_unused_minutes' => 'زمان تأییدشده نمی‌تواند بیشتر از زمان رزروشده باشد.']);
             if ($minutes !== $record->system_unused_minutes && blank($reason)) throw ValidationException::withMessages(['reason' => 'برای اصلاح دستی زمان، ثبت دلیل الزامی است.']);
-            $amount = min((int) $record->total_paid_amount, $this->amountForMinutes($record->hourly_rate_snapshot, $minutes));
+            $amount = $this->refundForUnusedMinutes((int) $record->total_paid_amount, (int) $record->reserved_minutes, $minutes);
             $record->update(['approved_unused_minutes' => $minutes, 'suggested_refund_amount' => $amount, 'refund_status' => 'approved', 'approved_by' => $actor->id, 'approved_at' => now(), 'adjustment_reason' => $reason]);
             $this->audit($record, 'minutes_approved', $actor, $amount, $reason);
             return $this->refresh($record->refresh());
@@ -185,11 +201,12 @@ class AppointmentBillingService
             if ($record->appointment->status !== AppointmentUserStatusEnum::STATUS_SUCCESSFUL || $record->total_paid_amount <= 0) {
                 throw ValidationException::withMessages(['refund' => 'تا پیش از تأیید پرداخت نوبت، بازگشت وجه امکان‌پذیر نیست.']);
             }
-            $amount = min((int) $record->total_paid_amount, $this->amountForMinutes($record->hourly_rate_snapshot, $record->approved_unused_minutes));
+            $amount = $this->refundForUnusedMinutes((int) $record->total_paid_amount, (int) $record->reserved_minutes, (int) $record->approved_unused_minutes);
             if ($amount <= 0) throw ValidationException::withMessages(['refund' => 'مبلغ قابل بازگشت صفر است.']);
             $wallet = app(WalletService::class)->refund($record->patient, $amount, 'appointment-consultation-refund:'.$record->id, [
                 'appointment_id' => $record->appointment_id, 'billing_record_id' => $record->id,
                 'approved_unused_minutes' => $record->approved_unused_minutes, 'approved_by' => $actor->id,
+                ...$this->calculationMetadata($record),
             ]);
             $record->update(['refunded_amount' => $amount, 'refund_status' => 'completed', 'wallet_transaction_id' => $wallet->id, 'approved_by' => $actor->id, 'approved_at' => now()]);
             $this->audit($record, 'wallet_refunded', $actor, $amount, $record->adjustment_reason);
@@ -233,7 +250,7 @@ class AppointmentBillingService
             $confirmationAction = $minuteDifference === 0
                 ? 'refund_confirmed'
                 : ($isPractitionerAdjustment ? 'practitioner_adjusted_refund' : 'admin_adjusted_refund');
-            $amount = min((int) $record->total_paid_amount, $this->amountForMinutes((int) $record->hourly_rate_snapshot, $minutes));
+            $amount = $this->refundForUnusedMinutes((int) $record->total_paid_amount, (int) $record->reserved_minutes, $minutes);
             $confirmedAt = now();
             $wallet = $amount > 0 ? app(WalletService::class)->refund(
                 $record->patient,
@@ -250,8 +267,7 @@ class AppointmentBillingService
                     'system_unused_minutes' => (int) $record->system_unused_minutes,
                     'minute_difference' => $minuteDifference,
                     'minutes_changed_by_practitioner' => $isPractitionerAdjustment,
-                    'hourly_rate_snapshot' => (int) $record->hourly_rate_snapshot,
-                    'appointment_total_amount' => (int) $record->total_paid_amount,
+                    ...$this->calculationMetadata($record),
                     'refund_amount' => $amount,
                     'practitioner_receivable' => min(
                         max(0, (int) $record->total_paid_amount - $amount),
@@ -316,6 +332,13 @@ class AppointmentBillingService
         return intdiv(($hourlyRate * $minutes) + 30000, 60000) * 1000;
     }
 
+    public function refundForUnusedMinutes(int $appointmentAmount, int $reservedMinutes, int $unusedMinutes): int
+    {
+        if ($appointmentAmount <= 0 || $reservedMinutes <= 0 || $unusedMinutes <= 0) return 0;
+        $unusedMinutes = min($unusedMinutes, $reservedMinutes);
+        return min($appointmentAmount, (int) (round(($appointmentAmount * $unusedMinutes / $reservedMinutes) / 1000) * 1000));
+    }
+
     public function correctCompletedRefund(AppointmentBillingRecord $record, int $minutes, User $actor, string $reason, string $requestToken): AppointmentBillingAdjustment
     {
         return DB::transaction(function () use ($record, $minutes, $actor, $reason, $requestToken) {
@@ -328,7 +351,7 @@ class AppointmentBillingService
             if ($minutes > $record->reserved_minutes) throw ValidationException::withMessages(['corrected_unused_minutes' => 'زمان اصلاح‌شده بیشتر از زمان رزروشده است.']);
             $currentMinutes = (int) ($record->adjustments()->latest('id')->value('corrected_unused_minutes') ?? $record->approved_unused_minutes);
             $currentAmount = (int) $record->refunded_amount + (int) $record->adjustments()->sum('amount_change');
-            $targetAmount = min((int) $record->total_paid_amount, $this->amountForMinutes($record->hourly_rate_snapshot, $minutes));
+            $targetAmount = $this->refundForUnusedMinutes((int) $record->total_paid_amount, (int) $record->reserved_minutes, $minutes);
             $change = $targetAmount - $currentAmount;
             if ($change === 0) throw ValidationException::withMessages(['corrected_unused_minutes' => 'این مقدار تغییری در مبلغ ایجاد نمی‌کند.']);
             $key = 'appointment-billing-adjustment:'.$requestToken;
@@ -348,6 +371,7 @@ class AppointmentBillingService
                 'actor_name' => $actor->fullName,
                 'corrected_at' => now()->toIso8601String(),
                 'reason' => $reason,
+                ...$this->calculationMetadata($record),
             ];
             $wallet = $change > 0
                 ? app(WalletService::class)->credit($record->patient, $change, 'admin_adjustment', $key, $detail)
@@ -375,6 +399,65 @@ class AppointmentBillingService
         return match ($appointment->kind) {
             AppointmentUserKindEnum::ONLINE => 'online', AppointmentUserKindEnum::VOIP => 'phone', default => 'in_person',
         };
+    }
+
+    private function appointmentPaidAmount(AppointmentUser $appointment): int
+    {
+        $detailAmount = max(0, (int) data_get(
+            $appointment->details,
+            AppointmentUser::DETAIL_PAYMENT.'.'.AppointmentUser::DETAIL_PAYMENT_PRICE.'.int',
+            0
+        ));
+        if ($detailAmount > 0) return $detailAmount;
+
+        $transaction = $appointment->transaction;
+        if ($transaction?->status === TransactionStatusEnum::SUCCESSFUL) {
+            $transactionAmount = max(0, (int) ($transaction->total_cost ?: $transaction->cost));
+            if ($transactionAmount > 0) return $transactionAmount;
+        }
+
+        // Legacy appointments did not persist a price snapshot. Resolve it once from
+        // the exact appointment setting/type attached to that appointment.
+        $setting = $appointment->setting;
+        if (! $setting) return 0;
+        $typeKey = match ($appointment->kind) {
+            AppointmentUserKindEnum::VOIP => AppointmentSetting::VOIP,
+            AppointmentUserKindEnum::ONLINE => AppointmentSetting::ONLINE,
+            default => AppointmentSetting::IN_PERSON,
+        };
+
+        return max(0, (int) str_replace(',', '', (string) data_get(
+            $setting->detail,
+            AppointmentSetting::PAYMENT.'.'.$typeKey.'.'.AppointmentSetting::PRICE,
+            0
+        )));
+    }
+
+    private function hasExplicitAppointmentAmount(AppointmentUser $appointment): bool
+    {
+        if ((int) data_get($appointment->details, AppointmentUser::DETAIL_PAYMENT.'.'.AppointmentUser::DETAIL_PAYMENT_PRICE.'.int', 0) > 0) {
+            return true;
+        }
+
+        $transaction = $appointment->transaction;
+        return $transaction?->status === TransactionStatusEnum::SUCCESSFUL
+            && (int) ($transaction->total_cost ?: $transaction->cost) > 0;
+    }
+
+    private function calculationMetadata(AppointmentBillingRecord $record): array
+    {
+        return [
+            'pricing_basis' => 'appointment_amount_prorated_by_reserved_minutes',
+            'appointment_total_amount' => (int) $record->total_paid_amount,
+            'reserved_minutes' => (int) $record->reserved_minutes,
+            'raw_answered_talk_seconds' => (int) $record->raw_answered_talk_seconds,
+            'ignored_talk_seconds' => (int) $record->ignored_talk_seconds,
+            'valid_talk_seconds' => (int) $record->answered_talk_seconds,
+            'connection_overhead_minutes_snapshot' => (int) ($record->connection_overhead_minutes_snapshot ?? 0),
+            'billable_talk_seconds' => (int) $record->billable_talk_seconds,
+            'system_unused_minutes' => (int) $record->system_unused_minutes,
+            'payout_hourly_rate_snapshot' => (int) $record->payout_hourly_rate_snapshot,
+        ];
     }
 
     private function ensureAppointmentIsNotCancelled(AppointmentBillingRecord $record): void

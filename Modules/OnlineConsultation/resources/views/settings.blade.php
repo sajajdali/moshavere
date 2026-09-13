@@ -2,7 +2,7 @@
 @section('consultation-title', 'تنظیمات مشاوره آنلاین')
 @section('consultation-description', 'تنظیم نوبت‌دهی، دسترسی اپلیکیشن و اتصال ویپ')
 @section('consultation-content')
-<div class="oc-notice"><i class="fa-solid fa-circle-info" aria-hidden="true"></i><p>درخواست تماس مشاور به مسیر ثابت <bdi class="oc-ltr">/api/v1/VoIP/request_call</bdi> روی آدرس سرور VoIP ارسال می‌شود و فقط پاسخ HTTP 202 موفق است.</p></div>
+<div class="oc-notice"><i class="fa-solid fa-circle-info" aria-hidden="true"></i><p>درخواست تماس مشاور به مسیر ثابت <bdi class="oc-ltr">/api/v1/VoIP/request_call</bdi> روی آدرس سرور VoIP ارسال می‌شود و توکن با هدر <bdi class="oc-ltr">X-Call-Fire-Key</bdi> ارسال خواهد شد؛ فقط پاسخ HTTP 202 موفق است.</p></div>
 @php($record = $settings)
 <form method="POST" action="{{ route('admin.consultation.settings.save') }}" class="oc-stack">
     @csrf @method('PUT')
@@ -22,9 +22,8 @@
         @include('onlineconsultation::field', ['name' => 'voip_host', 'label' => 'آدرس سرور', 'direction' => 'ltr', 'help' => 'نمونه: http://rokhvanak.ir:2214 — مسیر /api/v1/VoIP/request_call خودکار اضافه می‌شود.'])
         @include('onlineconsultation::field', ['name' => 'voip_port', 'label' => 'پورت SIP', 'type' => 'number', 'min' => 1, 'max' => 65535, 'required' => true])
         @include('onlineconsultation::field', ['name' => 'voip_transport', 'label' => 'پروتکل انتقال', 'options' => ['tls' => 'TLS', 'tcp' => 'TCP', 'udp' => 'UDP'], 'required' => true])
-        @include('onlineconsultation::field', ['name' => 'voip_username', 'label' => 'نام کاربری اتصال', 'direction' => 'ltr'])
-        @include('onlineconsultation::field', ['name' => 'voip_secret', 'label' => 'رمز اتصال', 'type' => 'password', 'help' => 'برای حفظ رمز قبلی، خالی بگذارید.'])
-        <div class="oc-secret oc-full"><span class="oc-help">رمز ذخیره‌شده: {{ $settings->getRawOriginal('voip_secret') ? 'دارد' : 'ندارد' }}</span><label class="oc-check" for="clear_voip_secret"><input class="oc-check-input" id="clear_voip_secret" type="checkbox" name="clear_voip_secret" value="1" @checked(old('clear_voip_secret'))><span class="oc-check-title">حذف رمز ذخیره‌شده</span></label></div>
+        @include('onlineconsultation::field', ['name' => 'voip_call_token', 'label' => 'توکن تماس اتوماتیک', 'type' => 'text', 'direction' => 'ltr', 'help' => 'توکن ذخیره‌شده در هدر X-Call-Fire-Key ارسال می‌شود.'])
+        <div class="oc-secret oc-full"><span class="oc-help">توکن تماس: {{ $settings->voip_call_token ? 'ثبت شده است' : 'ناقص است' }}</span><label class="oc-check" for="clear_voip_call_token"><input class="oc-check-input" id="clear_voip_call_token" type="checkbox" name="clear_voip_call_token" value="1" @checked(old('clear_voip_call_token'))><span class="oc-check-title">حذف توکن اختصاصی این بخش</span></label></div>
         </div></div>
     </section>
     <section class="oc-panel">
@@ -34,7 +33,8 @@
         @include('onlineconsultation::field', ['name' => 'queue_number', 'label' => 'شماره صف', 'direction' => 'ltr'])
         @include('onlineconsultation::field', ['name' => 'ring_timeout_seconds', 'label' => 'مهلت زنگ‌خوردن (ثانیه)', 'type' => 'number', 'min' => 10, 'max' => 180, 'required' => true])
         @include('onlineconsultation::field', ['name' => 'max_attempts', 'label' => 'حداکثر تلاش تماس', 'type' => 'number', 'min' => 1, 'max' => 5, 'required' => true])
-        @include('onlineconsultation::field', ['name' => 'ignored_short_call_minutes', 'label' => 'حد تماس کوتاه / حداقل مکالمه معتبر (دقیقه)', 'type' => 'number', 'min' => 0, 'max' => 30, 'required' => true, 'help' => 'مدت کمتر یا مساوی این حد، تماس کوتاه است و قطع مشاور هشدار محسوب می‌شود؛ مدت بیشتر از آن، مشاوره انجام‌شده و پایان عادی تماس است. این تماس‌های کوتاه از زمان مالی نیز حذف می‌شوند. پیش‌فرض: ۶ دقیقه.'])
+        @include('onlineconsultation::field', ['name' => 'ignored_short_call_minutes', 'label' => 'حد تشخیص تماس کوتاه (دقیقه)', 'type' => 'number', 'min' => 0, 'max' => 30, 'required' => true, 'help' => 'این مقدار فقط برای تشخیص تماس کوتاه و هشدار قطع تماس استفاده می‌شود و هیچ زمانی را از محاسبات مالی کم نمی‌کند. پیش‌فرض: ۶ دقیقه.'])
+        @include('onlineconsultation::field', ['name' => 'connection_overhead_minutes', 'label' => 'زمان سربار اتصال و مکالمه (دقیقه)', 'type' => 'number', 'min' => 0, 'max' => 60, 'required' => true, 'help' => 'زمان ثابت بابت شماره‌گیری، انتظار و برقراری اتصال که به مجموع مکالمه معتبر اضافه می‌شود. مثال: با مقدار ۶، مکالمه ۳۰ دقیقه‌ای در محاسبات مالی ۳۶ دقیقه منظور می‌شود. مقدار هر نوبت هنگام ایجاد محاسبه ذخیره و ثابت می‌ماند.'])
         @include('onlineconsultation::checkbox', ['name' => 'allow_transfer', 'label' => 'اجازه انتقال تماس'])
         @include('onlineconsultation::checkbox', ['name' => 'recording_requested', 'label' => 'درخواست ضبط مکالمه', 'help' => 'پس از اتصال سرویس و دریافت رضایت طرفین'])
         @include('onlineconsultation::checkbox', ['name' => 'consent_required', 'label' => 'الزام رضایت طرفین برای ضبط'])

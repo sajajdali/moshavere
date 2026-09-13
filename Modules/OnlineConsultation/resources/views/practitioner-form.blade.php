@@ -50,6 +50,7 @@
         <div class="oc-panel-body"><div class="oc-grid">
         @include('onlineconsultation::checkbox', ['name' => 'active', 'label' => 'همکار فعال است', 'help' => 'غیرفعال‌کردن همکار، دسترسی اپلیکیشن او را هم قطع می‌کند.'])
         @include('onlineconsultation::checkbox', ['name' => 'app_access', 'label' => 'دسترسی به اپلیکیشن مشاوره', 'help' => 'فعال‌بودن دسترسی کلی اپلیکیشن در تنظیمات سایت نیز لازم است.'])
+        @include('onlineconsultation::checkbox', ['name' => 'tomorrow_schedule_sms_enabled', 'label' => 'پیامک برنامه نوبت‌های فردا', 'help' => 'در صورت فعال‌بودن تنظیم کلی، هر شب ساعت تعیین‌شده فقط زمانی پیامک ارسال می‌شود که این همکار برای فردا نوبت تأییدشده داشته باشد.'])
         @include('onlineconsultation::field', ['name' => 'availability', 'label' => 'وضعیت پاسخ‌گویی', 'options' => ['offline' => 'آفلاین', 'ready' => 'آماده', 'busy' => 'مشغول'], 'help' => 'وضعیت فعلاً به‌صورت دستی تعیین می‌شود.', 'required' => true])
         </div></div>
     </section>

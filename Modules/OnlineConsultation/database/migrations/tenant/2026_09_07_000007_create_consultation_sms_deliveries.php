@@ -27,7 +27,7 @@ return new class extends Migration
             $table->timestamps();
         });
 
-        foreach ([500 => 1, 501 => '', 502 => 180, 503 => 1, 504 => '', 505 => 60, 506 => 1, 507 => '', 508 => 15, 509 => 1, 510 => '', 511 => 15, 512 => 1, 513 => '', 514 => '21:00'] as $key => $value) {
+        foreach ([500 => 1, 501 => '', 502 => 180, 503 => 1, 504 => '', 505 => 60, 506 => 1, 507 => '', 508 => 15, 509 => 1, 510 => '', 511 => 15, 512 => 0, 513 => '', 514 => '23:00'] as $key => $value) {
             DB::table('settings')->insertOrIgnore(['setting_key' => $key, 'setting_value' => $value]);
         }
     }

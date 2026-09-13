@@ -63,7 +63,7 @@ class Setting extends Component
         }
         $dailyTime = $this->settingValues[SettingKeyEnum::CONSULT_SMS_PRACTITIONER_DAILY_TIME->value] ?? null;
         if ($dailyTime !== null && preg_match('/^(?:[01]\d|2[0-3]):[0-5]\d$/', (string) $dailyTime) !== 1) {
-            $this->addError('settingValues.'.SettingKeyEnum::CONSULT_SMS_PRACTITIONER_DAILY_TIME->value, 'ساعت گزارش پایان روز باید با قالب HH:MM وارد شود.');
+            $this->addError('settingValues.'.SettingKeyEnum::CONSULT_SMS_PRACTITIONER_DAILY_TIME->value, 'ساعت ارسال برنامه فردا باید با قالب HH:MM وارد شود.');
             return;
         }
         foreach ($this->settingValues as $key => $value) {

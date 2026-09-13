@@ -10,6 +10,7 @@ use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Queue;
 use Illuminate\Support\Facades\Http;
 use Modules\OnlineConsultation\Jobs\SendConsultationSms;
+use Modules\OnlineConsultation\Jobs\SendTomorrowAppointmentSummary;
 use Modules\OnlineConsultation\Models\ConsultationSmsDelivery;
 use Modules\OnlineConsultation\Models\ConsultationSmsReminderRule;
 use Modules\OnlineConsultation\Services\ConsultationReminderScheduler;
@@ -65,6 +66,7 @@ class ConsultationTest extends TestCase
             'Modules/OnlineConsultation/database/migrations/tenant/2026_09_10_000013_add_financial_split_to_consultation_billing.php',
             'Modules/OnlineConsultation/database/migrations/tenant/2026_09_11_000014_create_appointment_callback_requests_table.php',
             'Modules/OnlineConsultation/database/migrations/tenant/2026_09_12_000016_create_appointment_alternate_phones_table.php',
+            'Modules/OnlineConsultation/database/migrations/tenant/2026_09_13_000019_add_tomorrow_schedule_sms_to_consultation_practitioners.php',
         ] as $path) {
             (require base_path($path))->up();
         }
@@ -100,10 +102,45 @@ class ConsultationTest extends TestCase
         return array_replace([
             'user_id' => $this->manager->id, 'display_name' => 'کارشناس آزمون', 'kind' => 'expert',
             'active' => '1', 'app_access' => '1', 'availability' => 'ready', 'extension' => '201',
+            'tomorrow_schedule_sms_enabled' => '0',
             'sip_secret' => 'private-test-secret',
             'hourly_rate' => '1000000',
             'payout_hourly_rate' => '600000',
         ], $overrides);
+    }
+
+    public function test_tomorrow_schedule_sms_is_compact_ordered_and_not_created_when_empty(): void
+    {
+        Queue::fake();
+        $profile = ConsultationPractitioner::create($this->profile(['tomorrow_schedule_sms_enabled' => 1]));
+        $tomorrow = now('Asia/Tehran')->addDay()->startOfDay();
+
+        (new SendTomorrowAppointmentSummary($profile->id, $tomorrow->toDateString(), 'tomorrow-template', tenant()?->getTenantKey()))->handle();
+        $this->assertDatabaseCount('consultation_sms_deliveries', 0);
+
+        foreach ([['10:00:00', 'کامران', 'تفتی'], ['09:00:00', 'مریم', 'رضایی']] as $index => [$time, $name, $family]) {
+            $patient = User::create(['mobile' => '0912555000'.$index, 'password' => 'test-password']);
+            $patient->first_name = $name;
+            $patient->last_name = $family;
+            $patient->save();
+            AppointmentUser::withoutEvents(fn () => AppointmentUser::create([
+                'user_id' => $patient->id, 'doctor_id' => $profile->user_id,
+                'status' => AppointmentUserStatusEnum::STATUS_SUCCESSFUL->value, 'type' => 1, 'kind' => 3,
+                'date_visit' => $tomorrow->setTimeFromTimeString($time), 'start_time' => $time,
+                'end_time' => $tomorrow->setTimeFromTimeString($time)->addMinutes(30)->format('H:i:s'),
+                'tracking_code' => 'TOMORROW-'.$index,
+            ]));
+        }
+
+        (new SendTomorrowAppointmentSummary($profile->id, $tomorrow->toDateString(), 'tomorrow-template', tenant()?->getTenantKey()))->handle();
+
+        $delivery = ConsultationSmsDelivery::where('type', 'practitioner_tomorrow_schedule')->firstOrFail();
+        $this->assertSame("فردا:۲ نوبت\n۹ مریم رضایی\n۱۰ کامران تفتی", data_get($delivery->payload, 'message_text'));
+        $this->assertSame([data_get($delivery->payload, 'message_text')], data_get($delivery->payload, 'params'));
+        Queue::assertPushed(SendConsultationSms::class, fn ($job) => $job->deliveryId === $delivery->id);
+
+        (new SendTomorrowAppointmentSummary($profile->id, $tomorrow->toDateString(), 'tomorrow-template', tenant()?->getTenantKey()))->handle();
+        $this->assertDatabaseCount('consultation_sms_deliveries', 1);
     }
 
     private function noShowAppointment(array $overrides = []): AppointmentUser

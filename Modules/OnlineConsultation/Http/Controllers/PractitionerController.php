@@ -93,6 +93,7 @@ class PractitionerController extends Controller
             'kind' => ['required', Rule::in(['doctor', 'expert'])],
             'active' => 'required|boolean',
             'app_access' => 'required|boolean',
+            'tomorrow_schedule_sms_enabled' => 'required|boolean',
             'availability' => ['required', Rule::in(['ready', 'busy', 'offline'])],
             'extension' => ['nullable', 'regex:/^[0-9]{1,20}$/', Rule::unique('consultation_practitioners', 'extension')->ignore($person?->id)],
             'sip_username' => 'nullable|string|max:255', 'sip_secret' => 'nullable|string|max:1024',

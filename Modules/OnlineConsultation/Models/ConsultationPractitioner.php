@@ -13,7 +13,7 @@ class ConsultationPractitioner extends Model
     protected $hidden = ['sip_secret'];
 
     protected $casts = [
-        'active' => 'boolean', 'app_access' => 'boolean',
+        'active' => 'boolean', 'app_access' => 'boolean', 'tomorrow_schedule_sms_enabled' => 'boolean',
         'sip_secret' => 'encrypted', 'weekly_schedule' => 'array',
         'hourly_rate' => 'integer', 'payout_hourly_rate' => 'integer',
     ];

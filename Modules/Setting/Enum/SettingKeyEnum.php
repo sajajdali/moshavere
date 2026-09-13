@@ -392,9 +392,9 @@ enum SettingKeyEnum: int implements EnumHasNameInterface, SettingTypeInterface, 
             self::CONSULT_SMS_PRACTITIONER_REMINDER_ACTIVE => 'فعال‌بودن یادآوری نوبت مشاور',
             self::CONSULT_SMS_PRACTITIONER_REMINDER_TEMPLATE => 'نام قالب یادآوری نزدیک‌شدن نوبت مشاور',
             self::CONSULT_SMS_PRACTITIONER_REMINDER_MINUTES => 'فاصله ارسال یادآوری مشاور (دقیقه قبل)',
-            self::CONSULT_SMS_PRACTITIONER_DAILY_ACTIVE => 'فعال‌بودن گزارش پایان روز مشاور',
-            self::CONSULT_SMS_PRACTITIONER_DAILY_TEMPLATE => 'نام قالب گزارش پایان روز مشاور',
-            self::CONSULT_SMS_PRACTITIONER_DAILY_TIME => 'ساعت ارسال گزارش پایان روز',
+            self::CONSULT_SMS_PRACTITIONER_DAILY_ACTIVE => 'فعال‌بودن پیامک برنامه فردای مشاوران',
+            self::CONSULT_SMS_PRACTITIONER_DAILY_TEMPLATE => 'نام قالب برنامه فردا (یک پارامتر)',
+            self::CONSULT_SMS_PRACTITIONER_DAILY_TIME => 'ساعت ارسال برنامه فردا',
 
             default => ''
         };
@@ -443,7 +443,8 @@ enum SettingKeyEnum: int implements EnumHasNameInterface, SettingTypeInterface, 
             self::CONSULT_SMS_PATIENT_SECOND_TEMPLATE, self::CONSULT_SMS_PATIENT_SECOND_MINUTES => 'این پیامک یک ساعت قبل از زمان شروع مشاوره برای بیمار ارسال می‌شود.',
             self::CONSULT_SMS_PATIENT_FINAL_TEMPLATE, self::CONSULT_SMS_PATIENT_FINAL_MINUTES => 'این پیامک پانزده دقیقه قبل از زمان شروع مشاوره برای بیمار ارسال می‌شود.',
             self::CONSULT_SMS_PRACTITIONER_REMINDER_TEMPLATE, self::CONSULT_SMS_PRACTITIONER_REMINDER_MINUTES => 'این پیامک پانزده دقیقه قبل از شروع هر نوبت برای مشاور ارسال می‌شود.',
-            self::CONSULT_SMS_PRACTITIONER_DAILY_TEMPLATE, self::CONSULT_SMS_PRACTITIONER_DAILY_TIME => 'این پیامک در پایان روز برای مشاور ارسال می‌شود و خلاصه عملکرد و نوبت‌های همان روز را نمایش می‌دهد.',
+            self::CONSULT_SMS_PRACTITIONER_DAILY_TEMPLATE => 'قالب پنل پیامک باید فقط یک پارامتر داشته باشد؛ متن فشرده تعداد و ساعت/نام بیماران فردا در پارامتر اول قرار می‌گیرد.',
+            self::CONSULT_SMS_PRACTITIONER_DAILY_TIME => 'هر شب در این ساعت فقط برای مشاوران فعال‌شده‌ای که فردا نوبت دارند ارسال می‌شود. مقدار پیشنهادی: 23:00',
             default => ''
         };
     }
@@ -567,7 +568,7 @@ enum SettingKeyEnum: int implements EnumHasNameInterface, SettingTypeInterface, 
             self::CONSULT_SMS_PATIENT_SECOND_ACTIVE => 'یادآوری دوم بیمار · گیرنده: بیمار',
             self::CONSULT_SMS_PATIENT_FINAL_ACTIVE => 'یادآوری نهایی بیمار · گیرنده: بیمار',
             self::CONSULT_SMS_PRACTITIONER_REMINDER_ACTIVE => 'یادآوری هر نوبت · گیرنده: مشاور',
-            self::CONSULT_SMS_PRACTITIONER_DAILY_ACTIVE => 'گزارش پایان روز · گیرنده: مشاور',
+            self::CONSULT_SMS_PRACTITIONER_DAILY_ACTIVE => 'برنامه نوبت‌های فردا · گیرنده: مشاور',
             default => '',
         };
     }

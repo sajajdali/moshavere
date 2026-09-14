@@ -1,0 +1,17 @@
+{
+    "name": "PractitionerApi",
+    "alias": "practitionerapi",
+    "description": "Versioned mobile API for doctors and online-consultation practitioners",
+    "keywords": [
+        "api",
+        "doctor",
+        "practitioner",
+        "mobile",
+        "openapi"
+    ],
+    "priority": 0,
+    "providers": [
+        "Modules\\PractitionerApi\\Providers\\PractitionerApiServiceProvider"
+    ],
+    "files": []
+}

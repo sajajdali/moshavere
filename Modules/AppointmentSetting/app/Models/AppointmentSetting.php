@@ -71,6 +71,10 @@ class AppointmentSetting extends Model
     {
         return $this->belongsTo(Service::class);
     }
+    public function place()
+    {
+        return $this->belongsTo(\Modules\Place\app\Models\Place::class);
+    }
     public function segments()
     {
         return $this->belongsToMany(AppointmentSegment::class, 'appointment_segment_setting');

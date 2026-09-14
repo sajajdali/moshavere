@@ -1,0 +1,31 @@
+{
+  "info": {
+    "name": "Practitioner API v1",
+    "description": "Tenant-aware manual checks. Never save real SIP passwords or production bearer tokens in this file.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {"key": "base_url", "value": "http://nobat1.test:8084/api/practitioner/v1"},
+    {"key": "token", "value": ""},
+    {"key": "mobile", "value": "09120000000"},
+    {"key": "device_identifier", "value": "manual-test-installation"},
+    {"key": "appointment_id", "value": "1"},
+    {"key": "patient_id", "value": "1"}
+  ],
+  "auth": {"type": "bearer", "bearer": [{"key": "token", "value": "{{token}}", "type": "string"}]},
+  "item": [
+    {"name": "OTP request", "request": {"auth": {"type": "noauth"}, "method": "POST", "header": [{"key": "Accept", "value": "application/json"}], "body": {"mode": "raw", "raw": "{\"mobile\":\"{{mobile}}\",\"device_identifier\":\"{{device_identifier}}\"}", "options": {"raw": {"language": "json"}}}, "url": "{{base_url}}/auth/otp/request"}},
+    {"name": "OTP verify", "request": {"auth": {"type": "noauth"}, "method": "POST", "header": [{"key": "Accept", "value": "application/json"}], "body": {"mode": "raw", "raw": "{\"mobile\":\"{{mobile}}\",\"code\":\"1234\",\"device_name\":\"Postman\",\"device_os\":\"android\",\"device_identifier\":\"{{device_identifier}}\"}", "options": {"raw": {"language": "json"}}}, "url": "{{base_url}}/auth/otp/verify"}},
+    {"name": "Profile and Softphone", "request": {"method": "GET", "url": "{{base_url}}/me"}},
+    {"name": "Dashboard", "request": {"method": "GET", "url": "{{base_url}}/dashboard"}},
+    {"name": "Appointments", "request": {"method": "GET", "url": "{{base_url}}/appointments?scope=all"}},
+    {"name": "Appointment detail", "request": {"method": "GET", "url": "{{base_url}}/appointments/{{appointment_id}}"}},
+    {"name": "Calls", "request": {"method": "GET", "url": "{{base_url}}/appointments/{{appointment_id}}/calls"}},
+    {"name": "Reports", "request": {"method": "GET", "url": "{{base_url}}/appointments/{{appointment_id}}/reports"}},
+    {"name": "Patient history", "request": {"method": "GET", "url": "{{base_url}}/patients/{{patient_id}}/history"}},
+    {"name": "Settlement", "request": {"method": "GET", "url": "{{base_url}}/appointments/{{appointment_id}}/settlement"}},
+    {"name": "Daily report", "request": {"method": "GET", "url": "{{base_url}}/reports/daily?scope=last_7_days"}},
+    {"name": "Rotate FCM token", "request": {"method": "PATCH", "header": [{"key": "Accept", "value": "application/json"}], "body": {"mode": "raw", "raw": "{\"device_identifier\":\"{{device_identifier}}\",\"fcm_token\":\"replace-with-test-token\"}", "options": {"raw": {"language": "json"}}}, "url": "{{base_url}}/devices/current"}},
+    {"name": "Logout", "request": {"method": "POST", "url": "{{base_url}}/auth/logout"}}
+  ]
+}

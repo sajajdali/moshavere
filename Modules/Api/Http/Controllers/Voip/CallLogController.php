@@ -14,6 +14,7 @@ use Modules\OnlineConsultation\Models\AppointmentConsultantNoAnswer;
 use Modules\OnlineConsultation\Models\AppointmentCallbackRequest;
 use Modules\OnlineConsultation\Support\ConsultationAccess;
 use Modules\OnlineConsultation\Services\AppointmentBillingService;
+use Modules\User\Notifications\UserMessageNotification;
 
 class CallLogController extends Controller
 {
@@ -126,6 +127,21 @@ class CallLogController extends Controller
                 $this->syncAppointmentSurvey($log->appointment_id, $surveyScore);
                 $billing = app(AppointmentBillingService::class)->ensure($log->appointment);
                 if ($billing) app(AppointmentBillingService::class)->refresh($billing);
+            }
+            if (! $isUpdate && $log->appointment?->doctor) {
+                \Illuminate\Support\Facades\DB::afterCommit(function () use ($log): void {
+                    try {
+                        $log->appointment->doctor->notify(new UserMessageNotification(
+                            'وضعیت تماس مشاوره',
+                            $log->final_result === 'ANSWERED' ? 'تماس مشاوره با موفقیت برقرار شد.' : 'نتیجه تماس مشاوره ثبت شد.',
+                            'نتیجه تماس در پرونده نوبت ثبت شده است. برای مشاهده جزئیات، اپ را باز کنید.',
+                            ['type' => 'voip_call_result', 'appointment_id' => $log->appointment_id, 'call_id' => $log->call_id],
+                            '/appointments/'.$log->appointment_id,
+                        ));
+                    } catch (\Throwable $notificationException) {
+                        report($notificationException);
+                    }
+                });
             }
             return $this->ok([
                 'status' => true,

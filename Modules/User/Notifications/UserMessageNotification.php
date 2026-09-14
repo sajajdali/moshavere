@@ -39,14 +39,16 @@ class UserMessageNotification extends Notification
 
     public function toFcm($notifiable)
     {
+        $params = is_array($this->params) ? $this->params : [];
         return FcmMessage::create()
-            ->data([
+            ->data(array_merge([
                 'title' => $this->title,
                 'excerpt' => $this->excerpt,
                 'message' => $this->message,
-                'link' => $this->link,
-                // TODO:: 'route' =>
-            ])
+                'link' => (string) $this->link,
+            ], collect($params)->mapWithKeys(fn ($value, $key) => [
+                (string) $key => is_scalar($value) || $value === null ? (string) $value : json_encode($value, JSON_UNESCAPED_UNICODE),
+            ])->all()))
             ->custom([
                 'android' => [
                     'notification' => [
@@ -74,6 +76,8 @@ class UserMessageNotification extends Notification
             'title' => $this->title,
             'excerpt' => $this->excerpt,
             'message' => $this->message,
+            'params' => $this->params,
+            'link' => $this->link,
         ];
     }
 }

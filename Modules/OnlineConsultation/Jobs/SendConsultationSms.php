@@ -16,6 +16,8 @@ use Modules\OnlineConsultation\Support\ConsultationAccess;
 use Modules\OnlineConsultation\Services\ConsultationReminderScheduler;
 use Modules\Setting\Entities\Setting;
 use Modules\Setting\Enum\SettingKeyEnum;
+use Modules\OnlineConsultation\Models\ConsultationSmsReminderRule;
+use Modules\User\Notifications\UserMessageNotification;
 
 class SendConsultationSms implements ShouldQueue
 {
@@ -70,6 +72,20 @@ class SendConsultationSms implements ShouldQueue
                 $delivery->payload['message_text'] ?? null,
             ));
             $delivery->update(['status' => 'sent', 'sent_at' => now(), 'provider_response' => 'درخواست به کانال پیامک تحویل شد.', 'error_message' => null]);
+            if ($delivery->recipient_type === ConsultationSmsReminderRule::RECIPIENT_PRACTITIONER
+                && $delivery->appointment?->doctor) {
+                try {
+                    $delivery->appointment->doctor->notify(new UserMessageNotification(
+                        'یادآوری نوبت مشاوره',
+                        $delivery->payload['message_text'] ?? 'زمان نوبت تلفنی شما نزدیک است.',
+                        $delivery->payload['message_text'] ?? 'زمان نوبت تلفنی شما نزدیک است.',
+                        ['type' => 'voip_appointment_reminder', 'appointment_id' => $delivery->appointment_id],
+                        '/appointments/'.$delivery->appointment_id,
+                    ));
+                } catch (\Throwable $notificationException) {
+                    report($notificationException);
+                }
+            }
         } catch (\Throwable $e) {
             $delivery->update(['status' => $this->attempts() >= $this->tries ? 'failed' : 'retrying', 'error_message' => mb_substr($e->getMessage(), 0, 2000)]);
             throw $e;

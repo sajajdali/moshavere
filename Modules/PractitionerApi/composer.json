@@ -1,0 +1,10 @@
+{
+    "name": "modules/practitioner-api",
+    "description": "Mobile API for doctors and consultants",
+    "type": "laravel-module",
+    "autoload": {
+        "psr-4": {
+            "Modules\\PractitionerApi\\": ""
+        }
+    }
+}

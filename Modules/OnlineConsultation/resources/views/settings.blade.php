@@ -11,12 +11,13 @@
         <div class="oc-panel-body"><div class="oc-grid">
         @include('onlineconsultation::checkbox', ['name' => 'booking_enabled', 'label' => 'فعال‌بودن رزرو مشاوره', 'help' => 'تنظیم رزرو برای زمان راه‌اندازی سرویس'])
         @include('onlineconsultation::checkbox', ['name' => 'app_enabled', 'label' => 'دسترسی به اپلیکیشن', 'help' => 'هر همکار به مجوز اختصاصی در پروفایل خود نیز نیاز دارد.'])
+        @include('onlineconsultation::checkbox', ['name' => 'test_login_enabled', 'label' => 'ورود تستی', 'help' => 'فقط برای تست: پزشک یا مشاور فعال بدون مجوز شخصی اپ و بدون پیامک، همیشه با کد ۱۲۳۴ وارد می‌شود و کد در پاسخ API نمایش داده می‌شود.'])
         @include('onlineconsultation::field', ['name' => 'connection_method', 'label' => 'روش برقراری تماس', 'options' => ['operator' => 'با هماهنگی اپراتور', 'callback' => 'تماس با دو طرف از سرور', 'app' => 'از اپلیکیشن'], 'required' => true])
         @include('onlineconsultation::field', ['name' => 'timezone', 'label' => 'منطقه زمانی', 'direction' => 'ltr', 'help' => 'مثال: Asia/Tehran', 'required' => true])
         </div></div>
     </section>
     <section class="oc-panel">
-        <div class="oc-panel-header"><div><h2 class="oc-panel-title"><i class="fa-solid fa-network-wired" aria-hidden="true"></i>تنظیمات VoIP</h2><p class="oc-subtitle">آدرس این بخش مرجع همه مشاوران سایت است و در فرم پزشک قابل ویرایش نیست.</p></div></div>
+        <div class="oc-panel-header"><div><h2 class="oc-panel-title"><i class="fa-solid fa-network-wired" aria-hidden="true"></i>تنظیمات VoIP</h2><p class="oc-subtitle">آدرس، پورت و پروتکل این بخش مرجع ثابت Softphone همه مشاوران سایت است و در فرم پزشک قابل ویرایش نیست؛ API آن را پس از ورود و در پروفایل برمی‌گرداند.</p></div></div>
         <div class="oc-panel-body"><div class="oc-grid">
         @include('onlineconsultation::field', ['name' => 'voip_driver', 'label' => 'نوع سرور', 'options' => ['unconfigured' => 'هنوز مشخص نشده', 'asterisk' => 'Asterisk', 'issabel' => 'Issabel', 'freepbx' => 'FreePBX', 'other' => 'سایر'], 'required' => true])
         @include('onlineconsultation::field', ['name' => 'voip_host', 'label' => 'آدرس سرور', 'direction' => 'ltr', 'help' => 'نمونه: http://rokhvanak.ir:2214 — مسیر /api/v1/VoIP/request_call خودکار اضافه می‌شود.'])

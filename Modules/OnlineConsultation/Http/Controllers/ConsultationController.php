@@ -42,6 +42,7 @@ class ConsultationController extends Controller
         $settings = ConsultationSetting::current();
         $data = $request->validate([
             'booking_enabled' => 'required|boolean', 'app_enabled' => 'required|boolean',
+            'test_login_enabled' => 'required|boolean',
             'timezone' => 'required|timezone',
             'connection_method' => ['required', Rule::in(['operator', 'callback', 'app'])],
             'voip_driver' => ['required', Rule::in(['unconfigured', 'asterisk', 'issabel', 'freepbx', 'other'])],

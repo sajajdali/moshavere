@@ -210,6 +210,7 @@ return [
             base_path('Modules/Absence/database/migrations/tenant'),
             base_path('Modules/Api/Database/Migrations/tenant'),
             base_path('Modules/OnlineConsultation/database/migrations/tenant'),
+            base_path('Modules/PractitionerApi/database/migrations/tenant'),
         ],
         '--realpath' => true,
     ],

@@ -67,6 +67,7 @@ class ConsultationTest extends TestCase
             'Modules/OnlineConsultation/database/migrations/tenant/2026_09_11_000014_create_appointment_callback_requests_table.php',
             'Modules/OnlineConsultation/database/migrations/tenant/2026_09_12_000016_create_appointment_alternate_phones_table.php',
             'Modules/OnlineConsultation/database/migrations/tenant/2026_09_13_000019_add_tomorrow_schedule_sms_to_consultation_practitioners.php',
+            'Modules/OnlineConsultation/database/migrations/tenant/2026_09_13_130000_add_test_login_to_consultation_settings_table.php',
         ] as $path) {
             (require base_path($path))->up();
         }
@@ -485,6 +486,38 @@ class ConsultationTest extends TestCase
         $data['recording_requested'] = '1';
         $data['consent_required'] = '0';
         $this->put('/admin/online-consultation/settings', $data)->assertSessionHasErrors('consent_required');
+    }
+
+    public function test_test_login_setting_is_visible_and_can_be_enabled(): void
+    {
+        $this->withoutMiddleware();
+
+        $settingsView = file_get_contents(module_path('OnlineConsultation', 'resources/views/settings.blade.php'));
+        $this->assertStringContainsString('ورود تستی', $settingsView);
+        $this->assertStringContainsString('۱۲۳۴', $settingsView);
+
+        $data = ConsultationSetting::current()->toArray();
+        unset($data['id'], $data['created_at'], $data['updated_at']);
+        unset(
+            $data['duration_minutes'], $data['buffer_minutes'], $data['advance_hours'],
+            $data['booking_horizon_days'], $data['cancellation_hours'],
+            $data['capacity_per_slot'], $data['default_fee'], $data['app_landing_content']
+        );
+        $data = array_replace($data, [
+            'booking_enabled' => '0',
+            'app_enabled' => '1',
+            'test_login_enabled' => '1',
+            'connection_overhead_minutes' => '0',
+            'allow_transfer' => '0',
+            'recording_requested' => '0',
+            'consent_required' => '1',
+        ]);
+
+        $this->put('/admin/online-consultation/settings', $data)
+            ->assertSessionHasNoErrors()
+            ->assertRedirect();
+
+        $this->assertTrue(ConsultationSetting::current()->test_login_enabled);
     }
 
     public function test_consultant_callback_sends_exact_payload_and_keeps_an_audit_log(): void

@@ -17,12 +17,32 @@
         </div></div>
     </section>
     <section class="oc-panel">
-        <div class="oc-panel-header"><div><h2 class="oc-panel-title"><i class="fa-solid fa-network-wired" aria-hidden="true"></i>تنظیمات VoIP</h2><p class="oc-subtitle">آدرس، پورت و پروتکل این بخش مرجع ثابت Softphone همه مشاوران سایت است و در فرم پزشک قابل ویرایش نیست؛ API آن را پس از ورود و در پروفایل برمی‌گرداند.</p></div></div>
+        <div class="oc-panel-header"><div><h2 class="oc-panel-title"><i class="fa-solid fa-bell" aria-hidden="true"></i>تماس خودکار با پزشک آفلاین</h2><p class="oc-subtitle">سه دقیقه پیش از نوبت، داخلی پزشک بررسی می‌شود و اگر آفلاین باشد تماس صوتی یادآوری ارسال خواهد شد.</p></div></div>
+        <div class="oc-panel-body"><div class="oc-grid">
+        @include('onlineconsultation::checkbox', ['name' => 'offline_alert_enabled', 'label' => 'فعال‌بودن هشدار تلفنی پزشک آفلاین', 'help' => 'فقط برای پزشک فعال دارای دسترسی اپلیکیشن و توکن ورود معتبر اجرا می‌شود؛ برای هر نوبت حداکثر یک تماس ثبت خواهد شد.'])
+        @include('onlineconsultation::field', ['name' => 'offline_alert_api_url', 'label' => 'آدرس API تماس خودکار با مشاور', 'direction' => 'ltr', 'help' => 'آدرس کامل endpoint دریافت درخواست تماس؛ نمونه: http://server:port/api/v1/VoIP/practitioner_offline_alert'])
+        @include('onlineconsultation::field', ['name' => 'offline_alert_route', 'label' => 'نام Route پیام صوتی آنلاین‌شدن پزشک', 'direction' => 'ltr', 'help' => 'نام Route تعریف‌شده روی سرور تماس که پیام «۲ دقیقه دیگر مشاوره شما فرا می‌رسد؛ لطفاً در اپلیکیشن آنلاین شوید» را پخش می‌کند. این مقدار در فیلد route درخواست ارسال می‌شود.'])
+        <div class="oc-notice oc-full"><i class="fa-solid fa-circle-info"></i><p>درخواست POST با هدر <bdi class="oc-ltr">X-Call-Fire-Key</bdi> و پارامترهای <bdi class="oc-ltr">phone, extension, route, appointment_id, request_id, minutes_until</bdi> ارسال می‌شود. توکن همین بخش از «توکن تماس اتوماتیک» بالا خوانده می‌شود.</p></div>
+        </div></div>
+    </section>
+    <section class="oc-panel">
+        <div class="oc-panel-header"><div><h2 class="oc-panel-title"><i class="fa-solid fa-network-wired" aria-hidden="true"></i>تنظیمات سرور VoIP</h2><p class="oc-subtitle">این آدرس فقط برای ارسال درخواست تماس اتوماتیک به سرور VoIP استفاده می‌شود.</p></div></div>
         <div class="oc-panel-body"><div class="oc-grid">
         @include('onlineconsultation::field', ['name' => 'voip_driver', 'label' => 'نوع سرور', 'options' => ['unconfigured' => 'هنوز مشخص نشده', 'asterisk' => 'Asterisk', 'issabel' => 'Issabel', 'freepbx' => 'FreePBX', 'other' => 'سایر'], 'required' => true])
-        @include('onlineconsultation::field', ['name' => 'voip_host', 'label' => 'آدرس سرور', 'direction' => 'ltr', 'help' => 'نمونه: http://rokhvanak.ir:2214 — مسیر /api/v1/VoIP/request_call خودکار اضافه می‌شود.'])
+        @include('onlineconsultation::field', ['name' => 'voip_host', 'label' => 'آدرس سرور VoIP', 'direction' => 'ltr', 'help' => 'نمونه: http://rokhvanak.ir:2214 — مسیر /api/v1/VoIP/request_call خودکار اضافه می‌شود.'])
+        </div></div>
+    </section>
+    <section class="oc-panel">
+        <div class="oc-panel-header"><div><h2 class="oc-panel-title"><i class="fa-solid fa-mobile-screen-button" aria-hidden="true"></i>تنظیمات Softphone</h2><p class="oc-subtitle">این آدرس مستقل از سرور درخواست تماس است و در API ورود، پروفایل و داشبورد برای اتصال اپلیکیشن برگردانده می‌شود.</p></div></div>
+        <div class="oc-panel-body"><div class="oc-grid">
+        @include('onlineconsultation::field', ['name' => 'softphone_server_address', 'label' => 'آدرس سرور Softphone', 'direction' => 'ltr', 'help' => 'نام میزبان، IP یا آدرس کامل سرور SIP؛ نمونه: sip.example.com یا https://sip.example.com'])
         @include('onlineconsultation::field', ['name' => 'voip_port', 'label' => 'پورت SIP', 'type' => 'number', 'min' => 1, 'max' => 65535, 'required' => true])
         @include('onlineconsultation::field', ['name' => 'voip_transport', 'label' => 'پروتکل انتقال', 'options' => ['tls' => 'TLS', 'tcp' => 'TCP', 'udp' => 'UDP'], 'required' => true])
+        </div></div>
+    </section>
+    <section class="oc-panel">
+        <div class="oc-panel-header"><div><h2 class="oc-panel-title"><i class="fa-solid fa-key" aria-hidden="true"></i>احراز درخواست تماس VoIP</h2></div></div>
+        <div class="oc-panel-body"><div class="oc-grid">
         @include('onlineconsultation::field', ['name' => 'voip_call_token', 'label' => 'توکن تماس اتوماتیک', 'type' => 'text', 'direction' => 'ltr', 'help' => 'توکن ذخیره‌شده در هدر X-Call-Fire-Key ارسال می‌شود.'])
         <div class="oc-secret oc-full"><span class="oc-help">توکن تماس: {{ $settings->voip_call_token ? 'ثبت شده است' : 'ناقص است' }}</span><label class="oc-check" for="clear_voip_call_token"><input class="oc-check-input" id="clear_voip_call_token" type="checkbox" name="clear_voip_call_token" value="1" @checked(old('clear_voip_call_token'))><span class="oc-check-title">حذف توکن اختصاصی این بخش</span></label></div>
         </div></div>
@@ -30,6 +50,7 @@
     <section class="oc-panel">
         <div class="oc-panel-header"><div><h2 class="oc-panel-title"><i class="fa-solid fa-phone-volume" aria-hidden="true"></i>مدیریت تماس و ضبط</h2></div></div>
         <div class="oc-panel-body"><div class="oc-grid">
+        @include('onlineconsultation::field', ['name' => 'call_center_number', 'label' => 'شماره مرکز تماس', 'direction' => 'ltr', 'help' => 'شماره‌ای که برای نمایش به کاربران، درج در پیامک‌ها و سایر بخش‌های مشاوره استفاده می‌شود؛ نمونه: 02112345678'])
         @include('onlineconsultation::field', ['name' => 'outbound_caller_id', 'label' => 'شماره نمایش تماس خروجی', 'direction' => 'ltr'])
         @include('onlineconsultation::field', ['name' => 'queue_number', 'label' => 'شماره صف', 'direction' => 'ltr'])
         @include('onlineconsultation::field', ['name' => 'ring_timeout_seconds', 'label' => 'مهلت زنگ‌خوردن (ثانیه)', 'type' => 'number', 'min' => 10, 'max' => 180, 'required' => true])

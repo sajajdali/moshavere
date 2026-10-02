@@ -41,6 +41,7 @@
         <div><span>پزشک / کارشناس</span><strong>{{ $appointment->doctor?->fullName ?: '—' }}</strong></div>
         <div><span>زمان نوبت</span><strong>@if($appointment->date_visit)<bdi>{{ verta($appointment->date_visit)->format('Y/m/d H:i') }}</bdi>@else—@endif</strong></div>
         <div><span>کد پیگیری</span><strong>{{ $appointment->tracking_code ?: '—' }}</strong></div>
+        <div><span>روش پرداخت</span><strong>{{ $appointment->transaction?->paid_by?->getName() ?: '—' }}</strong>@if(data_get($appointment->transaction?->detail, 'wallet.entry_id'))<small>سند کیف پول #{{ data_get($appointment->transaction->detail, 'wallet.entry_id') }}</small>@endif</div>
     </div></section>
 
     @if($consultationStart && $consultationEnd)
@@ -114,6 +115,21 @@
             @endif
         </div>
     </details>
+
+    @if($alternatePhonesAvailable && $canEditCase)
+    <div class="modal fade" id="alternate-phone-transfer-modal" tabindex="-1" aria-labelledby="alternate-phone-transfer-title" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered"><div class="modal-content oc-billing-modal" dir="rtl">
+            <div class="modal-header"><h2 class="modal-title" id="alternate-phone-transfer-title"><i class="fa-solid fa-triangle-exclamation oc-text-warning"></i> انتقال شماره ثابت</h2><button type="button" class="btn-close ms-0" data-bs-dismiss="modal" aria-label="بستن"></button></div>
+            <div class="modal-body">
+                <div class="oc-notice oc-notice-warning" style="margin:0"><i class="fa-solid fa-phone"></i><p><strong>این شماره قبلاً برای فرد یا نوبت دیگری ثبت شده است.</strong></p></div>
+                <p style="margin:0;line-height:2">آیا می‌خواهید شماره ثابت <strong class="oc-ltr" id="alternate-phone-transfer-number"></strong> برای بیمار این نوبت، <strong>{{ $appointment->user?->fullName ?: 'این کاربر' }}</strong>، تعریف شود؟</p>
+                <p class="oc-help" style="margin:0;line-height:2">با تأیید شما، این شماره از کاربر قبلی حذف و به این بیمار منتقل می‌شود. از این پس هرکس با این شماره ثابت تماس بگیرد، سامانه VoIP او را به‌عنوان <strong>{{ $appointment->user?->fullName ?: 'این کاربر' }}</strong> شناسایی می‌کند.</p>
+                <label class="oc-final-confirm"><input type="checkbox" id="alternate-phone-transfer-consent"><span>انتقال شماره و تغییر کاربر شناسایی‌شده را تأیید می‌کنم.</span></label>
+            </div>
+            <div class="modal-footer"><button type="button" class="oc-btn" data-bs-dismiss="modal">انصراف</button><button type="button" class="oc-btn oc-btn-danger" id="alternate-phone-transfer-submit" disabled><i class="fa-solid fa-arrow-right-arrow-left"></i>تأیید و انتقال شماره</button></div>
+        </div></div>
+    </div>
+    @endif
 
     <section class="oc-panel oc-case-panel">
         <div class="oc-case-hero {{ $consultationCase->isClosed() ? 'is-completed' : 'is-open' }}">
@@ -384,6 +400,46 @@
         <div class="modal fade" id="reopen-consultation-modal" tabindex="-1" aria-labelledby="reopen-consultation-title" aria-hidden="true"><div class="modal-dialog modal-dialog-centered"><div class="modal-content oc-billing-modal" dir="rtl"><form method="POST" action="{{ route('admin.consultation.case.reopen', $appointment) }}" id="reopen-consultation-form">@csrf<div class="modal-header"><h2 class="modal-title" id="reopen-consultation-title"><i class="fa-solid fa-lock-open"></i> بازکردن مجدد پرونده</h2><button type="button" class="btn-close ms-0" data-bs-dismiss="modal" aria-label="بستن"></button></div><div class="modal-body"><div class="oc-notice oc-notice-warning"><i class="fa-solid fa-circle-info"></i><p>با بازگشایی، امکان ثبت گزارش جدید و اتصال VoIP در بازه معتبر نوبت دوباره فعال می‌شود. این عملیات در تاریخچه باقی می‌ماند.</p></div><div class="oc-field"><label class="oc-label" for="reopen-reason">دلیل بازگشایی</label><textarea class="oc-input" id="reopen-reason" name="reopen_reason" minlength="5" maxlength="2000" rows="4" required>{{ old('reopen_reason') }}</textarea></div><label class="oc-final-confirm"><input type="checkbox" name="reopen_confirmed" value="1" id="reopen-confirmed" required><span>بازگشایی این پرونده و فعال‌شدن مجدد آن را تأیید می‌کنم.</span></label></div><div class="modal-footer"><button type="button" class="oc-btn" data-bs-dismiss="modal">انصراف</button><button class="oc-btn oc-btn-primary" id="reopen-consultation-submit" type="submit" disabled><i class="fa-solid fa-lock-open"></i>تأیید بازگشایی</button></div></form></div></div></div>
         @endif
     @endif
+
+    @php($smsStatusLabels = ['pending'=>'در انتظار','queued'=>'در صف ارسال','retrying'=>'تلاش مجدد','sent'=>'ارسال‌شده','failed'=>'ناموفق','skipped'=>'ارسال‌نشده'])
+    <section class="oc-panel" id="appointment-sms-deliveries">
+        <div class="oc-panel-header">
+            <div>
+                <h2 class="oc-panel-title"><i class="fa-solid fa-message"></i>پیامک‌های این نوبت</h2>
+                <p class="oc-help">همه پیامک‌های ثبت‌شده برای بیمار یا مشاور بابت همین نوبت</p>
+            </div>
+            <span class="oc-count-badge">{{ $smsDeliveries->count() }}</span>
+        </div>
+        @if($smsDeliveries->isEmpty())
+            <div class="oc-empty"><i class="fa-regular fa-message"></i><h3>پیامکی برای این نوبت ثبت نشده است</h3></div>
+        @else
+            <div class="oc-table-wrap"><table class="oc-table">
+                <thead><tr><th>عنوان پیامک</th><th>گیرنده</th><th>شماره دریافت‌کننده</th><th>زمان برنامه‌ریزی</th><th>زمان ارسال</th><th>وضعیت</th><th>نتیجه / خطا</th>@can('SUPER_ADMIN')<th>عملیات</th>@endcan</tr></thead>
+                <tbody>
+                @foreach($smsDeliveries as $smsDelivery)
+                    <tr class="{{ $smsDelivery->status === 'failed' ? 'oc-row-danger' : '' }}">
+                        <td><strong>{{ $smsDelivery->rule_title ?: $smsDelivery->reminderRule?->title ?: $smsDelivery->type }}</strong><small class="oc-cell-sub oc-ltr">قالب: {{ $smsDelivery->template }}</small></td>
+                        <td>{{ $smsDelivery->recipient_type === 'practitioner' ? 'پزشک / مشاور' : ($smsDelivery->recipient_type === 'patient' ? 'بیمار' : '—') }}</td>
+                        <td class="oc-ltr"><bdi>{{ $smsDelivery->recipient ?: '—' }}</bdi></td>
+                        <td><bdi>{{ $smsDelivery->scheduled_at ? verta($smsDelivery->scheduled_at)->format('Y/m/d H:i:s') : '—' }}</bdi></td>
+                        <td><bdi>{{ $smsDelivery->sent_at ? verta($smsDelivery->sent_at)->format('Y/m/d H:i:s') : '—' }}</bdi></td>
+                        <td><span class="oc-badge {{ $smsDelivery->status === 'sent' ? 'oc-badge-success' : ($smsDelivery->status === 'failed' ? 'oc-badge-danger' : 'oc-badge-warning') }}">{{ $smsStatusLabels[$smsDelivery->status] ?? $smsDelivery->status }}</span><small class="oc-cell-sub">تعداد تلاش: {{ $smsDelivery->attempts }}</small></td>
+                        <td>{{ $smsDelivery->error_message ?: $smsDelivery->provider_response ?: '—' }}</td>
+                        @can('SUPER_ADMIN')
+                        <td>
+                            @if(!$smsDelivery->sent_at && in_array($smsDelivery->status, ['pending', 'queued', 'retrying'], true))
+                                <form method="POST" action="{{ route('admin.consultation.call-reports.sms-deliveries.cancel', [$appointment, $smsDelivery]) }}" onsubmit="return confirm('ارسال این پیامک لغو شود؟');">@csrf @method('DELETE')<button class="oc-btn oc-btn-small oc-btn-danger" type="submit"><i class="fa-solid fa-ban"></i>لغو ارسال</button></form>
+                            @else
+                                <span class="oc-cell-sub">—</span>
+                            @endif
+                        </td>
+                        @endcan
+                    </tr>
+                @endforeach
+                </tbody>
+            </table></div>
+        @endif
+    </section>
 </div>
 @endsection
 @push('scripts')
@@ -478,6 +534,10 @@ document.addEventListener('DOMContentLoaded', function () {
     const alternateCount = document.getElementById('alternate-phone-count');
     const alternateError = document.getElementById('alternate-phone-error');
     const alternateSuccess = document.getElementById('alternate-phone-success');
+    const alternateTransferElement = document.getElementById('alternate-phone-transfer-modal');
+    const alternateTransferNumber = document.getElementById('alternate-phone-transfer-number');
+    const alternateTransferConsent = document.getElementById('alternate-phone-transfer-consent');
+    const alternateTransferSubmit = document.getElementById('alternate-phone-transfer-submit');
     const csrfToken = alternateForm?.querySelector('input[name="_token"]')?.value;
     const setAlternateCount = () => {
         if (alternateCount && alternateList) alternateCount.textContent = alternateList.querySelectorAll('.oc-alternate-phone-row').length;
@@ -502,38 +562,65 @@ document.addEventListener('DOMContentLoaded', function () {
         row.append(info, remove);
         return row;
     };
+    const submitAlternatePhone = async function (transferConfirmed = false) {
+        if (!alternateForm) return;
+        const formData = new FormData(alternateForm);
+        if (transferConfirmed) formData.set('transfer_confirmed', '1');
+        const activeSubmit = transferConfirmed ? alternateTransferSubmit : alternateSubmit;
+        if (activeSubmit) activeSubmit.disabled = true;
+        if (!transferConfirmed) alternateSubmit.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i><span>در حال بررسی…</span>';
+        else alternateTransferSubmit.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i>در حال انتقال…';
+        try {
+            const response = await fetch(alternateForm.action, {
+                method: 'POST', body: formData, credentials: 'same-origin',
+                headers: { 'Accept': 'application/json', 'X-Requested-With': 'XMLHttpRequest' }
+            });
+            const payload = await response.json();
+            if (response.status === 409 && payload?.code === 'alternate_phone_conflict') {
+                alternateTransferNumber.textContent = payload.phone || alternateInput.value;
+                alternateTransferConsent.checked = false;
+                alternateTransferSubmit.disabled = true;
+                bootstrap.Modal.getOrCreateInstance(alternateTransferElement).show();
+                return;
+            }
+            if (!response.ok) throw payload;
+            alternateList.appendChild(buildAlternatePhoneRow(payload.phone));
+            alternateList.hidden = false;
+            alternateEmpty.hidden = true;
+            alternateInput.value = '';
+            alternateSuccess.querySelector('p').textContent = payload.message;
+            alternateSuccess.hidden = false;
+            setAlternateCount();
+            if (transferConfirmed && window.bootstrap) bootstrap.Modal.getOrCreateInstance(alternateTransferElement).hide();
+        } catch (payload) {
+            if (transferConfirmed && window.bootstrap) bootstrap.Modal.getOrCreateInstance(alternateTransferElement).hide();
+            alternateError.textContent = payload?.errors?.alternate_phone?.[0] || payload?.message || 'ثبت شماره انجام نشد. دوباره تلاش کنید.';
+            alternateError.hidden = false;
+            alternateInput.focus();
+        } finally {
+            alternateSubmit.disabled = false;
+            alternateSubmit.innerHTML = '<i class="fa-solid fa-plus"></i><span>افزودن</span>';
+            if (alternateTransferSubmit) alternateTransferSubmit.innerHTML = '<i class="fa-solid fa-arrow-right-arrow-left"></i>تأیید و انتقال شماره';
+        }
+    };
     if (alternateForm) {
-        alternateForm.addEventListener('submit', async function (event) {
+        alternateForm.addEventListener('submit', function (event) {
             event.preventDefault();
             alternatePanel.open = true;
             alternateError.hidden = true;
             alternateSuccess.hidden = true;
-            alternateSubmit.disabled = true;
-            alternateSubmit.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i><span>در حال بررسی…</span>';
-            try {
-                const response = await fetch(alternateForm.action, {
-                    method: 'POST', body: new FormData(alternateForm), credentials: 'same-origin',
-                    headers: { 'Accept': 'application/json', 'X-Requested-With': 'XMLHttpRequest' }
-                });
-                const payload = await response.json();
-                if (!response.ok) throw payload;
-                alternateList.appendChild(buildAlternatePhoneRow(payload.phone));
-                alternateList.hidden = false;
-                alternateEmpty.hidden = true;
-                alternateInput.value = '';
-                alternateSuccess.querySelector('p').textContent = payload.message;
-                alternateSuccess.hidden = false;
-                setAlternateCount();
-            } catch (payload) {
-                alternateError.textContent = payload?.errors?.alternate_phone?.[0] || payload?.message || 'ثبت شماره انجام نشد. دوباره تلاش کنید.';
-                alternateError.hidden = false;
-                alternateInput.focus();
-            } finally {
-                alternateSubmit.disabled = false;
-                alternateSubmit.innerHTML = '<i class="fa-solid fa-plus"></i><span>افزودن</span>';
-            }
+            submitAlternatePhone(false);
         });
     }
+    alternateTransferConsent?.addEventListener('change', function () {
+        alternateTransferSubmit.disabled = !alternateTransferConsent.checked;
+    });
+    alternateTransferSubmit?.addEventListener('click', function () {
+        if (!alternateTransferConsent.checked) return;
+        alternateError.hidden = true;
+        alternateSuccess.hidden = true;
+        submitAlternatePhone(true);
+    });
     alternateList?.addEventListener('click', async function (event) {
         const button = event.target.closest('.alternate-phone-delete');
         if (!button || !confirm('این شماره از حساب بیمار و تمام نوبت‌هایش حذف شود؟')) return;

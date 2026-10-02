@@ -2,6 +2,7 @@
 
 namespace Modules\OnlineConsultation\Services;
 
+use Carbon\CarbonInterface;
 use Illuminate\Support\Facades\Schema;
 use Modules\AppointmentUser\app\Models\AppointmentUser;
 use Modules\AppointmentUser\Enum\AppointmentUserKindEnum;
@@ -12,6 +13,10 @@ use Modules\OnlineConsultation\Models\ConsultationSmsReminderRule;
 
 class ConsultationReminderScheduler
 {
+    public const DELIVERY_GRACE_MINUTES = 4;
+
+    public const EXPIRED_WINDOW_MESSAGE = 'زمان مجاز ارسال این یادآوری گذشته است.';
+
     public function cancelPendingForAppointment(int $appointmentId, string $reason): void
     {
         if (! $this->schemaReady()) {
@@ -121,6 +126,11 @@ class ConsultationReminderScheduler
 
         ConsultationSmsDelivery::whereNotNull('reminder_rule_id')
             ->where('status', 'pending')
+            ->where('scheduled_at', '<=', now()->subMinutes(self::DELIVERY_GRACE_MINUTES))
+            ->update(['status' => 'skipped', 'error_message' => self::EXPIRED_WINDOW_MESSAGE]);
+
+        ConsultationSmsDelivery::whereNotNull('reminder_rule_id')
+            ->where('status', 'pending')
             ->where('scheduled_at', '<=', now())
             ->orderBy('id')
             ->chunkById(100, function ($deliveries) {
@@ -148,6 +158,7 @@ class ConsultationReminderScheduler
             ? $appointment->user?->mobile
             : $appointment->doctor?->mobile;
         $scheduledAt = $appointment->date_visit->copy()->subMinutes($rule->minutes_before);
+        $expired = $this->reminderWindowExpired($scheduledAt);
         $key = implode(':', ['voip-reminder', $rule->id, $appointment->id, $rule->recipient_type]);
         $attributes = [
             'reminder_rule_id' => $rule->id,
@@ -159,10 +170,12 @@ class ConsultationReminderScheduler
             'recipient' => $recipient ?: '',
             'template' => $rule->template,
             'scheduled_at' => $scheduledAt,
-            'status' => blank($recipient) ? 'skipped' : 'pending',
+            'status' => blank($recipient) || $expired ? 'skipped' : 'pending',
             'attempts' => 0,
-            'error_message' => blank($recipient) ? 'شماره موبایل گیرنده ثبت نشده است.' : null,
-            'payload' => ['params' => $this->parameters($appointment), 'message_text' => $rule->message_text],
+            'error_message' => blank($recipient)
+                ? 'شماره موبایل گیرنده ثبت نشده است.'
+                : ($expired ? self::EXPIRED_WINDOW_MESSAGE : null),
+            'payload' => ['params' => $this->parameters($appointment)],
         ];
         $delivery = ConsultationSmsDelivery::firstOrCreate(['deduplication_key' => $key], $attributes);
 
@@ -173,6 +186,11 @@ class ConsultationReminderScheduler
         if (! $delivery->wasRecentlyCreated) {
             $delivery->fill($attributes)->save();
         }
+    }
+
+    public function reminderWindowExpired(CarbonInterface $scheduledAt): bool
+    {
+        return now()->gte($scheduledAt->copy()->addMinutes(self::DELIVERY_GRACE_MINUTES));
     }
 
     private function parameters(AppointmentUser $appointment): array

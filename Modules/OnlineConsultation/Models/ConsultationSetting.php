@@ -14,7 +14,7 @@ class ConsultationSetting extends Model
     protected $casts = [
         'voip_secret' => 'encrypted', 'voip_call_token' => 'encrypted', 'booking_enabled' => 'boolean',
         'app_enabled' => 'boolean', 'test_login_enabled' => 'boolean', 'recording_requested' => 'boolean',
-        'consent_required' => 'boolean', 'allow_transfer' => 'boolean',
+        'consent_required' => 'boolean', 'allow_transfer' => 'boolean', 'offline_alert_enabled' => 'boolean',
         'app_landing_content' => 'array',
         'ignored_short_call_minutes' => 'integer',
         'connection_overhead_minutes' => 'integer',
@@ -48,4 +48,5 @@ class ConsultationSetting extends Model
     {
         return (string) ($this->voip_secret ?: setting(SettingKeyEnum::VOIP_PASSWORD));
     }
+
 }

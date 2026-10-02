@@ -13,6 +13,7 @@ enum TransactionPaidEnum : int  implements EnumHasNameInterface
     case CARD_TO_CARD = 2;
     case BY_ADMIN = 3;
     case NO_NEED_TO_PAY = 4;
+    case WALLET = 5;
 
 
     public function getName(): string
@@ -23,6 +24,7 @@ enum TransactionPaidEnum : int  implements EnumHasNameInterface
             self::CARD_TO_CARD => 'کارت به کارت' ,
             self::BY_ADMIN => 'ثبت شده توسط ادمین' ,
             self::NO_NEED_TO_PAY => 'بدون نیاز به پرداخت' ,
+            self::WALLET => 'کیف پول' ,
             default => "",
         } ;
     }

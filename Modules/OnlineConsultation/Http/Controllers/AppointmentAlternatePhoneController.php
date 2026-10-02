@@ -31,21 +31,36 @@ class AppointmentAlternatePhoneController extends Controller
             'alternate_phone.regex' => 'فقط شماره ثابت ۱۱ رقمی با پیش‌شماره استان مجاز است؛ شماره موبایل پذیرفته نمی‌شود.',
         ]);
 
+        $transferred = false;
         try {
-            DB::transaction(function () use ($appointment, $phone, $request) {
-                if (AppointmentAlternatePhone::where('phone', $phone)->lockForUpdate()->exists()) {
-                    throw ValidationException::withMessages([
-                        'alternate_phone' => 'این شماره قبلاً برای فرد یا نوبت دیگری ثبت شده است.',
+            $alternatePhone = DB::transaction(function () use ($appointment, $phone, $request, &$transferred) {
+                $existingPhone = AppointmentAlternatePhone::where('phone', $phone)->lockForUpdate()->first();
+                if ($existingPhone) {
+                    if ((int) $existingPhone->patient_id === (int) $appointment->user_id) {
+                        throw ValidationException::withMessages([
+                            'alternate_phone' => 'این شماره قبلاً برای همین بیمار ثبت شده است.',
+                        ]);
+                    }
+                    if (! $request->boolean('transfer_confirmed')) {
+                        return $existingPhone->load('patient');
+                    }
+
+                    $existingPhone->update([
+                        'appointment_id' => $appointment->id,
+                        'patient_id' => $appointment->user_id,
+                        'created_by' => $request->user()->id,
                     ]);
+                    $transferred = true;
+
+                    return $existingPhone;
                 }
-                $alternatePhone = AppointmentAlternatePhone::create([
+
+                return AppointmentAlternatePhone::create([
                     'appointment_id' => $appointment->id,
                     'patient_id' => $appointment->user_id,
                     'phone' => $phone,
                     'created_by' => $request->user()->id,
                 ]);
-                $alternatePhone->setRelation('creator', $request->user());
-                return $alternatePhone;
             });
         } catch (QueryException $exception) {
             if (in_array((string) $exception->getCode(), ['23000', '23505'], true)) {
@@ -56,8 +71,24 @@ class AppointmentAlternatePhoneController extends Controller
             throw $exception;
         }
 
-        $alternatePhone = AppointmentAlternatePhone::with('creator')->where('phone', $phone)->firstOrFail();
-        $message = 'شماره ثابت به حساب بیمار اضافه شد و برای همه نوبت‌های او در VoIP قابل شناسایی است.';
+        if ((int) $alternatePhone->patient_id !== (int) $appointment->user_id) {
+            if ($request->expectsJson()) {
+                return response()->json([
+                    'message' => 'این شماره قبلاً برای فرد یا نوبت دیگری ثبت شده است.',
+                    'code' => 'alternate_phone_conflict',
+                    'phone' => $phone,
+                    'current_patient' => $alternatePhone->patient?->fullName ?: 'کاربر دیگری',
+                ], 409);
+            }
+            throw ValidationException::withMessages([
+                'alternate_phone' => 'این شماره قبلاً برای فرد یا نوبت دیگری ثبت شده است.',
+            ]);
+        }
+
+        $alternatePhone->load('creator');
+        $message = $transferred
+            ? 'شماره ثابت با موفقیت به این بیمار منتقل شد و اتصال آن از بیمار قبلی حذف شد.'
+            : 'شماره ثابت به حساب بیمار اضافه شد و برای همه نوبت‌های او در VoIP قابل شناسایی است.';
         if ($request->expectsJson()) {
             return response()->json([
                 'message' => $message,

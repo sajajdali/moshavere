@@ -1,9 +1,12 @@
 <?php
 namespace Modules\PractitionerApi\Services;
 
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Validation\ValidationException;
 use Modules\AppointmentUser\app\Models\AppointmentUser;
+use Modules\AppointmentUser\Enum\AppointmentUserKindEnum;
+use Modules\AppointmentUser\Enum\AppointmentUserStatusEnum;
 use Modules\OnlineConsultation\Models\AppointmentCallLog;
 use Modules\OnlineConsultation\Models\AppointmentCallbackRequest;
 use Modules\OnlineConsultation\Models\ConsultationPractitioner;
@@ -32,7 +35,61 @@ class PractitionerCallService
         $call = $this->callQuery($practitioner)->whereNull('ended_at')
             ->where(function (Builder $query) { $query->whereNull('final_result')->orWhereIn('final_result', ['RINGING', 'ANSWERED', 'IN_PROGRESS']); })
             ->latest('call_entered_at')->first();
-        return $call ? $this->present($call, 1) + ['appointment_id' => (int) $call->appointment_id] : null;
+        if ($call) return $this->present($call, 1) + ['appointment_id' => (int) $call->appointment_id, 'has_call' => true];
+
+        $appointment = $this->activeAppointment($practitioner);
+        if (! $appointment) return null;
+
+        [$startsAt, $endsAt] = $this->appointmentWindow($appointment);
+        return [
+            // CallRecord clients expect an integer id. Zero explicitly means that
+            // this context was inferred from the current appointment, not a call log.
+            'id' => 0, 'sequence' => 0, 'appointment_id' => (int) $appointment->id,
+            'direction' => '', 'started_at' => null, 'answered_at' => null, 'ended_at' => null,
+            'duration_seconds' => 0, 'result' => '', 'early' => false, 'ended_by' => 'none',
+            'channel' => 'voip', 'note' => null, 'has_call' => false,
+            'appointment' => [
+                'id' => (int) $appointment->id, 'file_no' => $appointment->tracking_code,
+                'starts_at' => $startsAt->toIso8601String(), 'ends_at' => $endsAt->toIso8601String(),
+                'patient' => [
+                    'id' => $appointment->user_id ? (int) $appointment->user_id : null,
+                    'full_name' => $appointment->user?->fullName,
+                    'mobile' => $appointment->user?->mobile,
+                ],
+            ],
+        ];
+    }
+
+    private function activeAppointment(ConsultationPractitioner $practitioner): ?AppointmentUser
+    {
+        $timezone = (string) (\Modules\OnlineConsultation\Models\ConsultationSetting::current()->timezone ?: config('app.timezone', 'Asia/Tehran'));
+        $now = now($timezone);
+
+        return AppointmentUser::query()->with(['user', 'consultationCase'])
+            ->where('doctor_id', $practitioner->user_id)
+            ->whereIn('kind', [AppointmentUserKindEnum::ONLINE->value, AppointmentUserKindEnum::VOIP->value])
+            ->where('status', '<>', AppointmentUserStatusEnum::STATUS_CANCEL->value)
+            ->whereBetween('date_visit', [
+                $now->copy()->subDay()->startOfDay()->setTimezone(config('app.timezone')),
+                $now->copy()->endOfDay()->setTimezone(config('app.timezone')),
+            ])
+            ->orderBy('date_visit')->get()
+            ->first(function (AppointmentUser $appointment) use ($now): bool {
+                if ($appointment->consultationCase?->isClosed()) return false;
+                [$startsAt, $endsAt] = $this->appointmentWindow($appointment);
+                return $now->betweenIncluded($startsAt, $endsAt);
+            });
+    }
+
+    /** @return array{0: Carbon, 1: Carbon} */
+    private function appointmentWindow(AppointmentUser $appointment): array
+    {
+        $timezone = (string) (\Modules\OnlineConsultation\Models\ConsultationSetting::current()->timezone ?: config('app.timezone', 'Asia/Tehran'));
+        $date = $appointment->date_visit->copy()->setTimezone($timezone)->toDateString();
+        $start = Carbon::parse($date.' '.($appointment->start_time ?: $appointment->date_visit->format('H:i:s')), $timezone);
+        $end = $appointment->end_time ? Carbon::parse($date.' '.$appointment->end_time, $timezone) : $start->copy()->addMinutes(30);
+        if ($end->lte($start)) $end->addDay();
+        return [$start, $end];
     }
 
     public function note(ConsultationPractitioner $practitioner, int $callId, ?string $note): array

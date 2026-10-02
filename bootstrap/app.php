@@ -1,5 +1,9 @@
 <?php
 
+// Runtime files may be created by either the web/cron user or an
+// administrator running Artisan. Keep them group-writable for www.
+umask(0002);
+
 /*
 |--------------------------------------------------------------------------
 | Create The Application

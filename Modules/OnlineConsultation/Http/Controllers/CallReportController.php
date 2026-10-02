@@ -17,6 +17,7 @@ use Modules\OnlineConsultation\Models\AppointmentConsultantNoAnswer;
 use Modules\OnlineConsultation\Models\AppointmentBillingRecord;
 use Modules\OnlineConsultation\Models\ConsultationPractitioner;
 use Modules\OnlineConsultation\Models\ConsultationSetting;
+use Modules\OnlineConsultation\Models\ConsultationSmsDelivery;
 use Modules\OnlineConsultation\Services\AppointmentBillingService;
 use Modules\OnlineConsultation\Models\AppointmentConsultationReport;
 use Modules\OnlineConsultation\Services\ConsultationCaseService;
@@ -226,7 +227,14 @@ class CallReportController extends Controller
             && $consultationCase->state === 'OPEN'
             && $callbackAvailability['available'];
 
-        return view('onlineconsultation::call-reports.appointment', compact('appointment', 'calls', 'hangupIncidents', 'noAnswerIncidents', 'callbackRequests', 'stats', 'billing', 'consultationCase', 'previousConsultationReports', 'outcomes', 'canEditCase', 'canRequestCallback', 'showCallbackAction', 'callbackAvailability', 'callbackAvailable', 'alternatePhonesAvailable', 'shortCallThresholdSeconds'));
+        $smsDeliveries = ConsultationAccess::schemaReady(['consultation_sms_deliveries'])
+            ? ConsultationSmsDelivery::with('reminderRule')
+                ->where('appointment_id', $appointment->id)
+                ->latest('scheduled_at')
+                ->get()
+            : collect();
+
+        return view('onlineconsultation::call-reports.appointment', compact('appointment', 'calls', 'hangupIncidents', 'noAnswerIncidents', 'callbackRequests', 'smsDeliveries', 'stats', 'billing', 'consultationCase', 'previousConsultationReports', 'outcomes', 'canEditCase', 'canRequestCallback', 'showCallbackAction', 'callbackAvailability', 'callbackAvailable', 'alternatePhonesAvailable', 'shortCallThresholdSeconds'));
     }
 
     public function updateAppointmentTime(Request $request, AppointmentUser $appointment)
@@ -287,6 +295,28 @@ class CallReportController extends Controller
         };
 
         return back()->with('success', $message);
+    }
+
+    public function cancelSmsDelivery(Request $request, AppointmentUser $appointment, ConsultationSmsDelivery $smsDelivery)
+    {
+        abort_unless($request->user()?->can('SUPER_ADMIN'), 403, 'فقط مدیر امکان لغو پیامک در صف را دارد.');
+        abort_unless((int) $smsDelivery->appointment_id === (int) $appointment->id, 404);
+
+        $cancelled = ConsultationSmsDelivery::query()
+            ->whereKey($smsDelivery->id)
+            ->where('appointment_id', $appointment->id)
+            ->whereNull('sent_at')
+            ->whereIn('status', ['pending', 'queued', 'retrying'])
+            ->update([
+                'status' => 'skipped',
+                'error_message' => 'ارسال این پیامک توسط مدیر لغو شد.',
+            ]);
+
+        return redirect()
+            ->route('admin.consultation.call-reports.appointment', $appointment)
+            ->with($cancelled ? 'success' : 'error', $cancelled
+                ? 'ارسال پیامک با موفقیت لغو شد.'
+                : 'این پیامک دیگر در صف ارسال نیست و امکان لغو آن وجود ندارد.');
     }
 
     public function call(AppointmentCallLog $callLog)

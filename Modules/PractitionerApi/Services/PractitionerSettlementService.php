@@ -6,6 +6,7 @@ use Carbon\Carbon;
 use Illuminate\Validation\ValidationException;
 use Modules\AppointmentUser\app\Models\AppointmentUser;
 use Modules\OnlineConsultation\Models\AppointmentBillingRecord;
+use Modules\OnlineConsultation\Models\AppointmentConsultationCase;
 use Modules\OnlineConsultation\Models\ConsultationPractitioner;
 use Modules\OnlineConsultation\Services\AppointmentBillingService;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
@@ -29,7 +30,7 @@ class PractitionerSettlementService
     public function confirm(ConsultationPractitioner $practitioner, int $appointmentId, array $data): array
     {
         $appointment = $this->ownedAppointment($practitioner, $appointmentId);
-        $this->ensureEnded($appointment);
+        $this->ensureCanSettle($appointment);
         $record = $this->billing->ensure($appointment);
         if (! $record) throw ValidationException::withMessages(['settlement' => ['اطلاعات مالی این نوبت قابل محاسبه نیست.']]);
         if ((int) $data['approved_unused_minutes'] > (int) $record->reserved_minutes) {
@@ -55,7 +56,7 @@ class PractitionerSettlementService
         return [
             'id' => (int) $record->id, 'appointment_id' => (int) $record->appointment_id,
             'status' => $record->refund_status, 'finalized' => $record->refund_status === 'completed',
-            'can_confirm' => $record->refund_status !== 'completed' && $this->hasEnded($appointment),
+            'can_confirm' => $record->refund_status !== 'completed' && $this->canSettle($appointment),
             'reserved_minutes' => (int) $record->reserved_minutes,
             'raw_talk_seconds' => (int) $record->raw_answered_talk_seconds,
             'ignored_talk_seconds' => (int) $record->ignored_talk_seconds,
@@ -83,11 +84,17 @@ class PractitionerSettlementService
         return $appointment;
     }
 
-    private function ensureEnded(AppointmentUser $appointment): void
+    private function ensureCanSettle(AppointmentUser $appointment): void
     {
-        if (! $this->hasEnded($appointment)) {
-            throw ValidationException::withMessages(['settlement' => ['تسویه فقط پس از پایان کامل بازه نوبت مجاز است.']]);
+        if (! $this->canSettle($appointment)) {
+            throw ValidationException::withMessages(['settlement' => ['تسویه پس از پایان بازه نوبت یا ثبت اتمام ویزیت مجاز است.']]);
         }
+    }
+
+    private function canSettle(AppointmentUser $appointment): bool
+    {
+        return $appointment->consultationCase?->state === AppointmentConsultationCase::STATE_COMPLETED
+            || $this->hasEnded($appointment);
     }
 
     private function hasEnded(AppointmentUser $appointment): bool

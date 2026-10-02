@@ -25,7 +25,7 @@ class PractitionerSoftphoneService
     public function for(ConsultationPractitioner $practitioner): array
     {
         $settings = ConsultationSetting::current();
-        $serverAddress = $this->nullableString($settings->voip_host);
+        $serverAddress = $this->nullableString($settings->softphone_server_address);
         $serverHost = $this->serverHost($serverAddress);
         $extension = $this->nullableString($practitioner->extension);
         $username = $this->nullableString($practitioner->sip_username);

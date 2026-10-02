@@ -1,4 +1,4 @@
-@if ($paginator->hasPages())
+@if (($always ?? false) || $paginator->hasPages())
     <div class="oc-pagination">
         <p class="oc-pagination-summary">
             نمایش

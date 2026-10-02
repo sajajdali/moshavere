@@ -39,6 +39,7 @@ class PractitionerApiServiceProvider extends ServiceProvider
 
         Scramble::registerApi('practitioner', [
             'api_path' => config('practitionerapi.path', 'api/practitioner/v1'),
+            'middleware' => [],
             'info' => [
                 'title' => 'Practitioner Mobile API',
                 'version' => config('practitionerapi.version', '1.0.0'),
@@ -78,8 +79,10 @@ OTP چهاررقمی، دارای اعتبار 120 ثانیه و فاصله ار
 ### ثبت Softphone و SIP
 پس از ورود موفق، آبجکت `data.practitioner.softphone` و پس از هر بار بازشدن اپ،
 آبجکت `data.softphone` در `GET /me` منبع قطعی ثبت Softphone است. `server_address`،
-`server_host`، `server_port` و `transport` از تنظیمات ثابت VoIP همان Tenant خوانده
-می‌شوند؛ `extension`، `username` و `password` مختص پزشک/مشاور واردشده هستند.
+`server_host` از تنظیم مستقل «آدرس سرور Softphone» و `server_port` و `transport`
+از تنظیمات SIP همان Tenant خوانده می‌شوند؛ `extension`، `username` و `password`
+مختص پزشک/مشاور واردشده هستند. آدرس سرور VoIP برای درخواست تماس مستقل است و در
+پیکربندی Softphone استفاده نمی‌شود.
 آدرس قدیمی احتمالی روی پروفایل پزشک مبنا نیست. کلاینت فقط وقتی
 `configured=true` است باید SIP REGISTER انجام دهد؛ در غیر این صورت
 `missing_fields` فیلدهای ناقص را مشخص می‌کند. `server_address` مقدار خام ثبت‌شده در

@@ -171,19 +171,30 @@
                                                         @endif
                                                     </td>
                                                     <td>
-                                                        <div class="dropdown">
-                                                            <button
-                                                                class="btn  {{ $ap->status->getButtonColor() }} dropdown-toggle"
-                                                                type="button" id="dropdownMenuButton1"
-                                                                data-bs-toggle="dropdown" aria-expanded="false">
-                                                                {{ $ap->status->getName() }}
-                                                            </button>
-                                                            <ul class="dropdown-menu"
-                                                                aria-labelledby="dropdownMenuButton1">
-                                                                @can('update', $ap)
-                                                                    @include('appointmentuser::components.appointmentlist.operationbutton')
-                                                                @endcan
-                                                            </ul>
+                                                        <div class="d-flex align-items-center justify-content-center gap-2">
+                                                            @if ($ap->kind === \Modules\AppointmentUser\Enum\AppointmentUserKindEnum::VOIP)
+                                                                <a href="{{ route('admin.consultation.call-reports.appointment', $ap) }}"
+                                                                    class="btn btn-sm btn-info"
+                                                                    title="مشاهده جزئیات نوبت ویپ"
+                                                                    aria-label="مشاهده جزئیات نوبت ویپ {{ $ap->id }}"
+                                                                    data-bs-toggle="tooltip" data-bs-placement="top">
+                                                                    <i class="fa fa-eye" aria-hidden="true"></i>
+                                                                </a>
+                                                            @endif
+                                                            <div class="dropdown">
+                                                                <button
+                                                                    class="btn  {{ $ap->status->getButtonColor() }} dropdown-toggle"
+                                                                    type="button" id="dropdownMenuButton-{{ $ap->id }}"
+                                                                    data-bs-toggle="dropdown" aria-expanded="false">
+                                                                    {{ $ap->status->getName() }}
+                                                                </button>
+                                                                <ul class="dropdown-menu"
+                                                                    aria-labelledby="dropdownMenuButton-{{ $ap->id }}">
+                                                                    @can('update', $ap)
+                                                                        @include('appointmentuser::components.appointmentlist.operationbutton')
+                                                                    @endcan
+                                                                </ul>
+                                                            </div>
                                                         </div>
                                                     </td>
                                                 </tr>

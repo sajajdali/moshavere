@@ -8,7 +8,9 @@ use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Str;
+use Illuminate\Validation\ValidationException;
 use Livewire\Attributes\Layout;
 use Livewire\Attributes\Locked;
 use Livewire\Attributes\Title;
@@ -23,11 +25,13 @@ use Modules\AppointmentUser\Enum\AppointmentUserKindEnum;
 use Modules\AppointmentUser\Enum\AppointmentUserStatusEnum;
 use Modules\Discount\app\Models\Discount;
 use Modules\Front\Traits\Paymenttrait;
+use Modules\OnlineConsultation\Models\ConsultationSetting;
 use Modules\Place\app\Models\Place;
 use Modules\Setting\Enum\SettingKeyEnum;
 use Modules\Transaction\app\Models\Transaction;
 use Modules\Transaction\Enum\TransactionPaidEnum;
 use Modules\Transaction\Enum\TransactionStatusEnum;
+use Modules\User\service\WalletService;
 use Shetabit\Multipay\Exceptions\InvalidPaymentException;
 use Shetabit\Multipay\Invoice;
 use Shetabit\Payment\Facade\Payment;
@@ -165,6 +169,7 @@ class AppointmentDetail extends Component
             $this->fetchData['discount_data'] = $discount;
             $finalPrice =  $discount->caculatePrice($this->fetchData['stauts']['price']);
             $this->fetchData['status']['price_after_discount'] = $finalPrice;
+            $this->prepareWalletPayment();
         } else {
             return  $this->addError('form.discount_code', 'کد تخفیف وارد شده اشتباه است!');
         }
@@ -201,7 +206,7 @@ class AppointmentDetail extends Component
     }
     public function GotoPayment()
     {
-        $amount = $this->fetchData['stauts']['price'];
+        $amount = $this->payableAmount();
         if (checkIp()) {
             $amount = '1500';
         }
@@ -211,7 +216,8 @@ class AppointmentDetail extends Component
             $amount = (int) $this->fetchData['stauts']['price'] / 10;
         }
         $t_data = [
-            'amount' => $this->fetchData['stauts']['price'],
+            'amount' => $this->payableAmount(),
+            'base_amount' => (int) $this->fetchData['stauts']['price'],
             'user_id' => $this->fetchData['app']->user->id,
             'mobile' =>  $this->fetchData['app']->user->mobile,
             'appointmentUser_id' =>  $this->fetchData['app']->id,
@@ -219,9 +225,9 @@ class AppointmentDetail extends Component
         ];
         if (isset($this->fetchData['discount_data'])) {
             $t_data['discount']['discount_id'] = $this->fetchData['discount_data']->id;
-            $t_data['discount']['discount_amount'] = $this->fetchData['stauts']['price'] -  $t_data['amount'];
+            $t_data['discount']['discount_amount'] = max(0, (int) $this->fetchData['stauts']['price'] - $t_data['amount']);
             $t_data['discount']['discount_code'] = $this->fetchData['discount_data']->code;
-            $amount = $t_data['discount']['discount_amount'];
+            $amount = $t_data['amount'];
         }
         // set the callback URL dynamically
         $callbackUrl = route('front.setAppointment.detail', ['tracking_code' => $this->fetchData['app']->tracking_code, 'call_back' => true]);
@@ -292,14 +298,13 @@ class AppointmentDetail extends Component
             'user_id' => $initial_data['user_id'],
             'transaction_code' =>  Transaction::generateTransactionCode(),
             'status' => TransactionStatusEnum::PENDING,
-            'cost' => $initial_data['amount'],
+            'cost' => $initial_data['base_amount'] ?? $initial_data['amount'],
             'total_cost' => $initial_data['amount'],
             'paid_by' => TransactionPaidEnum::ONLINE,
             'detail' => data_get($initial_data, 'detail'),
         ];
         if (isset($initial_data['discount'])) {
             $transactionData['discount_id'] = $initial_data['discount']['discount_id'];
-            $transactionData['cost'] =  $initial_data['amount'] . 0;
             $transactionData['discount_amount'] =  $initial_data['discount']['discount_amount'];
             $transactionData['discount_code'] =  $initial_data['discount']['discount_code'];
         }
@@ -319,10 +324,171 @@ class AppointmentDetail extends Component
         $newDetail = array_merge($old_Detials, $u_data['detail']);
         $transaction->update(['detail' => $newDetail]);
     }
+
+    public function payWithWallet(WalletService $walletService)
+    {
+        if (! $this->walletPaymentIsAvailableForCurrentUser()) {
+            abort(403);
+        }
+
+        $appointmentId = (int) $this->fetchData['app']->id;
+        $amount = $this->payableAmount();
+
+        try {
+            [$appointment, $paidNow] = DB::transaction(function () use ($walletService, $appointmentId, $amount): array {
+                $appointment = AppointmentUser::with(['user', 'transaction'])
+                    ->lockForUpdate()
+                    ->findOrFail($appointmentId);
+
+                if ((int) $appointment->user_id !== (int) auth()->id()) {
+                    abort(403);
+                }
+                if ($appointment->status === AppointmentUserStatusEnum::STATUS_SUCCESSFUL) {
+                    return [$appointment, false];
+                }
+                if ($appointment->status !== AppointmentUserStatusEnum::STATUS_WAIT_PAYMENT) {
+                    throw ValidationException::withMessages([
+                        'wallet' => 'این نوبت در وضعیت قابل پرداخت نیست.',
+                    ]);
+                }
+                if ($amount <= 0) {
+                    throw ValidationException::withMessages([
+                        'wallet' => 'مبلغ قابل پرداخت نامعتبر است.',
+                    ]);
+                }
+
+                $transactionData = [
+                    'amount' => $amount,
+                    'base_amount' => (int) $this->fetchData['stauts']['price'],
+                    'user_id' => $appointment->user_id,
+                    'mobile' => $appointment->user->mobile,
+                    'appointmentUser_id' => $appointment->id,
+                    'tracking_code' => $appointment->tracking_code,
+                ];
+                if (isset($this->fetchData['discount_data'])) {
+                    $transactionData['discount'] = [
+                        'discount_id' => $this->fetchData['discount_data']->id,
+                        'discount_amount' => max(0, (int) $this->fetchData['stauts']['price'] - $amount),
+                        'discount_code' => $this->fetchData['discount_data']->code,
+                    ];
+                }
+
+                $transaction = $this->createTransaction($transactionData);
+                $walletEntry = $walletService->debit(
+                    user: $appointment->user,
+                    amount: $amount,
+                    type: 'purchase',
+                    idempotencyKey: 'appointment-wallet-payment:'.$appointment->id,
+                    detail: [
+                        'reason' => 'پرداخت هزینه نوبت از کیف پول',
+                        'appointment_id' => $appointment->id,
+                        'appointment_tracking_code' => $appointment->tracking_code,
+                        'payment_method' => 'wallet',
+                        'amount' => $amount,
+                    ],
+                    transactionId: $transaction->id,
+                );
+
+                $detail = array_merge($transaction->detail ?? [], [
+                    'payment_method' => 'wallet',
+                    'paid_at' => now()->toIso8601String(),
+                    'appointment_id' => $appointment->id,
+                    'appointment_tracking_code' => $appointment->tracking_code,
+                    'wallet' => [
+                        'entry_id' => $walletEntry->id,
+                        'amount' => $amount,
+                        'balance_before' => $walletEntry->balance_before,
+                        'balance_after' => $walletEntry->balance_after,
+                        'idempotency_key' => $walletEntry->idempotency_key,
+                    ],
+                ]);
+                $transaction->update([
+                    'status' => TransactionStatusEnum::SUCCESSFUL,
+                    'paid_by' => TransactionPaidEnum::WALLET,
+                    'detail' => $detail,
+                ]);
+                $appointment->update([
+                    'status' => AppointmentUserStatusEnum::STATUS_SUCCESSFUL,
+                    'deadline_at' => null,
+                ]);
+
+                return [$appointment->fresh(['user', 'doctor', 'transaction']), true];
+            });
+
+            if ($paidNow) {
+                try {
+                    $this->sendSmsSuccessfulSms($appointment);
+                    $this->sendOnlineAppointmentFirstMessage($appointment);
+                } catch (\Throwable $notificationException) {
+                    Log::warning('Wallet payment succeeded but appointment notification failed', [
+                        'appointment_id' => $appointment->id,
+                        'message' => $notificationException->getMessage(),
+                    ]);
+                }
+            }
+
+            session()->flash('success', $paidNow
+                ? 'پرداخت با کیف پول با موفقیت انجام شد و نوبت شما فعال شد.'
+                : 'این نوبت قبلاً پرداخت و فعال شده است.');
+
+            return redirect()->route('front.setAppointment.detail', [
+                'tracking_code' => $appointment->tracking_code,
+            ]);
+        } catch (ValidationException $exception) {
+            $this->prepareWalletPayment();
+            $this->addError('wallet', $exception->validator->errors()->first('wallet'));
+
+            return null;
+        } catch (\Throwable $exception) {
+            Log::error('Wallet appointment payment failed', [
+                'appointment_id' => $appointmentId,
+                'user_id' => auth()->id(),
+                'message' => $exception->getMessage(),
+            ]);
+            $this->prepareWalletPayment();
+            $this->addError('wallet', 'پرداخت از کیف پول انجام نشد؛ لطفاً دوباره تلاش کنید.');
+
+            return null;
+        }
+    }
+
+    private function payableAmount(): int
+    {
+        return max(0, (int) data_get(
+            $this->fetchData,
+            'status.price_after_discount',
+            data_get($this->fetchData, 'stauts.price', 0)
+        ));
+    }
+
+    private function walletPaymentIsAvailableForCurrentUser(): bool
+    {
+        return Schema::hasTable('user_wallets')
+            && auth()->check()
+            && (int) auth()->id() === (int) $this->fetchData['app']->user_id;
+    }
+
+    private function prepareWalletPayment(): void
+    {
+        $visible = $this->walletPaymentIsAvailableForCurrentUser();
+        $balance = $visible ? app(WalletService::class)->balance(auth()->user()) : 0;
+        $amount = $this->payableAmount();
+
+        $this->fetchData['wallet'] = [
+            'visible' => $visible,
+            'balance' => $balance,
+            'amount' => $amount,
+            'sufficient' => $visible && $amount > 0 && $balance >= $amount,
+            'shortage' => max(0, $amount - $balance),
+            'balance_after' => max(0, $balance - $amount),
+        ];
+    }
+
     private function shouldGoToPaymentDirectly(): bool
     {
         $isPending = $this->fetchData['app']->status == AppointmentUserStatusEnum::STATUS_WAIT_PAYMENT;
         return $isPending &&
+            ! $this->walletPaymentIsAvailableForCurrentUser() &&
             setting(SettingKeyEnum::GO_TO_PAYMENT_DIRECTLY)
             && $this->fetchData['stauts']['payment'];
     }
@@ -460,6 +626,8 @@ class AppointmentDetail extends Component
             $this->userCanCancell();
             $this->hasDescripion();
             $this->appStatus();
+            $this->prepareWalletPayment();
+            $this->prepareVoipGuide();
             if ($this->shouldGoToPaymentDirectly()) {
                 return $this->GotoPayment();
             }
@@ -490,5 +658,52 @@ class AppointmentDetail extends Component
     public function render()
     {
         return view('front::livewire.set-appointment.appointment-detail');
+    }
+
+    private function prepareVoipGuide(): void
+    {
+        $appointment = $this->fetchData['app'];
+        if ($appointment->kind !== AppointmentUserKindEnum::VOIP
+            || $appointment->status !== AppointmentUserStatusEnum::STATUS_SUCCESSFUL
+            || ! $appointment->date_visit) {
+            return;
+        }
+
+        $start = $appointment->date_visit->copy();
+        $end = $start->copy();
+        if (filled($appointment->end_time)) {
+            $end->setTimeFromTimeString($appointment->end_time);
+            if ($end->lte($start)) {
+                $end->addDay();
+            }
+        } else {
+            $end->addMinutes(30);
+        }
+
+        try {
+            $callCenterNumber = ConsultationSetting::current()->call_center_number;
+        } catch (\Throwable) {
+            $callCenterNumber = null;
+        }
+        try {
+            $alternatePhones = $appointment->alternatePhones()->pluck('phone')->all();
+        } catch (\Throwable) {
+            $alternatePhones = [];
+        }
+        $allowedCallerNumbers = array_values(array_unique(array_filter(array_merge(
+            [$appointment->user?->mobile],
+            $alternatePhones,
+        ))));
+
+        $this->fetchData['voipGuide'] = [
+            'start_timestamp' => $start->timestamp,
+            'end_timestamp' => $end->timestamp,
+            'call_center_number' => filled($callCenterNumber) ? $callCenterNumber : null,
+            'allowed_caller_numbers' => $allowedCallerNumbers,
+            'new_appointment_url' => route('front.doctor.profile', [
+                'doctor_id' => $appointment->doctor_id,
+                'doctor_name' => str_replace(' ', '_', $appointment->doctor?->full_name ?: 'doctor'),
+            ]),
+        ];
     }
 }

@@ -60,6 +60,9 @@ class SendConsultationSms implements ShouldQueue
             return;
         }
         $delivery->refresh()->load(['appointment', 'reminderRule']);
+        if (in_array($delivery->status, ['sent', 'skipped', 'failed'], true)) {
+            return;
+        }
         if (! $this->reminderIsReady($delivery, $scheduler)) {
             return;
         }
@@ -69,7 +72,6 @@ class SendConsultationSms implements ShouldQueue
                 $delivery->template,
                 $delivery->recipient,
                 $delivery->payload['params'] ?? [],
-                $delivery->payload['message_text'] ?? null,
             ));
             $delivery->update(['status' => 'sent', 'sent_at' => now(), 'provider_response' => 'درخواست به کانال پیامک تحویل شد.', 'error_message' => null]);
             if ($delivery->recipient_type === ConsultationSmsReminderRule::RECIPIENT_PRACTITIONER
@@ -77,8 +79,8 @@ class SendConsultationSms implements ShouldQueue
                 try {
                     $delivery->appointment->doctor->notify(new UserMessageNotification(
                         'یادآوری نوبت مشاوره',
-                        $delivery->payload['message_text'] ?? 'زمان نوبت تلفنی شما نزدیک است.',
-                        $delivery->payload['message_text'] ?? 'زمان نوبت تلفنی شما نزدیک است.',
+                        'زمان نوبت تلفنی شما نزدیک است.',
+                        'زمان نوبت تلفنی شما نزدیک است.',
                         ['type' => 'voip_appointment_reminder', 'appointment_id' => $delivery->appointment_id],
                         '/appointments/'.$delivery->appointment_id,
                     ));
@@ -131,6 +133,14 @@ class SendConsultationSms implements ShouldQueue
         }
         if ($delivery->scheduled_at->isFuture()) {
             $delivery->update(['status' => 'pending', 'error_message' => null]);
+
+            return false;
+        }
+        if ($scheduler->reminderWindowExpired($delivery->scheduled_at)) {
+            $delivery->update([
+                'status' => 'skipped',
+                'error_message' => ConsultationReminderScheduler::EXPIRED_WINDOW_MESSAGE,
+            ]);
 
             return false;
         }

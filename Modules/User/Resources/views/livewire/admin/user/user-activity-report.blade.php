@@ -103,7 +103,7 @@
                         <td><strong><bdi>{{ $appointment->date_visit ? verta($appointment->date_visit)->format('Y/m/d H:i') : '—' }}</bdi></strong><small>{{ $appointment->start_time ? substr($appointment->start_time, 0, 5) : '—' }} تا {{ $appointment->end_time ? substr($appointment->end_time, 0, 5) : '—' }}</small></td>
                         <td><span class="report-pill">{{ $appointment->kind?->getName() ?? '—' }}</span><small>{{ $appointment->service?->title ?: $appointment->place?->title }}</small></td>
                         <td><span class="badge {{ $appointment->status?->getBadgeColor() }}">{{ $appointment->status?->getName() ?? '—' }}</span>@if($appointment->hasFinalizedPatientNoShow())<small class="text-danger d-block">عدم حضور بیمار؛ تسویه کامل بدون بازگشت وجه</small>@endif@if($appointment->trashed())<small class="text-danger">حذف‌شده</small>@endif</td>
-                        <td><strong>{{ number_format($price) }}</strong><small>تومان</small></td>
+                        <td><strong>{{ number_format($price) }}</strong><small>تومان</small>@if($appointment->transaction)<small>روش پرداخت: {{ $appointment->transaction->paid_by?->getName() ?: '—' }}</small>@endif</td>
                         <td><a class="btn btn-sm btn-outline-primary report-appointment-action" href="{{ $appointmentUrl }}"><i class="fa fa-folder-open me-1"></i> جزئیات و پرونده</a></td>
                     </tr>
                 @endforeach

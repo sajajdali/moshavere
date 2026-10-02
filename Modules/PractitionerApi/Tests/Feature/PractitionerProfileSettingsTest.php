@@ -67,6 +67,7 @@ class PractitionerProfileSettingsTest extends TestCase
             'duration_minutes' => 20,
             'timezone' => 'Asia/Tehran',
             'voip_host' => 'https://voip.example.test:2214',
+            'softphone_server_address' => 'https://softphone.example.test:7443',
             'voip_port' => 5061,
             'voip_transport' => 'tls',
             'voip_call_token' => 'test-call-token',
@@ -107,8 +108,8 @@ class PractitionerProfileSettingsTest extends TestCase
             ->assertJsonPath('data.availability', 'offline')
             ->assertJsonPath('data.booking_enabled', true)
             ->assertJsonPath('data.softphone.configured', true)
-            ->assertJsonPath('data.softphone.server_address', 'https://voip.example.test:2214')
-            ->assertJsonPath('data.softphone.server_host', 'voip.example.test')
+            ->assertJsonPath('data.softphone.server_address', 'https://softphone.example.test:7443')
+            ->assertJsonPath('data.softphone.server_host', 'softphone.example.test')
             ->assertJsonPath('data.softphone.server_port', 5061)
             ->assertJsonPath('data.softphone.transport', 'tls')
             ->assertJsonPath('data.softphone.extension', '102')
@@ -135,7 +136,7 @@ class PractitionerProfileSettingsTest extends TestCase
 
     public function test_softphone_reports_missing_configuration_and_never_uses_practitioner_host(): void
     {
-        ConsultationSetting::query()->whereKey(1)->update(['voip_host' => null]);
+        ConsultationSetting::query()->whereKey(1)->update(['softphone_server_address' => null]);
         $this->practitioner->update(['sip_username' => null, 'sip_secret' => null]);
 
         $this->getJson('/api/practitioner/v1/me')
@@ -300,6 +301,7 @@ class PractitionerProfileSettingsTest extends TestCase
             ->assertJsonPath('data.practitioner.id', $this->practitioner->id)
             ->assertJsonPath('data.booking.enabled', true)
             ->assertJsonPath('data.voip.configured', true)
+            ->assertJsonPath('data.voip.server_host', 'softphone.example.test')
             ->assertJsonPath('data.next_appointment.file_no', 'DASH-1001')
             ->assertJsonPath('data.next_appointment.countdown.starts_in_seconds', 3600)
             ->assertJsonPath('data.next_appointment.complaint_summary', 'پیگیری درمان')
@@ -401,6 +403,8 @@ class PractitionerProfileSettingsTest extends TestCase
 
         $this->getJson('/api/practitioner/v1/appointments/'.$appointment)
             ->assertOk()
+            ->assertJsonPath('data.status', 'in_progress')
+            ->assertJsonPath('data.case_state', 'OPEN')
             ->assertJsonPath('data.actions.no_show.allowed', false)
             ->assertJsonPath('data.actions.no_show.reason_code', 'answered_call_in_window')
             ->assertJsonPath('data.call_stats.answered', 1)
@@ -445,17 +449,33 @@ class PractitionerProfileSettingsTest extends TestCase
         $this->putJson('/api/practitioner/v1/calls/'.$otherCall.'/note', ['note' => 'غیرمجاز'])->assertNotFound();
     }
 
+    public function test_active_call_falls_back_to_the_appointment_in_the_current_time_window(): void
+    {
+        Carbon::setTestNow(Carbon::parse('2026-09-13 11:10:00', 'Asia/Tehran'));
+        $appointment = $this->createAppointment('09125550113', '2026-09-13 11:00:00', 'ACTIVE-WINDOW');
+
+        $this->getJson('/api/practitioner/v1/calls/active')->assertOk()
+            ->assertJsonPath('data.id', 0)
+            ->assertJsonPath('data.appointment_id', $appointment)
+            ->assertJsonPath('data.has_call', false)
+            ->assertJsonPath('data.appointment.id', $appointment)
+            ->assertJsonPath('data.appointment.file_no', 'ACTIVE-WINDOW');
+
+        Carbon::setTestNow(Carbon::parse('2026-09-13 11:31:00', 'Asia/Tehran'));
+        $this->getJson('/api/practitioner/v1/calls/active')->assertOk()->assertJsonPath('data', null);
+    }
+
     public function test_voip_configuration_can_update_only_practitioner_credentials(): void
     {
         $this->getJson('/api/practitioner/v1/voip/config')
-            ->assertOk()->assertJsonPath('data.server_host', 'voip.example.test')
+            ->assertOk()->assertJsonPath('data.server_host', 'softphone.example.test')
             ->assertJsonPath('data.password', 'private-sip-password');
 
         $this->putJson('/api/practitioner/v1/voip/config', [
             'extension' => '205', 'username' => 'advisor205', 'password' => 'new-secret',
             'server_host' => 'attacker.example.test',
         ])->assertOk()->assertJsonPath('data.extension', '205')
-            ->assertJsonPath('data.server_host', 'voip.example.test')->assertJsonPath('data.password', 'new-secret');
+            ->assertJsonPath('data.server_host', 'softphone.example.test')->assertJsonPath('data.password', 'new-secret');
 
         $this->putJson('/api/practitioner/v1/voip/config', ['extension' => '205', 'username' => 'advisor-renamed'])
             ->assertOk()->assertJsonPath('data.password', 'new-secret');
@@ -510,6 +530,9 @@ class PractitionerProfileSettingsTest extends TestCase
             ->assertJsonCount(1, 'data.reports')->assertJsonCount(8, 'data.outcomes');
 
         DB::table('appointment_consultation_cases')->where('appointment_id', $appointment)->update(['state' => 'COMPLETED']);
+        $this->getJson('/api/practitioner/v1/appointments/'.$appointment)->assertOk()
+            ->assertJsonPath('data.status', 'completed')
+            ->assertJsonPath('data.case_state', 'COMPLETED');
         $this->postJson('/api/practitioner/v1/appointments/'.$appointment.'/reports', $payload)
             ->assertUnprocessable()->assertJsonValidationErrors('case');
         $this->postJson('/api/practitioner/v1/appointments/'.$appointment.'/reports', [])->assertUnprocessable()
@@ -704,6 +727,33 @@ class PractitionerProfileSettingsTest extends TestCase
         $this->postJson($url, ['settlement_confirmed' => true, 'approved_unused_minutes' => 0])->assertNotFound();
     }
 
+    public function test_settlement_is_allowed_before_scheduled_end_after_visit_is_completed(): void
+    {
+        Carbon::setTestNow(Carbon::parse('2026-09-14 10:15:00', 'Asia/Tehran'));
+        $appointment = $this->createAppointment('09125550126', '2026-09-14 10:00:00', 'COMPLETED-EARLY-SETTLEMENT');
+        $patientId = (int) DB::table('appointment_users')->where('id', $appointment)->value('user_id');
+
+        DB::table('appointment_consultation_cases')->insert([
+            'appointment_id' => $appointment, 'state' => 'COMPLETED',
+            'completed_at' => now(), 'completed_by' => $this->practitioner->user_id,
+            'created_at' => now(), 'updated_at' => now(),
+        ]);
+        DB::table('appointment_billing_records')->insert([
+            'appointment_id' => $appointment, 'patient_id' => $patientId,
+            'practitioner_id' => $this->practitioner->user_id, 'consultation_type' => 'voip',
+            'hourly_rate_snapshot' => 800000, 'payout_hourly_rate_snapshot' => 600000,
+            'reserved_minutes' => 30, 'total_paid_amount' => 1000000, 'refund_status' => 'pending',
+            'created_at' => now(), 'updated_at' => now(),
+        ]);
+
+        $url = '/api/practitioner/v1/appointments/'.$appointment.'/settlement';
+        $this->getJson('/api/practitioner/v1/appointments/'.$appointment)
+            ->assertOk()->assertJsonPath('data.actions.settlement.allowed', true);
+        $this->getJson($url)->assertOk()->assertJsonPath('data.can_confirm', true);
+        $this->postJson($url, ['settlement_confirmed' => true, 'approved_unused_minutes' => 30])
+            ->assertOk()->assertJsonPath('data.settlement.finalized', true);
+    }
+
     public function test_daily_report_returns_today_specific_date_and_complete_seven_day_series(): void
     {
         Carbon::setTestNow(Carbon::parse('2026-09-14 18:00:00', 'Asia/Tehran'));
@@ -852,7 +902,8 @@ class PractitionerProfileSettingsTest extends TestCase
             $table->unsignedSmallInteger('advance_hours')->default(2); $table->unsignedSmallInteger('booking_horizon_days')->default(30);
             $table->unsignedSmallInteger('cancellation_hours')->default(12); $table->unsignedSmallInteger('capacity_per_slot')->default(1);
             $table->unsignedBigInteger('default_fee')->default(0); $table->string('timezone')->default('Asia/Tehran');
-            $table->string('voip_host')->nullable(); $table->unsignedSmallInteger('voip_port')->default(5061);
+            $table->string('voip_host')->nullable(); $table->string('softphone_server_address')->nullable();
+            $table->unsignedSmallInteger('voip_port')->default(5061);
             $table->string('voip_transport')->default('tls');
             $table->text('voip_call_token')->nullable();
             $table->unsignedSmallInteger('ring_timeout_seconds')->default(30); $table->unsignedTinyInteger('max_attempts')->default(2);

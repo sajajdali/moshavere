@@ -40,6 +40,9 @@ class ConsultationController extends Controller
     public function saveSettings(Request $request, AppointmentBillingService $billingService)
     {
         $settings = ConsultationSetting::current();
+        $request->merge([
+            'call_center_number' => $this->normalizePhoneNumber($request->input('call_center_number')),
+        ]);
         $data = $request->validate([
             'booking_enabled' => 'required|boolean', 'app_enabled' => 'required|boolean',
             'test_login_enabled' => 'required|boolean',
@@ -47,6 +50,7 @@ class ConsultationController extends Controller
             'connection_method' => ['required', Rule::in(['operator', 'callback', 'app'])],
             'voip_driver' => ['required', Rule::in(['unconfigured', 'asterisk', 'issabel', 'freepbx', 'other'])],
             'voip_host' => ['nullable', 'url:http,https', 'max:255'],
+            'softphone_server_address' => ['nullable', 'string', 'max:255', 'regex:/^\S+$/'],
             'voip_port' => 'required|integer|min:1|max:65535',
             'voip_transport' => ['required', Rule::in(['tls', 'tcp', 'udp'])],
             'voip_call_token' => [
@@ -57,7 +61,11 @@ class ConsultationController extends Controller
                 'string',
                 'max:1024',
             ],
+            'offline_alert_enabled' => 'required|boolean',
+            'offline_alert_api_url' => ['nullable', Rule::requiredIf(fn () => $request->boolean('offline_alert_enabled')), 'url:http,https', 'max:255'],
+            'offline_alert_route' => ['nullable', Rule::requiredIf(fn () => $request->boolean('offline_alert_enabled')), 'string', 'max:255', 'regex:/^[A-Za-z0-9._\-\/]+$/'],
             'clear_voip_call_token' => 'sometimes|boolean',
+            'call_center_number' => ['nullable', 'regex:/^\+?[0-9]{3,20}$/'],
             'outbound_caller_id' => ['nullable', 'regex:/^\+?[0-9]{3,20}$/'],
             'queue_number' => ['nullable', 'regex:/^[0-9]{1,20}$/'],
             'ring_timeout_seconds' => 'required|integer|min:10|max:180',
@@ -72,6 +80,10 @@ class ConsultationController extends Controller
             'voip_call_token.required' => 'برای آدرس سرور VoIP، توکن تماس اتوماتیک الزامی است.',
         ], [
             'voip_host' => 'آدرس سرور ویپ',
+            'offline_alert_api_url' => 'آدرس API تماس هشدار با مشاور',
+            'offline_alert_route' => 'نام Route پیام صوتی آنلاین‌شدن پزشک',
+            'softphone_server_address' => 'آدرس سرور Softphone',
+            'call_center_number' => 'شماره مرکز تماس',
             'consent_required' => 'رضایت برای ضبط',
         ]);
         if ($request->boolean('clear_voip_call_token')) {
@@ -90,4 +102,15 @@ class ConsultationController extends Controller
 
         return redirect()->route('admin.consultation.settings')->with('success', 'تنظیمات مشاوره آنلاین ذخیره شد.');
     }
+
+    private function normalizePhoneNumber(mixed $value): ?string
+    {
+        if (! is_string($value) || trim($value) === '') return null;
+
+        return strtr(preg_replace('/[\s\-()]+/', '', trim($value)), [
+            '۰'=>'0', '۱'=>'1', '۲'=>'2', '۳'=>'3', '۴'=>'4',
+            '۵'=>'5', '۶'=>'6', '۷'=>'7', '۸'=>'8', '۹'=>'9',
+        ]);
+    }
+
 }

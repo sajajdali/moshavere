@@ -137,7 +137,7 @@
     </div>
     <!-- page -->
 
-    @if (!$voipOnly && !settingVfc($settingValues, \Modules\Setting\Enum\SettingKeyEnum::DISABLE_FOOTER_DISPLAY))
+    @if (!request()->routeIs('front.setAppointment.detail') && !$voipOnly && !settingVfc($settingValues, \Modules\Setting\Enum\SettingKeyEnum::DISABLE_FOOTER_DISPLAY))
         @include('front::layouts.components.footer', ['settingValues' => $settingValues])
     @endif
     @include('front::layouts.components.scripts')

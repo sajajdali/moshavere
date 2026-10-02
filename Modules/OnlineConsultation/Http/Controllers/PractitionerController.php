@@ -9,6 +9,7 @@ use Illuminate\Validation\ValidationException;
 use Modules\OnlineConsultation\Models\ConsultationPractitioner;
 use Modules\OnlineConsultation\Models\AppointmentBillingRecord;
 use Modules\OnlineConsultation\Services\AppointmentBillingService;
+use Modules\OnlineConsultation\Services\PractitionerExtensionStatusService;
 use Modules\User\Entities\User;
 
 class PractitionerController extends Controller
@@ -43,6 +44,11 @@ class PractitionerController extends Controller
     public function edit(int $practitioner)
     {
         return $this->form(ConsultationPractitioner::findOrFail($practitioner));
+    }
+
+    public function extensionStatus(int $practitioner, PractitionerExtensionStatusService $statusService)
+    {
+        return response()->json($statusService->check(ConsultationPractitioner::findOrFail($practitioner)));
     }
 
     private function form(ConsultationPractitioner $person)

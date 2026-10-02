@@ -15,10 +15,15 @@ class ConsultationReminderController extends Controller
 {
     public function index(Request $request)
     {
+        if ($request->filled('recipient')) {
+            $request->merge(['recipient' => preg_replace('/\D+/', '', convert2english((string) $request->input('recipient')))]);
+        }
         $filters = $request->validate([
             'status' => ['nullable', Rule::in(['pending', 'queued', 'retrying', 'sent', 'failed', 'skipped'])],
             'recipient_type' => ['nullable', Rule::in(['patient', 'practitioner'])],
             'appointment' => ['nullable', 'string', 'max:100'],
+            'recipient' => ['nullable', 'string', 'max:20', 'regex:/^[0-9]+$/'],
+            'per_page' => ['nullable', 'integer', Rule::in([10, 20, 50])],
             'edit' => ['nullable', 'integer', 'min:1'],
         ]);
         $editingRule = isset($filters['edit']) ? ConsultationSmsReminderRule::findOrFail($filters['edit']) : null;
@@ -34,12 +39,13 @@ class ConsultationReminderController extends Controller
             })
             ->when($filters['status'] ?? null, fn ($query, $status) => $query->where('status', $status))
             ->when($filters['recipient_type'] ?? null, fn ($query, $recipient) => $query->where('recipient_type', $recipient))
+            ->when($filters['recipient'] ?? null, fn ($query, $recipient) => $query->where('recipient', 'like', '%'.$recipient.'%'))
             ->when($filters['appointment'] ?? null, function ($query, $appointment) {
                 $query->whereHas('appointment', fn ($appointmentQuery) => $appointmentQuery
                     ->where('tracking_code', 'like', '%'.$appointment.'%')
                     ->orWhere('id', ctype_digit($appointment) ? (int) $appointment : 0));
             })
-            ->latest('scheduled_at')->paginate(30)->withQueryString();
+            ->latest('scheduled_at')->paginate((int) ($filters['per_page'] ?? 10))->withQueryString();
 
         return view('onlineconsultation::sms-reminders', compact('rules', 'deliveries', 'editingRule', 'filters'));
     }
@@ -77,7 +83,6 @@ class ConsultationReminderController extends Controller
             'offset_value' => ['required', 'integer', 'min:1', 'max:10080'],
             'offset_unit' => ['required', Rule::in(['minute', 'hour'])],
             'template' => ['required', 'string', 'max:255'],
-            'message_text' => ['nullable', 'string', 'max:2000'],
             'active' => ['nullable', 'boolean'],
         ], [], [
             'title' => 'عنوان', 'recipient_type' => 'گیرنده', 'offset_value' => 'زمان ارسال',
@@ -93,7 +98,7 @@ class ConsultationReminderController extends Controller
             'recipient_type' => $data['recipient_type'],
             'minutes_before' => $minutes,
             'template' => trim($data['template']),
-            'message_text' => filled($data['message_text'] ?? null) ? trim($data['message_text']) : null,
+            'message_text' => null,
             'active' => $request->boolean('active'),
         ];
     }

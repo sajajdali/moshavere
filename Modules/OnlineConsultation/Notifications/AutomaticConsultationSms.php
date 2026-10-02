@@ -11,7 +11,6 @@ class AutomaticConsultationSms extends Notification
         private readonly string $template,
         private readonly string $recipient,
         private readonly array $params,
-        private readonly ?string $message = null,
     ) {}
 
     public function via(): array
@@ -21,6 +20,6 @@ class AutomaticConsultationSms extends Notification
 
     public function toArray(): array
     {
-        return ['template' => $this->template, 'receptor' => $this->recipient, 'params' => $this->params, 'message' => $this->message];
+        return ['template' => $this->template, 'receptor' => $this->recipient, 'params' => $this->params];
     }
 }

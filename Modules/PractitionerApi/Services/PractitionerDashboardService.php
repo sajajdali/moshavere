@@ -130,6 +130,7 @@ class PractitionerDashboardService
             'phase' => $phase,
             'status' => (string) $appointment->dashboard['status'],
             'status_reason' => $appointment->dashboard['reason'],
+            'case_state' => (string) ($appointment->consultationCase?->state ?: 'OPEN'),
             'countdown' => [
                 'starts_in_seconds' => $startsAt ? $serverTime->diffInSeconds($startsAt, false) : null,
                 'ends_in_seconds' => $endsAt ? $serverTime->diffInSeconds($endsAt, false) : null,

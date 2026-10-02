@@ -12,6 +12,7 @@ use Modules\OnlineConsultation\Http\Controllers\ConsultationCaseController;
 use Modules\OnlineConsultation\Http\Controllers\ConsultantFinancialReportController;
 use Modules\OnlineConsultation\Http\Controllers\ConsultationCallbackController;
 use Modules\OnlineConsultation\Http\Controllers\AppointmentAlternatePhoneController;
+use Modules\OnlineConsultation\Http\Controllers\PractitionerOfflineAlertController;
 
 Route::get('/', [ConsultationController::class, 'dashboard'])->name('dashboard');
 Route::get('/settings', [ConsultationController::class, 'settings'])->name('settings');
@@ -20,6 +21,7 @@ Route::get('/practitioners', [PractitionerController::class, 'index'])->name('pr
 Route::get('/practitioners/create', [PractitionerController::class, 'create'])->name('practitioners.create');
 Route::post('/practitioners', [PractitionerController::class, 'store'])->name('practitioners.store');
 Route::get('/practitioners/{practitioner}/edit', [PractitionerController::class, 'edit'])->whereNumber('practitioner')->name('practitioners.edit');
+Route::get('/practitioners/{practitioner}/extension-status', [PractitionerController::class, 'extensionStatus'])->whereNumber('practitioner')->name('practitioners.extension-status');
 Route::put('/practitioners/{practitioner}', [PractitionerController::class, 'update'])->whereNumber('practitioner')->name('practitioners.update');
 Route::get('/voip-logs', [VoipLogController::class, 'index'])->name('voip.logs');
 Route::get('/call-reports', [CallReportController::class, 'index'])->name('call-reports.index');
@@ -28,12 +30,14 @@ Route::get('/consultants-dashboard/export', [ConsultantDashboardController::clas
 Route::get('/consultants-dashboard/{practitioner}', [ConsultantDashboardController::class, 'show'])->whereNumber('practitioner')->name('consultants-dashboard.show');
 Route::get('/financial-report', [ConsultantFinancialReportController::class, 'index'])->name('financial-report.index');
 Route::get('/sms-deliveries', [ConsultationSmsController::class, 'index'])->name('sms-deliveries.index');
+Route::get('/practitioner-offline-alerts', [PractitionerOfflineAlertController::class, 'index'])->name('practitioner-offline-alerts.index');
 Route::get('/sms-reminders', [ConsultationReminderController::class, 'index'])->name('sms-reminders.index');
 Route::post('/sms-reminders', [ConsultationReminderController::class, 'store'])->name('sms-reminders.store');
 Route::put('/sms-reminders/{rule}', [ConsultationReminderController::class, 'update'])->whereNumber('rule')->name('sms-reminders.update');
 Route::delete('/sms-reminders/{rule}', [ConsultationReminderController::class, 'destroy'])->whereNumber('rule')->name('sms-reminders.destroy');
 Route::get('/call-reports/appointments/{appointment}', [CallReportController::class, 'appointment'])->whereNumber('appointment')->withTrashed()->name('call-reports.appointment');
 Route::put('/call-reports/appointments/{appointment}/time', [CallReportController::class, 'updateAppointmentTime'])->whereNumber('appointment')->name('call-reports.appointment-time.update');
+Route::delete('/call-reports/appointments/{appointment}/sms-deliveries/{smsDelivery}', [CallReportController::class, 'cancelSmsDelivery'])->whereNumber(['appointment', 'smsDelivery'])->withTrashed()->name('call-reports.sms-deliveries.cancel');
 Route::post('/call-reports/appointments/{appointment}/callback', [ConsultationCallbackController::class, 'store'])->whereNumber('appointment')->name('callback.store');
 Route::post('/call-reports/appointments/{appointment}/reports', [ConsultationCaseController::class, 'storeReport'])->whereNumber('appointment')->name('case.reports.store');
 Route::post('/call-reports/appointments/{appointment}/note', [ConsultationCaseController::class, 'storeNote'])->whereNumber('appointment')->name('case.note.store');

@@ -68,6 +68,9 @@ class ConsultationTest extends TestCase
             'Modules/OnlineConsultation/database/migrations/tenant/2026_09_12_000016_create_appointment_alternate_phones_table.php',
             'Modules/OnlineConsultation/database/migrations/tenant/2026_09_13_000019_add_tomorrow_schedule_sms_to_consultation_practitioners.php',
             'Modules/OnlineConsultation/database/migrations/tenant/2026_09_13_130000_add_test_login_to_consultation_settings_table.php',
+            'Modules/OnlineConsultation/database/migrations/tenant/2026_09_17_000021_add_call_center_number_to_consultation_settings.php',
+            'Modules/OnlineConsultation/database/migrations/tenant/2026_09_17_000022_add_landline_numbers_to_consultation_settings.php',
+            'Modules/OnlineConsultation/database/migrations/tenant/2026_09_17_000023_create_practitioner_offline_alerts.php',
         ] as $path) {
             (require base_path($path))->up();
         }
@@ -93,6 +96,7 @@ class ConsultationTest extends TestCase
 
     protected function tearDown(): void
     {
+        \Illuminate\Support\Carbon::setTestNow();
         tenancy()->initialized = false;
         tenancy()->tenant = null;
         parent::tearDown();
@@ -477,9 +481,11 @@ class ConsultationTest extends TestCase
         $data = array_replace($data, [
             'booking_enabled' => '0', 'app_enabled' => '1', 'allow_transfer' => '0',
             'recording_requested' => '0', 'consent_required' => '1', 'voip_secret' => 'secret-value',
+            'call_center_number' => '02112345678',
         ]);
         $this->put('/admin/online-consultation/settings', $data)->assertSessionHasNoErrors()->assertRedirect();
         $this->assertSame('secret-value', ConsultationSetting::current()->voip_secret);
+        $this->assertSame('02112345678', ConsultationSetting::current()->call_center_number);
         $data['voip_secret'] = '';
         $this->put('/admin/online-consultation/settings', $data)->assertSessionHasNoErrors();
         $this->assertSame('secret-value', ConsultationSetting::current()->voip_secret);
@@ -960,6 +966,40 @@ class ConsultationTest extends TestCase
             ->assertOk()->assertSee('شماره‌های ثابت بیمار')->assertSee('02112345678');
     }
 
+    public function test_fixed_phone_conflict_can_be_confirmed_and_transferred_to_current_patient(): void
+    {
+        $first = $this->noShowAppointment();
+        $secondPatient = User::create(['mobile' => '09121113333', 'password' => 'test-password']);
+        $second = AppointmentUser::withoutEvents(fn () => AppointmentUser::create([
+            'user_id' => $secondPatient->id, 'doctor_id' => $this->manager->id,
+            'status' => 1, 'type' => 1, 'kind' => 3, 'date_visit' => now(),
+            'start_time' => '13:00:00', 'end_time' => '13:30:00', 'tracking_code' => 'ALT-PHONE-TRANSFER',
+        ]));
+
+        $firstUrl = '/admin/online-consultation/call-reports/appointments/'.$first->id.'/alternate-phones';
+        $secondUrl = '/admin/online-consultation/call-reports/appointments/'.$second->id.'/alternate-phones';
+        $this->postJson($firstUrl, ['alternate_phone' => '02187654321'])->assertCreated();
+
+        $this->postJson($secondUrl, ['alternate_phone' => '02187654321'])
+            ->assertStatus(409)
+            ->assertJsonPath('code', 'alternate_phone_conflict')
+            ->assertJsonPath('phone', '02187654321');
+        $this->assertDatabaseHas('appointment_alternate_phones', [
+            'phone' => '02187654321', 'patient_id' => $first->user_id,
+        ]);
+
+        $this->postJson($secondUrl, [
+            'alternate_phone' => '02187654321', 'transfer_confirmed' => true,
+        ])->assertCreated()->assertJsonPath('phone.number', '02187654321');
+        $this->assertDatabaseMissing('appointment_alternate_phones', [
+            'phone' => '02187654321', 'patient_id' => $first->user_id,
+        ]);
+        $this->assertDatabaseHas('appointment_alternate_phones', [
+            'phone' => '02187654321', 'patient_id' => $second->user_id, 'appointment_id' => $second->id,
+        ]);
+        $this->assertSame(1, \Modules\OnlineConsultation\Models\AppointmentAlternatePhone::where('phone', '02187654321')->count());
+    }
+
     public function test_practitioner_can_report_complete_and_reopen_a_consultation_case(): void
     {
         $patient = User::create(['mobile' => '09124445566', 'password' => 'test-password']);
@@ -1078,9 +1118,23 @@ class ConsultationTest extends TestCase
         $this->assertCount(1, $deliveries->where('recipient_type', 'practitioner'));
         $this->assertSame($this->manager->mobile, $deliveries->firstWhere('recipient_type', 'practitioner')->recipient);
         $this->assertSame($visitAt->copy()->subMinutes(20)->toDateTimeString(), $deliveries->firstWhere('recipient_type', 'practitioner')->scheduled_at->toDateTimeString());
+        $this->assertArrayNotHasKey('message_text', $deliveries->first()->payload);
+        $this->assertCount(9, $deliveries->first()->payload['params']);
 
         $this->get('/admin/online-consultation/sms-reminders?appointment=VOIP-REMINDER-1')
-            ->assertOk()->assertSee('راهنمای پارامترهای قالب')->assertSee('VOIP-REMINDER-1')->assertSee('پزشک / مشاور');
+            ->assertOk()
+            ->assertSee('راهنمای پارامترهای قالب')
+            ->assertSee('VOIP-REMINDER-1')
+            ->assertSee('پزشک / مشاور')
+            ->assertDontSee('متن پیامک برای پنل‌های ارسال متنی');
+
+        $this->get('/admin/online-consultation/sms-reminders?recipient=0912-333-4455')
+            ->assertOk()
+            ->assertSee('VOIP-REMINDER-1')
+            ->assertSee('09123334455');
+        $this->get('/admin/online-consultation/sms-reminders?recipient=09999999999')
+            ->assertOk()
+            ->assertDontSee('VOIP-REMINDER-1');
     }
 
     public function test_due_voip_reminder_is_queued_and_cancelled_appointment_is_skipped(): void
@@ -1134,6 +1188,87 @@ class ConsultationTest extends TestCase
         $deletedDelivery = ConsultationSmsDelivery::where('appointment_id', $deletedAppointment->id)->where('reminder_rule_id', $rule->id)->firstOrFail();
         $deletedAppointment->delete();
         $this->assertSame('skipped', $deletedDelivery->fresh()->status);
+    }
+
+    public function test_reminders_are_only_sent_during_the_four_minute_delivery_window(): void
+    {
+        Queue::fake();
+        \Illuminate\Support\Carbon::setTestNow(now('Asia/Tehran')->startOfMinute());
+
+        $patient = User::create(['mobile' => '09125557777', 'password' => 'test-password']);
+        $scheduler = app(ConsultationReminderScheduler::class);
+        $makeAppointment = function (int $minutesUntil, string $trackingCode) use ($patient, $scheduler): AppointmentUser {
+            $visitAt = now()->addMinutes($minutesUntil);
+            $appointment = AppointmentUser::withoutEvents(fn () => AppointmentUser::create([
+                'user_id' => $patient->id,
+                'doctor_id' => $this->manager->id,
+                'status' => 1,
+                'type' => 1,
+                'kind' => 3,
+                'date_visit' => $visitAt,
+                'start_time' => $visitAt->format('H:i:s'),
+                'end_time' => $visitAt->copy()->addMinutes(30)->format('H:i:s'),
+                'tracking_code' => $trackingCode,
+            ]));
+            $scheduler->syncAppointment($appointment);
+
+            return $appointment;
+        };
+
+        $twoHourRule = ConsultationSmsReminderRule::create([
+            'title' => 'یادآوری دو ساعته',
+            'recipient_type' => 'patient',
+            'minutes_before' => 120,
+            'template' => 'patient-two-hours',
+            'active' => true,
+        ]);
+        $at120 = $makeAppointment(120, 'WINDOW-120');
+        $at117 = $makeAppointment(117, 'WINDOW-117');
+        $at116 = $makeAppointment(116, 'WINDOW-116');
+
+        $fifteenMinuteRule = ConsultationSmsReminderRule::create([
+            'title' => 'یادآوری پانزده دقیقه‌ای',
+            'recipient_type' => 'patient',
+            'minutes_before' => 15,
+            'template' => 'patient-fifteen-minutes',
+            'active' => true,
+        ]);
+        $at15 = $makeAppointment(15, 'WINDOW-15');
+        $at12 = $makeAppointment(12, 'WINDOW-12');
+        $at11 = $makeAppointment(11, 'WINDOW-11');
+
+        $scheduler->dispatchDue();
+
+        foreach ([$at120, $at117] as $appointment) {
+            $delivery = ConsultationSmsDelivery::where('appointment_id', $appointment->id)
+                ->where('reminder_rule_id', $twoHourRule->id)->firstOrFail();
+            $this->assertSame('queued', $delivery->status);
+            Queue::assertPushed(SendConsultationSms::class, fn ($job) => $job->deliveryId === $delivery->id);
+        }
+        $expiredTwoHour = ConsultationSmsDelivery::where('appointment_id', $at116->id)
+            ->where('reminder_rule_id', $twoHourRule->id)->firstOrFail();
+        $this->assertSame('skipped', $expiredTwoHour->status);
+        $this->assertSame(ConsultationReminderScheduler::EXPIRED_WINDOW_MESSAGE, $expiredTwoHour->error_message);
+
+        foreach ([$at15, $at12] as $appointment) {
+            $delivery = ConsultationSmsDelivery::where('appointment_id', $appointment->id)
+                ->where('reminder_rule_id', $fifteenMinuteRule->id)->firstOrFail();
+            $this->assertSame('queued', $delivery->status);
+            Queue::assertPushed(SendConsultationSms::class, fn ($job) => $job->deliveryId === $delivery->id);
+        }
+        $expiredFifteenMinute = ConsultationSmsDelivery::where('appointment_id', $at11->id)
+            ->where('reminder_rule_id', $fifteenMinuteRule->id)->firstOrFail();
+        $this->assertSame('skipped', $expiredFifteenMinute->status);
+        $this->assertSame(ConsultationReminderScheduler::EXPIRED_WINDOW_MESSAGE, $expiredFifteenMinute->error_message);
+
+        // A job that was queued on time must still be rejected if the worker starts it after the window closes.
+        \Illuminate\Support\Facades\Notification::fake();
+        \Illuminate\Support\Carbon::setTestNow(now()->addMinutes(4));
+        $queuedDelivery = ConsultationSmsDelivery::where('appointment_id', $at120->id)
+            ->where('reminder_rule_id', $twoHourRule->id)->firstOrFail();
+        (new SendConsultationSms($queuedDelivery->id, tenant()?->getTenantKey()))->handle($scheduler);
+        $this->assertSame('skipped', $queuedDelivery->fresh()->status);
+        $this->assertSame(ConsultationReminderScheduler::EXPIRED_WINDOW_MESSAGE, $queuedDelivery->fresh()->error_message);
     }
 
     public function test_early_calls_are_labeled_and_excluded_from_every_unanswered_metric(): void

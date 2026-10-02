@@ -107,7 +107,9 @@ class ConsultantDashboardService
             $status = 'completed';
             $reason = 'مشاور پرونده این مشاوره را به‌صورت قطعی تمام کرده است.';
         } elseif ($answered->isNotEmpty()) {
-            $status = $answered->sum('talk_duration_seconds') <= $shortCallThresholdSeconds ? 'review' : ($past ? 'completed' : 'in_progress');
+            // An answered call is evidence that the consultation is underway, not
+            // that its case was explicitly completed by the practitioner.
+            $status = $answered->sum('talk_duration_seconds') <= $shortCallThresholdSeconds ? 'review' : 'in_progress';
             $reason = $status === 'review' ? 'مجموع مکالمه از حد تماس کوتاه تنظیم‌شده بیشتر نشده است.' : null;
         } elseif ($past && $inboundInWindow->isNotEmpty() && $inboundInWindow->every(fn ($c) => $c->final_result !== 'ANSWERED')) {
             $status = 'practitioner_no_answer';
@@ -126,7 +128,9 @@ class ConsultantDashboardService
         }
 
         $billing = $appointment->billingRecord;
-        if ($billing?->refund_status === 'completed') {
+        if (! $past) {
+            $financial = 'awaiting_consultation';
+        } elseif ($billing?->refund_status === 'completed') {
             $financial = 'settled';
         } elseif ($billing && $billing->suggested_refund_amount > 0) {
             $financial = 'refundable';

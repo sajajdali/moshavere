@@ -23,10 +23,11 @@
         </div>
     @else
         <div class="oc-table-wrap" role="region" aria-label="فهرست پزشکان و کارشناسان" tabindex="0">
-            <table class="oc-table"><thead><tr><th scope="col">نام همکار</th><th scope="col">نوع / تخصص</th><th scope="col">داخلی</th><th scope="col">وضعیت</th><th scope="col">اپلیکیشن</th><th scope="col">مدیریت</th></tr></thead><tbody>
+            <table class="oc-table"><thead><tr><th scope="col">نام همکار</th><th scope="col">شماره موبایل</th><th scope="col">نوع / تخصص</th><th scope="col">داخلی</th><th scope="col">وضعیت</th><th scope="col">اپلیکیشن</th><th scope="col">مدیریت</th></tr></thead><tbody>
                 @foreach($people as $person)
                     <tr>
                         <td class="oc-person-name">{{ $person->display_name }}</td>
+                        <td class="oc-ltr">@if(filled($person->user?->mobile))<a href="tel:{{ $person->user->mobile }}"><bdi>{{ $person->user->mobile }}</bdi></a>@else<span class="oc-cell-sub">ثبت نشده</span>@endif</td>
                         <td>{{ $person->kind === 'doctor' ? 'پزشک' : 'کارشناس' }}<small class="oc-help">{{ $person->specialty ?: 'تخصص ثبت نشده' }}</small></td>
                         <td><bdi>{{ $person->extension ?: 'تعریف نشده' }}</bdi></td>
                         <td><span class="oc-badge {{ $person->active && $person->availability === 'ready' ? 'oc-badge-success' : ($person->active && $person->availability === 'busy' ? 'oc-badge-warning' : '') }}">{{ !$person->active ? 'غیرفعال' : (['offline' => 'آفلاین', 'ready' => 'آماده', 'busy' => 'مشغول'][$person->availability] ?? 'آفلاین') }}</span></td>

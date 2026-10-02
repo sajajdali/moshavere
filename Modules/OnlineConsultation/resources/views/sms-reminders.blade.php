@@ -49,13 +49,8 @@
                 <div class="oc-field">
                     <label class="oc-label" for="template">نام قالب پیامکی <span class="oc-required">*</span></label>
                     <input class="oc-input oc-ltr" id="template" name="template" maxlength="255" required value="{{ old('template', $editingRule?->template) }}" placeholder="نام یا کد الگوی ثبت‌شده در پنل پیامک">
+                    <small class="oc-help">نام یا کد همان الگویی را وارد کنید که در پنل پیامک ساخته‌اید؛ متن پیامک داخل پنل پیامک تعریف می‌شود.</small>
                     @error('template')<small class="oc-error">{{ $message }}</small>@enderror
-                </div>
-                <div class="oc-field oc-full">
-                    <label class="oc-label" for="message_text">متن پیامک برای پنل‌های ارسال متنی</label>
-                    <textarea class="oc-input" id="message_text" name="message_text" maxlength="2000" placeholder="برای پارس، فراز و استارپیام متن را با %param1% تا %param9% وارد کنید.">{{ old('message_text', $editingRule?->message_text) }}</textarea>
-                    <small class="oc-help">برای پنل‌های الگویی مثل SHSMS و IPPanel لازم نیست؛ نام قالب بالا استفاده می‌شود.</small>
-                    @error('message_text')<small class="oc-error">{{ $message }}</small>@enderror
                 </div>
                 <div class="oc-full">
                     <input type="hidden" name="active" value="0">
@@ -76,7 +71,7 @@
                             <span>۷ = لینک جزئیات نوبت</span><span>۸ = شماره پیگیری</span>
                             <span>۹ = آیدی نوبت</span>
                         </div>
-                        <small class="oc-help">در متن‌های مستقیم از %param1% تا %param9% و در پنل‌های الگویی از param1 تا param9 استفاده کنید.</small>
+                        <small class="oc-help">پارامترهای الگوی پنل پیامک را به‌ترتیب با نام‌های param1 تا param9 تعریف کنید.</small>
                     </div>
                 </div>
             </div>
@@ -116,17 +111,20 @@
             <h2 class="oc-panel-title"><i class="fa-solid fa-clock-rotate-left" aria-hidden="true"></i>ارسال‌های مرتبط با نوبت‌ها</h2>
             <form class="oc-inline" method="GET" action="{{ route('admin.consultation.sms-reminders.index') }}">
                 <input class="oc-input" style="width:180px" name="appointment" value="{{ $filters['appointment'] ?? '' }}" placeholder="آیدی یا شماره پیگیری">
+                <input class="oc-input oc-ltr" style="width:175px" name="recipient" value="{{ $filters['recipient'] ?? '' }}" placeholder="شماره موبایل گیرنده" inputmode="tel">
                 <select class="oc-input" style="width:145px" name="recipient_type"><option value="">همه گیرنده‌ها</option><option value="patient" @selected(($filters['recipient_type'] ?? '') === 'patient')>بیمار</option><option value="practitioner" @selected(($filters['recipient_type'] ?? '') === 'practitioner')>مشاور</option></select>
                 <select class="oc-input" style="width:145px" name="status"><option value="">همه وضعیت‌ها</option>@foreach($statusLabels as $value=>$label)<option value="{{ $value }}" @selected(($filters['status'] ?? '') === $value)>{{ $label }}</option>@endforeach</select>
+                <select class="oc-input" style="width:130px" name="per_page" aria-label="تعداد رکورد در هر صفحه"><option value="10" @selected((int)($filters['per_page'] ?? 10) === 10)>۱۰ رکورد</option><option value="20" @selected((int)($filters['per_page'] ?? 10) === 20)>۲۰ رکورد</option><option value="50" @selected((int)($filters['per_page'] ?? 10) === 50)>۵۰ رکورد</option></select>
                 <button class="oc-btn" type="submit">فیلتر</button>
-                @if(array_filter([$filters['appointment'] ?? null, $filters['recipient_type'] ?? null, $filters['status'] ?? null]))<a class="oc-btn" href="{{ route('admin.consultation.sms-reminders.index') }}#deliveries">پاک‌کردن</a>@endif
+                @if(array_filter([$filters['appointment'] ?? null, $filters['recipient'] ?? null, $filters['recipient_type'] ?? null, $filters['status'] ?? null]))<a class="oc-btn" href="{{ route('admin.consultation.sms-reminders.index') }}#deliveries">پاک‌کردن</a>@endif
             </form>
         </div>
         <div class="oc-table-wrap">
-            <table class="oc-table"><thead><tr><th>نوبت</th><th>بیمار / مشاور</th><th>یادآوری</th><th>گیرنده</th><th>زمان برنامه‌ریزی</th><th>زمان ارسال</th><th>وضعیت</th><th>نتیجه</th></tr></thead><tbody>
+            <table class="oc-table oc-clickable-table"><thead><tr><th>نوبت</th><th>بیمار / مشاور</th><th>یادآوری</th><th>گیرنده</th><th>زمان برنامه‌ریزی</th><th>زمان ارسال</th><th>وضعیت</th><th>نتیجه</th></tr></thead><tbody>
             @forelse($deliveries as $item)
-                <tr>
-                    <td><strong>#{{ $item->appointment?->tracking_code ?: $item->appointment_id }}</strong><small class="oc-cell-sub">آیدی: {{ $item->appointment_id }}</small></td>
+                @php($appointmentDetailsUrl = route('admin.consultation.call-reports.appointment', $item->appointment_id))
+                <tr data-href="{{ $appointmentDetailsUrl }}" tabindex="0" role="link" aria-label="مشاهده جزئیات نوبت {{ $item->appointment?->tracking_code ?: $item->appointment_id }}">
+                    <td><a class="oc-appointment-link" href="{{ $appointmentDetailsUrl }}"><strong>#{{ $item->appointment?->tracking_code ?: $item->appointment_id }}</strong></a><small class="oc-cell-sub">آیدی: {{ $item->appointment_id }}</small></td>
                     <td>{{ $item->appointment?->user?->fullName ?: '—' }}<small class="oc-cell-sub">مشاور: {{ $item->appointment?->doctor?->fullName ?: '—' }}</small></td>
                     <td>{{ $item->rule_title ?: $item->reminderRule?->title ?: $item->type }}<small class="oc-cell-sub oc-ltr">قالب: {{ $item->template }}</small></td>
                     <td><span class="oc-badge">{{ $item->recipient_type === 'practitioner' ? 'مشاور' : ($item->recipient_type === 'patient' ? 'بیمار' : 'نامشخص') }}</span><small class="oc-cell-sub oc-ltr">{{ $item->recipient }}</small></td>
@@ -140,7 +138,22 @@
             @endforelse
             </tbody></table>
         </div>
-        {{ $deliveries->links('onlineconsultation::components.pagination') }}
+        {{ $deliveries->links('onlineconsultation::components.pagination', ['always' => true]) }}
     </section>
 </div>
 @endsection
+@push('scripts')
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    document.querySelectorAll('#deliveries tr[data-href]').forEach(function (row) {
+        const openAppointment = function () { window.location.href = row.dataset.href; };
+        row.addEventListener('click', function (event) {
+            if (!event.target.closest('a, button, input, select, textarea')) openAppointment();
+        });
+        row.addEventListener('keydown', function (event) {
+            if (event.key === 'Enter') openAppointment();
+        });
+    });
+});
+</script>
+@endpush

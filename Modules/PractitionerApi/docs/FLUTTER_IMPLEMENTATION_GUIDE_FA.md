@@ -342,12 +342,17 @@ pagination را از `links` و `meta` بخوانید؛ صفحه را با حد�
 
 ```text
 id, file_no, starts_at, ends_at, duration_minutes,
-phase, status, status_reason, countdown,
+phase, status, status_reason, case_state, countdown,
 patient, section, complaint, calls, reports_count,
 settlement, actions
 ```
 
-`phase`: `upcoming|in_progress|past|unknown`. هر action معمولاً دارای `allowed`, `reason_code`, `reason` و داده تکمیلی است. نمایش و فعال‌بودن دکمه‌های auto-call، complete، no-show و settlement فقط باید از `actions` بیاید. زمان‌های grace را در Flutter hardcode نکنید؛ سرور تصمیم‌گیر نهایی است.
+`phase`: `upcoming|in_progress|past|unknown` فقط موقعیت زمانی نوبت است. `case_state` یکی از
+`OPEN|COMPLETED|PATIENT_NO_SHOW` و مرجع وضعیت قطعی پرونده است. مقدار `status=completed`
+فقط پس از عملیات صریح اتمام و `case_state=COMPLETED` برمی‌گردد؛ صرف برقراری
+تماس مشاوره را تمام‌شده نمی‌کند. هر action معمولاً دارای `allowed`, `reason_code`, `reason` و داده
+تکمیلی است. نمایش و فعال‌بودن دکمه‌های auto-call، complete، no-show و settlement فقط باید از
+`actions` بیاید. زمان‌های grace را در Flutter hardcode نکنید؛ سرور تصمیم‌گیر نهایی است.
 
 قبل از mutation حساس، جزئیات تازه دریافت کنید. در double tap دکمه را تا پایان درخواست disable کنید.
 

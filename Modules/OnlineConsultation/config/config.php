@@ -17,6 +17,7 @@ return [
             ['title' => 'گزارش جامع مالی کارشناسان', 'gate' => ['ONLINE_CONSULTATION_MANAGE'], 'policy_class' => null, 'icon' => 'fe fe-pie-chart', 'route' => 'admin.consultation.financial-report.index', 'has_badge' => false, 'has_child' => false, 'children' => null],
             ['title' => 'گزارش تماس‌ها', 'gate' => ['ONLINE_CONSULTATION_MANAGE'], 'policy_class' => null, 'icon' => 'fe fe-phone-call', 'route' => 'admin.consultation.call-reports.index', 'has_badge' => false, 'has_child' => false, 'children' => null],
             ['title' => 'یادآوری‌های پیامکی', 'gate' => ['ONLINE_CONSULTATION_MANAGE'], 'policy_class' => null, 'icon' => 'fe fe-message-square', 'route' => 'admin.consultation.sms-reminders.index', 'has_badge' => false, 'has_child' => false, 'children' => null],
+            ['title' => 'هشدار پزشکان آفلاین', 'gate' => ['SUPER_ADMIN'], 'policy_class' => null, 'icon' => 'fe fe-bell', 'route' => 'admin.consultation.practitioner-offline-alerts.index', 'has_badge' => false, 'has_child' => false, 'children' => null],
             ['title' => 'لاگ تماس‌های VoIP', 'gate' => ['ONLINE_CONSULTATION_MANAGE'], 'policy_class' => null, 'icon' => 'fe fe-list', 'route' => 'admin.consultation.voip.logs', 'has_badge' => false, 'has_child' => false, 'children' => null],
         ]],
 ];

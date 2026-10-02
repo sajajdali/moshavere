@@ -12,6 +12,8 @@ use Modules\OnlineConsultation\Services\ConsultationReminderScheduler;
 use Modules\Setting\Entities\Setting;
 use Modules\Setting\Enum\SettingKeyEnum;
 use Modules\OnlineConsultation\Support\ConsultationAccess;
+use Modules\OnlineConsultation\Services\PractitionerOfflineAlertService;
+use Illuminate\Support\Facades\Schema;
 
 class DispatchConsultationSms extends Command
 {
@@ -19,7 +21,7 @@ class DispatchConsultationSms extends Command
 
     protected $description = 'Create and dispatch due automatic consultation SMS messages';
 
-    public function handle(ConsultationReminderScheduler $reminders): int
+    public function handle(ConsultationReminderScheduler $reminders, PractitionerOfflineAlertService $offlineAlerts): int
     {
         if (! ConsultationAccess::enabled()) {
             return self::SUCCESS;
@@ -28,6 +30,9 @@ class DispatchConsultationSms extends Command
         $reminders->syncDueCandidates();
         $reminders->dispatchDue();
         $this->dispatchTomorrowSchedules();
+        if (Schema::hasTable('practitioner_offline_alerts')) {
+            $offlineAlerts->dispatchDue();
+        }
 
         return self::SUCCESS;
     }

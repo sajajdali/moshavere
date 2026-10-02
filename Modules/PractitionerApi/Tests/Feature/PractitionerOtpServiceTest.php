@@ -67,6 +67,7 @@ class PractitionerOtpServiceTest extends TestCase
             $table->id();
             $table->boolean('test_login_enabled')->default(false);
             $table->string('voip_host')->nullable();
+            $table->string('softphone_server_address')->nullable();
             $table->unsignedSmallInteger('voip_port')->default(5061);
             $table->string('voip_transport')->default('tls');
             $table->timestamps();
@@ -75,6 +76,7 @@ class PractitionerOtpServiceTest extends TestCase
             'id' => 1,
             'test_login_enabled' => false,
             'voip_host' => 'https://voip.example.test:2214',
+            'softphone_server_address' => 'https://softphone.example.test:7443',
             'voip_port' => 5061,
             'voip_transport' => 'tls',
         ]);
@@ -138,7 +140,7 @@ class PractitionerOtpServiceTest extends TestCase
         $this->assertTrue($token->expires_at->between(now()->addDays(89), now()->addDays(91)));
         $this->assertNotNull($otpRequest->fresh()->consumed_at);
         $this->assertTrue($result['practitioner']['softphone']['configured']);
-        $this->assertSame('voip.example.test', $result['practitioner']['softphone']['server_host']);
+        $this->assertSame('softphone.example.test', $result['practitioner']['softphone']['server_host']);
         $this->assertSame('sip-test-user', $result['practitioner']['softphone']['username']);
         $this->assertSame('private-sip-password', $result['practitioner']['softphone']['password']);
         $this->assertDatabaseHas('user_devices', [

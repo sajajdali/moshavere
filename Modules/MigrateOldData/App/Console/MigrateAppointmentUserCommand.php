@@ -10,6 +10,7 @@ use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Input\InputArgument;
 use Modules\AppointmentUser\app\Models\AppointmentUser;
 use Modules\AppointmentUser\Enum\AppointmentUserKindEnum;
+use Modules\AppointmentUser\Enum\AppointmentUserStatusEnum;
 use Modules\AppointmentSetting\app\Models\AppointmentSetting;
 
 class MigrateAppointmentUserCommand extends Command
@@ -42,8 +43,20 @@ class MigrateAppointmentUserCommand extends Command
 
         // Loop through each record and transform it
         foreach ($oldData as $data) {
+            $existingAppointment = DB::connection('new_mysql')
+                ->table('appointment_users')
+                ->where('id', $data->id)
+                ->first();
+
+            if ($existingAppointment) {
+                $this->repairMigratedCancellationStatus($data, $existingAppointment);
+                $this->repairMigratedSettingLink($data, $existingAppointment);
+                $this->repairMigratedDeletionState($data, $existingAppointment);
+                continue;
+            }
+
             // Transform the data according to new structure
-            if ($this->checkUserForegnKey($data->user_id)) {
+            if (is_null($data->user_id) || $this->checkUserForegnKey($data->user_id)) {
                 $newData = [
                     'id' => $data->id,
                     'agent_id' => $this->agentIdExists($data->agent_id) ? $data->agent_id : null,
@@ -54,18 +67,83 @@ class MigrateAppointmentUserCommand extends Command
                     'place_id' => $data->appointment_office_id,
                     'operator_id' => $this->findOperatorId($data->operator),
                     'tracking_code' => $this->trackingCode($data->code),
+                    'status' => $this->mapLegacyStatus((int) $data->status),
                     'kind' => AppointmentUserKindEnum::OldData($data->type),
                     'start_time' => $data->time_from,
                     'end_time' => $data->time_to,
                     'date_visit' => $this->caculateDateVisit($data),
                     'visited_at' => $data->visit_at,
                     'details' => $this->convertDetails(),
+                    'deleted_at' => $data->deleted_at,
+                    'created_at' => $data->created_at,
+                    'updated_at' => $data->updated_at,
                 ];
                 // Insert the transformed data into the new database
                 DB::connection('new_mysql')->table('appointment_users')->insert($newData);
             }
         }
         $this->info('appointment user transfered successfuly.');
+    }
+
+    /**
+     * The legacy application stored 0=pending, 1=confirmed and 2=cancelled.
+     */
+    public function mapLegacyStatus(int $status): int
+    {
+        return match ($status) {
+            0 => AppointmentUserStatusEnum::STATUS_PENDING->value,
+            2 => AppointmentUserStatusEnum::STATUS_CANCEL->value,
+            default => AppointmentUserStatusEnum::STATUS_SUCCESSFUL->value,
+        };
+    }
+
+    private function repairMigratedCancellationStatus(object $legacy, object $current): void
+    {
+        // Earlier imports omitted status, so MySQL assigned the confirmed default (1).
+        // Only repair that exact legacy mistake; do not overwrite later admin changes.
+        if ((int) $legacy->status !== 2
+            || (int) $current->status !== AppointmentUserStatusEnum::STATUS_SUCCESSFUL->value) {
+            return;
+        }
+
+        DB::connection('new_mysql')
+            ->table('appointment_users')
+            ->where('id', $legacy->id)
+            ->where('status', AppointmentUserStatusEnum::STATUS_SUCCESSFUL->value)
+            ->update(['status' => AppointmentUserStatusEnum::STATUS_CANCEL->value]);
+    }
+
+    private function repairMigratedSettingLink(object $legacy, object $current): void
+    {
+        $currentSettingDoctorId = $current->appointment_setting_id
+            ? DB::connection('new_mysql')->table('appointment_settings')
+                ->where('id', $current->appointment_setting_id)
+                ->value('user_id')
+            : null;
+
+        // Keep valid links (including any later manual correction) untouched.
+        if ((int) $currentSettingDoctorId === (int) $legacy->doctor_id) {
+            return;
+        }
+
+        DB::connection('new_mysql')
+            ->table('appointment_users')
+            ->where('id', $legacy->id)
+            ->update(['appointment_setting_id' => $this->settingId($legacy)]);
+    }
+
+    private function repairMigratedDeletionState(object $legacy, object $current): void
+    {
+        // Preserve legacy soft-deletes without restoring anything deleted later in the new app.
+        if ($legacy->deleted_at === null || $current->deleted_at !== null) {
+            return;
+        }
+
+        DB::connection('new_mysql')
+            ->table('appointment_users')
+            ->where('id', $legacy->id)
+            ->whereNull('deleted_at')
+            ->update(['deleted_at' => $legacy->deleted_at]);
     }
     private function agentIdExists($id){
         return Db::connection('new_mysql')->table('users')->where('id',$id)->exists();
@@ -116,8 +194,10 @@ class MigrateAppointmentUserCommand extends Command
         $placeId = $data->appointment_office_id;
         $setting = DB::connection('new_mysql')
             ->table('appointment_settings')
+            ->where('user_id', $data->doctor_id)
             ->where('service_id', $serviceId)
             ->where('place_id', $placeId)
+            ->whereNull('deleted_at')
             ->first()?->id ?? null;
         return $setting;
     }

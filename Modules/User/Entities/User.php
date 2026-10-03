@@ -446,7 +446,7 @@ class User extends Authenticatable
     }
     public function specialtyTypeName(): string
     {
-        return  UserSpecialityType::tryFrom($this->specialityType)->getPreName();
+        return UserSpecialityType::tryFrom((int) $this->specialityType)?->getPreName() ?? '';
     }
     public function isPatient(): bool
     {

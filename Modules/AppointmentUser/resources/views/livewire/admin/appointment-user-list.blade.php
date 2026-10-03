@@ -58,6 +58,9 @@
         .th-sort-arrow{font-size:10px;color:#c8cdd4;transition:color .15s}
         .th-sortable.active .th-sort-arrow{color:#0f766e}
         .appointment-row{padding:10px 8px;border-bottom:1px solid #eef0f3;background:#fff}
+        .appointment-row.is-cancelled{background:#fee4e2!important;box-shadow:inset -6px 0 #d92d20;border-bottom-color:#fda29b}
+        .appointment-row.is-cancelled>div:not(:first-child){opacity:.88}
+        .appointment-row.is-cancelled .om-status-main{background:#d92d20!important;color:#fff!important;border-color:#b42318!important;box-shadow:0 2px 5px rgba(180,35,24,.22)}
         .appointment-row.is-voip-incomplete{box-shadow:inset -4px 0 #f79009;background:#fffbeb!important}.appointment-row.is-voip-critical{box-shadow:inset -5px 0 #d92d20;background:#fff4f2!important}
         .appointment-row>div{padding:0 5px;min-width:0}
         .om-avatar{width:36px;height:36px;flex:none;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:600;color:#fff;background:#0f766e}
@@ -260,10 +263,13 @@
                                 default => 'background:#fdf2fa;color:#c11574;border-color:#fcceee',
                             };
                             $rowBackground = match($ap->status) {
-                                \Modules\AppointmentUser\Enum\AppointmentUserStatusEnum::STATUS_CANCEL => '#fff1f1',
+                                \Modules\AppointmentUser\Enum\AppointmentUserStatusEnum::STATUS_CANCEL => '#fee4e2',
                                 \Modules\AppointmentUser\Enum\AppointmentUserStatusEnum::STATUS_WAIT_PAYMENT => '#e9f3ff',
                                 default => $loop->odd ? '#f7fbff' : '#fff',
                             };
+                            $cancelledClass = $ap->status === \Modules\AppointmentUser\Enum\AppointmentUserStatusEnum::STATUS_CANCEL
+                                ? 'is-cancelled'
+                                : '';
                             $appointmentEnd = $ap->date_visit?->copy()->setTimeFromTimeString($ap->end_time ?: $ap->date_visit->format('H:i:s'));
                             if ($appointmentEnd && $ap->start_time && $ap->end_time && $ap->end_time <= $ap->start_time) $appointmentEnd->addDay();
                             $isPastVoip = $ap->kind === \Modules\AppointmentUser\Enum\AppointmentUserKindEnum::VOIP
@@ -280,7 +286,7 @@
                                     : route('admin.user.document', ['user' => $ap->user->id]))
                                 : '#';
                         @endphp
-                        <div class="appointment-grid appointment-row {{ $voipAttentionClass }}" style="background:{{ $rowBackground }}" wire:key="appointment-row-{{ $ap->id }}">
+                        <div class="appointment-grid appointment-row {{ $cancelledClass }} {{ $voipAttentionClass }}" style="background:{{ $rowBackground }}" wire:key="appointment-row-{{ $ap->id }}">
                             <div>
                                 <input wire:model="form.checkbox.{{ $ap->id }}" class="checkbox row-checkbox" id="checkbox-{{ $ap->id }}" type="checkbox" style="width:16px;height:16px;accent-color:#0f766e">
                             </div>
@@ -333,11 +339,11 @@
                                 <div class="w-100">
                                     @canany(['update', 'delete'], $ap)
                                         <div class="btn-group w-100">
-                                            <button type="button" class="om-status om-status-main dropdown-toggle" style="{{ $statusClass }}" data-bs-toggle="dropdown" data-bs-boundary="viewport"><i class="fa {{ $ap->status === \Modules\AppointmentUser\Enum\AppointmentUserStatusEnum::STATUS_SUCCESSFUL ? 'fa-check-circle' : 'fa-circle-o' }}"></i>{{ $ap->status->getName() }}</button>
+                                            <button type="button" class="om-status om-status-main dropdown-toggle" style="{{ $statusClass }}" data-bs-toggle="dropdown" data-bs-boundary="viewport"><i class="fa {{ $ap->status === \Modules\AppointmentUser\Enum\AppointmentUserStatusEnum::STATUS_CANCEL ? 'fa-ban' : ($ap->status === \Modules\AppointmentUser\Enum\AppointmentUserStatusEnum::STATUS_SUCCESSFUL ? 'fa-check-circle' : 'fa-circle-o') }}"></i>{{ $ap->status->getName() }}</button>
                                             <ul class="dropdown-menu dropdown-menu-end" role="menu">@include('appointmentuser::components.appointmentlist.operationbutton', ['quickTimeEditEnabled' => true])</ul>
                                         </div>
                                     @else
-                                        <span class="om-status om-status-main" style="{{ $statusClass }}"><i class="fa {{ $ap->status === \Modules\AppointmentUser\Enum\AppointmentUserStatusEnum::STATUS_SUCCESSFUL ? 'fa-check-circle' : 'fa-circle-o' }}"></i>{{ $ap->status->getName() }}</span>
+                                        <span class="om-status om-status-main" style="{{ $statusClass }}"><i class="fa {{ $ap->status === \Modules\AppointmentUser\Enum\AppointmentUserStatusEnum::STATUS_CANCEL ? 'fa-ban' : ($ap->status === \Modules\AppointmentUser\Enum\AppointmentUserStatusEnum::STATUS_SUCCESSFUL ? 'fa-check-circle' : 'fa-circle-o') }}"></i>{{ $ap->status->getName() }}</span>
                                     @endcan
                                 </div>
                                 @if($ap->kind === \Modules\AppointmentUser\Enum\AppointmentUserKindEnum::VOIP || $ap->hasFinalizedPatientNoShow() || $ap->hasCompletedPhoneConsultation() || (auth()->user()->can('appointment_user.feedBack') && ($ap->feedbacks->isNotEmpty() || $ap->surveyVoiceUrl())))

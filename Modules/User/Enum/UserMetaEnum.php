@@ -48,6 +48,20 @@ enum UserMetaEnum: int implements EnumHasNameInterface
 
     case DR_STORE_APP_SMS = 36;
 
+    // Legacy metadata kept during old-database migrations.
+    case LEGACY_ACQUAINTED = 37;
+    case LEGACY_LEVEL = 38;
+    case LEGACY_BIRTHDAY_DAY = 39;
+    case LEGACY_BIRTHDAY_MONTH = 40;
+    case LEGACY_BIRTHDAY_YEAR = 41;
+    case LEGACY_AGENT = 42;
+    case LEGACY_PROVINCE = 43;
+    case LEGACY_AGE = 44;
+    case LEGACY_MARITAL = 45;
+    case LEGACY_JOB = 46;
+    case LEGACY_LATITUDE = 47;
+    case LEGACY_LONGITUDE = 48;
+
 
     public static function keys(): array
     {
@@ -76,6 +90,27 @@ enum UserMetaEnum: int implements EnumHasNameInterface
             'FIRST_NAME' => self::FIRST_NAME,
             'LAST_NAME' => self::LAST_NAME,
             'AVATAR' => self::AVATAR,
+            'GENDER' => self::GENDER,
+            'ACQUAINTED' => self::LEGACY_ACQUAINTED,
+            'APPOINTMENT_ENABLED' => self::ACTIVE_APPOINTMENT,
+            'LEVEL' => self::LEGACY_LEVEL,
+            'BIRTHDAY_DAY' => self::LEGACY_BIRTHDAY_DAY,
+            'BIRTHDAY_MONTH' => self::LEGACY_BIRTHDAY_MONTH,
+            'BIRTHDAY_YEAR' => self::LEGACY_BIRTHDAY_YEAR,
+            'BEST_DOCTOR' => self::FAVORITE_DOCTOR,
+            'BANNED' => self::BAN_USER,
+            'AGENT' => self::LEGACY_AGENT,
+            'CITY' => self::CITY,
+            'PROVINCE' => self::LEGACY_PROVINCE,
+            'AGE' => self::LEGACY_AGE,
+            'MARITAL' => self::LEGACY_MARITAL,
+            'JOB' => self::LEGACY_JOB,
+            'NATIONAL_CODE' => self::NATIONAL_CODE,
+            'ABOUT_DOCTOR' => self::DOC_BIOGRAPHY,
+            'ADDRESS' => self::DOC_ADDRESS,
+            'DOCTOR_RATE' => self::DR_RATE,
+            'LATITUDE' => self::LEGACY_LATITUDE,
+            'LONGITUDE' => self::LEGACY_LONGITUDE,
         ];
         return $map[$oldKey] ?? null;
     }

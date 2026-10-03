@@ -38,10 +38,6 @@ class MigrateUserMetasCommand extends Command
         $oldData = DB::connection('old_mysql')->table('user_metas')->get();
         // Loop through each record and transform it
         foreach ($oldData as $data) {
-            if ($data->user_id <= 2) {
-                continue;
-            }
-
             if (!$this->checkUserForeignKey($data->user_id)) {
                 // user not migrated into new DB → skip to avoid FK error
                 continue;
@@ -50,7 +46,7 @@ class MigrateUserMetasCommand extends Command
             $newKey = $this->findMetaKeyEnumValue($data->meta_key, $data->user_id);
             $metavalue = $data->meta_value;
             if ($newKey == UserMetaEnum::AVATAR) {
-                $metavalue = url('public/avatar/' . $data->meta_value);
+                $metavalue = rtrim(env('NEW_APP_URL', config('app.url')), '/') . '/avatar/' . $data->meta_value;
             }
             if ($newKey != null &&  $this->checkUserForegnKey($data->user_id)) {
                 $newData = [
@@ -77,7 +73,6 @@ class MigrateUserMetasCommand extends Command
     }
     private function checkUserForegnKey($user_id)
     {
-        $user_exists = User::find($user_id) !== null;
-        return $user_exists;
+        return DB::connection('new_mysql')->table('users')->where('id', $user_id)->exists();
     }
 }

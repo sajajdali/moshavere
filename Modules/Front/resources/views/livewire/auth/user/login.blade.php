@@ -166,7 +166,7 @@
         <div class="pt-1 pb-16 bg-secondary-100">
             <div class="rounded-lg w-full max-w-[600px] mx-auto p-5 flex flex-col gap-4">
                 <a class="text-blue-700 hover:text-blue-900 flex" href="{{ route('front.login.doctor') }}">
-                    <span>ورود پزشک</span>
+                    <span>ورود پزشک/مدیر</span>
                     <svg class="w-6 h-6 mr-2" xmlns="http://www.w3.org/2000/svg">
                         <use xlink:href="#sprite-chevron-left-circle"></use>
                     </svg>

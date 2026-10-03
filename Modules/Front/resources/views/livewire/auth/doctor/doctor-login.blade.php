@@ -10,14 +10,14 @@
               class="bg-white rounded-lg w-full max-w-[600px] mx-auto p-5 flex flex-col gap-4"
               wire:loading.class='opacity-50'>
             <div class="text-center space-y-2">
-                <p class="text-lg font-semibold">ورود
+                <p class="text-lg font-semibold">ورود پزشک/مدیر
                     @unless(disableUi())
                         @if(setting(\Modules\Setting\Enum\SettingKeyEnum::ENABLE_DOCTOR_REGISTRATION))
                             / ثبت نام پزشک
                         @endif
                     @endunless
                 </p>
-                <p class="text-secondary-400">شماره تلفن و رمز عبور خود را وارد کنید
+                <p class="text-secondary-400">شماره موبایل یا ایمیل و رمز عبور خود را وارد کنید
                     @if(!disableUi())
                         @if(setting(\Modules\Setting\Enum\SettingKeyEnum::ENABLE_DOCTOR_REGISTRATION))
                         و در صورت نداشتن حساب ، روی گزینه ثبت نام کلیک کنید.
@@ -27,7 +27,7 @@
             </div>
             <div class="space-y-2">
                 <div class="flex items-center justify-between">
-                    <label for="docUserName" class="text-secondary-400 font-semibold">شماره تلفن </label>
+                    <label for="docUserName" class="text-secondary-400 font-semibold">شماره موبایل یا ایمیل</label>
                     @unless(disableUi())
                         @if(setting(\Modules\Setting\Enum\SettingKeyEnum::ENABLE_DOCTOR_REGISTRATION))
                             <a href="{{route('front.registration.doctor')}}"
@@ -39,9 +39,10 @@
                 </div>
             </div>
             <input type="text" id="docUserName"
-                   class="border @error('form.mobile') border-rose-300 @else border-secondary-300 @enderror rounded-lg bg-primary-tint-100 text-center py-2"
-                   wire:model='form.mobile' placeholder="مثال: 09123456789"/>
-            @error('form.mobile')
+                   inputmode="email" autocomplete="username"
+                   class="border @error('form.identifier') border-rose-300 @else border-secondary-300 @enderror rounded-lg bg-primary-tint-100 text-center py-2"
+                   wire:model='form.identifier' placeholder="مثال: 09123456789 یا doctor@example.com"/>
+            @error('form.identifier')
             <span class="text-rose-500">{{ $message }}</span>
             @enderror
             <div class="space-y-3">

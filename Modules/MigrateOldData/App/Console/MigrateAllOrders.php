@@ -3,6 +3,7 @@
 namespace Modules\MigrateOldData\App\Console;
 
 use Illuminate\Console\Command;
+use Illuminate\Support\Facades\DB;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Input\InputArgument;
 
@@ -42,16 +43,33 @@ class MigrateAllOrders extends Command
             'migrateData:specility',
             'migrateData:appointment_setting',
             'migrateData:appointment_user',
+            'migrateData:appointment_transactions',
         ];
-        // Run each command
-        try{
-            foreach ($commands as $command) {
-                $this->call($command);
-            }
-        }catch(\Exception $e){
-            dd($e->getMessage());
+        $previousDefaultConnection = DB::getDefaultConnection();
+
+        try {
+            DB::setDefaultConnection('new_mysql');
+
+            DB::connection('new_mysql')->transaction(function () use ($commands) {
+                foreach ($commands as $command) {
+                    $exitCode = $this->call($command);
+
+                    if ($exitCode !== self::SUCCESS) {
+                        throw new \RuntimeException("Migration command failed: {$command}");
+                    }
+                }
+            });
+        } catch (\Throwable $e) {
+            $this->error($e->getMessage());
+
+            return self::FAILURE;
+        } finally {
+            DB::setDefaultConnection($previousDefaultConnection);
         }
+
         $this->info('Data migration completed successfully.');
+
+        return self::SUCCESS;
     }
 
 }

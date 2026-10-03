@@ -17,6 +17,7 @@ use Modules\Front\app\Console\GenerateSitemapComman;
 use Modules\MigrateOldData\App\Console\MigrateAllOrders;
 use Modules\MigrateOldData\App\Console\MigrateAppointmentSetting;
 use Modules\MigrateOldData\App\Console\MigrateAppointmentUserCommand;
+use Modules\MigrateOldData\App\Console\MigrateAppointmentTransactionsCommand;
 use Modules\MigrateOldData\App\Console\MigratePlacesCommand;
 use Modules\MigrateOldData\App\Console\MigratePlaceUsersCommand;
 use Modules\MigrateOldData\App\Console\MigrateServiceseCommand;
@@ -44,6 +45,7 @@ class Kernel extends ConsoleKernel
         MigrateAppointmentSetting::class,
         MigrateUserMetasCommand::class,
         MigrateAppointmentUserCommand::class,
+        MigrateAppointmentTransactionsCommand::class,
         CompeleteOnlineAppointment::class,
         GenerateSitemapComman::class,
     ];

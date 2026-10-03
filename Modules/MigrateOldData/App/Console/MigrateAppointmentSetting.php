@@ -38,7 +38,14 @@ class MigrateAppointmentSetting extends Command
      */
     public function handle()
     {
-        $this->generalSetting();
+        $previousDefaultConnection = DB::getDefaultConnection();
+
+        try {
+            DB::setDefaultConnection('new_mysql');
+            DB::connection('new_mysql')->transaction(fn () => $this->generalSetting());
+        } finally {
+            DB::setDefaultConnection($previousDefaultConnection);
+        }
     }
     private function generalSetting()
     {
@@ -66,10 +73,18 @@ class MigrateAppointmentSetting extends Command
                 'detail' => $this->createDetail($data, $cost),
             ];
 
-            // Insert the transformed data into the new database and get the new ID
-            $newId = DB::connection('new_mysql')->table('appointment_settings')->insertGetId($newData);
-            // Retrieve the newly created record
-            $appointment_setting = DB::connection('new_mysql')->table('appointment_settings')->find($newId);
+            $settingKey = [
+                'user_id' => $data->user_id,
+                'service_id' => $data->appointment_part_id,
+                'place_id' => $data->appointment_office_id,
+            ];
+            DB::connection('new_mysql')->table('appointment_settings')->updateOrInsert($settingKey, $newData);
+            $appointment_setting = DB::connection('new_mysql')
+                ->table('appointment_settings')
+                ->where($settingKey)
+                ->whereNull('deleted_at')
+                ->orderBy('id')
+                ->first();
 
             $this->insertTimes($appointment_setting->id, $data);
             $this->segmnents($appointment_setting->id, $data);
@@ -117,21 +132,30 @@ class MigrateAppointmentSetting extends Command
     {
         $days = json_decode($data->content);
         $appointment_setting =  DB::connection('new_mysql')->table('appointment_settings')->where('id', $appointment_setting_id)->first();
+        DB::connection('new_mysql')->table('appointment_setting_times')
+            ->where('appointment_setting_id', $appointment_setting->id)
+            ->whereNull('special_date')
+            ->delete();
+
         foreach ($days as $dayName => $dayTime) {
             if ($dayTime->STATUS == false) {
                 continue;
             }
-            $app_setting_times = [
-                'appointment_setting_id'            => $appointment_setting->id,
-                'day_number'                        => $this->findDayName($dayName),
-                'start_at'                          => $this->calculateStartTime($dayTime),
-                'end_at'                            => $this->calculateEndTime($dayTime) ?? "00:00",
-            ];
-            if ($app_setting_times['start_at'] == '00:00' && $app_setting_times['end_at'] == '00:00') {
-                continue;
-            } else {
+
+            foreach (($dayTime->TIME ?? []) as $timeRange) {
+                $startAt = $timeRange->FROM ?? '00:00';
+                $endAt = $timeRange->TO ?? '00:00';
+                if ($startAt === '00:00' || $endAt === '00:00' || $startAt === $endAt) {
+                    continue;
+                }
+
+                $app_setting_times = [
+                    'appointment_setting_id' => $appointment_setting->id,
+                    'day_number' => $this->findDayName($dayName),
+                    'start_at' => $startAt,
+                    'end_at' => $endAt,
+                ];
                 DB::connection('new_mysql')->table('appointment_setting_times')->insert($app_setting_times);
-                // $appointment_setting->times()->create($app_setting_times);
             }
         }
     }
@@ -172,16 +196,30 @@ class MigrateAppointmentSetting extends Command
     }
     private function segmnents($appointment_setting_id, $data)
     {
-        $segment = json_decode($data->time_for_visit, true);
+        $segment = json_decode($data->time_for_visit, true) ?: [];
         $appointment_setting =  DB::connection('new_mysql')->table('appointment_settings')->where('id', $appointment_setting_id)->first();
-        if ($segment['STATUS'] == true) {
+        if (($segment['STATUS'] ?? false) == true) {
+            if (DB::connection('new_mysql')->table('appointment_segment_setting')
+                ->where('appointment_setting_id', $appointment_setting->id)->exists()) {
+                return;
+            }
+            $serviceTitle = DB::connection('new_mysql')
+                ->table('services')
+                ->where('id', $appointment_setting->service_id)
+                ->value('title');
+
             $segmentObj =  AppointmentSegment::create([
-                'title' => $appointment_setting->service?->title  . ' زمانبندی',
-                'multiple_choice' => $segment['SELECT_TYPE'] == 'multi' ? 0 : 1,
+                'title' => ($serviceTitle ?: 'خدمت') . ' زمانبندی',
+                'multiple_choice' => ($segment['SELECT_TYPE'] ?? null) == 'multi' ? 0 : 1,
                 'active' => 1,
             ]);
-            $appointment_setting->segments()->attach($segmentObj->id);
-            foreach ($segment['TIME'] as $segmentItems) {
+            DB::connection('new_mysql')->table('appointment_segment_setting')->insert([
+                'appointment_setting_id' => $appointment_setting->id,
+                'appointment_segment_id' => $segmentObj->id,
+                'created_at' => now(),
+                'updated_at' => now(),
+            ]);
+            foreach (($segment['TIME'] ?? []) as $segmentItems) {
                 $segmentObj->items()->create([
                     'title' => $segmentItems['TITLE'],
                     'display_on_site' => $segmentItems['DISPLAY_ON'],

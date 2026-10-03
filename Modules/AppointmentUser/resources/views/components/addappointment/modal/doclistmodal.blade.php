@@ -14,7 +14,7 @@
                         @if (isset($fetchData['docList']) && $fetchData['docList']->isNotEmpty())
                             <div class="d-flex flex-column g-3">
                                 @foreach ($fetchData['docList'] as $doc)
-                                    <a wire:click='docSelectedFrommodal({{ $doc->id }})'
+                                    <a wire:click='docSelectedFromModal({{ $doc->id }})'
                                         class="badge bg-primary-gradient my-1 p-5 text-white" data-bs-dismiss="modal"
                                         style="font-size: medium !important ; cursor: pointer;">{{ $doc->fullName }}</a>
                                 @endforeach

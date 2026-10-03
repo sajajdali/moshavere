@@ -43,9 +43,6 @@ class MigrateUsersCommand extends Command
         $oldData = DB::connection('old_mysql')->table('users')->get();
         // Loop through each record and transform it
         foreach ($oldData as $data) {
-            if ($data->id <= 2) {
-                continue;
-            }
             // Transform the data according to new structure
             if (User::where('mobile', $data->mobile)->exists()) {
                 continue;
@@ -61,7 +58,6 @@ class MigrateUsersCommand extends Command
                 'remember_token' => $data->remember_token ?? '',
             ];
             DB::connection('new_mysql')->table('users')->insert($newData);
-            $this->insertUserMetas($newData);
         }
         $this->info('users migration completed successfully.');
     }
@@ -73,21 +69,25 @@ class MigrateUsersCommand extends Command
 
         foreach ($oldUserRoles as $userRole) {
             $role = match ($userRole->role_id) {
+                1 => 1,
                 6 => 2,
                 2 => 3,
                 5 => 4,
-                4 => 5,
+                8 => 5,
                 default => 2,
             };
-            if ($userRole->model_id == 1) {
-                continue;
-            }
             $newUserRole = [
                 'role_id' => $role,
                 'model_type' => 'Modules\User\Entities\User',
                 'model_id' => $userRole->model_id,
             ];
-            DB::connection('new_mysql')->table('model_has_roles')->insert($newUserRole);
+            DB::connection('new_mysql')->table('model_has_roles')->updateOrInsert(
+                [
+                    'model_type' => $newUserRole['model_type'],
+                    'model_id' => $newUserRole['model_id'],
+                ],
+                ['role_id' => $newUserRole['role_id']]
+            );
         }
         $this->info("roled has been assigned");
     }
@@ -104,7 +104,7 @@ class MigrateUsersCommand extends Command
             $newKey = $this->findMetaKeyEnumValue($data->meta_key, $userData['id']);
             $metavalue = $data->meta_value;
             if ($newKey == UserMetaEnum::AVATAR) {
-                $metavalue = url('public/avatar/' . $data->meta_value);
+                $metavalue = rtrim(env('NEW_APP_URL', config('app.url')), '/') . '/avatar/' . $data->meta_value;
             }
             if ($newKey != null) {
                 $newData = [

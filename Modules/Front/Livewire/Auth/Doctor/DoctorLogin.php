@@ -8,7 +8,7 @@ use Livewire\Attributes\Layout;
 use Illuminate\Support\Facades\Auth;
 
 #[Layout('front::layouts.app')]
-#[Title('ورود پزشک')]
+#[Title('ورود پزشک/مدیر')]
 class DoctorLogin extends Component
 {
 
@@ -17,12 +17,21 @@ class DoctorLogin extends Component
 
     public function DocLoginForm()
     {
+        $identifier = trim((string) ($this->form['identifier'] ?? ''));
+        $loginField = filter_var($identifier, FILTER_VALIDATE_EMAIL) ? 'email' : 'mobile';
+
         $this->validate([
-            'form.mobile' => 'required|string|digits:11',
+            'form.identifier' => $loginField === 'email'
+                ? 'required|string|email:rfc|max:255'
+                : 'required|string|digits:11',
             'form.password' => 'required|min:4',
+        ], [
+            'form.identifier.required' => 'شماره موبایل یا ایمیل را وارد کنید.',
+            'form.identifier.email' => 'ایمیل واردشده معتبر نیست.',
+            'form.identifier.digits' => 'شماره موبایل باید ۱۱ رقم باشد.',
         ]);
 
-        if (Auth::attempt(['mobile' => $this->form['mobile'], 'password' => $this->form['password']])) {
+        if (Auth::attempt([$loginField => $identifier, 'password' => $this->form['password']])) {
             // Authentication passed, regenerate session token
             session()->regenerate();
             $user = Auth::user();

@@ -106,6 +106,11 @@ class AppointmentUserCreateOrUpdate extends Component
             $appSetting = AppointmentSetting::where('user_id', $doctor)->whereNull('service_id')
                 ->whereNull('place_id')?->first();
         }
+
+        if ($appSetting === null) {
+            return false;
+        }
+
         if ($appSetting->segments()->exists()) {
             $this->fetchData['segments']['is_one_choice'] = filter_var($appSetting->segments->first()->multiple_choice, FILTER_VALIDATE_BOOL);
             $this->fetchData['segments']['items'] = $appSetting->segments->first()->items;
@@ -148,7 +153,7 @@ class AppointmentUserCreateOrUpdate extends Component
             }
         }
         if (count($this->fetchData['docList']) == 1) {
-            return $this->docSelectedFrommodal($this->fetchData['docList']->first());
+            return $this->docSelectedFromModal($this->fetchData['docList']->first());
         }
         return  $this->lunchmodal('docModal');
     }

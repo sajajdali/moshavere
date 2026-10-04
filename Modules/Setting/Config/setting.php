@@ -99,6 +99,9 @@ $setting = [
             \Modules\Setting\Enum\SettingKeyEnum::HOME_ALERT_STATUS,
             \Modules\Setting\Enum\SettingKeyEnum::HOME_ALERT_TITLE,
             \Modules\Setting\Enum\SettingKeyEnum::HOME_ALERT_DESCRIPTION,
+            \Modules\Setting\Enum\SettingKeyEnum::FAVICON_16,
+            \Modules\Setting\Enum\SettingKeyEnum::FAVICON_32,
+            \Modules\Setting\Enum\SettingKeyEnum::FAVICON_APPLE_TOUCH,
 
         ],
     ],

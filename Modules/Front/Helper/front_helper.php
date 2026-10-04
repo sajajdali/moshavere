@@ -29,6 +29,9 @@ if (! function_exists('front_setting_array')) {
             \Modules\Setting\Enum\SettingKeyEnum::ENABLE_DOCTORS_MENU,
             \Modules\Setting\Enum\SettingKeyEnum::FOOTER_ENAMAD,
             \Modules\Setting\Enum\SettingKeyEnum::FOOTER_SAMANDEHI,
+            \Modules\Setting\Enum\SettingKeyEnum::FAVICON_16,
+            \Modules\Setting\Enum\SettingKeyEnum::FAVICON_32,
+            \Modules\Setting\Enum\SettingKeyEnum::FAVICON_APPLE_TOUCH,
         ]);
     }
 }

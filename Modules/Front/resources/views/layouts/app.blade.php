@@ -11,11 +11,17 @@
     <meta name="author" content="شمیران وب">
     <meta name="keywords" content="{{ setting(Modules\Setting\Enum\SettingKeyEnum::SITE_TITLE) }}">
     <!-- Favicon -->
-    <link rel="apple-touch-icon" sizes="76x76" href="{{ asset('default/admin/favicon/apple-touch-icon.png') }}">
-    <link rel="icon" type="image/png" sizes="32x32"
-        href="{{ asset('default/admin/favicon/favicon-32x32.png') }}">
-    <link rel="icon" type="image/png" sizes="16x16"
-        href="{{ asset('default/admin/favicon/favicon-16x16.png') }}">
+    @php
+        $favicon16 = settingVfc($settingValues, \Modules\Setting\Enum\SettingKeyEnum::FAVICON_16);
+        $favicon32 = settingVfc($settingValues, \Modules\Setting\Enum\SettingKeyEnum::FAVICON_32);
+        $faviconAppleTouch = settingVfc($settingValues, \Modules\Setting\Enum\SettingKeyEnum::FAVICON_APPLE_TOUCH);
+    @endphp
+    <link rel="apple-touch-icon" sizes="{{ $faviconAppleTouch ? '180x180' : '76x76' }}"
+        href="{{ $faviconAppleTouch ? assetStorage($faviconAppleTouch) : asset('default/admin/favicon/apple-touch-icon.png') }}">
+    <link rel="icon" sizes="32x32"
+        href="{{ $favicon32 ? assetStorage($favicon32) : asset('default/admin/favicon/favicon-32x32.png') }}">
+    <link rel="icon" sizes="16x16"
+        href="{{ $favicon16 ? assetStorage($favicon16) : asset('default/admin/favicon/favicon-16x16.png') }}">
     <link rel="manifest" href="{{ asset('default/admin/favicon/site.webmanifest') }}">
     <meta name="msapplication-TileColor" content="#ffffff">
     <meta name="theme-color" content="#ffffff">

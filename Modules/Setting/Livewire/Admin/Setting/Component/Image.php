@@ -33,8 +33,11 @@ class Image extends Component
 
     public function updatedPhoto()
     {
+        $isFavicon = in_array($this->meta, [SettingKeyEnum::FAVICON_16, SettingKeyEnum::FAVICON_32, SettingKeyEnum::FAVICON_APPLE_TOUCH], true);
+
         $this->validate([
-            'photo' => 'image|max:2048', // محدودیت ۲ مگابایت برای تصاویر
+            // فاوآیکون ها علاوه بر تصاویر معمول، فایل ico هم قبول میکنند
+            'photo' => $isFavicon ? 'mimes:png,ico,jpg,jpeg,webp,svg|max:512' : 'image|max:2048', // محدودیت ۲ مگابایت برای تصاویر
         ]);
 
         $path = $this->photo->store(tenant('id') . '/' . $this->filePath, 'tenant');

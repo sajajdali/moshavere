@@ -79,6 +79,10 @@ enum SettingKeyEnum: int implements EnumHasNameInterface, SettingTypeInterface, 
     case DISABLE_UI_FOR_VOIP_ONLY_APPOINTMENT = 441;
     case VOIP_APPOINTMENT_STATUS = 442;
     case VOIP_VOICE_RECORD_STATUS = 443;
+        // favicon
+    case FAVICON_16 = 444;
+    case FAVICON_32 = 445;
+    case FAVICON_APPLE_TOUCH = 446;
         // ABOUT US PAGE
     case ABOUT_US_FIRST_SECTION_TITLE = 23;
     case ABOUT_US_FIRST_SECTION_DESCRIPTION = 24;
@@ -255,6 +259,9 @@ enum SettingKeyEnum: int implements EnumHasNameInterface, SettingTypeInterface, 
             self::DISABLE_UI_FOR_VOIP_ONLY_APPOINTMENT => 'غیر فعال سازی ui برای بیماران ',
             self::VOIP_APPOINTMENT_STATUS => 'فعال سازی امکانات نوبت دهی تلفنی ',
             self::VOIP_VOICE_RECORD_STATUS => 'نمایش پیغام های ضبط شده در منو',
+            self::FAVICON_16 => 'آیکون مرورگر (16x16)',
+            self::FAVICON_32 => 'آیکون مرورگر (32x32)',
+            self::FAVICON_APPLE_TOUCH => 'آیکون موبایل / Apple Touch (180x180)',
 
 
             self::FOOTER_SAMANDEHI => 'نماد سامان دهی (لینک کامل درج شود)',
@@ -439,6 +446,9 @@ enum SettingKeyEnum: int implements EnumHasNameInterface, SettingTypeInterface, 
             self::DISABLE_UI_FOR_VOIP_ONLY_APPOINTMENT => 'عدم نمایش صفحات سایت ، برای نوبت دهی هایی که فقط تلفنی میباشند',
             self::VOIP_APPOINTMENT_STATUS => 'نمایش تماس های ورودی در منو',
             self::VOIP_VOICE_RECORD_STATUS => 'نمایش پیغام های ضبط شده در منو',
+            self::FAVICON_16 => 'فایل png یا ico با ابعاد ۱۶ در ۱۶ پیکسل. در صورت خالی بودن، آیکون پیش‌فرض نمایش داده می‌شود.',
+            self::FAVICON_32 => 'فایل png یا ico با ابعاد ۳۲ در ۳۲ پیکسل. در صورت خالی بودن، آیکون پیش‌فرض نمایش داده می‌شود.',
+            self::FAVICON_APPLE_TOUCH => 'فایل png با ابعاد ۱۸۰ در ۱۸۰ پیکسل برای افزودن سایت به صفحه اصلی موبایل.',
             self::CONSULT_SMS_PATIENT_FIRST_TEMPLATE, self::CONSULT_SMS_PATIENT_FIRST_MINUTES => 'این پیامک سه ساعت قبل از زمان شروع مشاوره برای بیمار ارسال می‌شود.',
             self::CONSULT_SMS_PATIENT_SECOND_TEMPLATE, self::CONSULT_SMS_PATIENT_SECOND_MINUTES => 'این پیامک یک ساعت قبل از زمان شروع مشاوره برای بیمار ارسال می‌شود.',
             self::CONSULT_SMS_PATIENT_FINAL_TEMPLATE, self::CONSULT_SMS_PATIENT_FINAL_MINUTES => 'این پیامک پانزده دقیقه قبل از زمان شروع مشاوره برای بیمار ارسال می‌شود.',
@@ -481,6 +491,7 @@ enum SettingKeyEnum: int implements EnumHasNameInterface, SettingTypeInterface, 
     {
         return match ($this) {
             self::SITE_LOGO_URL, self::HEADER1_IMAGE, self::HEADER2_MOBILE_BACKGROUND_IMAGE => SettingTypeEnum::IMAGE,
+            self::FAVICON_16, self::FAVICON_32, self::FAVICON_APPLE_TOUCH => SettingTypeEnum::IMAGE,
             self::DEFAULT_EXERCISE_STATUS => SettingTypeEnum::SELECT,
             self::HEADER1_TITLE_COLOR     => SettingTypeEnum::SELECT,
             self::SMS_SENDER => SettingTypeEnum::SELECT,
@@ -563,6 +574,7 @@ enum SettingKeyEnum: int implements EnumHasNameInterface, SettingTypeInterface, 
             self::GO_TO_PAYMENT_DIRECTLY => 'تنظیمات UX',
             self::HOME_ALERT_STATUS => 'نمایش پیغام در صفحه اصلی ',
             self::HEADER1_SHOW_BUTTON1 => 'کلید های روی هدر ',
+            self::FAVICON_16 => 'آیکون مرورگر (Favicon)',
             self::SMS_CUSTOM_LINK_TO_USER_TEMPLATE => 'Voip',
             self::CONSULT_SMS_PATIENT_FIRST_ACTIVE => 'یادآوری اول بیمار · گیرنده: بیمار',
             self::CONSULT_SMS_PATIENT_SECOND_ACTIVE => 'یادآوری دوم بیمار · گیرنده: بیمار',

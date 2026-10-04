@@ -32,22 +32,48 @@ class AppointmentUserCreateOrUpdate extends Component
     public $modalDate = null;
     public function searchDoctors()
     {
+        $this->resetPaginators();
         $this->render();
     }
     public function ignoreSearch()
     {
         $this->search = [];
+        $this->resetPaginators();
         $this->render();
     }
     public function searchService()
     {
-
+        $this->resetPaginators();
         $this->render();
+    }
+    // live search: a new search term always starts from the first page
+    public function updatedSearch()
+    {
+        $this->resetPaginators();
+    }
+    private function resetPaginators(): void
+    {
+        $this->resetPage();
+        $this->resetPage('servicesPage');
+    }
+    private function canSeeSections(): bool
+    {
+        $user = auth()->user();
+        return $user->isAdmin() || $user->hasRole('منشی');
+    }
+    // a doctor (who is not an admin) may only book for himself
+    private function authorizeDoctor(User $doctor): void
+    {
+        $user = auth()->user();
+        if (! $user->isAdmin() && $user->hasRole('پزشک') && (int) $doctor->id !== (int) $user->id) {
+            abort(403, 'Unauthorized');
+        }
     }
 
     //if user lunch modal from doctor section
     public function docSelected(User $user)
     {
+        $this->authorizeDoctor($user);
         $this->fetchData = [];
         $this->form['modalSelectedData']['serviec'] = null;
         $this->form['modalSelectedData']['place']   = null;
@@ -159,6 +185,7 @@ class AppointmentUserCreateOrUpdate extends Component
     }
     public function serviceSelected(Service $service)
     {
+        $this->authorizeDoctor(User::findOrFail($this->form['modalSelectedData']['doctor']));
         if ($this->hasSegment($this->form['modalSelectedData']['doctor'], $service->id, $this->form['modalSelectedData']['place'])) {
             $this->lunchModal('segmentModal');
             $this->form['modalSelectedData']['service'] = $service->id;
@@ -176,6 +203,7 @@ class AppointmentUserCreateOrUpdate extends Component
     }
     public function segmentSelected($segmentItemId = null)
     {
+        $this->authorizeDoctor(User::findOrFail($this->form['modalSelectedData']['doctor']));
         if ($segmentItemId == null) {
             $segmentsItemIds = [];
             foreach ($this->form['segmentSelectedIem'] as $itemId => $isSelected) {
@@ -199,6 +227,7 @@ class AppointmentUserCreateOrUpdate extends Component
     //if user lunch modal from service section
     public function serviceSelectedFromServiceSection(Service $service)
     {
+        abort_unless($this->canSeeSections(), 403);
         $this->fetchData = [];
         $this->form['modalSelectedData']['place']   = null;
         $this->form['modalSelectedData']['doctor']  = null;
@@ -218,6 +247,7 @@ class AppointmentUserCreateOrUpdate extends Component
     }
     public function docSelectedFromModal(User $user)
     {
+        $this->authorizeDoctor($user);
         $this->form['modalSelectedData']['doctor'] = $user->id;
         if (
             !empty($this->form['modalSelectedData']['place']) &&
@@ -277,19 +307,20 @@ class AppointmentUserCreateOrUpdate extends Component
                         ]);
                     });
                 });
-            })->orderByDesc('id')->paginate(20);
+            })->with(['metas', 'specialities', 'services', 'places'])->orderByDesc('id')->paginate(20);
         }
-        $Services = Service::when($permitionCondition, function ($q) {
+        $Services = Service::withCount('user')->when($permitionCondition, function ($q) {
             return $q->whereHas('user', function ($qq) {
                 $qq->where('users.id', auth()->user()->id);
             });
         })->where('active', ActiveEnum::ACTIVE)
             ->when(isset($this->search['searchService']) && !empty($this->search['searchService']), function ($query) {
                 return $query->where('title', 'LIKE', "%{$this->search['searchService']}%");
-            })->orderByDesc('id')->paginate(20);
+            })->orderByDesc('id')->paginate(20, pageName: 'servicesPage');
         return view('appointmentuser::livewire.admin.appointment-user-create-or-update', [
             'doctors' => $docQuery,
             'Services' => $Services,
+            'canSeeSections' => $this->canSeeSections(),
         ]);
     }
 }

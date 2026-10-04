@@ -1,226 +1,190 @@
-<div>
-    <style>
-        #RegistrAnAppointment .modal-dialog { max-width: 760px; max-height: calc(100vh - 32px); }
-        #RegistrAnAppointment .modal-content { max-height: calc(100vh - 32px); border: 0; border-radius: 22px; overflow: hidden; box-shadow: 0 24px 70px rgba(31, 41, 55, .18); }
-        #RegistrAnAppointment .appointment-modal-head { padding: 22px 26px 18px; color: #fff; background: linear-gradient(135deg, #1665d8 0%, #7257d9 100%); }
-        #RegistrAnAppointment .appointment-modal-head h5 { color: inherit; font-size: 1.15rem; margin: 0; }
-        #RegistrAnAppointment .appointment-title { display: flex; align-items: center; gap: 10px; }
-        #RegistrAnAppointment .appointment-modal-head p { color: rgba(255,255,255,.78); margin: 6px 0 0; font-size: .84rem; }
-        #RegistrAnAppointment .appointment-close { width: 34px; height: 34px; border: 0; border-radius: 10px; color: #fff; background: rgba(255,255,255,.14); }
-        #RegistrAnAppointment .appointment-progress { display: flex; gap: 7px; margin-top: 18px; }
-        #RegistrAnAppointment .appointment-progress span { height: 4px; flex: 1; border-radius: 99px; background: rgba(255,255,255,.22); }
-        #RegistrAnAppointment .appointment-progress span.active { background: #fff; }
-        #RegistrAnAppointment .modal-body { min-height: 0; padding: 24px 26px 28px; overflow-y: auto !important; overscroll-behavior: contain; background: #fbfcff; }
-        #RegistrAnAppointment .appointment-modal-head, #RegistrAnAppointment .modal-footer { flex-shrink: 0; }
-        #RegistrAnAppointment .appointment-card { padding: 18px; margin-bottom: 16px; border: 1px solid #e7ebf3; border-radius: 16px; background: #fff; }
-        #RegistrAnAppointment .section-title { display: flex; align-items: center; gap: 10px; margin-bottom: 14px; color: #172033; font-weight: 700; }
-        #RegistrAnAppointment .section-icon { display: inline-flex; align-items: center; justify-content: center; width: 34px; height: 34px; border-radius: 10px; color: #356ad8; background: #edf3ff; }
-        #RegistrAnAppointment .form-control, #RegistrAnAppointment .form-select { min-height: 46px; border-color: #dfe5ef; border-radius: 11px; background-color: #fff; }
-        #RegistrAnAppointment .form-control:focus, #RegistrAnAppointment .form-select:focus { border-color: #7299eb; box-shadow: 0 0 0 3px rgba(62,110,218,.11); }
-        #RegistrAnAppointment .field-hint { color: #8490a5; font-size: .78rem; }
-        #RegistrAnAppointment .kind-grid, #RegistrAnAppointment .option-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
-        #RegistrAnAppointment .option-grid.two { grid-template-columns: repeat(2, 1fr); }
-        #RegistrAnAppointment .choice-input { position: absolute; opacity: 0; pointer-events: none; }
-        #RegistrAnAppointment .choice-card { display: flex; align-items: center; gap: 11px; min-height: 64px; padding: 11px 13px; margin: 0; cursor: pointer; border: 1px solid #e1e6ef; border-radius: 13px; background: #fff; transition: .16s ease; }
-        #RegistrAnAppointment .choice-card:hover { border-color: #aebfe5; transform: translateY(-1px); }
-        #RegistrAnAppointment .choice-input:checked + .choice-card { border-color: #4779df; background: #f3f7ff; box-shadow: 0 0 0 2px rgba(71,121,223,.1); }
-        #RegistrAnAppointment .choice-icon { display: inline-flex; align-items: center; justify-content: center; flex: 0 0 38px; width: 38px; height: 38px; border-radius: 11px; color: #3267d4; background: #eaf1ff; }
-        #RegistrAnAppointment .choice-copy strong, #RegistrAnAppointment .choice-copy small { display: block; }
-        #RegistrAnAppointment .choice-copy small { margin-top: 2px; color: #8a94a6; font-size: .72rem; }
-        #RegistrAnAppointment .selected-kind { display: flex; align-items: center; gap: 9px; padding: 10px 13px; margin-bottom: 16px; border-radius: 12px; color: #2859bd; background: #edf4ff; font-size: .84rem; }
-        #RegistrAnAppointment .advanced-toggle { color: #56647a; text-decoration: none; font-weight: 600; }
-        #RegistrAnAppointment .modal-footer { padding: 16px 26px 22px; border: 0; background: #fbfcff; }
-        #RegistrAnAppointment .primary-action { min-width: 135px; min-height: 44px; border: 0; border-radius: 12px; background: linear-gradient(135deg, #216cda, #6657d8); box-shadow: 0 8px 18px rgba(58,91,198,.22); }
-        #RegistrAnAppointment .secondary-action { min-height: 44px; border-radius: 12px; }
-        #RegistrAnAppointment .lookup-icon { display: flex; align-items: center; justify-content: center; width: 54px; height: 54px; margin: 2px auto 15px; border-radius: 16px; color: #356ad8; background: #edf3ff; font-size: 1.35rem; }
-        #RegistrAnAppointment .patient-summary { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 11px 14px; margin-bottom: 16px; border: 1px solid #e4eaf4; border-radius: 13px; background: #fff; }
-        #RegistrAnAppointment .error-message { display: block; margin-top: 6px; color: #dc3545; font-size: .8rem; }
-        #RegistrAnAppointment .mobile-field { display: flex; direction: rtl; width: 100%; }
-        #RegistrAnAppointment .mobile-field .mobile-icon { display: inline-flex; align-items: center; justify-content: center; flex: 0 0 48px; border: 1px solid #dfe5ef; border-left: 0; border-radius: 0 11px 11px 0; color: #356ad8; background: #f4f7fc; font-size: 1.15rem; }
-        #RegistrAnAppointment .mobile-field .form-control { direction: ltr; text-align: left; border-radius: 11px 0 0 11px; }
-        #RegistrAnAppointment .mobile-field .form-control:focus { position: relative; z-index: 1; }
-        @media (max-width: 767px) {
-            #RegistrAnAppointment .modal-dialog { margin: 10px; }
-            #RegistrAnAppointment .modal-body, #RegistrAnAppointment .modal-footer, #RegistrAnAppointment .appointment-modal-head { padding-left: 17px; padding-right: 17px; }
-            #RegistrAnAppointment .kind-grid, #RegistrAnAppointment .option-grid, #RegistrAnAppointment .option-grid.two { grid-template-columns: 1fr; }
-        }
-    </style>
+<div class="sar-root" dir="rtl">
+    @php
+        $kinds = $fetchData['appointment_kinds'] ?? [];
+        $hasOperators = isset($fetchData['operators']);
+    @endphp
 
     <div wire:ignore.self class="modal fade" id="RegistrAnAppointment" data-bs-backdrop="static"
-        data-bs-keyboard="false" tabindex="-1" aria-labelledby="appointmentRegistrationTitle" aria-hidden="true" dir="rtl">
+        data-bs-keyboard="false" tabindex="-1" aria-labelledby="registrationModalTitle" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content">
-                <div class="appointment-modal-head">
-                    <div class="d-flex align-items-start justify-content-between">
-                        <div>
-                            <h5 class="appointment-title" id="appointmentRegistrationTitle"><i class="fa fa-calendar-check-o"></i><span>ثبت سریع نوبت</span></h5>
-                            <p>@if ($step === 1) ابتدا مراجعه‌کننده را پیدا کنید @elseif ($step === 2) مشخصات نوبت را بررسی و ثبت کنید @elseif ($step === 3) اپراتور پاسخ‌گو را انتخاب کنید @else تأیید ثبت نوبت هم‌زمان @endif</p>
+                <div class="sar-head">
+                    <div class="sar-head-top">
+                        <div class="sar-heading">
+                            <span class="sar-title" id="registrationModalTitle">ثبت نوبت</span>
+                            <span class="sar-when">
+                                @if ($appDate)
+                                    {{ $appDate }}
+                                    @if (!empty($form['time']['from']))
+                                        — ساعت {{ substr($form['time']['from'], 0, 5) }} تا {{ substr($form['time']['until'] ?? '', 0, 5) }}
+                                    @endif
+                                @else
+                                    اطلاعات بیمار و نوبت را تکمیل کنید
+                                @endif
+                            </span>
                         </div>
-                        <button type="button" class="appointment-close" wire:click="dismisModal" data-bs-dismiss="modal" aria-label="بستن"><i class="fa fa-times"></i></button>
+                        <button type="button" class="sar-close" wire:click="dismisModal" data-bs-dismiss="modal" aria-label="بستن">×</button>
                     </div>
-                    <div class="appointment-progress" aria-hidden="true">
-                        <span class="active"></span><span class="{{ $step >= 2 ? 'active' : '' }}"></span>
-                        @if (isset($fetchData['operators']))<span class="{{ $step >= 3 ? 'active' : '' }}"></span>@endif
+                    <div class="sar-steps" aria-label="مراحل ثبت نوبت">
+                        <span class="sar-step-dot active">۱</span><span class="sar-step-label {{ $step === 1 ? 'active' : '' }}">شماره همراه بیمار</span>
+                        <span class="sar-step-line"></span>
+                        <span class="sar-step-dot {{ $step > 1 ? 'active' : '' }}">۲</span><span class="sar-step-label {{ $step === 2 || $step === 4 ? 'active' : '' }}">اطلاعات نوبت</span>
+                        @if ($hasOperators)
+                            <span class="sar-step-line"></span>
+                            <span class="sar-step-dot {{ $step === 3 ? 'active' : '' }}">۳</span><span class="sar-step-label {{ $step === 3 ? 'active' : '' }}">اپراتور</span>
+                        @endif
                     </div>
                 </div>
 
-                <div class="modal-body">
+                <div class="sar-body">
                     @error('userNotExists')
-                        <div class="alert alert-danger border-0 rounded-3" role="alert"><i class="fa fa-exclamation-triangle ms-1"></i>{{ $message }}</div>
+                        <div class="sar-notice sar-danger" role="alert"><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> {{ $message }}</div>
                     @enderror
 
                     @if ($step === 1)
-                        <div class="lookup-icon"><i class="fa fa-user-plus"></i></div>
-                        <div class="text-center mb-4"><strong class="d-block mb-1">جست‌وجوی مراجعه‌کننده</strong><span class="field-hint">برای ثبت نوبت، شماره موبایل بیمار الزامی است</span></div>
-                        <div class="appointment-card">
-                            <label for="appointment_mobile" class="form-label fw-bold">شماره موبایل</label>
-                            <div class="mobile-field" x-data>
-                                <span class="mobile-icon" aria-hidden="true"><i class="fa fa-mobile"></i></span>
-                                <input type="tel" inputmode="numeric" autocomplete="tel" autofocus maxlength="11"
-                                    class="form-control @error('form.number') is-invalid @enderror" id="appointment_mobile"
-                                    value="{{ $form['number'] }}" wire:keydown.enter.prevent="numberSet" placeholder="09123456789"
-                                    x-on:input="
-                                        let number = $el.value
-                                            .replace(/[۰-۹]/g, digit => '۰۱۲۳۴۵۶۷۸۹'.indexOf(digit))
-                                            .replace(/[٠-٩]/g, digit => '٠١٢٣٤٥٦٧٨٩'.indexOf(digit))
-                                            .replace(/[^0-9]/g, '')
-                                            .slice(0, 11);
-                                        $el.value = number;
-                                        $wire.set('form.number', number, false);
-                                        if (number.length === 11) { $wire.numberSet(); }
-                                    ">
-                            </div>
-                            @error('form.number')<span class="error-message">{{ $message }}</span>@enderror
+                        <label class="sar-field" for="appointment_mobile" x-data>
+                            <span class="sar-label">ثبت نوبت با شماره همراه</span>
+                            <input type="tel" inputmode="numeric" autocomplete="tel" autofocus maxlength="11"
+                                class="sar-input @error('form.number') is-invalid @enderror" id="appointment_mobile" dir="ltr"
+                                value="{{ $form['number'] }}" wire:keydown.enter.prevent="numberSet" placeholder="09123456789"
+                                x-on:input="
+                                    let number = $el.value
+                                        .replace(/[۰-۹]/g, digit => '۰۱۲۳۴۵۶۷۸۹'.indexOf(digit))
+                                        .replace(/[٠-٩]/g, digit => '٠١٢٣٤٥٦٧٨٩'.indexOf(digit))
+                                        .replace(/[^0-9]/g, '')
+                                        .slice(0, 11);
+                                    $el.value = number;
+                                    $wire.set('form.number', number, false);
+                                    if (number.length === 11) { $wire.numberSet(); }
+                                ">
+                            @error('form.number')<span class="sar-error">{{ $message }}</span>@enderror
+                        </label>
 
-                            @if ($fetchData['document_number_enabled'] ?? false)
-                                <div class="d-flex align-items-center gap-3 my-3"><hr class="flex-grow-1 m-0"><span class="field-hint">اطلاعات تکمیلی</span><hr class="flex-grow-1 m-0"></div>
-                                <label for="appointment_document" class="form-label fw-bold">شماره پرونده <span class="field-hint">(اختیاری)</span></label>
-                                <input type="text" inputmode="numeric" autocomplete="off" class="form-control @error('form.document_number') is-invalid @enderror" id="appointment_document" wire:model="form.document_number" placeholder="شماره پرونده را وارد کنید">
-                                @error('form.document_number')<span class="error-message">{{ $message }}</span>@enderror
-                            @endif
-                        </div>
+                        @if ($fetchData['document_number_enabled'] ?? false)
+                            <div class="sar-divider"></div>
+                            <label class="sar-field" for="appointment_document">
+                                <span class="sar-label">یا ثبت نوبت با شماره پرونده</span>
+                                <input type="text" inputmode="numeric" autocomplete="off" class="sar-input @error('form.document_number') is-invalid @enderror"
+                                    id="appointment_document" wire:model="form.document_number" placeholder="شماره پرونده">
+                                @error('form.document_number')<span class="sar-error">{{ $message }}</span>@enderror
+                            </label>
+                        @endif
                     @elseif ($step === 2)
-                        @if (isset($fetchData['user']))
-                            <div class="patient-summary"><div><i class="fa fa-check-circle text-success ms-2"></i><strong>{{ $form['first_name'] }} {{ $form['last_name'] }}</strong></div><span class="field-hint">{{ $form['number'] ?? $fetchData['user']->mobile }}</span></div>
+                        @php
+                            // the user-details section stays closed only for a patient who already has a full name;
+                            // on a missing or invalid name it opens and turns red
+                            $userInfoHasError = $errors->has('form.first_name') || $errors->has('form.last_name');
+                            $userHasName = isset($fetchData['user']) && filled($form['first_name'] ?? null) && filled($form['last_name'] ?? null);
+                            $userInfoOpen = ! $userHasName || $userInfoHasError;
+                        @endphp
+                        @if (count($kinds) === 0)
+                            <div class="sar-notice sar-danger" role="alert">برای این برنامه هیچ نوع نوبتی فعال نشده است. ابتدا تنظیمات نوبت را اصلاح کنید.</div>
                         @endif
 
-                        @if (count($fetchData['appointment_kinds'] ?? []) === 0)
-                            <div class="alert alert-danger border-0 rounded-3">برای این برنامه هیچ نوع نوبتی فعال نشده است. ابتدا تنظیمات نوبت را اصلاح کنید.</div>
-                        @elseif (count($fetchData['appointment_kinds'] ?? []) > 1)
-                            <div class="appointment-card">
-                                <div class="section-title"><span class="section-icon"><i class="fa fa-stethoscope"></i></span>نوع نوبت را انتخاب کنید</div>
-                                <div class="kind-grid">
-                                    @foreach ($fetchData['appointment_kinds'] as $kind)
-                                        <div>
-                                            <input class="choice-input" type="radio" wire:model.live="form.kind" value="{{ $kind['value'] }}" name="appointment_kind" id="appointment_kind_{{ $kind['value'] }}">
-                                            <label class="choice-card" for="appointment_kind_{{ $kind['value'] }}">
-                                                <span class="choice-icon"><i class="fa {{ $kind['icon'] }}"></i></span>
-                                                <span class="choice-copy"><strong>{{ $kind['name'] }}</strong><small>{{ $kind['hint'] }}</small></span>
-                                            </label>
-                                        </div>
+                        <section class="sar-section">
+                            <button type="button" class="sar-section-title w-100 {{ $userInfoHasError ? 'sar-has-error' : 'border-0 bg-transparent p-0' }} {{ $userInfoOpen ? '' : 'collapsed' }}"
+                                data-bs-toggle="collapse" data-bs-target="#appointment-user-details"
+                                aria-expanded="{{ $userInfoOpen ? 'true' : 'false' }}" aria-controls="appointment-user-details">
+                                <i class="fa fa-angle-down sar-collapse-icon" aria-hidden="true"></i>
+                                <strong>مشخصات کاربری</strong>
+                                @if ($userInfoHasError)
+                                    <i class="fa fa-exclamation-circle" aria-hidden="true"></i>
+                                @endif
+                                <span></span>
+                            </button>
+                            <div id="appointment-user-details" class="collapse {{ $userInfoOpen ? 'show' : '' }}">
+                                <div class="sar-grid">
+                                    <label class="sar-field" for="appointment-first-name"><span class="sar-label">نام کاربر</span><input type="text" class="sar-input @error('form.first_name') is-invalid @enderror" id="appointment-first-name" wire:model="form.first_name">@error('form.first_name')<span class="sar-error">{{ $message }}</span>@enderror</label>
+                                    <label class="sar-field" for="appointment-last-name"><span class="sar-label">نام خانوادگی</span><input type="text" class="sar-input @error('form.last_name') is-invalid @enderror" id="appointment-last-name" wire:model="form.last_name">@error('form.last_name')<span class="sar-error">{{ $message }}</span>@enderror</label>
+                                    <label class="sar-field sar-span-2" for="appointment-document-registration"><span class="sar-label">شماره پرونده</span><input type="text" inputmode="numeric" class="sar-input" id="appointment-document-registration" wire:model="form.document_number"></label>
+                                </div>
+                            </div>
+                        </section>
+
+                        <section class="sar-section">
+                            <div class="sar-section-title"><strong>زمان نوبت</strong><span></span></div>
+                            <div class="sar-grid">
+                                <label class="sar-field" for="appointment-from"><span class="sar-label">از ساعت</span><input type="time" class="sar-input @error('form.time.from') is-invalid @enderror" id="appointment-from" wire:model="form.time.from">@error('form.time.from')<span class="sar-error">{{ $message }}</span>@enderror</label>
+                                <label class="sar-field" for="appointment-until"><span class="sar-label">تا ساعت</span><input type="time" class="sar-input @error('form.time.until') is-invalid @enderror" id="appointment-until" wire:model="form.time.until">@error('form.time.until')<span class="sar-error">{{ $message }}</span>@enderror</label>
+                            </div>
+                        </section>
+
+                        <section class="sar-section">
+                            <div class="sar-section-title"><strong>نوع نوبت</strong><span></span></div>
+                            <div class="sar-choices">
+                                <span class="sar-choice"><input type="radio" wire:model="form.appType" value="main_app" name="appTypeRadio" id="appointment-main"><label for="appointment-main">نوبت اصلی</label></span>
+                                <span class="sar-choice"><input type="radio" wire:model="form.appType" value="in_between" name="appTypeRadio" id="appointment-between"><label for="appointment-between">بین مریض</label></span>
+                            </div>
+                        </section>
+
+                        @if (count($kinds) > 1)
+                            <section class="sar-section">
+                                <div class="sar-section-title"><strong>نحوه برگزاری نوبت</strong><span></span></div>
+                                @error('form.kind')<span class="sar-error">{{ $message }}</span>@enderror
+                                <div class="sar-choices">
+                                    @foreach ($kinds as $kind)
+                                        <span class="sar-choice"><input type="radio" wire:model.live="form.kind" value="{{ $kind['value'] }}" name="appointmentKind" id="appointment-kind-{{ $kind['value'] }}"><label for="appointment-kind-{{ $kind['value'] }}">نوبت {{ $kind['name'] }}</label></span>
                                     @endforeach
                                 </div>
-                                @error('form.kind')<span class="error-message">{{ $message }}</span>@enderror
-                            </div>
-                        @elseif (count($fetchData['appointment_kinds'] ?? []) === 1)
-                            <div class="selected-kind"><i class="fa {{ $fetchData['appointment_kinds'][0]['icon'] }}"></i>این نوبت به‌صورت <strong>{{ $fetchData['appointment_kinds'][0]['name'] }}</strong> ثبت می‌شود.</div>
+                            </section>
+                        @elseif (count($kinds) === 1)
+                            <section class="sar-section">
+                                <div class="sar-section-title"><strong>نحوه برگزاری نوبت</strong><span></span></div>
+                                <div class="sar-choices"><span class="sar-choice"><input type="radio" checked disabled id="appointment-kind-single"><label for="appointment-kind-single">نوبت {{ $kinds[0]['name'] }}</label></span></div>
+                            </section>
                         @endif
 
                         @if ($this->paymentEnabledForSelectedKind())
-                            <div class="appointment-card">
-                                <div class="section-title"><span class="section-icon"><i class="fa fa-credit-card"></i></span>نحوه ثبت نوبت</div>
-                                <p class="field-hint mb-3">پرداخت آنلاین برای این نوع نوبت فعال است؛ یکی از حالت‌های زیر را انتخاب کنید.</p>
-                                @error('form.payment_registration')<div class="alert alert-danger py-2">{{ $message }}</div>@enderror
-                                <div class="option-grid two">
-                                    <div><input class="choice-input" type="radio" wire:model="form.payment_registration" value="confirmed" name="payment_registration" id="payment_confirmed"><label class="choice-card" for="payment_confirmed"><span class="choice-icon"><i class="fa fa-check-circle"></i></span><span class="choice-copy"><strong>ثبت نوبت تأییدشده</strong><small>نوبت بدون نیاز به پرداخت بیمار قطعی می‌شود.</small></span></label></div>
-                                    <div><input class="choice-input" type="radio" wire:model="form.payment_registration" value="payment_link" name="payment_registration" id="payment_link"><label class="choice-card" for="payment_link"><span class="choice-icon"><i class="fa fa-credit-card"></i></span><span class="choice-copy"><strong>ارسال لینک پرداخت</strong><small>نوبت تا پایان مهلت پرداخت رزرو می‌ماند.</small></span></label></div>
+                            <section class="sar-section">
+                                <div class="sar-section-title"><strong>وضعیت پرداخت</strong><span></span></div>
+                                @error('form.payment_registration')<div class="sar-notice sar-danger">{{ $message }}</div>@enderror
+                                <div class="sar-choices">
+                                    <span class="sar-choice"><input type="radio" wire:model="form.payment_registration" value="confirmed" name="payment_registration" id="payment_confirmed"><label for="payment_confirmed">ثبت تأییدشده، بدون نیاز به پرداخت</label></span>
+                                    <span class="sar-choice"><input type="radio" wire:model="form.payment_registration" value="payment_link" name="payment_registration" id="payment_link"><label for="payment_link">لینک پرداخت ارسال شود</label></span>
                                 </div>
-                            </div>
+                            </section>
                         @endif
 
-                        <div class="appointment-card">
-                            <div class="section-title"><span class="section-icon"><i class="fa fa-user"></i></span>مشخصات مراجعه‌کننده</div>
-                            <div class="row g-3">
-                                <div class="col-md-6">
-                                    <label for="appointment_first_name" class="form-label">نام</label>
-                                    <input type="text" class="form-control @error('form.first_name') is-invalid @enderror" id="appointment_first_name" wire:model="form.first_name">
-                                    @error('form.first_name')<span class="error-message">{{ $message }}</span>@enderror
-                                </div>
-                                <div class="col-md-6">
-                                    <label for="appointment_last_name" class="form-label">نام خانوادگی</label>
-                                    <input type="text" class="form-control @error('form.last_name') is-invalid @enderror" id="appointment_last_name" wire:model="form.last_name">
-                                    @error('form.last_name')<span class="error-message">{{ $message }}</span>@enderror
-                                </div>
-                                <div class="col-12">
-                                    <label for="appointment_document_registration" class="form-label">شماره پرونده <span class="field-hint">(اختیاری)</span></label>
-                                    <input type="text" class="form-control" id="appointment_document_registration" wire:model="form.document_number">
-                                </div>
+                        <section class="sar-section">
+                            <div class="sar-section-title"><strong>ارسال پیامک</strong><span></span></div>
+                            <div class="sar-choices">
+                                <span class="sar-choice"><input type="radio" wire:model="form.smsType" value="send" name="smsStatusType" id="appointment-sms"><label for="appointment-sms">پیامک ارسال شود</label></span>
+                                <span class="sar-choice"><input type="radio" wire:model="form.smsType" value="unsend" name="smsStatusType" id="appointment-no-sms"><label for="appointment-no-sms">پیامک ارسال نشود</label></span>
                             </div>
-                        </div>
+                        </section>
 
-                        <div class="appointment-card">
-                            <div class="section-title"><span class="section-icon"><i class="fa fa-clock-o"></i></span>زمان نوبت</div>
-                            <div class="row g-3">
-                                <div class="col-md-6"><label for="appointment_from" class="form-label">از ساعت</label><input type="time" class="form-control @error('form.time.from') is-invalid @enderror" id="appointment_from" wire:model="form.time.from">@error('form.time.from')<span class="error-message">{{ $message }}</span>@enderror</div>
-                                <div class="col-md-6"><label for="appointment_until" class="form-label">تا ساعت</label><input type="time" class="form-control @error('form.time.until') is-invalid @enderror" id="appointment_until" wire:model="form.time.until">@error('form.time.until')<span class="error-message">{{ $message }}</span>@enderror</div>
-                            </div>
-                        </div>
-
-                        <div class="appointment-card">
-                            <a class="advanced-toggle d-flex align-items-center justify-content-between" data-bs-toggle="collapse" href="#appointmentAdvancedOptions" role="button" aria-expanded="false" aria-controls="appointmentAdvancedOptions">
-                                <span><i class="fa fa-sliders ms-2"></i>تنظیمات تکمیلی</span><i class="fa fa-angle-down"></i>
-                            </a>
-                            <div class="collapse mt-3 {{ $errors->has('form.registerWithoutPayment') ? 'show' : '' }}"
-                                id="appointmentAdvancedOptions" x-data
-                                x-init="$el.addEventListener('shown.bs.collapse', () => setTimeout(() => $el.scrollIntoView({ behavior: 'smooth', block: 'nearest' }), 50))">
-                                <label class="form-label">جایگاه نوبت</label>
-                                <div class="option-grid two mb-3">
-                                    <div><input class="choice-input" type="radio" wire:model="form.appType" value="main_app" name="appointment_type" id="appointment_main"><label class="choice-card" for="appointment_main"><span class="choice-icon"><i class="fa fa-list-ol"></i></span><span class="choice-copy"><strong>نوبت اصلی</strong></span></label></div>
-                                    <div><input class="choice-input" type="radio" wire:model="form.appType" value="in_between" name="appointment_type" id="appointment_between"><label class="choice-card" for="appointment_between"><span class="choice-icon"><i class="fa fa-random"></i></span><span class="choice-copy"><strong>بین مریض</strong></span></label></div>
-                                </div>
-
-                                <label class="form-label">ارسال پیامک</label>
-                                <div class="option-grid two">
-                                    <div><input class="choice-input" type="radio" wire:model="form.smsType" value="send" name="sms_status" id="sms_send"><label class="choice-card" for="sms_send"><span class="choice-icon"><i class="fa fa-comment"></i></span><span class="choice-copy"><strong>ارسال شود</strong></span></label></div>
-                                    <div><input class="choice-input" type="radio" wire:model="form.smsType" value="unsend" name="sms_status" id="sms_skip"><label class="choice-card" for="sms_skip"><span class="choice-icon"><i class="fa fa-ban"></i></span><span class="choice-copy"><strong>ارسال نشود</strong></span></label></div>
-                                </div>
-                                <label for="appointment_description" class="form-label mt-3">توضیحات <span class="field-hint">(اختیاری)</span></label>
-                                <textarea class="form-control" id="appointment_description" rows="2" wire:model="form.description"></textarea>
-                            </div>
-                        </div>
+                        <section class="sar-section">
+                            <div class="sar-section-title"><strong>توضیحات</strong><span></span></div>
+                            <label class="sar-field" for="appointment-description"><span class="sar-label">توضیحات نوبت</span><textarea class="sar-textarea" id="appointment-description" rows="3" wire:model="form.description" placeholder="مثلاً: معرفی‌شده از بخش داخلی"></textarea></label>
+                        </section>
                     @elseif ($step === 3)
-                        <div class="appointment-card">
-                            <div class="section-title"><span class="section-icon"><i class="fa fa-headphones"></i></span>انتخاب اپراتور</div>
-                            <p class="field-hint mb-3">اپراتوری را که این نوبت را پاسخ می‌دهد انتخاب کنید.</p>
-                            <select class="form-select @error('form.operator') is-invalid @enderror" wire:model="form.operator">
-                                <option value="">بدون اپراتور</option>
-                                @foreach ($fetchData['operators'] as $userId => $userName)<option value="{{ $userId }}">{{ $userName }}</option>@endforeach
-                            </select>
-                            @error('form.operator')<span class="error-message">{{ $message }}</span>@enderror
-                        </div>
+                        <section class="sar-section">
+                            <div class="sar-section-title"><strong>اپراتور نوبت</strong><span></span></div>
+                            <label class="sar-field" for="appointment-operator">
+                                <span class="sar-label">انتخاب اپراتور</span>
+                                <select class="sar-select @error('form.operator') is-invalid @enderror" id="appointment-operator" wire:model="form.operator">
+                                    <option value="">بدون اپراتور</option>
+                                    @foreach ($fetchData['operators'] ?? [] as $user_id => $user_name)<option value="{{ $user_id }}">{{ $user_name }}</option>@endforeach
+                                </select>
+                                @error('form.operator')<span class="sar-error">{{ $message }}</span>@enderror
+                            </label>
+                        </section>
                     @elseif ($step === 4)
-                        <div class="appointment-card text-center py-4">
-                            <span class="lookup-icon text-warning"><i class="fa fa-exclamation"></i></span>
-                            <h6 class="mb-2">این بازه زمانی قبلاً رزرو شده است</h6>
-                            <p class="field-hint mb-0">آیا مطمئن هستید که نوبت دیگری در همین ساعت ثبت شود؟</p>
-                        </div>
+                        <div class="sar-notice"><strong>تداخل زمانی</strong><br>در ساعت انتخابی شما یک نوبت ثبت شده است. آیا مایل هستید این نوبت نیز ثبت شود؟</div>
                     @endif
                 </div>
 
-                <div class="modal-footer d-flex align-items-center justify-content-between">
-                    <div>
-                        @if (in_array($step, [2, 3], true))
-                            <button type="button" class="btn btn-light secondary-action" wire:click="privousStep" wire:loading.attr="disabled"><i class="fa fa-arrow-right ms-1"></i>بازگشت</button>
-                        @endif
-                    </div>
-                    <div class="d-flex gap-2">
-                        <button type="button" class="btn btn-light secondary-action" wire:click="dismisModal" data-bs-dismiss="modal">انصراف</button>
-                        <button type="button" class="btn btn-primary primary-action" wire:click="numberSet"
-                            wire:loading.attr="disabled" wire:target="numberSet"
-                            @disabled($step === 2 && count($fetchData['appointment_kinds'] ?? []) === 0)>
-                            <span wire:loading.remove wire:target="numberSet">@if ($step === 1) ادامه <i class="fa fa-arrow-left me-1"></i> @elseif ($step === 4) بله، ثبت شود @else ثبت نهایی <i class="fa fa-check me-1"></i> @endif</span>
-                            <span wire:loading wire:target="numberSet"><i class="fa fa-spinner fa-spin ms-1"></i>در حال انجام...</span>
+                <div class="sar-foot">
+                    @if (in_array($step, [2, 3], true))
+                        <button type="button" class="sar-button sar-secondary sar-back" wire:click="privousStep" wire:loading.attr="disabled" wire:target="privousStep"><i class="fa fa-angle-right" aria-hidden="true"></i><span>مرحله قبل</span></button>
+                    @endif
+                    <div class="sar-foot-actions">
+                        <button type="button" class="sar-button sar-primary" wire:click="numberSet" wire:loading.attr="disabled" wire:target="numberSet"
+                            @disabled($step === 2 && count($kinds) === 0)>
+                            <span wire:loading.remove wire:target="numberSet">@if ($step === 1) ادامه @elseif($step === 4) بله، ثبت شود @else ثبت نوبت @endif</span>
+                            <span class="spinner-border spinner-border-sm sar-loading" wire:loading wire:target="numberSet" role="status" aria-hidden="true"></span>
                         </button>
+                        <button type="button" class="sar-button sar-secondary" wire:click="dismisModal" data-bs-dismiss="modal">بی‌خیال</button>
                     </div>
                 </div>
             </div>

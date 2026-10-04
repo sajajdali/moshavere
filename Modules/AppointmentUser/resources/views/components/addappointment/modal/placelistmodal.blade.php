@@ -1,41 +1,42 @@
 <div>
-    <div class="modal effect-slide-in-bottom fade" id="placeModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true"
-        wire:ignore.self>
-        <div class="modal-dialog">
+    <div class="modal ac-modal effect-slide-in-bottom fade" id="placeModal" tabindex="-1"
+        aria-labelledby="placeModalLabel" aria-hidden="true" wire:ignore.self>
+        <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="exampleModalLabel">
-                        انتخاب مطب
+                    <h5 class="modal-title" id="placeModalLabel">
+                        <span class="ac-modal-icon"><i class="fa-solid fa-location-dot" aria-hidden="true"></i></span>
+                        <span>
+                            انتخاب مطب
+                            <span class="ac-modal-sub">محل حضور را انتخاب کنید</span>
+                        </span>
                     </h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    <div>
-                        @if (isset($fetchData['placeList']) && $fetchData['placeList']->isNotEmpty())
-                            <div class="d-flex flex-column g-3">
-                                @foreach ($fetchData['placeList'] as $plaec)
-                                    <a wire:click='placeSelected({{ $plaec->id }})' data-bs-dismiss="modal"
-                                        class="badge bg-danger-gradient my-1 p-5 text-white"
-                                        style="font-size: medium !important ; cursor: pointer;">{{ $plaec->title }}</a>
-                                @endforeach
-                            </div>
-                        @else
-                            <div class="alert alert-warning" role="alert">
-                                <span class="alert-inner--icon me-2"><i class="fe fe-info"></i></span>
-                                <span class="alert-inner--text"><strong>هیچ پزشکی برای این بخش تعریف نشده
-                                        است</strong>
-                                    <br>
-                                    لطفا ابتدا برای این بخش ، پزشک انتخاب کنید و تنظیمات را انجام دهید تا
-                                    بتوانید اقدام
-                                    به ثبت
-                                    نوبت
-                                    نمایید</span>
-                            </div>
-                        @endif
-                    </div>
+                    @if (isset($fetchData['placeList']) && $fetchData['placeList']->isNotEmpty())
+                        <span class="ac-modal-hint">محل حضور مورد نظر را انتخاب کنید</span>
+                        <div class="ac-option-list">
+                            @foreach ($fetchData['placeList'] as $place)
+                                <button type="button" class="ac-option" data-bs-dismiss="modal"
+                                    wire:key="modal-place-{{ $place->id }}"
+                                    wire:click="placeSelected({{ $place->id }})">
+                                    <span class="ac-option-text">
+                                        <span class="ac-option-title">{{ $place->title }}</span>
+                                    </span>
+                                    <span class="ac-option-mark"></span>
+                                </button>
+                            @endforeach
+                        </div>
+                    @else
+                        <div class="ac-note">
+                            <strong>هیچ مطبی تعریف نشده است</strong>
+                            لطفا ابتدا یک مطب به سیستم اضافه کرده و تنظیمات زمان‌های حضور را از قسمت تنظیمات نوبت‌دهی انجام دهید.
+                        </div>
+                    @endif
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">بیخیال</button>
+                    <button type="button" class="ac-btn-ghost" data-bs-dismiss="modal">بی‌خیال</button>
                 </div>
             </div>
         </div>

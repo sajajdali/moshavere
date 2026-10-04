@@ -1,54 +1,60 @@
 <div>
-    <div class="modal effect-flip-horizontal fade" id="segmentModal" tabindex="-1" aria-labelledby="exampleModalLabel"
-        aria-hidden="true" wire:ignore.self>
-        <div class="modal-dialog" wire:key='{{ time() }}'>
+    <div class="modal ac-modal effect-flip-horizontal fade" id="segmentModal" tabindex="-1"
+        aria-labelledby="segmentModalLabel" aria-hidden="true" wire:ignore.self>
+        <div class="modal-dialog modal-dialog-centered" wire:key='{{ time() }}'>
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="exampleModalLabel">
-                        انتخاب بخش بندی
+                    <h5 class="modal-title" id="segmentModalLabel">
+                        <span class="ac-modal-icon"><i class="fa-solid fa-list-ul" aria-hidden="true"></i></span>
+                        <span>
+                            انتخاب بخش‌بندی
+                            <span class="ac-modal-sub">زیربخش مورد نظر را مشخص کنید</span>
+                        </span>
                     </h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
-                <div class="modal-body" style="overflow-y: scroll !important; max-height: 400px;">
-                    <div>
-                        @if (isset($fetchData['segments']['items']) && $fetchData['segments']['items']->isNotEmpty())
-                            @if ($fetchData['segments']['is_one_choice'])
-                                <div class="d-flex flex-column g-3">
-                                    @foreach ($fetchData['segments']['items'] as $segment)
-                                        <a wire:click='segmentSelected({{ $segment->id }})'
-                                            class="badge bg-info-gradient my-1 p-5 text-white"
-                                            style="font-size: medium !important ; cursor: pointer;">{{ $segment->title }}</a>
-                                    @endforeach
-                                </div>
-                            @else
-                            <h5 class="mb-4">
-                                لطفا بخش بندی های مورد نظر را انتخاب کنید:
-                            </h5>
+                <div class="modal-body">
+                    @if (isset($fetchData['segments']['items']) && $fetchData['segments']['items']->isNotEmpty())
+                        @if ($fetchData['segments']['is_one_choice'])
+                            <span class="ac-modal-hint">بخش‌بندی مورد نظر را انتخاب کنید</span>
+                            <div class="ac-option-list">
                                 @foreach ($fetchData['segments']['items'] as $segment)
-                                    <div class="d-flex flex-column g-3 my-2 @if($loop->even) bg-gray-100 @endif p-2 rounded-top rounded-bottom">
-                                        <div class="col-lg-4">
-                                            <label class="ckbox" for="{{ $loop->index }}-segment-items">
-                                                <input type="checkbox" wire:model='form.segmentSelectedIem.{{ $segment->id }}' id="{{ $loop->index }}-segment-items"><span
-                                                    class="fs-6">{{ $segment->title }}</span>
-                                            </label>
-                                        </div>
-                                        {{-- <a wire:click='segmentSelected({{ $segment->id }})'
-                                            class="badge bg-danger-gradient my-1 p-5 text-white"
-                                            style="font-size: medium !important ; cursor: pointer;">{{ $segment->title }}</a> --}}
-                                    </div>
+                                    <button type="button" class="ac-option" wire:key='segment-{{ $segment->id }}'
+                                        wire:click='segmentSelected({{ $segment->id }})'>
+                                        <span class="ac-option-text">
+                                            <span class="ac-option-title">{{ $segment->title }}</span>
+                                        </span>
+                                        <span class="ac-option-mark"></span>
+                                    </button>
                                 @endforeach
-                            @endif
+                            </div>
                         @else
-                            <div class="alert alert-warning" role="alert">
-                                <span class="alert-inner--icon me-2"><i class="fe fe-info"></i></span>
-                                <span class="alert-inner--text"><strong>زیر بخش ها تعریف نشده اند</strong>
+                            <span class="ac-modal-hint">لطفا بخش‌بندی‌های مورد نظر را انتخاب کنید (چند انتخابی)</span>
+                            <div class="ac-option-list">
+                                @foreach ($fetchData['segments']['items'] as $segment)
+                                    <label class="ac-check" for="{{ $loop->index }}-segment-items"
+                                        wire:key='segment-check-{{ $segment->id }}'>
+                                        <input type="checkbox" id="{{ $loop->index }}-segment-items"
+                                            wire:model='form.segmentSelectedIem.{{ $segment->id }}'>
+                                        <span>{{ $segment->title }}</span>
+                                    </label>
+                                @endforeach
                             </div>
                         @endif
-                    </div>
+                    @else
+                        <div class="ac-note">
+                            <strong>زیربخش‌ها تعریف نشده‌اند</strong>
+                            ابتدا از تنظیمات نوبت‌دهی، بخش‌بندی مورد نظر را تعریف کنید.
+                        </div>
+                    @endif
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-info" wire:click='segmentSelected'>ثبت نوبت</button>
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">بیخیال</button>
+                    @if (isset($fetchData['segments']['items']) &&
+                            $fetchData['segments']['items']->isNotEmpty() &&
+                            !$fetchData['segments']['is_one_choice'])
+                        <button type="button" class="ac-btn-primary" wire:click='segmentSelected'>ادامه و انتخاب زمان</button>
+                    @endif
+                    <button type="button" class="ac-btn-ghost" data-bs-dismiss="modal">بی‌خیال</button>
                 </div>
             </div>
         </div>

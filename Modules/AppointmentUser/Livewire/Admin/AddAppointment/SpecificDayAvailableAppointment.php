@@ -56,6 +56,12 @@ class SpecificDayAvailableAppointment extends Component
     {
         $this->moveToScheduledDay(1);
     }
+    public function today()
+    {
+        $this->fetchData['selectedDate'] = Carbon::today();
+        $this->RecreatelistOfAppointment();
+        $this->dateHasBeenChange();
+    }
     private function moveToScheduledDay(int $direction): void
     {
         $date = app('AppointmentUserService')->adjacentScheduledDay(
@@ -172,7 +178,7 @@ class SpecificDayAvailableAppointment extends Component
     }
 
     #[On('docHasChange')]
-    public function RebiuldCacheDataWithDoctorId($appId, $serviceId = null, $placeId = null)
+    public function RebiuldCacheDataWithDoctorId($appId, $serviceId = null, $placeId = null, $segmentItemId = null)
     {
         $app = AppointmentSetting::find($appId);
         if (! $app) {
@@ -186,8 +192,9 @@ class SpecificDayAvailableAppointment extends Component
             'appId' => $app->id,
             'date' => verta($this->fetchData['selectedDate'])->format('Y-m-d'),
         ];
-        if (!empty($this->fetchData['segment'])) {
-            $parameters['segmentItemId'] = $this->fetchData['segment'];
+        // the sub-sections belong to the newly chosen doctor/section, not to the page we are leaving
+        if (! empty($segmentItemId)) {
+            $parameters['segmentItemId'] = $segmentItemId;
         }
 
         return redirect()->route('admin.appointment.add.specificday', $parameters);

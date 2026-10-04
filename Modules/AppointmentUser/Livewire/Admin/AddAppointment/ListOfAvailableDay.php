@@ -69,6 +69,12 @@ class ListOfAvailableDay extends Component
         $service = $sectionId instanceof Service ? $sectionId : Service::findOrFail($sectionId);
         $place = $placeId instanceof Place ? $placeId : Place::findOrFail($placeId);
 
+        // a doctor (who is not an admin) may only book for himself
+        $user = auth()->user();
+        if (! $user->isAdmin() && $user->hasRole('پزشک') && (int) $doctor->id !== (int) $user->id) {
+            abort(403, 'Unauthorized');
+        }
+
         $this->fethData['service'] = $service;
         $this->fethData['doctor']  = $doctor;
         $this->fethData['place']   = $place;

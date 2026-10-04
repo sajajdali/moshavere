@@ -6,166 +6,203 @@
         </div>
     </div>
     @include('admin::layouts.components.alert')
-    <div class="card">
-        <div class="card-header border-bottom">
-            <h3 class="card-title"> انتخاب پزشک</h3>
-            <div class="card-options">
-                <button class="btn btn-primary" type="button" data-bs-toggle="collapse" data-bs-target="#advanceSearch"
-                    aria-expanded="false" aria-controls="advanceSearch">
-                    جست و جوی پیشرفته
-                </button>
-                @if (isset($search['id']) || isset($search['mobile']) || isset($search['first_name']) || isset($search['last_name']))
-                    <button class="btn btn-secondary ms-2" type="button" wire:click="resetProperties"
-                        wire:loading.class="bg-gray btn-loading disabled">نمایش همه
-                    </button>
-                @endif
+    <div class="card doctor-picker">
+        <div class="card-header border-bottom doctor-picker-header">
+            <div>
+                <h3 class="card-title mb-1">
+                    انتخاب پزشک
+                    @if (isset($doctors) && ! $form['services'] && ! $form['place'])
+                        <span class="doctor-picker-count">{{ number_format($doctors->total()) }} پزشک</span>
+                    @endif
+                </h3>
+                <small class="text-muted">برای تنظیم روزها و ساعت‌های حضور، پزشک مورد نظر را انتخاب کنید.</small>
             </div>
+            @if (isset($doctors) && ! $form['services'] && ! $form['place'])
+                <div class="doctor-picker-search">
+                    <i class="fa-solid fa-magnifying-glass" aria-hidden="true"></i>
+                    <input type="search" class="form-control" wire:model.live.debounce.400ms="search.q"
+                        placeholder="جستجو: نام، نام خانوادگی، موبایل یا شناسه" aria-label="جستجوی پزشک">
+                    <span class="doctor-picker-spinner" wire:loading wire:target="search.q">
+                        <i class="fa-solid fa-spinner fa-spin" aria-hidden="true"></i>
+                    </span>
+                    @if (filled($search['q'] ?? null))
+                        <button type="button" class="doctor-picker-clear" wire:click="resetProperties" wire:loading.remove wire:target="search.q"
+                            title="پاک کردن جستجو" aria-label="پاک کردن جستجو">
+                            <i class="fa-solid fa-xmark" aria-hidden="true"></i>
+                        </button>
+                    @endif
+                </div>
+            @endif
         </div>
         <div class="card-body">
             @if (! isset($doctors))
-            <div class="col-md-12 alert alert-primary fade show" role="alert">
-                <i class="fa fa-bell-o me-2 ms-1" aria-hidden="true"></i>
-                پزشکی یافت نشد ! لطفا ابتدا پزشک به سیستم اضافه کنید .
-            </div>
-            @endif
-            <div class="mb-5 collapse {{ $searchPanel }}" id="advanceSearch" wire:ignore>
-                <form class="form-horizontal example" autocomplete="off">
-                    <div class="row mb-4">
-                        <label for="search-id" class="col-md-2 form-label">ایدی</label>
-                        <div class="col-md-10">
-                            <input class="form-control" id="search-id" wire:model="search.id" placeholder="ایدی پزشک"
-                                type="text">
-                        </div>
-                    </div>
-                    <div class="row mb-4">
-                        <label for="search-name" class="col-md-2 form-label">نام پزشک</label>
-                        <div class="col-md-10">
-                            <input class="form-control" id="search-name" wire:model="search.first_name"
-                                placeholder="نام " type="text">
-                        </div>
-                    </div>
-                    <div class="row mb-4">
-                        <label for="search-name" class="col-md-2 form-label">نام خانوادگی پزشک</label>
-                        <div class="col-md-10">
-                            <input class="form-control" id="search-name" wire:model="search.last_name"
-                                placeholder="نام خانوادگی" type="text">
-                        </div>
-                    </div>
-                    <div class="row mb-4">
-                        <label for="search-name" class="col-md-2 form-label">موبایل پزشک</label>
-                        <div class="col-md-10">
-                            <input class="form-control" id="search-name" wire:model="search.mobile"
-                                placeholder="شماره تماس" type="text">
-                        </div>
-                    </div>
-
-                    <button class="btn btn-primary" type="button" wire:click="startSearch"
-                        wire:loading.class="bg-gray btn-loading disabled">جست و
-                        جو
-                    </button>
-                </form>
-            </div>
-            @if (isset($doctors) && $form['services'] != 'true' && $form['place'] != 'true')
-                <div class="row mt-5">
-                    <div class="row">
-                        <h5 class="text-muted mt-1 mb-5">برای تنظیم زمان حضور، پزشک مورد نظر را انتخاب کنید</h5>
-                        @foreach ($doctors as $key => $doctor)
-                            <div class="col-lg-6 col-md-12 col-sm-12">
-                                <div class="card mb-5 shadow-lg" style="border-radius: 10px">
-                                    <div class="card-body">
-                                        <div class="client-title mt-0 flex-column flex-sm-row">
-                                            <figure class="rounded-circle align-self-start mb-0">
-                                                @if ($doctor->avatar)
-                                                    <img src="{{ $doctor->getUserAvatar() }}" alt="Generic placeholder image"
-                                                        class="avatar brround avatar-lg me-3">
-                                                @else
-                                                    <svg xmlns="http://www.w3.org/2000/svg" class="w-inner-icn"
-                                                        enable-background="new 0 0 24 24" viewBox="0 0 24 24">
-                                                        <path
-                                                            d="M14.6650391,13.3672485C16.6381226,12.3842773,17.9974365,10.3535767,18,8c0-3.3137207-2.6862793-6-6-6S6,4.6862793,6,8c0,2.3545532,1.3595581,4.3865967,3.3334961,5.3690186c-3.6583862,1.0119019-6.5859375,4.0562134-7.2387695,8.0479736c-0.0002441,0.0013428-0.0004272,0.0026855-0.0006714,0.0040283c-0.0447388,0.272583,0.1399536,0.5297852,0.4125366,0.5745239c0.272522,0.0446777,0.5297241-0.1400146,0.5744629-0.4125366c0.624939-3.8344727,3.6308594-6.8403931,7.465332-7.465332c4.9257812-0.8027954,9.5697632,2.5395508,10.3725586,7.465332C20.9594727,21.8233643,21.1673584,21.9995117,21.4111328,22c0.0281372,0.0001831,0.0562134-0.0021362,0.0839844-0.0068359h0.0001831c0.2723389-0.0458984,0.4558716-0.303833,0.4099731-0.5761719C21.2677002,17.5184937,18.411377,14.3986206,14.6650391,13.3672485z M12,13c-2.7614136,0-5-2.2385864-5-5s2.2385864-5,5-5c2.7600708,0.0032349,4.9967651,2.2399292,5,5C17,10.7614136,14.7614136,13,12,13z" />
-                                                    </svg>
-                                                @endif
-                                            </figure>
-                                            <div class="media-body my-3 my-sm-0">
-                                                <h4 class="time-title p-0 mb-0 font-weight-semibold leading-normal">
-                                                    <a href="{{ route('admin.appointment.setting', ['user' => $doctor->id]) }}"
-                                                        class="text-dark">{{ $doctor->fullName }}</a>
-                                                </h4>
-                                                <span></span>
-                                            </div>
-                                            <a href="{{ route('admin.appointment.setting', ['user' => $doctor->id]) }}"
-                                                data-bs-toggle="tooltip" data-bs-placement="top"
-                                                title="تنظمات روز های حضور" class="btn btn-info d-block loading-btn">
-                                                <i class="fa fa-calendar"aria-hidden="true"></i> <span>تنظیمات روز های
-                                                    حضور</span>
-                                            </a>
-                                        </div>
-                                        <div class="d-flex align-items-center justify-content-center mt-4">
-                                            <div
-                                                class="pe-4 border-end d-flex align-items-center justify-content-center">
-                                                <h5 class="mb-0 me-3 text-muted">بخش ها</h5>
-                                                <p class="m-0 text-dark">{{$doctor->service->count()}}</p>
-                                            </div>
-                                            <div class="ms-4 d-flex align-items-center justify-content-center">
-                                                <h5 class="mb-0 me-3 text-muted">بخش با زمان اختصاصی</h5>
-                                                <p class="m-0 text-dark">{{$doctor->specialServiceseCount()}}</p>
-                                            </div>
-                                        </div>
-                                    </div>
+                <div class="doctor-picker-empty">
+                    <i class="fa-solid fa-user-doctor" aria-hidden="true"></i>
+                    <strong>پزشکی یافت نشد</strong>
+                    <p>لطفا ابتدا پزشک به سیستم اضافه کنید.</p>
+                    <a href="{{ route('admin.user.create') }}" class="btn btn-primary">افزودن پزشک جدید</a>
+                </div>
+            @elseif ($form['services'])
+                <div class="doctor-picker-empty">
+                    <i class="fa-solid fa-briefcase-medical" aria-hidden="true"></i>
+                    <strong>بخشی یافت نشد</strong>
+                    <p>برای تنظیم زمان حضور، ابتدا بخش (سرویس) به سیستم اضافه کنید.</p>
+                    @can('create', \Modules\Service\app\Models\Service::class)
+                        <a href="{{ route('admin.service.create') }}" class="btn btn-primary">افزودن بخش جدید</a>
+                    @endcan
+                </div>
+            @elseif ($form['place'])
+                <div class="doctor-picker-empty">
+                    <i class="fa-solid fa-hospital" aria-hidden="true"></i>
+                    <strong>مطبی یافت نشد</strong>
+                    <p>برای تنظیم زمان حضور، ابتدا مطب به سیستم اضافه کنید.</p>
+                    <a href="{{ route('admin.place.create') }}" class="btn btn-primary">افزودن مطب جدید</a>
+                </div>
+            @elseif ($doctors->isEmpty())
+                <div class="doctor-picker-empty">
+                    <i class="fa-solid fa-magnifying-glass" aria-hidden="true"></i>
+                    <strong>پزشکی با این مشخصات پیدا نشد</strong>
+                    <p>عبارت جستجو را تغییر دهید.</p>
+                    <button type="button" class="btn btn-outline-primary" wire:click="resetProperties">نمایش همه پزشکان</button>
+                </div>
+            @else
+                {{-- one doctor per row: a long horizontal card --}}
+                <div class="doctor-rows" wire:loading.class="opacity-50" wire:target="search.q, resetProperties, gotoPage, previousPage, nextPage">
+                    @foreach ($doctors as $doctor)
+                        @php
+                            $settingUrl = route('admin.appointment.setting', ['user' => $doctor->id]);
+                            // names and avatar come from the eager-loaded metas; the first_name/last_name accessors query per doctor
+                            $firstName = trim((string) $doctor->getMetas(\Modules\User\Enum\UserMetaEnum::FIRST_NAME)->last()?->meta_value);
+                            $lastName = trim((string) $doctor->getMetas(\Modules\User\Enum\UserMetaEnum::LAST_NAME)->last()?->meta_value);
+                            $fullName = trim("{$firstName} {$lastName}");
+                            $initials = collect([$firstName, $lastName])->map(fn ($part) => mb_substr($part, 0, 1))->filter()->implode(' ');
+                            $hasAvatar = filled($doctor->getMetas(\Modules\User\Enum\UserMetaEnum::AVATAR)->sortByDesc('created_at')->first()?->meta_value);
+                            $specialty = $doctor->specialities->pluck('title')->filter()->implode('، ');
+                        @endphp
+                        <div class="doctor-row {{ $doctor->has_general_setting ? '' : 'is-unset' }}" wire:key="doctor-{{ $doctor->id }}">
+                            <div class="doctor-row-who">
+                                @if ($hasAvatar)
+                                    <img src="{{ $doctor->getUserAvatar() }}" alt="" class="doctor-tile-avatar" loading="lazy">
+                                @else
+                                    <span class="doctor-tile-avatar doctor-tile-initials">{{ $initials ?: '؟' }}</span>
+                                @endif
+                                <div class="doctor-tile-name">
+                                    {{-- stretched-link makes the whole row clickable --}}
+                                    <a href="{{ $settingUrl }}" class="stretched-link loading-btn" title="{{ $fullName }}">
+                                        <span class="doctor-tile-prefix">دکتر</span>
+                                        {{ $fullName ?: 'بدون نام' }}
+                                    </a>
+                                    <small>{{ $specialty ?: 'تخصص ثبت نشده' }}</small>
                                 </div>
                             </div>
-                        @endforeach
-                        <div class="d-flex justify-content-center">
-                            {{$doctors->links()}}
+                            <div class="doctor-row-facts">
+                                <span title="شناسه پزشک"><i class="fa-solid fa-hashtag" aria-hidden="true"></i>{{ $doctor->id }}</span>
+                                @if ($doctor->mobile)
+                                    <span dir="ltr" title="موبایل"><i class="fa-solid fa-mobile-screen" aria-hidden="true"></i>{{ $doctor->mobile }}</span>
+                                @endif
+                            </div>
+                            <div class="doctor-row-stats">
+                                <span><i class="fa-solid fa-layer-group" aria-hidden="true"></i><strong>{{ $doctor->service_count }}</strong> بخش</span>
+                                <span><i class="fa-regular fa-clock" aria-hidden="true"></i><strong>{{ $doctor->special_settings_count }}</strong> زمان اختصاصی</span>
+                            </div>
+                            <div class="doctor-row-status">
+                                @if ($doctor->has_general_setting)
+                                    <span class="badge bg-success-transparent text-success">
+                                        <i class="fa-solid fa-circle-check me-1" aria-hidden="true"></i>تنظیم شده
+                                    </span>
+                                @else
+                                    <span class="badge bg-warning-transparent text-warning">
+                                        <i class="fa-solid fa-clock me-1" aria-hidden="true"></i>تنظیم نشده
+                                    </span>
+                                @endif
+                            </div>
+                            <a href="{{ $settingUrl }}" class="btn btn-sm {{ $doctor->has_general_setting ? 'btn-outline-primary' : 'btn-primary' }} doctor-row-action loading-btn">
+                                <i class="fa-solid {{ $doctor->has_general_setting ? 'fa-pen-to-square' : 'fa-calendar-plus' }} me-1" aria-hidden="true"></i>
+                                {{ $doctor->has_general_setting ? 'ویرایش زمان‌های حضور' : 'تنظیم زمان‌های حضور' }}
+                            </a>
                         </div>
-                    </div>
+                    @endforeach
                 </div>
-            @elseif($form['services'])
-                <div class="alert alert-primary alert-dismissible fade show" role="alert">
-                    <span class="alert-inner--text"><strong>بخشی یافت نشد!!</strong>
-                        <br>
-                        لطفا ابتدا بخش به سیستم اضافه کنید
-
-                        اضافه کنید</span>
-                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close">
-                        <span aria-hidden="true">×</span>
-                    </button>
+                <div class="d-flex justify-content-center mt-4">
+                    {{ $doctors->links() }}
                 </div>
-                @can('create', \Modules\Service\app\Models\Service::class)
-                <a href="{{ route('admin.service.create') }}" class="btn btn-success">افزودن بخش جدید
-                </a>
-                @endcan
-            @elseif($form['place'])
-                <div class="alert alert-primary alert-dismissible fade show" role="alert">
-                    <span class="alert-inner--text"><strong>مطب یافت نشد!!</strong>
-                        <br>
-                        لطفا ابتدا مطب به سیستم اضافه کنید
-
-                        اضافه کنید</span>
-                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close">
-                        <span aria-hidden="true">×</span>
-                    </button>
-                </div>
-                <a href="{{ route('admin.place.create') }}" class="btn btn-success">افزودن مطب جدید
-                </a>
-            @elseif(isset($doctors) &&  $doctors->count() < 1)
-                <div class="alert alert-primary alert-dismissible fade show" role="alert">
-                    <span class="alert-inner--text"><strong>پزشکی یافت نشد!!</strong>
-                        <br>
-                        لطفا ابتدا پزشکان را به سایت
-
-                        اضافه کنید</span>
-                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close">
-                        <span aria-hidden="true">×</span>
-                    </button>
-                </div>
-                <a href="{{ route('admin.user.create') }}" class="btn btn-success">افزودن پزشک جدید
-                </a>
-            <div class="d-flex justify-content-center">
-                  {{ $doctors->links() }}
-            </div>
             @endif
         </div>
     </div>
-
 </div>
+@push('styles')
+    <style>
+        .doctor-picker-header { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; justify-content: space-between; }
+        .doctor-picker-header .card-title { display: flex; align-items: center; gap: 8px; }
+        .doctor-picker-count {
+            padding: 2px 10px; border-radius: 20px; font-size: 12px; font-weight: 600;
+            color: var(--primary-bg-color, #0070bb); background: color-mix(in srgb, var(--primary-bg-color, #0070bb) 10%, transparent);
+        }
+        .doctor-picker-search { position: relative; flex: 0 1 360px; min-width: 220px; }
+        .doctor-picker-search .form-control { padding-right: 38px; padding-left: 36px; border-radius: 10px; }
+        .doctor-picker-search .form-control::-webkit-search-cancel-button { display: none; }
+        .doctor-picker-search > .fa-magnifying-glass { position: absolute; right: 13px; top: 50%; transform: translateY(-50%); opacity: .45; pointer-events: none; }
+        .doctor-picker-spinner { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); opacity: .6; }
+        .doctor-picker-clear {
+            position: absolute; left: 8px; top: 50%; transform: translateY(-50%); display: grid; place-items: center;
+            width: 24px; height: 24px; padding: 0; border: 0; border-radius: 50%; background: rgba(128, 128, 160, .14); color: inherit; cursor: pointer;
+        }
+        .doctor-picker-clear:hover { background: rgba(128, 128, 160, .26); }
+        /* one doctor per row: who | id & mobile | counts | status | action */
+        .doctor-rows { display: flex; flex-direction: column; gap: 10px; transition: opacity .15s; }
+        .doctor-row {
+            position: relative; cursor: pointer;
+            display: grid; align-items: center; gap: 12px 20px; padding: 12px 16px;
+            grid-template-columns: minmax(220px, 2.2fr) minmax(150px, 1fr) minmax(190px, 1.1fr) auto auto;
+            border: 1px solid rgba(128, 128, 160, .22); border-inline-start: 4px solid var(--primary-bg-color, #0070bb);
+            border-radius: 12px; transition: box-shadow .15s, border-color .15s;
+        }
+        /* doctors without a general setting get a warning accent so they stand out */
+        .doctor-row.is-unset { border-inline-start-color: #f7b731; }
+        .doctor-row:hover { border-color: color-mix(in srgb, var(--primary-bg-color, #0070bb) 55%, transparent); box-shadow: 0 6px 18px -12px rgba(40, 40, 80, .35); }
+        .doctor-row:hover, .doctor-row.is-unset:hover { border-inline-start-color: var(--primary-bg-color, #0070bb); }
+        .doctor-row:focus-within { border-color: var(--primary-bg-color, #0070bb); }
+        .doctor-row .stretched-link:focus { outline: none; }
+        /* the action button stays clickable above the row-wide link */
+        .doctor-row-action { position: relative; z-index: 2; white-space: nowrap; }
+        .doctor-row-who { display: flex; align-items: center; gap: 12px; min-width: 0; }
+        .doctor-row-facts { display: flex; flex-direction: column; gap: 2px; font-size: 13px; }
+        .doctor-row-facts > span { opacity: .75; white-space: nowrap; }
+        .doctor-row-facts i { margin-left: 6px; opacity: .6; }
+        .doctor-row-stats { display: flex; flex-wrap: wrap; gap: 6px; }
+        .doctor-row-stats > span { padding: 4px 10px; border-radius: 8px; font-size: 12.5px; white-space: nowrap; background: rgba(128, 128, 160, .08); }
+        .doctor-row-stats i { margin-left: 5px; opacity: .55; font-size: 12px; }
+        .doctor-row-stats strong { font-size: 14px; margin-left: 2px; }
+        .doctor-row-status .badge { font-weight: 600; white-space: nowrap; }
+        @media (max-width: 1199.98px) {
+            .doctor-row { grid-template-columns: minmax(200px, 1fr) auto auto; }
+            .doctor-row-facts { flex-direction: row; flex-wrap: wrap; gap: 4px 14px; grid-column: 1 / -1; order: 5; }
+            .doctor-row-stats { grid-column: 1 / -1; order: 6; }
+        }
+        @media (max-width: 575.98px) {
+            .doctor-picker-search { flex-basis: 100%; }
+            .doctor-row { grid-template-columns: 1fr auto; }
+            .doctor-row-action { grid-column: 1 / -1; order: 7; width: 100%; }
+        }
+        .doctor-tile-avatar { width: 48px; height: 48px; flex: 0 0 48px; border-radius: 50%; object-fit: cover; }
+        .doctor-tile-initials {
+            display: inline-flex; align-items: center; justify-content: center; font-weight: 700; font-size: 15px;
+            color: var(--primary-bg-color, #0070bb); background: color-mix(in srgb, var(--primary-bg-color, #0070bb) 14%, transparent);
+        }
+        .doctor-tile-name { min-width: 0; flex: 1; display: flex; flex-direction: column; gap: 3px; }
+        /* names wrap to two lines instead of being cut off */
+        .doctor-tile-name a {
+            font-weight: 800; font-size: 17px; line-height: 1.55; color: #16213a;
+            display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; overflow-wrap: anywhere;
+        }
+        .doctor-tile-name a:hover { color: var(--primary-bg-color, #0070bb); }
+        .doctor-tile-prefix { font-weight: 500; font-size: 14px; opacity: .6; }
+        .doctor-tile-name small { font-size: 13px; color: #5b6477; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .dark-mode .doctor-tile-name a { color: #eef1f8; }
+        .dark-mode .doctor-tile-name a:hover { color: var(--primary-bg-color, #0070bb); }
+        .dark-mode .doctor-tile-name small { color: #a9b1c4; }
+        .doctor-picker-empty { display: flex; flex-direction: column; align-items: center; gap: 6px; padding: 40px 16px; text-align: center; }
+        .doctor-picker-empty > i { font-size: 34px; opacity: .35; margin-bottom: 6px; }
+        .doctor-picker-empty p { margin: 0 0 10px; opacity: .7; }
+    </style>
+@endpush

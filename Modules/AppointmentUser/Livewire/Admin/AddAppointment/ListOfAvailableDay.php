@@ -103,7 +103,8 @@ class ListOfAvailableDay extends Component
                 return redirect()->route('admin.appointment.doctor.list');
             }
         }
-        $details = [];
+        // admin panel: list every free place of a slot when the setting allows several appointments per hour
+        $details = ['expand_slots' => true];
         if ($segmentItemId != null) {
             $details['segment_time'] = $this->fethData['segment_time'];
         }

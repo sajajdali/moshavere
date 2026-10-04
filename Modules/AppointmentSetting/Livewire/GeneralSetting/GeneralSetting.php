@@ -48,6 +48,10 @@ class GeneralSetting extends Component
             'status' => false,
             'count' => null,
         ],
+        'multipleAppointmentsPerHour' => [
+            'status' => false,
+            'count' => 1,
+        ],
         'accessibility' => [
             'dont_show_times' => [
                 'status' => false,
@@ -261,6 +265,7 @@ class GeneralSetting extends Component
             'form.operators.ids'                  => 'required_if:form.operators.status,true',
             'form.openTime.time'                  => 'required_if:form.openTime.status,true',
             'form.emptyAppointmentDisplayLimit.count' => 'required_if:form.emptyAppointmentDisplayLimit.status,true|integer|min:1',
+            'form.multipleAppointmentsPerHour.count' => 'required_if:form.multipleAppointmentsPerHour.status,true|nullable|integer|min:1',
         ];
         if (isset($this->form['maxAvailabeAppointment']['status']) && $this->form['maxAvailabeAppointment']['status'] == true) {
             if (isset($this->form['visitType']['online']) && $this->form['visitType']['online'] == true) {
@@ -300,6 +305,9 @@ class GeneralSetting extends Component
         }
         if (! data_get($this->form, 'emptyAppointmentDisplayLimit.status', false)) {
             unset($this->form['emptyAppointmentDisplayLimit']['count']);
+        }
+        if (! data_get($this->form, 'multipleAppointmentsPerHour.status', false)) {
+            $this->form['multipleAppointmentsPerHour']['count'] = 1;
         }
         if (isset($this->form['monitoring']['status'])  && $this->form['monitoring']['status'] == false) {
             if (isset($this->form['monitoring']['hour'])) {
@@ -401,6 +409,13 @@ class GeneralSetting extends Component
                     AppointmentSetting::PRICE                        => isset($this->form['payment']['inPerson']['price'])    ? $this->form['payment']['inPerson']['price']    : null,
                 ],
             ]
+        ];
+        $multipleAppointmentsPerHourStatus = (bool) data_get($this->form, 'multipleAppointmentsPerHour.status', false);
+        $detail[AppointmentSetting::MULTIPLE_APPOINTMENTS_PER_HOUR] = [
+            AppointmentSetting::STATUS => $multipleAppointmentsPerHourStatus,
+            'count' => $multipleAppointmentsPerHourStatus
+                ? (int) data_get($this->form, 'multipleAppointmentsPerHour.count', 1)
+                : 1,
         ];
         if (isset($this->form['openTime']['status']) && data_get($this->form, 'openTime.status', false)) {
             $detail[AppointmentSetting::OPEN_TIME] = data_get($this->form, 'openTime.time');
@@ -554,6 +569,8 @@ class GeneralSetting extends Component
             ? (int) $emptyAppointmentDisplayLimit
             : null;
         $this->form['maxAvailabeAppointment']['ForSecretery'] = $apSet->detail[AppointmentSetting::MAX_AVAILABLE_APPOINTMENT_FOR_SECRETERY] ?? null;
+        $this->form['multipleAppointmentsPerHour']['status'] = (bool) data_get($apSet->detail, AppointmentSetting::MULTIPLE_APPOINTMENTS_PER_HOUR . '.status', false);
+        $this->form['multipleAppointmentsPerHour']['count']  = max(1, (int) data_get($apSet->detail, AppointmentSetting::MULTIPLE_APPOINTMENTS_PER_HOUR . '.count', 1));
         $this->form['cancel']['day']                     = $apSet->cancellation_by_user ?? null;
         $this->form['avtive']                            = $apSet->active == ActiveEnum::ACTIVE ? true : false;
         if (isset($apSet->last_day_active)) {

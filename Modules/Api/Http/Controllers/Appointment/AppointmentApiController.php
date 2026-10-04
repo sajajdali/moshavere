@@ -327,36 +327,18 @@ class AppointmentApiController extends Controller
 
         $conditions = $alert = null;
 
-        $appointmentSetting = AppointmentSetting::where('user_id', $doctorId);
-
-        // online
-        if ($kind == AppointmentUserKindEnum::ONLINE->value) {
-            $appointmentSetting->where('detail->visit_type_online', true);
-        } // in person
-        else {
-            $appointmentSetting->where('detail->visit_type_inPerson', true);
-        }
-
-        if ($placesId) {
-            if (AppointmentSetting::where('user_id', $doctorId)->where('place_id', $servicesId)->count()) {
-                $appointmentSetting->where('place_id', $placesId);
-            } else {
-                $appointmentSetting->whereNull('place_id');
-            }
-        }
-
-        if ($servicesId) {
-            if (AppointmentSetting::where('user_id', $doctorId)->where('service_id', $servicesId)->count()) {
-                $appointmentSetting->where('service_id', $servicesId);
-            } else {
-                $appointmentSetting->whereNull('service_id');
-            }
-        }
+        // dedicated setting of this doctor/service/place, otherwise the doctor's general setting,
+        // in both cases only if it offers the requested visit type (online / in person)
+        $visitType = $kind == AppointmentUserKindEnum::ONLINE->value ? 'detail->visit_type_online' : 'detail->visit_type_inPerson';
+        $appointmentSetting = AppointmentSetting::resolveFor(
+            $doctorId,
+            $servicesId,
+            $placesId,
+            scope: fn($q) => $q->where($visitType, true)
+        );
         if ($servicesId ==  3) {
             $servicesId =  $question;
         }
-
-        $appointmentSetting = $appointmentSetting->first();
 
         if (!$appointmentSetting) {
             return $this->requestException([

@@ -80,7 +80,7 @@ class SpecificDayAvailableAppointment extends Component
         unset($this->fetchData['navigationMessage']);
         $this->form['changeDate'] = verta($this->fetchData['selectedDate'])->format('Y/m/d');
         $app = $this->fetchData['appointmentSetting'];
-        $details = ['specialDays' => $this->fetchData['selectedDate']->toDateString()];
+        $details = ['specialDays' => $this->fetchData['selectedDate']->toDateString(), 'expand_slots' => true];
         if (isset($this->fetchData['segment_time'])) {
             $details['segment_time'] = $this->fetchData['segment_time'];
         }
@@ -116,6 +116,7 @@ class SpecificDayAvailableAppointment extends Component
         $result = [];
         $temPResult = [];
         $reservedAppBeforeCacheCreate = null;
+        $reservedAppPlaced = false;
         if (isset($this->fetchData['reserve_app_till_cache_create'])) {
             $reservedAppBeforeCacheCreate = $this->fetchData['reserve_app_till_cache_create'];
         }
@@ -124,6 +125,10 @@ class SpecificDayAvailableAppointment extends Component
                 foreach ($day as $month => $appointments) {
                     foreach ($appointments as $day => $appointment) {
                         $dayNumber = $appointment['day_number_gmt'];
+                        // the reserved appointment may already be part of the list (it is read live)
+                        if ($reservedAppBeforeCacheCreate && in_array($reservedAppBeforeCacheCreate->id, array_column($appointment['times'], 'appointment_user_id'))) {
+                            $reservedAppPlaced = true;
+                        }
                         foreach ($appointment['times'] as $time) {
                             if ($time['status']) {
                                 // Increment the counter
@@ -136,8 +141,10 @@ class SpecificDayAvailableAppointment extends Component
                                 ];
 
                                 // check for existing app before cache generate
-                                if (! is_null($reservedAppBeforeCacheCreate)) {
+                                // (only once: with several empty places per slot the timestamp repeats)
+                                if (! is_null($reservedAppBeforeCacheCreate) && ! $reservedAppPlaced) {
                                     if ($reservedAppBeforeCacheCreate->date_visit->timestamp == $time['timestamp']) {
+                                        $reservedAppPlaced = true;
                                         $temPResult[] = [
                                             'status' => false,
                                             'from' => $time['from'],

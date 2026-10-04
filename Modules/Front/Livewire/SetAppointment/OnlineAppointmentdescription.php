@@ -79,12 +79,7 @@ class OnlineAppointmentdescription extends Component
         if ($isServiceBelongToUser != true  || $isPlaceBelongToUser != true) {
             return abort(404);
         }
-        $appSetting = AppointmentSetting::where('user_id', $doc)
-        ->where(function ($q) use($service) {
-            return $q->where('service_id', $service)->orWhereNull('service_id');
-        })->where(function ($q) use($place)  {
-            return $q->where('place_id', $place)->orWhereNull('place_id');
-        })->first();
+        $appSetting = AppointmentSetting::resolveFor($doc, $service, $place);
         $this->fetchData['isAppAvailable'] = true ;
         if(isset($appSetting->detail[AppointmentSetting::MAX_ACTIVE_APP_FOR_ONLINE_APP] )) {
             $maxAppointmentForEachDay = (int) $appSetting->detail[AppointmentSetting::MAX_ACTIVE_APP_FOR_ONLINE_APP] ;

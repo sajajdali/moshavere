@@ -119,13 +119,7 @@ class Service extends Model
                 ];
                 if ($placeId != null) {
                     $routeProperty['place_id'] = $placeId;
-                    $appointmentSetting = AppointmentSetting::where('place_id', $placeId)
-                        ->where('service_id', $this->id)
-                        ->where('user_id', $doctor->id)
-                        ->first();
-                    if ($appointmentSetting === null) {
-                        $appointmentSetting = AppointmentSetting::firstWhere('user_id', $doctor->id);
-                    }
+                    $appointmentSetting = AppointmentSetting::resolveFor($doctor->id, $this->id, $placeId);
                     if ($appointmentSetting?->segments()->exists()) {
                         return route('front.doctor.profile', $routeProperty);
                     } else {

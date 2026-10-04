@@ -569,20 +569,7 @@ class VoipController extends Controller
         if (! $doctorId) {
             return null;
         }
-        $appointmentSetting =  AppointmentSetting::query()
-            ->active()
-            ->where('user_id', $doctorId)
-            ->when($placeId, fn($query) => $query->where('place_id', $placeId))
-            ->when(! $placeId, fn($query) => $query->whereNull('place_id'))
-            ->when($serviceId, fn($query) => $query->where('service_id', $serviceId))
-            ->when(! $serviceId, fn($query) => $query->whereNull('service_id'))
-            ->first()
-            ?? AppointmentSetting::query()
-            ->active()
-            ->where('user_id', $doctorId)
-            ->whereNull('place_id')
-            ->whereNull('service_id')
-            ->first();
+        $appointmentSetting = AppointmentSetting::resolveFor($doctorId, $serviceId, $placeId, activeOnly: true);
         Log::info('appointmentSetting lookup completed', [
             'appointment_setting_id' => $appointmentSetting?->id,
             'doctor_id' => $doctorId,
@@ -846,19 +833,7 @@ class VoipController extends Controller
         if ($findAlterNateDoctor == null) {
             return null;
         }
-        $appointmentSetting = AppointmentSetting::where('user_id', $findAlterNateDoctor->id);
-
-        if ($placesId) {
-            $appointmentSetting->where('place_id', $placesId);
-        } else {
-            $appointmentSetting->whereNull('place_id');
-        }
-        if ($servicesId) {
-            $appointmentSetting->where('service_id', $servicesId);
-        } else {
-            $appointmentSetting->whereNull('service_id');
-        }
-        $appointmentSetting = $appointmentSetting->first();
+        $appointmentSetting = AppointmentSetting::resolveFor($findAlterNateDoctor->id, $servicesId, $placesId);
 
         if (!$appointmentSetting) {
             return $this->requestException([

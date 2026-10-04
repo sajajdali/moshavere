@@ -4,12 +4,32 @@
         ->filter(fn($slot) => !$slot['status'] && !empty($slot['appointment_user_id']))
         ->count();
     $freeCount = count($dayAppointments) - $bookedCount;
+
+    // multiple appointments in one slot: number each entry inside its from/until group
+    $multiPerHour = $fetchData['appointmentSetting']->appointmentsPerHour() > 1;
+    $slotGroupSize = [];
+    $slotPosition = [];
+    if ($multiPerHour) {
+        foreach ($dayAppointments as $i => $slot) {
+            $groupKey = $slot['from'] . '|' . $slot['until'];
+            $slotGroupSize[$groupKey] = ($slotGroupSize[$groupKey] ?? 0) + 1;
+            $slotPosition[$i] = $slotGroupSize[$groupKey];
+        }
+    }
 @endphp
 
 <div class="sd-page" dir="rtl">
 @once
     @push('styles')
         <link href="{{ admin_asset('css/specific-day-appointment.css') }}" rel="stylesheet">
+        <style>
+            .sd-row-multi-next .sd-time-values { opacity: .45; }
+            .sd-multi-badge {
+                display: inline-block; margin-top: 4px; padding: 1px 8px; border-radius: 10px;
+                font-size: 11px; white-space: nowrap; color: var(--primary-bg-color, #6259ca);
+                background: rgba(98, 89, 202, .12);
+            }
+        </style>
     @endpush
 @endonce
 
@@ -107,6 +127,9 @@
                         @php
                             $ap = null;
                             $user = null;
+                            $groupSize = $multiPerHour ? $slotGroupSize[$eachTime['from'] . '|' . $eachTime['until']] : 1;
+                            $inGroup = $groupSize > 1;
+                            $multiClass = $inGroup ? 'sd-row-multi' . (($slotPosition[$key] ?? 1) > 1 ? ' sd-row-multi-next' : '') : '';
                             if (!$eachTime['status'] && !empty($eachTime['appointment_user_id'])) {
                                 $ap = Modules\AppointmentUser\app\Models\AppointmentUser::find(
                                     $eachTime['appointment_user_id'],
@@ -116,12 +139,15 @@
                         @endphp
 
                         @if ($ap)
-                            <div class="sd-row sd-row-booked {{ $ap->type == Modules\AppointmentUser\Enum\AppointmentUserTypeEnum::BETWEEN_PATIENTS ? 'sd-row-between' : '' }}"
+                            <div class="sd-row sd-row-booked {{ $multiClass }} {{ $ap->type == Modules\AppointmentUser\Enum\AppointmentUserTypeEnum::BETWEEN_PATIENTS ? 'sd-row-between' : '' }}"
                                 data-slot-state="booked" @if ($edited['status']) style="display:none" @endif>
                                 <div class="sd-time"><span class="sd-index">{{ $key + 1 }}</span><span
                                         class="sd-time-values"><span
                                             class="sd-time-from">{{ substr($eachTime['from'], 0, -3) }}</span><span
                                             class="sd-time-until">{{ substr($eachTime['until'], 0, -3) }}</span></span>
+                                    @if ($inGroup)
+                                        <span class="sd-multi-badge">نوبت {{ $slotPosition[$key] }} از {{ $groupSize }}</span>
+                                    @endif
                                 </div>
                                 <span class="sd-marker"></span>
                                 <div class="sd-slot-content">
@@ -169,11 +195,14 @@
                                 </div>
                             </div>
                         @else
-                            <div class="sd-row" data-slot-state="free">
+                            <div class="sd-row {{ $multiClass }}" data-slot-state="free">
                                 <div class="sd-time"><span class="sd-index">{{ $key + 1 }}</span><span
                                         class="sd-time-values"><span
                                             class="sd-time-from">{{ substr($eachTime['from'], 0, -3) }}</span><span
                                             class="sd-time-until">{{ substr($eachTime['until'], 0, -3) }}</span></span>
+                                    @if ($inGroup)
+                                        <span class="sd-multi-badge">نوبت {{ $slotPosition[$key] }} از {{ $groupSize }}</span>
+                                    @endif
                                 </div>
                                 <span class="sd-marker"></span>
                                 <div class="sd-slot-content">

@@ -255,14 +255,13 @@ class ShowAvailableDayForDoctor extends Component
 
     private function getAvailableDay()
     {
-        $appointmentSetting = AppointmentSetting::activeSetting()->where('service_id', $this->fetchData['service']->id)
-            ->where('place_id', $this->fetchData['places']->id)
-            ->where('user_id', $this->fetchData['doc']->id)
-            ->first();
-        //check for general setting
-        if (!isset($appointmentSetting)) {
-            $appointmentSetting = AppointmentSetting::activeSetting()->where('user_id', $this->fetchData['doc']->id)->first();
-        }
+        // dedicated setting of this doctor/service/place, otherwise the doctor's general setting
+        $appointmentSetting = AppointmentSetting::resolveFor(
+            $this->fetchData['doc']->id,
+            $this->fetchData['service']->id,
+            $this->fetchData['places']->id,
+            activeOnly: true
+        );
         if (isset($this->fetchData['segment_time'])) {
             // if segment exists , genereate list of appointment
             $details = [];

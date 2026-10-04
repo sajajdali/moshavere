@@ -47,6 +47,7 @@
         $advancedSettingsHasErrors = collect([
             'form.operators.*',
             'form.interference.*',
+            'form.multipleAppointmentsPerHour.*',
             'form.avtive',
         ])->contains(fn ($key) => $errors->has($key));
     @endphp
@@ -785,6 +786,55 @@
                 <p class="text-muted"><strong class="me-1"> نکته!! </strong> با فعال سازی این قسمت، نوبت های این
                     بخش بدون اینکه با سایر نوبت های همان روز
                     پزشک بررسی شود ، ثبت میشود، به عبارتی ممکن است در یک زمان چند نوبت برای این پزشک ثبت شود </p>
+            </div>
+        </div>
+    </div>
+    {{-- multiple appointments per hour --}}
+    <div class="card shadow-sm custom-card-Setting @error('form.multipleAppointmentsPerHour.count') border border-danger @enderror">
+        <div class="card-header border-bottom d-flex justify-content-between">
+            <h3 class="d-flex align-item-center">
+                <i class="fa fa-clone me-2 d-none d-sm-inline" aria-hidden="true"></i>
+                <span>اجازه ثبت چند نوبت در یک ساعت</span>
+            </h3>
+            <div class="main-toggle-group d-sm-flex align-item-center ms-0">
+                <div class="toggle toggle-lg toggle-primary my-1 customCheckbox @if (data_get($form, 'multipleAppointmentsPerHour.status', false)) on @else off @endif"
+                    data-id="multipleAppointmentsPerHour.status" wire:ignore.self data-bs-toggle="collapse"
+                    href="#multipleAppointmentsPerHour" role="button"
+                    aria-expanded="{{ data_get($form, 'multipleAppointmentsPerHour.status', false) ? 'true' : 'false' }}"
+                    aria-controls="multipleAppointmentsPerHour">
+                    <span></span>
+                </div>
+            </div>
+        </div>
+        <div class="collapse @if (data_get($form, 'multipleAppointmentsPerHour.status', false)) show @endif"
+            id="multipleAppointmentsPerHour" wire:ignore.self>
+            <div class="card-body">
+                @error('form.multipleAppointmentsPerHour.count')
+                    <div class="alert alert-danger" role="alert">
+                        <p class="text-danger mb-0">تعداد نوبت در هر ساعت را با عددی بزرگ‌تر از صفر مشخص کنید.</p>
+                    </div>
+                @enderror
+                <div class="row">
+                    <div class="col-md-5 pt-2">
+                        <label class="text-primary" for="multipleAppointmentsPerHourCount">
+                            تعداد نوبت در هر ساعت
+                        </label>
+                    </div>
+                    <div class="col-md-7">
+                        <div class="input-group mb-3">
+                            <input type="number" min="1"
+                                class="form-control @error('form.multipleAppointmentsPerHour.count') is-invalid @enderror"
+                                id="multipleAppointmentsPerHourCount"
+                                wire:model="form.multipleAppointmentsPerHour.count">
+                            <div class="input-group-prepend">
+                                <span class="input-group-text">عدد</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="d-flex mt-2">
+                        <p class="text-muted mb-0"><strong class="me-1">نکته!!</strong> با فعال سازی این امکان ، در هر ساعت بیشتر از یک نوبت قابل دریافت خواهد بود. مقدار پیش‌فرض سیستم یک نوبت در هر ساعت است.</p>
+                    </div>
+                </div>
             </div>
         </div>
     </div>

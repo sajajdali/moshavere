@@ -298,6 +298,9 @@ class AppointmentUserService
             ? (int)$appointmentSettings->detail[AppointmentSetting::MAX_AVAILABLE_APPOINTMENT_EACH_DAY]
             : null;
 
+        // Number of appointments that can share one slot (default 1)
+        $slotCapacity = $appointmentSetting->appointmentsPerHour();
+
         // -----------------------------
         // 3) Build output (same structure)
         // -----------------------------
@@ -349,6 +352,8 @@ class AppointmentUserService
                     $dow             = $currentDate->copy()->addDay()->dayOfWeek; // preserved your original +1 day logic
                     $attendanceTimes = collect($weeklyTimesByDow[$dow] ?? []);
                 }
+                // the same attendance range stored twice must not generate every slot twice
+                $attendanceTimes = $attendanceTimes->unique(fn($t) => $t->start_at . '|' . $t->end_at);
                 // Place booked appointments (only for this day)
                 if (!empty($appointmentsByDay[$dateKey])) {
                     foreach ($appointmentsByDay[$dateKey] as $appointment) {
@@ -406,6 +411,55 @@ class AppointmentUserService
                     // Slot generation loop (unchanged logic)
                     while ($startTime->lt($endTime)) {
 
+                        // Multiple appointments per slot: a slot that is already partly booked
+                        // (exact same from/until) still shows the remaining empty places
+                        if ($slotCapacity > 1) {
+                            $slotUntil = $startTime->copy()->addMinutes($timeForVisit);
+                            if ($slotUntil->lte($endTime)) {
+                                $slotFrom      = strtotime($startTime->toTimeString());
+                                $slotUntilTs   = strtotime($slotUntil->toTimeString());
+                                $bookedInSlot  = 0;
+                                $otherTimes    = [];
+                                foreach ($dayOutput['times'] as $existingTime) {
+                                    $isBookedMain = isset($existingTime['appointment_user_id'])
+                                        && ($existingTime['type'] ?? AppointmentUserTypeEnum::MAIN__APPOINTMENT->value) == AppointmentUserTypeEnum::MAIN__APPOINTMENT->value
+                                        && isset($existingTime['app_status'])
+                                        && in_array($existingTime['app_status'], AppointmentUserStatusEnum::confirmed());
+                                    if (
+                                        $isBookedMain
+                                        && strtotime($existingTime['from']) === $slotFrom
+                                        && strtotime($existingTime['until']) === $slotUntilTs
+                                    ) {
+                                        $bookedInSlot++;
+                                    } else {
+                                        $otherTimes[] = $existingTime;
+                                    }
+                                }
+                                if (
+                                    $bookedInSlot > 0
+                                    && $this->isTimeRangeAvailable($startTime->toTimeString(), $slotUntil->toTimeString(), $otherTimes)['status'] == false
+                                ) {
+                                    $thisStatus = !$currentDate->copy()->addDay()->isPast();
+                                    if ($maxAppointmentEachDay !== null && $numberAppointmentsPerDay >= $maxAppointmentEachDay) {
+                                        $thisStatus = false;
+                                    }
+                                    for ($i = $bookedInSlot; $i < $slotCapacity; $i++) {
+                                        $dayOutput['times'][] = [
+                                            'status'    => $thisStatus,
+                                            'timestamp' => $currentDate->copy()->setTime($startTime->hour, $startTime->minute)->timestamp,
+                                            'from'      => $startTime->toTimeString(),
+                                            'until'     => $slotUntil->toTimeString(),
+                                        ];
+                                        if ($thisStatus) {
+                                            $dayOutput['empty_appoints']++;
+                                        }
+                                    }
+                                    $startTime->addMinutes($timeForVisit);
+                                    continue;
+                                }
+                            }
+                        }
+
                         $overlaps = $this->isTimeRangeAvailable(
                             $startTime->toTimeString(),
                             $startTime->copy()->addMinutes($timeForVisit),
@@ -442,6 +496,19 @@ class AppointmentUserService
 
                                 if ($thisStatus) {
                                     $dayOutput['empty_appoints']++;
+                                }
+
+                                // extra empty places for the same slot
+                                for ($i = 1; $i < $slotCapacity; $i++) {
+                                    $dayOutput['times'][] = [
+                                        'status'    => $thisStatus,
+                                        'timestamp' => $currentDate->copy()->setTime($startTime->hour, $startTime->minute)->timestamp,
+                                        'from'      => $startTime->toTimeString(),
+                                        'until'     => $until->toTimeString(),
+                                    ];
+                                    if ($thisStatus) {
+                                        $dayOutput['empty_appoints']++;
+                                    }
                                 }
 
                                 // preserve original stepping logic
@@ -559,6 +626,18 @@ class AppointmentUserService
                 return strtotime($a['from']) <=> strtotime($b['from']);
             });
 
+            // Several places per slot are only listed one by one in the admin panel ('expand_slots');
+            // every other consumer (website, API, VoIP, cache) gets one entry per slot, which is
+            // free while at least one place is left. The capacity itself is enforced in storeAppointment.
+            if ($slotCapacity > 1 && empty($details['expand_slots'])) {
+                $dayOutput['times'] = $this->collapseSlotPlaces($dayOutput['times']);
+                $dayOutput['empty_appoints'] = count(array_filter($dayOutput['times'], fn($t) => $t['status'] && isset($t['timestamp'])));
+                if ($dayOutput['empty_appoints'] == 0) {
+                    $dayOutput['status']      = false;
+                    $dayOutput['user_status'] = false;
+                }
+            }
+
             $output['data'][$year][$month][$day] = $dayOutput;
             $lastDayInLog = $currentDate->toDateString();
 
@@ -603,6 +682,25 @@ class AppointmentUserService
         ];
         return $output;
     }
+    /**
+     * Collapse the repeated places of one slot (same from/until) into a single entry:
+     * the first free place when there is one, otherwise the first booked one.
+     */
+    private function collapseSlotPlaces(array $times): array
+    {
+        $collapsed = [];
+        foreach ($times as $time) {
+            $key = $time['from'] . '|' . $time['until'];
+            if (! isset($collapsed[$key])) {
+                $collapsed[$key] = $time;
+            } elseif ($time['status'] && ! $collapsed[$key]['status']) {
+                $collapsed[$key] = $time;
+            }
+        }
+
+        return array_values($collapsed);
+    }
+
     private function hasExactBooked(array $times, string $from, string $until): bool
     {
         foreach ($times as $t) {
@@ -633,8 +731,8 @@ class AppointmentUserService
                         ->where('end_time', '>', $startDateTime);
                 });
             })
-            ->exists();
-        return !$existingAppointments;
+            ->count();
+        return $existingAppointments < $appointmentSetting->appointmentsPerHour();
     }
     public function paymentstatus(AppointmentSetting $appointmentSetting)
     {
@@ -746,6 +844,20 @@ class AppointmentUserService
 
         // check if time is full
         $appoiutnemtTime = Carbon::createFromTimestamp($appointmentData->timestamp, 'Asia/Tehran')->toDateTimeString();
+
+        // The capacity check and the insert below must be atomic: with several places per slot a plain
+        // "count then create" lets concurrent requests all pass the check and overbook the slot.
+        $slotLock = Cache::lock('appointment-slot:' . $appointmentSetting->user_id . ':' . $appoiutnemtTime, 15);
+        try {
+            $slotLock->block(10);
+        } catch (\Illuminate\Contracts\Cache\LockTimeoutException $e) {
+            return [
+                'status' => false,
+                'message' => 'در حال حاضر درخواست دیگری برای این ساعت در حال ثبت است، لطفا چند لحظه بعد مجدد تلاش کنید',
+                'route' => 'time'
+            ];
+        }
+        try {
         $checkForAppointmentExists = AppointmentUser::where('appointment_setting_id', $appointmentSetting->id)
             ->whereIn('status', [
                 AppointmentUserStatusEnum::STATUS_PENDING,
@@ -755,7 +867,7 @@ class AppointmentUserService
                 AppointmentUserStatusEnum::STATUS_NOT_ATTENDED,
                 AppointmentUserStatusEnum::STATUS_MONITORING,
             ])
-            ->where('date_visit', $appoiutnemtTime)->exists();
+            ->where('date_visit', $appoiutnemtTime)->count() >= $appointmentSetting->appointmentsPerHour();
         $isFromAdminPanell = isset($detail['store_from_admin_panel']) && $detail['store_from_admin_panel'] == true;
         if (! $isFromAdminPanell && $checkForAppointmentExists) {
             return [
@@ -1014,6 +1126,9 @@ class AppointmentUserService
 
         // store appointment in DB
         $appointmentUser = $appointmentSetting->appointmentUsers()->create($appointmentUserModel);
+        } finally {
+            $slotLock->release();
+        }
 
         // insert online appointment
         if ($appointmentData->kind == AppointmentUserKindEnum::ONLINE) {

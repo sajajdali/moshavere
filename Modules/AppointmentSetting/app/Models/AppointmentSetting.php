@@ -58,6 +58,20 @@ class AppointmentSetting extends Model
         return (int) $limit;
     }
 
+    /**
+     * Number of appointments allowed in a single hour (default 1).
+     */
+    public function appointmentsPerHour(): int
+    {
+        $count = data_get($this->detail, self::MULTIPLE_APPOINTMENTS_PER_HOUR . '.count');
+
+        if (! data_get($this->detail, self::MULTIPLE_APPOINTMENTS_PER_HOUR . '.status') || ! is_numeric($count) || (int) $count < 1) {
+            return 1;
+        }
+
+        return (int) $count;
+    }
+
     public function scopeActive(Builder $query): Builder
     {
         return $query->where('active', ActiveEnum::ACTIVE->value);
@@ -116,20 +130,34 @@ class AppointmentSetting extends Model
         }
         return true;
     }
+    /**
+     * The setting that applies to a doctor in a service/place: the doctor's dedicated setting for exactly
+     * that service and place, otherwise the doctor's general setting (service_id and place_id null).
+     * Never another doctor's, another service's or another place's setting.
+     *
+     * @param  callable|null  $scope  extra constraint applied to both lookups (e.g. visit type)
+     */
+    public static function resolveFor($doctorId, $serviceId = null, $placeId = null, bool $activeOnly = false, ?callable $scope = null): ?self
+    {
+        $base = fn() => self::query()
+            ->where('user_id', $doctorId)
+            ->when($activeOnly, fn($q) => $q->where('active', ActiveEnum::ACTIVE->value))
+            ->when($scope, fn($q) => $scope($q));
+
+        $setting = null;
+        if (! empty($serviceId) || ! empty($placeId)) {
+            $setting = $base()
+                ->when(! empty($serviceId), fn($q) => $q->where('service_id', $serviceId), fn($q) => $q->whereNull('service_id'))
+                ->when(! empty($placeId), fn($q) => $q->where('place_id', $placeId), fn($q) => $q->whereNull('place_id'))
+                ->first();
+        }
+
+        return $setting ?? $base()->whereNull('service_id')->whereNull('place_id')->first();
+    }
+
     public static function SpecialOrGeneralSetting($doctorId, $serviceId = null, $placeId = null)
     {
-        $app =  self::Where('user_id', $doctorId)
-            ->when($serviceId != null, function ($q) use ($serviceId) {
-                return $q->where('service_id', $serviceId);
-            })->when($placeId != null, function ($q) use ($placeId) {
-                return $q->where('place_id', $placeId);
-            })->first();
-        if ($app == null) {
-            $app =  AppointmentSetting::where('user_id', $doctorId)
-                ->whereNull('place_id')
-                ->whereNull('service_id')->first();
-        }
-        return $app;
+        return self::resolveFor($doctorId, $serviceId, $placeId);
     }
     public function hasDaySetting($date): bool
     {
@@ -162,17 +190,7 @@ class AppointmentSetting extends Model
     }
     public static function findSettingId($doctorId, $ServiceId, $PlaceId)
     {
-        $setting = self::where('user_id', $doctorId)
-            ->where('service_id', $ServiceId)
-            ->where('place_id', $PlaceId)
-            ->first();
-        if (is_null($setting)) {
-            $setting = self::where('user_id', $doctorId)
-                ->whereNull('service_id')
-                ->whereNull('place_id')
-                ->first();
-        }
-        return $setting;
+        return self::resolveFor($doctorId, $ServiceId, $PlaceId);
     }
     public static function doseSettingHasOperator(self $appointmentSetting): bool
     {

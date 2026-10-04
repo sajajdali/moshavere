@@ -34,6 +34,9 @@ trait AppointmentSettingDetailKeyTrait
     const DONT_SHOW_TIMES_MESSAGE = 'message';
     const OPEN_TIME = 'open_time';
 
+    // multiple appointments in the same hour
+    const MULTIPLE_APPOINTMENTS_PER_HOUR = 'multipleAppointmentsPerHour';
+
     // time to deactive appointment after that
     const MAX_ACTIVE_TIME_ONLINE_APPOINTMENT = 'maxActiveTimeOnlineAppointment';
 

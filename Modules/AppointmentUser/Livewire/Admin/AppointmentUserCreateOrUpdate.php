@@ -125,13 +125,7 @@ class AppointmentUserCreateOrUpdate extends Component
     }
     private function hasSegment($doctor, $service, $place): bool
     {
-        $appSetting = AppointmentSetting::where('user_id', $doctor)
-            ->where('service_id', $service)
-            ->where('place_id', $place)?->first();
-        if ($appSetting == null) {
-            $appSetting = AppointmentSetting::where('user_id', $doctor)->whereNull('service_id')
-                ->whereNull('place_id')?->first();
-        }
+        $appSetting = AppointmentSetting::resolveFor($doctor, $service, $place);
 
         if ($appSetting === null) {
             return false;

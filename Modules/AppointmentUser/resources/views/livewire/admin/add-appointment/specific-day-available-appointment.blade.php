@@ -245,7 +245,7 @@
         :serviceId="$fetchData['service']->id" :placeId="$fetchData['place']" :segmentId="$fetchData['segment']"
         :key="'change-doctor-service-' . $fetchData['appId'] . '-' . $fetchData['service']->id . '-' . $fetchData['place']" />
     <livewire:appointmentuser::admin.add-appointment.modal.specific-day-appointment-registration-modal :appId="$fetchData['appId']"
-        :appTime="$fetchData['time']" :serviceId="$fetchData['service']->id" :placeId="$fetchData['place']" :segmentId="$fetchData['segment']" :key="'register-appointment-' .
+        :appTime="$fetchData['time']" :appDate="verta($fetchData['selectedDate'])->format('Y-m-d')" :serviceId="$fetchData['service']->id" :placeId="$fetchData['place']" :segmentId="$fetchData['segment']" :key="'register-appointment-' .
             $fetchData['appId'] .
             '-' .
             $fetchData['service']->id .
@@ -313,11 +313,10 @@
                     myModal.show();
                 }, 1000);
             });
+            // the modal already received the date and time when it was mounted: open it right away,
+            // without a server round trip (which showed the page loading overlay) or a fixed delay
             if ({{ $fetchData['showRegisterModal'] }}) {
-                @this.dateHasBeenChange();
-                setTimeout(() => {
-                    setAppModalInst.show();
-                }, 1000);
+                setAppModalInst.show();
             };
             Livewire.on('closeModal', function() {
                 modal.hide();

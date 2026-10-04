@@ -8,6 +8,7 @@ use Livewire\Component;
 use Livewire\Attributes\On;
 use Modules\User\Entities\User;
 use Livewire\Attributes\Computed;
+use Livewire\Attributes\Renderless;
 use Illuminate\Support\Facades\Cache;
 use Hekmatinasser\Verta\Facades\Verta;
 use Modules\Place\app\Models\Place;
@@ -35,6 +36,8 @@ class SpecificDayAvailableAppointment extends Component
             return $this->loadDifferentDayDetail();
         }
     }
+    // only dispatches browser/child events: re-rendering this (heavy) page for it is wasted time
+    #[Renderless]
     public function dateHasBeenChange()
     {
         $this->dispatch('dateHasBeenChange', newDate: verta($this->fetchData['selectedDate'])->format('Y-m-d'))->to(SpecificDayAppointmentRegistrationModal::class);
@@ -80,13 +83,13 @@ class SpecificDayAvailableAppointment extends Component
         unset($this->fetchData['navigationMessage']);
         $this->form['changeDate'] = verta($this->fetchData['selectedDate'])->format('Y/m/d');
         $app = $this->fetchData['appointmentSetting'];
-        $details = ['specialDays' => $this->fetchData['selectedDate']->toDateString(), 'expand_slots' => true];
+        // only the selected day is shown, so only that day is generated (not the following 60 days)
+        $details = ['specialDay' => $this->fetchData['selectedDate']->toDateString(), 'expand_slots' => true];
         if (isset($this->fetchData['segment_time'])) {
             $details['segment_time'] = $this->fetchData['segment_time'];
         }
         $newListTimes = app('AppointmentUserService')
             ->listAppointments($app, $details);
-        $this->fetchData['RawlistOfAppointment'] = $newListTimes;
         $this->fetchData['listOfAppointment'] =  $this->listOfAppointment($newListTimes);
         unset($this->fetchData['showingAppointmentIndex']);
         foreach ($this->fetchData['listOfAppointment'] as $index => $avaiableTimes) {
@@ -206,6 +209,7 @@ class SpecificDayAvailableAppointment extends Component
 
         return redirect()->route('admin.appointment.add.specificday', $parameters);
     }
+    #[Renderless]
     public function passTimeToRegisterAppointmentModal($from, $until)
     {
         $this->dispatch('dateHasBeenChange', newDate: verta($this->fetchData['selectedDate'])->format('Y-m-d'))->to(SpecificDayAppointmentRegistrationModal::class);

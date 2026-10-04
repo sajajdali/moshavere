@@ -12,9 +12,7 @@
     <meta name="author" content="شمیران وب">
     <meta name="keywords" content="مدیریت {{ setting(Modules\Setting\Enum\SettingKeyEnum::SITE_TITLE) }}">
     <!-- Favicon -->
-    <link rel="apple-touch-icon" sizes="76x76" href="{{ admin_default_asset('favicon/apple-touch-icon.png') }}">
-    {{-- <link rel="icon" type="image/png" sizes="32x32" href="{{ admin_default_asset('favicon/favicon-32x32.png') }}">
-    <link rel="icon" type="image/png" sizes="16x16" href="{{ admin_default_asset('favicon/favicon-16x16.png') }}"> --}}
+    @include('setting::partials.favicon')
     <link rel="manifest" href="{{ admin_default_asset('favicon/site.webmanifest') }}">
     {{-- <link rel="mask-icon" href="{{ admin_default_asset('favicon/safari-pinned-tab.svg') }}" color="#5bbad5">
     <link rel="mask-icon" href="{{ admin_default_asset('favicon/safari-pinned-tab.svg') }}" color="#5bbad5"> --}}

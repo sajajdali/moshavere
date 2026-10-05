@@ -19,6 +19,83 @@
     @include('admin::layouts.components.alert')
 
     @php
+        $settingInfo = $this->editingSettingInfo();
+    @endphp
+    @php
+        $scopeIsGeneral = $settingInfo['creates_special'] ? false : $settingInfo['is_general'];
+        $scopeService = $settingInfo['creates_special'] ? $settingInfo['requested_service'] : $settingInfo['service'];
+        $scopePlace = $settingInfo['creates_special'] ? $settingInfo['requested_place'] : $settingInfo['place'];
+        if ($settingInfo['creates_special']) {
+            $scopeTitle = 'ایجاد تنظیمات اختصاصی جدید';
+            $scopeIcon = 'fa-plus-circle';
+        } elseif ($settingInfo['setting_id']) {
+            $scopeTitle = $scopeIsGeneral ? 'در حال ویرایش تنظیمات عمومی' : 'در حال ویرایش تنظیمات اختصاصی';
+            $scopeIcon = 'fa-pencil';
+        } else {
+            $scopeTitle = $scopeIsGeneral ? 'ایجاد تنظیمات عمومی جدید' : 'ایجاد تنظیمات اختصاصی جدید';
+            $scopeIcon = 'fa-plus-circle';
+        }
+    @endphp
+    <style>
+        .setting-scope { display: flex; gap: 14px; align-items: flex-start; padding: 16px 18px; margin-bottom: 24px;
+            border-radius: 10px; border: 1px solid #d6e6f5; border-inline-start: 5px solid #2f80c9; background: #f3f8fd; color: #1f2d3d; }
+        .setting-scope.is-general { border-color: #f1dfb4; border-inline-start-color: #d99a12; background: #fff9ec; }
+        .setting-scope-icon { flex: 0 0 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center;
+            font-size: 17px; color: #fff; background: #2f80c9; }
+        .setting-scope.is-general .setting-scope-icon { background: #d99a12; }
+        .setting-scope-body { flex: 1; min-width: 0; }
+        .setting-scope-head { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin-bottom: 6px; }
+        .setting-scope-title { font-size: 15px; font-weight: 700; margin: 0; color: inherit; }
+        .setting-scope-badge { font-size: 12px; font-weight: 600; padding: 2px 10px; border-radius: 20px; color: #1d5f99; background: #dcebf8; }
+        .setting-scope.is-general .setting-scope-badge { color: #8a5d00; background: #fbecc8; }
+        .setting-scope-id { font-size: 12px; color: #6b7a8c; }
+        .setting-scope-chips { display: flex; flex-wrap: wrap; gap: 8px; margin: 8px 0 4px; }
+        .setting-scope-chip { display: inline-flex; align-items: center; gap: 6px; font-size: 13px; padding: 4px 12px; border-radius: 6px;
+            background: #fff; border: 1px solid #d6e6f5; color: #1f2d3d; }
+        .setting-scope-chip i { color: #6b7a8c; }
+        .setting-scope-chip .setting-scope-label { margin: 0; color: #6b7a8c; }
+        .setting-scope-text { margin: 4px 0 0; font-size: 13px; line-height: 1.9; color: #4a5868; }
+        .dark-mode .setting-scope { background: #1f2a3a; border-color: #2f3f55; color: #e6edf5; }
+        .dark-mode .setting-scope.is-general { background: #2e2818; border-color: #4a3d1f; }
+        .dark-mode .setting-scope-chip { background: #263345; border-color: #36475e; color: #e6edf5; }
+        .dark-mode .setting-scope-text, .dark-mode .setting-scope-chip i, .dark-mode .setting-scope-chip .setting-scope-label, .dark-mode .setting-scope-id { color: #a9b6c6; }
+    </style>
+    <div class="setting-scope {{ $scopeIsGeneral ? 'is-general' : '' }}" role="status">
+        <span class="setting-scope-icon"><i class="fa {{ $scopeIcon }}" aria-hidden="true"></i></span>
+        <div class="setting-scope-body">
+            <div class="setting-scope-head">
+                <h2 class="setting-scope-title">{{ $scopeTitle }}</h2>
+                <span class="setting-scope-badge">{{ $scopeIsGeneral ? 'عمومی' : 'اختصاصی' }}</span>
+                @if ($settingInfo['setting_id'] && ! $settingInfo['creates_special'])
+                    <span class="setting-scope-id">شناسه تنظیمات: {{ $settingInfo['setting_id'] }}</span>
+                @endif
+            </div>
+            @unless ($scopeIsGeneral)
+                <div class="setting-scope-chips">
+                    <span class="setting-scope-chip"><i class="fa fa-stethoscope" aria-hidden="true"></i><span class="setting-scope-label">بخش:</span>
+                        <strong>{{ $scopeService ?? 'بخش یافت نشد' }}</strong></span>
+                    @if ($scopePlace)
+                        <span class="setting-scope-chip"><i class="fa fa-map-marker" aria-hidden="true"></i><span class="setting-scope-label">مکان:</span>
+                            <strong>{{ $scopePlace }}</strong></span>
+                    @endif
+                </div>
+            @endunless
+            <p class="setting-scope-text">
+                @if ($settingInfo['creates_special'])
+                    این بخش هنوز تنظیمات اختصاصی ندارد. مقادیر فرم از تنظیمات عمومی پر شده‌اند و با ذخیره،
+                    تنظیمات جدیدی فقط برای این بخش ساخته می‌شود؛ تنظیمات عمومی تغییری نمی‌کند.
+                @elseif ($scopeIsGeneral)
+                    این تنظیمات برای همه بخش‌ها و مکان‌هایی اعمال می‌شود که تنظیمات اختصاصی ندارند.
+                @elseif ($settingInfo['setting_id'])
+                    تغییرات فقط روی تنظیمات همین بخش اعمال می‌شود.
+                @else
+                    با ذخیره، تنظیمات جدیدی فقط برای این بخش ساخته می‌شود.
+                @endif
+            </p>
+        </div>
+    </div>
+
+    @php
         $scheduleSettingsHasErrors = collect([
             'form.visitType.*',
             'form.timeFrame',

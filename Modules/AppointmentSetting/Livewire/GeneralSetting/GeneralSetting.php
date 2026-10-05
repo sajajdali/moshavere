@@ -747,6 +747,31 @@ class GeneralSetting extends Component
         AppointmentSettingTime::whereNotNull('special_date')->where('special_date', '<', now()->subDay())->delete();
     }
 
+    /**
+     * What this page is editing: an existing setting (general or special for a service/place),
+     * a new special setting prefilled from the general one, or a brand new setting.
+     */
+    public function editingSettingInfo(): array
+    {
+        $setting = $this->isEdited && isset($this->appointment_setting) ? $this->appointment_setting : null;
+        $serviceId = $setting ? $setting->service_id : $this->fetchData['service_id'] ?? null;
+        $placeId = $setting ? $setting->place_id : $this->fetchData['place'] ?? null;
+
+        return [
+            'setting_id' => $setting?->id,
+            'is_general' => empty($serviceId) && empty($placeId),
+            // a section without its own setting: the form shows the general values and saving creates a new setting
+            'creates_special' => $setting && ! empty($this->fetchData['service_id']) && ! $this->isSpecialTimeEdited,
+            'requested_service_id' => $this->fetchData['service_id'] ?? null,
+            'requested_service' => ! empty($this->fetchData['service_id']) ? Service::find($this->fetchData['service_id'])?->title : null,
+            'requested_place' => ! empty($this->fetchData['place']) ? Place::find($this->fetchData['place'])?->title : null,
+            'service_id' => $serviceId,
+            'service' => $serviceId ? Service::find($serviceId)?->title : null,
+            'place_id' => $placeId,
+            'place' => $placeId ? Place::find($placeId)?->title : null,
+        ];
+    }
+
     public function render()
     {
 

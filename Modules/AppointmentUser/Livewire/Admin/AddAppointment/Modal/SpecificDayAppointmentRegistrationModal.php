@@ -225,7 +225,9 @@ class SpecificDayAppointmentRegistrationModal extends Component
             $from,
             $until,
             Verta::parse($this->appDate)->toCarbon()->toDateString(),
-            $appSetting
+            $appSetting,
+            $this->serviceId ?? $this->fetchData['service']?->id,
+            $this->placeId
         );
     }
 

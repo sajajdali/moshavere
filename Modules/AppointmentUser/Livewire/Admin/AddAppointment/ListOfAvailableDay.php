@@ -104,7 +104,7 @@ class ListOfAvailableDay extends Component
             }
         }
         // admin panel: list every free place of a slot when the setting allows several appointments per hour
-        $details = ['expand_slots' => true];
+        $details = ['expand_slots' => true, 'service_id' => $service->id, 'place_id' => $place->id];
         if ($segmentItemId != null) {
             $details['segment_time'] = $this->fethData['segment_time'];
         }

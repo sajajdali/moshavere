@@ -26,7 +26,7 @@ class SpecificDayAppointmentDateSelectionTest extends TestCase
 
     private function expectSelectedDate(string $date, ?int $segmentTime = null, bool $empty = false): void
     {
-        $details = ['specialDays' => $date];
+        $details = ['specialDay' => $date, 'expand_slots' => true, 'service_id' => null, 'place_id' => null];
         if ($segmentTime !== null) {
             $details['segment_time'] = $segmentTime;
         }

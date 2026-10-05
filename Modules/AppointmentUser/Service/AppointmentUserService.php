@@ -233,8 +233,8 @@ class AppointmentUserService
         // Appointments -> pre-group by Y-m-d for O(1) day lookups
         $appointments = AppointmentUser::query()
             ->where('doctor_id', $doctorId)
-            ->when($checkForInterface == false, function ($q) use ($appointmentSetting) {
-                return $q->where('appointment_setting_id', $appointmentSetting->id);
+            ->when($checkForInterface == false, function ($q) use ($appointmentSetting, $details) {
+                return $this->scopeSettingAppointments($q, $appointmentSetting, $details['service_id'] ?? null, $details['place_id'] ?? null);
             })
             ->whereBetween('date_visit', [$startDate, $endDate->copy()->endOfDay()])
             ->orderBy('date_visit')
@@ -701,6 +701,24 @@ class AppointmentUserService
         return array_values($collapsed);
     }
 
+    /**
+     * Without interference a setting only sees its own appointments, plus the ones of the same doctor
+     * for the same service and place stored through another setting (e.g. the doctor's general setting):
+     * those occupy the same time and must not be shown or booked as free.
+     */
+    private function scopeSettingAppointments($query, AppointmentSetting $appointmentSetting, $serviceId = null, $placeId = null)
+    {
+        $serviceId = $serviceId ?: $appointmentSetting->service_id;
+        $placeId   = $placeId ?: $appointmentSetting->place_id;
+
+        return $query->where(function ($q) use ($appointmentSetting, $serviceId, $placeId) {
+            $q->where('appointment_setting_id', $appointmentSetting->id);
+            if (! empty($serviceId) && ! empty($placeId)) {
+                $q->orWhere(fn($q) => $q->where('service_id', $serviceId)->where('place_id', $placeId));
+            }
+        });
+    }
+
     private function hasExactBooked(array $times, string $from, string $until): bool
     {
         foreach ($times as $t) {
@@ -714,14 +732,14 @@ class AppointmentUserService
         }
         return false;
     }
-    public function isAppointmentTimeAvailable($startDateTime, $endDateTime, $dateVisit, AppointmentSetting $appointmentSetting)
+    public function isAppointmentTimeAvailable($startDateTime, $endDateTime, $dateVisit, AppointmentSetting $appointmentSetting, $serviceId = null, $placeId = null)
     {
         // Check if there are any overlapping appointments
         $existingAppointments = AppointmentUser::where('doctor_id', $appointmentSetting->user_id)
             ->where('type', AppointmentUserTypeEnum::MAIN__APPOINTMENT)
             ->whereIn('status', AppointmentUserStatusEnum::confirmed());
         if (!$appointmentSetting->interference) {
-            $existingAppointments->where('appointment_setting_id', $appointmentSetting->id);
+            $this->scopeSettingAppointments($existingAppointments, $appointmentSetting, $serviceId, $placeId);
         }
         $existingAppointments = $existingAppointments
             ->whereDate('date_visit', $dateVisit)
@@ -832,7 +850,7 @@ class AppointmentUserService
         $detailDatabaseDB[AppointmentUser::USER_MODEL] = UserResource::make($userModelAppointment->userModel->user);
 
         if ($appointmentData->kind == AppointmentUserKindEnum::IN_PERSION && $appointmentData->appointmentVia->usesSelfServiceRules()) {
-            $checkTimeAvailable = $this->isAppointmentTimeAvailable($dateAppointment->toTimeString(), $dateAppointment->copy()->addMinutes($appointmentSetting->time_for_visit)->toTimeString(), $dateAppointment->toDateString(), $appointmentSetting);
+            $checkTimeAvailable = $this->isAppointmentTimeAvailable($dateAppointment->toTimeString(), $dateAppointment->copy()->addMinutes($appointmentSetting->time_for_visit)->toTimeString(), $dateAppointment->toDateString(), $appointmentSetting, $appointmentData->serviceId, $appointmentData->placeId);
             if (!$checkTimeAvailable) {
                 //                return [
                 //                    'status' => false,
@@ -858,7 +876,7 @@ class AppointmentUserService
             ];
         }
         try {
-        $checkForAppointmentExists = AppointmentUser::where('appointment_setting_id', $appointmentSetting->id)
+        $checkForAppointmentExists = $this->scopeSettingAppointments(AppointmentUser::where('doctor_id', $appointmentSetting->user_id), $appointmentSetting, $appointmentData->serviceId, $appointmentData->placeId)
             ->whereIn('status', [
                 AppointmentUserStatusEnum::STATUS_PENDING,
                 AppointmentUserStatusEnum::STATUS_SUCCESSFUL,

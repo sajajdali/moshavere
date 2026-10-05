@@ -84,7 +84,13 @@ class SpecificDayAvailableAppointment extends Component
         $this->form['changeDate'] = verta($this->fetchData['selectedDate'])->format('Y/m/d');
         $app = $this->fetchData['appointmentSetting'];
         // only the selected day is shown, so only that day is generated (not the following 60 days)
-        $details = ['specialDay' => $this->fetchData['selectedDate']->toDateString(), 'expand_slots' => true];
+        $details = [
+            'specialDay' => $this->fetchData['selectedDate']->toDateString(),
+            'expand_slots' => true,
+            // a general setting has no service/place of its own: the page's ones find the booked appointments
+            'service_id' => ($this->fetchData['service'] ?? null)?->id,
+            'place_id' => $this->fetchData['place'] ?? null,
+        ];
         if (isset($this->fetchData['segment_time'])) {
             $details['segment_time'] = $this->fetchData['segment_time'];
         }

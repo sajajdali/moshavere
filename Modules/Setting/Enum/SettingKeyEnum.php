@@ -136,6 +136,7 @@ enum SettingKeyEnum: int implements EnumHasNameInterface, SettingTypeInterface, 
     case PAYMENT_PAYSTAR_TOKEN = 150;
     case PAYMENT_PAYSTAR_SIGN = 151;
     case PAYMENT_ZARINPAL_MERCHENID = 154;
+    case PAYMENT_ZIBAL_MERCHENID = 159;
     case PAYMENT_RULES_AND_CONDITION_STATUS = 155;
     case PAYMENT_RULES_AND_CONDITION_DESCRIPTION = 156;
     case SECREYERY_SEND_LINK_FOR_APPOINTMENT = 157;
@@ -178,6 +179,7 @@ enum SettingKeyEnum: int implements EnumHasNameInterface, SettingTypeInterface, 
 
         // registration
     case USER_REGISTER_NATIONAL_CODE_REQUIRED = 355;
+    case USER_REGISTER_BIRTHDAY_REQUIRED = 358;
     case LOGIN_WITHOUT_OTP = 357;
 
         // jibi
@@ -199,6 +201,40 @@ enum SettingKeyEnum: int implements EnumHasNameInterface, SettingTypeInterface, 
     case CONSULT_SMS_PRACTITIONER_DAILY_ACTIVE = 512;
     case CONSULT_SMS_PRACTITIONER_DAILY_TEMPLATE = 513;
     case CONSULT_SMS_PRACTITIONER_DAILY_TIME = 514;
+        // ساختار و ظاهر نوبت دهی
+    case APPOINTMENT_MODE = 520;
+    case USE_NEW_TEMPLATE = 521;
+    case NEW_TPL_PRIMARY_DOCTOR = 530;
+
+        // متن ها و دکمه های هدر اصلی (قالب جدید)
+    case NEW_TPL_HERO_BADGE_TEXT = 531;
+    case NEW_TPL_HERO_TITLE = 532;
+    case NEW_TPL_HERO_SUBTITLE = 533;
+    case NEW_TPL_HERO_DESCRIPTION = 534;
+    case NEW_TPL_HERO_PRIMARY_BUTTON_TEXT = 535;
+    case NEW_TPL_HERO_SECONDARY_BUTTON_TEXT = 536;
+    case NEW_TPL_HERO_PHONE = 537;
+    case NEW_TPL_DOCTOR_EDUCATION = 538;
+    case NEW_TPL_DOCTOR_EXPERIENCE = 539;
+    case NEW_TPL_PATIENTS_COUNT = 540;
+    case NEW_TPL_DEVICES_DESCRIPTION = 541;
+    // منسوخ: به FOOTER_ENAMAD منتقل شد؛ برای خوانده شدن ردیف های قدیمی دیتابیس نگه داشته شده است
+    case NEW_TPL_FOOTER_ENAMAD = 543;
+
+        // appointment management
+    case DONT_SEND_SMS_WHEN_CANCEL_AND_DELETE_APPOINTMENT = 542;
+
+        // تصاویر قالب جدید
+    case NEW_TPL_HERO_IMAGE = 522;
+    case NEW_TPL_DOCTOR_AVATAR = 523;
+    case NEW_TPL_CLINIC_LOGO = 524;
+    case NEW_TPL_ABOUT_IMAGE = 525;
+    case NEW_TPL_TEAM_IMAGE = 526;
+    case NEW_TPL_DEVICE_IMAGE = 527;
+    case NEW_TPL_DEPARTMENT_IMAGE = 528;
+    case NEW_TPL_BOOKING_BANNER_IMAGE = 529;
+
+
 
     public function isSupportCache(): bool
     {
@@ -233,13 +269,13 @@ enum SettingKeyEnum: int implements EnumHasNameInterface, SettingTypeInterface, 
             self::SHOW_FALSE_APPOINTMENT_STATUS => 'نمایش ساعت های پر شده در لیست ساعت ها به کاربران',
             self::SITE_FIRST_SECTION_TITLE => 'عنوان بخش اول در صفحه ی اصلی(عنوان پیشنهادی: ویزیت فوری)',
             self::SITE_FIRST_SECTION_DESCRIPTION => 'توضیح بخش اول در صفحه ی اصلی',
-            self::SITE_SECEND_SECTION_TITLE => 'عنوان بخش دوم در صفحه ی اصلی(عنوان پیشنهادی: معرفی پزشکان)',
-            self::SITE_SECEND_SECTION_DESCRIPTION => 'توضیح بخش دوم در صفحه ی اصلی)',
+            self::SITE_SECEND_SECTION_TITLE => 'عنوان بخش درباره در صفحه اصلی',
+            self::SITE_SECEND_SECTION_DESCRIPTION => 'متن بخش درباره در صفحه اصلی',
             self::APPOINTMENT_DETAIL_PAYMENT_DESCRIPTION_STATUS => ' وضعیت توضیحات در صفحه ی جزئیات نوبت که مربوط به پرداخت میباشد',
             self::APPOINTMENT_DETAIL_PAYMENT_DESCRIPTION_TEXT => 'متن توضیحات در صفحه ی جزئیات نوبت که مربوط به پرداخت میباشد ',
             self::APPOINTMENT_SHOW_FALSE_STATUS_DAYS => 'در قسمت دریافت نوبت ، روز هایی که تمامی نوبت آنها پر هست به کاربر نمایش دهد',
             self::APPOINTMENT_GALLERY_TITLE => 'تیتر نمایش گالری پزشک',
-            self::FOOTER_ENAMAD => 'ای نماد (لینک کامل درج شود)',
+            self::FOOTER_ENAMAD => 'کد نماد اینماد',
             self::ACTIVE_HEADER => 'هدر فعال',
             self::HEADER1_IMAGE => 'عکس اصلی هدر',
             self::HEADER1_TITLE1 => 'تیتر اصلی هدر',
@@ -257,6 +293,28 @@ enum SettingKeyEnum: int implements EnumHasNameInterface, SettingTypeInterface, 
             self::HEADER2_MOBILE_BACKGROUND_IMAGE => 'عکس پس زمینه موبایل',
             self::DISABLE_ONLINE_APPOINTMENT => 'غیر فعال سازی نوبت آنلاین',
             self::DISABLE_UI_FOR_VOIP_ONLY_APPOINTMENT => 'غیر فعال سازی ui برای بیماران ',
+            self::APPOINTMENT_MODE => 'ساختار نوبت دهی سایت',
+            self::USE_NEW_TEMPLATE => 'نوبت دهی با ظاهر جدید',
+            self::NEW_TPL_PRIMARY_DOCTOR => 'پزشک اصلی نمایش داده شده در صفحه اول',
+            self::NEW_TPL_HERO_BADGE_TEXT => 'متن نشان بالای عنوان (مثال: پذیرش امروز)',
+            self::NEW_TPL_HERO_TITLE => 'عنوان اصلی صفحه',
+            self::NEW_TPL_HERO_SUBTITLE => 'زیرعنوان معرفی پزشک',
+            self::NEW_TPL_HERO_DESCRIPTION => 'توضیح بخش معرفی',
+            self::NEW_TPL_HERO_PRIMARY_BUTTON_TEXT => 'متن دکمه اصلی هدر',
+            self::NEW_TPL_HERO_SECONDARY_BUTTON_TEXT => 'متن دکمه دوم هدر (تماس)',
+            self::NEW_TPL_HERO_PHONE => 'شماره تماس دکمه دوم هدر',
+            self::NEW_TPL_DOCTOR_EDUCATION => 'تحصیلات و سوابق پزشک',
+            self::NEW_TPL_DOCTOR_EXPERIENCE => 'تعداد سال سابقه پزشک',
+            self::NEW_TPL_PATIENTS_COUNT => 'تعداد بیماران پزشک',
+            self::NEW_TPL_DEVICES_DESCRIPTION => 'توضیحات دستگاه‌ها و تجهیزات',
+            self::NEW_TPL_HERO_IMAGE => 'تصویر اصلی صفحه اول (هدر قالب جدید)',
+            self::NEW_TPL_DOCTOR_AVATAR => 'تصویر پزشک',
+            self::NEW_TPL_CLINIC_LOGO => 'لوگوی کلینیک',
+            self::NEW_TPL_ABOUT_IMAGE => 'تصویر بخش درباره ما',
+            self::NEW_TPL_TEAM_IMAGE => 'تصویر تیم درمان',
+            self::NEW_TPL_DEVICE_IMAGE => 'تصویر دستگاه ها و تجهیزات',
+            self::NEW_TPL_DEPARTMENT_IMAGE => 'تصویر بخش های کلینیک',
+            self::NEW_TPL_BOOKING_BANNER_IMAGE => 'تصویر بنر رزرو نوبت',
             self::VOIP_APPOINTMENT_STATUS => 'فعال سازی امکانات نوبت دهی تلفنی ',
             self::VOIP_VOICE_RECORD_STATUS => 'نمایش پیغام های ضبط شده در منو',
             self::FAVICON_16 => 'آیکون مرورگر (16x16)',
@@ -277,6 +335,7 @@ enum SettingKeyEnum: int implements EnumHasNameInterface, SettingTypeInterface, 
             self::SHOW_FLOATING_SOCIAL_ICONS => 'نمایش ایکون های اینستاگرام و واتس اپ به صورت شناور',
             self::ALLOW_MULTIPLE_APP_FROM_ADMIN_PANEL => 'اجازه ثبت نوبت در پنل منشی، برای ساعت هایی که از قبل یک نوبت ثبت شده در آن ساعت وجود دارد',
             self::APPOINTMENT_SHOW_DESCRIPTION_IN_APP_LIST => 'نمایش توضیحات مربوط به نوبت در صفحه ی لیست نوبت ها',
+            self::DONT_SEND_SMS_WHEN_CANCEL_AND_DELETE_APPOINTMENT => 'عدم ارسال پیامک هنگام کنسل و حذف کردن نوبت',
             self::SHOW_ABOUT_US_MENU_BUTTON => 'نمایش درباره ما در منو',
             self::HOME_ALERT_STATUS => 'فعال بودن هشدار صفحه اصلی',
             self::HOME_ALERT_TITLE => 'عنوان هشدار صفحه اصلی',
@@ -300,6 +359,7 @@ enum SettingKeyEnum: int implements EnumHasNameInterface, SettingTypeInterface, 
             self::PAYMENT_PAYSTAR_TOKEN => 'کد درگاه پرداخت پی استار',
             self::PAYMENT_PAYSTAR_SIGN => 'امضا درگاه پی استار',
             self::PAYMENT_ZARINPAL_MERCHENID => 'مرچند ایدی درگاه زرین پال',
+            self::PAYMENT_ZIBAL_MERCHENID => 'مرچنت ایدی درگاه زیبال',
             self::PAYMENT_RULES_AND_CONDITION_STATUS => 'فعال سازی شرایط و قوانین پرداخت',
             self::PAYMENT_RULES_AND_CONDITION_DESCRIPTION => 'شرایط و قوانین مربوط به پرداخت',
             self::SECREYERY_SEND_LINK_FOR_APPOINTMENT => 'امکان ارسال لینک پرداخت نوبت به کاربر توسط منشی',
@@ -383,6 +443,7 @@ enum SettingKeyEnum: int implements EnumHasNameInterface, SettingTypeInterface, 
 
             //REGISTRATION
             self::USER_REGISTER_NATIONAL_CODE_REQUIRED => 'الزامی بودن وارد کردن کد ملی در هنگام ثبت نام',
+            self::USER_REGISTER_BIRTHDAY_REQUIRED => 'الزامی بودن وارد کردن تاریخ تولد در هنگام ثبت نام',
             self::LOGIN_WITHOUT_OTP => 'ورود بدون تایید شماره موبایل',
 
             //JIBIT
@@ -422,10 +483,17 @@ enum SettingKeyEnum: int implements EnumHasNameInterface, SettingTypeInterface, 
              <br/> 9 = آیدی
              ',
             self::SMS_APPROVED_MONITORING_APPOINTMENT => 'در صورت فعال بودن پایش نوبت ، و تغییر وضعیت نوبت به در انتظار پرداخت(تایید نوبت) این پیامک برای کاربر ارسال میشود',
+            self::SITE_LOGO_URL => 'لوگوی سایت؛ در هدر و فوتر سایت و در سربرگ صفحه‌های اپ نمایش داده میشود.',
+            self::SITE_TITLE => 'نام نمایشی سایت؛ در عنوان تب مرورگر، متای صفحات، و به عنوان مقدار پیش فرض در پیامک ها و توضیحات پرداخت استفاده میشود.',
+            self::SITE_SLIDER_TITLE => 'زیرعنوانی که بالای قسمت جست و جوی صفحه اصلی نمایش داده میشود.',
+            self::FOOTER_DESCRIPTION => 'متن توضیحات سایت که در فوتر نمایش داده میشود.',
             self::INSTAGRAM_ADDRESS => 'آدرس باید به این صورت وارد شد https://www.instagram.com/shemiranweb/',
             self::WHATSAPP_ADDRESS => 'آدرس باید به این صورت وارد شد https://wa.me/090000000',
-            self::FOOTER_ENAMAD => 'ادرس url فقط درج شود نه تگ کامل ',
-            self::FOOTER_SAMANDEHI => 'ادرس url فقط درج شود نه تگ کامل ',
+            self::TELEGRAM_ADDRESS => 'آدرس کامل صفحه یا آیدی تلگرام؛ در فوتر سایت به صورت لینک نمایش داده میشود.',
+            self::DISABLE_FOOTER_DISPLAY => 'در صورت فعال بودن، فوتر سایت به طور کامل مخفی میشود.',
+            self::FOOTER_ENAMAD => 'کد کامل اینماد را همانطور که از سایت اینماد دریافت کرده‌اید (شامل تگ a و تصویر) وارد کنید؛ در فوتر همهٔ قالب‌ها نمایش داده میشود. در صورت خالی بودن، نمادی نمایش داده نمیشود.',
+            self::APPOINTMENT_SHOW_DESCRIPTION_IN_APP_LIST => 'نمایش توضیحات نوبت در لیست نوبت های پنل ادمین/منشی؛ روی سایت عمومی تاثیری ندارد.',
+            self::DONT_SEND_SMS_WHEN_CANCEL_AND_DELETE_APPOINTMENT => 'در صورت فعال بودن، انتخاب گزینهٔ «کنسل و حذف کردن» نوبت پیامک کنسلی برای بیمار ارسال نمی‌کند.',
             self::SMS_SENDER => 'دیفالت بر روی shsms میباشد',
             self::SMS_PARSSMS_LOGIN_TEXT => 'شامل یک پارامتر که کد ارسالی است میباشد.',
             self::PAYMENT_PARSIAN_TOKEN => '<span class="my-3"></span>',
@@ -443,6 +511,17 @@ enum SettingKeyEnum: int implements EnumHasNameInterface, SettingTypeInterface, 
              <br/> ۸ = شماره پیگیری.',
             self::SMS_CUSTOM_LINK_TO_USER_TEMPLATE => 'پارامتر الگو: <br /> ۱ = عنوان سایت',
             self::SMS_CUSTOM_LINK_2_TO_USER_TEMPLATE => 'پارامتر الگو: <br /> ۱ = عنوان سایت',
+            self::APPOINTMENT_MODE => 'ساختار سایت را مشخص میکند. بر اساس این مقدار، صفحه اصلی و تصاویر مورد نیاز تغییر میکنند.',
+            self::USE_NEW_TEMPLATE => 'در صورت فعال بودن، سایت با قالب جدید نمایش داده میشود و تصاویر همین بخش استفاده میشوند. در صورت غیر فعال بودن (حالت پیش فرض)، قالب قدیم و «تنظیمات هدر» فعال میماند.',
+            self::NEW_TPL_PRIMARY_DOCTOR => 'در حالت «تک پزشک»، وقتی بیش از یک پزشک در سیستم ثبت شده باشد، این گزینه مشخص میکند کدام پزشک و خدمات او در صفحه اصلی نمایش داده شود.',
+            self::NEW_TPL_HERO_BADGE_TEXT => 'در صورت خالی بودن، این نشان نمایش داده نمیشود.',
+            self::NEW_TPL_HERO_TITLE => 'در حالت‌های تک‌پزشک، اگر خالی باشد نام پزشک اصلی نمایش داده می‌شود؛ در حالت کلینیک عنوان پیش‌فرض نمایش داده می‌شود.',
+            self::NEW_TPL_HERO_SUBTITLE => 'در صورت خالی بودن، تخصص پزشک اصلی نمایش داده میشود.',
+            self::NEW_TPL_HERO_DESCRIPTION => 'در صورت خالی بودن، بیوگرافی پزشک اصلی نمایش داده میشود.',
+            self::NEW_TPL_DOCTOR_EDUCATION => 'هر سابقه را در یک خط و به صورت «سال | عنوان سابقه یا مدرک» وارد کنید. مثال: ۱۳۹۲ | فلوشیپ اکوکاردیوگرافی — مرکز قلب تهران',
+            self::NEW_TPL_DOCTOR_EXPERIENCE => 'فقط تعداد سال سابقه را وارد کنید؛ مثال: ۱۶',
+            self::NEW_TPL_PATIENTS_COUNT => 'عدد یا متن نمایشی را وارد کنید؛ مثال: ۹٫۴ هزار',
+            self::NEW_TPL_DEVICES_DESCRIPTION => 'متنی که کنار تصویر دستگاه‌ها در صفحهٔ اصلی نمایش داده می‌شود.',
             self::DISABLE_UI_FOR_VOIP_ONLY_APPOINTMENT => 'عدم نمایش صفحات سایت ، برای نوبت دهی هایی که فقط تلفنی میباشند',
             self::VOIP_APPOINTMENT_STATUS => 'نمایش تماس های ورودی در منو',
             self::VOIP_VOICE_RECORD_STATUS => 'نمایش پیغام های ضبط شده در منو',
@@ -492,6 +571,14 @@ enum SettingKeyEnum: int implements EnumHasNameInterface, SettingTypeInterface, 
         return match ($this) {
             self::SITE_LOGO_URL, self::HEADER1_IMAGE, self::HEADER2_MOBILE_BACKGROUND_IMAGE => SettingTypeEnum::IMAGE,
             self::FAVICON_16, self::FAVICON_32, self::FAVICON_APPLE_TOUCH => SettingTypeEnum::IMAGE,
+            self::APPOINTMENT_MODE => SettingTypeEnum::SELECT,
+            self::USE_NEW_TEMPLATE => SettingTypeEnum::CHECK,
+            self::NEW_TPL_PRIMARY_DOCTOR => SettingTypeEnum::SELECT,
+            self::NEW_TPL_HERO_DESCRIPTION, self::NEW_TPL_DOCTOR_EDUCATION,
+            self::NEW_TPL_DEVICES_DESCRIPTION => SettingTypeEnum::TEXTAREA,
+            self::NEW_TPL_HERO_IMAGE, self::NEW_TPL_DOCTOR_AVATAR, self::NEW_TPL_CLINIC_LOGO,
+            self::NEW_TPL_ABOUT_IMAGE, self::NEW_TPL_TEAM_IMAGE, self::NEW_TPL_DEVICE_IMAGE,
+            self::NEW_TPL_DEPARTMENT_IMAGE, self::NEW_TPL_BOOKING_BANNER_IMAGE => SettingTypeEnum::IMAGE,
             self::DEFAULT_EXERCISE_STATUS => SettingTypeEnum::SELECT,
             self::HEADER1_TITLE_COLOR     => SettingTypeEnum::SELECT,
             self::SMS_SENDER => SettingTypeEnum::SELECT,
@@ -546,10 +633,12 @@ enum SettingKeyEnum: int implements EnumHasNameInterface, SettingTypeInterface, 
             self::APPOINTMENT_ONLINE_DESCRPTION => SettingTypeEnum::TEXTAREA,
             self::UI_NOW_SHOW_SEARCH_BAR, self::ACTIVE_API, self::ENABLE_CITY_SEARCH, self::ENABLE_LATEST_DOCTORS, self::ENABLE_HOME_FAQ, self::MOST_VIEWED_SECTIONS_ICONS_VIEW, self::ENABLE_MOST_VIEWED_SECTIONS, self::ENABLE_DOCTOR_REGISTRATION, self::SHOW_FLOATING_SOCIAL_ICONS, self::DISABLE_FOOTER_DISPLAY => SettingTypeEnum::CHECK,
             self::USER_REGISTER_NATIONAL_CODE_REQUIRED => SettingTypeEnum::CHECK,
+            self::USER_REGISTER_BIRTHDAY_REQUIRED => SettingTypeEnum::CHECK,
             self::LOGIN_WITHOUT_OTP => SettingTypeEnum::CHECK,
             self::GO_TO_PAYMENT_DIRECTLY => SettingTypeEnum::CHECK,
             self::DONT_SEND_SMS_FOR_PAYMENT_LINK => SettingTypeEnum::CHECK,
             self::CONSULT_SMS_PATIENT_FIRST_ACTIVE, self::CONSULT_SMS_PATIENT_SECOND_ACTIVE, self::CONSULT_SMS_PATIENT_FINAL_ACTIVE, self::CONSULT_SMS_PRACTITIONER_REMINDER_ACTIVE, self::CONSULT_SMS_PRACTITIONER_DAILY_ACTIVE => SettingTypeEnum::CHECK,
+            self::DONT_SEND_SMS_WHEN_CANCEL_AND_DELETE_APPOINTMENT => SettingTypeEnum::CHECK,
             default => SettingTypeEnum::TEXT
         };
     }
@@ -563,15 +652,27 @@ enum SettingKeyEnum: int implements EnumHasNameInterface, SettingTypeInterface, 
             self::SMS_SET_APP_MONITORING => 'پایش نوبت',
             self::SMS_APPOINTMENT_TO_DOCTOR => 'اطلاع رسانی به اپراتور و پزشک',
             self::APPOINTMENT_STATUS => 'تنظیمات عمومی',
+            self::SHOW_FALSE_APPOINTMENT_STATUS => 'نمایش نوبت‌ها',
+            self::APPOINTMENT_SET_APPOINTMENT_WITH_DOCUMENT_NUMBER => 'ثبت و مدیریت نوبت در پنل',
+            self::DONT_SEND_SMS_WHEN_CANCEL_AND_DELETE_APPOINTMENT => 'کنسل و حذف نوبت',
+            self::SECREYERY_SEND_LINK_FOR_APPOINTMENT => 'پرداخت و رزرو نوبت',
             self::APPOINTMENT_DESCRIPTION_STATUS => 'صفحه جزئیات نوبت',
             self::PAYMENT_PAYSTAR_TOKEN => 'درگاه پی استار',
             self::PAYMENT_ZARINPAL_MERCHENID => 'درگاه زرین پال',
+            self::PAYMENT_ZIBAL_MERCHENID => 'درگاه زیبال',
             self::PAYMENT_PARSIAN_TOKEN => 'درگاه پارسیان',
             self::PAYMENT_SAMAN_TERMINAL_NUMBER => 'درگاه سامان',
             self::PAYMENT_SEP_TERMINAL_ID => 'درگاه سپ(درگاه سامان کیش)',
             self::PAYMENT_RULES_AND_CONDITION_STATUS => 'شرایط و قوانین پرداخت',
             self::LOGIN_WITHOUT_OTP => 'دارای حساسیت امنیتی',
             self::GO_TO_PAYMENT_DIRECTLY => 'تنظیمات UX',
+            self::APPOINTMENT_MODE => 'ساختار و ظاهر نوبت دهی',
+            self::NEW_TPL_PRIMARY_DOCTOR => 'ساختار و ظاهر نوبت دهی',
+            self::NEW_TPL_HERO_BADGE_TEXT => 'متن ها و دکمه های هدر صفحه اصلی',
+            self::SITE_SECEND_SECTION_TITLE => 'بخش درباره',
+            self::NEW_TPL_DOCTOR_EDUCATION => 'تحصیلات و آمار پزشک',
+            self::NEW_TPL_DEVICES_DESCRIPTION => 'دستگاه‌ها و تجهیزات',
+            self::NEW_TPL_HERO_IMAGE => 'تصاویر قالب جدید',
             self::HOME_ALERT_STATUS => 'نمایش پیغام در صفحه اصلی ',
             self::HEADER1_SHOW_BUTTON1 => 'کلید های روی هدر ',
             self::FAVICON_16 => 'آیکون مرورگر (Favicon)',
@@ -595,6 +696,8 @@ enum SettingKeyEnum: int implements EnumHasNameInterface, SettingTypeInterface, 
                 'image_header' => 'هدر با معرفی',
                 'ba_image' => 'هدر با عکس پس زمینه',
             ],
+            self::APPOINTMENT_MODE => AppointmentModeEnum::options(),
+            self::NEW_TPL_PRIMARY_DOCTOR => User::activeAppointmentDoctorOptions(),
             self::SMS_SENDER => [
                 'shsms' => 'shsms',
                 'ghasedak' => 'قاصدک',
@@ -614,7 +717,8 @@ enum SettingKeyEnum: int implements EnumHasNameInterface, SettingTypeInterface, 
                 'zrinpal' => 'زرین پال',
                 'parsian' => 'پارسیان',
                 'saman' => 'سامان',
-                'sep' => 'سپ'
+                'sep' => 'سپ',
+                'zibal' => 'زیبال',
             ],
             default => []
         };

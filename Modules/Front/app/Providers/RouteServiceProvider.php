@@ -60,7 +60,16 @@ class RouteServiceProvider extends ServiceProvider
         }
 
         $tenantRoutePath = module_path('Front', 'Tenants/'.$tenantId.'/routes/livewire.php');
-        $defaultRoutes = module_path('Front', '/routes/livewire.php');
+
+        // انتخاب قالب در تنظیمات، تعیین کننده است و بر مسیرهای اختصاصی تننت اولویت دارد؛
+        // در غیر این صورت مسیرهای اختصاصی تننت و سپس مسیرهای پیش فرض لایوایر استفاده میشوند.
+        if ($this->newTemplateEnabledFor($tenantId)) {
+            $routes = module_path('Front', '/routes/newapp.php');
+        } elseif (file_exists($tenantRoutePath)) {
+            $routes = $tenantRoutePath;
+        } else {
+            $routes = module_path('Front', '/routes/livewire.php');
+        }
 
         Route::middleware([
             'web',
@@ -68,8 +77,53 @@ class RouteServiceProvider extends ServiceProvider
             PreventAccessFromCentralDomains::class,
             RedirectToLoginForVoipOnlyAppointments::class,
         ])
-            ->group(file_exists($tenantRoutePath) ? $tenantRoutePath : $defaultRoutes);
+            ->group($routes);
     }
+    /**
+     * آیا برای این تننت قالب جدید فعال است.
+     * در زمان ثبت مسیرها هنوز تننت مقداردهی نشده، بنابراین مقدار تنظیمات
+     * مستقیم از دیتابیس همان تننت خوانده و برای همان درخواست کش میشود.
+     */
+    protected function newTemplateEnabledFor(?string $tenantId): bool
+    {
+        if ($tenantId === null) {
+            return false;
+        }
+
+        try {
+            $tenant = \App\Models\Tenant::find($tenantId);
+            if (! $tenant) {
+                return false;
+            }
+
+            // نام دیتابیس روی خود تننت ذخیره شده و ممکن است با prefix پیش فرض یکی نباشد
+            $database = $tenant->database()->getName();
+            // اتصال 'tenant' خودش پویاست، پس از اتصال مرکزی به عنوان الگو استفاده میشود
+            $template = config('tenancy.database.template_tenant_connection')
+                ?: config('tenancy.database.central_connection', 'mysql');
+
+            // یک اتصال موقت به دیتابیس همین تننت، بدون تغییر وضعیت tenancy
+            config([
+                'database.connections.front_template_check' => array_merge(
+                    config('database.connections.'.$template),
+                    ['database' => $database],
+                ),
+            ]);
+
+            $value = \Illuminate\Support\Facades\DB::connection('front_template_check')
+                ->table('settings')
+                ->where('setting_key', \Modules\Setting\Enum\SettingKeyEnum::USE_NEW_TEMPLATE->value)
+                ->value('setting_value');
+
+            \Illuminate\Support\Facades\DB::purge('front_template_check');
+
+            return filter_var($value, FILTER_VALIDATE_BOOL);
+        } catch (\Throwable $e) {
+            // اگر دیتابیس یا جدول تنظیمات در دسترس نبود، قالب قدیم استفاده میشود
+            return false;
+        }
+    }
+
     protected function mapAdminRoutes(): void
     {
         Route::middleware([

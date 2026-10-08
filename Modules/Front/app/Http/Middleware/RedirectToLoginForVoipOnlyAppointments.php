@@ -20,6 +20,9 @@ class RedirectToLoginForVoipOnlyAppointments
             'front.login.doctor',
             'front.user.registration',
             'front.logout',
+            // جزئیات نوبت با کد پیگیری بدون ورود قابل مشاهده است
+            'front.setAppointment.detail',
+            'front.setAppointment.detail.legacy',
         )) {
             return $next($request);
         }

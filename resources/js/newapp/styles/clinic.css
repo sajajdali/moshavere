@@ -1,0 +1,174 @@
+/* خانه کلینیک — از طرح Clinic Booking Home.dc.html */
+.cl-wrap { max-width: 1180px; margin: 0 auto; padding-inline: 16px; }
+.cl-muted { font-size: 12px; color: var(--c-muted); }
+.cl-h1 { margin: 16px 0 10px; font-size: clamp(26px, 6.4vw, 46px); line-height: 1.28; font-weight: 800; letter-spacing: -.5px; text-wrap: pretty; max-width: 15em; }
+.cl-h2 { margin: 0 0 6px; font-size: clamp(20px, 4.8vw, 28px); font-weight: 800; }
+.cl-sub { margin: 0 0 20px; font-size: 14px; line-height: 1.8; color: var(--c-muted); }
+.cl-lead { margin: 0 0 22px; font-size: clamp(14px, 3.6vw, 17px); line-height: 1.9; color: var(--c-muted); max-width: 30em; text-wrap: pretty; }
+.cl-section { padding-top: 36px; padding-bottom: 8px; }
+.cl-section--last { padding-bottom: 44px; }
+.cl-section__head { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
+.cl-link { font-size: 13px; font-weight: 700; }
+
+/* هدر */
+.cl-header { position: sticky; top: 0; z-index: 40; background: rgba(255,255,255,.94); backdrop-filter: blur(10px); border-bottom: 1px solid var(--c-line); }
+.cl-header__bar { padding-block: 12px; display: flex; align-items: center; gap: 12px; }
+.cl-brand { display: flex; align-items: center; gap: 10px; flex: 1 1 auto; min-width: 0; color: var(--c-ink); }
+.cl-brand__mark, .cl-brand__logo { width: 38px; height: 38px; border-radius: 12px; flex: 0 0 auto; }
+.cl-brand__logo { object-fit: cover; }
+.cl-brand__mark { background: linear-gradient(140deg, var(--c-brand), var(--c-accent-2)); display: grid; place-items: center; color: #fff; font-weight: 800; font-size: 17px; }
+.cl-brand__text { display: flex; flex-direction: column; line-height: 1.25; min-width: 0; }
+.cl-brand__text strong { font-size: 16px; color: var(--c-ink); white-space: nowrap; }
+.cl-brand__text span { font-size: 11px; color: var(--c-muted); white-space: nowrap; }
+.cl-nav { align-items: center; gap: 4px; font-size: 14px; }
+.cl-nav a { padding: 9px 12px; border-radius: 9px; color: var(--c-ink-2); }
+.cl-nav a:hover { background: var(--c-brand-soft); color: var(--c-brand); }
+.cl-actions { align-items: center; gap: 8px; flex: 0 0 auto; }
+.cl-btn-outline { padding: 10px 14px; border-radius: 10px; border: 1px solid var(--c-line-2); background: #fff; color: var(--c-brand); font-size: 14px; font-weight: 600; cursor: pointer; text-align: center; }
+.cl-btn-outline:hover { background: var(--c-brand-soft); }
+.cl-btn-solid { padding: 10px 16px; border-radius: 10px; background: var(--c-brand); color: #fff; font-size: 14px; font-weight: 700; text-align: center; }
+.cl-btn-solid:hover { background: var(--c-brand-dark); color: #fff; }
+.cl-burger { width: 46px; height: 46px; flex: 0 0 auto; border-radius: 12px; border: 1px solid #d9e3e1; background: #fff; display: grid; place-items: center; cursor: pointer; padding: 0; }
+.cl-burger span { display: block; width: 20px; height: 2px; background: var(--c-ink); border-radius: 2px; box-shadow: 0 6px 0 var(--c-ink), 0 -6px 0 var(--c-ink); }
+.cl-mobile-nav { border-top: 1px solid var(--c-line); background: #fff; padding: 10px 16px 16px; flex-direction: column; gap: 2px; animation: naFade .18s ease; }
+.cl-mobile-nav > a { display: block; padding: 14px 12px; border-radius: 10px; font-size: 15px; font-weight: 600; color: var(--c-ink); }
+.cl-mobile-nav__row { display: flex; gap: 10px; margin-top: 10px; }
+.cl-mobile-nav__row > * { flex: 1 1 0; padding: 14px; border-radius: 12px; }
+
+/* هدر تصویری */
+.cl-header--image { position: relative; background-color: #123f43; background-size: cover; background-position: center; border-bottom: 0; backdrop-filter: none; }
+.cl-header--image .cl-brand, .cl-header--image .cl-brand__text strong { color: #fff; }
+.cl-header--image .cl-brand__text span { color: rgba(255,255,255,.72); }
+.cl-header--image .cl-brand__mark { background: rgba(255,255,255,.16); border: 1px solid rgba(255,255,255,.28); }
+.cl-header--image .cl-nav a { color: rgba(255,255,255,.86); }
+.cl-header--image .cl-nav a:hover { background: rgba(255,255,255,.14); color: #fff; }
+.cl-header--image .cl-btn-outline { background: transparent; color: #fff; border-color: rgba(255,255,255,.4); }
+.cl-header--image .cl-btn-outline:hover { background: rgba(255,255,255,.14); }
+.cl-header--image .cl-btn-solid { background: #fff; color: var(--c-brand); }
+.cl-header--image .cl-btn-solid:hover { background: var(--c-brand-soft); }
+.cl-header--image .cl-burger { background: rgba(255,255,255,.12); border-color: rgba(255,255,255,.4); }
+.cl-header--image .cl-burger span { background: #fff; box-shadow: 0 6px 0 #fff, 0 -6px 0 #fff; }
+.cl-header--image .cl-mobile-nav { background: rgba(9,34,36,.96); border-top-color: rgba(255,255,255,.18); }
+.cl-header--image .cl-mobile-nav > a { color: #fff; }
+.cl-header__hero { padding-top: 8px; padding-bottom: 34px; }
+.cl-header__hero h1 { margin: 10px 0; font-size: clamp(24px, 6vw, 40px); line-height: 1.3; font-weight: 800; color: #fff; max-width: 16em; text-wrap: pretty; }
+.cl-header__hero p { margin: 0 0 18px; font-size: clamp(13px, 3.4vw, 16px); line-height: 1.9; color: rgba(255,255,255,.82); max-width: 30em; }
+.cl-header__cta { display: flex; flex-wrap: wrap; gap: 10px; }
+.cl-cta-primary, .cl-cta-ghost { min-height: 52px; display: flex; align-items: center; justify-content: center; border-radius: 14px; color: #fff; }
+.cl-cta-primary { flex: 1 1 200px; background: var(--c-accent-2); font-size: 16px; font-weight: 800; }
+.cl-cta-primary:hover { background: #26786e; color: #fff; }
+.cl-cta-ghost { flex: 1 1 180px; border: 1px solid rgba(255,255,255,.45); font-size: 15px; font-weight: 700; }
+.cl-cta-ghost:hover { background: rgba(255,255,255,.14); color: #fff; }
+
+/* نوبت‌دهی */
+.cl-booking { background: linear-gradient(180deg, var(--c-brand-soft) 0%, var(--c-bg) 100%); border-bottom: 1px solid var(--c-line); }
+.cl-booking__in { padding-top: 32px; padding-bottom: 40px; }
+.cl-pill { display: inline-flex; align-items: center; gap: 8px; padding: 7px 12px; border-radius: 999px; background: var(--c-ok-soft); color: var(--c-accent); font-size: 12px; font-weight: 600; }
+.cl-pill i { width: 7px; height: 7px; border-radius: 50%; background: var(--c-accent-2); }
+.cl-search { background: #fff; border: 1px solid var(--c-line); border-radius: 20px; padding: 14px; box-shadow: 0 12px 30px -18px rgba(10,110,189,.35); }
+.cl-search__row { display: flex; flex-wrap: wrap; gap: 10px; }
+.cl-search__field { flex: 1 1 260px; display: flex; align-items: center; gap: 10px; background: var(--c-bg); border: 1px solid var(--c-line); border-radius: 14px; padding: 0 14px; min-height: 54px; }
+.cl-search__icon { width: 16px; height: 16px; border: 2px solid #8fa0a3; border-radius: 50%; flex: 0 0 auto; }
+.cl-search__field input { flex: 1 1 auto; border: 0; background: transparent; outline: none; font-size: 15px; min-width: 0; color: var(--c-ink); }
+.cl-search select { flex: 1 1 170px; min-height: 54px; border: 1px solid var(--c-line); background: var(--c-bg); border-radius: 14px; padding: 0 12px; font-size: 15px; color: var(--c-ink); outline: none; }
+.cl-search__btn { flex: 1 1 180px; min-height: 54px; border: 0; border-radius: 14px; background: var(--c-brand); color: #fff; font-size: 16px; font-weight: 700; cursor: pointer; }
+.cl-search__btn:hover { background: var(--c-brand-dark); }
+.cl-suggest { margin-top: 12px; border-top: 1px dashed var(--c-line); padding-top: 10px; display: flex; flex-direction: column; gap: 4px; }
+.cl-suggest a { display: flex; align-items: center; gap: 12px; padding: 10px; border-radius: 12px; }
+.cl-suggest a:hover { background: var(--c-brand-soft); }
+.cl-suggest a > span { flex: 1 1 auto; min-width: 0; }
+.cl-suggest strong { display: block; font-size: 14px; color: var(--c-ink); }
+.cl-suggest a > span span { font-size: 12px; color: var(--c-muted); }
+.cl-suggest em { font-style: normal; flex: 0 0 auto; font-size: 12px; font-weight: 700; color: var(--c-accent); background: var(--c-ok-soft); padding: 6px 10px; border-radius: 999px; white-space: nowrap; }
+.cl-quick { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 14px; }
+.cl-quick > span { font-size: 12px; color: var(--c-muted); align-self: center; }
+.cl-quick a { padding: 8px 13px; border-radius: 999px; background: #fff; border: 1px solid #d9e3e1; font-size: 13px; font-weight: 600; color: var(--c-ink-2); }
+.cl-quick a:hover { border-color: var(--c-brand); color: var(--c-brand); }
+.cl-stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 10px; margin: 24px 0 0; }
+.cl-stats > div { background: #fff; border: 1px solid var(--c-line); border-radius: 16px; padding: 14px 16px; }
+.cl-stats dt { font-size: 12px; color: var(--c-muted); }
+.cl-stats dd { margin: 4px 0 0; font-size: 22px; font-weight: 800; color: var(--c-brand); }
+.cl-stats dd.is-accent { color: var(--c-accent-2); }
+
+/* تخصص‌ها */
+.cl-spec-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px; }
+.cl-spec { background: #fff; border: 1px solid var(--c-line); border-radius: 18px; padding: 18px 16px; display: flex; flex-direction: column; gap: 10px; min-height: 128px; color: inherit; transition: transform .15s, box-shadow .15s, border-color .15s; }
+.cl-spec:hover { border-color: var(--c-brand); box-shadow: 0 10px 24px -18px rgba(10,110,189,.6); transform: translateY(-2px); }
+.cl-spec__mark { width: 42px; height: 42px; border-radius: 13px; background: var(--c-brand-soft); display: grid; place-items: center; font-size: 18px; font-weight: 800; color: var(--c-brand); }
+.cl-spec strong { font-size: 16px; color: var(--c-ink); }
+.cl-spec__meta { font-size: 12px; color: var(--c-muted); margin-top: auto; }
+
+/* پزشکان */
+.cl-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 12px; }
+.cl-grid--feat { gap: 14px; }
+.cl-grid--dep { grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); }
+.cl-doc { background: #fff; border: 1px solid var(--c-line); border-radius: 18px; padding: 14px; display: flex; flex-direction: column; gap: 12px; }
+.cl-doc--featured { border-radius: 20px; padding: 16px; gap: 14px; }
+.cl-doc__head { display: flex; gap: 12px; align-items: center; }
+.cl-doc--featured .cl-doc__head { align-items: flex-start; }
+.cl-doc__avatar { flex: 0 0 auto; border-radius: 15px; object-fit: cover; }
+.cl-doc--featured .cl-doc__avatar { border-radius: 16px; }
+.cl-doc__avatar--ph { background-color: var(--c-placeholder); background-image: repeating-linear-gradient(135deg, var(--c-placeholder-2) 0 6px, var(--c-placeholder) 6px 12px); display: grid; place-items: center; font-family: ui-monospace, monospace; font-size: 9px; color: var(--c-muted-2); }
+.cl-doc__info { flex: 1 1 auto; min-width: 0; }
+.cl-doc__info strong { display: block; font-size: 15px; }
+.cl-doc--featured .cl-doc__info strong { font-size: 16px; line-height: 1.5; }
+.cl-doc__spec { display: block; font-size: 12px; color: var(--c-brand); font-weight: 600; margin-top: 3px; }
+.cl-doc__rate { flex: 0 0 auto; font-size: 12px; font-weight: 700; color: var(--c-gold); }
+.cl-doc--featured .cl-doc__rate { background: var(--c-gold-soft); border-radius: 999px; padding: 6px 10px; }
+.cl-doc__next { display: flex; align-items: center; justify-content: space-between; gap: 8px; border-top: 1px dashed var(--c-line); padding-top: 10px; }
+.cl-doc__next span { font-size: 12px; color: var(--c-muted); }
+.cl-doc__next strong { font-size: 13px; color: var(--c-accent); }
+.cl-doc__next--box { background: var(--c-ok-soft); border: 0; border-radius: 14px; padding: 12px 14px; }
+.cl-doc__next--box span { color: var(--c-accent); }
+.cl-doc__next--box strong { font-size: 14px; }
+.cl-doc__slots { display: flex; flex-wrap: wrap; gap: 8px; }
+.cl-doc__slots button { padding: 10px 12px; min-height: 44px; border-radius: 12px; border: 1px solid var(--c-line-2); background: var(--c-bg); font-size: 13px; font-weight: 600; color: var(--c-ink); cursor: pointer; }
+.cl-doc__slots button:hover { border-color: var(--c-accent-2); background: var(--c-ok-soft); }
+.cl-doc__btns { display: flex; gap: 8px; margin-top: auto; }
+.cl-btn-line, .cl-btn-fill { flex: 1 1 0; min-height: 46px; display: flex; align-items: center; justify-content: center; border-radius: 13px; font-size: 14px; font-weight: 700; cursor: pointer; text-align: center; }
+.cl-btn-line { border: 1px solid var(--c-line-2); background: #fff; color: var(--c-brand); }
+.cl-btn-line:hover { background: var(--c-brand-soft); }
+.cl-btn-fill { border: 0; background: var(--c-brand); color: #fff; }
+.cl-btn-fill:hover { background: var(--c-brand-dark); }
+.cl-doc--featured .cl-btn-line, .cl-doc--featured .cl-btn-fill { min-height: 48px; border-radius: 14px; }
+
+.cl-chips { display: flex; flex-wrap: wrap; gap: 8px; padding: 4px 0 14px; }
+.cl-chips button { min-height: 44px; padding: 0 16px; border-radius: 999px; border: 1px solid #d9e3e1; background: #fff; color: var(--c-ink-2); font-size: 13px; font-weight: 600; cursor: pointer; white-space: nowrap; }
+.cl-chips button:hover { border-color: var(--c-brand); color: var(--c-brand); }
+.cl-chips button.is-on { background: var(--c-brand); border-color: var(--c-brand); color: #fff; }
+.cl-chips .cl-chips__more { border: 1px dashed #c7d3d1; background: var(--c-brand-soft); color: var(--c-brand); font-weight: 700; }
+.cl-empty { background: #fff; border: 1px dashed var(--c-line-2); border-radius: 18px; padding: 28px 20px; text-align: center; display: flex; flex-direction: column; align-items: center; gap: 6px; }
+.cl-empty strong { font-size: 15px; }
+.cl-empty span { font-size: 13px; color: var(--c-muted); margin-bottom: 8px; }
+
+/* بخش‌ها */
+.cl-dep { background: #fff; border: 1px solid var(--c-line); border-radius: 18px; padding: 18px; display: flex; flex-direction: column; gap: 10px; }
+.cl-dep__head { display: flex; align-items: center; gap: 10px; }
+.cl-dep__head img { width: 40px; height: 40px; border-radius: 12px; object-fit: cover; }
+.cl-dep__head strong { flex: 1 1 auto; font-size: 16px; }
+.cl-dep__head > span { font-size: 12px; font-weight: 700; color: var(--c-brand); background: var(--c-brand-soft); padding: 6px 10px; border-radius: 999px; white-space: nowrap; }
+.cl-dep p { margin: 0; font-size: 13px; line-height: 1.9; color: var(--c-muted); }
+.cl-dep__soon { font-size: 12px; color: var(--c-accent); font-weight: 600; }
+.cl-dep .cl-btn-line { flex: 0 0 auto; margin-top: 6px; }
+
+/* مراحل */
+.cl-steps { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 12px; }
+.cl-steps li { background: #fff; border: 1px solid var(--c-line); border-radius: 18px; padding: 20px; display: flex; flex-direction: column; gap: 10px; }
+.cl-steps li > span { width: 38px; height: 38px; border-radius: 12px; background: var(--c-brand); color: #fff; display: grid; place-items: center; font-weight: 800; }
+.cl-steps li > span.is-accent { background: var(--c-accent-2); }
+.cl-steps strong { font-size: 16px; }
+.cl-steps em { font-style: normal; font-size: 13px; line-height: 1.9; color: var(--c-muted); }
+
+/* فراخوان */
+.cl-cta { background: linear-gradient(145deg, var(--c-brand), #2a7f74); border-radius: 24px; padding: 28px 20px; color: #fff; text-align: center; }
+.cl-cta h2 { margin: 0 0 10px; font-size: clamp(20px, 5vw, 30px); font-weight: 800; line-height: 1.4; }
+.cl-cta p { margin: 0 auto 20px; font-size: 14px; line-height: 1.9; color: rgba(255,255,255,.86); max-width: 34em; }
+.cl-cta a { display: inline-flex; align-items: center; justify-content: center; min-height: 54px; padding: 0 28px; border-radius: 16px; background: #fff; color: var(--c-brand); font-size: 16px; font-weight: 800; }
+.cl-cta a:hover { background: var(--c-brand-soft); }
+
+@media (max-width: 939px) { .cl-mobile-nav.na-hide-desk { display: flex; } }
+
+
+.cl-crumb { display: flex; gap: 8px; font-size: 12px; color: var(--c-muted); margin-bottom: 14px; }
+.cl-service-head { display: flex; align-items: center; gap: 16px; }
+.cl-service-head img { width: 72px; height: 72px; border-radius: 18px; object-fit: cover; flex: 0 0 auto; }

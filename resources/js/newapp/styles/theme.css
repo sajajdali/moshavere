@@ -1,0 +1,535 @@
+/*
+ * قالب جدید نوبت دهی
+ * پالت رنگ و توکن ها عیناً از طرح های D:\project\ui\tenant استخراج شده است.
+ */
+:root {
+  --c-brand: #145c63;
+  --c-brand-dark: #0e4a50;
+  --c-brand-soft: #eaf1f0;
+  --c-accent: #17635c;
+  --c-accent-2: #2f8f83;
+  --c-ink: #12232b;
+  --c-ink-2: #3a4c53;
+  --c-muted: #5f7480;
+  --c-muted-2: #8b9b9c;
+  --c-line: #e4ebea;
+  --c-line-2: #cdd9d7;
+  --c-bg: #f7f9f9;
+  --c-surface: #ffffff;
+  --c-placeholder: #eef2f1;
+  --c-placeholder-2: #dfe8e6;
+  --c-danger: #a8443a;
+  --c-danger-soft: #f7ecea;
+  --c-gold: #9a7434;
+  --c-gold-soft: #f5eee0;
+  --c-ok-soft: #e9f2ef;
+
+  --r-sm: 9px;
+  --r-md: 14px;
+  --r-lg: 18px;
+  --r-xl: 24px;
+
+  --shadow-sm: 0 2px 6px rgba(9, 28, 42, 0.08);
+  --shadow-md: 0 4px 14px rgba(9, 28, 42, 0.12);
+  --shadow-lg: 0 10px 30px rgba(9, 28, 42, 0.16);
+
+  --maxw: 1120px;
+}
+
+* { box-sizing: border-box; }
+
+html, body { margin: 0; padding: 0; }
+
+body {
+  font-family: Vazirmatn, system-ui, sans-serif;
+  background: var(--c-bg);
+  color: var(--c-ink);
+  -webkit-font-smoothing: antialiased;
+}
+
+a { color: var(--c-brand); text-decoration: none; }
+a:hover { color: var(--c-brand-dark); }
+input, select, button, textarea { font-family: inherit; }
+
+.na-wrap { max-width: var(--maxw); margin: 0 auto; padding: 0 16px; }
+
+/* اسکلتون بارگذاری */
+@keyframes naPulse { 0%, 100% { opacity: 1 } 50% { opacity: .45 } }
+.na-skel {
+  background: var(--c-placeholder);
+  border-radius: var(--r-md);
+  animation: naPulse 1.4s ease-in-out infinite;
+}
+
+/* موج نور روی اسکلتون - حس «در حال بارگذاری» را واضح تر می کند.
+   جهت حرکت با راست به چپ بودن صفحه هماهنگ است. */
+@keyframes naShimmer { from { transform: translateX(-100%) } to { transform: translateX(100%) } }
+.na-shimmer {
+  position: relative;
+  overflow: hidden;
+  background: var(--c-placeholder);
+  border-radius: var(--r-md);
+}
+.na-shimmer::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, .75), transparent);
+  /* تاخیر از روی متغیر خود عنصر خوانده می شود تا موج پلکانی دیده شود */
+  animation: naShimmer 1.25s ease-in-out infinite;
+  animation-delay: var(--na-delay, 0ms);
+}
+
+/* چرخنده */
+@keyframes naSpin { to { transform: rotate(360deg) } }
+.na-spinner {
+  width: 18px;
+  height: 18px;
+  flex: 0 0 auto;
+  border-radius: 50%;
+  border: 2px solid var(--c-line-2);
+  border-top-color: var(--c-brand);
+  animation: naSpin .7s linear infinite;
+}
+
+/* چرخنده بزرگ برای لودینگ تمام صفحه */
+.na-spinner--lg {
+  width: 62px;
+  height: 62px;
+  border-width: 5px;
+  animation-duration: .85s;
+}
+
+/* لودینگ تمام صفحه:
+   پس زمینه صفحه بلر می شود و فقط یک لایه سفید بسیار کم رنگ رویش می نشیند،
+   تا محتوای پشت آن همچنان دیده شود. */
+@keyframes naOverlayIn { from { opacity: 0 } to { opacity: 1 } }
+.na-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 120;
+  display: grid;
+  place-items: center;
+  padding: 24px;
+  background: rgba(255, 255, 255, .12);
+  -webkit-backdrop-filter: blur(10px) saturate(120%);
+  backdrop-filter: blur(10px) saturate(120%);
+  animation: naOverlayIn .18s ease;
+}
+
+/* اگر مرورگر بلر پس زمینه را پشتیبانی نکند، لایه سفید پررنگ تر می شود
+   تا متن لودینگ همچنان خوانا بماند. */
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  .na-overlay { background: rgba(255, 255, 255, .82); }
+}
+
+/* کارت سفید زیر چرخنده و متن */
+.na-overlay__box {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 18px;
+  text-align: center;
+  padding: 30px 40px;
+  border-radius: var(--r-xl);
+  background: rgba(255, 255, 255, .72);
+  border: 1px solid rgba(255, 255, 255, .9);
+  box-shadow: 0 18px 50px -18px rgba(9, 28, 42, .28);
+}
+.na-overlay__text {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--c-ink);
+}
+.na-overlay__hint {
+  font-size: 13px;
+  color: var(--c-muted);
+  margin-top: -8px;
+}
+
+/* بارگذاری هر بخش به صورت جداگانه: به جای قفل کردن کل صفحه با یک لودینگ
+   تمام‌صفحه، شکل کلی همان بخش (اسکلتون) با بلر و پالس نمایش داده می شود
+   و یک نشان کوچک وسط آن می گوید این قسمت در حال بارگذاری است. */
+.na-section-loading {
+  position: relative;
+  overflow: hidden;
+  border-radius: var(--r-xl);
+}
+.na-section-loading__content {
+  filter: blur(5px);
+  animation: naPulse 1.6s ease-in-out infinite;
+  pointer-events: none;
+  user-select: none;
+}
+.na-section-loading__badge {
+  position: absolute;
+  top: 50%; left: 50%;
+  transform: translate(-50%, -50%);
+  display: flex; align-items: center; gap: 10px;
+  padding: 12px 18px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, .88);
+  border: 1px solid rgba(255, 255, 255, .9);
+  box-shadow: 0 12px 34px -14px rgba(9, 28, 42, .35);
+  font-size: 13px; font-weight: 700; color: var(--c-ink-2);
+  white-space: nowrap;
+  -webkit-backdrop-filter: blur(6px);
+  backdrop-filter: blur(6px);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .na-section-loading__content { animation: none; opacity: .75; }
+}
+
+/* نقطه های متحرک کنار متن */
+@keyframes naDot { 0%, 80%, 100% { opacity: .25 } 40% { opacity: 1 } }
+.na-dots > i {
+  display: inline-block;
+  width: 6px;
+  height: 6px;
+  margin-inline-start: 3px;
+  border-radius: 50%;
+  background: var(--c-brand);
+  animation: naDot 1.2s ease-in-out infinite;
+}
+.na-dots > i:nth-child(2) { animation-delay: .15s }
+.na-dots > i:nth-child(3) { animation-delay: .3s }
+
+/* در صورت فعال بودن «کاهش حرکت» در سیستم کاربر */
+@media (prefers-reduced-motion: reduce) {
+  .na-shimmer::after { animation: none; }
+  .na-spinner { animation-duration: 2s; }
+  .na-skel { animation: none; opacity: .7; }
+  .na-overlay { animation: none; }
+  .na-dots > i { animation: none; opacity: .6; }
+}
+
+/* جای تصویر - مطابق طرح */
+.na-ph {
+  background-color: var(--c-placeholder);
+  background-image: repeating-linear-gradient(135deg, var(--c-placeholder-2) 0 8px, var(--c-placeholder) 8px 16px);
+  display: grid;
+  place-items: center;
+  font-family: ui-monospace, monospace;
+  font-size: 11px;
+  color: var(--c-muted-2);
+}
+
+/* شیت های مودال: در موبایل از پایین باز میشوند و در دسکتاپ وسط صفحه.
+   نقطه شکست ۶۲۰ پیکسل، مطابق طرح. */
+.na-sheet-overlay {
+  position: fixed; inset: 0; z-index: 90;
+  background: rgba(9, 28, 42, 0.55);
+  backdrop-filter: blur(3px);
+  display: flex; justify-content: center;
+  align-items: flex-end;
+}
+
+.na-sheet {
+  position: relative; width: 100%; max-width: 520px;
+  background: var(--c-surface);
+  border-radius: 24px 24px 0 0;
+  padding: 20px 20px 24px;
+  box-shadow: 0 -20px 60px -20px rgba(9, 28, 42, 0.5);
+  animation: naUp .22s ease;
+  max-height: 92vh; overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: var(--c-line-2) transparent;
+}
+
+.na-sheet::-webkit-scrollbar { width: 8px; }
+.na-sheet::-webkit-scrollbar-track { background: transparent; }
+.na-sheet::-webkit-scrollbar-thumb {
+  background-color: var(--c-line-2);
+  border-radius: 999px;
+  border: 2px solid var(--c-surface);
+  background-clip: padding-box;
+}
+.na-sheet::-webkit-scrollbar-thumb:hover { background-color: var(--c-muted); }
+
+/* دکمه شناور ته شیت: هنگام اسکرول محتوای بلند (مثلاً چند انتخابی ناحیه ها)،
+   کاربر مجبور نیست تا انتهای صفحه اسکرول کند تا دکمه ادامه/ثبت را ببیند. */
+.na-sheet__floating-footer {
+  position: sticky; bottom: 0; z-index: 5;
+  margin: 16px -20px -24px; padding: 12px 20px calc(20px + env(safe-area-inset-bottom, 0px));
+  background: linear-gradient(180deg, rgba(255,255,255,0) 0%, var(--c-surface) 28%);
+}
+
+@media (min-width: 620px) {
+  .na-sheet-overlay { align-items: center; padding: 24px; }
+  .na-sheet {
+    border-radius: 24px;
+    box-shadow: 0 30px 70px -25px rgba(9, 28, 42, 0.55);
+    max-height: 88vh;
+  }
+}
+
+@keyframes naFade { from { opacity: 0; transform: translateY(-6px) } to { opacity: 1; transform: none } }
+@keyframes naUp { from { opacity: 0; transform: translateY(24px) } to { opacity: 1; transform: none } }
+@keyframes dcPulse { 0%, 100% { opacity: 0.35 } 50% { opacity: 1 } }
+@keyframes dcIconIn {
+  from { opacity: 0; scale: .5; }
+  to { opacity: 1; scale: 1; }
+}
+
+.na-btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+  border: 0; cursor: pointer; font-weight: 700; font-size: 14px;
+  border-radius: var(--r-md); padding: 12px 20px;
+  background: var(--c-brand); color: #fff;
+}
+.na-btn:hover { background: var(--c-brand-dark); }
+.na-btn[disabled] { opacity: .55; cursor: not-allowed; }
+.na-btn--ghost { background: var(--c-brand-soft); color: var(--c-brand); }
+.na-btn--ghost:hover { background: var(--c-line); color: var(--c-brand-dark); }
+
+.na-card {
+  background: var(--c-surface);
+  border: 1px solid var(--c-line);
+  border-radius: var(--r-xl);
+  padding: 18px;
+}
+
+.na-field {
+  display: flex; align-items: center; gap: 8px;
+  background: var(--c-bg); border: 1px solid var(--c-line);
+  border-radius: var(--r-md); padding: 0 16px; min-height: 54px;
+}
+.na-field input, .na-field select {
+  flex: 1; border: 0; outline: 0; background: transparent;
+  font-size: 14px; color: var(--c-ink); min-width: 0;
+}
+
+/* ورود مستقل پنل مدیریت */
+.admin-login-page {
+  min-height: 100vh; padding: 28px 16px; display: grid; place-items: center;
+  background:
+    radial-gradient(circle at 12% 12%, rgba(47,143,131,.14), transparent 30%),
+    radial-gradient(circle at 88% 88%, rgba(20,92,99,.11), transparent 28%),
+    var(--c-bg);
+}
+.admin-login-shell {
+  width: min(920px, 100%); min-height: 570px; display: grid;
+  grid-template-columns: minmax(0, .92fr) minmax(0, 1.08fr);
+  overflow: hidden; border: 1px solid var(--c-line); border-radius: 28px;
+  background: var(--c-surface); box-shadow: 0 28px 80px -35px rgba(9,28,42,.42);
+}
+.admin-login-brand {
+  position: relative; isolation: isolate; overflow: hidden;
+  padding: 48px 42px; display: flex; flex-direction: column; justify-content: space-between;
+  color: #fff; background: linear-gradient(145deg, var(--c-brand-dark), var(--c-brand));
+}
+.admin-login-brand::before, .admin-login-brand::after {
+  content: ''; position: absolute; z-index: -1; border-radius: 50%;
+  border: 1px solid rgba(255,255,255,.13);
+}
+.admin-login-brand::before { width: 290px; height: 290px; inset: -125px auto auto -120px; }
+.admin-login-brand::after { width: 220px; height: 220px; inset: auto -110px -100px auto; }
+.admin-login-brand__mark {
+  width: 58px; height: 58px; display: grid; place-items: center; overflow: hidden;
+  border-radius: 18px; background: rgba(255,255,255,.16); border: 1px solid rgba(255,255,255,.22);
+  box-shadow: 0 14px 35px rgba(0,0,0,.12); font-size: 23px; font-weight: 800;
+}
+.admin-login-brand__mark img { width: 100%; height: 100%; object-fit: cover; }
+.admin-login-brand__eyebrow { margin: 0 0 10px; font-size: 13px; font-weight: 700; color: rgba(255,255,255,.72); }
+.admin-login-brand h1 { margin: 0; font-size: clamp(23px, 3vw, 31px); line-height: 1.5; }
+.admin-login-brand p:not(.admin-login-brand__eyebrow) { margin: 14px 0 0; font-size: 14px; line-height: 2; color: rgba(255,255,255,.75); }
+.admin-login-brand__security { display: flex; align-items: center; gap: 10px; font-size: 12.5px; color: rgba(255,255,255,.78); }
+.admin-login-brand__security svg { width: 21px; height: 21px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+.admin-login-form-wrap { padding: 54px 52px 34px; display: flex; flex-direction: column; justify-content: center; }
+.admin-login-heading { display: flex; align-items: center; gap: 13px; margin-bottom: 30px; }
+.admin-login-heading__icon { width: 45px; height: 45px; display: grid; place-items: center; flex: 0 0 auto; border-radius: 14px; color: var(--c-brand); background: var(--c-brand-soft); }
+.admin-login-heading__icon svg { width: 22px; height: 22px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+.admin-login-heading h2 { margin: 0 0 5px; font-size: 21px; }
+.admin-login-heading p { margin: 0; color: var(--c-muted); font-size: 13px; }
+.admin-login-form { display: flex; flex-direction: column; gap: 18px; }
+.admin-login-form > label { display: flex; flex-direction: column; gap: 8px; color: var(--c-ink-2); font-size: 13px; font-weight: 650; }
+.admin-login-field { min-height: 54px; display: flex; align-items: center; gap: 11px; padding: 0 14px; border: 1px solid var(--c-line-2); border-radius: var(--r-md); background: var(--c-bg); transition: border-color .18s, box-shadow .18s, background .18s; }
+.admin-login-field:focus-within { border-color: var(--c-brand); background: #fff; box-shadow: 0 0 0 3px rgba(20,92,99,.1); }
+.admin-login-field > svg, .admin-login-password-toggle svg { width: 20px; height: 20px; flex: 0 0 auto; fill: none; stroke: var(--c-muted); stroke-width: 1.7; stroke-linecap: round; stroke-linejoin: round; }
+.admin-login-field input { width: 100%; min-width: 0; border: 0; outline: 0; background: transparent; color: var(--c-ink); font-size: 15px; }
+.admin-login-password-toggle { display: grid; place-items: center; padding: 5px; border: 0; background: transparent; cursor: pointer; }
+.admin-login-error { padding: 11px 13px; border-radius: 11px; background: var(--c-danger-soft); color: var(--c-danger); font-size: 12.5px; font-weight: 600; line-height: 1.8; }
+.admin-login-submit { width: 100%; min-height: 52px; margin-top: 2px; }
+.admin-login-submit .na-spinner { width: 17px; height: 17px; border-color: rgba(255,255,255,.4); border-top-color: #fff; }
+.admin-login-back { align-self: center; margin-top: 24px; font-size: 13px; font-weight: 650; }
+.admin-login-register { align-self: center; margin: 22px 0 0; color: var(--c-muted); font-size: 13px; }
+.admin-login-register a { font-weight: 700; }
+.admin-login-register + .admin-login-back { margin-top: 12px; }
+@media (max-width: 720px) {
+  .admin-login-page { padding: 0; place-items: stretch; background: var(--c-surface); }
+  .admin-login-shell { min-height: 100vh; display: flex; flex-direction: column; border: 0; border-radius: 0; box-shadow: none; }
+  .admin-login-brand { min-height: 180px; padding: 26px 24px; gap: 24px; }
+  .admin-login-brand > div:nth-child(2) { margin-top: auto; }
+  .admin-login-brand h1 { font-size: 21px; }
+  .admin-login-brand p:not(.admin-login-brand__eyebrow), .admin-login-brand__security { display: none; }
+  .admin-login-brand__mark { width: 48px; height: 48px; border-radius: 15px; }
+  .admin-login-form-wrap { flex: 1; padding: 34px 22px 28px; justify-content: flex-start; }
+  .admin-login-heading { margin-bottom: 28px; }
+}
+
+.na-chip {
+  display: inline-flex; align-items: center; gap: 6px;
+  border-radius: 999px; padding: 7px 13px; font-size: 12px; font-weight: 700;
+  background: var(--c-brand-soft); color: var(--c-brand); border: 1px solid transparent;
+  cursor: pointer;
+}
+.na-chip--on { background: var(--c-brand); color: #fff; }
+
+.na-sec-title { font-size: 20px; font-weight: 800; color: var(--c-ink); margin: 0; }
+.na-sec-sub { font-size: 13px; color: var(--c-muted); margin: 6px 0 0; line-height: 1.9; }
+
+.na-grid { display: grid; gap: 16px; }
+@media (min-width: 700px) { .na-grid--2 { grid-template-columns: 1fr 1fr; } }
+@media (min-width: 940px) { .na-grid--3 { grid-template-columns: repeat(3, 1fr); } }
+
+.na-hide-desk { display: block; }
+.na-show-desk { display: none; }
+@media (min-width: 940px) {
+  .na-hide-desk { display: none; }
+  .na-show-desk { display: flex; }
+}
+
+/* صفحه پروفایل پزشک - مطابق طرح:
+   در دسکتاپ دو ستونی با ستون کناری چسبان، در موبایل تک ستونی
+   به همراه نوار ثابت پایین صفحه. */
+@media (min-width: 940px) {
+  .dp-grid { grid-template-columns: 1.6fr 1fr; align-items: start; }
+  .dp-aside { position: sticky; top: 84px; }
+  .dp-sticky { display: none !important; }
+}
+
+/* هدر معرفی پزشک - صفحه اصلی تک پزشک */
+.na-hero {
+  position: relative;
+  overflow: hidden;
+  background:
+    radial-gradient(1100px 420px at 85% -10%, rgba(23, 99, 92, 0.16), transparent 60%),
+    linear-gradient(180deg, var(--c-brand-soft) 0%, var(--c-bg) 100%);
+  border-bottom: 1px solid var(--c-line);
+}
+.na-hero__grid {
+  display: grid;
+  gap: 32px;
+  padding: 44px 16px 40px;
+  align-items: center;
+}
+@media (min-width: 780px) {
+  .na-hero__grid { grid-template-columns: 1.15fr 0.85fr; padding: 60px 16px 52px; }
+}
+
+.na-hero__badge {
+  display: inline-flex; align-items: center; gap: 8px;
+  background: var(--c-surface); color: var(--c-accent);
+  border: 1px solid var(--c-line-2);
+  border-radius: 999px; padding: 8px 14px; font-size: 12px; font-weight: 700;
+  margin-bottom: 16px; box-shadow: var(--shadow-sm);
+}
+.na-hero__dot {
+  width: 8px; height: 8px; border-radius: 50%; background: var(--c-accent-2);
+  box-shadow: 0 0 0 3px rgba(47, 143, 131, 0.18);
+}
+
+.na-hero__name { font-size: clamp(24px, 4vw, 34px); font-weight: 800; margin: 0 0 8px; line-height: 1.35; color: var(--c-ink); }
+.na-hero__specialty {
+  display: inline-block; margin: 0 0 16px; font-size: 14px; font-weight: 700;
+  color: var(--c-brand); background: var(--c-brand-soft);
+  border-radius: 999px; padding: 6px 14px;
+}
+.na-hero__bio { margin: 0 0 22px; font-size: 14.5px; color: var(--c-ink-2); line-height: 2; max-width: 56ch; }
+
+.na-hero__figure { position: relative; }
+.na-hero__photo {
+  width: 100%; aspect-ratio: 4/3; object-fit: cover; border-radius: var(--r-xl);
+  box-shadow: var(--shadow-lg); border: 6px solid var(--c-surface);
+}
+.na-hero__stats {
+  display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px;
+  margin: -34px 14px 0; position: relative; z-index: 2;
+}
+@media (max-width: 480px) { .na-hero__stats { margin-inline: 6px; } }
+.na-hero__stat {
+  background: var(--c-surface); border-radius: var(--r-lg); box-shadow: var(--shadow-md);
+  padding: 14px 8px; text-align: center; border: 1px solid var(--c-line);
+}
+.na-hero__stat dt { font-size: 11px; color: var(--c-muted); margin-bottom: 4px; }
+.na-hero__stat dd { margin: 0; font-size: 16px; font-weight: 800; color: var(--c-ink); }
+
+.na-hero__actions { display: flex; flex-wrap: wrap; gap: 10px; }
+.na-hero__actions .na-btn { padding: 13px 22px; font-size: 14.5px; box-shadow: var(--shadow-sm); }
+
+/* بخش خدمات */
+.na-services__head {
+  display: flex; align-items: flex-end; justify-content: space-between; gap: 16px;
+  margin-bottom: 22px; flex-wrap: wrap;
+}
+.na-grid--services {
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+}
+
+.na-svc-card {
+  background: var(--c-surface); border: 1px solid var(--c-line); border-radius: var(--r-lg);
+  padding: 18px; display: flex; flex-direction: column; gap: 12px;
+  transition: box-shadow .15s ease, border-color .15s ease;
+}
+.na-svc-card:hover { box-shadow: var(--shadow-md); border-color: var(--c-line-2); }
+.na-svc-card__mark {
+  flex: 0 0 auto; width: 44px; height: 44px; border-radius: 13px;
+  background: var(--c-brand-soft); color: var(--c-brand);
+  display: grid; place-items: center; font-weight: 800; font-size: 14px;
+}
+.na-svc-card__mark--img { object-fit: contain; padding: 8px; background: var(--c-surface); }
+.na-svc-card__name { display: block; font-size: 15px; }
+.na-svc-card__meta { display: block; font-size: 12px; color: var(--c-muted); margin-top: 3px; }
+.na-svc-card__desc { margin: 0; font-size: 13px; color: var(--c-muted); line-height: 1.9; }
+.na-svc-card__foot {
+  display: flex; align-items: center; gap: 10px; margin-top: auto; padding-top: 2px;
+}
+.na-svc-card__soonest { font-size: 12px; color: var(--c-accent); font-weight: 700; }
+.na-svc-card__btn { margin-inline-start: auto; padding: 10px 16px; font-size: 13px; }
+
+/* نظرات بیماران */
+.na-review {
+  background: var(--c-surface); border: 1px solid var(--c-line); border-radius: var(--r-lg);
+  padding: 18px; display: flex; flex-direction: column; gap: 12px;
+}
+.na-review__head { display: flex; align-items: center; gap: 10px; }
+.na-review__avatar {
+  width: 38px; height: 38px; border-radius: 50%; flex: 0 0 auto;
+  background: var(--c-brand-soft); color: var(--c-brand);
+  display: grid; place-items: center; font-weight: 700; font-size: 14px;
+}
+.na-review__name { display: block; font-size: 14px; font-weight: 700; }
+.na-review__date { font-size: 11px; color: var(--c-muted-2); }
+.na-review__rating {
+  margin-inline-start: auto; font-size: 12px; font-weight: 700; color: var(--c-gold);
+  background: var(--c-gold-soft); border-radius: 999px; padding: 5px 9px; flex: 0 0 auto;
+}
+.na-review__body { margin: 0; font-size: 13px; line-height: 2; color: var(--c-ink-2); }
+
+/* آدرس و ساعات کاری */
+.na-contact-card {
+  background: var(--c-surface); border: 1px solid var(--c-line); border-radius: var(--r-xl);
+  padding: 20px; display: flex; flex-direction: column; gap: 14px;
+}
+.na-contact-card__hours {
+  border-top: 1px dashed var(--c-line); padding-top: 12px;
+  display: flex; flex-direction: column; gap: 8px;
+}
+.na-contact-card__hours-row {
+  display: flex; align-items: center; justify-content: space-between; gap: 10px; font-size: 13px;
+}
+
+/* بنر فراخوان نهایی */
+.na-cta {
+  background: linear-gradient(145deg, var(--c-brand), var(--c-accent-2));
+  border-radius: var(--r-xl); padding: 30px 20px; color: #fff; text-align: center;
+}
+.na-cta h2 { margin: 0 0 10px; font-size: clamp(20px, 5vw, 28px); font-weight: 800; line-height: 1.4; }
+.na-cta p { margin: 0 auto 20px; font-size: 14px; line-height: 1.9; color: rgba(255,255,255,.86); max-width: 32em; }
+.na-cta .na-btn { background: #fff; color: var(--c-brand); padding: 14px 26px; }
+.na-cta .na-btn:hover { background: var(--c-brand-soft); }
+
+/* نماد اینماد در فوتر قالب جدید */
+.na-footer-enamad { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; }
+.na-footer-enamad img { max-width: 110px; max-height: 110px; height: auto; }

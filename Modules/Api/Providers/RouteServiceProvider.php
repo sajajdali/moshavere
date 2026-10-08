@@ -69,5 +69,15 @@ class RouteServiceProvider extends ServiceProvider
             ])
             ->namespace($this->moduleNamespace)
             ->group(module_path('Api', '/Routes/api_v1_voip.php'));
+
+        // اپ جدید React: در همان دامنه تننت اجرا میشود و با session احراز هویت میشود
+        Route::prefix('api/v1')
+            ->middleware([
+                'web',
+                InitializeTenancyByDomain::class,
+                PreventAccessFromCentralDomains::class,
+            ])
+            ->namespace($this->moduleNamespace)
+            ->group(module_path('Api', '/Routes/api_v1_tenant_app.php'));
     }
 }

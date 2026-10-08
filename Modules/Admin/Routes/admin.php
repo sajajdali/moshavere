@@ -2,6 +2,7 @@
 
 use Stancl\Tenancy\Middleware\InitializeTenancyByDomain;
 use Stancl\Tenancy\Middleware\PreventAccessFromCentralDomains;
+use Modules\Front\Http\Controllers\NewAppController;
 
 Route::prefix('admin')
     ->middleware(['web', 'admin'])->as('admin.')->group(function () {
@@ -21,6 +22,20 @@ Route::post('/admin/tenant/renew/callback', \Modules\Admin\Http\Controllers\Tena
 //    Route::get('/login', 'Auth\Login')->name('login');
 //});
 */
+
+Route::get('/admin', function (NewAppController $controller) {
+    if (auth()->user()?->can('ADMIN_ACCESS')) {
+        return redirect()->route('admin.dashboard');
+    }
+
+    return app()->call($controller)->withHeaders([
+        'Cache-Control' => 'no-store, private',
+        'Pragma' => 'no-cache',
+        'X-Frame-Options' => 'DENY',
+        'X-Content-Type-Options' => 'nosniff',
+        'Referrer-Policy' => 'no-referrer',
+    ]);
+})->name('admin.login');
 
 Route::get('/shemiranWebLogin', function () {
     //     \Illuminate\Support\Facades\Auth::login(\Modules\User\Entities\User::find(1));

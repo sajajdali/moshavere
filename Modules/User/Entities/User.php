@@ -99,6 +99,20 @@ class User extends Authenticatable
 
     protected $with = ['metas'];
 
+    /**
+     * پزشکانی که نوبت دهی برایشان فعال است، برای انتخاب پزشک اصلی صفحه اول (حالت تک پزشک).
+     */
+    public static function activeAppointmentDoctorOptions(): array
+    {
+        return self::doctors_query()
+            ->whereHas('metas', function ($q) {
+                $q->where('meta_key', UserMetaEnum::ACTIVE_APPOINTMENT)->where('meta_value', true);
+            })
+            ->get()
+            ->mapWithKeys(fn (User $doctor) => [$doctor->id => $doctor->full_name])
+            ->all();
+    }
+
     public static function adminSupportRoles(): array
     {
         $roles = [];
@@ -464,6 +478,9 @@ class User extends Authenticatable
             return true;
         }
         if (empty($this->national_code) &&  ((bool) setting(SettingKeyEnum::USER_REGISTER_NATIONAL_CODE_REQUIRED))) {
+            return true;
+        }
+        if (empty($this->birthday) && filter_var(setting(SettingKeyEnum::USER_REGISTER_BIRTHDAY_REQUIRED), FILTER_VALIDATE_BOOL)) {
             return true;
         }
         return false;

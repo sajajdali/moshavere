@@ -57,13 +57,10 @@
                 <div class="space-y-6">
                     <p class="font-semibold">نماد ها</p>
                     <div class="grid grid-cols-2 gap-8">
-                        @if(settingVfc($settingValues,\Modules\Setting\Enum\SettingKeyEnum::FOOTER_ENAMAD))
-                            <a referrerpolicy='origin' target='_blank'
-                               href='{{setting(\Modules\Setting\Enum\SettingKeyEnum::FOOTER_ENAMAD)}}'
-                            ><img class="h-[114px]"
-                                  referrerpolicy='origin'
-                                  src={{front_asset('img/enamad.png')}}
-                                   alt='' style='cursor:pointer'></a>
+                        @if($enamad = enamad_html(settingVfc($settingValues,\Modules\Setting\Enum\SettingKeyEnum::FOOTER_ENAMAD)))
+                            <div class="flex justify-center">
+                                {!! $enamad !!}
+                            </div>
                         @endif
                         {{-- <a href='https://trustseal.enamad.ir/?id=524685&Code=XbRtaf8YeLbNzaEfJdrxZzyGgINAyaCR'
                             referrerpolicy='origin' target='_blank' class="flex justify-center">

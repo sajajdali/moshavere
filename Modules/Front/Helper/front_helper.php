@@ -35,6 +35,27 @@ if (! function_exists('front_setting_array')) {
         ]);
     }
 }
+// کد نماد اینماد برای نمایش در فوتر
+if (! function_exists('enamad_html')) {
+    function enamad_html(?string $value): ?string
+    {
+        $value = trim((string) $value);
+        if ($value === '') {
+            return null;
+        }
+
+        // کد کامل اینماد (تگ a به همراه تصویر)؛ سایر تگ ها حذف میشوند
+        if (str_contains($value, '<')) {
+            $value = preg_replace('#<(script|style)\b[^>]*>.*?</\1>#is', '', $value);
+
+            return trim(strip_tags($value, '<a><img>')) ?: null;
+        }
+
+        // مقادیر قدیمی که فقط لینک اینماد ذخیره شده بود
+        return '<a referrerpolicy="origin" target="_blank" href="' . e($value) . '">'
+            . '<img referrerpolicy="origin" src="' . front_asset('assets/images/enamad.png') . '" alt="" style="cursor:pointer"></a>';
+    }
+}
 // setting value from collection
 if (! function_exists('settingVfc')) {
     function settingVfc($collection, $enum): null |string

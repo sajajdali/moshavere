@@ -255,7 +255,7 @@ trait OprationButtonsTrait
     protected function sendfeedBackLink(AppointmentUser $appointmentUser)
     {
         $link_code = ShortLink::generateShortLinkCode();
-        $link_url = route('front.feedBack', ['appointmentUser_id' => $appointmentUser->id, 'user_id' => $appointmentUser->user->id]);
+        $link_url = $appointmentUser->feedbackUrl();
         ShortLink::create([
             'link_code' => $link_code,
             'link_url'  => $link_url,

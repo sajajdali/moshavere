@@ -2,6 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 use Modules\Api\Http\Controllers\Tenant\TenantAppController;
+use Modules\Api\Http\Controllers\Tenant\TenantFeedbackController;
 
 /*
 |--------------------------------------------------------------------------
@@ -38,6 +39,14 @@ Route::prefix('tenant')->group(function () {
 
     // جزئیات نوبت با کد پیگیری؛ مانند صفحه قبلی بدون نیاز به ورود.
     // محدودیت نرخ برای جلوگیری از حدس زدن کدهای پیگیری
+    // نظرسنجی بیمار؛ بدون ورود، فقط با کد پیگیری تصادفی نوبت
+    Route::get('feedback/{tracking_code}', [TenantFeedbackController::class, 'show'])
+        ->where('tracking_code', '[A-Za-z0-9_-]+')
+        ->middleware('throttle:30,1');
+    Route::post('feedback/{tracking_code}', [TenantFeedbackController::class, 'store'])
+        ->where('tracking_code', '[A-Za-z0-9_-]+')
+        ->middleware('throttle:20,1');
+
     Route::get('appointment/{tracking_code}', [TenantAppController::class, 'appointment'])
         ->where('tracking_code', '[A-Za-z0-9_-]+')
         ->middleware('throttle:30,1');

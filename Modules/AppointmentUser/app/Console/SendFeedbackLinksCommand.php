@@ -9,6 +9,7 @@ use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Log;
 use Modules\AppointmentUser\app\Models\AppointmentUser;
 use Modules\AppointmentUser\app\Models\FeedbackForm;
+use Modules\AppointmentUser\app\Services\FeedbackFormResolver;
 use Modules\AppointmentUser\app\Notifications\AppointmentUserFeedbackSmsnotification;
 use Modules\AppointmentUser\Enum\AppointmentUserKindEnum;
 use Modules\AppointmentUser\Enum\AppointmentUserStatusEnum;
@@ -78,7 +79,7 @@ class SendFeedbackLinksCommand extends Command
                 continue;
             }
 
-            $form = $this->resolveForm($forms, $appointment);
+            $form = app(FeedbackFormResolver::class)->resolve($appointment, $forms);
             if (! $form) {
                 $this->line("#{$appointment->id} has no matching feedback form, skipped");
                 continue;
@@ -126,48 +127,12 @@ class SendFeedbackLinksCommand extends Command
         return Carbon::parse($day . ' ' . $appointment->start_time)->addMinutes($minutes);
     }
 
-    /**
-     * The most specific active form for the appointment, in this order:
-     *  1. the appointment's doctor and service
-     *  2. the doctor only (form without service)
-     *  3. the service only (form without doctor)
-     *  4. a global form (without doctor and service)
-     * A form bound to another place never applies; inside a step a form of the appointment's own
-     * place wins over a form without place, then the newest form wins.
-     */
-    private function resolveForm(Collection $forms, AppointmentUser $appointment): ?FeedbackForm
-    {
-        $forms = $forms->filter(fn (FeedbackForm $form) => empty($form->place_id) || (int) $form->place_id === (int) $appointment->place_id);
-
-        $steps = [
-            fn (FeedbackForm $f) => (int) $f->doctor_id === (int) $appointment->doctor_id && (int) $f->service_id === (int) $appointment->service_id,
-            fn (FeedbackForm $f) => (int) $f->doctor_id === (int) $appointment->doctor_id && empty($f->service_id),
-            fn (FeedbackForm $f) => empty($f->doctor_id) && (int) $f->service_id === (int) $appointment->service_id,
-            fn (FeedbackForm $f) => empty($f->doctor_id) && empty($f->service_id),
-        ];
-
-        foreach ($steps as $matches) {
-            $form = $forms->filter($matches)
-                ->sortByDesc(fn (FeedbackForm $f) => [(int) ! empty($f->place_id), $f->id])
-                ->first();
-            if ($form) {
-                return $form;
-            }
-        }
-
-        return null;
-    }
-
     private function sendLink(AppointmentUser $appointment, string $smsTemplate, FeedbackForm $form): bool
     {
         // the link is created first so a second run can never send it again
         $shortLink = ShortLink::create([
             'link_code'          => ShortLink::generateShortLinkCode(),
-            'link_url'           => route('front.feedBack', [
-                'appointmentUser_id' => $appointment->id,
-                'user_id'            => $appointment->user->id,
-                'form_id'            => $form->id,
-            ]),
+            'link_url'           => $appointment->feedbackUrl($form->id),
             'shortlinkable_type' => 'feedBack',
             'shortlinkable_id'   => $appointment->id,
         ]);

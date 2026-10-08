@@ -156,6 +156,10 @@ export const api = {
   // ثبت نوبت پس از تایید بیمار
   bookAppointment: (id, body) =>
     request(`/doctor/${id}/appointment`, { method: 'POST', body }),
+  // نظرسنجی بیمار (بدون ورود، با کد پیگیری نوبت)
+  feedback: (code) => request(`/feedback/${encodeURIComponent(code)}`),
+  sendFeedback: (code, answers) =>
+    request(`/feedback/${encodeURIComponent(code)}`, { method: 'POST', body: { answers } }),
   appointment: (code) => request(`/appointment/${encodeURIComponent(code)}`),
   cancelAppointment: (code, reason) =>
     request(`/appointment/${encodeURIComponent(code)}/cancel`, { method: 'POST', body: { reason } }),

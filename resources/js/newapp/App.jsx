@@ -15,6 +15,7 @@ import PatientProfile from './pages/PatientProfile.jsx';
 import OnlineVisitChat from './pages/OnlineVisitChat.jsx';
 import Login from './pages/Login.jsx';
 import AdminLogin from './pages/AdminLogin.jsx';
+import Feedback from './pages/Feedback.jsx';
 import ServicePage from './pages/ServicePage.jsx';
 import NotFound from './pages/NotFound.jsx';
 
@@ -35,6 +36,7 @@ export default function App({ bootstrap }) {
               <Routes>
                 <Route path="/" element={<Home />} />
                 <Route path="/search" element={<Search />} />
+                <Route path="/feedback/:code" element={<Feedback />} />
                 <Route path="/service/:id" element={<ServicePage />} />
                 <Route path="/service/:id/:name" element={<ServicePage />} />
                 <Route path="/aboutus" element={<AboutUs />} />

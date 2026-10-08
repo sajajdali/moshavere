@@ -24,8 +24,17 @@ Route::middleware(['web'])->group(function () {
     // مسیرهایی که همچنان سمت سرور رندر می شوند
     Route::get('/appointment/checkout', Checkout::class)->name('setAppointment.checkout');
     Route::get('/registration-doctor', DoctorRegistration::class)->name('front.registration.doctor');
-    Route::get('feed/{appointmentUser_id}/{user_id}', Questions::class)
-        ->middleware('throttle:20,1')->name('front.feedBack');
+    // لینک قدیمی نظرسنجی (پیامک های ارسال شده پیشین): فقط اگر کاربر همان صاحب نوبت باشد
+    // به صفحه جدید (با کد پیگیری) هدایت میشود
+    Route::get('feed/{appointmentUser_id}/{user_id}', function (string $appointmentUser_id, string $user_id) {
+        $appointment = \Modules\AppointmentUser\app\Models\AppointmentUser::find($appointmentUser_id);
+        abort_unless($appointment && (int) $appointment->user_id === (int) $user_id && $appointment->tracking_code, 404);
+
+        return redirect()->route('front.feedback.show', ['tracking_code' => $appointment->tracking_code]);
+    })->middleware('throttle:20,1')->name('front.feedBack');
+    Route::get('/feedback/{tracking_code}', NewAppController::class)
+        ->where('tracking_code', '[A-Za-z0-9_-]+')
+        ->name('front.feedback.show');
 });
 
 /*

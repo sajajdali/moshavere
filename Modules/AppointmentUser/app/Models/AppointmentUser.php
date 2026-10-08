@@ -122,6 +122,24 @@ class AppointmentUser extends Model
         });
     }
 
+    /**
+     * لینک نظرسنجی برای بیمار. در قالب جدید با کد پیگیری (۸ رقمی تصادفی) ساخته میشود
+     * تا بدون ورود قابل استفاده باشد ولی با حدس زدن شناسه نوبت باز نشود (IDOR)؛
+     * در قالب قدیم همان لینک قبلی است.
+     */
+    public function feedbackUrl(?int $formId = null): string
+    {
+        if (\Modules\Setting\Enum\AppointmentModeEnum::newTemplateEnabled() && $this->tracking_code) {
+            return rtrim(route('front.homePage'), '/') . '/feedback/' . $this->tracking_code;
+        }
+
+        return route('front.feedBack', array_filter([
+            'appointmentUser_id' => $this->id,
+            'user_id' => $this->user_id,
+            'form_id' => $formId,
+        ]));
+    }
+
     public function setting()
     {
         return $this->belongsTo(AppointmentSetting::class, 'appointment_setting_id');

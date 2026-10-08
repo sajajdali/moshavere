@@ -35,6 +35,16 @@ return [
                 'children' => null
             ],
             [
+                'title' => 'تاریخچه وضعیت نوبت‌ها',
+                'gate' => 'SUPER_ADMIN',
+                'policy_class' => null,
+                'icon' => 'fe fe-clock',
+                'route' => 'admin.appointment_user.status_logs',
+                'has_badge' => false,
+                'has_child' => false,
+                'children' => null,
+            ],
+            [
                 'title' => 'تنظیمات نوبت دهی',
                 'gate' => ['AppointmentSetting','AppointmentSetting.own'],
                 'policy_class' => \Modules\AppointmentSetting\app\Models\AppointmentSetting::class,

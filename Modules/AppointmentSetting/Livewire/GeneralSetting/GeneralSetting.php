@@ -52,6 +52,9 @@ class GeneralSetting extends Component
             'status' => false,
             'count' => 1,
         ],
+        'showShortTimes' => [
+            'status' => false,
+        ],
         'accessibility' => [
             'dont_show_times' => [
                 'status' => false,
@@ -410,6 +413,9 @@ class GeneralSetting extends Component
                 ],
             ]
         ];
+        $detail[AppointmentSetting::SHOW_SHORT_TIMES] = [
+            AppointmentSetting::STATUS => (bool) data_get($this->form, 'showShortTimes.status', false),
+        ];
         $multipleAppointmentsPerHourStatus = (bool) data_get($this->form, 'multipleAppointmentsPerHour.status', false);
         $detail[AppointmentSetting::MULTIPLE_APPOINTMENTS_PER_HOUR] = [
             AppointmentSetting::STATUS => $multipleAppointmentsPerHourStatus,
@@ -569,6 +575,7 @@ class GeneralSetting extends Component
             ? (int) $emptyAppointmentDisplayLimit
             : null;
         $this->form['maxAvailabeAppointment']['ForSecretery'] = $apSet->detail[AppointmentSetting::MAX_AVAILABLE_APPOINTMENT_FOR_SECRETERY] ?? null;
+        $this->form['showShortTimes']['status'] = (bool) data_get($apSet->detail, AppointmentSetting::SHOW_SHORT_TIMES . '.status', false);
         $this->form['multipleAppointmentsPerHour']['status'] = (bool) data_get($apSet->detail, AppointmentSetting::MULTIPLE_APPOINTMENTS_PER_HOUR . '.status', false);
         $this->form['multipleAppointmentsPerHour']['count']  = max(1, (int) data_get($apSet->detail, AppointmentSetting::MULTIPLE_APPOINTMENTS_PER_HOUR . '.count', 1));
         $this->form['cancel']['day']                     = $apSet->cancellation_by_user ?? null;

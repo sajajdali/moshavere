@@ -301,6 +301,10 @@ class AppointmentUserService
         // Number of appointments that can share one slot (default 1)
         $slotCapacity = $appointmentSetting->appointmentsPerHour();
 
+        // admin panel only: also list free times shorter than the visit time
+        $showShortTimes = ! empty($details['expand_slots'])
+            && (bool) data_get($appointmentSetting->detail, AppointmentSetting::SHOW_SHORT_TIMES . '.status', false);
+
         // -----------------------------
         // 3) Build output (same structure)
         // -----------------------------
@@ -586,6 +590,26 @@ class AppointmentUserService
                                             )
                                             && $startTimeOverLap !== $overlapsAgain['existingFrom']
                                         ) {
+                                            // free time shorter than the visit time: only listed in the admin panel when the setting allows it
+                                            if (
+                                                $showShortTimes
+                                                && strtotime($overlapsAgain['existingFrom']) > strtotime($startTimeOverLap)
+                                                && $this->isTimeRangeAvailable($startTimeOverLap, $overlapsAgain['existingFrom'], $dayOutput['times'])['status'] == false
+                                                && ! collect($dayOutput['times'])->contains(fn($t) => ! empty($t['gap']) && $t['from'] === $startTimeOverLap && $t['until'] === $overlapsAgain['existingFrom'])
+                                            ) {
+                                                $shortStatus = !$currentDate->copy()->addDay()->isPast();
+                                                $shortStart = Carbon::parse($startTimeOverLap);
+                                                $dayOutput['times'][] = [
+                                                    'status'    => $shortStatus,
+                                                    'timestamp' => $currentDate->copy()->setTime($shortStart->hour, $shortStart->minute)->timestamp,
+                                                    'from'      => $startTimeOverLap,
+                                                    'until'     => $overlapsAgain['existingFrom'],
+                                                    'gap'       => true,
+                                                ];
+                                                if ($shortStatus) {
+                                                    $dayOutput['empty_appoints']++;
+                                                }
+                                            }
                                         } else {
                                             // مدت زمان ویزیت کمتر از زمان ویزیت میباشد را نمایشد نمیدهد
                                             $dayOutput['times'][] = [

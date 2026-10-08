@@ -5,6 +5,7 @@ namespace Modules\AppointmentUser\Livewire\Admin\AddAppointment\Modal;
 use Carbon\Carbon;
 use Livewire\Component;
 use Livewire\Attributes\On;
+use Livewire\Attributes\Computed;
 use Modules\User\Entities\User;
 use Modules\User\Enum\UserMetaEnum;
 use Hekmatinasser\Verta\Facades\Verta;
@@ -38,6 +39,40 @@ class SpecificDayAppointmentRegistrationModal extends Component
     public $placeId;
     public $appDate;
     public $segmentId;
+    public string $patientSearch = '';
+
+    /**
+     * Existing patients whose first or last name contains every typed word.
+     */
+    #[Computed]
+    public function patientResults(): array
+    {
+        $words = array_values(array_filter(preg_split('/\s+/u', trim($this->patientSearch)) ?: []));
+        if ($words === [] || mb_strlen(trim($this->patientSearch)) < 2) {
+            return [];
+        }
+
+        $query = User::query();
+        foreach ($words as $word) {
+            $like = '%'.addcslashes($word, '%_\\').'%';
+            $query->whereHas('metas', function ($q) use ($like) {
+                $q->whereIn('meta_key', [UserMetaEnum::FIRST_NAME, UserMetaEnum::LAST_NAME])
+                    ->where('meta_value', 'like', $like);
+            });
+        }
+
+        return $query->limit(8)->get()->map(fn (User $user) => [
+            'mobile' => $user->mobile,
+            'name' => trim($this->loadedMetaValue($user, UserMetaEnum::FIRST_NAME).' '.$this->loadedMetaValue($user, UserMetaEnum::LAST_NAME)),
+        ])->all();
+    }
+
+    public function selectPatient(string $mobile)
+    {
+        $this->form['number'] = $mobile;
+        $this->patientSearch = '';
+        $this->findeOrCreateUser();
+    }
 
     private function defaultForm(): array
     {
@@ -59,6 +94,7 @@ class SpecificDayAppointmentRegistrationModal extends Component
     public function dismisModal()
     {
         $this->form = $this->defaultForm();
+        $this->patientSearch = '';
         if (isset($this->fetchData['user'])) {
             unset($this->fetchData['user']);
         }

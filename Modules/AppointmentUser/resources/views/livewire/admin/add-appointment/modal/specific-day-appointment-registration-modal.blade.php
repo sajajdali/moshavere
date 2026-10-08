@@ -42,6 +42,25 @@
                     @enderror
 
                     @if ($step === 1)
+                        <div class="sar-field" style="position:relative">
+                            <label class="sar-label" for="appointment_patient_search">جستجوی بیمار با نام یا نام خانوادگی</label>
+                            <input type="text" autocomplete="off" class="sar-input" id="appointment_patient_search"
+                                wire:model.live.debounce.300ms="patientSearch" placeholder="نام یا نام خانوادگی بیمار">
+                            @if (count($this->patientResults))
+                                <div class="list-group shadow-sm" style="position:absolute;top:100%;inset-inline:0;z-index:20">
+                                    @foreach ($this->patientResults as $patient)
+                                        <button type="button" class="list-group-item list-group-item-action d-flex justify-content-between"
+                                            wire:key="patient-{{ $patient['mobile'] }}" wire:click="selectPatient('{{ $patient['mobile'] }}')">
+                                            <span>{{ $patient['name'] ?: 'بدون نام' }}</span>
+                                            <span dir="ltr" class="text-muted">{{ $patient['mobile'] }}</span>
+                                        </button>
+                                    @endforeach
+                                </div>
+                            @elseif (mb_strlen(trim($patientSearch)) >= 2)
+                                <span class="sar-error" style="color:inherit;opacity:.7">بیماری با این نام یافت نشد.</span>
+                            @endif
+                        </div>
+                        <div class="sar-divider"></div>
                         <label class="sar-field" for="appointment_mobile" x-data>
                             <span class="sar-label">ثبت نوبت با شماره همراه</span>
                             <input type="tel" inputmode="numeric" autocomplete="tel" autofocus maxlength="11"

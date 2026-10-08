@@ -57,6 +57,7 @@ class NewSiteCreateOrUpdate extends Component
             'AppointmentUser' => 'نوبت‌دهی کاربران',
             'Chat' => 'گفتگو و پیام‌رسانی',
             'Discount' => 'تخفیف‌ها',
+            'Finance' => 'مدیریت مالی',
             'OnlineConsultation' => 'مشاوره آنلاین صوتی',
             'Place' => 'مدیریت مطب و مکان‌ها',
             'Reminder' => 'یادآوری‌ها',

@@ -125,6 +125,7 @@
             'form.operators.*',
             'form.interference.*',
             'form.multipleAppointmentsPerHour.*',
+            'form.showShortTimes.*',
             'form.avtive',
         ])->contains(fn ($key) => $errors->has($key));
     @endphp
@@ -912,6 +913,29 @@
                         <p class="text-muted mb-0"><strong class="me-1">نکته!!</strong> با فعال سازی این امکان ، در هر ساعت بیشتر از یک نوبت قابل دریافت خواهد بود. مقدار پیش‌فرض سیستم یک نوبت در هر ساعت است.</p>
                     </div>
                 </div>
+            </div>
+        </div>
+    </div>
+    {{-- show times shorter than the visit time --}}
+    <div class="card shadow-sm custom-card-Setting">
+        <div class="card-header border-bottom d-flex justify-content-between">
+            <h3 class="d-flex align-item-center">
+                <i class="fa fa-hourglass-half me-2 d-none d-sm-inline" aria-hidden="true"></i>
+                <span>نمایش ساعت‌هایی که زمانشان کمتر از زمان ویزیت می‌باشد</span>
+            </h3>
+            <div class="main-toggle-group d-sm-flex align-item-center ms-0">
+                <div class="toggle toggle-lg toggle-primary my-1 customCheckbox @if (data_get($form, 'showShortTimes.status', false)) on @else off @endif"
+                    data-id="showShortTimes.status" wire:ignore.self data-bs-toggle="collapse"
+                    href="#showShortTimes" role="button"
+                    aria-expanded="{{ data_get($form, 'showShortTimes.status', false) ? 'true' : 'false' }}"
+                    aria-controls="showShortTimes">
+                    <span></span>
+                </div>
+            </div>
+        </div>
+        <div class="collapse @if (data_get($form, 'showShortTimes.status', false)) show @endif" id="showShortTimes" wire:ignore.self>
+            <div class="card-body">
+                <p class="text-muted mb-0"><strong class="me-1">نکته!!</strong> با فعال سازی این امکان، در صفحه ثبت نوبت پنل مدیریت، زمان‌های آزادی که از مدت زمان ویزیت کوتاه‌تر هستند (مثلاً بین دو نوبت) نیز با نشان «کمتر از مدت ویزیت» نمایش داده می‌شوند.</p>
             </div>
         </div>
     </div>

@@ -37,6 +37,9 @@ trait AppointmentSettingDetailKeyTrait
     // multiple appointments in the same hour
     const MULTIPLE_APPOINTMENTS_PER_HOUR = 'multipleAppointmentsPerHour';
 
+    // list free times shorter than the visit time in the admin panel
+    const SHOW_SHORT_TIMES = 'showShortTimes';
+
     // time to deactive appointment after that
     const MAX_ACTIVE_TIME_ONLINE_APPOINTMENT = 'maxActiveTimeOnlineAppointment';
 

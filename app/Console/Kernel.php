@@ -12,6 +12,7 @@ use Modules\AppointmentUser\app\Console\CheckAppointmentUserDedlineDateCommand;
 use Modules\AppointmentUser\app\Console\CompeleteOnlineAppointment;
 use Modules\AppointmentUser\app\Console\DisabledAwnsweredOnlineAppointmentCommand;
 use Modules\AppointmentUser\app\Console\MakeCacheCommand;
+use Modules\AppointmentUser\app\Console\SendFeedbackLinksCommand;
 use Modules\AppointmentUser\app\Console\SendReminderscommand;
 use Modules\Front\app\Console\GenerateSitemapComman;
 use Modules\MigrateOldData\App\Console\MigrateAllOrders;
@@ -32,6 +33,7 @@ class Kernel extends ConsoleKernel
     protected $commands = [
         MakeCacheCommand::class,
         SendReminderscommand::class,
+        SendFeedbackLinksCommand::class,
         RenewCacheCommand::class,
         DisabledAwnsweredOnlineAppointmentCommand::class,
         CheckAppointmentUserDedlineDateCommand::class,
@@ -66,6 +68,12 @@ class Kernel extends ConsoleKernel
                 Artisan::call('appointment:sendReminders');
             });
         })->name('appointment-reminders')->everyFifteenMinutes()->withoutOverlapping();
+
+        $schedule->call(function () {
+            tenancy()->runForMultiple(null, function ($tenant) {
+                Artisan::call('appointment:send-feedback-links');
+            });
+        })->name('appointment-feedback-links')->everyFifteenMinutes()->between('08:00', '23:00')->withoutOverlapping();
 
         $schedule->call(function () {
             tenancy()->runForMultiple(null, fn () => Artisan::call('consultation:dispatch-sms'));

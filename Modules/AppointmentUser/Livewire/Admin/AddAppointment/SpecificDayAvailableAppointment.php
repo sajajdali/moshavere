@@ -126,6 +126,7 @@ class SpecificDayAvailableAppointment extends Component
         $temPResult = [];
         $reservedAppBeforeCacheCreate = null;
         $reservedAppPlaced = false;
+        $showShortTimes = (bool) data_get($this->fetchData['appointmentSetting']->detail, AppointmentSetting::SHOW_SHORT_TIMES . '.status', false);
         if (isset($this->fetchData['reserve_app_till_cache_create'])) {
             $reservedAppBeforeCacheCreate = $this->fetchData['reserve_app_till_cache_create'];
         }
@@ -165,6 +166,10 @@ class SpecificDayAvailableAppointment extends Component
                                 }
                                 // If two matches are found, break out of the loop
                             } else {
+                                // a free time shorter than the visit time is hidden unless the setting allows it
+                                if (isset($time['gap']) && ! $showShortTimes) {
+                                    continue;
+                                }
                                 $temPResult[] = [
                                     'status' => false,
                                     'from' => $time['from'],

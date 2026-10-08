@@ -77,14 +77,9 @@
         function activateCurrentLink() {
             const normalizeUrl = function (url) {
                 const normalizedUrl = new URL(url, window.location.origin);
-                const parameters = Array.from(normalizedUrl.searchParams.entries())
-                    .sort(function (left, right) {
-                        return left[0] === right[0]
-                            ? left[1].localeCompare(right[1])
-                            : left[0].localeCompare(right[0]);
-                    });
-
-                normalizedUrl.search = new URLSearchParams(parameters).toString();
+                // Query values such as formId identify a view within the same
+                // menu page and should not prevent its menu item becoming active.
+                normalizedUrl.search = '';
                 normalizedUrl.hash = '';
 
                 return normalizedUrl.href.replace(/\/$/, '');
@@ -117,6 +112,26 @@
                 $(this).prev('.admin-menu-link')
                     .addClass('is-open')
                     .attr('aria-expanded', 'true');
+            });
+
+            window.requestAnimationFrame(function () {
+                const sidebar = $sidebar[0];
+                const link = $activeLink[0];
+                const sidebarRect = sidebar.getBoundingClientRect();
+                const linkRect = link.getBoundingClientRect();
+                const padding = 12;
+
+                if (linkRect.top < sidebarRect.top + padding) {
+                    sidebar.scrollTo({
+                        top: sidebar.scrollTop + linkRect.top - sidebarRect.top - padding,
+                        behavior: 'smooth'
+                    });
+                } else if (linkRect.bottom > sidebarRect.bottom - padding) {
+                    sidebar.scrollTo({
+                        top: sidebar.scrollTop + linkRect.bottom - sidebarRect.bottom + padding,
+                        behavior: 'smooth'
+                    });
+                }
             });
         }
 
@@ -205,4 +220,3 @@
         handleResize();
     });
 })(jQuery);
-

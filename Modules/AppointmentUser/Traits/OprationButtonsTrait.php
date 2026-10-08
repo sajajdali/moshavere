@@ -4,8 +4,9 @@ namespace Modules\AppointmentUser\Traits;
 
 use Carbon\Carbon;
 use App\Models\ShortLink;
-use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Auth\Access\AuthorizationException;
 use Modules\Setting\Enum\SettingKeyEnum;
 use Modules\AppointmentUser\app\Models\AppointmentUser;
 use Modules\AppointmentUser\app\Models\AppointmentOnline;
@@ -23,9 +24,25 @@ use Modules\AppointmentUser\app\Notifications\AppointmentUserFeedbackSmsnotifica
 //this Trait is return value as a UerMetaEnum not string
 trait OprationButtonsTrait
 {
+    /**
+     * The buttons are only hidden in the page, so every action has to check the permission again:
+     * a Livewire call can be sent without the button. The appointment is allowed when the user has
+     * at least one of the abilities (the operations menu is shown to everyone who can update or delete).
+     */
+    private function authorizeAppointment($id, string ...$abilities): AppointmentUser
+    {
+        $app = AppointmentUser::findOrFail($id);
+        foreach ($abilities as $ability) {
+            if (Gate::allows($ability, $app)) {
+                return $app;
+            }
+        }
+
+        throw new AuthorizationException('شما دسترسی لازم برای این عملیات را ندارید');
+    }
     public function changeType($id)
     {
-        $app = AppointmentUser::find($id);
+        $app = $this->authorizeAppointment($id, 'update', 'delete');
         $app->update(['type' =>  AppointmentUserTypeEnum::BETWEEN_PATIENTS]);
 
         // regenerate cache
@@ -35,7 +52,7 @@ trait OprationButtonsTrait
     }
     public function cancelAppointment($id, $sendSmsStatus)
     {
-        $app = AppointmentUser::find($id);
+        $app = $this->authorizeAppointment($id, 'update', 'delete');
         $app->update(['status' =>  AppointmentUserStatusEnum::STATUS_CANCEL, 'deadline_at' => null]);
         if ($sendSmsStatus) {
             $smsTemplate = setting(SettingKeyEnum::SMS_APPOINTMENT_CANCEL);
@@ -55,8 +72,34 @@ trait OprationButtonsTrait
         event(new CancelAppointmentEvent($app));
         return  $this->redirectToPage('نوبت با موفقیت کنسل شد');
     }
+    public function cancelSelectedApp()
+    {
+        $ids = collect($this->form['checkbox'] ?? [])->filter()->keys();
+        if ($ids->isEmpty()) {
+            return $this->redirectToPage('هیچ نوبتی انتخاب نشده است');
+        }
+        // check every selected appointment first, so nothing is cancelled when one of them is not allowed
+        $appointments = $ids->map(fn ($id) => $this->authorizeAppointment($id, 'update', 'delete'));
+
+        foreach ($appointments as $app) {
+            if ($app->status === AppointmentUserStatusEnum::STATUS_CANCEL) {
+                continue;
+            }
+            $app->update(['status' => AppointmentUserStatusEnum::STATUS_CANCEL, 'deadline_at' => null]);
+            if ($app->kind == AppointmentUserKindEnum::ONLINE) {
+                $app->online()->update(['status' => AppointmentOnlineStatusEnum::CANCEL]);
+            }
+            $this->reGenerateCacheJob($app);
+            event(new CancelAppointmentEvent($app));
+        }
+        $this->form['checkbox'] = [];
+
+        return $this->redirectToPage('نوبت های انتخابی با موفقیت کنسل شدند');
+    }
     public function cancelAndDeleteApp($id)
     {
+        // deleting is stricter than cancelling: only the delete permission is accepted
+        $this->authorizeAppointment($id, 'delete');
         $this->cancelAppointment($id, false);
 
         $app = AppointmentUser::find($id);
@@ -67,7 +110,7 @@ trait OprationButtonsTrait
     }
     public function ApprovemonitoringAppointment($id)
     {
-        $app = AppointmentUser::find($id);
+        $app = $this->authorizeAppointment($id, 'update', 'delete');
         $deadLine_Time = $app->setting->detail[AppointmentSetting::MONITORTING_APPOINTMENT] ?? 1;
         $Appoointment_dedLine = now()->addHours((int)$deadLine_Time);
         $app->update(['status' => AppointmentUserStatusEnum::STATUS_WAIT_PAYMENT, 'deadline_at' => $Appoointment_dedLine]);
@@ -79,7 +122,7 @@ trait OprationButtonsTrait
     }
     public function disApprovemonitoringAppointment($id)
     {
-        $app = AppointmentUser::find($id);
+        $app = $this->authorizeAppointment($id, 'update', 'delete');
         $app->update(['status' => AppointmentUserStatusEnum::STATUS_DISAPPROVED, 'deadline_at' => null]);
         // regenerate cache
         $this->reGenerateCacheJob($app);
@@ -87,7 +130,7 @@ trait OprationButtonsTrait
     }
     public function disApprovemonitoringAppointmentWithSms($id)
     {
-        $app = AppointmentUser::find($id);
+        $app = $this->authorizeAppointment($id, 'update', 'delete');
         $app->update(['status' => AppointmentUserStatusEnum::STATUS_DISAPPROVED, 'deadline_at' => null]);
         $app->notify(new AppointmentSmsNotification(setting(SettingKeyEnum::SMS_DIS_APPROVED_MONITORING_APPOINTMENT)));
         // regenerate cache
@@ -96,7 +139,7 @@ trait OprationButtonsTrait
     }
     public function ApproveOnlineAppointment($id)
     {
-        $app = AppointmentUser::find($id);
+        $app = $this->authorizeAppointment($id, 'update', 'delete');
         $onlineApp = AppointmentOnline::firstWhere('appointment_user_id', $app->id);
         $detail = [
             AppointmentOnline::COFRIM_OR_REJECT_STATUS => [
@@ -116,7 +159,7 @@ trait OprationButtonsTrait
     }
     public function disApproveOnlineAppointment($id)
     {
-        $appointmentUser = AppointmentUser::find($id);
+        $appointmentUser = $this->authorizeAppointment($id, 'update', 'delete');
         $this->fetchData['disapproveId'] = $id;
         $this->dispatch('lunchModal', true);
 
@@ -126,7 +169,7 @@ trait OprationButtonsTrait
     public function disaprovedModal()
     {
         $this->validate(['form.reason' => 'required'], ['form.reason.required' =>  'لطفا دلیل رد شدن را بنویسید']);
-        $app = AppointmentUser::find($this->fetchData['disapproveId']);
+        $app = $this->authorizeAppointment($this->fetchData['disapproveId'], 'update', 'delete');
         $reson_for_disapproved = [
             AppointmentUser::DISAPPROVED_DESCRIPTION => $this->form['reason'],
             AppointmentOnline::COFRIM_OR_REJECT_STATUS => [
@@ -158,7 +201,7 @@ trait OprationButtonsTrait
 
     public function editAppointment($id)
     {
-        $app = AppointmentUser::find($id);
+        $app = $this->authorizeAppointment($id, 'update', 'delete');
         $date = verta($app->date_visit)->format('Y-m-d');
         // regenerate cache
         $this->reGenerateCacheJob($app);
@@ -181,6 +224,7 @@ trait OprationButtonsTrait
     }
     public function userAttenedToAppointment(AppointmentUser $appointmentUser)
     {
+        $this->authorizeAppointment($appointmentUser->id, 'update', 'delete');
         $this->sendfeedBackLink($appointmentUser);
         $this->changeAttendedStatus($appointmentUser, true);
         // regenerate cache
@@ -189,6 +233,7 @@ trait OprationButtonsTrait
     }
     public function userNotAttenedToAppointment(AppointmentUser $appointmentUser)
     {
+        $this->authorizeAppointment($appointmentUser->id, 'update', 'delete');
         $this->changeAttendedStatus($appointmentUser, false);
         // regenerate cache
         $this->reGenerateCacheJob($appointmentUser);
@@ -224,66 +269,6 @@ trait OprationButtonsTrait
         // regenerate cache
         $this->reGenerateCacheJob($appointmentUser);
     }
-    // TODO :: refund
-    protected function refuntPaiedApp($model)
-    {
-        // TODO::this isnt working
-        $appointmentUser = AppointmentUser::find($model);
-        $endpoint = "https://next.zarinpal.com/api/v4/graphql";
-        $query = '
-            mutation AddRefund($session_id: ID!, $amount: BigInteger!, $description: String, $reason: RefundReasonEnum) {
-                resource: AddRefund(session_id: $session_id, amount: $amount, description: $description, reason: $reason) {
-                    terminal_id
-                    id
-                    amount
-                    timeline {
-                        refund_amount
-                        refund_time
-                        refund_status
-                    }
-                }
-            }
-        ';
-        $session_id = $appointmentUser->transaction->detail['transactionId'];
-        $amount     = $appointmentUser->transaction->total_cost;
-        $description = 'بازگشت وجه نوبت' . $appointmentUser->id;
-        $reason     = 'بازگشت وجه نوبت' . $appointmentUser->id;
-
-        $merchenId  = setting(SettingKeyEnum::PAYMENT_ZARINPAL_MERCHENID);
-        $response = Http::withHeaders([
-            'Accept' => 'application/json',
-            'Authorization' => 'Bearer ' . $merchenId,
-        ])->post('https://next.zarinpal.com/api/v4/graphql/', [
-            'query' => $query,
-            'operationName' => 'AddRefund',
-            'variables' => [
-                'session_id' => $session_id,
-                'amount' => $amount,
-                'description' => $description,
-                'reason' => $reason,
-            ],
-        ]);
-
-        if ($response->successful()) {
-            $arr_response = $response->json();
-            if (!empty($arr_response) && isset($arr_response['data']['resource']['amount'])) {
-                $this->cancelAppointment($appointmentUser->id, false);
-                $old_details = $appointmentUser->details;
-                $new_details = array_merge($old_details, ['refund' => $arr_response]);
-                $appointmentUser->update(['details' => $new_details]);
-                $smsTemplate = setting(\Modules\Setting\Enum\SettingKeyEnum::SMS_AFTER_REFUND);
-                if ($smsTemplate) {
-                    $appointmentUser->notify(new AppointmentSmsNotification($smsTemplate));
-                }
-                $this->reGenerateCacheJob($appointmentUser);
-                $this->redirectToPage('وضعیت نوبت به کاربر حضور پیدا نکرده تغییر کرد');
-            }
-            $this->sendNotification($appointmentUser, 'وجه پرداختی به جساب شما بازگشت داده شد');
-        } else {
-            $this->redirectToPage('خطا');
-        }
-    }
-
     private function sendNotification(AppointmentUser $appointmentUser, string $notifMessage)
     {
         if (isset($appointmentUser->details[AppointmentUser::STORE_FROM_APPLICATION]) && $appointmentUser->details[AppointmentUser::STORE_FROM_APPLICATION]) {
@@ -301,6 +286,7 @@ trait OprationButtonsTrait
     }
     public function resendPaymentSms(AppointmentUser $appointmentUser)
     {
+        $this->authorizeAppointment($appointmentUser->id, 'update', 'delete');
         $appointmentUser->notify(new AppointmentSmsNotification(setting(SettingKeyEnum::SMS_APPOINTMENT_WAITING_PAYMENT)));
         $this->redirectToPage('پیامک پرداخت مجدد ارسال شد');
     }

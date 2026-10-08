@@ -472,7 +472,6 @@ class AppointmentUserList extends Component
             'cancelWithSms' => $this->cancelAppointment($model, true),
             'cancelWithOutSms' => $this->cancelAppointment($model, false),
             'delete' => $this->cancelAndDeleteApp($model),
-            'refundPayment' => $this->refuntPaiedApp($model),
             'resendPaymentSms' => $this->resendPaymentSms($model),
             default => '',
         };

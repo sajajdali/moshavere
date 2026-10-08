@@ -4,6 +4,10 @@
             <div>
                 <h1 class="page-title">نظرسنجی های انجام شده</h1>
             </div>
+            <div class="ms-auto pageheader-btn d-flex gap-2">
+                <a href="{{ route('admin.appointment.feedback.create') }}" class="btn btn-primary"><i class="fa fa-plus me-1"></i> ایجاد فرم نظرسنجی</a>
+                <a href="{{ route('admin.appointment.feedback.forms') }}" class="btn btn-secondary">فرم های نظرسنجی</a>
+            </div>
         </div>
         @include('admin::layouts.components.alert')
         <div class="row row-sm"  wire:loading.class="op-0-3">

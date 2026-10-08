@@ -6,20 +6,48 @@ $menu = [
 // permistion define in appointmentUser
     'menu' => [
         'title' => 'نمایش',
-        'gate' => ['appointment_user.comment', 'appointment_user.feedback','comment.own','contact-us'],
+        'gate' => ['appointment_user.comment', 'appointment_user.feedBack','comment.own','contact-us'],
         'policy_class' => null,
         'has_divider' => true,
         'priority' => 70,
         'children' => [
             [
-                'title' => 'نظر سنجی ',
-                'gate' => 'appointment_user.feedback',
+                'title' => 'نظرسنجی',
+                'gate' => 'appointment_user.feedBack',
                 'policy_class' => null,
                 'icon' => 'fe fe-activity',
-                'route' => 'admin.appointment.feedback',
+                'route' => null,
                 'has_badge' => false,
-                'has_child' => false,
-                'children' => null
+                'has_child' => true,
+                'children' => [
+                    [
+                        'title' => 'نظرسنجی های انجام شده',
+                        'gate' => 'appointment_user.feedBack',
+                        'policy_class' => null,
+                        'icon' => 'fa fa-list',
+                        'route' => 'admin.appointment.feedback',
+                        'has_child' => false,
+                        'children' => null,
+                    ],
+                    [
+                        'title' => 'فرم های نظرسنجی',
+                        'gate' => 'appointment_user.feedBack',
+                        'policy_class' => null,
+                        'icon' => 'fa fa-list',
+                        'route' => 'admin.appointment.feedback.forms',
+                        'has_child' => false,
+                        'children' => null,
+                    ],
+                    [
+                        'title' => 'پاسخ های فرم های نظرسنجی',
+                        'gate' => 'appointment_user.feedBack',
+                        'policy_class' => null,
+                        'icon' => 'fa fa-list',
+                        'route' => 'admin.appointment.feedback.answers',
+                        'has_child' => false,
+                        'children' => null,
+                    ],
+                ],
             ],
 
         ],

@@ -1,0 +1,11 @@
+{
+    "name": "Finance",
+    "alias": "finance",
+    "description": "Financial management: manual payments, system payments and per-patient reports",
+    "keywords": [],
+    "priority": 0,
+    "providers": [
+        "Modules\\Finance\\app\\Providers\\FinanceServiceProvider"
+    ],
+    "files": []
+}

@@ -1,4 +1,5 @@
-.fb-wrap { max-width: 640px; padding-top: 28px; padding-bottom: 40px; }
+.na-wrap.fb-wrap { max-width: 640px; padding-top: 48px; padding-bottom: 56px; }
+@media (min-width: 700px) { .na-wrap.fb-wrap { padding-top: 72px; } }
 .fb-card { background: #fff; border: 1px solid var(--c-line); border-radius: 20px; padding: 22px 18px; }
 .fb-card h1 { margin: 0 0 6px; font-size: clamp(20px, 5vw, 26px); font-weight: 800; }
 .fb-sub { margin: 0 0 20px; font-size: 13px; color: var(--c-muted); line-height: 1.9; }

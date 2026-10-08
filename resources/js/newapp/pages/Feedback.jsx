@@ -127,6 +127,7 @@ export default function Feedback() {
   const change = (id, v) => {
     setAnswers((a) => ({ ...a, [id]: v }));
     setErrors((e) => ({ ...e, [id]: undefined }));
+    setFormError('');
   };
 
   const submit = async (e) => {

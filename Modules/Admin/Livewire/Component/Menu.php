@@ -227,6 +227,13 @@ class Menu extends Component
             'مدیریتنوبتدهی' => ['fa-calendar-days', 'icon-calendar'],
             'نظرسنجی' => ['fa-square-poll-vertical', 'icon-chart'],
             'نوبتآنلاین' => ['fa-laptop-medical', 'icon-online'],
+            // مدیریت مالی
+            'داشبوردمالی' => ['fa-chart-line', 'icon-chart'],
+            'پرداختها' => ['fa-money-check-dollar', 'icon-money'],
+            'گزارشمالیبیماران' => ['fa-file-invoice-dollar', 'icon-accounting'],
+            'دلایلپرداخت' => ['fa-tags', 'icon-gift'],
+            // گزارش نوبت‌ها (فقط مدیر کل)
+            'تاریخچهوضعیتنوبتها' => ['fa-clock-rotate-left', 'icon-calendar'],
         ];
 
         [$icon, $color] = $mainIcons[$title] ?? ['fa-circle', 'icon-gear'];

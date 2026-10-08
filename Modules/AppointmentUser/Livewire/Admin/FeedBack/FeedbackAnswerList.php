@@ -2,10 +2,11 @@
 
 namespace Modules\AppointmentUser\Livewire\Admin\FeedBack;
 
+use App\Models\ShortLink;
+use Illuminate\Support\Facades\DB;
+use Livewire\Attributes\Url;
 use Livewire\Component;
 use Livewire\WithPagination;
-use Livewire\Attributes\Url;
-use Illuminate\Support\Facades\DB;
 use Modules\AppointmentUser\app\Models\AppointmentUser;
 use Modules\AppointmentUser\app\Models\FeedbackAnswer;
 use Modules\AppointmentUser\app\Models\FeedbackForm;
@@ -17,7 +18,7 @@ class FeedbackAnswerList extends Component
     #[Url]
     public $formId = '';
 
-    // "appointmentUserId-formId" of the row whose answers are expanded
+    // "appointmentUserId-formId" of the submission shown in the modal
     public ?string $opened = null;
 
     public function updatingFormId()
@@ -26,9 +27,14 @@ class FeedbackAnswerList extends Component
         $this->opened = null;
     }
 
-    public function toggle(string $key)
+    public function open(string $key)
     {
-        $this->opened = $this->opened === $key ? null : $key;
+        $this->opened = $key;
+    }
+
+    public function close()
+    {
+        $this->opened = null;
     }
 
     public static function formatAnswer($answer): string
@@ -43,6 +49,20 @@ class FeedbackAnswerList extends Component
         return (string) $answer->answer;
     }
 
+    /**
+     * آخرین لینک نظرسنجی ارسال شده برای هر نوبت، کلید: شناسه نوبت.
+     */
+    private function sentLinks(iterable $appointmentIds)
+    {
+        return ShortLink::query()
+            ->where('shortlinkable_type', 'feedBack')
+            ->whereIn('shortlinkable_id', $appointmentIds)
+            ->orderBy('id')
+            ->get()
+            ->groupBy('shortlinkable_id')
+            ->map(fn ($links) => $links->first());
+    }
+
     public function render()
     {
         $submissions = FeedbackAnswer::query()
@@ -52,30 +72,57 @@ class FeedbackAnswerList extends Component
             ->orderByDesc('answered_at')
             ->paginate(10);
 
+        $ids = $submissions->pluck('appointment_user_id');
         $appointments = AppointmentUser::with(['user', 'doctor', 'service', 'place'])
             ->withTrashed()
-            ->whereIn('id', $submissions->pluck('appointment_user_id'))
+            ->whereIn('id', $ids)
             ->get()->keyBy('id');
         $forms = FeedbackForm::withTrashed()
             ->whereIn('id', $submissions->pluck('feedback_form_id'))
             ->get()->keyBy('id');
+        $links = $this->sentLinks($ids);
 
-        $details = collect();
+        $modal = null;
         if ($this->opened) {
             [$appId, $formId] = array_pad(explode('-', $this->opened), 2, null);
-            $details = FeedbackAnswer::with('question')
+            $appId = (int) $appId;
+            $formId = (int) $formId;
+
+            $answers = FeedbackAnswer::with('question')
                 ->where('appointment_user_id', $appId)
                 ->where('feedback_form_id', $formId)
                 ->get()
-                ->sortBy(fn ($a) => $a->question?->sort);
+                ->keyBy('feedback_form_question_id');
+
+            if ($answers->isNotEmpty()) {
+                $form = FeedbackForm::withTrashed()->with(['questions'])->find($formId);
+                $app = $appointments->get($appId)
+                    ?? AppointmentUser::with(['user', 'doctor', 'service', 'place'])->withTrashed()->find($appId);
+                $link = $links->get($appId) ?? $this->sentLinks([$appId])->get($appId);
+
+                $modal = [
+                    'form' => $form,
+                    'appointment' => $app,
+                    'link' => $link,
+                    'answered_at' => $answers->max('created_at'),
+                    // سوال‌های فرم به ترتیب؛ سوال حذف‌شده‌ای که پاسخ دارد هم در انتها نشان داده میشود
+                    'rows' => collect($form?->questions ?? [])
+                        ->map(fn ($q) => ['question' => $q, 'answer' => $answers->get($q->id)])
+                        ->concat(
+                            $answers->reject(fn ($a) => collect($form?->questions ?? [])->contains('id', $a->feedback_form_question_id))
+                                ->map(fn ($a) => ['question' => $a->question, 'answer' => $a])
+                        ),
+                ];
+            }
         }
 
         return view('appointmentuser::livewire.admin.feed-back.feedback-answer-list', [
             'submissions' => $submissions,
             'appointments' => $appointments,
             'forms' => $forms,
+            'links' => $links,
             'allForms' => FeedbackForm::orderBy('title')->get(),
-            'details' => $details,
+            'modal' => $modal,
         ]);
     }
 }

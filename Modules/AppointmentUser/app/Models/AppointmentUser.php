@@ -391,6 +391,10 @@ class AppointmentUser extends Model
         </small>';
         }
     }
+    public function feedbackAnswers()
+    {
+        return $this->hasMany(FeedbackAnswer::class);
+    }
     public function feedbacks()
     {
         return $this->hasMany(FeedBack::class);

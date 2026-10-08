@@ -21,7 +21,8 @@ class SendFeedbackLinksCommand extends Command
     protected $signature = 'appointment:send-feedback-links
                             {--delay=10 : minutes to wait after the visit has finished}
                             {--max-age=3 : only appointments that finished in the last N hours (so old ones are never sent)}
-                            {--dry-run : list the appointments without sending anything}';
+                            {--dry-run : list the appointments without sending anything}
+                            {--appointment= : send only to this appointment id, ignoring the delay / max-age window and the already-sent check}';
 
     protected $description = 'send the feedback short link to patients some minutes after their visit has finished';
 
@@ -37,43 +38,63 @@ class SendFeedbackLinksCommand extends Command
         $maxAge = max(1, (int) $this->option('max-age'));
         $dryRun = (bool) $this->option('dry-run');
         $now    = now();
+        // manual send for one appointment: the time window and the already-sent check do not apply
+        $onlyId = $this->option('appointment') ? (int) $this->option('appointment') : null;
 
         $appointments = AppointmentUser::query()
             // the setting may have been deleted after the appointment was booked: its visit duration is still needed
             ->with(['setting' => fn ($query) => $query->withTrashed(), 'user'])
-            ->where('kind', AppointmentUserKindEnum::IN_PERSION)
-            ->where('type', AppointmentUserTypeEnum::MAIN__APPOINTMENT)
-            ->whereIn('status', [
-                AppointmentUserStatusEnum::STATUS_SUCCESSFUL,
-                AppointmentUserStatusEnum::STATUS_ATTENDED,
-            ])
-            // only recent visits (the visit day is today, or yesterday for visits that finish around midnight)
-            ->whereDate('date_visit', '>=', $now->copy()->subHours($maxAge)->toDateString())
-            ->whereDate('date_visit', '<=', $now->toDateString())
-            // the feedback link has not been sent before (the link is stored with the 'feedBack' type)
-            ->whereNotExists(function ($query) {
-                $query->selectRaw('1')
-                    ->from('short_links')
-                    ->whereColumn('short_links.shortlinkable_id', 'appointment_users.id')
-                    ->where('short_links.shortlinkable_type', 'feedBack');
+            ->when($onlyId, function ($query) use ($onlyId) {
+                // a manual send only needs an appointment the patient can actually give feedback for
+                $query->whereKey($onlyId)->whereIn('status', [
+                    AppointmentUserStatusEnum::STATUS_SUCCESSFUL,
+                    AppointmentUserStatusEnum::STATUS_ATTENDED,
+                    AppointmentUserStatusEnum::STATUS_ONILNE_CLOSED,
+                ]);
+            }, function ($query) use ($now, $maxAge) {
+                $query->where('kind', AppointmentUserKindEnum::IN_PERSION)
+                    ->where('type', AppointmentUserTypeEnum::MAIN__APPOINTMENT)
+                    ->whereIn('status', [
+                        AppointmentUserStatusEnum::STATUS_SUCCESSFUL,
+                        AppointmentUserStatusEnum::STATUS_ATTENDED,
+                    ])
+                    // only recent visits (the visit day is today, or yesterday for visits that finish around midnight)
+                    ->whereDate('date_visit', '>=', $now->copy()->subHours($maxAge)->toDateString())
+                    ->whereDate('date_visit', '<=', $now->toDateString())
+                    // the feedback link has not been sent before (the link is stored with the 'feedBack' type)
+                    ->whereNotExists(function ($query) {
+                        $query->selectRaw('1')
+                            ->from('short_links')
+                            ->whereColumn('short_links.shortlinkable_id', 'appointment_users.id')
+                            ->where('short_links.shortlinkable_type', 'feedBack');
+                    });
             })
+            // an appointment that already has an answer never gets the link again
             ->whereDoesntHave('feedbacks')
+            ->whereDoesntHave('feedbackAnswers')
             ->get();
+
+        if ($onlyId && $appointments->isEmpty()) {
+            $this->warn("appointment #{$onlyId} not found, not in a status that accepts feedback, or already answered");
+            return self::SUCCESS;
+        }
 
         $forms = FeedbackForm::query()->where('active', true)->get();
 
         $sent = 0;
         foreach ($appointments as $appointment) {
             $endsAt = $this->visitEndsAt($appointment);
-            if (! $endsAt) {
+            if (! $endsAt && ! $onlyId) {
                 continue;
             }
-            // the visit has finished and `delay` minutes have passed
-            if ($now->lt($endsAt->copy()->addMinutes($delay))) {
-                continue;
-            }
-            if ($endsAt->lt($now->copy()->subHours($maxAge))) {
-                continue;
+            if (! $onlyId) {
+                // the visit has finished and `delay` minutes have passed
+                if ($now->lt($endsAt->copy()->addMinutes($delay))) {
+                    continue;
+                }
+                if ($endsAt->lt($now->copy()->subHours($maxAge))) {
+                    continue;
+                }
             }
             if (empty($appointment->user?->mobile)) {
                 continue;
@@ -86,7 +107,8 @@ class SendFeedbackLinksCommand extends Command
             }
 
             if ($dryRun) {
-                $this->line("#{$appointment->id} visit ended {$endsAt->format('Y-m-d H:i')} -> would send form #{$form->id} ({$form->title})");
+                $ended = $endsAt?->format('Y-m-d H:i') ?? 'unknown';
+                $this->line("#{$appointment->id} visit ended {$ended} -> would send form #{$form->id} ({$form->title})");
                 $sent++;
                 continue;
             }

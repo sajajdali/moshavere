@@ -129,15 +129,13 @@ class AppointmentUser extends Model
      */
     public function feedbackUrl(?int $formId = null): string
     {
+        // آدرس را از دامنه خود تننت میسازیم (نه route()/APP_URL)، چون در اجرای کنسول و صف
+        // route() آدرس پایه نادرست میدهد و لینک کوتاه به سایت دیگری هدایت میشد.
         if (\Modules\Setting\Enum\AppointmentModeEnum::newTemplateEnabled() && $this->tracking_code) {
-            return rtrim(route('front.homePage'), '/') . '/feedback/' . $this->tracking_code;
+            return tenant_url('/feedback/' . $this->tracking_code);
         }
 
-        return route('front.feedBack', array_filter([
-            'appointmentUser_id' => $this->id,
-            'user_id' => $this->user_id,
-            'form_id' => $formId,
-        ]));
+        return tenant_url('/feed/' . $this->id . '/' . $this->user_id, array_filter(['form_id' => $formId]));
     }
 
     public function setting()

@@ -123,7 +123,7 @@ class FeedbackFormCreate extends Component
             }
         });
 
-        return redirect()->route('admin.appointment.feedback')->with('success', 'فرم نظرسنجی ذخیره شد');
+        return redirect()->route('admin.appointment.feedback.forms')->with('success', 'فرم نظرسنجی ذخیره شد');
     }
 
     public function render()

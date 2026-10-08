@@ -253,7 +253,8 @@ class AppointmentUser extends Model
 
         return $this->shortLink()->create([
             'link_code' => ShortLink::generateShortLinkCode(),
-            'link_url' => route('front.setAppointment.detail', ['tracking_code' => $this->tracking_code]),
+            // مسیر نسبی + دامنه تننت؛ route() مطلق در کنسول/صف از APP_URL میخواند
+            'link_url' => tenant_url(route('front.setAppointment.detail', ['tracking_code' => $this->tracking_code], false)),
         ]);
     }
 

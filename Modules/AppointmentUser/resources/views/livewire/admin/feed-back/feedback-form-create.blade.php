@@ -4,7 +4,7 @@
             <h1 class="page-title">ایجاد فرم نظرسنجی</h1>
         </div>
         <div class="ms-auto pageheader-btn">
-            <a href="{{ route('admin.appointment.feedback') }}" class="btn btn-secondary">بازگشت به نظرسنجی ها</a>
+            <a href="{{ route('admin.appointment.feedback.forms') }}" class="btn btn-secondary">بازگشت به فرم های نظرسنجی</a>
         </div>
     </div>
     @include('admin::layouts.components.alert')

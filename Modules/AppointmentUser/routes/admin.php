@@ -5,7 +5,6 @@ use Modules\AppointmentUser\app\Models\AppointmentUser;
 use Modules\AppointmentUser\Livewire\Admin\AppointmentUserList;
 use Modules\AppointmentUser\Livewire\Admin\AppointmentStatusLogList;
 use Modules\AppointmentUser\Livewire\Admin\Online\MessageDetail;
-use Modules\AppointmentUser\Livewire\Admin\FeedBack\Feedbackindex;
 use Modules\AppointmentUser\Livewire\Admin\FeedBack\FeedbackFormCreate;
 use Modules\AppointmentUser\Livewire\Admin\FeedBack\FeedbackFormList;
 use Modules\AppointmentUser\Livewire\Admin\FeedBack\FeedbackAnswerList;
@@ -31,7 +30,6 @@ Route::group([], function () {
     Route::get('appointment_user/create', AppointmentUserCreateOrUpdate::class)->name('appointment_user.addApp')->middleware('can:appointment_user.addApp');
     Route::get('appointment_user/edit/{appointment_user}', AppointmentUserCreateOrUpdate::class)->name('appointment_user.edit')->can('edit', AppointmentUser::class);
     Route::get('appointment_user/Online/message/list', AppointmentOnlineMessagesList::class)->name('appointment_user.message.list')->middleware('can:appointment_user.message');
-    Route::get('appointment/feedback', Feedbackindex::class)->name('appointment.feedback')->middleware('can:appointment_user.feedBack');
     Route::get('appointment/feedback/forms', FeedbackFormList::class)->name('appointment.feedback.forms')->middleware('can:appointment_user.feedBack');
     Route::get('appointment/feedback/answers', FeedbackAnswerList::class)->name('appointment.feedback.answers')->middleware('can:appointment_user.feedBack');
     Route::get('appointment/feedback/create', FeedbackFormCreate::class)->name('appointment.feedback.create')->middleware('can:appointment_user.feedBack');

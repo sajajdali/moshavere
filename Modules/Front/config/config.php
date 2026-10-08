@@ -21,15 +21,6 @@ $menu = [
                 'has_child' => true,
                 'children' => [
                     [
-                        'title' => 'نظرسنجی های انجام شده',
-                        'gate' => 'appointment_user.feedBack',
-                        'policy_class' => null,
-                        'icon' => 'fa fa-list',
-                        'route' => 'admin.appointment.feedback',
-                        'has_child' => false,
-                        'children' => null,
-                    ],
-                    [
                         'title' => 'فرم های نظرسنجی',
                         'gate' => 'appointment_user.feedBack',
                         'policy_class' => null,

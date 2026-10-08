@@ -104,6 +104,17 @@ class AppointmentUser extends Model
                 throw \Illuminate\Validation\ValidationException::withMessages(['appointment' => 'این نوبت بابت عدم حضور بیمار تسویه قطعی شده است؛ تغییر مشخصات، زمان یا لغو آن مجاز نیست.']);
             }
         });
+        // تاریخچه تغییر وضعیت (فقط برای مدیر کل قابل مشاهده است)
+        static::created(fn (self $a) => AppointmentStatusLog::record($a, AppointmentStatusLog::EVENT_CREATED, null, $a->status));
+        static::updated(function (self $a) {
+            if ($a->wasChanged('status')) {
+                $original = $a->getOriginal('status');
+                $from = $original instanceof AppointmentUserStatusEnum ? $original : AppointmentUserStatusEnum::tryFrom((int) $original);
+                AppointmentStatusLog::record($a, AppointmentStatusLog::EVENT_STATUS_CHANGED, $from, $a->status);
+            }
+        });
+        static::deleted(fn (self $a) => AppointmentStatusLog::record($a, AppointmentStatusLog::EVENT_DELETED, $a->status, null));
+        static::restored(fn (self $a) => AppointmentStatusLog::record($a, AppointmentStatusLog::EVENT_RESTORED, null, $a->status));
         static::deleting(function (self $appointment) {
             if ($appointment->hasFinalizedPatientNoShow()) {
                 throw \Illuminate\Validation\ValidationException::withMessages(['appointment' => 'نوبت تسویه‌شده بابت عدم حضور بیمار برای حفظ سوابق مالی قابل حذف نیست.']);

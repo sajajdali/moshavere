@@ -3,6 +3,7 @@
 use Illuminate\Support\Facades\Route;
 use Modules\AppointmentUser\app\Models\AppointmentUser;
 use Modules\AppointmentUser\Livewire\Admin\AppointmentUserList;
+use Modules\AppointmentUser\Livewire\Admin\AppointmentStatusLogList;
 use Modules\AppointmentUser\Livewire\Admin\Online\MessageDetail;
 use Modules\AppointmentUser\Livewire\Admin\FeedBack\Feedbackindex;
 use Modules\AppointmentUser\Livewire\Admin\AppointmentUserCreateOrUpdate;
@@ -23,6 +24,7 @@ use Modules\AppointmentUser\Livewire\Admin\AddAppointment\SpecificDayAvailableAp
 
 Route::group([], function () {
     Route::get('appointment_user/list', AppointmentUserList::class)->name('appointment_user.list')->middleware(['appointment_user_list_middlewere']);
+    Route::get('appointment_user/status-logs', AppointmentStatusLogList::class)->name('appointment_user.status_logs')->middleware('can:SUPER_ADMIN');
     Route::get('appointment_user/create', AppointmentUserCreateOrUpdate::class)->name('appointment_user.addApp')->middleware('can:appointment_user.addApp');
     Route::get('appointment_user/edit/{appointment_user}', AppointmentUserCreateOrUpdate::class)->name('appointment_user.edit')->can('edit', AppointmentUser::class);
     Route::get('appointment_user/Online/message/list', AppointmentOnlineMessagesList::class)->name('appointment_user.message.list')->middleware('can:appointment_user.message');

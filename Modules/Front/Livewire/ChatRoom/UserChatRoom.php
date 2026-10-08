@@ -160,7 +160,7 @@ class UserChatRoom extends Component
     public function cancelAppointment()
     {
         $this->fetchData['appOnline']->update(['status' => AppointmentOnlineStatusEnum::CANCEL]);
-        $this->fetchData['appOnline']->appointmentUser()->update(['status' => AppointmentUserStatusEnum::STATUS_CANCEL]);
+        $this->fetchData['appOnline']->appointmentUser?->update(['status' => AppointmentUserStatusEnum::STATUS_CANCEL]);
         return redirect()->route('admin.appointment_user.message.detail', ['onlineAppId' => $this->fetchData['appOnline']->id])->with('success', 'نوبت با موفقیت کنسل شد');
     }
 
@@ -208,3 +208,4 @@ class UserChatRoom extends Component
         return view('front::livewire.chat-room.user-chat-room');
     }
 }
+

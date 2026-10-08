@@ -24,6 +24,11 @@ class AppointmentUserServiceProvider extends ServiceProvider
         $this->registerViews();
         $this->loadMigrationsFrom(module_path($this->moduleName, 'database/migrations'));
 
+        \Illuminate\Support\Facades\Event::listen(
+            \Modules\AppointmentUser\app\Events\AppointmentStatusChanged::class,
+            \Modules\AppointmentUser\app\Listeners\RecordAppointmentStatusLog::class,
+        );
+
         $this->app->singleton('AppointmentUserService', function ($app) {
             return new AppointmentUserService($app);
         });
@@ -117,3 +122,4 @@ class AppointmentUserServiceProvider extends ServiceProvider
         return $paths;
     }
 }
+

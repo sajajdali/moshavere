@@ -219,7 +219,7 @@ class MessageDetail extends Component
     }
     public function approvedAppointment()
     {
-        $this->fetchData['appOnline']->appointmentUser()->update([
+        $this->fetchData['appOnline']->appointmentUser?->update([
             'status' => AppointmentUserStatusEnum::STATUS_SUCCESSFUL,
             'deadline_at' => null
         ]);
@@ -237,7 +237,7 @@ class MessageDetail extends Component
                 $detail = [AppointmentUser::DISAPPROVED_DESCRIPTION => $this->form['reason']];
             }
         }
-        $this->fetchData['appOnline']->appointmentUser()->update(['status' => AppointmentUserStatusEnum::STATUS_CANCEL]);
+        $this->fetchData['appOnline']->appointmentUser?->update(['status' => AppointmentUserStatusEnum::STATUS_CANCEL]);
         $this->fetchData['appOnline']->update(['status' => AppointmentOnlineStatusEnum::REJECT]);
 
         return redirect()->route('admin.appointment_user.message.detail', $this->fetchData['appOnline']->id);
@@ -246,7 +246,7 @@ class MessageDetail extends Component
     public function cancelAppointment()
     {
         $this->fetchData['appOnline']->update(['status' => AppointmentOnlineStatusEnum::CANCEL]);
-        $this->fetchData['appOnline']->appointmentUser()->update(['status' => AppointmentUserStatusEnum::STATUS_CANCEL]);
+        $this->fetchData['appOnline']->appointmentUser?->update(['status' => AppointmentUserStatusEnum::STATUS_CANCEL]);
         return redirect()->route('admin.appointment_user.message.detail', ['onlineAppId' => $this->fetchData['appOnline']->id])->with('success', 'نوبت با موفقیت کنسل شد');
     }
     public function closeApp()
@@ -269,7 +269,7 @@ class MessageDetail extends Component
         $appointmentUser->setting->runGenerateCacheJob(specialDayConvert($appointmentUser->date_visit));
 
         $this->fetchData['appOnline']->update(['status' => AppointmentOnlineStatusEnum::COMPLETED_BY_DOCTOR]);
-        $this->fetchData['appOnline']->appointmentUser()->update(['status' => AppointmentUserStatusEnum::STATUS_ONILNE_CLOSED]);
+        $this->fetchData['appOnline']->appointmentUser?->update(['status' => AppointmentUserStatusEnum::STATUS_ONILNE_CLOSED]);
         return redirect()->route('admin.appointment_user.message.detail', ['onlineAppId' => $this->fetchData['appOnline']->id])->with('success', 'وضعیت نوبت به تمام شده ، تغییر پیدا کرد');
     }
     public function updateComponent()
@@ -337,3 +337,4 @@ class MessageDetail extends Component
         return view('appointmentuser::livewire.admin.online.message-detail');
     }
 }
+

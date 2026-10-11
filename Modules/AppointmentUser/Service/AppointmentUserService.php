@@ -729,16 +729,30 @@ class AppointmentUserService
      * Without interference a setting only sees its own appointments, plus the ones of the same doctor
      * for the same service and place stored through another setting (e.g. the doctor's general setting):
      * those occupy the same time and must not be shown or booked as free.
+     * The doctor's general setting also covers every service/place without a dedicated setting of its own,
+     * so it sees the appointments stored through a deleted or replaced setting (e.g. migrated appointments).
      */
     private function scopeSettingAppointments($query, AppointmentSetting $appointmentSetting, $serviceId = null, $placeId = null)
     {
         $serviceId = $serviceId ?: $appointmentSetting->service_id;
         $placeId   = $placeId ?: $appointmentSetting->place_id;
+        $isGeneral = empty($appointmentSetting->service_id) && empty($appointmentSetting->place_id);
+        $appointmentsTable = $query->getModel()->getTable();
 
-        return $query->where(function ($q) use ($appointmentSetting, $serviceId, $placeId) {
+        return $query->where(function ($q) use ($appointmentSetting, $serviceId, $placeId, $isGeneral, $appointmentsTable) {
             $q->where('appointment_setting_id', $appointmentSetting->id);
             if (! empty($serviceId) && ! empty($placeId)) {
                 $q->orWhere(fn($q) => $q->where('service_id', $serviceId)->where('place_id', $placeId));
+            }
+            if ($isGeneral) {
+                // same lookup as AppointmentSetting::resolveFor: no dedicated setting -> general setting
+                $q->orWhereNotExists(
+                    AppointmentSetting::query()
+                        ->selectRaw('1')
+                        ->where('user_id', $appointmentSetting->user_id)
+                        ->whereColumn('service_id', $appointmentsTable . '.service_id')
+                        ->whereColumn('place_id', $appointmentsTable . '.place_id')
+                );
             }
         });
     }
@@ -775,6 +789,39 @@ class AppointmentUserService
             })
             ->count();
         return $existingAppointments < $appointmentSetting->appointmentsPerHour();
+    }
+    /**
+     * Counts every active in-person appointment of the doctor overlapping the requested time, whatever
+     * setting, service or place it was stored with (deleted settings and migrated appointments with a
+     * midnight date_visit included), against the number of appointments the setting allows per slot.
+     */
+    private function patientSlotIsFull(AppointmentSetting $appointmentSetting, Carbon $start, ?string $endTime): bool
+    {
+        $end = $endTime ? Carbon::parse($start->toDateString() . ' ' . $endTime, $start->getTimezone()) : null;
+        if (! $end || $end->lte($start)) {
+            $end = $start->copy()->addMinutes(max(1, (int) $appointmentSetting->time_for_visit));
+        }
+        $from  = $start->toTimeString();
+        $until = $end->toTimeString();
+
+        $booked = AppointmentUser::where('doctor_id', $appointmentSetting->user_id)
+            ->where('kind', AppointmentUserKindEnum::IN_PERSION)
+            ->whereIn('status', [
+                AppointmentUserStatusEnum::STATUS_PENDING,
+                AppointmentUserStatusEnum::STATUS_SUCCESSFUL,
+                AppointmentUserStatusEnum::STATUS_WAIT_PAYMENT,
+                AppointmentUserStatusEnum::STATUS_ATTENDED,
+                AppointmentUserStatusEnum::STATUS_NOT_ATTENDED,
+                AppointmentUserStatusEnum::STATUS_MONITORING,
+            ])
+            ->whereDate('date_visit', $start->toDateString())
+            ->where(function ($q) use ($from, $until) {
+                $q->where('start_time', $from)
+                    ->orWhere(fn($q) => $q->where('start_time', '<', $until)->where('end_time', '>', $from));
+            })
+            ->count();
+
+        return $booked >= $appointmentSetting->appointmentsPerHour();
     }
     public function paymentstatus(AppointmentSetting $appointmentSetting)
     {
@@ -873,17 +920,6 @@ class AppointmentUserService
 
         $detailDatabaseDB[AppointmentUser::USER_MODEL] = UserResource::make($userModelAppointment->userModel->user);
 
-        if ($appointmentData->kind == AppointmentUserKindEnum::IN_PERSION && $appointmentData->appointmentVia->usesSelfServiceRules()) {
-            $checkTimeAvailable = $this->isAppointmentTimeAvailable($dateAppointment->toTimeString(), $dateAppointment->copy()->addMinutes($appointmentSetting->time_for_visit)->toTimeString(), $dateAppointment->toDateString(), $appointmentSetting, $appointmentData->serviceId, $appointmentData->placeId);
-            if (!$checkTimeAvailable) {
-                //                return [
-                //                    'status' => false,
-                //                    'message' => 'زمان انتخابی شما توسط شخصی دیگر پر شده است . لطفا یک زمان دیگر انتخاب کنید',
-                //                    'route' => 'time'
-                //                ];
-            }
-        }
-
         // check if time is full
         $appoiutnemtTime = Carbon::createFromTimestamp($appointmentData->timestamp, 'Asia/Tehran')->toDateTimeString();
 
@@ -909,7 +945,13 @@ class AppointmentUserService
                 AppointmentUserStatusEnum::STATUS_NOT_ATTENDED,
                 AppointmentUserStatusEnum::STATUS_MONITORING,
             ])
-            ->where('date_visit', $appoiutnemtTime)->count() >= $appointmentSetting->appointmentsPerHour();
+            // migrated appointments keep date_visit at midnight, so the slot is also matched by date + start_time
+            ->where(function ($q) use ($appoiutnemtTime) {
+                $slot = Carbon::parse($appoiutnemtTime);
+                $q->where('date_visit', $appoiutnemtTime)
+                    ->orWhere(fn($q) => $q->whereDate('date_visit', $slot->toDateString())->where('start_time', $slot->toTimeString()));
+            })
+            ->count() >= $appointmentSetting->appointmentsPerHour();
         $isFromAdminPanell = isset($detail['store_from_admin_panel']) && $detail['store_from_admin_panel'] == true;
         if (! $isFromAdminPanell && $checkForAppointmentExists) {
             return [
@@ -979,6 +1021,21 @@ class AppointmentUserService
             $appointmentData->appointmentVia->usesSelfServiceRules()
         ) {
             $status = AppointmentUserStatusEnum::STATUS_MONITORING;
+        }
+
+        // final check: whatever the slot list showed, a patient never books a time of the doctor that already
+        // holds as many appointments as the setting allows (one unless multipleAppointmentsPerHour is enabled)
+        if (
+            ! $isFromAdminPanell &&
+            $appointmentData->kind == AppointmentUserKindEnum::IN_PERSION &&
+            $appointmentData->appointmentVia->usesSelfServiceRules() &&
+            $this->patientSlotIsFull($appointmentSetting, $visitDateTime, $endTime)
+        ) {
+            return [
+                'status' => false,
+                'message' => 'زمان انتخابی شما توسط شخصی دیگر پر شده است . لطفا یک زمان دیگر انتخاب کنید',
+                'route' => 'time'
+            ];
         }
 
         // store appointment

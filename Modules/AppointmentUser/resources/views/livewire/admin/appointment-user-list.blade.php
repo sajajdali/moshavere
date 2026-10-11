@@ -3,6 +3,7 @@
     $hasFilters = collect($search)->contains(fn($value) => filled($value));
     $selectedCount = collect(data_get($form, 'checkbox', []))->filter()->count();
     $totalStats = $appointments->total();
+    $showSetterColumn = auth()->user()?->isAdmin() ?? false;
 @endphp
 
 <div class="appointment-list-page" dir="rtl">
@@ -51,6 +52,7 @@
         .appointment-row .dropdown-menu li a i{width:16px;text-align:center}
         .appointment-table{min-width:1480px}
         .appointment-grid{display:grid;grid-template-columns:42px 58px minmax(170px,.9fr) 1.15fr 128px 1fr 1fr 118px 168px 120px 126px;align-items:center}
+        .appointment-grid.without-setter{grid-template-columns:42px 58px minmax(170px,.9fr) 1.15fr 128px 1fr 118px 168px 120px 126px}
         .appointment-head{padding:0 8px;background:#f9fafb;border-bottom:1px solid #e6e8ec;position:sticky;top:0;z-index:5}
         .appointment-head>div{padding:10px 5px;font-size:12px;font-weight:600;color:#667085}
         .th-sortable{cursor:pointer;user-select:none;display:flex;align-items:center;gap:4px}
@@ -230,14 +232,16 @@
 
             <div class="appointment-table-wrap">
                 <div class="appointment-table">
-                    <div class="appointment-grid appointment-head">
+                    <div class="appointment-grid appointment-head {{ $showSetterColumn ? '' : 'without-setter' }}">
                         <div><input type="checkbox" class="checkbox select-all-visible" style="width:16px;height:16px;accent-color:#0f766e"></div>
                         <div class="th-sortable {{ $sortField === 'id' ? 'active' : '' }}" wire:click="sortBy('id')">شناسه <i class="fa {{ $sortField === 'id' ? ($sortDirection === 'asc' ? 'fa-arrow-up' : 'fa-arrow-down') : 'fa-arrows-v' }} th-sort-arrow"></i></div>
                         <div>کاربر</div>
                         <div>پزشک / اپراتور</div>
                         <div class="th-sortable {{ $sortField === 'date_visit' ? 'active' : '' }}" wire:click="sortBy('date_visit')">زمان نوبت <i class="fa {{ $sortField === 'date_visit' ? ($sortDirection === 'asc' ? 'fa-arrow-up' : 'fa-arrow-down') : 'fa-arrows-v' }} th-sort-arrow"></i></div>
                         <div class="th-sortable {{ $sortField === 'service_id' ? 'active' : '' }}" wire:click="sortBy('service_id')">بخش <i class="fa {{ $sortField === 'service_id' ? ($sortDirection === 'asc' ? 'fa-arrow-up' : 'fa-arrow-down') : 'fa-arrows-v' }} th-sort-arrow"></i></div>
-                        <div>ثبت شده توسط</div>
+                        @if ($showSetterColumn)
+                            <div>ثبت شده توسط</div>
+                        @endif
                         <div class="th-sortable {{ $sortField === 'created_at' ? 'active' : '' }}" wire:click="sortBy('created_at')">تاریخ ثبت <i class="fa {{ $sortField === 'created_at' ? ($sortDirection === 'asc' ? 'fa-arrow-up' : 'fa-arrow-down') : 'fa-arrows-v' }} th-sort-arrow"></i></div>
                         <div class="th-sortable {{ $sortField === 'status' ? 'active' : '' }}" wire:click="sortBy('status')">وضعیت و عملیات <i class="fa {{ $sortField === 'status' ? ($sortDirection === 'asc' ? 'fa-arrow-up' : 'fa-arrow-down') : 'fa-arrows-v' }} th-sort-arrow"></i></div>
                         <div>کد ملی</div>
@@ -286,7 +290,7 @@
                                     : route('admin.user.document', ['user' => $ap->user->id]))
                                 : '#';
                         @endphp
-                        <div class="appointment-grid appointment-row {{ $cancelledClass }} {{ $voipAttentionClass }}" style="background:{{ $rowBackground }}" wire:key="appointment-row-{{ $ap->id }}">
+                        <div class="appointment-grid appointment-row {{ $showSetterColumn ? '' : 'without-setter' }} {{ $cancelledClass }} {{ $voipAttentionClass }}" style="background:{{ $rowBackground }}" wire:key="appointment-row-{{ $ap->id }}">
                             <div>
                                 <input wire:model="form.checkbox.{{ $ap->id }}" class="checkbox row-checkbox" id="checkbox-{{ $ap->id }}" type="checkbox" style="width:16px;height:16px;accent-color:#0f766e">
                             </div>
@@ -325,12 +329,14 @@
                                     <span class="om-muted om-ellipsis">{{ collect($this->segmentData($ap->id))->pluck('title')->implode('، ') }}</span>
                                 @endif
                             </div>
-                            <div class="d-flex flex-column gap-1">
-                                <span class="om-ellipsis" style="font-size:13px;color:#344054">{{ filled($ap->agent?->fullName) ? $ap->agent->fullName : 'خود کاربر' }}</span>
-                                @if ($ap->kind == \Modules\AppointmentUser\Enum\AppointmentUserKindEnum::ONLINE && $ap->hasAgent())
-                                    <span class="om-muted">{{ $ap->confirm_or_reject_by() }}</span>
-                                @endif
-                            </div>
+                            @if ($showSetterColumn)
+                                <div class="d-flex flex-column gap-1">
+                                    <span class="om-ellipsis" style="font-size:13px;color:#344054">{{ filled($ap->agent?->fullName) ? $ap->agent->fullName : 'خود کاربر' }}</span>
+                                    @if ($ap->kind == \Modules\AppointmentUser\Enum\AppointmentUserKindEnum::ONLINE && $ap->hasAgent())
+                                        <span class="om-muted">{{ $ap->confirm_or_reject_by() }}</span>
+                                    @endif
+                                </div>
+                            @endif
                             <div class="d-flex flex-column gap-1">
                                 <span style="font-size:12.5px;color:#344054" dir="ltr">{{ verta($ap->created_at)->format('Y/m/d') }}</span>
                                 <span class="om-muted" dir="ltr">{{ verta($ap->created_at)->format('H:i') }}</span>

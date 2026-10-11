@@ -16,6 +16,22 @@
             $slotPosition[$i] = $slotGroupSize[$groupKey];
         }
     }
+    // last row of each multi-slot group, in the "all" view and in the "free only" view (booked rows hidden),
+    // so the separator line under a group stays visible whatever the filter
+    $groupLastAll = [];
+    $groupLastFree = [];
+    foreach ($dayAppointments as $i => $slot) {
+        $groupKey = $slot['from'] . '|' . $slot['until'];
+        if (($slotGroupSize[$groupKey] ?? 1) < 2) {
+            continue;
+        }
+        $groupLastAll[$groupKey] = $i;
+        if ($slot['status'] || empty($slot['appointment_user_id'])) {
+            $groupLastFree[$groupKey] = $i;
+        }
+    }
+    $groupLastAll = array_flip($groupLastAll);
+    $groupLastFree = array_flip($groupLastFree);
 @endphp
 
 <div class="sd-page" dir="rtl">
@@ -24,6 +40,16 @@
         <link href="{{ admin_asset('css/specific-day-appointment.css') }}" rel="stylesheet">
         <style>
             .sd-row-multi-next .sd-time-values { opacity: .45; }
+            /* separator under the last place of each hour: drawn on the last visible row of the group */
+            .sd-rows[data-view="all"] .sd-row[data-multi-last-all],
+            .sd-rows[data-view="free"] .sd-row[data-multi-last-free] {
+                border-bottom: 2px solid rgba(98, 89, 202, .22);
+                border-bottom-left-radius: 0;
+                border-bottom-right-radius: 0;
+                margin-bottom: 8px;
+            }
+            .sd-rows[data-view="all"] .sd-row[data-multi-last-all] + .sd-row,
+            .sd-rows[data-view="free"] .sd-row[data-multi-last-free] + .sd-row { border-top: 0; }
             .sd-multi-badge {
                 display: inline-block; margin-top: 4px; padding: 1px 8px; border-radius: 10px;
                 font-size: 11px; white-space: nowrap; color: var(--primary-bg-color, #6259ca);
@@ -121,7 +147,7 @@
                     <span class="sd-presence-line"></span><span>پایان حضور:
                         {{ substr($dayAppointments[array_key_last($dayAppointments)]['until'], 0, -3) }}</span>
                 </div>
-                <div class="sd-rows" id="appointment_content"
+                <div class="sd-rows" id="appointment_content" data-view="{{ $edited['status'] ? 'free' : 'all' }}"
                     wire:key="appointment-times-{{ $fetchData['selectedDate']->format('Y-m-d') }}">
                     @foreach ($dayAppointments as $key => $eachTime)
                         @php
@@ -140,7 +166,8 @@
 
                         @if ($ap)
                             <div class="sd-row sd-row-booked {{ $multiClass }} {{ $ap->type == Modules\AppointmentUser\Enum\AppointmentUserTypeEnum::BETWEEN_PATIENTS ? 'sd-row-between' : '' }}"
-                                data-slot-state="booked" @if ($edited['status']) style="display:none" @endif>
+                                data-slot-state="booked" @if ($edited['status']) style="display:none" @endif
+                                @isset($groupLastAll[$key]) data-multi-last-all @endisset>
                                 <div class="sd-time"><span class="sd-index">{{ $key + 1 }}</span><span
                                         class="sd-time-values"><span
                                             class="sd-time-from">{{ substr($eachTime['from'], 0, -3) }}</span><span
@@ -195,7 +222,9 @@
                                 </div>
                             </div>
                         @else
-                            <div class="sd-row {{ $multiClass }}" data-slot-state="free">
+                            <div class="sd-row {{ $multiClass }}" data-slot-state="free"
+                                @isset($groupLastAll[$key]) data-multi-last-all @endisset
+                                @isset($groupLastFree[$key]) data-multi-last-free @endisset>
                                 <div class="sd-time"><span class="sd-index">{{ $key + 1 }}</span><span
                                         class="sd-time-values"><span
                                             class="sd-time-from">{{ substr($eachTime['from'], 0, -3) }}</span><span
@@ -298,6 +327,7 @@
                     schedule.find('[data-sd-filter]').removeClass('active');
                     $(this).addClass('active');
                     schedule.find('[data-slot-state="booked"]').toggle(filter === 'all');
+                    schedule.find('.sd-rows').attr('data-view', filter);
                     schedule.find('[data-filter-empty]').toggle(filter === 'free');
                 });
 

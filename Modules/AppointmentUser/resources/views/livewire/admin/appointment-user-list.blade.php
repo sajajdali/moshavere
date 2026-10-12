@@ -50,9 +50,9 @@
         .appointment-row .dropdown-menu li a{display:flex;align-items:center;gap:9px;padding:8px 10px;border-radius:7px;color:#344054;font-size:12.5px;white-space:nowrap}
         .appointment-row .dropdown-menu li a:hover{background:#f2f4f7;text-decoration:none}
         .appointment-row .dropdown-menu li a i{width:16px;text-align:center}
-        .appointment-table{min-width:1480px}
-        .appointment-grid{display:grid;grid-template-columns:42px 58px minmax(170px,.9fr) 1.15fr 128px 1fr 1fr 118px 168px 120px 126px;align-items:center}
-        .appointment-grid.without-setter{grid-template-columns:42px 58px minmax(170px,.9fr) 1.15fr 128px 1fr 118px 168px 120px 126px}
+        .appointment-table{min-width:1600px}
+        .appointment-grid{display:grid;grid-template-columns:42px 58px minmax(170px,.9fr) 1.15fr 128px 1fr 1fr 118px 168px 120px 126px 120px;align-items:center}
+        .appointment-grid.without-setter{grid-template-columns:42px 58px minmax(170px,.9fr) 1.15fr 128px 1fr 118px 168px 120px 126px 120px}
         .appointment-head{padding:0 8px;background:#f9fafb;border-bottom:1px solid #e6e8ec;position:sticky;top:0;z-index:5}
         .appointment-head>div{padding:10px 5px;font-size:12px;font-weight:600;color:#667085}
         .th-sortable{cursor:pointer;user-select:none;display:flex;align-items:center;gap:4px}
@@ -246,6 +246,7 @@
                         <div class="th-sortable {{ $sortField === 'status' ? 'active' : '' }}" wire:click="sortBy('status')">وضعیت و عملیات <i class="fa {{ $sortField === 'status' ? ($sortDirection === 'asc' ? 'fa-arrow-up' : 'fa-arrow-down') : 'fa-arrows-v' }} th-sort-arrow"></i></div>
                         <div>کد ملی</div>
                         <div class="th-sortable {{ $sortField === 'kind' ? 'active' : '' }}" wire:click="sortBy('kind')">نوع نوبت <i class="fa {{ $sortField === 'kind' ? ($sortDirection === 'asc' ? 'fa-arrow-up' : 'fa-arrow-down') : 'fa-arrows-v' }} th-sort-arrow"></i></div>
+                        <div>ثبت شده از</div>
                     </div>
 
                     @forelse ($appointments as $key => $ap)
@@ -408,6 +409,17 @@
                                 @if ($ap->isStoredFromVoip())
                                     <span class="om-pill" style="background:#f0f9ff;color:#026aa2;border-color:#b9e6fe">ثبت از ویپ</span>
                                 @endif
+                            </div>
+                            @php
+                                [$sourceLabel, $sourceIcon, $sourceStyle] = match ($ap->registrationSource()) {
+                                    \Modules\AppointmentUser\Enum\AppointmentVia::SELF => ['سایت (خود بیمار)', 'fa-globe', 'background:#ecfdf3;color:#067647;border-color:#abefc6'],
+                                    \Modules\AppointmentUser\Enum\AppointmentVia::BY_ADMIN => ['پنل مدیریت', 'fa-user-md', 'background:#eff8ff;color:#175cd3;border-color:#b2ddff'],
+                                    \Modules\AppointmentUser\Enum\AppointmentVia::VOIP => ['تلفن (ویپ)', 'fa-phone', 'background:#f0f9ff;color:#026aa2;border-color:#b9e6fe'],
+                                    \Modules\AppointmentUser\Enum\AppointmentVia::IMPORT_FROM => ['ایمپورت شده', 'fa-download', ''],
+                                };
+                            @endphp
+                            <div>
+                                <span class="om-pill" style="{{ $sourceStyle }}"><i class="fa {{ $sourceIcon }}"></i> {{ $sourceLabel }}</span>
                             </div>
                         </div>
                         @if ($setting['show_description'])

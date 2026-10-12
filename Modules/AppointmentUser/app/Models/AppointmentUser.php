@@ -164,6 +164,18 @@ class AppointmentUser extends Model
         return is_numeric($value) ? AppointmentVia::tryFrom((int) $value) : null;
     }
 
+    /**
+     * منبع ثبت نوبت. در نوبت های قدیمی که منبع در جزئیات ذخیره نشده، اگر ثبت کننده
+     * شخصی غیر از خود بیمار باشد نوبت از پنل مدیریت ثبت شده است.
+     */
+    public function registrationSource(): AppointmentVia
+    {
+        return $this->appointmentVia()
+            ?? ($this->agent_id && (int) $this->agent_id !== (int) $this->user_id
+                ? AppointmentVia::BY_ADMIN
+                : AppointmentVia::SELF);
+    }
+
     public function isStoredFromVoip(): bool
     {
         return $this->appointmentVia() === AppointmentVia::VOIP;

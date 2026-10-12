@@ -52,6 +52,7 @@ class Menu extends Component
             ],
             'نوبتدهی' => [
                 'لیست نوبتهای ثبتشده',
+                'گزارش عمومی',
                 'نوبتهای امروز',
                 'نوبتهای معاینه آنلاین',
                 'نوبتهای رزرو جراحی',
@@ -167,6 +168,7 @@ class Menu extends Component
             'نمایشسالنانتظار' => ['fa-tv', 'icon-display'],
             'سالنانتظارباتصویر' => ['fa-image', 'icon-image'],
             'لیستنوبتهایثبتشده' => ['fa-calendar-check', 'icon-calendar'],
+            'گزارشعمومی' => ['fa-chart-pie', 'icon-chart'],
             'بازخوردبیماران' => ['fa-comments', 'icon-feedback'],
             'نوبتهایامروز' => ['fa-calendar-day', 'icon-today'],
             'نوبتهای'.'معاینهآنلاین' => ['fa-laptop-medical', 'icon-online'],

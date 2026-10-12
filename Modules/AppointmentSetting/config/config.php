@@ -35,6 +35,16 @@ return [
                 'children' => null
             ],
             [
+                'title' => 'گزارش عمومی',
+                'gate' => 'SUPER_ADMIN',
+                'policy_class' => null,
+                'icon' => 'fe fe-pie-chart',
+                'route' => 'admin.appointment_user.report',
+                'has_badge' => false,
+                'has_child' => false,
+                'children' => null,
+            ],
+            [
                 'title' => 'تاریخچه وضعیت نوبت‌ها',
                 'gate' => 'SUPER_ADMIN',
                 'policy_class' => null,

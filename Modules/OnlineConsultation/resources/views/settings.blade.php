@@ -11,7 +11,7 @@
         <div class="oc-panel-body"><div class="oc-grid">
         @include('onlineconsultation::checkbox', ['name' => 'booking_enabled', 'label' => 'فعال‌بودن رزرو مشاوره', 'help' => 'تنظیم رزرو برای زمان راه‌اندازی سرویس'])
         @include('onlineconsultation::checkbox', ['name' => 'app_enabled', 'label' => 'دسترسی به اپلیکیشن', 'help' => 'هر همکار به مجوز اختصاصی در پروفایل خود نیز نیاز دارد.'])
-        @include('onlineconsultation::checkbox', ['name' => 'test_login_enabled', 'label' => 'ورود تستی', 'help' => 'فقط برای تست: پزشک یا مشاور فعال بدون مجوز شخصی اپ و بدون پیامک، همیشه با کد ۱۲۳۴ وارد می‌شود و کد در پاسخ API نمایش داده می‌شود.'])
+        <input type="hidden" name="test_login_enabled" value="0">
         @include('onlineconsultation::field', ['name' => 'connection_method', 'label' => 'روش برقراری تماس', 'options' => ['operator' => 'با هماهنگی اپراتور', 'callback' => 'تماس با دو طرف از سرور', 'app' => 'از اپلیکیشن'], 'required' => true])
         @include('onlineconsultation::field', ['name' => 'timezone', 'label' => 'منطقه زمانی', 'direction' => 'ltr', 'help' => 'مثال: Asia/Tehran', 'required' => true])
         </div></div>

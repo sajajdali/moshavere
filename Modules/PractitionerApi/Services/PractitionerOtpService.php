@@ -4,13 +4,13 @@ namespace Modules\PractitionerApi\Services;
 
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Http\Exceptions\HttpResponseException;
 use Illuminate\Validation\ValidationException;
 use Laravel\Sanctum\PersonalAccessToken;
 use Modules\Api\Entities\UserDevice;
 use Modules\Api\Notifications\AuthSmsNotification;
 use Modules\OnlineConsultation\Models\ConsultationPractitioner;
-use Modules\OnlineConsultation\Models\ConsultationSetting;
 use Modules\PractitionerApi\Models\PractitionerOtpRequest;
 
 class PractitionerOtpService
@@ -19,13 +19,14 @@ class PractitionerOtpService
     {
     }
 
-    /** @return array{test_mode: bool, test_code?: string} */
-    public function request(string $mobile, ?string $deviceIdentifier, ?string $ip): array
+    /**
+     * کد ورود را با الگوی پیامک ورود تنظیمات (SMS_API_LOGIN_TEMPLATE) برای پزشک ارسال میکند.
+     */
+    public function request(string $mobile, ?string $deviceIdentifier, ?string $ip): void
     {
-        $testMode = $this->testModeEnabled();
-        $this->activePractitioner($mobile, $testMode);
+        $this->activePractitioner($mobile);
 
-        $code = $testMode ? '1234' : str_pad((string) random_int(0, 9999), 4, '0', STR_PAD_LEFT);
+        $code = str_pad((string) random_int(0, 9999), 4, '0', STR_PAD_LEFT);
 
         $otpRequest = DB::transaction(function () use ($mobile, $deviceIdentifier, $ip, $code): PractitionerOtpRequest {
             $otpRequest = PractitionerOtpRequest::query()->lockForUpdate()->where('mobile', $mobile)->first();
@@ -62,14 +63,16 @@ class PractitionerOtpService
             return $otpRequest;
         });
 
-        if (! $testMode) {
+        try {
             $otpRequest->notify(new AuthSmsNotification($code));
-        }
+        } catch (\Throwable $exception) {
+            Log::error('practitioner otp sms failed', ['mobile' => $mobile, 'error' => $exception->getMessage()]);
+            // کدی که به دست پزشک نرسیده نباید جلوی درخواست دوباره را بگیرد؛
+            // پاسخ خطا همان پاسخ قبلی (500) میماند تا قرارداد API تغییر نکند
+            $otpRequest->update(['next_request_at' => now(), 'expires_at' => now()]);
 
-        return array_filter([
-            'test_mode' => $testMode,
-            'test_code' => $testMode ? $code : null,
-        ], fn ($value) => $value !== null);
+            throw $exception;
+        }
     }
 
     /**
@@ -89,14 +92,13 @@ class PractitionerOtpService
      */
     public function verify(string $mobile, string $code, array $device): array
     {
-        $testMode = $this->testModeEnabled();
-        $result = DB::transaction(function () use ($mobile, $code, $device, $testMode): array {
+        $result = DB::transaction(function () use ($mobile, $code, $device): array {
             $otpRequest = PractitionerOtpRequest::query()
                 ->lockForUpdate()
                 ->where('mobile', $mobile)
                 ->first();
 
-            if ($otpRequest->locked_until?->isFuture()) {
+            if ($otpRequest?->locked_until?->isFuture()) {
                 $this->locked($otpRequest->locked_until->diffInSeconds(now()));
             }
 
@@ -124,7 +126,7 @@ class PractitionerOtpService
                 return ['error' => 'invalid_code'];
             }
 
-            $practitioner = $this->activePractitioner($mobile, $testMode);
+            $practitioner = $this->activePractitioner($mobile);
             $expiresAt = now()->addDays((int) config('practitionerapi.token_expiration_days', 90));
 
             $this->revokePreviousTokenForInstallation(
@@ -166,8 +168,6 @@ class PractitionerOtpService
                     'availability' => (string) $practitioner->availability,
                     'softphone' => $this->softphones->for($practitioner),
                 ],
-                'test_mode' => $testMode,
-                'test_code' => $testMode ? '1234' : null,
             ];
         });
 
@@ -179,20 +179,16 @@ class PractitionerOtpService
             throw ValidationException::withMessages(['code' => ['کد ورود صحیح نیست.']]);
         }
 
-        if (! $testMode) {
-            unset($result['test_mode'], $result['test_code']);
-        }
-
         return $result;
     }
 
     /** @return object{user: mixed, user_id: int, id: int, display_name: string, kind: string, specialty: string|null, availability: string} */
-    private function activePractitioner(string $mobile, bool $testMode = false): object
+    private function activePractitioner(string $mobile): object
     {
         $practitioner = ConsultationPractitioner::query()
             ->with('user')
             ->where('active', true)
-            ->when(! $testMode, fn ($query) => $query->where('app_access', true))
+            ->where('app_access', true)
             ->whereHas('user', fn ($query) => $query->where('mobile', $mobile))
             ->first();
 
@@ -201,11 +197,6 @@ class PractitionerOtpService
         }
 
         return $practitioner;
-    }
-
-    private function testModeEnabled(): bool
-    {
-        return (bool) ConsultationSetting::current()->test_login_enabled;
     }
 
     private function revokePreviousTokenForInstallation(int $userId, ?string $deviceIdentifier): void

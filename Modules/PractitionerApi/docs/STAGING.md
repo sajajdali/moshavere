@@ -7,7 +7,7 @@
 - Configure queue workers and the scheduler used by consultation reminders.
 - Configure Firebase credentials on the server. Never place Firebase server credentials, VoIP API tokens, or SIP secrets in the mobile bundle.
 - Set the Tenant VoIP host, SIP port/transport and call token in the administration panel.
-- Keep test login disabled. If temporarily enabled, the API intentionally discloses `test_mode=true` and `test_code=1234`; disable it before production sign-off.
+- Configure the Tenant SMS provider and the login SMS template; practitioner OTP codes are always delivered by SMS (there is no test login).
 
 ## Client contract
 

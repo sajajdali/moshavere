@@ -211,16 +211,16 @@ terms_url, min_supported_version
 - mobile باید شماره فعال پزشک/مشاور Tenant باشد.
 - OTP چهاررقمی، اعتبار 120 ثانیه، فاصله ارسال مجدد 60 ثانیه، حداکثر 5 تلاش ناموفق و قفل 15 دقیقه است.
 - پاسخ `202` شامل `expires_in` و `resend_after` است.
-- اگر «ورود تستی» در پنل Tenant فعال باشد، پیامک ارسال نمی‌شود و فقط در همان حالت پاسخ شامل `test_mode:true` و `test_code:"1234"` است.
-- اگر حالت تست خاموش باشد این دو فیلد در پاسخ وجود ندارند. اپ هرگز نباید 1234 را hardcode یا برای محیط عادی پیشنهاد کند؛ فقط داده پاسخ را نمایش دهد.
-- در حالت تست، حساب همچنان باید پزشک/مشاور فعال باشد، اما محدودیت شخصی `app_access` bypass می‌شود.
+- کد همیشه با الگوی «پیامک ورود» تنظیمات پیامک Tenant ارسال می‌شود و حالت ورود تستی وجود ندارد.
+- حساب باید پزشک/مشاور فعال و دارای مجوز `app_access` باشد.
+- اگر ارسال پیامک ناموفق باشد، مانند قبل خطای سرور برمی‌گردد و اپ می‌تواند بلافاصله دوباره درخواست دهد.
 
 ### `POST /auth/otp/verify`
 
 ```json
 {
   "mobile":"09xxxxxxxxx",
-  "code":"1234",
+  "code":"4821",
   "device_name":"نام دستگاه قابل فهم",
   "device_os":"android",
   "device_identifier":"stable-installation-uuid",
@@ -235,7 +235,6 @@ terms_url, min_supported_version
 - ورود مجدد همان installation فقط token قبلی همان installation را باطل می‌کند؛ چند دستگاه مستقل مجازند.
 - token از نوع Bearer و دارای `expires_at` است؛ اعتبار پیش‌فرض 90 روز.
 - پاسخ موفق شامل `data.token_type`, `data.access_token`, `data.expires_at`, `data.practitioner` و `data.practitioner.softphone` است.
-- در حالت تست فعال، `data.test_mode` و `data.test_code` نیز وجود دارند.
 
 ### `POST /auth/logout`
 
@@ -644,8 +643,8 @@ Deep link اعلان ابتدا باید session و tenant را validate کند�
 ### Auth و Tenant
 
 - ورود عادی، OTP اشتباه، expiry، resend، 5 تلاش و قفل.
-- حالت تست روشن: نمایش 1234 و ورود حساب فعال؛ حالت خاموش: نبود کامل test fields و عدم پذیرش فرضی 1234.
-- حساب غیرفعال، `app_access` خاموش در حالت عادی، token منقضی و tenant اشتباه.
+- خطای ارسال پیامک و امکان درخواست مجدد فوری.
+- حساب غیرفعال، `app_access` خاموش، token منقضی و tenant اشتباه.
 - ورود مجدد همان installation و ورود هم‌زمان دو دستگاه.
 
 ### SIP

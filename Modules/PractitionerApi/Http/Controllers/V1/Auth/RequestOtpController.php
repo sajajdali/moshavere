@@ -18,13 +18,10 @@ class RequestOtpController
      *
      * کد چهاررقمی ورود را با قالب پیامک login سامانه برای پزشک یا مشاور فعال همین
      * Tenant ارسال می‌کند. کد 120 ثانیه اعتبار دارد و ارسال مجدد پس از 60 ثانیه
-     * مجاز است. حساب ناموجود، غیرفعال یا فاقد app_access پاسخ 403 دریافت می‌کند؛
-     * فقط ورود تستی فعال، شرط app_access را برای پزشک/مشاور فعال نادیده می‌گیرد.
+     * مجاز است. حساب ناموجود، غیرفعال یا فاقد app_access پاسخ 403 دریافت می‌کند.
      */
-    #[ApiResponse(202, 'در حالت عادی کد پیامک می‌شود. فقط هنگام فعال‌بودن ورود تستی، test_mode و test_code نیز برگردانده می‌شوند و پیامکی ارسال نمی‌شود.', type: 'array{message: string, data: array{expires_in: int, resend_after: int, test_mode?: bool, test_code?: string}}', examples: [[
+    #[ApiResponse(202, 'کد ورود با الگوی پیامک ورود تنظیمات سامانه ارسال شد.', type: 'array{message: string, data: array{expires_in: int, resend_after: int}}', examples: [[
         'message' => 'کد ورود ارسال شد.', 'data' => ['expires_in' => 120, 'resend_after' => 60],
-    ], [
-        'message' => 'ورود تستی فعال است.', 'data' => ['expires_in' => 120, 'resend_after' => 60, 'test_mode' => true, 'test_code' => '1234'],
     ]])]
     #[ApiResponse(403, 'پزشک یا مشاور فعال نیست یا دسترسی اپلیکیشن ندارد.', type: 'array{message: string}', examples: [[
         'message' => 'حساب فعال پزشک یا مشاور برای این شماره یافت نشد.',
@@ -42,21 +39,18 @@ class RequestOtpController
     #[Header('Retry-After', 'تعداد ثانیه تا امکان درخواست بعدی.', type: 'int', example: 45, status: 429)]
     public function __invoke(RequestOtpRequest $request, PractitionerOtpService $otp): JsonResponse
     {
-        $result = $otp->request(
+        $otp->request(
             $request->validated('mobile'),
             $request->validated('device_identifier'),
             $request->ip(),
         );
 
         return response()->json([
-            'message' => $result['test_mode'] ? 'ورود تستی فعال است.' : 'کد ورود ارسال شد.',
+            'message' => 'کد ورود ارسال شد.',
             'data' => [
                 'expires_in' => (int) config('practitionerapi.otp.ttl_seconds', 120),
                 'resend_after' => (int) config('practitionerapi.otp.resend_after_seconds', 60),
-            ] + ($result['test_mode'] ? [
-                'test_mode' => true,
-                'test_code' => $result['test_code'],
-            ] : []),
+            ],
         ], Response::HTTP_ACCEPTED);
     }
 }

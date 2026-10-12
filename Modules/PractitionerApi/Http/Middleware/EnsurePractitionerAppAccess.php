@@ -6,7 +6,6 @@ use Closure;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Modules\OnlineConsultation\Models\ConsultationPractitioner;
-use Modules\OnlineConsultation\Models\ConsultationSetting;
 use Symfony\Component\HttpFoundation\Response;
 
 class EnsurePractitionerAppAccess
@@ -23,11 +22,10 @@ class EnsurePractitionerAppAccess
             return $this->forbidden('توکن اجازه دسترسی به اپلیکیشن پزشکان را ندارد.');
         }
 
-        $testLoginEnabled = (bool) ConsultationSetting::current()->test_login_enabled;
         $practitioner = ConsultationPractitioner::query()
             ->where('user_id', $user->id)
             ->where('active', true)
-            ->when(! $testLoginEnabled, fn ($query) => $query->where('app_access', true))
+            ->where('app_access', true)
             ->first();
 
         if (! $practitioner) {

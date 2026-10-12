@@ -20,7 +20,7 @@ class VerifyOtpController
      * device_identifier توکن قبلی همان نصب را باطل می‌کند، اما سایر دستگاه‌ها فعال
      * می‌مانند. زمان expires_at به ISO-8601 همراه offset برگردانده می‌شود.
      */
-    #[ApiResponse(200, 'ورود موفق، صدور Bearer token و اطلاعات کامل ثبت SIP. password محرمانه است و نباید log یا خارج از حافظه امن نگهداری شود. test_mode و test_code فقط در حالت ورود تستی فعال برمی‌گردند.', type: 'array{message: string, data: array{token_type: string, access_token: string, expires_at: string, practitioner: array{id: int, user_id: int, display_name: string, kind: string, specialty: string|null, availability: string, softphone: array{configured: bool, server_address: string|null, server_host: string|null, server_port: int, transport: string, extension: string|null, username: string|null, password: string|null, missing_fields: list<string>}}, test_mode?: bool, test_code?: string}}', examples: [[
+    #[ApiResponse(200, 'ورود موفق، صدور Bearer token و اطلاعات کامل ثبت SIP. password محرمانه است و نباید log یا خارج از حافظه امن نگهداری شود.', type: 'array{message: string, data: array{token_type: string, access_token: string, expires_at: string, practitioner: array{id: int, user_id: int, display_name: string, kind: string, specialty: string|null, availability: string, softphone: array{configured: bool, server_address: string|null, server_host: string|null, server_port: int, transport: string, extension: string|null, username: string|null, password: string|null, missing_fields: list<string>}}}}', examples: [[
         'message' => 'ورود با موفقیت انجام شد.',
         'data' => [
             'token_type' => 'Bearer',
@@ -35,14 +35,6 @@ class VerifyOtpController
                 'availability' => 'offline',
                 'softphone' => ['configured' => true, 'server_address' => 'https://voip.example.test:2214', 'server_host' => 'voip.example.test', 'server_port' => 5061, 'transport' => 'tls', 'extension' => '102', 'username' => 'advisor102', 'password' => 'individual-sip-password', 'missing_fields' => []],
             ],
-        ],
-    ], [
-        'message' => 'ورود با موفقیت انجام شد.',
-        'data' => [
-            'token_type' => 'Bearer', 'access_token' => '1|example-token',
-            'expires_at' => '2026-12-12T12:00:00+03:30',
-            'practitioner' => ['id' => 12, 'user_id' => 48, 'display_name' => 'دکتر نمونه', 'kind' => 'doctor', 'specialty' => null, 'availability' => 'offline', 'softphone' => ['configured' => true, 'server_address' => 'https://voip.example.test:2214', 'server_host' => 'voip.example.test', 'server_port' => 5061, 'transport' => 'tls', 'extension' => '102', 'username' => 'advisor102', 'password' => 'individual-sip-password', 'missing_fields' => []]],
-            'test_mode' => true, 'test_code' => '1234',
         ],
     ]])]
     #[ApiResponse(403, 'حساب پزشک هنگام تأیید کد غیرفعال یا دسترسی اپ آن لغو شده است.', type: 'array{message: string}', examples: [[
@@ -76,10 +68,7 @@ class VerifyOtpController
                 'access_token' => $result['token'],
                 'expires_at' => $result['expires_at'],
                 'practitioner' => $result['practitioner'],
-            ] + (($result['test_mode'] ?? false) ? [
-                'test_mode' => true,
-                'test_code' => $result['test_code'],
-            ] : []),
+            ],
         ]);
     }
 }

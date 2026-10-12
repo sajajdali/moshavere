@@ -494,13 +494,14 @@ class ConsultationTest extends TestCase
         $this->put('/admin/online-consultation/settings', $data)->assertSessionHasErrors('consent_required');
     }
 
-    public function test_test_login_setting_is_visible_and_can_be_enabled(): void
+    public function test_test_login_option_is_hidden_but_request_contract_is_kept(): void
     {
         $this->withoutMiddleware();
 
+        // گزینه از فرم حذف شده ولی فیلد درخواست (required|boolean) همچنان ارسال و پذیرفته میشود
         $settingsView = file_get_contents(module_path('OnlineConsultation', 'resources/views/settings.blade.php'));
-        $this->assertStringContainsString('ورود تستی', $settingsView);
-        $this->assertStringContainsString('۱۲۳۴', $settingsView);
+        $this->assertStringNotContainsString("'label' => 'ورود تستی'", $settingsView);
+        $this->assertStringContainsString('<input type="hidden" name="test_login_enabled" value="0">', $settingsView);
 
         $data = ConsultationSetting::current()->toArray();
         unset($data['id'], $data['created_at'], $data['updated_at']);

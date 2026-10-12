@@ -112,8 +112,7 @@ class PractitionerOtpServiceTest extends TestCase
         $practitioner = $this->practitioner();
         $service = app(PractitionerOtpService::class);
 
-        $requestResult = $service->request($practitioner->user->mobile, 'test-installation', '127.0.0.1');
-        $this->assertSame(['test_mode' => false], $requestResult);
+        $service->request($practitioner->user->mobile, 'test-installation', '127.0.0.1');
 
         $otpRequest = PractitionerOtpRequest::query()->firstOrFail();
         $code = null;
@@ -157,47 +156,69 @@ class PractitionerOtpServiceTest extends TestCase
         ]);
     }
 
-    public function test_enabled_test_login_uses_1234_without_sms_and_bypasses_personal_app_access(): void
+    public function test_legacy_test_login_flag_neither_skips_sms_nor_bypasses_app_access(): void
     {
         Notification::fake();
+        // مقدار قدیمی ذخیره شده در دیتابیس دیگر هیچ اثری ندارد
         ConsultationSetting::query()->whereKey(1)->update(['test_login_enabled' => true]);
-        $practitioner = $this->practitioner(['app_access' => false]);
+        $practitioner = $this->practitioner();
         $service = app(PractitionerOtpService::class);
 
-        $requestResult = $service->request($practitioner->user->mobile, 'test-mode-installation', '127.0.0.1');
+        $service->request($practitioner->user->mobile, 'installation', '127.0.0.1');
 
-        $this->assertSame(['test_mode' => true, 'test_code' => '1234'], $requestResult);
-        Notification::assertNothingSent();
-        $this->assertTrue(Hash::check('1234', PractitionerOtpRequest::query()->firstOrFail()->code_hash));
+        Notification::assertSentTo(PractitionerOtpRequest::query()->firstOrFail(), AuthSmsNotification::class);
 
-        $result = $service->verify(
-            $practitioner->user->mobile,
-            '1234',
-            $this->device('test-mode-installation'),
-        );
-
-        $this->assertTrue($result['test_mode']);
-        $this->assertSame('1234', $result['test_code']);
-        $this->assertNotNull(PersonalAccessToken::findToken($result['token']));
+        $practitioner->update(['app_access' => false]);
+        PractitionerOtpRequest::query()->delete();
+        try {
+            $service->request($practitioner->user->mobile, null, '127.0.0.1');
+            $this->fail('Practitioner without app access received an OTP.');
+        } catch (HttpException $exception) {
+            $this->assertSame(403, $exception->getStatusCode());
+        }
     }
 
-    public function test_disabled_test_login_neither_accepts_1234_nor_exposes_test_code(): void
+    public function test_fixed_code_1234_is_not_accepted(): void
     {
         Notification::fake();
         $practitioner = $this->practitioner();
         $service = app(PractitionerOtpService::class);
-        $requestResult = $service->request($practitioner->user->mobile, null, '127.0.0.1');
+        $service->request($practitioner->user->mobile, null, '127.0.0.1');
         PractitionerOtpRequest::query()->update(['code_hash' => Hash::make('9876')]);
-
-        $this->assertSame(['test_mode' => false], $requestResult);
-        $this->assertArrayNotHasKey('test_code', $requestResult);
 
         try {
             $service->verify($practitioner->user->mobile, '1234', $this->device());
-            $this->fail('Test code was accepted while test login was disabled.');
+            $this->fail('Fixed test code was accepted.');
         } catch (ValidationException) {
             $this->assertSame(1, PractitionerOtpRequest::query()->firstOrFail()->attempts);
         }
+    }
+
+    public function test_failed_sms_keeps_original_error_and_allows_immediate_retry(): void
+    {
+        $practitioner = $this->practitioner();
+        $this->app->instance(\Illuminate\Contracts\Notifications\Dispatcher::class, new class implements \Illuminate\Contracts\Notifications\Dispatcher {
+            public function send($notifiables, $notification)
+            {
+                throw new \RuntimeException('sms provider is down');
+            }
+
+            public function sendNow($notifiables, $notification, ?array $channels = null)
+            {
+                throw new \RuntimeException('sms provider is down');
+            }
+        });
+
+        try {
+            app(PractitionerOtpService::class)->request($practitioner->user->mobile, null, '127.0.0.1');
+            $this->fail('Failed SMS was reported as sent.');
+        } catch (\RuntimeException $exception) {
+            $this->assertSame('sms provider is down', $exception->getMessage());
+        }
+
+        $otpRequest = PractitionerOtpRequest::query()->firstOrFail();
+        $this->assertFalse($otpRequest->next_request_at->isFuture());
+        $this->assertTrue($otpRequest->expires_at->lte(now()));
     }
 
     public function test_inactive_or_app_disabled_practitioner_cannot_request_otp(): void

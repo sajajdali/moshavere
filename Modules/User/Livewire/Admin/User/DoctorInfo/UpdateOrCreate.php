@@ -11,6 +11,7 @@ use Modules\User\Enum\UserSpecialityType;
 use Modules\Speciality\app\Models\Speciality;
 use Modules\OnlineConsultation\Models\ConsultationPractitioner;
 use Modules\OnlineConsultation\Support\ConsultationAccess;
+use Illuminate\Validation\Rule;
 
 class UpdateOrCreate extends Component
 {
@@ -30,9 +31,18 @@ class UpdateOrCreate extends Component
             $profile = ConsultationPractitioner::firstOrNew(['user_id' => $this->user->id]);
             if ($this->onlineConsultant) {
                 $this->validate([
-                    'consultationExtension' => ['required', 'regex:/^[0-9]{1,20}$/'],
+                    'consultationExtension' => [
+                        'required',
+                        'regex:/^[0-9]{1,20}$/',
+                        Rule::unique('consultation_practitioners', 'extension')->ignore($profile->getKey()),
+                    ],
                     'consultationHourlyRate' => ['required', 'integer', 'min:0', 'max:1000000000'],
-                ], [], ['consultationExtension' => 'داخلی', 'consultationHourlyRate' => 'هزینه یک ساعت مشاوره']);
+                ], [
+                    'consultationExtension.unique' => 'این داخلی قبلاً استفاده شده است.',
+                ], [
+                    'consultationExtension' => 'داخلی',
+                    'consultationHourlyRate' => 'هزینه یک ساعت مشاوره',
+                ]);
                 $profile->fill([
                     'display_name' => $profile->display_name ?: $this->user->fullName,
                     'kind' => $profile->kind ?: 'doctor',

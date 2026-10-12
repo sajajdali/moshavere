@@ -327,6 +327,29 @@ class PractitionerProfileSettingsTest extends TestCase
             ->assertJsonValidationErrors('date');
     }
 
+    public function test_dashboard_and_appointment_list_include_in_person_appointments(): void
+    {
+        Carbon::setTestNow(Carbon::parse('2026-09-13 10:00:00', 'Asia/Tehran'));
+        $appointment = $this->createAppointment(
+            '09125550110',
+            '2026-09-13 11:00:00',
+            'OWN-IN-PERSON',
+            kind: 1,
+        );
+
+        $this->getJson('/api/practitioner/v1/dashboard?date=2026-09-13')
+            ->assertOk()
+            ->assertJsonPath('data.next_appointment.id', $appointment)
+            ->assertJsonPath('data.today_stats.total', 1)
+            ->assertJsonPath('data.empty_state.show', false);
+
+        $this->getJson('/api/practitioner/v1/appointments?scope=all')
+            ->assertOk()
+            ->assertJsonPath('meta.total', 1)
+            ->assertJsonPath('data.0.id', $appointment)
+            ->assertJsonPath('data.0.file_no', 'OWN-IN-PERSON');
+    }
+
     public function test_appointment_list_filters_searches_and_paginates_only_owned_records(): void
     {
         Carbon::setTestNow(Carbon::parse('2026-09-13 10:00:00', 'Asia/Tehran'));
@@ -868,12 +891,18 @@ class PractitionerProfileSettingsTest extends TestCase
         $this->assertSame('/appointments/42', $payload['link']);
     }
 
-    private function createAppointment(string $mobile, string $dateVisit, string $trackingCode, int $status = 1): int
+    private function createAppointment(
+        string $mobile,
+        string $dateVisit,
+        string $trackingCode,
+        int $status = 1,
+        int $kind = 3,
+    ): int
     {
         $patient = User::query()->create(['mobile' => $mobile, 'password' => 'password']);
         return DB::table('appointment_users')->insertGetId([
             'user_id' => $patient->id, 'doctor_id' => $this->practitioner->user_id,
-            'kind' => 3, 'status' => $status, 'tracking_code' => $trackingCode,
+            'kind' => $kind, 'status' => $status, 'tracking_code' => $trackingCode,
             'date_visit' => $dateVisit, 'start_time' => substr($dateVisit, 11),
             'end_time' => Carbon::parse($dateVisit)->addMinutes(30)->format('H:i:s'),
             'created_at' => now(), 'updated_at' => now(),

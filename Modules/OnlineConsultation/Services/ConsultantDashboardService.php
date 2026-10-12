@@ -73,10 +73,18 @@ class ConsultantDashboardService
         return $options;
     }
 
-    public function query(Carbon $from, Carbon $to, ?int $practitionerId = null): Builder
+    public function query(
+        Carbon $from,
+        Carbon $to,
+        ?int $practitionerId = null,
+        bool $includeInPerson = false,
+    ): Builder
     {
         return AppointmentUser::query()
-            ->whereIn('kind', [AppointmentUserKindEnum::ONLINE->value, AppointmentUserKindEnum::VOIP->value])
+            ->when(! $includeInPerson, fn (Builder $query) => $query->whereIn('kind', [
+                AppointmentUserKindEnum::ONLINE->value,
+                AppointmentUserKindEnum::VOIP->value,
+            ]))
             ->where('status', '<>', AppointmentUserStatusEnum::STATUS_CANCEL->value)
             ->whereBetween('date_visit', [$from, $to])
             ->whereHas('doctor', fn (Builder $q) => $q->whereHas('consultationPractitioner', fn (Builder $p) => $p->where('active', true)))

@@ -74,7 +74,12 @@ class PractitionerAppointmentService
 
     private function query(ConsultationPractitioner $practitioner): Builder
     {
-        return $this->consultations->query(Carbon::create(2000, 1, 1), Carbon::create(2100, 1, 1), $practitioner->user_id)
+        return $this->consultations->query(
+            Carbon::create(2000, 1, 1),
+            Carbon::create(2100, 1, 1),
+            $practitioner->user_id,
+            includeInPerson: true,
+        )
             ->with(['user', 'service:id,title', 'place:id,title', 'callLogs', 'billingRecord.adjustments', 'consultationCase'])
             ->withCount('consultationReports');
     }

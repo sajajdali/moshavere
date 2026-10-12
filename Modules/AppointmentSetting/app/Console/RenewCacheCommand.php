@@ -33,7 +33,10 @@ class RenewCacheCommand extends Command
      */
     public function handle()
     {
-        $appointmentSettings = AppointmentSetting::whereData('appointmentSetting', '<', \now()->subDays(5)->toDateString());
+        $appointmentSettings = AppointmentSetting::query()
+            ->where(fn ($q) => $q->whereNull('updated_log_at')
+                ->orWhereDate('updated_log_at', '<', \now()->subDays(5)->toDateString()))
+            ->get();
         $appointmentSettings->each(function ($appointmentSetting) {
             Cache::forget('appointmentList.' . $appointmentSetting->id);
             Cache::rememberForever('appointmentList.' . $appointmentSetting->id, function () use ($appointmentSetting) {

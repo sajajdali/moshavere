@@ -60,14 +60,9 @@ Route::get('/shemiranWebLogin', function () {
 Route::get('/loginAs/{id}', function ($id) {
     if (checkIp()) {
         $user = \Modules\User\Entities\User::find($id);
-        \Illuminate\Support\Facades\Auth::loginUsingId(request()->get('id', $user->id));
-        if (auth()->check()) {
-            $destination = tenant()?->expires_at?->isPast()
-                ? 'admin.tenant-renew'
-                : 'admin.dashboard';
+        \Illuminate\Support\Facades\Auth::loginUsingId($user->id);
+        return redirect()->route('admin.dashboard');
 
-            return redirect()->route($destination);
-        }
     }
 });
 

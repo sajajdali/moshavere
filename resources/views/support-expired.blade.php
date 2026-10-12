@@ -16,7 +16,7 @@
         <div class="date"><span>تاریخ پایان پشتیبانی:</span><strong>{{ verta($expiredTenant->expires_at)->format('Y/m/d') }}</strong></div>
     @endif
     <div class="actions">
-        <a class="btn primary" href="/shemiranWebLogin">ورود مدیریت و تمدید</a>
+        {{-- <a class="btn primary" href="/shemiranWebLogin">ورود مدیریت و تمدید</a> --}}
         <a class="btn secondary" href="javascript:location.reload()">بررسی مجدد وضعیت</a>
     </div>
 </section></main>

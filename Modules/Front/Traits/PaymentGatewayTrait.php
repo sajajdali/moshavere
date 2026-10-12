@@ -156,6 +156,14 @@ trait PaymentGatewayTrait
     }
 
     /**
+     * برای تست درگاه از آی پی های مجاز (checkIp) مبلغ ۱۵۰۰ تومان (۱۵۰۰۰ ریال) پرداخت میشود.
+     */
+    protected function payableGatewayAmount(int $amount): int
+    {
+        return checkIp() ? 15000 : $amount;
+    }
+
+    /**
      * مبالغ سایت به ریال است؛ درایورهایی که واحدشان تومان تنظیم شده خودشان مبلغ را ×۱۰ میکنند.
      */
     protected function gatewayAmount(string $gateway, int $amount): int

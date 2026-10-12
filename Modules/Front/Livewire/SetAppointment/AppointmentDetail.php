@@ -184,9 +184,6 @@ class AppointmentDetail extends Component
     public function GotoPayment()
     {
         $amount = $this->payableAmount();
-        if (checkIp()) {
-            $amount = 1500;
-        }
         $activeGateway = $this->activePaymentGateway();
         $t_data = [
             'amount' => $this->payableAmount(),
@@ -206,7 +203,7 @@ class AppointmentDetail extends Component
         $callbackUrl = route('front.setAppointment.detail', ['tracking_code' => $this->fetchData['app']->tracking_code, 'call_back' => true]);
         $description = 'کاربر پرداخت کننده : ' . $this->fetchData['app']->user?->full_name ?? 'بدون نام' . 'شماره تماس: ' . $this->fetchData['app']->user?->mobile ?? 'بدون موبایل' . 'شماره ردیف: ' . $this->fetchData['app']->id;
         $transaction =   $this->createTransaction($t_data);
-        $payment = $this->purchaseFromGateway($activeGateway, (int) $amount, $description, $callbackUrl, $this->fetchData['app']->user?->mobile);
+        $payment = $this->purchaseFromGateway($activeGateway, $this->payableGatewayAmount((int) $amount), $description, $callbackUrl, $this->fetchData['app']->user?->mobile);
         if (! $payment) {
             return;
         }
@@ -478,12 +475,9 @@ class AppointmentDetail extends Component
                     $this->fetchData['app']->details,
                     AppointmentUser::DETAIL_PAYMENT . '.' . AppointmentUser::DETAIL_PAYMENT_PRICE . '.int'
                 );
-                if (checkIp()) {
-                    $amount = (int) 1500;
-                }
                 $receipt = $this->verifyGatewayPayment(
                     $activeGateway,
-                    $amount,
+                    $this->payableGatewayAmount($amount),
                     $this->fetchData['app']->transaction->detail['transactionId']
                 );
                 DB::transaction(function () use ($receipt, $activeGateway) {

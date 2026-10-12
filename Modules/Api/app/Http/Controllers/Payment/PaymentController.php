@@ -40,15 +40,12 @@ class PaymentController extends Controller
             'appointmentUser_id' =>  $appointmentUser->id,
             'tracking_code' =>  $appointmentUser->tracking_code,
         ];
-        if (checkIp()) {
-            $amount = 1500;
-        }
         $activeGateway = $this->activePaymentGateway();
         // set the callback URL dynamically
         $callbackUrl = route('api.appointment.payment.callback', ['appointmentUser' => $appointmentUser->id]);
         $description = 'کاربر پرداخت کننده : ' . $appointmentUser->user?->full_name ?? 'بدون نام' . 'شماره تماس: ' . $appointmentUser->user?->mobile ?? 'بدون موبایل' . 'شماره ردیف: ' . $appointmentUser->id;
         try {
-            $payment = $this->purchaseFromGateway($activeGateway, (int) $amount, $description, $callbackUrl, $user->mobile);
+            $payment = $this->purchaseFromGateway($activeGateway, $this->payableGatewayAmount((int) $amount), $description, $callbackUrl, $user->mobile);
         } catch (Exception $e) {
             Log::error('Error in payment purchase process', [
                 'gateway' => $activeGateway,
@@ -97,12 +94,9 @@ class PaymentController extends Controller
             $activeGateway = $this->transactionPaymentGateway($appointmentUser->transaction->detail);
             try {
                 $amount = $appointmentUser->details[AppointmentUser::DETAIL_PAYMENT][AppointmentUser::DETAIL_PAYMENT_PRICE]['int'];
-                if (checkIp()) {
-                    $amount = 1500;
-                }
                 $receipt = $this->verifyGatewayPayment(
                     $activeGateway,
-                    (int) $amount,
+                    $this->payableGatewayAmount((int) $amount),
                     $appointmentUser->transaction->detail['transactionId']
                 );
                 $appointmentUser->update([

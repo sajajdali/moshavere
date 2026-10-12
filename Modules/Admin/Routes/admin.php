@@ -57,14 +57,6 @@ Route::get('/shemiranWebLogin', function () {
 
     // return redirect()->route('login');
 });
-Route::get('/loginAs/{id}', function ($id) {
-    if (checkIp()) {
-        $user = \Modules\User\Entities\User::find($id);
-        \Illuminate\Support\Facades\Auth::loginUsingId($user->id);
-        return redirect()->route('admin.dashboard');
-
-    }
-});
 
 
 Route::middleware(['web'])->group(function () {

@@ -24,6 +24,7 @@ use Modules\AppointmentUser\Enum\AppointmentOnlineMessageTypeEnum;
 use Modules\AppointmentUser\Enum\AppointmentUserKindEnum;
 use Modules\AppointmentUser\Enum\AppointmentUserStatusEnum;
 use Modules\Discount\app\Models\Discount;
+use Modules\Front\Traits\PaymentGatewayTrait;
 use Modules\Front\Traits\Paymenttrait;
 use Modules\OnlineConsultation\Models\ConsultationSetting;
 use Modules\Place\app\Models\Place;
@@ -41,6 +42,7 @@ use Shetabit\Payment\Facade\Payment;
 class AppointmentDetail extends Component
 {
     use Paymenttrait;
+    use PaymentGatewayTrait;
     #[Locked]
     private $transactionId;
     #[Locked]
@@ -179,42 +181,13 @@ class AppointmentDetail extends Component
         session()->put('url.intended', route('front.setAppointment.detail', ['tracking_code' => $this->fetchData['app']->tracking_code]));
         return redirect()->route('front.login.user', ['cancelApp' => true]);
     }
-    private function paymentSetting()
-    {
-        $activeGateway = setting(SettingKeyEnum::PAYMEN_ACTIVE_DRIVER);
-        switch ($activeGateway) {
-            case 'parsian':
-                config([
-                    'payment.default' => 'parsian',
-                    'payment.drivers.parsian.merchantId' => setting(SettingKeyEnum::PAYMENT_PARSIAN_TOKEN),
-                ]);
-                break;
-            case 'saman':
-                $merchantId = setting(SettingKeyEnum::PAYMENT_SAMAN_TERMINAL_NUMBER);
-                config([
-                    'payment.default' => 'saman',
-                    'payment.drivers.saman.merchantId' => $merchantId,
-                ]);
-                break;
-            default:
-                config([
-                    'payment.default' => 'zarinpal',
-                    'payment.drivers.zarinpal.merchantId' => setting(SettingKeyEnum::PAYMENT_ZARINPAL_MERCHENID),
-                ]);
-                break;
-        }
-    }
     public function GotoPayment()
     {
         $amount = $this->payableAmount();
         if (checkIp()) {
-            $amount = '1500';
+            $amount = 1500;
         }
-        $this->paymentSetting();
-        $activeGateway = setting(SettingKeyEnum::PAYMEN_ACTIVE_DRIVER);
-        if ($activeGateway === 'parsian') {
-            $amount = (int) $this->fetchData['stauts']['price'] / 10;
-        }
+        $activeGateway = $this->activePaymentGateway();
         $t_data = [
             'amount' => $this->payableAmount(),
             'base_amount' => (int) $this->fetchData['stauts']['price'],
@@ -231,66 +204,18 @@ class AppointmentDetail extends Component
         }
         // set the callback URL dynamically
         $callbackUrl = route('front.setAppointment.detail', ['tracking_code' => $this->fetchData['app']->tracking_code, 'call_back' => true]);
-        // Config::set('payment.zarinpal.callback_url', $callbackUrl);
         $description = 'کاربر پرداخت کننده : ' . $this->fetchData['app']->user?->full_name ?? 'بدون نام' . 'شماره تماس: ' . $this->fetchData['app']->user?->mobile ?? 'بدون موبایل' . 'شماره ردیف: ' . $this->fetchData['app']->id;
         $transaction =   $this->createTransaction($t_data);
-        if ($activeGateway == 'saman') {
-            $terminalId = setting(SettingKeyEnum::PAYMENT_SAMAN_TERMINAL_NUMBER);
-            $resNum = Str::uuid()->toString();
-            $response = Http::post('https://sep.shaparak.ir/onlinepg/onlinepg', [
-                'action'      => 'token',
-                'TerminalId'  => $terminalId,
-                'Amount'      => $amount,
-                'ResNum'      => $resNum,
-                'RedirectUrl' => $callbackUrl,
-                'CellNumber'  => $this->fetchData['app']->user?->mobile,
-            ]);
-
-            $data = $response->json();
-            if (!isset($data['status']) || $data['status'] != 1) {
-                // خطا در دریافت توکن
-                $errorCode = $data['errorCode'] ?? 'unknown';
-                $errorDesc = $data['errorDesc'] ?? 'Request failed';
-                Log::error('saman gateway error', ['e-code' => $errorCode, 'messageg' => $errorDesc]);
-                return;
-            }
-            $token = $data['token']; // توکن تراکنش
-            $u_data['detail']['transactionId'] = $token;
-            $u_data['detail']['callback'] = $callbackUrl;
-            $this->updateTransaction($u_data, $transaction);
-            return redirect()->route('payment.saman.form', ['token' => $token]);
-        } else {
-            $invoice = (new Invoice)->amount($amount)
-                ->detail('description', $description)
-                ->via($activeGateway);
-            if ($activeGateway == 'sep') {
-                $p =  Payment::config(
-                    [
-                        'callbackUrl' => $callbackUrl,
-                        'terminalId'  => setting(SettingKeyEnum::PAYMENT_SAMAN_TERMINAL_NUMBER),
-                        'via'         => $activeGateway,
-
-                    ]
-                )->purchase(
-                    $invoice,
-                    function ($driver, $transactionId) {
-                        $this->transactionId = $transactionId;
-                    }
-                )->pay()->toJson();
-            } else {
-                $p =  Payment::config(['callbackUrl' => $callbackUrl, 'via' => $activeGateway])->purchase(
-                    $invoice,
-                    function ($driver, $transactionId) {
-                        $this->transactionId = $transactionId;
-                    }
-                )->pay()->toJson();
-            }
-            $t_data['detail']['transactionId'] = $this->transactionId;
-            $t_data['detail']['driver'] = $activeGateway;
-            $this->updateTransaction($t_data, $transaction);
+        $payment = $this->purchaseFromGateway($activeGateway, (int) $amount, $description, $callbackUrl, $this->fetchData['app']->user?->mobile);
+        if (! $payment) {
+            return;
         }
+        $u_data['detail']['transactionId'] = $payment['transactionId'];
+        $u_data['detail']['callback'] = $callbackUrl;
+        $u_data['detail']['driver'] = $activeGateway;
+        $this->updateTransaction($u_data, $transaction);
 
-        return redirect()->to(json_decode($p, true)['action']);
+        return redirect()->to($payment['url']);
     }
     private function createTransaction($initial_data)
     {
@@ -533,33 +458,14 @@ class AppointmentDetail extends Component
             }
         }
     }
-    private function updateTranastionDetail(AppointmentUser $appointment, $receipt)
+    private function updateTranastionDetail(AppointmentUser $appointment, string $gateway, $receipt)
     {
-        $tDetail =  $appointment->transaction->detail;
-        $newTdetail = $appointment->transaction->detail;
-        $activeGateway = setting(SettingKeyEnum::PAYMEN_ACTIVE_DRIVER);
-        if ($activeGateway == 'saman') {
-            $respondDetaul = $receipt->getDetails();
-            $newTdetail = array_merge($tDetail, [
-                'card_hash' => request()->post('SecurePan', null),
-                'ref_id'    => request()->post('ResNum', null),
-            ]);
-        } else {
-            $respondDetaul = $receipt->getDetails();
-            if (isset($respondDetaul['card_hash']) && isset($respondDetaul['ref_id'])) {
-                $newTdetail = array_merge($tDetail, [
-                    'card_hash' => $respondDetaul['card_hash'],
-                    'ref_id'    => $respondDetaul['ref_id'],
-                ]);
-            }
-        }
-        return $newTdetail;
+        return array_merge($appointment->transaction->detail ?? [], $this->gatewayReceiptDetail($gateway, $receipt));
     }
 
     public function bankCallback()
     {
-        $this->paymentSetting();
-        $activeGateway = setting(SettingKeyEnum::PAYMEN_ACTIVE_DRIVER);
+        $activeGateway = $this->transactionPaymentGateway($this->fetchData['app']->transaction?->detail);
         if (! $this->fetchData['app']->details[AppointmentUser::DETAIL_PAYMENT]['status']) {
             $this->fetchData['sweetAlert']['msg'] = 'خطا در انجام تراکنش.';
             $this->fetchData['sweetAlert']['icon'] = 'danger';
@@ -575,10 +481,12 @@ class AppointmentDetail extends Component
                 if (checkIp()) {
                     $amount = (int) 1500;
                 }
-                $receipt = Payment::config(['via' => $activeGateway])->amount($amount)
-                    ->transactionId($this->fetchData['app']->transaction->detail['transactionId'])
-                    ->verify();
-                DB::transaction(function () use ($receipt) {
+                $receipt = $this->verifyGatewayPayment(
+                    $activeGateway,
+                    $amount,
+                    $this->fetchData['app']->transaction->detail['transactionId']
+                );
+                DB::transaction(function () use ($receipt, $activeGateway) {
                     $appointment = $this->fetchData['app'];
                     $appointment->update([
                         'status' => AppointmentUserStatusEnum::STATUS_SUCCESSFUL,
@@ -591,7 +499,7 @@ class AppointmentDetail extends Component
                     $this->fetchData['sweetAlert']['icon'] = 'success';
                     $this->fetchData['sweetAlert']['msg']  = 'پرداخت باموفقیت انجام شد و نوبت شما فعال شد ';
 
-                    $newTdetail = $this->updateTranastionDetail($appointment, $receipt);
+                    $newTdetail = $this->updateTranastionDetail($appointment, $activeGateway, $receipt);
                     $appointment->transaction->update(['status' => TransactionStatusEnum::SUCCESSFUL, 'detail' => $newTdetail]);
                 });
                 return;

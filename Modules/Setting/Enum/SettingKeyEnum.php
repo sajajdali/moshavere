@@ -145,6 +145,9 @@ enum SettingKeyEnum: int implements EnumHasNameInterface, SettingTypeInterface, 
     case PAYMENT_SAMAN_TERMINAL_NUMBER = 162;
     case PAYMENT_SAMAN_TERMINAL_PASS = 163;
     case PAYMENT_SEP_TERMINAL_ID = 164;
+    case PAYMENT_SADAD_MERCHANT_ID = 165;
+    case PAYMENT_SADAD_TERMINAL_ID = 166;
+    case PAYMENT_SADAD_KEY = 169;
     case GO_TO_PAYMENT_DIRECTLY = 167;
 
 
@@ -368,6 +371,9 @@ enum SettingKeyEnum: int implements EnumHasNameInterface, SettingTypeInterface, 
             self::PAYMENT_SAMAN_TERMINAL_NUMBER => 'شماره ترمینال سامان(MID)',
             self::PAYMENT_SAMAN_TERMINAL_PASS => 'رمز ترمینال سامان',
             self::PAYMENT_SEP_TERMINAL_ID => 'شماره ترمینال سپ',
+            self::PAYMENT_SADAD_MERCHANT_ID => 'شماره پذیرنده سداد (Merchant ID)',
+            self::PAYMENT_SADAD_TERMINAL_ID => 'شماره ترمینال سداد (Terminal ID)',
+            self::PAYMENT_SADAD_KEY => 'کلید ترمینال سداد (Terminal Key)',
             self::GO_TO_PAYMENT_DIRECTLY => 'انتقال مستقیم به درگاه بعد از انتخاب گزینه تایید نوبت',
 
             // headers
@@ -498,6 +504,7 @@ enum SettingKeyEnum: int implements EnumHasNameInterface, SettingTypeInterface, 
             self::SMS_PARSSMS_LOGIN_TEXT => 'شامل یک پارامتر که کد ارسالی است میباشد.',
             self::PAYMENT_PARSIAN_TOKEN => '<span class="my-3"></span>',
             self::PAYMENT_SAMAN_TERMINAL_PASS => '<span class="my-3"></span>',
+            self::PAYMENT_SADAD_KEY => 'کلید ترمینال (Base64) که از بانک ملی دریافت شده است.',
             self::ACTIVE_JIBIT => 'در حال توسعه...',
             self::LOGIN_WITHOUT_OTP => 'اخطار امنیتی: با فعال کردن این ویژگی، هر شخصی میتواند با هر شماره ای وارد سیستم شده و نوبت های مربوط به هر شماره را مشاهده کند!!!!!',
             self::SMS_FARAZ_LINE_NUMBER => 'الزامی برای ارسال توسط فراز و آیپی پنل',
@@ -663,6 +670,7 @@ enum SettingKeyEnum: int implements EnumHasNameInterface, SettingTypeInterface, 
             self::PAYMENT_PARSIAN_TOKEN => 'درگاه پارسیان',
             self::PAYMENT_SAMAN_TERMINAL_NUMBER => 'درگاه سامان',
             self::PAYMENT_SEP_TERMINAL_ID => 'درگاه سپ(درگاه سامان کیش)',
+            self::PAYMENT_SADAD_MERCHANT_ID => 'درگاه سداد (بانک ملی)',
             self::PAYMENT_RULES_AND_CONDITION_STATUS => 'شرایط و قوانین پرداخت',
             self::LOGIN_WITHOUT_OTP => 'دارای حساسیت امنیتی',
             self::GO_TO_PAYMENT_DIRECTLY => 'تنظیمات UX',
@@ -719,6 +727,7 @@ enum SettingKeyEnum: int implements EnumHasNameInterface, SettingTypeInterface, 
                 'saman' => 'سامان',
                 'sep' => 'سپ',
                 'zibal' => 'زیبال',
+                'sadad' => 'سداد (بانک ملی)',
             ],
             default => []
         };

@@ -2,11 +2,11 @@
 
 namespace Modules\Api\App\Http\Controllers\Payment;
 
+use Exception;
 use Illuminate\Http\Request;
-use Shetabit\Multipay\Invoice;
 use App\Http\Controllers\Controller;
-use Shetabit\Payment\Facade\Payment;
-use Illuminate\Support\Facades\Config;
+use Illuminate\Support\Facades\Log;
+use Modules\Front\Traits\PaymentGatewayTrait;
 use Modules\Api\Trait\ApiHandlerTrait;
 use Modules\Setting\Enum\SettingKeyEnum;
 use Modules\Transaction\app\Models\Transaction;
@@ -25,7 +25,7 @@ use Modules\AppointmentUser\app\Notifications\AppointmentDocAndOperatorNotificat
 class PaymentController extends Controller
 {
     use ApiHandlerTrait;
-    private $transactionId;
+    use PaymentGatewayTrait;
     public function createPaymentLink(AppointmentUser $appointmentUser)
     {
         if ($appointmentUser->status == AppointmentUserStatusEnum::STATUS_SUCCESSFUL) {
@@ -40,32 +40,31 @@ class PaymentController extends Controller
             'appointmentUser_id' =>  $appointmentUser->id,
             'tracking_code' =>  $appointmentUser->tracking_code,
         ];
+        if (checkIp()) {
+            $amount = 1500;
+        }
+        $activeGateway = $this->activePaymentGateway();
         // set the callback URL dynamically
         $callbackUrl = route('api.appointment.payment.callback', ['appointmentUser' => $appointmentUser->id]);
-        // Config::set('payment.zarinpal.callback_url', $callbackUrl);
         $description = 'کاربر پرداخت کننده : ' . $appointmentUser->user?->full_name ?? 'بدون نام' . 'شماره تماس: ' . $appointmentUser->user?->mobile ?? 'بدون موبایل' . 'شماره ردیف: ' . $appointmentUser->id;
-        $invoice = (new Invoice)->amount($amount)->detail('description', $description)->via(setting(SettingKeyEnum::PAYMEN_ACTIVE_DRIVER));
-        // Retrieve json format of Redirection (in this case you can handle redirection to bank gateway)
-        // $merchenId = setting(SettingKeyEnum::PAYMENT_ZARINPAL_MERCHENID);
-        // $p = Payment::config(['callbackUrl' => $callbackUrl, 'mechandId' => $merchenId])->purchase(
-        //     $invoice,
-        //     function ($driver, $transactionId) {
-        //         $this->transactionId = $transactionId;
-        //     }
-        // )->pay()->toJson();
-        $p =   Payment::callbackUrl($callbackUrl)->purchase(
-            $invoice,
-            function ($driver, $transactionId) {
-                $this->transactionId = $transactionId;
-            }
-        )->pay()->toJson();
+        try {
+            $payment = $this->purchaseFromGateway($activeGateway, (int) $amount, $description, $callbackUrl, $user->mobile);
+        } catch (Exception $e) {
+            Log::error('Error in payment purchase process', [
+                'gateway' => $activeGateway,
+                'error_message' => $e->getMessage(),
+            ]);
+            $payment = null;
+        }
+        if (! $payment) {
+            return redirect()->route('front.setAppointment.detail', ['tracking_code' => $appointmentUser->tracking_code, 'msg' => 'خطا در اتصال به درگاه پرداخت']);
+        }
 
-        $t_data['detail']['transactionId'] = $this->transactionId;
+        $t_data['detail']['transactionId'] = $payment['transactionId'];
         $t_data['detail']['callback'] = $callbackUrl;
-
-        $t_data['detail']['driver'] = setting(SettingKeyEnum::PAYMEN_ACTIVE_DRIVER);
+        $t_data['detail']['driver'] = $activeGateway;
         $this->createTransaction($t_data);
-        return redirect()->to(json_decode($p, true)['action']);
+        return redirect()->to($payment['url']);
     }
     private function createTransaction($initial_data)
     {
@@ -94,25 +93,27 @@ class PaymentController extends Controller
     }
     public function callback(AppointmentUser $appointmentUser, Request $request)
     {
-        if ($appointmentUser->status == AppointmentUserStatusEnum::STATUS_WAIT_PAYMENT) {
+        if ($appointmentUser->status == AppointmentUserStatusEnum::STATUS_WAIT_PAYMENT && $appointmentUser->transaction) {
+            $activeGateway = $this->transactionPaymentGateway($appointmentUser->transaction->detail);
             try {
                 $amount = $appointmentUser->details[AppointmentUser::DETAIL_PAYMENT][AppointmentUser::DETAIL_PAYMENT_PRICE]['int'];
-                $receipt = Payment::amount($amount)
-                    ->transactionId($appointmentUser->transaction->detail['transactionId'])
-                    ->verify();
+                if (checkIp()) {
+                    $amount = 1500;
+                }
+                $receipt = $this->verifyGatewayPayment(
+                    $activeGateway,
+                    (int) $amount,
+                    $appointmentUser->transaction->detail['transactionId']
+                );
                 $appointmentUser->update([
-                    'status' => AppointmentUserStatusEnum::STATUS_SUCCESSFUL
+                    'status' => AppointmentUserStatusEnum::STATUS_SUCCESSFUL,
+                    'deadline_at' => null,
                 ]);
                 $smsTemplate = setting(SettingKeyEnum::SMS_APPOINTMENT_AFTER_PAYMENT);
                 if (isset($smsTemplate)) {
                     $appointmentUser->notify(new AppointmentSmsNotification($smsTemplate));
                 }
-                $tDetail =  $appointmentUser->transaction->detail;
-                $respondDetaul = $receipt->getDetails();
-                $newTdetail = array_merge($tDetail, [
-                    'card_hash' => $respondDetaul['card_hash'],
-                    'ref_id' => $respondDetaul['ref_id'],
-                ]);
+                $newTdetail = array_merge($appointmentUser->transaction->detail ?? [], $this->gatewayReceiptDetail($activeGateway, $receipt));
                 $appointmentUser->transaction->update(['status' => TransactionStatusEnum::SUCCESSFUL, 'detail' => $newTdetail]);
                 // if appointment is online
                 if ($appointmentUser->kind == AppointmentUserKindEnum::ONLINE) {
@@ -141,9 +142,17 @@ class PaymentController extends Controller
                 return redirect()->route('front.setAppointment.detail', ['tracking_code' => $appointmentUser->tracking_code, 'msg' => 'پرداخت با موفقیت انجام شد']);
             } catch (InvalidPaymentException $exception) {
                 $appointmentUser->transaction->update(['status' => TransactionStatusEnum::REJECTED]);
-                session()->flash('error', 'خطا در انجام تراکنش');
+                return redirect()->route('front.setAppointment.detail', ['tracking_code' => $appointmentUser->tracking_code, 'msg' => 'خطا در انجام تراکنش']);
+            } catch (Exception $e) {
+                Log::error('Error in payment verification process', [
+                    'gateway' => $activeGateway,
+                    'error_message' => $e->getMessage(),
+                    'stack_trace' => $e->getTraceAsString(),
+                ]);
                 return redirect()->route('front.setAppointment.detail', ['tracking_code' => $appointmentUser->tracking_code, 'msg' => 'خطا در انجام تراکنش']);
             }
         }
+
+        return redirect()->route('front.setAppointment.detail', ['tracking_code' => $appointmentUser->tracking_code]);
     }
 }

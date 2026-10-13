@@ -30,7 +30,7 @@ class PractitionerDashboardService
         $to = $selectedDate->copy()->endOfDay()->setTimezone(config('app.timezone'));
 
         $appointments = $this->consultations
-            ->query($from, $to, $practitioner->user_id)
+            ->query($from, $to, $practitioner->user_id, includeInPerson: true)
             ->with([
                 'user',
                 'service:id,title',
@@ -192,7 +192,12 @@ class PractitionerDashboardService
         $start = $selectedDate->copy()->subDays(3)->startOfDay();
         $end = $selectedDate->copy()->addDays(3)->endOfDay();
         $counts = $this->consultations
-            ->query($start->copy()->setTimezone(config('app.timezone')), $end->copy()->setTimezone(config('app.timezone')), $practitioner->user_id)
+            ->query(
+                $start->copy()->setTimezone(config('app.timezone')),
+                $end->copy()->setTimezone(config('app.timezone')),
+                $practitioner->user_id,
+                includeInPerson: true,
+            )
             ->get(['date_visit'])
             ->countBy(fn (AppointmentUser $appointment) => $appointment->date_visit->copy()->setTimezone($timezone)->toDateString());
 

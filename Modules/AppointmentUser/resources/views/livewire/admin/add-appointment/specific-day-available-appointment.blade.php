@@ -1,9 +1,18 @@
 @php
     $dayAppointments = $this->ShowListOfAppointmentForSpecificDay();
-    $bookedCount = collect($dayAppointments)
-        ->filter(fn($slot) => !$slot['status'] && !empty($slot['appointment_user_id']))
+    $occupiedSlots = collect($dayAppointments)
+        ->filter(fn($slot) => !$slot['status'] && !empty($slot['appointment_user_id']));
+    // load the day's appointments once: used for the booked counter and for each booked row below
+    $dayAppointmentUsers = Modules\AppointmentUser\app\Models\AppointmentUser::with('user')
+        ->whereIn('id', $occupiedSlots->pluck('appointment_user_id')->unique())
+        ->get()
+        ->keyBy('id');
+    // only confirmed appointments count as booked; cancelled / pending ones are left out
+    $bookedCount = $occupiedSlots
+        ->filter(fn($slot) => $dayAppointmentUsers->get($slot['appointment_user_id'])?->status ===
+            Modules\AppointmentUser\Enum\AppointmentUserStatusEnum::STATUS_SUCCESSFUL)
         ->count();
-    $freeCount = count($dayAppointments) - $bookedCount;
+    $freeCount = count($dayAppointments) - $occupiedSlots->count();
 
     // multiple appointments in one slot: number each entry inside its from/until group
     $multiPerHour = $fetchData['appointmentSetting']->appointmentsPerHour() > 1;
@@ -157,9 +166,7 @@
                             $inGroup = $groupSize > 1;
                             $multiClass = $inGroup ? 'sd-row-multi' . (($slotPosition[$key] ?? 1) > 1 ? ' sd-row-multi-next' : '') : '';
                             if (!$eachTime['status'] && !empty($eachTime['appointment_user_id'])) {
-                                $ap = Modules\AppointmentUser\app\Models\AppointmentUser::find(
-                                    $eachTime['appointment_user_id'],
-                                );
+                                $ap = $dayAppointmentUsers->get($eachTime['appointment_user_id']);
                                 $user = $ap?->user;
                             }
                         @endphp

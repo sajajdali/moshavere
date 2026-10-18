@@ -132,8 +132,8 @@ class SpecificDayAppointmentRegistrationModal extends Component
             $rules = [
                 'form.first_name' => 'required',
                 'form.last_name' => 'required',
-                'form.time.from' => 'required',
-                'form.time.until' => 'required',
+                'form.time.from' => ['required', 'regex:/^([01]\d|2[0-3]):[0-5]\d(:[0-5]\d)?$/'],
+                'form.time.until' => ['required', 'regex:/^([01]\d|2[0-3]):[0-5]\d(:[0-5]\d)?$/'],
             ];
 
             if (count($this->fetchData['appointment_kinds'] ?? []) > 1) {
@@ -391,6 +391,8 @@ class SpecificDayAppointmentRegistrationModal extends Component
             'form.last_name.required' => 'وارد کردن نام خانوادگی الزامی است',
             'form.time.from.required' => 'زمان نوبت به درستی انتخاب نشده است!',
             'form.time.until.required' => 'زمان پایان نوبت به درستی انتخاب نشده است!',
+            'form.time.from.regex' => 'زمان نوبت را به صورت ۲۴ ساعته (مثلاً 09:30) وارد کنید.',
+            'form.time.until.regex' => 'زمان پایان نوبت را به صورت ۲۴ ساعته (مثلاً 17:30) وارد کنید.',
             'form.kind.required' => 'لطفاً نوع نوبت را انتخاب کنید.',
             'form.kind.in' => 'نوع نوبت انتخاب‌شده معتبر نیست.',
             'form.payment_registration.required' => 'نحوه ثبت نوبت را انتخاب کنید.',

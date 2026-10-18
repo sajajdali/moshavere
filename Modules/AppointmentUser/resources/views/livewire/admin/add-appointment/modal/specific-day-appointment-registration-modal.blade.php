@@ -123,8 +123,77 @@
                         <section class="sar-section">
                             <div class="sar-section-title"><strong>زمان نوبت</strong><span></span></div>
                             <div class="sar-grid">
-                                <label class="sar-field" for="appointment-from"><span class="sar-label">از ساعت</span><input type="time" class="sar-input @error('form.time.from') is-invalid @enderror" id="appointment-from" wire:model="form.time.from">@error('form.time.from')<span class="sar-error">{{ $message }}</span>@enderror</label>
-                                <label class="sar-field" for="appointment-until"><span class="sar-label">تا ساعت</span><input type="time" class="sar-input @error('form.time.until') is-invalid @enderror" id="appointment-until" wire:model="form.time.until">@error('form.time.until')<span class="sar-error">{{ $message }}</span>@enderror</label>
+                                {{-- 24-hour time fields: a native type="time" input shows AM/PM on 12-hour locales.
+                                     Type HH:MM (auto-formatted) or tap an hour / minute in the popup. --}}
+                                <style>
+                                    .sar-tp{position:relative}
+                                    .sar-tp-input{text-align:center;letter-spacing:2px;font-variant-numeric:tabular-nums;direction:ltr}
+                                    .sar-tp-pop{position:absolute;top:calc(100% + 6px);inset-inline:0;z-index:30;padding:12px;border:1px solid #e0e3e8;border-radius:12px;background:#fff;box-shadow:0 10px 30px rgba(20,23,28,.14);direction:ltr}
+                                    .sar-tp-cap{margin:0 0 6px;font-size:11.5px;color:#6b7280;direction:rtl;text-align:right}
+                                    .sar-tp-grid{display:grid;grid-template-columns:repeat(6,1fr);gap:4px;margin-bottom:10px}
+                                    .sar-tp-grid:last-child{margin-bottom:0}
+                                    .sar-tp-cell{padding:7px 0;border:1px solid transparent;border-radius:8px;background:#f4f5f7;font-size:13px;color:#14171c;cursor:pointer;font-variant-numeric:tabular-nums}
+                                    .sar-tp-cell:hover{background:#e6f4f2}
+                                    .sar-tp-cell.on{background:#0d9488;color:#fff}
+                                </style>
+                                @foreach (['from' => ['appointment-from', 'از ساعت'], 'until' => ['appointment-until', 'تا ساعت']] as $timeKey => [$timeId, $timeLabel])
+                                    <div class="sar-field sar-tp"
+                                        x-data="{
+                                            t: $wire.entangle('form.time.{{ $timeKey }}'),
+                                            text: '',
+                                            open: false,
+                                            init() {
+                                                this.text = (this.t || '').slice(0, 5);
+                                                this.$watch('t', v => { if ((v || '').slice(0, 5) !== this.text) this.text = (v || '').slice(0, 5); });
+                                            },
+                                            get h() { return this.text.slice(0, 2) },
+                                            get m() { return this.text.slice(3, 5) },
+                                            format(raw) {
+                                                const fa = '۰۱۲۳۴۵۶۷۸۹', ar = '٠١٢٣٤٥٦٧٨٩';
+                                                let d = raw.replace(/[۰-۹٠-٩]/g, c => { const i = fa.indexOf(c); return i > -1 ? i : ar.indexOf(c); }).replace(/\D/g, '').slice(0, 4);
+                                                if (d.length === 1 && d > '2') d = '0' + d;
+                                                if (d.length >= 2 && +d.slice(0, 2) > 23) d = '23' + d.slice(2);
+                                                if (d.length >= 4 && +d.slice(2) > 59) d = d.slice(0, 2) + '59';
+                                                return d.length > 2 ? d.slice(0, 2) + ':' + d.slice(2) : d;
+                                            },
+                                            typed(e) {
+                                                this.text = this.format(e.target.value);
+                                                e.target.value = this.text;
+                                                this.t = this.text.length === 5 ? this.text : '';
+                                            },
+                                            finish() {
+                                                if (this.text.length === 1) this.text = '0' + this.text;
+                                                if (this.text.length === 2) this.text += ':00';
+                                                else if (this.text.length === 4) this.text += '0';
+                                                this.t = this.text.length === 5 ? this.text : '';
+                                            },
+                                            setHour(v) { this.text = v + ':' + (this.m.length === 2 ? this.m : '00'); this.t = this.text; },
+                                            setMinute(v) { this.text = (this.h.length === 2 ? this.h : '00') + ':' + v; this.t = this.text; this.open = false; }
+                                        }"
+                                        @click.outside="open = false" @keydown.escape="open = false">
+                                        <label class="sar-label" for="{{ $timeId }}">{{ $timeLabel }}</label>
+                                        <input type="text" id="{{ $timeId }}" inputmode="numeric" autocomplete="off" maxlength="5" placeholder="--:--"
+                                            class="sar-input sar-tp-input @error('form.time.' . $timeKey) is-invalid @enderror"
+                                            :value="text" @input="typed($event)" @focus="open = true" @blur="finish()" @keydown.enter="open = false">
+                                        <div class="sar-tp-pop" x-show="open" x-cloak x-transition.opacity.duration.100ms>
+                                            <p class="sar-tp-cap">ساعت</p>
+                                            <div class="sar-tp-grid">
+                                                @for ($hour = 0; $hour < 24; $hour++)
+                                                    <button type="button" class="sar-tp-cell" :class="{ on: h === '{{ sprintf('%02d', $hour) }}' }"
+                                                        @mousedown.prevent @click="setHour('{{ sprintf('%02d', $hour) }}')">{{ sprintf('%02d', $hour) }}</button>
+                                                @endfor
+                                            </div>
+                                            <p class="sar-tp-cap">دقیقه</p>
+                                            <div class="sar-tp-grid">
+                                                @foreach (range(0, 55, 5) as $minute)
+                                                    <button type="button" class="sar-tp-cell" :class="{ on: m === '{{ sprintf('%02d', $minute) }}' }"
+                                                        @mousedown.prevent @click="setMinute('{{ sprintf('%02d', $minute) }}')">{{ sprintf('%02d', $minute) }}</button>
+                                                @endforeach
+                                            </div>
+                                        </div>
+                                        @error('form.time.' . $timeKey)<span class="sar-error">{{ $message }}</span>@enderror
+                                    </div>
+                                @endforeach
                             </div>
                         </section>
 

@@ -62,6 +62,11 @@ enum UserMetaEnum: int implements EnumHasNameInterface
     case LEGACY_LATITUDE = 47;
     case LEGACY_LONGITUDE = 48;
 
+    // Patient file fields collected when an admin registers an appointment.
+    case FATHER_NAME = 49;
+    case MARITAL_STATUS = 50;
+    case ACQUAINTANCE = 51;
+
 
     public static function keys(): array
     {
@@ -81,6 +86,9 @@ enum UserMetaEnum: int implements EnumHasNameInterface
             self::DOCUMENT_NUMBER => 'شماره پرونده',
             self::NATIONAL_CODE => 'کد ملی',
             self::CITY => 'شهر',
+            self::FATHER_NAME => 'نام پدر',
+            self::MARITAL_STATUS => 'وضعیت تاهل',
+            self::ACQUAINTANCE => 'نحوه آشنایی با مرکز',
         };
     }
     public static function fromOldKey(string $oldKey, $userid): ?self

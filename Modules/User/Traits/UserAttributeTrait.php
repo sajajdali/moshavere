@@ -209,6 +209,30 @@ trait UserAttributeTrait
             set: fn($value) => $this->metas()->updateOrCreate(['meta_key' => $operator], ['meta_value' => $value])
         );
     }
+    public function fatherName(): Attribute
+    {
+        $operator = UserMetaEnum::FATHER_NAME;
+        return Attribute::make(
+            get: fn() => $this->getMeta($operator)?->meta_value,
+            set: fn($value) => $this->metas()->updateOrCreate(['meta_key' => $operator], ['meta_value' => $value])
+        );
+    }
+    public function maritalStatus(): Attribute
+    {
+        $operator = UserMetaEnum::MARITAL_STATUS;
+        return Attribute::make(
+            get: fn() => $this->getMeta($operator)?->meta_value,
+            set: fn($value) => $this->metas()->updateOrCreate(['meta_key' => $operator], ['meta_value' => $value])
+        );
+    }
+    public function acquaintance(): Attribute
+    {
+        $operator = UserMetaEnum::ACQUAINTANCE;
+        return Attribute::make(
+            get: fn() => $this->getMeta($operator)?->meta_value,
+            set: fn($value) => $this->metas()->updateOrCreate(['meta_key' => $operator], ['meta_value' => $value])
+        );
+    }
     public function drGallery(): Attribute
     {
         $operator = UserMetaEnum::DR_GALLERY;

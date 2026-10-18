@@ -26,6 +26,11 @@ class SpecificDayAppointmentRegistrationModal extends Component
         "document" => null,
         "first_name" => null,
         "last_name" => null,
+        "national_code" => null,
+        "birth_date" => null,
+        "father_name" => null,
+        "marital_status" => null,
+        "acquaintance" => null,
         "appType" => 'main_app',
         "smsType" => 'send',
         "kind" => null,
@@ -40,6 +45,25 @@ class SpecificDayAppointmentRegistrationModal extends Component
     public $appDate;
     public $segmentId;
     public string $patientSearch = '';
+
+    /** فیلدهای پرونده مراجع که پیش از ثبت نوبت باید کامل باشند. */
+    private const PROFILE_FIELDS = ['national_code', 'birth_date', 'father_name', 'marital_status', 'acquaintance'];
+
+    public const MARITAL_STATUSES = [
+        'single' => 'مجرد',
+        'married' => 'متأهل',
+        'divorced' => 'مطلقه / جدا شده',
+        'widowed' => 'همسر فوت شده',
+    ];
+
+    public const ACQUAINTANCE_OPTIONS = [
+        'اینستاگرام',
+        'جستجوی گوگل',
+        'معرفی دوستان و آشنایان',
+        'معرفی پزشک یا مرکز دیگر',
+        'تبلیغات محیطی',
+        'سایر',
+    ];
 
     /**
      * Existing patients whose first or last name contains every typed word.
@@ -82,6 +106,11 @@ class SpecificDayAppointmentRegistrationModal extends Component
             'document_number' => null,
             'first_name' => null,
             'last_name' => null,
+            'national_code' => null,
+            'birth_date' => null,
+            'father_name' => null,
+            'marital_status' => null,
+            'acquaintance' => null,
             'appType' => 'main_app',
             'smsType' => 'send',
             'kind' => count($this->fetchData['appointment_kinds'] ?? []) === 1
@@ -119,6 +148,9 @@ class SpecificDayAppointmentRegistrationModal extends Component
         unset($this->fetchData['tempUser']);
         $this->form['first_name'] = null;
         $this->form['last_name'] = null;
+        foreach (self::PROFILE_FIELDS as $field) {
+            $this->form[$field] = null;
+        }
         $this->form['document'] = null;
         $this->form['document_number'] = null;
         $this->step = 1;
@@ -129,9 +161,19 @@ class SpecificDayAppointmentRegistrationModal extends Component
         if ($this->step == 1) {
             $this->findeOrCreateUser();
         } elseif ($this->step == 2) {
+            $this->normalizeProfileInputs();
             $rules = [
                 'form.first_name' => 'required',
                 'form.last_name' => 'required',
+                'form.national_code' => ['required', 'digits:10'],
+                'form.birth_date' => ['required', function ($attribute, $value, $fail) {
+                    if ($this->parseBirthDate((string) $value) === null) {
+                        $fail('تاریخ تولد را به صورت شمسی و صحیح وارد کنید (مثلاً 1370/05/21).');
+                    }
+                }],
+                'form.father_name' => 'required|string|max:100',
+                'form.marital_status' => 'required|in:'.implode(',', array_keys(self::MARITAL_STATUSES)),
+                'form.acquaintance' => 'required|in:'.implode(',', self::ACQUAINTANCE_OPTIONS),
                 'form.time.from' => ['required', 'regex:/^([01]\d|2[0-3]):[0-5]\d(:[0-5]\d)?$/'],
                 'form.time.until' => ['required', 'regex:/^([01]\d|2[0-3]):[0-5]\d(:[0-5]\d)?$/'],
             ];
@@ -153,6 +195,8 @@ class SpecificDayAppointmentRegistrationModal extends Component
 
             if (!isset($this->fetchData['user'])) {
                 $this->createUser();
+            } else {
+                $this->saveProfile($this->fetchData['user']);
             }
             if (isset($this->fetchData['operators'])) {
                 $this->step = 3;
@@ -189,11 +233,79 @@ class SpecificDayAppointmentRegistrationModal extends Component
             'mobile' => $this->fetchData['tempUser']['number'],
             'password' => uniqId(),
         ]);
-        $this->fetchData['user']->first_name = $this->form['first_name'];
-        $this->fetchData['user']->last_name = $this->form['last_name'];
+        $this->saveProfile($this->fetchData['user']);
         if (isset($this->form['document_number'])) {
             $this->fetchData['user']->document_number = $this->form['document_number'];
         }
+    }
+
+    /**
+     * اطلاعات پرونده مراجع (مشخصات هویتی، تاریخ تولد، نام پدر، تاهل و نحوه آشنایی) را روی کاربر ذخیره می کند.
+     */
+    private function saveProfile(User $user): void
+    {
+        $birth = $this->parseBirthDate((string) $this->form['birth_date']);
+
+        $user->first_name = $this->form['first_name'];
+        $user->last_name = $this->form['last_name'];
+        $user->national_code = $this->form['national_code'];
+        $user->birthday = json_encode(['year' => $birth['year'], 'month' => $birth['month'], 'day' => $birth['day']]);
+        $user->father_name = trim((string) $this->form['father_name']);
+        $user->marital_status = $this->form['marital_status'];
+        $user->acquaintance = $this->form['acquaintance'];
+    }
+
+    private function normalizeProfileInputs(): void
+    {
+        foreach (['national_code', 'birth_date'] as $field) {
+            if (filled($this->form[$field] ?? null)) {
+                $this->form[$field] = (string) convert2english(trim((string) $this->form[$field]));
+            }
+        }
+        if (filled($this->form['father_name'] ?? null)) {
+            $this->form['father_name'] = trim((string) $this->form['father_name']);
+        }
+        // Restore a leading zero that a spreadsheet or keyboard may have dropped.
+        if (preg_match('/^\d{8,9}$/', (string) ($this->form['national_code'] ?? ''))) {
+            $this->form['national_code'] = str_pad($this->form['national_code'], 10, '0', STR_PAD_LEFT);
+        }
+    }
+
+    /**
+     * @return array{year:int,month:int,day:int}|null
+     */
+    private function parseBirthDate(string $value): ?array
+    {
+        $value = (string) convert2english(trim($value));
+        if (!preg_match('#^(\d{4})[/-](\d{1,2})[/-](\d{1,2})$#', $value, $m)) {
+            return null;
+        }
+        [$year, $month, $day] = [(int) $m[1], (int) $m[2], (int) $m[3]];
+        $today = Verta::now();
+        if ($year < 1300 || $month < 1 || $month > 12 || $day < 1 || $day > ($month <= 6 ? 31 : 30)) {
+            return null;
+        }
+        if ($year > $today->year || ($year === $today->year && ($month > $today->month || ($month === $today->month && $day > $today->day)))) {
+            return null;
+        }
+
+        return ['year' => $year, 'month' => $month, 'day' => $day];
+    }
+
+    /** سن محاسبه شده از تاریخ تولد واردشده، برای نمایش در فرم. */
+    public function birthAge(): ?int
+    {
+        $birth = $this->parseBirthDate((string) ($this->form['birth_date'] ?? ''));
+        if ($birth === null) {
+            return null;
+        }
+        $today = Verta::now();
+        $age = $today->year - $birth['year'];
+        if ($today->month < $birth['month'] || ($today->month === $birth['month'] && $today->day < $birth['day'])) {
+            $age--;
+        }
+
+        return max($age, 0);
     }
     private function findeOrCreateUser()
     {
@@ -238,6 +350,15 @@ class SpecificDayAppointmentRegistrationModal extends Component
             $this->form['document_number'] = $this->form['document'];
             $this->form['first_name'] = $this->loadedMetaValue($user, UserMetaEnum::FIRST_NAME);
             $this->form['last_name'] = $this->loadedMetaValue($user, UserMetaEnum::LAST_NAME);
+            $this->form['national_code'] = $this->loadedMetaValue($user, UserMetaEnum::NATIONAL_CODE);
+            $this->form['father_name'] = $this->loadedMetaValue($user, UserMetaEnum::FATHER_NAME);
+            $this->form['marital_status'] = $this->loadedMetaValue($user, UserMetaEnum::MARITAL_STATUS);
+            $this->form['acquaintance'] = $this->loadedMetaValue($user, UserMetaEnum::ACQUAINTANCE);
+
+            $birth = json_decode((string) $this->loadedMetaValue($user, UserMetaEnum::BIRTHDAY), true);
+            $this->form['birth_date'] = is_array($birth) && isset($birth['year'], $birth['month'], $birth['day'])
+                ? sprintf('%04d/%02d/%02d', $birth['year'], $birth['month'], $birth['day'])
+                : null;
         }
     }
 
@@ -389,6 +510,15 @@ class SpecificDayAppointmentRegistrationModal extends Component
             'form.number.digits' => 'شماره موبایل صحیح نیست!',
             'form.first_name.required' => 'وارد کردن نام الزامی است',
             'form.last_name.required' => 'وارد کردن نام خانوادگی الزامی است',
+            'form.national_code.required' => 'وارد کردن کد ملی الزامی است',
+            'form.national_code.digits' => 'کد ملی باید ۱۰ رقم باشد',
+            'form.birth_date.required' => 'وارد کردن تاریخ تولد الزامی است',
+            'form.father_name.required' => 'وارد کردن نام پدر الزامی است',
+            'form.father_name.max' => 'نام پدر حداکثر ۱۰۰ کاراکتر باشد',
+            'form.marital_status.required' => 'وضعیت تأهل را انتخاب کنید',
+            'form.marital_status.in' => 'وضعیت تأهل انتخاب‌شده معتبر نیست',
+            'form.acquaintance.required' => 'نحوه آشنایی با مرکز را انتخاب کنید',
+            'form.acquaintance.in' => 'نحوه آشنایی انتخاب‌شده معتبر نیست',
             'form.time.from.required' => 'زمان نوبت به درستی انتخاب نشده است!',
             'form.time.until.required' => 'زمان پایان نوبت به درستی انتخاب نشده است!',
             'form.time.from.regex' => 'زمان نوبت را به صورت ۲۴ ساعته (مثلاً 09:30) وارد کنید.',

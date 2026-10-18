@@ -45,6 +45,7 @@ class AppointmentUserList extends Component
         'Doc_id'               => null,
         'kind'                 => null,
         'voip_followup_status' => null,
+        'registration_source'  => null,
     ];
     public array $fetchData = [];
     public array $setting = [];
@@ -109,6 +110,7 @@ class AppointmentUserList extends Component
             'AppointmentStatus'    => null,
             'kind'                 => null,
             'voip_followup_status' => null,
+            'registration_source'  => null,
         ];
         $this->resetPage();
     }
@@ -406,6 +408,16 @@ class AppointmentUserList extends Component
             if (!empty($condition)) {
                 $query->when($condition, $callback);
             }
+        }
+        if (in_array($this->search['registration_source'] ?? null, ['self', 'staff', 'import', 'voip'], true)) {
+            // هم ارز AppointmentUser::registrationSource(): منبع ذخیره شده در جزئیات، وگرنه ثبت کننده غیر از مراجع = پنل مدیریت
+            $table = DB::connection()->getTablePrefix().$query->getModel()->getTable();
+            $via = fn (int $value) => "({$table}.details LIKE '%\"appointment_via\":{$value}%' OR {$table}.details LIKE '%\"appointment_via\": {$value}%')";
+            $query->whereRaw(
+                "(CASE WHEN {$via(4)} THEN 'voip' WHEN {$via(2)} THEN 'staff' WHEN {$via(3)} THEN 'import' WHEN {$via(1)} THEN 'self'"
+                ." WHEN {$table}.agent_id IS NOT NULL AND {$table}.agent_id <> {$table}.user_id THEN 'staff' ELSE 'self' END) = ?",
+                [$this->search['registration_source']]
+            );
         }
         if (filled($this->search['voip_followup_status'] ?? null)) {
             $query->where('kind', AppointmentUserKindEnum::VOIP)

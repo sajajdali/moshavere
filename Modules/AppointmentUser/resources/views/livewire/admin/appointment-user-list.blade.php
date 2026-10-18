@@ -201,6 +201,7 @@
                                     <label><span>اپراتور نوبت</span><select wire:model="search.appointment_operatorId"><option value="">همه اپراتورها</option><option value="0">بدون اپراتور</option>@foreach (\Modules\User\Entities\User::operators() as $operators)<option value="{{ $operators->id }}">{{ $operators->fullName }}</option>@endforeach</select></label>
                                 @endif
                                 <label><span>ثبت کننده نوبت</span><select wire:model="search.setterAppointment"><option value="">انتخاب کنید...</option>@foreach (($fetchData['appointmentSetter'] ?? []) as $role)<option value="{{ $role->id }}">{{ $role->name }}</option>@endforeach</select></label>
+                                <label><span>ثبت شده از</span><select wire:model="search.registration_source"><option value="">همه منابع</option><option value="self">سایت (خود مراجع)</option><option value="staff">پنل مدیریت</option><option value="voip">تلفن (ویپ)</option><option value="import">ایمپورت شده</option></select></label>
                             </div>
                         </div>
 

@@ -2007,6 +2007,12 @@ class TenantAppController extends Controller
                 'message' => 'کد ملی باید ۱۰ رقم باشد.',
             ]);
         }
+        if ($nationalCode !== '' && User::where('national_code', $nationalCode)->whereKeyNot($user->id)->exists()) {
+            return $this->badRequest([
+                'status' => false,
+                'message' => 'این کد ملی قبلاً برای کاربر دیگری ثبت شده است.',
+            ]);
+        }
         if ($nationalCode === '' && ! $user->national_code
             && filter_var(setting(SettingKeyEnum::USER_REGISTER_NATIONAL_CODE_REQUIRED), FILTER_VALIDATE_BOOL)) {
             return $this->badRequest([
@@ -2117,6 +2123,13 @@ class TenantAppController extends Controller
                     return $this->badRequest([
                         'status' => false,
                         'message' => 'کد ملی باید ۱۰ رقم باشد.',
+                    ]);
+                }
+
+                if (User::where('national_code', $code)->whereKeyNot($user->id)->exists()) {
+                    return $this->badRequest([
+                        'status' => false,
+                        'message' => 'این کد ملی قبلاً برای کاربر دیگری ثبت شده است.',
                     ]);
                 }
 

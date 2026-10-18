@@ -270,11 +270,14 @@ class AppointmentUserList extends Component
                 'condition' => isset($this->search['national_code']),
                 'callback' => function ($query) {
                     return $query->whereHas('user', function ($q) {
-                        $q->whereHas('metas', function ($qq) {
-                            $qq->where([
-                                ['meta_key', UserMetaEnum::NATIONAL_CODE],
-                                ['meta_value', 'LIKE', "%{$this->search['national_code']}%"],
-                            ]);
+                        $q->where(function ($qq) {
+                            $qq->where('national_code', 'LIKE', "%{$this->search['national_code']}%")
+                                ->orWhereHas('metas', function ($qqq) {
+                                    $qqq->where([
+                                        ['meta_key', UserMetaEnum::NATIONAL_CODE],
+                                        ['meta_value', 'LIKE', "%{$this->search['national_code']}%"],
+                                    ]);
+                                });
                         });
                     });
                 },

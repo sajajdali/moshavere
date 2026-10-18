@@ -23,7 +23,7 @@ class UserProfileLivewire extends Component
             'form.first_name'        => 'required|string|max:225',
             'form.last_name'         => 'required|string|max:225',
             'form.gender'            => 'required|string|max:225',
-            'form.national_code'     => 'nullable|string|max:225',
+            'form.national_code'     => ['nullable', 'string', 'max:225', \Illuminate\Validation\Rule::unique('users', 'national_code')->ignore($this->user->id)],
             'form.email'             => 'nullable|string|max:225',
         ]);
         $this->user->first_name = $this->form['first_name'];

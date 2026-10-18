@@ -4,6 +4,9 @@ namespace Modules\User\Traits;
 
 use Modules\User\Enum\UserMetaEnum;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
+use Illuminate\Validation\ValidationException;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 
 trait UserAttributeTrait
@@ -41,15 +44,51 @@ trait UserAttributeTrait
         );
     }
 
+    /**
+     * کد ملی در ستون یکتای users.national_code ذخیره می شود. کدهای قدیمی که هنگام انتقال نامعتبر یا تکراری بودند
+     * هنوز در user_metas هستند و در صورت خالی بودن ستون از همانجا خوانده می شوند.
+     * مقدار دهی بلافاصله ذخیره می شود (مثل سایر فیلدهای متا) و save() لازم نیست.
+     */
     public function nationalCode(): Attribute
     {
         return Attribute::make(
-            get: fn() => $this->getMeta(UserMetaEnum::NATIONAL_CODE)?->meta_value,
-            set: fn($value) => $this->metas()->updateOrCreate(
-                ['meta_key' => UserMetaEnum::NATIONAL_CODE],
-                ['meta_value' => $value]
-            )
+            get: fn($value) => filled($value)
+                ? $value
+                : $this->getMeta(UserMetaEnum::NATIONAL_CODE)?->meta_value,
+            set: function ($value) {
+                $value = filled($value) ? trim((string) $value) : null;
+
+                if (! $this->hasNationalCodeColumn()) {
+                    $this->metas()->updateOrCreate(['meta_key' => UserMetaEnum::NATIONAL_CODE], ['meta_value' => $value]);
+
+                    return [];
+                }
+
+                if ($value !== null && static::query()
+                    ->where('national_code', $value)
+                    ->when($this->exists, fn($q) => $q->whereKeyNot($this->getKey()))
+                    ->exists()) {
+                    throw ValidationException::withMessages(['national_code' => 'این کد ملی قبلاً برای مراجع دیگری ثبت شده است.']);
+                }
+
+                if ($this->exists) {
+                    static::query()->whereKey($this->getKey())->update(['national_code' => $value]);
+                    $this->metas()->where('meta_key', UserMetaEnum::NATIONAL_CODE)->delete();
+                    $this->unsetRelation('metas');
+                }
+
+                return ['national_code' => $value];
+            }
         );
+    }
+
+    private function hasNationalCodeColumn(): bool
+    {
+        static $known = [];
+        $key = $this->getConnectionName() ?? 'default';
+
+        return $known[$key . '|' . DB::connection($this->getConnectionName())->getDatabaseName()]
+            ??= Schema::connection($this->getConnectionName())->hasColumn($this->getTable(), 'national_code');
     }
 
     public function documentNumber(): Attribute

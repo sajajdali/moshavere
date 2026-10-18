@@ -114,11 +114,14 @@ class AppointmentOnlineMessagesList extends Component
                 });
             })->when(isset($this->search['nationalCode']), function ($q) {
                 return $q->whereHas('user', function ($qq) {
-                    return $qq->whereHas('metas', function ($qqq) {
-                        return $qqq->where([
-                            ['meta_key', UserMetaEnum::NATIONAL_CODE],
-                            ['meta_value', 'LIKE', "%{$this->search['nationalCode']}%"],
-                        ]);
+                    return $qq->where(function ($qqq) {
+                        $qqq->where('national_code', 'LIKE', "%{$this->search['nationalCode']}%")
+                            ->orWhereHas('metas', function ($qqqq) {
+                                return $qqqq->where([
+                                    ['meta_key', UserMetaEnum::NATIONAL_CODE],
+                                    ['meta_value', 'LIKE', "%{$this->search['nationalCode']}%"],
+                                ]);
+                            });
                     });
                 });
             })->when(isset($this->search['search-docNumberId']), function ($q) {

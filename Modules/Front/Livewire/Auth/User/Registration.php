@@ -34,19 +34,21 @@ class Registration extends Component
             'form.last_name.string'    => 'فرمت وارد شده صحیح نیست',
             'form.gender.string'       => 'فرمت وارد شده صحیح نیست',
             'form.email.email'         => 'ایمیل وارد شده صحیح نیست',
+            'form.national_code.unique' => 'این کد ملی قبلاً ثبت شده است',
         ];
     }
     protected function rules()
     {
+        $nationalCodeUnique = \Illuminate\Validation\Rule::unique('users', 'national_code')->ignore($this->user?->id);
         $rules =  [
             'form.first_name' => 'required|string|max:225',
             'form.last_name'  => 'required|string|max:225',
             'form.gender'     => 'required|string|max:225',
             'form.email'      => 'nullable|email|max:225',
-            'form.national_code'  => 'nullable|digits:10',
+            'form.national_code'  => ['nullable', 'digits:10', $nationalCodeUnique],
         ];
         if ($this->fetchData['is_national_code_required']) {
-            $rules['form.national_code'] = 'required|digits:10';
+            $rules['form.national_code'] = ['required', 'digits:10', $nationalCodeUnique];
         }
         return $rules;
     }

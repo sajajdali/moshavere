@@ -3,6 +3,7 @@
 namespace Modules\AppointmentUser\Livewire\Admin\AddAppointment\Modal;
 
 use Carbon\Carbon;
+use Illuminate\Validation\Rule;
 use Livewire\Component;
 use Livewire\Attributes\On;
 use Livewire\Attributes\Computed;
@@ -165,7 +166,7 @@ class SpecificDayAppointmentRegistrationModal extends Component
             $rules = [
                 'form.first_name' => 'required',
                 'form.last_name' => 'required',
-                'form.national_code' => ['required', 'digits:10'],
+                'form.national_code' => ['required', 'digits:10', Rule::unique('users', 'national_code')->ignore($this->fetchData['user']->id ?? null)],
                 'form.birth_date' => ['required', function ($attribute, $value, $fail) {
                     if ($this->parseBirthDate((string) $value) === null) {
                         $fail('تاریخ تولد را به صورت شمسی و صحیح وارد کنید (مثلاً 1370/05/21).');
@@ -265,10 +266,6 @@ class SpecificDayAppointmentRegistrationModal extends Component
         if (filled($this->form['father_name'] ?? null)) {
             $this->form['father_name'] = trim((string) $this->form['father_name']);
         }
-        // Restore a leading zero that a spreadsheet or keyboard may have dropped.
-        if (preg_match('/^\d{8,9}$/', (string) ($this->form['national_code'] ?? ''))) {
-            $this->form['national_code'] = str_pad($this->form['national_code'], 10, '0', STR_PAD_LEFT);
-        }
     }
 
     /**
@@ -350,7 +347,7 @@ class SpecificDayAppointmentRegistrationModal extends Component
             $this->form['document_number'] = $this->form['document'];
             $this->form['first_name'] = $this->loadedMetaValue($user, UserMetaEnum::FIRST_NAME);
             $this->form['last_name'] = $this->loadedMetaValue($user, UserMetaEnum::LAST_NAME);
-            $this->form['national_code'] = $this->loadedMetaValue($user, UserMetaEnum::NATIONAL_CODE);
+            $this->form['national_code'] = $user->national_code;
             $this->form['father_name'] = $this->loadedMetaValue($user, UserMetaEnum::FATHER_NAME);
             $this->form['marital_status'] = $this->loadedMetaValue($user, UserMetaEnum::MARITAL_STATUS);
             $this->form['acquaintance'] = $this->loadedMetaValue($user, UserMetaEnum::ACQUAINTANCE);
@@ -512,6 +509,7 @@ class SpecificDayAppointmentRegistrationModal extends Component
             'form.last_name.required' => 'وارد کردن نام خانوادگی الزامی است',
             'form.national_code.required' => 'وارد کردن کد ملی الزامی است',
             'form.national_code.digits' => 'کد ملی باید ۱۰ رقم باشد',
+            'form.national_code.unique' => 'این کد ملی قبلاً برای مراجع دیگری ثبت شده است',
             'form.birth_date.required' => 'وارد کردن تاریخ تولد الزامی است',
             'form.father_name.required' => 'وارد کردن نام پدر الزامی است',
             'form.father_name.max' => 'نام پدر حداکثر ۱۰۰ کاراکتر باشد',

@@ -1,8 +1,8 @@
 @extends('onlineconsultation::shell')
 @section('consultation-title','گزارش پیامک‌های خودکار مشاوره')
-@section('consultation-description','وضعیت ارسال، تلاش مجدد و خطاهای پیامک‌های بیمار و مشاور')
+@section('consultation-description','وضعیت ارسال، تلاش مجدد و خطاهای پیامک‌های مراجع و مشاور')
 @section('consultation-content')
-@php($types=['patient_first_reminder'=>'یادآوری اول بیمار','patient_second_reminder'=>'یادآوری دوم بیمار','patient_final_reminder'=>'یادآوری نهایی بیمار','practitioner_appointment_reminder'=>'یادآوری نوبت مشاور','practitioner_daily_report'=>'گزارش پایان روز مشاور'])
+@php($types=['patient_first_reminder'=>'یادآوری اول مراجع','patient_second_reminder'=>'یادآوری دوم مراجع','patient_final_reminder'=>'یادآوری نهایی مراجع','practitioner_appointment_reminder'=>'یادآوری نوبت مشاور','practitioner_daily_report'=>'گزارش پایان روز مشاور'])
 <section class="oc-panel">
     <div class="oc-panel-header">
         <form class="oc-inline" method="GET">

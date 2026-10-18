@@ -110,7 +110,7 @@ class Index extends Component
         $this->user = User::find($this->user->id);
         $this->fillProfile();
         $this->editingProfile = false;
-        $this->dispatch('showAlert', message: 'اطلاعات بیمار با موفقیت ذخیره شد');
+        $this->dispatch('showAlert', message: 'اطلاعات مراجع با موفقیت ذخیره شد');
     }
 
     #[On('delete')]

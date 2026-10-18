@@ -6,7 +6,7 @@
 @php
     $duration = fn ($seconds) => sprintf('%02d:%02d:%02d', intdiv((int) $seconds, 3600), intdiv(((int) $seconds) % 3600, 60), ((int) $seconds) % 60);
     $date = fn ($value) => $value ? verta($value)->format('Y/m/d H:i:s') : '—';
-    $disconnectors = ['PATIENT' => 'قطع تماس توسط بیمار', 'DOCTOR' => 'قطع تماس توسط مشاور', 'SYSTEM' => 'قطع توسط سیستم', 'UNKNOWN' => 'نامشخص'];
+    $disconnectors = ['PATIENT' => 'قطع تماس توسط مراجع', 'DOCTOR' => 'قطع تماس توسط مشاور', 'SYSTEM' => 'قطع توسط سیستم', 'UNKNOWN' => 'نامشخص'];
     $early = $callLog->isEarlyCall();
     $activeHangup = ! $early && $callLog->isConsultantHangupWarning($shortCallThresholdSeconds);
     $completedHangup = ! $early && $callLog->isCompletedConsultantHangup($shortCallThresholdSeconds);
@@ -16,13 +16,13 @@
     $displayResult = $callPresentation::label($callLog, $shortCallThresholdSeconds);
     $resultTone = $callPresentation::tone($callLog, $shortCallThresholdSeconds);
     $surveyScore = $callLog->surveyScore();
-    $directionLabel = ['OUTBOUND' => 'خروجی؛ درخواست مشاور', 'INBOUND' => 'ورودی؛ تماس بیمار'][$callLog->direction] ?? 'نامشخص';
+    $directionLabel = ['OUTBOUND' => 'خروجی؛ درخواست مشاور', 'INBOUND' => 'ورودی؛ تماس مراجع'][$callLog->direction] ?? 'نامشخص';
 @endphp
 <div class="oc-stack">
     @if($early)<div class="oc-notice"><i class="fa-solid fa-clock"></i><p><strong>{{ $displayResult }}.</strong> این تلاش خارج از بازه مشاوره است و در آمار تماس‌های بی‌پاسخ یا هشدار عدم پاسخ مشاور محاسبه نمی‌شود.</p></div>@endif
     @if($activeHangup || $activeNoAnswer)<div class="oc-alert"><i class="fa-solid fa-triangle-exclamation"></i><p><strong>هشدار مدیریتی:</strong> {{ $activeHangup ? 'قطع تماس کوتاه توسط مشاور' : 'عدم پاسخ‌گویی مشاور در موعد نوبت' }} برای این تماس ثبت شده است.</p></div>@endif
     @if($completedHangup)<div class="oc-notice oc-notice-success"><i class="fa-solid fa-circle-check"></i><p><strong>مشاوره انجام شد.</strong> مکالمه {{ $duration($callLog->talk_duration_seconds) }} طول کشیده و از حد {{ $duration($shortCallThresholdSeconds) }} بیشتر است؛ پایان تماس توسط مشاور هشدار محسوب نمی‌شود.</p></div>@endif
-    @if($patientHangup)<div class="oc-notice oc-notice-success"><i class="fa-solid fa-circle-check"></i><p><strong>تماس توسط بیمار پایان یافت.</strong> مشاوره برقرار بوده و بیمار پس از {{ $duration($callLog->talk_duration_seconds) }} مکالمه تماس را قطع کرده است؛ برای این تماس هیچ رویداد قطع مشاور ثبت نشده است.</p></div>@endif
+    @if($patientHangup)<div class="oc-notice oc-notice-success"><i class="fa-solid fa-circle-check"></i><p><strong>تماس توسط مراجع پایان یافت.</strong> مشاوره برقرار بوده و مراجع پس از {{ $duration($callLog->talk_duration_seconds) }} مکالمه تماس را قطع کرده است؛ برای این تماس هیچ رویداد قطع مشاور ثبت نشده است.</p></div>@endif
     @if($surveyScore !== null)
     <section class="oc-panel"><div class="oc-panel-header"><h2 class="oc-panel-title"><i class="fa-solid fa-star"></i>نظرسنجی همین تماس</h2><span class="oc-badge oc-badge-warning">{{ $surveyScore }} از ۵</span></div><div class="oc-panel-body"><div class="oc-survey-call-score" aria-label="امتیاز {{ $surveyScore }} از ۵"><strong>{{ $surveyScore }}</strong><span>از ۵</span><div aria-hidden="true">@for($star = 1; $star <= 5; $star++)<i class="fa-{{ $star <= $surveyScore ? 'solid' : 'regular' }} fa-star"></i>@endfor</div></div></div></section>
     @endif
@@ -46,7 +46,7 @@
     </div></section>
     @endif
     <section class="oc-panel"><div class="oc-panel-header"><h2 class="oc-panel-title"><i class="fa-solid fa-phone-volume"></i>نتیجه تماس</h2><span class="oc-badge oc-badge-{{ $resultTone }}">{{ $displayResult }}</span></div><div class="oc-panel-body oc-detail-grid">
-        @foreach([['شناسه فنی تماس',$callLog->call_id],['شناسه درخواست تماس',data_get($callLog->additional_data, 'request_id')],['شناسه نوبت',$callLog->appointment_id ? '#'.$callLog->appointment_id : 'بدون نوبت'],['شماره بیمار',$callLog->patient_phone],['جهت تماس',$directionLabel],['وضعیت نوبت',$early ? 'پیش از زمان نوبت' : $callLog->appointment_state],['نتیجه خام VoIP',$callLog->final_result],['نوع اتصال',$callLog->connection_type],['شروع نوبت',$date($callLog->appointment_start_at)],['پایان نوبت',$date($callLog->appointment_end_at)],['داخلی اصلی',$callLog->primary_extension],['مقصد نهایی',$callLog->destination],['مقصد متصل‌شده',$callLog->connected_destination],['شناسه کارشناس',$callLog->operator_id],['پاسخ‌گو',$callLog->operator?->fullName ?: $callLog->responded_by],['قطع‌کننده',$early ? 'خارج از بازه نوبت' : ($completedHangup ? 'پایان عادی تماس توسط مشاور' : ($activeHangup ? 'قطع تماس کوتاه توسط مشاور' : ($disconnectors[$callLog->disconnected_by] ?? $callLog->disconnected_by)))],['علت قطع',$callLog->hangup_cause]] as [$label,$value])<div><span>{{ $label }}</span><strong class="oc-break">{{ $value ?: '—' }}</strong></div>@endforeach
+        @foreach([['شناسه فنی تماس',$callLog->call_id],['شناسه درخواست تماس',data_get($callLog->additional_data, 'request_id')],['شناسه نوبت',$callLog->appointment_id ? '#'.$callLog->appointment_id : 'بدون نوبت'],['شماره مراجع',$callLog->patient_phone],['جهت تماس',$directionLabel],['وضعیت نوبت',$early ? 'پیش از زمان نوبت' : $callLog->appointment_state],['نتیجه خام VoIP',$callLog->final_result],['نوع اتصال',$callLog->connection_type],['شروع نوبت',$date($callLog->appointment_start_at)],['پایان نوبت',$date($callLog->appointment_end_at)],['داخلی اصلی',$callLog->primary_extension],['مقصد نهایی',$callLog->destination],['مقصد متصل‌شده',$callLog->connected_destination],['شناسه کارشناس',$callLog->operator_id],['پاسخ‌گو',$callLog->operator?->fullName ?: $callLog->responded_by],['قطع‌کننده',$early ? 'خارج از بازه نوبت' : ($completedHangup ? 'پایان عادی تماس توسط مشاور' : ($activeHangup ? 'قطع تماس کوتاه توسط مشاور' : ($disconnectors[$callLog->disconnected_by] ?? $callLog->disconnected_by)))],['علت قطع',$callLog->hangup_cause]] as [$label,$value])<div><span>{{ $label }}</span><strong class="oc-break">{{ $value ?: '—' }}</strong></div>@endforeach
     </div></section>
     <section class="oc-panel"><div class="oc-panel-header"><h2 class="oc-panel-title"><i class="fa-solid fa-timeline"></i>خط زمانی تماس</h2></div><div class="oc-panel-body"><div class="oc-timeline">
         @foreach([['ورود تماس',$callLog->call_entered_at,'fa-phone'],['شروع شماره‌گیری',$callLog->dial_started_at,'fa-phone-arrow-up-right'],['پاسخ‌گویی',$callLog->answered_at,'fa-headset'],['پایان تماس',$callLog->ended_at,'fa-phone-slash']] as [$label,$value,$icon])<div class="oc-timeline-item {{ $value ? 'is-done' : '' }}"><i class="fa-solid {{ $icon }}"></i><span>{{ $label }}</span><strong><bdi>{{ $date($value) }}</bdi></strong></div>@endforeach

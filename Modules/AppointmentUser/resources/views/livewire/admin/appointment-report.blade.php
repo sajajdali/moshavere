@@ -6,7 +6,7 @@
     $presets = ['7d' => '۷ روز', '30d' => '۳۰ روز', '90d' => '۳ ماه', '6m' => '۶ ماه', 'year' => 'امسال', '1y' => '۱ سال', 'all' => 'همه'];
     $doctorName = $doctorId !== '' ? ($doctors[$doctorId] ?? null) : null;
     $registrarName = match (true) {
-        $registrar === 'patients' => 'خود بیماران',
+        $registrar === 'patients' => 'خود مراجعین',
         $registrar === 'staff' => 'همه منشی‌ها و مدیران',
         $registrar !== '' => $registrars[$registrar] ?? null,
         default => null,
@@ -145,7 +145,7 @@
                 <div class="ar-input"><i class="fa fa-user-plus"></i>
                     <select wire:model.live="registrar">
                         <option value="">همه</option>
-                        <option value="patients">خود بیماران (سایت و ویپ)</option>
+                        <option value="patients">خود مراجعین (سایت و ویپ)</option>
                         <option value="staff">همه منشی‌ها و مدیران</option>
                         @if ($registrars->isNotEmpty())
                             <optgroup label="منشی‌ها و مدیران">
@@ -197,7 +197,7 @@
             </div>
         </div>
         <div class="ar-card ar-kpi" style="--kpi-color:#067647;--kpi-soft:#ecfdf3">
-            <div class="ar-kpi-head"><span class="ar-kpi-label">دریافتی توسط بیماران</span><span class="ar-kpi-icon"><i class="fa fa-globe"></i></span></div>
+            <div class="ar-kpi-head"><span class="ar-kpi-label">دریافتی توسط مراجعین</span><span class="ar-kpi-icon"><i class="fa fa-globe"></i></span></div>
             <div class="ar-kpi-value ar-num">{{ $fa($patientsTotal) }} <small>{{ $faNum($pct($patientsTotal, $kpi['total'])) }}٪</small></div>
             <div class="ar-kpi-foot"><span><span class="ar-dot" style="background:var(--ar-self)"></span>سایت {{ $fa($kpi['self']) }}</span><span><span class="ar-dot" style="background:var(--ar-voip)"></span>ویپ {{ $fa($kpi['voip']) }}</span></div>
         </div>
@@ -217,9 +217,9 @@
             <div class="ar-kpi-foot">میانگین هر پرداخت {{ $fa($kpi['pay_avg']) }} ریال</div>
         </div>
         <div class="ar-card ar-kpi" style="--kpi-color:#b54708;--kpi-soft:#fffaeb">
-            <div class="ar-kpi-head"><span class="ar-kpi-label">بیماران یکتا</span><span class="ar-kpi-icon"><i class="fa fa-users"></i></span></div>
+            <div class="ar-kpi-head"><span class="ar-kpi-label">مراجعین یکتا</span><span class="ar-kpi-icon"><i class="fa fa-users"></i></span></div>
             <div class="ar-kpi-value ar-num">{{ $fa($kpi['patients']) }}</div>
-            <div class="ar-kpi-foot">به طور میانگین {{ $faNum($kpi['patients'] ? round($kpi['total'] / $kpi['patients'], 1) : 0) }} نوبت برای هر بیمار</div>
+            <div class="ar-kpi-foot">به طور میانگین {{ $faNum($kpi['patients'] ? round($kpi['total'] / $kpi['patients'], 1) : 0) }} نوبت برای هر مراجع</div>
         </div>
         <div class="ar-card ar-kpi" style="--kpi-color:#026aa2;--kpi-soft:#f0f9ff">
             <div class="ar-kpi-head"><span class="ar-kpi-label">پزشکان دارای نوبت</span><span class="ar-kpi-icon"><i class="fa fa-user-md"></i></span></div>
@@ -251,7 +251,7 @@
             <div class="ar-chart tall" wire:ignore><canvas id="ar-trend"></canvas><div class="ar-empty"><i class="fa fa-bar-chart"></i>داده‌ای برای نمایش نیست</div></div>
         </div>
         <div class="ar-card ar-panel">
-            <div class="ar-panel-head"><div><h3 class="ar-panel-title">سهم منبع ثبت نوبت</h3><div class="ar-panel-sub">بیمار از سایت، منشی/مدیریت یا ویپ</div></div></div>
+            <div class="ar-panel-head"><div><h3 class="ar-panel-title">سهم منبع ثبت نوبت</h3><div class="ar-panel-sub">مراجع از سایت، منشی/مدیریت یا ویپ</div></div></div>
             <div class="ar-chart tall" wire:ignore><canvas id="ar-sources"></canvas><div class="ar-empty"><i class="fa fa-pie-chart"></i>داده‌ای برای نمایش نیست</div></div>
         </div>
     </div>
@@ -365,7 +365,7 @@
     <div class="ar-grid ar-grid-2" style="margin-top:14px">
         {{-- جدول ثبت کنندگان --}}
         <div class="ar-card ar-panel">
-            <div class="ar-panel-head"><div><h3 class="ar-panel-title">ثبت‌کنندگان نوبت</h3><div class="ar-panel-sub">منشی‌ها و مدیرانی که برای بیمار نوبت ثبت کرده‌اند</div></div></div>
+            <div class="ar-panel-head"><div><h3 class="ar-panel-title">ثبت‌کنندگان نوبت</h3><div class="ar-panel-sub">منشی‌ها و مدیرانی که برای مراجع نوبت ثبت کرده‌اند</div></div></div>
             <div class="ar-table-wrap">
                 <table class="ar-table" style="min-width:520px">
                     <thead><tr><th>ثبت‌کننده</th><th>تعداد نوبت</th><th>سهم</th><th>پزشکان</th><th>لغو شده</th><th>پرداختی (ریال)</th></tr></thead>
@@ -381,13 +381,13 @@
                             </tr>
                         @endforeach
                         <tr>
-                            <td><span class="ar-name"><span class="ar-avatar" style="background:#ecfdf3;color:#067647"><i class="fa fa-globe"></i></span>خود بیماران (سایت)</span></td>
+                            <td><span class="ar-name"><span class="ar-avatar" style="background:#ecfdf3;color:#067647"><i class="fa fa-globe"></i></span>خود مراجعین (سایت)</span></td>
                             <td class="ar-num"><strong>{{ $fa($kpi['self']) }}</strong></td>
                             <td class="ar-num">{{ $faNum($pct($kpi['self'], $kpi['total'])) }}٪</td>
                             <td colspan="3" class="ar-muted"></td>
                         </tr>
                         <tr>
-                            <td><span class="ar-name"><span class="ar-avatar" style="background:#fffaeb;color:#b54708"><i class="fa fa-phone"></i></span>خود بیماران (ویپ)</span></td>
+                            <td><span class="ar-name"><span class="ar-avatar" style="background:#fffaeb;color:#b54708"><i class="fa fa-phone"></i></span>خود مراجعین (ویپ)</span></td>
                             <td class="ar-num"><strong>{{ $fa($kpi['voip']) }}</strong></td>
                             <td class="ar-num">{{ $faNum($pct($kpi['voip'], $kpi['total'])) }}٪</td>
                             <td colspan="3"></td>
@@ -510,7 +510,7 @@
                 labels: t.labels,
                 datasets: [
                     { type: 'line', label: 'لغو شده', data: t.canceled, borderColor: colors.danger, backgroundColor: colors.danger, borderWidth: 2, pointRadius: 2, tension: .35, order: 0 },
-                    { type: 'bar', label: 'سایت (خود بیمار)', data: t.self, backgroundColor: colors.self, stack: 's', ...bar({ borderRadius: 4 }) },
+                    { type: 'bar', label: 'سایت (خود مراجع)', data: t.self, backgroundColor: colors.self, stack: 's', ...bar({ borderRadius: 4 }) },
                     { type: 'bar', label: 'منشی / مدیریت', data: t.staff, backgroundColor: colors.staff, stack: 's', ...bar({ borderRadius: 4 }) },
                     { type: 'bar', label: 'ویپ', data: t.voip, backgroundColor: colors.voip, stack: 's', ...bar({ borderRadius: 4 }) },
                 ],

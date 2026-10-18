@@ -69,7 +69,7 @@ class SendTomorrowAppointmentSummary implements ShouldQueue, ShouldBeUnique
             $time = substr((string) ($appointment->start_time ?: $appointment->date_visit?->format('H:i')), 0, 5);
             $time = preg_replace('/^0/', '', $time);
             $time = preg_replace('/:00$/', '', $time);
-            $name = trim((string) $appointment->user?->fullName) ?: 'بیمار';
+            $name = trim((string) $appointment->user?->fullName) ?: 'مراجع';
 
             return $this->persianDigits($time).' '.$name;
         });

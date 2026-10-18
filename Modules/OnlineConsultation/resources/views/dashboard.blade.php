@@ -5,7 +5,7 @@
 <a class="oc-btn oc-btn-primary" href="{{ route('admin.consultation.practitioners.create') }}"><i class="fa-solid fa-plus" aria-hidden="true"></i>افزودن پزشک / کارشناس</a>
 @endsection
 @section('consultation-content')
-<div class="oc-notice"><i class="fa-solid fa-circle-info" aria-hidden="true"></i><p>درخواست تماس مشاور به endpoint تنظیم‌شده ارسال می‌شود؛ شماره‌گیری بیمار، پخش پیام و اتصال داخلی را سرور PBX انجام می‌دهد. وضعیت آماده / مشغول فعلاً دستی است.</p></div>
+<div class="oc-notice"><i class="fa-solid fa-circle-info" aria-hidden="true"></i><p>درخواست تماس مشاور به endpoint تنظیم‌شده ارسال می‌شود؛ شماره‌گیری مراجع، پخش پیام و اتصال داخلی را سرور PBX انجام می‌دهد. وضعیت آماده / مشغول فعلاً دستی است.</p></div>
 <div class="oc-stack">
     <div class="oc-stats">
         @foreach([

@@ -267,7 +267,7 @@
             @enderror
             <div class="row">
                 <div class="col-md-5 pt-2">
-                    <label class="text-primary" for="maxDaysAvailableApp"> بیمار حداکثر برای چند روز فعال بعد بتواند
+                    <label class="text-primary" for="maxDaysAvailableApp"> مراجع حداکثر برای چند روز فعال بعد بتواند
                         نوبت دریافت
                         کند</label>
                 </div>
@@ -285,7 +285,7 @@
                         کاربر بتواند تا چند روز آینده نوبت دریافت بکند
                     --}}
                     <p class="text-muted"><strong class="me-1"> نکته!! </strong>در این قسمت میتوانید تعیین کنید
-                        بیمار ، تا چند روز آینده ، اجازه ی دریافت نوبت را داشته باشد</p>
+                        مراجع ، تا چند روز آینده ، اجازه ی دریافت نوبت را داشته باشد</p>
                 </div>
             </div>
         </div>
@@ -445,7 +445,7 @@
                         </div>
                     </div>
                     <div class="d-flex mt-2">
-                        <p class="text-muted mb-0"><strong class="me-1">نکته!!</strong> تعداد نمایش نوبت خالی به بیمار در هر روز ، برای اینکه نوبت ها به ترتیب دریافت شوند.</p>
+                        <p class="text-muted mb-0"><strong class="me-1">نکته!!</strong> تعداد نمایش نوبت خالی به مراجع در هر روز ، برای اینکه نوبت ها به ترتیب دریافت شوند.</p>
                     </div>
                 </div>
             </div>
@@ -494,7 +494,7 @@
                     </div>
                     <div class="d-flex  mt-2">
 
-                        <p class="text-muted"><strong class="me-1"> نکته!! </strong> بیمار از چند روز قبل از فرا
+                        <p class="text-muted"><strong class="me-1"> نکته!! </strong> مراجع از چند روز قبل از فرا
                             رسیدن
                             نوبت خود ، امکان کنسل کردن نوبت خود را
                             داشته باشد!</p>

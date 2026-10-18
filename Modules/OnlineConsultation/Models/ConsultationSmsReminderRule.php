@@ -23,7 +23,7 @@ class ConsultationSmsReminderRule extends Model
 
     public function recipientLabel(): string
     {
-        return $this->recipient_type === self::RECIPIENT_PATIENT ? 'بیمار' : 'پزشک / مشاور';
+        return $this->recipient_type === self::RECIPIENT_PATIENT ? 'مراجع' : 'پزشک / مشاور';
     }
 
     public function offsetLabel(): string

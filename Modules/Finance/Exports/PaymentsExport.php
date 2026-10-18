@@ -23,7 +23,7 @@ class PaymentsExport implements FromCollection, WithHeadings, WithMapping, Shoul
 
     public function headings(): array
     {
-        return ['تاریخ', 'ساعت', 'بیمار', 'موبایل', 'نوع', 'منبع', 'روش پرداخت', 'دلیل پرداخت', 'پزشک', 'مبلغ', 'شماره پیگیری', 'توضیحات'];
+        return ['تاریخ', 'ساعت', 'مراجع', 'موبایل', 'نوع', 'منبع', 'روش پرداخت', 'دلیل پرداخت', 'پزشک', 'مبلغ', 'شماره پیگیری', 'توضیحات'];
     }
 
     public function map($row): array

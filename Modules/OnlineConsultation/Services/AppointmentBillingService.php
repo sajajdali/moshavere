@@ -463,7 +463,7 @@ class AppointmentBillingService
     private function ensureAppointmentIsNotCancelled(AppointmentBillingRecord $record): void
     {
         if ($record->appointment?->consultationCase?->state === 'PATIENT_NO_SHOW') {
-            throw ValidationException::withMessages(['refund' => 'این نوبت با علت عدم حضور بیمار تسویه قطعی شده است؛ بازگشت وجه یا تغییر محاسبه مجاز نیست.']);
+            throw ValidationException::withMessages(['refund' => 'این نوبت با علت عدم حضور مراجع تسویه قطعی شده است؛ بازگشت وجه یا تغییر محاسبه مجاز نیست.']);
         }
         if ($record->appointment?->status === AppointmentUserStatusEnum::STATUS_CANCEL) {
             throw ValidationException::withMessages([

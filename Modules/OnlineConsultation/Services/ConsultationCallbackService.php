@@ -32,7 +32,7 @@ class ConsultationCallbackService
             return [
                 'available' => false,
                 'available_at' => $availableAt,
-                'reason' => 'اگر بیمار تا ۵ دقیقه پس از شروع نوبت تماس نگیرد، تماس با بیمار فعال می‌شود.',
+                'reason' => 'اگر مراجع تا ۵ دقیقه پس از شروع نوبت تماس نگیرد، تماس با مراجع فعال می‌شود.',
             ];
         }
 
@@ -85,7 +85,7 @@ class ConsultationCallbackService
             $this->recordRejected($callback, 'توکن تماس اتوماتیک در تنظیمات مشاوره ثبت نشده است.');
         }
         if (! preg_match('/^09\d{9}$/', $phone)) {
-            $this->recordRejected($callback, 'شماره موبایل بیمار برای درخواست تماس معتبر نیست.');
+            $this->recordRejected($callback, 'شماره موبایل مراجع برای درخواست تماس معتبر نیست.');
         }
         if ($extension === '') {
             $this->recordRejected($callback, 'داخلی مشاور تعریف نشده است.');

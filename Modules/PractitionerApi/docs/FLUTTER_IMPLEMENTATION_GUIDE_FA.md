@@ -350,7 +350,9 @@ settlement, actions
 `OPEN|COMPLETED|PATIENT_NO_SHOW` و مرجع وضعیت قطعی پرونده است. مقدار `status=completed`
 فقط پس از عملیات صریح اتمام و `case_state=COMPLETED` برمی‌گردد؛ صرف برقراری
 تماس مشاوره را تمام‌شده نمی‌کند. هر action معمولاً دارای `allowed`, `reason_code`, `reason` و داده
-تکمیلی است. نمایش و فعال‌بودن دکمه‌های auto-call، complete، no-show و settlement فقط باید از
+تکمیلی است. نوبت کنسل‌شده با `status=cancelled` در فهرست و جزئیات می‌آید (ساختار و نوع بقیه فیلدها
+تغییری ندارد و `case_state` همچنان یکی از مقادیر بالاست)؛ همه actionهای آن `allowed=false` هستند. کلاینت باید
+برای مقدار ناشناخته `status` حالت پیش‌فرض داشته باشد. نمایش و فعال‌بودن دکمه‌های auto-call، complete، no-show و settlement فقط باید از
 `actions` بیاید. زمان‌های grace را در Flutter hardcode نکنید؛ سرور تصمیم‌گیر نهایی است.
 
 قبل از mutation حساس، جزئیات تازه دریافت کنید. در double tap دکمه را تا پایان درخواست disable کنید.

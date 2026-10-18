@@ -89,10 +89,10 @@
                 <div class="sl-section">افراد و زمان نوبت</div>
                 <div class="row">
                     <div class="col-lg-4 col-md-6 sl-field">
-                        <label for="log-patient">بیمار</label>
+                        <label for="log-patient">مراجع</label>
                         <div class="input-group">
                             <span class="input-group-text"><i class="fa fa-user"></i></span>
-                            <input id="log-patient" type="search" class="form-control" wire:model.live.debounce.300ms="patient" placeholder="نام یا موبایل بیمار">
+                            <input id="log-patient" type="search" class="form-control" wire:model.live.debounce.300ms="patient" placeholder="نام یا موبایل مراجع">
                         </div>
                     </div>
                     <div class="col-lg-4 col-md-6 sl-field">
@@ -142,7 +142,7 @@
                             <th>به وضعیت</th>
                             <th>تغییر دهنده</th>
                             <th>کد پیگیری</th>
-                            <th>بیمار</th>
+                            <th>مراجع</th>
                             <th>پزشک</th>
                             <th>زمان نوبت</th>
                         </tr>
@@ -178,7 +178,7 @@
                                         {{ $log->changed_by_name }}
                                     @else
                                         <span class="text-muted">
-                                            {{ match ($log->source) { 'console' => 'سیستم (زمان‌بندی/کنسول)', 'api' => 'API', default => 'سیستم / بیمار (بدون ورود)' } }}
+                                            {{ match ($log->source) { 'console' => 'سیستم (زمان‌بندی/کنسول)', 'api' => 'API', default => 'سیستم / مراجع (بدون ورود)' } }}
                                         </span>
                                     @endif
                                     @if ($log->ip)

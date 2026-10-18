@@ -19,14 +19,14 @@
                                         — ساعت {{ substr($form['time']['from'], 0, 5) }} تا {{ substr($form['time']['until'] ?? '', 0, 5) }}
                                     @endif
                                 @else
-                                    اطلاعات بیمار و نوبت را تکمیل کنید
+                                    اطلاعات مراجع و نوبت را تکمیل کنید
                                 @endif
                             </span>
                         </div>
                         <button type="button" class="sar-close" wire:click="dismisModal" data-bs-dismiss="modal" aria-label="بستن">×</button>
                     </div>
                     <div class="sar-steps" aria-label="مراحل ثبت نوبت">
-                        <span class="sar-step-dot active">۱</span><span class="sar-step-label {{ $step === 1 ? 'active' : '' }}">شماره همراه بیمار</span>
+                        <span class="sar-step-dot active">۱</span><span class="sar-step-label {{ $step === 1 ? 'active' : '' }}">شماره همراه مراجع</span>
                         <span class="sar-step-line"></span>
                         <span class="sar-step-dot {{ $step > 1 ? 'active' : '' }}">۲</span><span class="sar-step-label {{ $step === 2 || $step === 4 ? 'active' : '' }}">اطلاعات نوبت</span>
                         @if ($hasOperators)
@@ -43,9 +43,9 @@
 
                     @if ($step === 1)
                         <div class="sar-field" style="position:relative">
-                            <label class="sar-label" for="appointment_patient_search">جستجوی بیمار با نام یا نام خانوادگی</label>
+                            <label class="sar-label" for="appointment_patient_search">جستجوی مراجع با نام یا نام خانوادگی</label>
                             <input type="text" autocomplete="off" class="sar-input" id="appointment_patient_search"
-                                wire:model.live.debounce.300ms="patientSearch" placeholder="نام یا نام خانوادگی بیمار">
+                                wire:model.live.debounce.300ms="patientSearch" placeholder="نام یا نام خانوادگی مراجع">
                             @if (count($this->patientResults))
                                 <div class="list-group shadow-sm" style="position:absolute;top:100%;inset-inline:0;z-index:20">
                                     @foreach ($this->patientResults as $patient)
@@ -57,7 +57,7 @@
                                     @endforeach
                                 </div>
                             @elseif (mb_strlen(trim($patientSearch)) >= 2)
-                                <span class="sar-error" style="color:inherit;opacity:.7">بیماری با این نام یافت نشد.</span>
+                                <span class="sar-error" style="color:inherit;opacity:.7">مراجعی با این نام یافت نشد.</span>
                             @endif
                         </div>
                         <div class="sar-divider"></div>

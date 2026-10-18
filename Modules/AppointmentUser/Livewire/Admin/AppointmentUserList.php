@@ -199,7 +199,7 @@ class AppointmentUserList extends Component
 
         $this->msg = match (true) {
             $smsQueued => 'زمان نوبت با موفقیت تغییر کرد و پیامک تغییر زمان در صف ارسال قرار گرفت.',
-            $validated['quickTimeEdit']['send_sms'] => 'زمان نوبت تغییر کرد؛ اما قالب پیامک یا شماره موبایل بیمار در دسترس نبود.',
+            $validated['quickTimeEdit']['send_sms'] => 'زمان نوبت تغییر کرد؛ اما قالب پیامک یا شماره موبایل مراجع در دسترس نبود.',
             default => 'زمان نوبت با موفقیت تغییر کرد.',
         };
         $this->dispatch('closeQuickTimeEditModal');
@@ -565,7 +565,7 @@ class AppointmentUserList extends Component
             $billing?->refund_status === 'completed' => 'تسویه نهایی‌شده',
             $billing?->refund_status === 'approved' => 'محاسبه تأییدشده؛ در انتظار واریز',
             $billing !== null => 'در انتظار محاسبه و تأیید',
-            $appointment->status === AppointmentUserStatusEnum::STATUS_WAIT_PAYMENT => 'در انتظار پرداخت بیمار',
+            $appointment->status === AppointmentUserStatusEnum::STATUS_WAIT_PAYMENT => 'در انتظار پرداخت مراجع',
             $appointment->status === AppointmentUserStatusEnum::STATUS_SUCCESSFUL => 'پرداخت / ثبت نوبت تأیید شده',
             default => 'فاقد تسویه مالی',
         };

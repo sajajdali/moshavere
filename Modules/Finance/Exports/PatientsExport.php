@@ -23,7 +23,7 @@ class PatientsExport implements FromCollection, WithHeadings, WithMapping, Shoul
 
     public function headings(): array
     {
-        return ['بیمار', 'موبایل', 'تعداد پرداخت', 'پرداخت سیستمی', 'پرداخت دستی', 'بازگشت وجه', 'خالص پرداخت', 'آخرین پرداخت'];
+        return ['مراجع', 'موبایل', 'تعداد پرداخت', 'پرداخت سیستمی', 'پرداخت دستی', 'بازگشت وجه', 'خالص پرداخت', 'آخرین پرداخت'];
     }
 
     public function map($row): array

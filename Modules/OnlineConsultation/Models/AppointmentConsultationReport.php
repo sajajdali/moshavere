@@ -13,7 +13,7 @@ class AppointmentConsultationReport extends Model
         'FOLLOW_UP_REQUIRED' => 'نیازمند پیگیری یا جلسه بعدی',
         'PRESCRIPTION_PROVIDED' => 'توصیه یا نسخه ارائه شد',
         'REFERRED' => 'ارجاع به متخصص یا مرکز دیگر',
-        'PATIENT_NO_ANSWER' => 'بیمار پاسخ نداد',
+        'PATIENT_NO_ANSWER' => 'مراجع پاسخ نداد',
         'CONSULTANT_NO_ANSWER' => 'مشاور پاسخ نداد',
         'CANCELLED' => 'مشاوره لغو شد',
         'OTHER' => 'سایر موارد',

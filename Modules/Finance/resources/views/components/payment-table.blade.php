@@ -8,7 +8,7 @@
                 <tr>
                     <th>تاریخ</th>
                     @if ($showPatient)
-                        <th>بیمار</th>
+                        <th>مراجع</th>
                     @endif
                     <th>منبع</th>
                     <th>روش پرداخت</th>

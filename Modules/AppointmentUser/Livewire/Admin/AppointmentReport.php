@@ -25,7 +25,7 @@ class AppointmentReport extends Component
     // فیلترها در آدرس صفحه نگه داشته میشوند تا گزارش قابل اشتراک و بعد از بارگذاری مجدد ثابت بماند
     #[Url(except: '')]
     public string $doctorId = '';
-    // '' همه | patients خود بیماران (سایت و ویپ) | staff همه منشی ها و مدیران | شناسه ثبت کننده
+    // '' همه | patients خود مراجعین (سایت و ویپ) | staff همه منشی ها و مدیران | شناسه ثبت کننده
     #[Url(except: '')]
     public string $registrar = '';
     #[Url(as: 'from', except: '')]
@@ -41,7 +41,7 @@ class AppointmentReport extends Component
     public string $granularity = 'week';
 
     private const SOURCE_LABELS = [
-        'self' => 'سایت (خود بیمار)',
+        'self' => 'سایت (خود مراجع)',
         'staff' => 'منشی / مدیریت',
         'voip' => 'تلفن (ویپ)',
         'import' => 'ایمپورت شده',
@@ -435,7 +435,7 @@ class AppointmentReport extends Component
 
     /**
      * منبع ثبت نوبت، هم ارز AppointmentUser::registrationSource():
-     * ابتدا منبع ذخیره شده در جزئیات، وگرنه اگر ثبت کننده کسی غیر از خود بیمار باشد «منشی/مدیریت».
+     * ابتدا منبع ذخیره شده در جزئیات، وگرنه اگر ثبت کننده کسی غیر از خود مراجع باشد «منشی/مدیریت».
      */
     private function sourceSql(string $table = ''): string
     {

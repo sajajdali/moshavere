@@ -14,7 +14,7 @@ enum AppointmentVia: int implements EnumHasNameInterface , EnumHasApiResultInter
     public function getName(): string
     {
         return match($this) {
-            self::SELF => 'توسط بیمار',
+            self::SELF => 'توسط مراجع',
             self::BY_ADMIN => 'توسط ادمین',
             self::IMPORT_FROM => 'ایمپورت شده',
             self::VOIP => 'از طریق ویپ',

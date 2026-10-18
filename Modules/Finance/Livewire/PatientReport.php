@@ -13,7 +13,7 @@ use Modules\Finance\Livewire\Concerns\InteractsWithFinanceFilters;
 use Modules\Finance\Services\FinanceReportService;
 use Modules\User\Entities\User;
 
-#[Title('گزارش مالی بیماران')]
+#[Title('گزارش مالی مراجعین')]
 class PatientReport extends Component
 {
     use InteractsWithFinanceFilters, WithPagination;

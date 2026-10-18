@@ -33,7 +33,7 @@ class CallResultPresentation
         }
 
         if ($call->wasDisconnectedByPatient()) {
-            return 'مشاوره برقرار شد؛ تماس توسط بیمار پایان یافت';
+            return 'مشاوره برقرار شد؛ تماس توسط مراجع پایان یافت';
         }
 
         if ($call->countsAsUnanswered()) {

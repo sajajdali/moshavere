@@ -81,7 +81,7 @@
 
     <div class="page-header">
         <div>
-            <h1 class="page-title">پرونده بیمار</h1>
+            <h1 class="page-title">پرونده مراجع</h1>
         </div>
         <div class="ms-auto pageheader-btn d-flex gap-2">
             <a href="{{ route('admin.user.report', $user) }}" class="btn btn-secondary">
@@ -233,7 +233,7 @@
         {{-- appointments --}}
         <div class="pf-panel" x-show="tab === 'appointments'" wire:loading.class="op-0-3" wire:target="appointments_page">
             @if ($appointments->isEmpty())
-                <div class="pf-empty"><i class="fa fa-calendar-o" aria-hidden="true"></i>برای این بیمار نوبتی ثبت نشده است</div>
+                <div class="pf-empty"><i class="fa fa-calendar-o" aria-hidden="true"></i>برای این مراجع نوبتی ثبت نشده است</div>
             @else
                 <div class="table-responsive">
                     <table class="table table-hover pf-table text-nowrap text-center mb-0">
@@ -315,14 +315,14 @@
                     </div>
                 </details>
             @empty
-                <div class="pf-empty"><i class="fa fa-star-o" aria-hidden="true"></i>این بیمار هنوز به نظرسنجی ای پاسخ نداده است</div>
+                <div class="pf-empty"><i class="fa fa-star-o" aria-hidden="true"></i>این مراجع هنوز به نظرسنجی ای پاسخ نداده است</div>
             @endforelse
         </div>
 
         {{-- payments --}}
         <div class="pf-panel" x-show="tab === 'payments'" x-cloak wire:loading.class="op-0-3" wire:target="payments_page">
             @if ($payments->isEmpty())
-                <div class="pf-empty"><i class="fa fa-credit-card" aria-hidden="true"></i>پرداختی برای این بیمار ثبت نشده است</div>
+                <div class="pf-empty"><i class="fa fa-credit-card" aria-hidden="true"></i>پرداختی برای این مراجع ثبت نشده است</div>
             @else
                 <div class="table-responsive">
                     <table class="table table-hover pf-table text-nowrap text-center mb-0">
@@ -372,7 +372,7 @@
             @else
                 <div class="pf-soon">
                     <i class="fa fa-line-chart" aria-hidden="true"></i>
-                    برای مشاهدهٔ گزارش مالی بیمار به دسترسی «مدیریت مالی» نیاز دارید.
+                    برای مشاهدهٔ گزارش مالی مراجع به دسترسی «مدیریت مالی» نیاز دارید.
                 </div>
             @endif
         </div>

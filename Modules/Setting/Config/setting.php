@@ -267,7 +267,7 @@ $setting = [
         ],
     ],
     'REGISTRATION' => [
-        'title' => 'ثبت نام بیماران',
+        'title' => 'ثبت نام مراجعین',
         'icon' => 'fa fa-user',
         'settings' => [
             \Modules\Setting\Enum\SettingKeyEnum::USER_REGISTER_NATIONAL_CODE_REQUIRED,

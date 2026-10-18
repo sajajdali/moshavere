@@ -46,7 +46,7 @@ return [
                 'children' => null,
             ],
             [
-                'title' => 'گزارش مالی بیماران',
+                'title' => 'گزارش مالی مراجعین',
                 'gate' => 'finance',
                 'policy_class' => null,
                 'icon' => 'fe fe-file-text',

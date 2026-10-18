@@ -15,7 +15,7 @@
             <h3 class="fin-card-title"><i class="fa fa-{{ $editingId ? 'pencil' : 'plus' }}"></i> {{ $editingId ? 'ویرایش دلیل پرداخت' : 'افزودن دلیل پرداخت' }}</h3>
         </div>
         <div class="fin-card-body">
-            <p class="text-muted small">دلیل پرداخت مشخص می کند بیمار مبلغ را برای چه چیزی پرداخت کرده است (مثلا بیعانه نوبت بعدی). این فهرست را کلینیک خودش مدیریت می کند و در همهٔ گزارش ها استفاده می شود.</p>
+            <p class="text-muted small">دلیل پرداخت مشخص می کند مراجع مبلغ را برای چه چیزی پرداخت کرده است (مثلا بیعانه نوبت بعدی). این فهرست را کلینیک خودش مدیریت می کند و در همهٔ گزارش ها استفاده می شود.</p>
             <form wire:submit.prevent="save" class="row g-3 align-items-end">
                 <div class="col-md-6">
                     <label class="form-label">عنوان <span class="text-danger">*</span></label>

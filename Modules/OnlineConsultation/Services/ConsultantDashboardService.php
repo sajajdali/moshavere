@@ -78,6 +78,7 @@ class ConsultantDashboardService
         Carbon $to,
         ?int $practitionerId = null,
         bool $includeInPerson = false,
+        bool $includeCancelled = false,
     ): Builder
     {
         return AppointmentUser::query()
@@ -85,7 +86,7 @@ class ConsultantDashboardService
                 AppointmentUserKindEnum::ONLINE->value,
                 AppointmentUserKindEnum::VOIP->value,
             ]))
-            ->where('status', '<>', AppointmentUserStatusEnum::STATUS_CANCEL->value)
+            ->when(! $includeCancelled, fn (Builder $query) => $query->where('status', '<>', AppointmentUserStatusEnum::STATUS_CANCEL->value))
             ->whereBetween('date_visit', [$from, $to])
             ->whereHas('doctor', fn (Builder $q) => $q->whereHas('consultationPractitioner', fn (Builder $p) => $p->where('active', true)))
             ->when($practitionerId, fn (Builder $q) => $q->where('doctor_id', $practitionerId));
@@ -107,9 +108,12 @@ class ConsultantDashboardService
         $status = 'pending';
         $reason = null;
 
-        if ($appointment->consultationCase?->state === 'PATIENT_NO_SHOW') {
+        if ($appointment->status === AppointmentUserStatusEnum::STATUS_CANCEL) {
+            $status = 'cancelled';
+            $reason = 'این نوبت کنسل شده است.';
+        } elseif ($appointment->consultationCase?->state === 'PATIENT_NO_SHOW') {
             $status = 'patient_no_show';
-            $reason = 'عدم حضور بیمار؛ کل زمان نوبت تسویه شده و بازگشت کیف پول صفر است.';
+            $reason = 'عدم حضور مراجع؛ کل زمان نوبت تسویه شده و بازگشت کیف پول صفر است.';
             if ($inbound->isNotEmpty() || $answered->isNotEmpty()) $reason .= ' هشدار: تماس پس از ثبت عدم حضور دریافت شده؛ نیازمند بررسی اعتراض.';
         } elseif ($appointment->consultationCase?->state === 'COMPLETED') {
             $status = 'completed';
@@ -121,10 +125,10 @@ class ConsultantDashboardService
             $reason = $status === 'review' ? 'مجموع مکالمه از حد تماس کوتاه تنظیم‌شده بیشتر نشده است.' : null;
         } elseif ($past && $inboundInWindow->isNotEmpty() && $inboundInWindow->every(fn ($c) => $c->final_result !== 'ANSWERED')) {
             $status = 'practitioner_no_answer';
-            $reason = 'بیمار تماس گرفته اما مشاور پاسخ نداده است.';
+            $reason = 'مراجع تماس گرفته اما مشاور پاسخ نداده است.';
         } elseif ($past && $outboundInWindow->isNotEmpty() && $outboundInWindow->every(fn ($c) => $c->final_result !== 'ANSWERED')) {
             $status = 'patient_no_answer';
-            $reason = 'مشاور تماس گرفته اما بیمار پاسخ نداده است.';
+            $reason = 'مشاور تماس گرفته اما مراجع پاسخ نداده است.';
         } elseif ($past && $inWindow->isNotEmpty()) {
             $status = 'failed';
             $reason = 'تمام تلاش‌های تماس ناموفق یا بدون مکالمه بوده‌اند.';
@@ -147,7 +151,7 @@ class ConsultantDashboardService
         }
 
         $appointment->setAttribute('dashboard', [
-            'status' => $status, 'reason' => $reason, 'alert' => ! in_array($status, ['completed', 'patient_no_show'], true) && $past && $answered->isEmpty(),
+            'status' => $status, 'reason' => $reason, 'alert' => ! in_array($status, ['completed', 'patient_no_show', 'cancelled'], true) && $past && $answered->isEmpty(),
             'calls' => $calls->count(), 'answered' => $answered->count(), 'unanswered' => $unanswered->count(),
             'early_calls' => $earlyCalls->count(),
             'patient_attempts' => $inbound->count(), 'practitioner_attempts' => $outbound->count(),

@@ -43,7 +43,7 @@ class AppointmentUser extends Model
     const USER_MODEL = 'user_model';
     const DISAPPROVED_DESCRIPTION = 'disapproved_description';
 
-    //تنظیمات ثبت حضور و یا عدم حضور بیمار در مطب
+    //تنظیمات ثبت حضور و یا عدم حضور مراجع در مطب
     const USRE_ATTENDED_STATUS = 'user_attenede_status';
     const PENDING_APPOINTMENT_BY_SECRETERY = 'pendding_appointment_by_secretery';
 
@@ -101,7 +101,7 @@ class AppointmentUser extends Model
         static::updating(function (self $appointment) {
             if ($appointment->isDirty(['status', 'kind', 'user_id', 'doctor_id', 'date_visit', 'start_time', 'end_time'])
                 && $appointment->fresh()?->hasFinalizedPatientNoShow()) {
-                throw \Illuminate\Validation\ValidationException::withMessages(['appointment' => 'این نوبت بابت عدم حضور بیمار تسویه قطعی شده است؛ تغییر مشخصات، زمان یا لغو آن مجاز نیست.']);
+                throw \Illuminate\Validation\ValidationException::withMessages(['appointment' => 'این نوبت بابت عدم حضور مراجع تسویه قطعی شده است؛ تغییر مشخصات، زمان یا لغو آن مجاز نیست.']);
             }
         });
         // تاریخچه تغییر وضعیت (فقط برای مدیر کل قابل مشاهده است)
@@ -117,13 +117,13 @@ class AppointmentUser extends Model
         static::restored(fn (self $a) => AppointmentStatusLog::record($a, AppointmentStatusLog::EVENT_RESTORED, null, $a->status));
         static::deleting(function (self $appointment) {
             if ($appointment->hasFinalizedPatientNoShow()) {
-                throw \Illuminate\Validation\ValidationException::withMessages(['appointment' => 'نوبت تسویه‌شده بابت عدم حضور بیمار برای حفظ سوابق مالی قابل حذف نیست.']);
+                throw \Illuminate\Validation\ValidationException::withMessages(['appointment' => 'نوبت تسویه‌شده بابت عدم حضور مراجع برای حفظ سوابق مالی قابل حذف نیست.']);
             }
         });
     }
 
     /**
-     * لینک نظرسنجی برای بیمار. در قالب جدید با کد پیگیری (۸ رقمی تصادفی) ساخته میشود
+     * لینک نظرسنجی برای مراجع. در قالب جدید با کد پیگیری (۸ رقمی تصادفی) ساخته میشود
      * تا بدون ورود قابل استفاده باشد ولی با حدس زدن شناسه نوبت باز نشود (IDOR)؛
      * در قالب قدیم همان لینک قبلی است.
      */
@@ -166,7 +166,7 @@ class AppointmentUser extends Model
 
     /**
      * منبع ثبت نوبت. در نوبت های قدیمی که منبع در جزئیات ذخیره نشده، اگر ثبت کننده
-     * شخصی غیر از خود بیمار باشد نوبت از پنل مدیریت ثبت شده است.
+     * شخصی غیر از خود مراجع باشد نوبت از پنل مدیریت ثبت شده است.
      */
     public function registrationSource(): AppointmentVia
     {

@@ -104,7 +104,7 @@ class ConsultantDashboardController extends Controller
         return response()->streamDownload(function () use ($items) {
             $out = fopen('php://output', 'w');
             fwrite($out, "\xEF\xBB\xBF");
-            fputcsv($out, ['کد نوبت', 'مشاور', 'بیمار', 'موبایل', 'زمان نوبت', 'وضعیت', 'علت', 'تماس بیمار', 'تماس مشاور', 'پاسخ', 'بی‌پاسخ در زمان نوبت', 'تماس زودهنگام', 'مکالمه (ثانیه)', 'پرداخت', 'بازگشت']);
+            fputcsv($out, ['کد نوبت', 'مشاور', 'مراجع', 'موبایل', 'زمان نوبت', 'وضعیت', 'علت', 'تماس مراجع', 'تماس مشاور', 'پاسخ', 'بی‌پاسخ در زمان نوبت', 'تماس زودهنگام', 'مکالمه (ثانیه)', 'پرداخت', 'بازگشت']);
             foreach ($items as $a) {
                 fputcsv($out, [$a->tracking_code ?: $a->id, $a->doctor?->fullName, $a->user?->fullName, $a->user?->mobile, $a->date_visit, $a->dashboard['status'], $a->dashboard['reason'], $a->dashboard['patient_attempts'], $a->dashboard['practitioner_attempts'], $a->dashboard['answered'], $a->dashboard['unanswered'], $a->dashboard['early_calls'], $a->dashboard['talk_seconds'], $a->billingRecord?->total_paid_amount, $a->billingRecord?->refunded_amount]);
             }

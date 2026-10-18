@@ -38,7 +38,7 @@ class AppointmentAlternatePhoneController extends Controller
                 if ($existingPhone) {
                     if ((int) $existingPhone->patient_id === (int) $appointment->user_id) {
                         throw ValidationException::withMessages([
-                            'alternate_phone' => 'این شماره قبلاً برای همین بیمار ثبت شده است.',
+                            'alternate_phone' => 'این شماره قبلاً برای همین مراجع ثبت شده است.',
                         ]);
                     }
                     if (! $request->boolean('transfer_confirmed')) {
@@ -87,8 +87,8 @@ class AppointmentAlternatePhoneController extends Controller
 
         $alternatePhone->load('creator');
         $message = $transferred
-            ? 'شماره ثابت با موفقیت به این بیمار منتقل شد و اتصال آن از بیمار قبلی حذف شد.'
-            : 'شماره ثابت به حساب بیمار اضافه شد و برای همه نوبت‌های او در VoIP قابل شناسایی است.';
+            ? 'شماره ثابت با موفقیت به این مراجع منتقل شد و اتصال آن از مراجع قبلی حذف شد.'
+            : 'شماره ثابت به حساب مراجع اضافه شد و برای همه نوبت‌های او در VoIP قابل شناسایی است.';
         if ($request->expectsJson()) {
             return response()->json([
                 'message' => $message,
@@ -112,10 +112,10 @@ class AppointmentAlternatePhoneController extends Controller
         $alternatePhone->delete();
 
         if ($request->expectsJson()) {
-            return response()->json(['message' => 'شماره ثابت از حساب بیمار حذف شد.']);
+            return response()->json(['message' => 'شماره ثابت از حساب مراجع حذف شد.']);
         }
 
-        return back()->with('success', 'شماره ثابت از حساب بیمار حذف شد.');
+        return back()->with('success', 'شماره ثابت از حساب مراجع حذف شد.');
     }
 
     private function authorizeMutation(Request $request, AppointmentUser $appointment): void

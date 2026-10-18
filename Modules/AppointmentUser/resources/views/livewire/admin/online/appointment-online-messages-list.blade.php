@@ -119,7 +119,7 @@
                                                 <label for="search-UserMobile" class="form-label"><strong>کد
                                                         ملی</strong></label>
                                                 <input class="form-control" id="search-UserMobile"
-                                                    wire:model="search.nationalCode" placeholder="کد ملی بیمار"
+                                                    wire:model="search.nationalCode" placeholder="کد ملی مراجع"
                                                     type="text">
 
                                             </div>

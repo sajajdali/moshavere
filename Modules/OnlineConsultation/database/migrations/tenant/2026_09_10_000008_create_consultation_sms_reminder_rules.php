@@ -51,14 +51,14 @@ return new class extends Migration
         $practitionerTemplate = trim((string) $setting(510, ''));
 
         $rules = [
-            ['title' => 'یادآوری اول بیمار', 'recipient_type' => 'patient', 'minutes_before' => max(1, (int) $setting(502, 180)), 'template' => $firstTemplate ?: null, 'active' => $firstTemplate !== '' && $enabled($setting(500, false))],
-            ['title' => 'یادآوری نهایی بیمار', 'recipient_type' => 'patient', 'minutes_before' => max(1, (int) $setting(508, 15)), 'template' => $finalTemplate ?: null, 'active' => $finalTemplate !== '' && $enabled($setting(506, false))],
+            ['title' => 'یادآوری اول مراجع', 'recipient_type' => 'patient', 'minutes_before' => max(1, (int) $setting(502, 180)), 'template' => $firstTemplate ?: null, 'active' => $firstTemplate !== '' && $enabled($setting(500, false))],
+            ['title' => 'یادآوری نهایی مراجع', 'recipient_type' => 'patient', 'minutes_before' => max(1, (int) $setting(508, 15)), 'template' => $finalTemplate ?: null, 'active' => $finalTemplate !== '' && $enabled($setting(506, false))],
             ['title' => 'یادآوری نوبت برای مشاور', 'recipient_type' => 'practitioner', 'minutes_before' => $practitionerTemplate !== '' ? max(1, (int) $setting(511, 20)) : 20, 'template' => $practitionerTemplate ?: null, 'active' => $practitionerTemplate !== '' && $enabled($setting(509, false))],
         ];
 
         $secondTemplate = trim((string) $setting(504, ''));
         if ($secondTemplate !== '') {
-            $rules[] = ['title' => 'یادآوری دوم بیمار', 'recipient_type' => 'patient', 'minutes_before' => max(1, (int) $setting(505, 60)), 'template' => $secondTemplate, 'active' => $enabled($setting(503, false))];
+            $rules[] = ['title' => 'یادآوری دوم مراجع', 'recipient_type' => 'patient', 'minutes_before' => max(1, (int) $setting(505, 60)), 'template' => $secondTemplate, 'active' => $enabled($setting(503, false))];
         }
 
         foreach ($rules as $rule) {
@@ -66,9 +66,9 @@ return new class extends Migration
         }
 
         $legacyTypes = [
-            'patient_first_reminder' => ['patient', 'یادآوری اول بیمار'],
-            'patient_second_reminder' => ['patient', 'یادآوری دوم بیمار'],
-            'patient_final_reminder' => ['patient', 'یادآوری نهایی بیمار'],
+            'patient_first_reminder' => ['patient', 'یادآوری اول مراجع'],
+            'patient_second_reminder' => ['patient', 'یادآوری دوم مراجع'],
+            'patient_final_reminder' => ['patient', 'یادآوری نهایی مراجع'],
             'practitioner_appointment_reminder' => ['practitioner', 'یادآوری نوبت برای مشاور'],
         ];
         foreach ($legacyTypes as $type => [$recipientType, $title]) {

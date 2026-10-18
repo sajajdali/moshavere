@@ -128,7 +128,7 @@
             <div>
                 <div class="appointment-breadcrumb"><span>پیشخوان</span><span>/</span><span>نوبت‌ها</span></div>
                 <h1 class="appointment-title">لیست نوبت‌های ثبت شده</h1>
-                <div class="appointment-subtitle">مدیریت و پیگیری نوبت‌های بیماران - نمایش {{ $appointments->firstItem() ?? 0 }} تا {{ $appointments->lastItem() ?? 0 }} از {{ $appointments->total() }} نوبت</div>
+                <div class="appointment-subtitle">مدیریت و پیگیری نوبت‌های مراجعین - نمایش {{ $appointments->firstItem() ?? 0 }} تا {{ $appointments->lastItem() ?? 0 }} از {{ $appointments->total() }} نوبت</div>
             </div>
             <div class="appointment-actions">
                 <button wire:loading.class="btn-loading bg-gray" wire:target="ExportData" wire:click="ExportData" class="om-btn" type="button">
@@ -412,7 +412,7 @@
                             </div>
                             @php
                                 [$sourceLabel, $sourceIcon, $sourceStyle] = match ($ap->registrationSource()) {
-                                    \Modules\AppointmentUser\Enum\AppointmentVia::SELF => ['سایت (خود بیمار)', 'fa-globe', 'background:#ecfdf3;color:#067647;border-color:#abefc6'],
+                                    \Modules\AppointmentUser\Enum\AppointmentVia::SELF => ['سایت (خود مراجع)', 'fa-globe', 'background:#ecfdf3;color:#067647;border-color:#abefc6'],
                                     \Modules\AppointmentUser\Enum\AppointmentVia::BY_ADMIN => ['پنل مدیریت', 'fa-user-md', 'background:#eff8ff;color:#175cd3;border-color:#b2ddff'],
                                     \Modules\AppointmentUser\Enum\AppointmentVia::VOIP => ['تلفن (ویپ)', 'fa-phone', 'background:#f0f9ff;color:#026aa2;border-color:#b9e6fe'],
                                     \Modules\AppointmentUser\Enum\AppointmentVia::IMPORT_FROM => ['ایمپورت شده', 'fa-download', ''],

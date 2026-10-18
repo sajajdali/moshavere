@@ -11,7 +11,7 @@
                 </button>
             @endif
             <a href="{{ route('admin.finance.payments') }}" class="btn btn-secondary"><i class="fa fa-list me-1" aria-hidden="true"></i> همه پرداخت ها</a>
-            <a href="{{ route('admin.finance.patients') }}" class="btn btn-secondary"><i class="fa fa-users me-1" aria-hidden="true"></i> گزارش بیماران</a>
+            <a href="{{ route('admin.finance.patients') }}" class="btn btn-secondary"><i class="fa fa-users me-1" aria-hidden="true"></i> گزارش مراجعین</a>
         </div>
     </div>
     @include('admin::layouts.components.alert')
@@ -65,14 +65,14 @@
                 <div class="fin-card">
                     <div class="fin-card-head">
                         <h3 class="fin-card-title"><i class="fa fa-trophy"></i> بیشترین پرداخت</h3>
-                        <a href="{{ route('admin.finance.patients') }}" class="small">همه بیماران</a>
+                        <a href="{{ route('admin.finance.patients') }}" class="small">همه مراجعین</a>
                     </div>
                     <div class="fin-card-body p-0">
                         @if ($summary['topPatients']->isEmpty())
                             <div class="fin-empty" style="padding: 20px 0">داده ای وجود ندارد</div>
                         @else
                             <table class="table table-hover fin-table mb-0">
-                                <thead><tr><th>بیمار</th><th class="text-center">تعداد</th><th class="text-end">خالص (تومان)</th></tr></thead>
+                                <thead><tr><th>مراجع</th><th class="text-center">تعداد</th><th class="text-end">خالص (تومان)</th></tr></thead>
                                 <tbody>
                                     @foreach ($summary['topPatients'] as $patient)
                                         <tr>

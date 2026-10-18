@@ -47,7 +47,7 @@
                 <span><i class="fa fa-phone"></i><bdi>{{ $user->mobile ?: 'ثبت نشده' }}</bdi></span>
                 <span><i class="fa fa-envelope"></i><bdi>{{ $user->email ?: 'ثبت نشده' }}</bdi></span>
                 <span><i class="fa fa-calendar"></i>عضویت: {{ $user->created_at ? verta($user->created_at)->format('Y/m/d') : '—' }}</span>
-                <span><i class="fa fa-user-md"></i>{{ $stats['patient_appointments'] }} نوبت به‌عنوان بیمار · {{ $stats['provider_appointments'] }} نوبت به‌عنوان پزشک</span>
+                <span><i class="fa fa-user-md"></i>{{ $stats['patient_appointments'] }} نوبت به‌عنوان مراجع · {{ $stats['provider_appointments'] }} نوبت به‌عنوان پزشک</span>
             </div>
         </div>
         <div class="report-health">
@@ -75,7 +75,7 @@
 
     <section class="card report-card" id="appointments">
         <div class="card-header report-card-header">
-            <div><span class="report-section-icon blue"><i class="fa fa-calendar"></i></span><div><h3 class="card-title">تاریخچه کامل نوبت‌ها</h3><p>نوبت‌های کاربر در نقش بیمار و پزشک، همراه وضعیت و جزئیات مالی</p></div></div>
+            <div><span class="report-section-icon blue"><i class="fa fa-calendar"></i></span><div><h3 class="card-title">تاریخچه کامل نوبت‌ها</h3><p>نوبت‌های کاربر در نقش مراجع و پزشک، همراه وضعیت و جزئیات مالی</p></div></div>
             @if($schemas['appointmentSchema'])
                 <select class="form-control report-filter" wire:model.live="appointmentStatus" aria-label="فیلتر وضعیت نوبت">
                     <option value="">همه وضعیت‌ها</option>
@@ -89,7 +89,7 @@
             @elseif($appointments->isEmpty())
                 <div class="report-empty"><i class="fa fa-calendar-times-o"></i><strong>نوبتی با این مشخصات ثبت نشده است.</strong></div>
             @else
-                <div class="table-responsive"><table class="table report-table mb-0"><thead><tr><th>نوبت</th><th>نقش کاربر</th><th>پزشک / بیمار</th><th>زمان مراجعه</th><th>نوع</th><th>وضعیت</th><th>مبلغ</th><th>پرونده</th></tr></thead><tbody>
+                <div class="table-responsive"><table class="table report-table mb-0"><thead><tr><th>نوبت</th><th>نقش کاربر</th><th>پزشک / مراجع</th><th>زمان مراجعه</th><th>نوع</th><th>وضعیت</th><th>مبلغ</th><th>پرونده</th></tr></thead><tbody>
                 @foreach($appointments as $appointment)
                     @php
                         $isPatient = (int) $appointment->user_id === (int) $user->id;
@@ -98,11 +98,11 @@
                     @endphp
                     <tr data-href="{{ $appointmentUrl }}" tabindex="0" role="link" aria-label="مشاهده جزئیات و پرونده نوبت {{ $appointment->id }}" @class(['report-appointment-row', 'report-deleted' => $appointment->trashed()])>
                         <td><a class="report-appointment-link" href="{{ $appointmentUrl }}"><strong>#{{ $appointment->id }}</strong><small>{{ $appointment->tracking_code ?: 'بدون کد پیگیری' }}</small></a></td>
-                        <td><span class="report-pill {{ $isPatient ? 'report-pill-primary' : 'report-pill-purple' }}">{{ $isPatient ? 'بیمار' : 'پزشک / ارائه‌دهنده' }}</span></td>
+                        <td><span class="report-pill {{ $isPatient ? 'report-pill-primary' : 'report-pill-purple' }}">{{ $isPatient ? 'مراجع' : 'پزشک / ارائه‌دهنده' }}</span></td>
                         <td><strong>{{ $isPatient ? ($appointment->doctor?->full_name ?: '—') : ($appointment->user?->full_name ?: '—') }}</strong><small><bdi>{{ $isPatient ? ($appointment->doctor?->mobile ?: '—') : ($appointment->user?->mobile ?: '—') }}</bdi></small></td>
                         <td><strong><bdi>{{ $appointment->date_visit ? verta($appointment->date_visit)->format('Y/m/d H:i') : '—' }}</bdi></strong><small>{{ $appointment->start_time ? substr($appointment->start_time, 0, 5) : '—' }} تا {{ $appointment->end_time ? substr($appointment->end_time, 0, 5) : '—' }}</small></td>
                         <td><span class="report-pill">{{ $appointment->kind?->getName() ?? '—' }}</span><small>{{ $appointment->service?->title ?: $appointment->place?->title }}</small></td>
-                        <td><span class="badge {{ $appointment->status?->getBadgeColor() }}">{{ $appointment->status?->getName() ?? '—' }}</span>@if($appointment->hasFinalizedPatientNoShow())<small class="text-danger d-block">عدم حضور بیمار؛ تسویه کامل بدون بازگشت وجه</small>@endif@if($appointment->trashed())<small class="text-danger">حذف‌شده</small>@endif</td>
+                        <td><span class="badge {{ $appointment->status?->getBadgeColor() }}">{{ $appointment->status?->getName() ?? '—' }}</span>@if($appointment->hasFinalizedPatientNoShow())<small class="text-danger d-block">عدم حضور مراجع؛ تسویه کامل بدون بازگشت وجه</small>@endif@if($appointment->trashed())<small class="text-danger">حذف‌شده</small>@endif</td>
                         <td><strong>{{ number_format($price) }}</strong><small>تومان</small>@if($appointment->transaction)<small>روش پرداخت: {{ $appointment->transaction->paid_by?->getName() ?: '—' }}</small>@endif</td>
                         <td><a class="btn btn-sm btn-outline-primary report-appointment-action" href="{{ $appointmentUrl }}"><i class="fa fa-folder-open me-1"></i> جزئیات و پرونده</a></td>
                     </tr>
@@ -145,13 +145,13 @@
                     @endphp
                     <tr>
                         <td><strong><bdi>{{ $call->call_entered_at ? verta($call->call_entered_at)->format('Y/m/d H:i:s') : verta($call->created_at)->format('Y/m/d H:i:s') }}</bdi></strong><small class="ltr">{{ $call->call_id }}</small></td>
-                        <td><span class="report-pill {{ $patientRole ? 'report-pill-primary' : 'report-pill-purple' }}">{{ $patientRole ? 'بیمار' : 'پزشک / اپراتور' }}</span><small>{{ $call->direction === 'OUTBOUND' ? 'خروجی' : ($call->direction === 'INBOUND' ? 'ورودی' : 'نامشخص') }}</small></td>
+                        <td><span class="report-pill {{ $patientRole ? 'report-pill-primary' : 'report-pill-purple' }}">{{ $patientRole ? 'مراجع' : 'پزشک / اپراتور' }}</span><small>{{ $call->direction === 'OUTBOUND' ? 'خروجی' : ($call->direction === 'INBOUND' ? 'ورودی' : 'نامشخص') }}</small></td>
                         <td><strong class="ltr">{{ $call->patient_phone ?: '—' }}</strong><small class="ltr">مقصد: {{ $call->connected_destination ?: $call->primary_extension ?: $call->destination ?: '—' }}</small></td>
                         <td>@if($call->appointment_id)<strong>#{{ $call->appointment_id }}</strong><small>{{ $call->appointment?->tracking_code ?: '—' }}</small>@else<span class="report-pill">بدون نوبت مرتبط</span>@endif</td>
                         <td><span class="report-result is-{{ $resultTone }}"><i class="fa {{ $resultOk ? 'fa-check' : ($earlyCall ? 'fa-clock-o' : 'fa-times') }}"></i>{{ $displayResult }}</span><small>{{ ['DIRECT'=>'مستقیم','DIVERTED'=>'انتقال‌یافته','NONE'=>'بدون اتصال'][$call->connection_type] ?? $call->connection_type }}</small>@if($call->surveyScore() !== null)<small><i class="fa fa-star" aria-hidden="true"></i> نظرسنجی: {{ $call->surveyScore() }} از ۵</small>@endif</td>
                         <td><bdi>{{ $duration($call->wait_duration_seconds + $call->ring_duration_seconds) }}</bdi></td>
                         <td><strong class="report-talk"><bdi>{{ $duration($call->talk_duration_seconds) }}</bdi></strong></td>
-                        <td>{{ $earlyCall ? 'خارج از بازه نوبت' : ($completedHangup ? 'پایان عادی توسط پزشک' : (['PATIENT'=>'بیمار','DOCTOR'=>'پزشک','SYSTEM'=>'سیستم','UNKNOWN'=>'نامشخص'][$call->disconnected_by] ?? '—')) }}<small>{{ $earlyCall ? 'جزو بی‌پاسخ نیست' : ($completedHangup ? 'مشاوره بیشتر از حد تنظیم‌شده انجام شده' : 'علت: '.($call->hangup_cause ?? '—') ) }}</small></td>
+                        <td>{{ $earlyCall ? 'خارج از بازه نوبت' : ($completedHangup ? 'پایان عادی توسط پزشک' : (['PATIENT'=>'مراجع','DOCTOR'=>'پزشک','SYSTEM'=>'سیستم','UNKNOWN'=>'نامشخص'][$call->disconnected_by] ?? '—')) }}<small>{{ $earlyCall ? 'جزو بی‌پاسخ نیست' : ($completedHangup ? 'مشاوره بیشتر از حد تنظیم‌شده انجام شده' : 'علت: '.($call->hangup_cause ?? '—') ) }}</small></td>
                     </tr>
                 @endforeach
                 </tbody></table></div>

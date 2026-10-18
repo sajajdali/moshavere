@@ -13,7 +13,7 @@
                     <div class="modal-body">
                         {{-- patient --}}
                         <div class="mb-4">
-                            <label class="form-label">بیمار <span class="text-danger">*</span></label>
+                            <label class="form-label">مراجع <span class="text-danger">*</span></label>
                             @if ($patient)
                                 <div class="d-flex align-items-center justify-content-between border rounded-phil p-2 px-3" style="background: var(--fin-soft)">
                                     <span><i class="fa fa-user-o me-2 text-muted"></i><strong>{{ $patient->fullName ?: $patient->mobile }}</strong>
@@ -24,7 +24,7 @@
                                 </div>
                             @else
                                 <input type="text" class="form-control" wire:model.live.debounce.400ms="patientSearch"
-                                    placeholder="نام یا موبایل بیمار را بنویسید..." autocomplete="off">
+                                    placeholder="نام یا موبایل مراجع را بنویسید..." autocomplete="off">
                                 @if ($results->isNotEmpty())
                                     <div class="list-group mt-1">
                                         @foreach ($results as $result)
@@ -36,7 +36,7 @@
                                         @endforeach
                                     </div>
                                 @elseif (mb_strlen(trim($patientSearch)) >= 2)
-                                    <div class="fin-amount-hint">بیماری پیدا نشد.</div>
+                                    <div class="fin-amount-hint">مراجعی پیدا نشد.</div>
                                 @endif
                             @endif
                             @error('userId') <div class="text-danger small mt-1">{{ $message }}</div> @enderror
@@ -128,7 +128,7 @@
                                 {{-- select2: its options are the patient's appointments, sent by the `finance-appointments` event (see the script) --}}
                                 <div wire:ignore>
                                     <select class="form-select" id="financeAppointmentSelect" disabled>
-                                        <option value="">ابتدا بیمار را انتخاب کنید</option>
+                                        <option value="">ابتدا مراجع را انتخاب کنید</option>
                                     </select>
                                 </div>
                                 @error('form.appointment_user_id') <div class="text-danger small mt-1">{{ $message }}</div> @enderror
@@ -200,7 +200,7 @@
                     });
                     Livewire.on('finance-appointments', function(data) {
                         var selected = String(data.selected || '');
-                        $appointment.empty().append(new Option(data.hasPatient ? 'بدون نوبت مشخص' : 'ابتدا بیمار را انتخاب کنید', '', false, false));
+                        $appointment.empty().append(new Option(data.hasPatient ? 'بدون نوبت مشخص' : 'ابتدا مراجع را انتخاب کنید', '', false, false));
                         (data.options || []).forEach(function(option) {
                             $appointment.append(new Option(option.text, option.id, false, option.id === selected));
                         });

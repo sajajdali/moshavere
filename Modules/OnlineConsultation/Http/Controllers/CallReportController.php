@@ -290,7 +290,7 @@ class CallReportController extends Controller
 
         $message = match (true) {
             $smsQueued => 'زمان نوبت با موفقیت تغییر کرد و پیامک تغییر زمان در صف ارسال قرار گرفت.',
-            $request->boolean('send_sms') => 'زمان نوبت تغییر کرد؛ اما قالب پیامک یا شماره موبایل بیمار در دسترس نبود.',
+            $request->boolean('send_sms') => 'زمان نوبت تغییر کرد؛ اما قالب پیامک یا شماره موبایل مراجع در دسترس نبود.',
             default => 'زمان نوبت با موفقیت تغییر کرد.',
         };
 
@@ -333,7 +333,7 @@ class CallReportController extends Controller
             'reason' => ['nullable', 'string', 'max:2000'],
         ]);
         $service->confirmAndRefund($billingRecord, (int) $data['approved_unused_minutes'], $request->user(), $data['reason'] ?? null);
-        return back()->with('success', 'محاسبه نهایی تأیید، مبلغ به کیف پول بیمار واریز و رکورد مالی قفل شد.');
+        return back()->with('success', 'محاسبه نهایی تأیید، مبلغ به کیف پول مراجع واریز و رکورد مالی قفل شد.');
     }
 
     public function correctBilling(Request $request, AppointmentBillingRecord $billingRecord, AppointmentBillingService $service)

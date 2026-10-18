@@ -70,7 +70,7 @@ class ConsultationCaseController extends Controller
         $this->authorizeMutation($request, $appointment);
         $request->validate(['no_show_confirmed' => ['accepted']]);
         $service->markPatientNoShow($appointment, $request->user());
-        return back()->with('success', 'عدم حضور بیمار ثبت و کل مبلغ نوبت تسویه شد؛ بازگشت به کیف پول صفر است.');
+        return back()->with('success', 'عدم حضور مراجع ثبت و کل مبلغ نوبت تسویه شد؛ بازگشت به کیف پول صفر است.');
     }
 
     public function reopen(Request $request, AppointmentUser $appointment, ConsultationCaseService $service)

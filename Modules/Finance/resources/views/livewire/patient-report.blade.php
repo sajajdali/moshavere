@@ -2,7 +2,7 @@
     @include('finance::components.assets')
     <div class="page-header">
         <div>
-            <h1 class="page-title">گزارش مالی بیماران</h1>
+            <h1 class="page-title">گزارش مالی مراجعین</h1>
         </div>
         <div class="ms-auto pageheader-btn d-flex gap-2 flex-wrap">
             @if ($canExport)
@@ -30,19 +30,19 @@
     @endphp
     <div class="fin-card" wire:loading.class="op-0-3" wire:target="filter,setRange,resetFilters,sortBy,gotoPage,nextPage,previousPage">
         <div class="fin-card-head">
-            <h3 class="fin-card-title"><i class="fa fa-users"></i> بیماران</h3>
-            <span class="text-muted small">{{ number_format($patients->total()) }} بیمار</span>
+            <h3 class="fin-card-title"><i class="fa fa-users"></i> مراجعین</h3>
+            <span class="text-muted small">{{ number_format($patients->total()) }} مراجع</span>
         </div>
         <div class="fin-card-body">
             @if ($patients->isEmpty())
-                <div class="fin-empty"><i class="fa fa-users" aria-hidden="true"></i>بیماری با این فیلترها پیدا نشد</div>
+                <div class="fin-empty"><i class="fa fa-users" aria-hidden="true"></i>مراجعی با این فیلترها پیدا نشد</div>
             @else
                 <div class="table-responsive">
                     <table class="table table-hover fin-table text-nowrap text-center mb-0">
                         <thead>
                             <tr>
                                 <th>#</th>
-                                <th class="text-start">بیمار</th>
+                                <th class="text-start">مراجع</th>
                                 @foreach ($columns as $key => $label)
                                     <th class="fin-th-sort" wire:click="sortBy('{{ $key }}')">
                                         {{ $label }}

@@ -9,7 +9,7 @@
         <div class="fin-filter-grid">
             @if (in_array('search', $show))
                 <div>
-                    <label>جستجوی بیمار (نام یا موبایل)</label>
+                    <label>جستجوی مراجع (نام یا موبایل)</label>
                     <input type="text" class="form-control" wire:model.live.debounce.500ms="filter.search" placeholder="جستجو...">
                 </div>
             @endif

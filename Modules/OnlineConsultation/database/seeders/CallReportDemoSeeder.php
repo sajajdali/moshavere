@@ -69,7 +69,7 @@ class CallReportDemoSeeder extends Seeder
             $patient = User::updateOrCreate(['mobile' => $mobile], ['password' => Hash::make('demo-only')]);
             DB::table('user_metas')->updateOrInsert(
                 ['user_id' => $patient->id, 'meta_key' => UserMetaEnum::FIRST_NAME->value],
-                ['meta_value' => 'بیمار تستی '.$index, 'updated_at' => now(), 'created_at' => now()]
+                ['meta_value' => 'مراجع تستی '.$index, 'updated_at' => now(), 'created_at' => now()]
             );
             DB::table('user_metas')->updateOrInsert(
                 ['user_id' => $patient->id, 'meta_key' => UserMetaEnum::LAST_NAME->value],

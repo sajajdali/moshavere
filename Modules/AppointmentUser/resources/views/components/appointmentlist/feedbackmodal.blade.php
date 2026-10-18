@@ -11,13 +11,13 @@
         #feedBackModal .feedback-empty{padding:35px 15px;text-align:center;color:#667085}#feedBackModal .feedback-empty i{display:block;margin-bottom:10px;color:#c7d2fe;font-size:38px}#feedBackModal .modal-footer{padding:14px 22px;border-top:1px solid #eaecf0;background:#fff}#feedBackModal .feedback-dismiss{min-width:100px;height:38px;border:0;border-radius:10px;background:#4f46e5;color:#fff;font-size:13px;font-weight:700}
     </style>
     <div wire:ignore.self class="modal fade" id="feedBackModal" tabindex="-1" aria-labelledby="feedBackModalLabel" aria-hidden="true"><div class="modal-dialog modal-dialog-centered modal-dialog-scrollable"><div class="modal-content">
-        <div class="feedback-hero"><div class="feedback-hero-content"><span class="feedback-hero-icon"><i class="fa fa-star"></i></span><div><h5 id="feedBackModalLabel">نتیجه نظرسنجی بیمار</h5><p>بازخورد ثبت‌شده برای این نوبت</p></div><button type="button" class="feedback-close" data-bs-dismiss="modal" aria-label="بستن"><i class="fa fa-times"></i></button></div></div>
+        <div class="feedback-hero"><div class="feedback-hero-content"><span class="feedback-hero-icon"><i class="fa fa-star"></i></span><div><h5 id="feedBackModalLabel">نتیجه نظرسنجی مراجع</h5><p>بازخورد ثبت‌شده برای این نوبت</p></div><button type="button" class="feedback-close" data-bs-dismiss="modal" aria-label="بستن"><i class="fa fa-times"></i></button></div></div>
         <div class="modal-body">
             @php
                 $feedbackItems = collect($fetchData['feedbacks'] ?? []);
             @endphp
             @if ($feedbackItems->isNotEmpty())
-                <div class="feedback-summary"><span class="feedback-summary-icon"><i class="fa fa-commenting"></i></span><div><strong>{{ $feedbackItems->count() }} پاسخ ثبت شده</strong><small>جزئیات پاسخ‌های بیمار را در ادامه مشاهده می‌کنید.</small></div></div>
+                <div class="feedback-summary"><span class="feedback-summary-icon"><i class="fa fa-commenting"></i></span><div><strong>{{ $feedbackItems->count() }} پاسخ ثبت شده</strong><small>جزئیات پاسخ‌های مراجع را در ادامه مشاهده می‌کنید.</small></div></div>
                 <div class="feedback-list">@foreach ($feedbackItems as $feedback)
                     @php
                         $feedbackQuestion = Modules\Front\enum\FeedbackId::tryFrom((int) $feedback->question);
@@ -31,7 +31,7 @@
                     </div></div>
                 @endforeach</div>
             @elseif (empty($fetchData['feedbackVoiceUrl']))<div class="feedback-empty"><i class="fa fa-comment-o"></i><strong>پاسخی برای این نظرسنجی ثبت نشده است.</strong></div>@endif
-            @if (! empty($fetchData['feedbackVoiceUrl']))<div class="feedback-voice"><div class="feedback-voice-head"><i class="fa fa-microphone"></i><strong>پیام صوتی بیمار</strong></div><audio controls preload="metadata" aria-label="پخش صدای ضبط‌شده بیمار"><source src="{{ $fetchData['feedbackVoiceUrl'] }}" type="audio/wav">مرورگر شما امکان پخش صدا را ندارد.</audio></div>@endif
+            @if (! empty($fetchData['feedbackVoiceUrl']))<div class="feedback-voice"><div class="feedback-voice-head"><i class="fa fa-microphone"></i><strong>پیام صوتی مراجع</strong></div><audio controls preload="metadata" aria-label="پخش صدای ضبط‌شده مراجع"><source src="{{ $fetchData['feedbackVoiceUrl'] }}" type="audio/wav">مرورگر شما امکان پخش صدا را ندارد.</audio></div>@endif
         </div>
         <div class="modal-footer"><button type="button" class="feedback-dismiss" data-bs-dismiss="modal">بستن</button></div>
     </div></div></div>

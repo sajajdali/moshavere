@@ -6,6 +6,7 @@ use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Modules\AppointmentUser\app\Models\AppointmentUser;
+use Modules\AppointmentUser\Enum\AppointmentUserStatusEnum;
 use Modules\OnlineConsultation\Models\AppointmentConsultationCase;
 use Modules\OnlineConsultation\Models\ConsultationPractitioner;
 use Modules\OnlineConsultation\Models\ConsultationSetting;
@@ -79,6 +80,7 @@ class PractitionerAppointmentService
             Carbon::create(2100, 1, 1),
             $practitioner->user_id,
             includeInPerson: true,
+            includeCancelled: true,
         )
             ->with(['user', 'service:id,title', 'place:id,title', 'callLogs', 'billingRecord.adjustments', 'consultationCase'])
             ->withCount('consultationReports');
@@ -115,7 +117,7 @@ class PractitionerAppointmentService
     {
         $starts = $item['starts_at'] ? Carbon::parse($item['starts_at']) : null;
         $ends = $item['ends_at'] ? Carbon::parse($item['ends_at']) : null;
-        $closed = $appointment->consultationCase?->isClosed() ?? false;
+        $closed = ($appointment->consultationCase?->isClosed() ?? false) || $appointment->status === AppointmentUserStatusEnum::STATUS_CANCEL;
         $completed = $appointment->consultationCase?->state === AppointmentConsultationCase::STATE_COMPLETED;
         $reports = (int) $appointment->consultation_reports_count;
         $answered = $appointment->callLogs->filter(fn ($call) => $call->occurredDuringAppointment() && $call->final_result === 'ANSWERED')->count();
@@ -126,7 +128,7 @@ class PractitionerAppointmentService
             'complete' => $this->action(! $closed && $reports > 0, $closed ? 'case_closed' : 'report_required', $closed ? 'پرونده نوبت بسته شده است.' : 'ابتدا حداقل یک گزارش ثبت کنید.', ['requires_report' => true, 'reports_count' => $reports]),
             'no_show' => $this->action(! $closed && $ends && $now->gt($ends) && $answered === 0, $closed ? 'case_closed' : (!$ends || $now->lte($ends) ? 'appointment_not_ended' : 'answered_call_in_window'), $closed ? 'پرونده نوبت بسته شده است.' : (!$ends || $now->lte($ends) ? 'بازه نوبت هنوز تمام نشده است.' : 'در بازه نوبت تماس موفق ثبت شده است.')),
             'auto_call' => $this->action(! $closed && $voipReady && $autoAfter && $ends && $now->gte($autoAfter) && $now->lte($ends), $closed ? 'case_closed' : (!$voipReady ? 'voip_not_configured' : (!$autoAfter || $now->lt($autoAfter) ? 'too_early' : 'appointment_ended')), $closed ? 'پرونده نوبت بسته شده است.' : (!$voipReady ? 'تنظیمات Softphone کامل نیست.' : (!$autoAfter || $now->lt($autoAfter) ? 'تماس خودکار شش دقیقه پس از شروع نوبت مجاز می‌شود.' : 'بازه نوبت پایان یافته است.')), ['allowed_after' => $autoAfter?->toIso8601String()]),
-            'settlement' => $this->action(($completed || ($ends && $now->gt($ends))) && $appointment->dashboard['financial'] !== 'settled', $appointment->dashboard['financial'] === 'settled' ? 'already_settled' : 'appointment_not_ended', $appointment->dashboard['financial'] === 'settled' ? 'تسویه قبلاً نهایی شده است.' : 'تسویه پس از پایان نوبت یا ثبت اتمام ویزیت مجاز است.', ['status' => $appointment->dashboard['financial']]),
+            'settlement' => $this->action($appointment->status !== AppointmentUserStatusEnum::STATUS_CANCEL && ($completed || ($ends && $now->gt($ends))) && $appointment->dashboard['financial'] !== 'settled', $appointment->dashboard['financial'] === 'settled' ? 'already_settled' : 'appointment_not_ended', $appointment->dashboard['financial'] === 'settled' ? 'تسویه قبلاً نهایی شده است.' : 'تسویه پس از پایان نوبت یا ثبت اتمام ویزیت مجاز است.', ['status' => $appointment->dashboard['financial']]),
         ];
     }
 

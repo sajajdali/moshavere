@@ -31,7 +31,7 @@
     <div class="fin-kpi">
         <span class="fin-kpi-icon gray"><i class="fa fa-users" aria-hidden="true"></i></span>
         <div>
-            <div class="fin-kpi-value">{{ number_format($totals->patients) }}<span class="fin-kpi-unit">بیمار</span></div>
+            <div class="fin-kpi-value">{{ number_format($totals->patients) }}<span class="fin-kpi-unit">مراجع</span></div>
             <div class="fin-kpi-label">{{ number_format($totals->rows) }} پرداخت</div>
         </div>
     </div>

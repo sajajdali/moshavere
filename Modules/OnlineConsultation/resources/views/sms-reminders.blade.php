@@ -1,6 +1,6 @@
 @extends('onlineconsultation::shell')
 @section('consultation-title','یادآوری‌های پیامکی نوبت تلفنی')
-@section('consultation-description','تعریف یادآوری‌های بیمار و مشاور و مشاهده سوابق هر نوبت تلفنی')
+@section('consultation-description','تعریف یادآوری‌های مراجع و مشاور و مشاهده سوابق هر نوبت تلفنی')
 @section('consultation-content')
 @php
     $isEdit = (bool) $editingRule;
@@ -21,16 +21,16 @@
             <div class="oc-panel-body oc-grid">
                 <div class="oc-field">
                     <label class="oc-label" for="title">عنوان یادآوری <span class="oc-required">*</span></label>
-                    <input class="oc-input" id="title" name="title" maxlength="255" required value="{{ old('title', $editingRule?->title) }}" placeholder="مثلاً یادآوری ۱۵ دقیقه قبل برای بیمار">
+                    <input class="oc-input" id="title" name="title" maxlength="255" required value="{{ old('title', $editingRule?->title) }}" placeholder="مثلاً یادآوری ۱۵ دقیقه قبل برای مراجع">
                     @error('title')<small class="oc-error">{{ $message }}</small>@enderror
                 </div>
                 <div class="oc-field">
                     <label class="oc-label" for="recipient_type">گیرنده <span class="oc-required">*</span></label>
                     <select class="oc-input" id="recipient_type" name="recipient_type" required>
-                        <option value="patient" @selected(old('recipient_type', $editingRule?->recipient_type ?? 'patient') === 'patient')>بیمار</option>
+                        <option value="patient" @selected(old('recipient_type', $editingRule?->recipient_type ?? 'patient') === 'patient')>مراجع</option>
                         <option value="practitioner" @selected(old('recipient_type', $editingRule?->recipient_type) === 'practitioner')>پزشک / مشاور نوبت</option>
                     </select>
-                    <small class="oc-help">شماره بیمار یا شماره پزشک/مشاور متصل به همان نوبت استفاده می‌شود.</small>
+                    <small class="oc-help">شماره مراجع یا شماره پزشک/مشاور متصل به همان نوبت استفاده می‌شود.</small>
                     @error('recipient_type')<small class="oc-error">{{ $message }}</small>@enderror
                 </div>
                 <div class="oc-field">
@@ -63,7 +63,7 @@
                     <i class="fa-solid fa-circle-info" aria-hidden="true"></i>
                     <div>
                         <strong>راهنمای پارامترهای قالب</strong>
-                        <p>پارامترها برای قالب بیمار و پزشک/مشاور یکسان و به ترتیب زیر هستند:</p>
+                        <p>پارامترها برای قالب مراجع و پزشک/مشاور یکسان و به ترتیب زیر هستند:</p>
                         <div class="oc-grid" style="margin-top:8px;gap:2px 28px">
                             <span>۱ = نام کاربر</span><span>۲ = نام خانوادگی کاربر</span>
                             <span>۳ = نام پزشک / مشاور</span><span>۴ = نام بخش</span>
@@ -112,7 +112,7 @@
             <form class="oc-inline" method="GET" action="{{ route('admin.consultation.sms-reminders.index') }}">
                 <input class="oc-input" style="width:180px" name="appointment" value="{{ $filters['appointment'] ?? '' }}" placeholder="آیدی یا شماره پیگیری">
                 <input class="oc-input oc-ltr" style="width:175px" name="recipient" value="{{ $filters['recipient'] ?? '' }}" placeholder="شماره موبایل گیرنده" inputmode="tel">
-                <select class="oc-input" style="width:145px" name="recipient_type"><option value="">همه گیرنده‌ها</option><option value="patient" @selected(($filters['recipient_type'] ?? '') === 'patient')>بیمار</option><option value="practitioner" @selected(($filters['recipient_type'] ?? '') === 'practitioner')>مشاور</option></select>
+                <select class="oc-input" style="width:145px" name="recipient_type"><option value="">همه گیرنده‌ها</option><option value="patient" @selected(($filters['recipient_type'] ?? '') === 'patient')>مراجع</option><option value="practitioner" @selected(($filters['recipient_type'] ?? '') === 'practitioner')>مشاور</option></select>
                 <select class="oc-input" style="width:145px" name="status"><option value="">همه وضعیت‌ها</option>@foreach($statusLabels as $value=>$label)<option value="{{ $value }}" @selected(($filters['status'] ?? '') === $value)>{{ $label }}</option>@endforeach</select>
                 <select class="oc-input" style="width:130px" name="per_page" aria-label="تعداد رکورد در هر صفحه"><option value="10" @selected((int)($filters['per_page'] ?? 10) === 10)>۱۰ رکورد</option><option value="20" @selected((int)($filters['per_page'] ?? 10) === 20)>۲۰ رکورد</option><option value="50" @selected((int)($filters['per_page'] ?? 10) === 50)>۵۰ رکورد</option></select>
                 <button class="oc-btn" type="submit">فیلتر</button>
@@ -120,14 +120,14 @@
             </form>
         </div>
         <div class="oc-table-wrap">
-            <table class="oc-table oc-clickable-table"><thead><tr><th>نوبت</th><th>بیمار / مشاور</th><th>یادآوری</th><th>گیرنده</th><th>زمان برنامه‌ریزی</th><th>زمان ارسال</th><th>وضعیت</th><th>نتیجه</th></tr></thead><tbody>
+            <table class="oc-table oc-clickable-table"><thead><tr><th>نوبت</th><th>مراجع / مشاور</th><th>یادآوری</th><th>گیرنده</th><th>زمان برنامه‌ریزی</th><th>زمان ارسال</th><th>وضعیت</th><th>نتیجه</th></tr></thead><tbody>
             @forelse($deliveries as $item)
                 @php($appointmentDetailsUrl = route('admin.consultation.call-reports.appointment', $item->appointment_id))
                 <tr data-href="{{ $appointmentDetailsUrl }}" tabindex="0" role="link" aria-label="مشاهده جزئیات نوبت {{ $item->appointment?->tracking_code ?: $item->appointment_id }}">
                     <td><a class="oc-appointment-link" href="{{ $appointmentDetailsUrl }}"><strong>#{{ $item->appointment?->tracking_code ?: $item->appointment_id }}</strong></a><small class="oc-cell-sub">آیدی: {{ $item->appointment_id }}</small></td>
                     <td>{{ $item->appointment?->user?->fullName ?: '—' }}<small class="oc-cell-sub">مشاور: {{ $item->appointment?->doctor?->fullName ?: '—' }}</small></td>
                     <td>{{ $item->rule_title ?: $item->reminderRule?->title ?: $item->type }}<small class="oc-cell-sub oc-ltr">قالب: {{ $item->template }}</small></td>
-                    <td><span class="oc-badge">{{ $item->recipient_type === 'practitioner' ? 'مشاور' : ($item->recipient_type === 'patient' ? 'بیمار' : 'نامشخص') }}</span><small class="oc-cell-sub oc-ltr">{{ $item->recipient }}</small></td>
+                    <td><span class="oc-badge">{{ $item->recipient_type === 'practitioner' ? 'مشاور' : ($item->recipient_type === 'patient' ? 'مراجع' : 'نامشخص') }}</span><small class="oc-cell-sub oc-ltr">{{ $item->recipient }}</small></td>
                     <td>{{ verta($item->scheduled_at)->format('Y/m/d H:i') }}</td>
                     <td>{{ $item->sent_at ? verta($item->sent_at)->format('Y/m/d H:i:s') : '—' }}</td>
                     <td><span class="oc-badge {{ $item->status === 'sent' ? 'oc-badge-success' : ($item->status === 'failed' ? 'oc-badge-danger' : '') }}">{{ $statusLabels[$item->status] ?? $item->status }}</span><small class="oc-cell-sub">تلاش: {{ $item->attempts }}</small></td>

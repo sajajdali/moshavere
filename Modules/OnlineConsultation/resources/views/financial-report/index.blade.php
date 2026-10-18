@@ -1,6 +1,6 @@
 @extends('onlineconsultation::shell')
 @section('consultation-title', 'گزارش جامع مالی کارشناسان')
-@section('consultation-description', 'درآمد، بازگشت وجه، عملکرد تماس، دایورت و رضایت بیماران در یک گزارش مدیریتی')
+@section('consultation-description', 'درآمد، بازگشت وجه، عملکرد تماس، دایورت و رضایت مراجعین در یک گزارش مدیریتی')
 @section('consultation-header-actions')
 <button class="oc-btn" type="submit" form="financial-report-filter" name="export" value="1"><i class="fa-solid fa-file-excel"></i>خروجی اکسل CSV</button>
 @endsection
@@ -32,17 +32,17 @@
         @foreach([
             ['مبلغ نهایی‌شده',$money($m['gross_income']),'فقط نوبت‌های تأیید و ثبت‌شده','fa-coins','green'],
             ['مبلغ در انتظار تأیید',$money($m['pending_gross_income']),number_format($m['unsettled']).' نوبت وارد محاسبات نشده','fa-hourglass-half','orange'],
-            ['بازگشت قطعی',$money($m['refunded']),'واریز شده به بیمار','fa-rotate-left','danger'],
+            ['بازگشت قطعی',$money($m['refunded']),'واریز شده به مراجع','fa-rotate-left','danger'],
             ['کل هزینه برگشتی قطعی',$money($m['effective_refund']),'فقط بازگشت ثبت و نهایی‌شده','fa-money-bill-transfer','danger'],
             ['خالص پس از بازگشت',$money($m['net_after_refund']),'مبلغ ویزیت منهای کل بازگشت','fa-wallet','blue'],
             ['سهم کارشناسان',$money($m['practitioner_income']),'بر اساس زمان مالی مکالمه','fa-user-doctor','purple'],
             ['سود مجموعه',$money($m['platform_profit']),'ویزیت منهای بازگشت و سهم کارشناس','fa-building-columns','green'],
             ['بازگشت پیشنهادی',$money($m['pending_refund']),'اطلاعاتی؛ وارد محاسبات نشده','fa-clock-rotate-left','orange'],
-            ['عدم حضور بیمار',number_format($m['patient_no_show']),'تسویه کامل؛ بازگشت کیف پول صفر','fa-user-xmark','orange'],
-            ['کل نوبت',number_format($m['appointments']),'برای '.number_format($m['unique_patients']).' بیمار','fa-calendar-check','blue'],
+            ['عدم حضور مراجع',number_format($m['patient_no_show']),'تسویه کامل؛ بازگشت کیف پول صفر','fa-user-xmark','orange'],
+            ['کل نوبت',number_format($m['appointments']),'برای '.number_format($m['unique_patients']).' مراجع','fa-calendar-check','blue'],
             ['دقایق مالی',number_format($m['talk_minutes']),'حذف‌شده: '.number_format((int)ceil($m['ignored_talk_seconds']/60)).' دقیقه','fa-clock','blue'],
             ['نرخ پاسخ‌گویی',$m['answer_rate'].'٪',number_format($m['answered']).' پاسخ و '.number_format($m['unanswered']).' بی‌پاسخ در موعد','fa-headset','green'],
-            ['رضایت بیماران',$m['survey_average']!==null?$m['survey_average'].' از ۵':'بدون داده',number_format($m['survey_appointments']).' نوبت دارای نظر','fa-star','orange'],
+            ['رضایت مراجعین',$m['survey_average']!==null?$m['survey_average'].' از ۵':'بدون داده',number_format($m['survey_appointments']).' نوبت دارای نظر','fa-star','orange'],
         ] as [$label,$value,$detail,$icon,$tone])
         <article class="oc-executive-card is-{{ $tone }}"><i class="fa-solid {{ $icon }}"></i><div><span>{{ $label }}</span><strong>{{ $value }}</strong><small>{{ $detail }}</small></div></article>
         @endforeach
@@ -70,7 +70,7 @@
 
     <section class="oc-panel">
         <div class="oc-panel-header"><h2 class="oc-panel-title"><i class="fa-solid fa-users"></i>مقایسه دقیق کارشناسان</h2><span>مبالغ به تومان</span></div>
-        <div class="oc-table-wrap"><table class="oc-table oc-financial-table"><thead><tr><th>کارشناس</th><th>نوبت / بیمار</th><th>ورودی / خروجی</th><th>پاسخ / بی‌پاسخ</th><th>قطع کوتاه / عدم پاسخ</th><th>دایورت</th><th>زمان خام / مالی</th><th>مبلغ ویزیت</th><th>بازگشت قطعی / انتظار</th><th>کل برگشتی</th><th>خالص پس از بازگشت</th><th>سهم کارشناس</th><th>سود مجموعه</th><th>رضایت</th></tr></thead><tbody>
+        <div class="oc-table-wrap"><table class="oc-table oc-financial-table"><thead><tr><th>کارشناس</th><th>نوبت / مراجع</th><th>ورودی / خروجی</th><th>پاسخ / بی‌پاسخ</th><th>قطع کوتاه / عدم پاسخ</th><th>دایورت</th><th>زمان خام / مالی</th><th>مبلغ ویزیت</th><th>بازگشت قطعی / انتظار</th><th>کل برگشتی</th><th>خالص پس از بازگشت</th><th>سهم کارشناس</th><th>سود مجموعه</th><th>رضایت</th></tr></thead><tbody>
         @forelse($report['rows'] as $row) @php $mRow = $row['metrics']; @endphp
             <tr><td><strong>{{ $row['profile']->display_name }}</strong><small class="oc-cell-sub">{{ $row['profile']->specialty?:'کارشناس مشاوره' }}</small><small class="oc-cell-sub">نرخ سهم: {{ $money($row['profile']->payout_hourly_rate) }}</small></td><td>{{ number_format($mRow['appointments']) }} / {{ number_format($mRow['unique_patients']) }}<small class="oc-cell-sub">تکمیل: {{ $mRow['completed'] }} · باز: {{ $mRow['open'] }} · عدم حضور: {{ $mRow['patient_no_show'] }}</small></td><td>{{ $mRow['inbound'] }} / {{ $mRow['outbound'] }}</td><td><span class="oc-text-success">{{ $mRow['answered'] }} پاسخ</span><span class="oc-cell-sub oc-text-danger">{{ $mRow['unanswered'] }} بی‌پاسخ در موعد</span><small class="oc-cell-sub">{{ $mRow['early_calls'] }} زودهنگام (خارج از بی‌پاسخ)</small></td><td><span class="oc-text-danger">{{ $mRow['consultant_hangups'] }} قطع</span><small class="oc-cell-sub">{{ $mRow['consultant_no_answers'] }} عدم پاسخ</small></td><td>{{ $mRow['diverted'] }}<small class="oc-cell-sub">{{ $duration($mRow['diverted_total_seconds']) }}</small></td><td class="oc-ltr">{{ $duration($mRow['raw_talk_seconds']) }}<small class="oc-cell-sub">مالی: {{ $duration($mRow['talk_seconds']) }} · حذف: {{ $duration($mRow['ignored_talk_seconds']) }}</small></td><td>{{ number_format($mRow['gross_income']) }}</td><td class="oc-text-danger">{{ number_format($mRow['refunded']) }}<small class="oc-cell-sub">انتظار: {{ number_format($mRow['pending_refund']) }}</small></td><td class="oc-text-danger">{{ number_format($mRow['effective_refund']) }}</td><td>{{ number_format($mRow['net_after_refund']) }}</td><td class="oc-net-income">{{ number_format($mRow['practitioner_income']) }}</td><td class="oc-net-income">{{ number_format($mRow['platform_profit']) }}</td><td>{{ $mRow['survey_average']!==null?$mRow['survey_average'].' / ۵':'—' }}<small class="oc-cell-sub">{{ $mRow['survey_appointments'] }} نوبت · {{ $mRow['voice_surveys'] }} صوتی</small></td></tr>
         @empty<tr><td colspan="14"><div class="oc-empty"><i class="fa-solid fa-chart-pie"></i><h3>داده‌ای برای این بازه وجود ندارد</h3></div></td></tr>@endforelse
@@ -79,7 +79,7 @@
 
     <section class="oc-panel">
         <div class="oc-panel-header"><h2 class="oc-panel-title"><i class="fa-solid fa-receipt"></i>ریز حسابرسی نوبت‌ها</h2><span>{{ number_format($report['appointmentRows']->count()) }} نوبت · برای جزئیات روی ردیف کلیک کنید</span></div>
-        <div class="oc-table-wrap"><table class="oc-table oc-financial-table oc-clickable-table"><thead><tr><th>نوبت / تاریخ</th><th>کارشناس / بیمار</th><th>رزرو / زمان مالی</th><th>تماس / پاسخ</th><th>قطع کوتاه / عدم پاسخ</th><th>دایورت</th><th>مبلغ ویزیت</th><th>بازگشت قطعی / انتظار</th><th>کل برگشتی</th><th>خالص پس از بازگشت</th><th>سهم کارشناس</th><th>سود مجموعه</th><th>نظرسنجی</th></tr></thead><tbody>
+        <div class="oc-table-wrap"><table class="oc-table oc-financial-table oc-clickable-table"><thead><tr><th>نوبت / تاریخ</th><th>کارشناس / مراجع</th><th>رزرو / زمان مالی</th><th>تماس / پاسخ</th><th>قطع کوتاه / عدم پاسخ</th><th>دایورت</th><th>مبلغ ویزیت</th><th>بازگشت قطعی / انتظار</th><th>کل برگشتی</th><th>خالص پس از بازگشت</th><th>سهم کارشناس</th><th>سود مجموعه</th><th>نظرسنجی</th></tr></thead><tbody>
         @forelse($report['appointmentRows'] as $row) @php $a = $row['appointment']; $am = $row['metrics']; @endphp
             <tr data-href="{{ route('admin.consultation.call-reports.appointment',$a) }}"><td><strong>#{{ $a->tracking_code?:$a->id }}</strong>@if($am['patient_no_show'])<small class="oc-cell-sub oc-text-danger">{{ $a->dashboard['reason'] }}</small>@endif<small class="oc-cell-sub"><bdi>{{ $a->date_visit?verta($a->date_visit)->format('Y/m/d H:i'):'—' }}</bdi></small><span class="oc-badge {{ $am['settled'] ? 'oc-badge-success' : 'oc-badge-warning' }}">{{ $am['settled'] ? 'تأیید و نهایی‌شده' : 'نیازمند تأیید نهایی' }}</span></td><td><strong>{{ $a->doctor?->fullName?:'—' }}</strong><small class="oc-cell-sub">{{ $a->user?->fullName?:'—' }}</small><small class="oc-cell-sub oc-ltr">{{ $a->user?->mobile?:'—' }}</small></td><td>{{ $am['reserved_minutes'] }} دقیقه<small class="oc-cell-sub oc-ltr">مالی: {{ $duration($am['talk_seconds']) }}</small><small class="oc-cell-sub oc-ltr">خام: {{ $duration($am['raw_talk_seconds']) }} · حذف: {{ $duration($am['ignored_talk_seconds']) }}</small></td><td>{{ $am['calls'] }} تماس<small class="oc-cell-sub"><span class="oc-text-success">{{ $am['answered'] }} پاسخ</span> · <span class="oc-text-danger">{{ $am['unanswered'] }} بی‌پاسخ در موعد</span></small>@if($am['early_calls'])<small class="oc-cell-sub">{{ $am['early_calls'] }} زودهنگام (خارج از بی‌پاسخ)</small>@endif</td><td><span class="oc-text-danger">{{ $am['consultant_hangups'] }} قطع</span><small class="oc-cell-sub">{{ $am['consultant_no_answers'] }} عدم پاسخ</small></td><td>{{ $am['diverted'] }} تماس<small class="oc-cell-sub oc-ltr">{{ $duration($am['diverted_total_seconds']) }}</small></td><td>{{ number_format($am['all_gross_income']) }}@if($am['unsettled'])<small class="oc-cell-sub oc-text-danger">هنوز وارد جمع مالی نشده</small>@endif</td><td class="oc-text-danger">{{ number_format($am['refunded']) }}<small class="oc-cell-sub">پیشنهادی: {{ number_format($am['pending_refund']) }}</small></td><td class="oc-text-danger">{{ number_format($am['effective_refund']) }}</td><td>{{ number_format($am['net_after_refund']) }}</td><td class="oc-net-income">{{ number_format($am['practitioner_income']) }}</td><td class="oc-net-income">{{ number_format($am['platform_profit']) }}</td><td>{{ $am['survey_average']!==null?$am['survey_average'].' / ۵':'—' }}<small class="oc-cell-sub">{{ $am['survey_answers'] }} پاسخ{{ $am['voice_surveys']?' · صوتی':'' }}</small></td></tr>
         @empty<tr><td colspan="13"><div class="oc-empty"><p>نوبتی در این بازه ثبت نشده است.</p></div></td></tr>@endforelse
@@ -101,7 +101,7 @@
                     @endphp
                     <article class="oc-daily-card">
                         <header class="oc-daily-card-head">
-                            <div class="oc-daily-date"><i class="fa-regular fa-calendar"></i><div><strong>{{ $day['label'] }}</strong><small>{{ $dm['appointments'] }} نوبت ثبت‌شده · {{ $dm['patient_no_show'] }} عدم حضور بیمار</small></div></div>
+                            <div class="oc-daily-date"><i class="fa-regular fa-calendar"></i><div><strong>{{ $day['label'] }}</strong><small>{{ $dm['appointments'] }} نوبت ثبت‌شده · {{ $dm['patient_no_show'] }} عدم حضور مراجع</small></div></div>
                             <div class="oc-daily-activity"><span><i class="fa-solid fa-phone"></i>{{ number_format($dm['calls']) }} تماس</span><span><i class="fa-regular fa-clock"></i>{{ number_format($dm['talk_minutes']) }} دقیقه مالی</span><span><i class="fa-solid fa-headset"></i>{{ $dm['answer_rate'] }}٪ پاسخ‌گویی</span></div>
                             <div class="oc-daily-total"><span>مبلغ ویزیت روز</span><strong>{{ $money($dm['gross_income']) }}</strong></div>
                         </header>

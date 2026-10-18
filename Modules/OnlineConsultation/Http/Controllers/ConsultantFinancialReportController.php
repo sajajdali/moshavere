@@ -42,15 +42,15 @@ class ConsultantFinancialReportController extends Controller
         return response()->streamDownload(function () use ($report) {
             $out = fopen('php://output', 'w');
             fwrite($out, "\xEF\xBB\xBF");
-            $financialHeader = ['عدم حضور بیمار (تسویه کامل)', 'مبلغ نهایی‌شده', 'مبلغ در انتظار تأیید', 'بازگشت قطعی', 'بازگشت پیشنهادی (غیرقطعی)', 'کل هزینه برگشتی قطعی', 'خالص قطعی', 'سهم قطعی کارشناس', 'سود قطعی مجموعه'];
+            $financialHeader = ['عدم حضور مراجع (تسویه کامل)', 'مبلغ نهایی‌شده', 'مبلغ در انتظار تأیید', 'بازگشت قطعی', 'بازگشت پیشنهادی (غیرقطعی)', 'کل هزینه برگشتی قطعی', 'خالص قطعی', 'سهم قطعی کارشناس', 'سود قطعی مجموعه'];
             $financialValues = fn (array $m) => [$m['patient_no_show'], $m['gross_income'], $m['pending_gross_income'], $m['refunded'], $m['pending_refund'], $m['effective_refund'], $m['net_after_refund'], $m['practitioner_income'], $m['platform_profit']];
 
             fputcsv($out, ['جمع کل گزارش']);
-            fputcsv($out, array_merge(['کل نوبت', 'بیمار منحصربه‌فرد', 'کل تماس', 'بی‌پاسخ در زمان نوبت', 'تماس زودهنگام'], $financialHeader));
+            fputcsv($out, array_merge(['کل نوبت', 'مراجع منحصربه‌فرد', 'کل تماس', 'بی‌پاسخ در زمان نوبت', 'تماس زودهنگام'], $financialHeader));
             fputcsv($out, array_merge([$report['allMetrics']['appointments'], $report['allMetrics']['unique_patients'], $report['allMetrics']['calls'], $report['allMetrics']['unanswered'], $report['allMetrics']['early_calls']], $financialValues($report['allMetrics'])));
             fputcsv($out, []);
             fputcsv($out, ['تفکیک کارشناسان']);
-            fputcsv($out, array_merge(['کارشناس', 'نوبت', 'بیمار', 'ورودی', 'خروجی', 'پاسخ', 'بی‌پاسخ در زمان نوبت', 'تماس زودهنگام', 'قطع توسط کارشناس', 'عدم پاسخ کارشناس', 'دایورت', 'دقایق خام', 'دقایق حذف‌شده', 'دقایق مالی'], $financialHeader, ['تعداد نظرسنجی', 'میانگین رضایت']));
+            fputcsv($out, array_merge(['کارشناس', 'نوبت', 'مراجع', 'ورودی', 'خروجی', 'پاسخ', 'بی‌پاسخ در زمان نوبت', 'تماس زودهنگام', 'قطع توسط کارشناس', 'عدم پاسخ کارشناس', 'دایورت', 'دقایق خام', 'دقایق حذف‌شده', 'دقایق مالی'], $financialHeader, ['تعداد نظرسنجی', 'میانگین رضایت']));
             foreach ($report['rows'] as $row) {
                 $m = $row['metrics'];
                 fputcsv($out, array_merge([$row['profile']->display_name, $m['appointments'], $m['unique_patients'], $m['inbound'], $m['outbound'], $m['answered'], $m['unanswered'], $m['early_calls'], $m['consultant_hangups'], $m['consultant_no_answers'], $m['diverted'], (int) ceil($m['raw_talk_seconds'] / 60), (int) ceil($m['ignored_talk_seconds'] / 60), $m['talk_minutes']], $financialValues($m), [$m['survey_appointments'], $m['survey_average']]));
@@ -64,7 +64,7 @@ class ConsultantFinancialReportController extends Controller
             }
             fputcsv($out, []);
             fputcsv($out, ['ریز نوبت‌ها']);
-            fputcsv($out, array_merge(['شناسه نوبت', 'کد پیگیری', 'تاریخ', 'کارشناس', 'بیمار', 'وضعیت تسویه', 'بی‌پاسخ در زمان نوبت', 'تماس زودهنگام', 'دقایق مالی'], $financialHeader));
+            fputcsv($out, array_merge(['شناسه نوبت', 'کد پیگیری', 'تاریخ', 'کارشناس', 'مراجع', 'وضعیت تسویه', 'بی‌پاسخ در زمان نوبت', 'تماس زودهنگام', 'دقایق مالی'], $financialHeader));
             foreach ($report['appointmentRows'] as $row) {
                 $appointment = $row['appointment'];
                 $m = $row['metrics'];

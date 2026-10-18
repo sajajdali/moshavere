@@ -111,7 +111,7 @@ class ConsultationCaseService
             }
             if ($appointment->status !== \Modules\AppointmentUser\Enum\AppointmentUserStatusEnum::STATUS_SUCCESSFUL
                 || $appointment->kind !== \Modules\AppointmentUser\Enum\AppointmentUserKindEnum::VOIP) {
-                throw ValidationException::withMessages(['no_show' => 'عدم حضور بیمار فقط برای نوبت تلفنی پرداخت‌شده و لغونشده مجاز است.']);
+                throw ValidationException::withMessages(['no_show' => 'عدم حضور مراجع فقط برای نوبت تلفنی پرداخت‌شده و لغونشده مجاز است.']);
             }
             if (! $appointment->date_visit || ! $appointment->start_time || ! $appointment->end_time) {
                 throw ValidationException::withMessages(['no_show' => 'تاریخ یا ساعت شروع و پایان نوبت مشخص نیست؛ عدم حضور قابل ثبت نیست.']);
@@ -145,7 +145,7 @@ class ConsultationCaseService
             $answered = $calls->filter(fn ($call) => $call->final_result === 'ANSWERED' || $call->answered_at || $call->talk_duration_seconds > 0);
             if ($patientCalls->isNotEmpty() || $answered->isNotEmpty()) {
                 throw ValidationException::withMessages(['no_show' => sprintf(
-                    'بیمار در بازه نوبت %d بار تماس گرفته است؛ %d تماس دارای پاسخ یا مکالمه و %d تلاش بیمار بدون پاسخ ثبت شده است. تماس‌های پیش از شروع نوبت محاسبه نمی‌شوند؛ اما هر تماس کوتاه یا ناموفق در بازه نوبت مانع ثبت عدم حضور است.',
+                    'مراجع در بازه نوبت %d بار تماس گرفته است؛ %d تماس دارای پاسخ یا مکالمه و %d تلاش مراجع بدون پاسخ ثبت شده است. تماس‌های پیش از شروع نوبت محاسبه نمی‌شوند؛ اما هر تماس کوتاه یا ناموفق در بازه نوبت مانع ثبت عدم حضور است.',
                     $patientCalls->count(), $answered->count(), $patientCalls->filter(fn ($call) => $call->final_result !== 'ANSWERED' && ! $call->answered_at && ! $call->talk_duration_seconds)->count()
                 )]);
             }
@@ -163,14 +163,14 @@ class ConsultationCaseService
                         return ! $incident->hung_up_at->lt($start) && ! $incident->hung_up_at->gt($end);
                     })->pluck('call_id'))->unique();
             if ($incidentCalls->isNotEmpty()) {
-                throw ValidationException::withMessages(['no_show' => 'در بازه این نوبت '.$incidentCalls->count().' تماس دارای رویداد عدم پاسخ یا قطع مشاور ثبت شده است؛ حتی بدون گزارش نهایی تماس، عدم حضور بیمار مجاز نیست.']);
+                throw ValidationException::withMessages(['no_show' => 'در بازه این نوبت '.$incidentCalls->count().' تماس دارای رویداد عدم پاسخ یا قطع مشاور ثبت شده است؛ حتی بدون گزارش نهایی تماس، عدم حضور مراجع مجاز نیست.']);
             }
             $billingService = app(AppointmentBillingService::class);
             $billing = $billingService->ensure($appointment);
             if (! $billing || $billing->total_paid_amount <= 0 || $billing->payout_hourly_rate_snapshot <= 0) {
                 throw ValidationException::withMessages(['no_show' => 'اطلاعات مالی، مبلغ پرداخت یا نرخ سهم مشاور ثبت نشده یا معتبر نیست.']);
             }
-            $reason = 'عدم حضور بیمار؛ پایان بازه نوبت گذشته و در بازه رزروشده هیچ تلاش تماس بیمار یا مکالمه ثبت نشده است. تماس‌های پیش از شروع نوبت محاسبه نشدند؛ کل زمان رزروشده محاسبه شد و بازگشت کیف پول صفر است.';
+            $reason = 'عدم حضور مراجع؛ پایان بازه نوبت گذشته و در بازه رزروشده هیچ تلاش تماس مراجع یا مکالمه ثبت نشده است. تماس‌های پیش از شروع نوبت محاسبه نشدند؛ کل زمان رزروشده محاسبه شد و بازگشت کیف پول صفر است.';
             $billing = $billingService->settlePatientNoShow($billing, $actor, $reason);
             $case->update(['state' => AppointmentConsultationCase::STATE_PATIENT_NO_SHOW, 'completed_at' => now(), 'completed_by' => $actor->id]);
             $case->events()->create([
@@ -192,7 +192,7 @@ class ConsultationCaseService
             $appointment = AppointmentUser::lockForUpdate()->findOrFail($appointment->id);
             $case = AppointmentConsultationCase::where('appointment_id', $appointment->id)->lockForUpdate()->firstOrFail();
             if ($case->state === AppointmentConsultationCase::STATE_PATIENT_NO_SHOW) {
-                throw ValidationException::withMessages(['reopen_reason' => 'عدم حضور بیمار دارای تسویه قطعی است و با بازگشایی عادی قابل تغییر نیست.']);
+                throw ValidationException::withMessages(['reopen_reason' => 'عدم حضور مراجع دارای تسویه قطعی است و با بازگشایی عادی قابل تغییر نیست.']);
             }
             if ($case->state === AppointmentConsultationCase::STATE_OPEN) return $case;
             $reopenedAt = now();

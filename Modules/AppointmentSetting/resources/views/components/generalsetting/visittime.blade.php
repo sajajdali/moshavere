@@ -2,7 +2,7 @@
     <h3 class="d-flex align-items-center">
         <i class="fa fa-clock-o me-2 d-none d-sm-inline" aria-hidden="true"></i>
         <span>
-            زمان مورد نیاز برای <span class="text-primary">ویزیت</span> هر بیمار
+            زمان مورد نیاز برای <span class="text-primary">ویزیت</span> هر مراجع
         </span>
     </h3>
 </div>
@@ -28,7 +28,7 @@
             </div>
         @enderror
         <div class="col-md-4 pt-2">
-            <label class="text-primary" for="basic-url">مدت زمان مورد نیاز برای ویزیت هر بیمار</label>
+            <label class="text-primary" for="basic-url">مدت زمان مورد نیاز برای ویزیت هر مراجع</label>
         </div>
         <div class="col-md-8">
             <div class="input-group mb-3">

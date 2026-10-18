@@ -22,12 +22,12 @@
     @else
         <div class="page-header">
             <div>
-                <h1 class="page-title">وضعیت مالی بیمار <strong class="text-primary">{{ $name }}</strong></h1>
+                <h1 class="page-title">وضعیت مالی مراجع <strong class="text-primary">{{ $name }}</strong></h1>
             </div>
             <div class="ms-auto pageheader-btn d-flex gap-2 flex-wrap">
                 @if ($canCreate)
                     <button type="button" class="btn btn-primary" wire:click="$dispatch('finance-open-form', { userId: {{ $user->id }} })">
-                        <i class="fa fa-plus me-1" aria-hidden="true"></i> ثبت پرداخت برای این بیمار
+                        <i class="fa fa-plus me-1" aria-hidden="true"></i> ثبت پرداخت برای این مراجع
                     </button>
                 @endif
                 @if ($canExport)
@@ -35,7 +35,7 @@
                         <i class="fa fa-file-excel-o me-1" aria-hidden="true"></i> خروجی اکسل
                     </button>
                 @endif
-                <a href="{{ route('admin.user.document', $user) }}" class="btn btn-secondary"><i class="fa fa-folder-open-o me-1" aria-hidden="true"></i> پرونده بیمار</a>
+                <a href="{{ route('admin.user.document', $user) }}" class="btn btn-secondary"><i class="fa fa-folder-open-o me-1" aria-hidden="true"></i> پرونده مراجع</a>
             </div>
         </div>
         @include('admin::layouts.components.alert')

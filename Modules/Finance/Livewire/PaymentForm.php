@@ -171,7 +171,7 @@ class PaymentForm extends Component
     protected function validationAttributes(): array
     {
         return [
-            'userId' => 'بیمار',
+            'userId' => 'مراجع',
             'form.type' => 'نوع',
             'form.method' => 'روش پرداخت',
             'form.purpose_id' => 'دلیل پرداخت',
@@ -188,13 +188,13 @@ class PaymentForm extends Component
     protected function messages(): array
     {
         return [
-            'userId.required' => 'لطفا بیمار را انتخاب کنید.',
+            'userId.required' => 'لطفا مراجع را انتخاب کنید.',
             'form.amount.required' => 'مبلغ را وارد کنید.',
             'form.amount.numeric' => 'مبلغ باید عدد باشد.',
             'form.amount.integer' => 'مبلغ باید عدد صحیح باشد.',
             'form.amount.min' => 'مبلغ باید بیشتر از صفر باشد.',
             'form.paid_time.regex' => 'ساعت را به شکل 14:30 وارد کنید.',
-            'form.appointment_user_id.exists' => 'این نوبت متعلق به این بیمار نیست.',
+            'form.appointment_user_id.exists' => 'این نوبت متعلق به این مراجع نیست.',
         ];
     }
 

@@ -17,7 +17,7 @@
                 <div class="modal-body">
                     <div class="quick-time-summary">
                         <div>
-                            <span>بیمار</span>
+                            <span>مراجع</span>
                             <strong>{{ $quickTimeEditMeta['patient'] ?? '---' }}</strong>
                         </div>
                         <div>

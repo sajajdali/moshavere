@@ -131,7 +131,7 @@
                         </div>
 
                         <div class="fb-meta">
-                            <div><small>بیمار</small><strong>{{ $mApp?->user?->fullname ?? 'نوبت یافت نشد' }}</strong></div>
+                            <div><small>مراجع</small><strong>{{ $mApp?->user?->fullname ?? 'نوبت یافت نشد' }}</strong></div>
                             <div><small>پزشک</small><strong>{{ $mApp?->doctor?->fullname ?? '-' }}</strong></div>
                             <div><small>بخش</small><strong>{{ $mApp?->service?->title ?? '-' }}</strong></div>
                             <div><small>زمان ویزیت</small><strong>{{ $mApp?->date_visit ? verta($mApp->date_visit)->format('Y/m/d') . ' ' . substr((string) $mApp->start_time, 0, 5) : '-' }}</strong></div>

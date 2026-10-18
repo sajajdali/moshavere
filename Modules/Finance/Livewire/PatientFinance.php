@@ -15,7 +15,7 @@ use Modules\Finance\Livewire\Concerns\InteractsWithFinanceFilters;
 use Modules\Finance\Services\FinanceReportService;
 use Modules\User\Entities\User;
 
-#[Title('وضعیت مالی بیمار')]
+#[Title('وضعیت مالی مراجع')]
 class PatientFinance extends Component
 {
     use InteractsWithFinanceFilters, WithPagination;

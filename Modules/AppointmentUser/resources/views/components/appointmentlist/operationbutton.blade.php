@@ -82,14 +82,14 @@
                 <li>
                     <a wire:click='userNotAttenedToAppointment({{ $ap->id }})' href="#">
                         <i class="fa fa-user-times text-danger" aria-hidden="true"></i>
-                        عدم حضور بیمار
+                        عدم حضور مراجع
                     </a>
                 </li>
             @else
                 <li>
                     <a wire:click='userAttenedToAppointment({{ $ap->id }})' href="#">
                         <i class="fa fa-user-plus text-success" aria-hidden="true"></i>
-                        حضور بیمار
+                        حضور مراجع
                     </a>
                 </li>
             @endif
@@ -97,13 +97,13 @@
             <li>
                 <a wire:click='userNotAttenedToAppointment({{ $ap->id }})' href="#">
                     <i class="fa fa-user-times text-danger" aria-hidden="true"></i>
-                    عدم حضور بیمار
+                    عدم حضور مراجع
                 </a>
             </li>
             <li>
                 <a wire:click='userAttenedToAppointment({{ $ap->id }})' href="#">
                     <i class="fa fa-user-plus text-success" aria-hidden="true"></i>
-                    حضور بیمار
+                    حضور مراجع
                 </a>
             </li>
         @endif

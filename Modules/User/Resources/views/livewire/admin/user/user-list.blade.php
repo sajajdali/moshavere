@@ -5,6 +5,7 @@
         </div>
         <div class="ms-auto pageheader-btn">
             @can('create', \Modules\User\Entities\User::class)
+                <a href="{{ route('admin.user.add-patient') }}" class="btn btn-success me-1"><i class="fa fa-user-plus me-1"></i> افزودن مراجع</a>
                 <a href="{{ route('admin.user.create') }}" class="btn btn-azure">افزودن کاربر جدید</a>
             @endcan
         </div>

@@ -67,6 +67,15 @@ return [
                         'has_child' => false,
                         'children' => null,
                     ],
+                    [
+                        'title' => 'افزودن مراجع',
+                        'gate' => 'create',
+                        'policy_class' => \Modules\User\Entities\User::class,
+                        'icon' => 'fa fa-user-plus',
+                        'route' => 'admin.user.add-patient',
+                        'has_child' => false,
+                        'children' => null,
+                    ],
                 ],
             ],
             [

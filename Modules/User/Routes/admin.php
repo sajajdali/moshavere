@@ -5,6 +5,7 @@
 Route::get('user', \Modules\User\Livewire\Admin\User\UserList::class)->name('user.index')->can('viewAny', \Modules\User\Entities\User::class);
 Route::get('doctor-service-management', \Modules\User\Livewire\Admin\User\DoctorServiceManagement::class)->name('doctor-service-management')->can('viewAny', \Modules\User\Entities\User::class);
 Route::get('user/create', \Modules\User\Livewire\Admin\User\UserCreateOrUpdate::class)->name('user.create')->can('create', \Modules\User\Entities\User::class);
+Route::get('user/add-patient', \Modules\User\Livewire\Admin\User\AddPatient::class)->name('user.add-patient')->can('create', \Modules\User\Entities\User::class);
 Route::get('user/report/{user}', \Modules\User\Livewire\Admin\User\UserActivityReport::class)
     ->name('user.report')
     ->can('viewReport', 'user');

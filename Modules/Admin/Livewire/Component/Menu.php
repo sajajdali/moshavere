@@ -124,6 +124,9 @@ class Menu extends Component
             if ($title === 'افزودن' && str_contains($route, 'user.create')) {
                 return 'fa-solid fa-user-plus admin-submenu-icon';
             }
+            if ($title === 'افزودن مراجع') {
+                return 'fa-solid fa-hospital-user admin-submenu-icon';
+            }
 
             $childIcons = [
                 'لیست' => 'fa-list',

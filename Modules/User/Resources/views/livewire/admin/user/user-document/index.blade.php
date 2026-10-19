@@ -3,6 +3,9 @@
     @php
         $patientName = trim((string) $user->fullName) !== '' ? $user->fullName : $user->mobile;
         $initial = mb_substr(trim((string) $patientName), 0, 1);
+        $patientFile = \Modules\User\Support\PatientProfile::load($user);
+        $patientAge = \Modules\User\Support\PatientProfile::age((string) $patientFile['birth_date']);
+        $maritalLabel = \Modules\User\Support\PatientProfile::MARITAL_STATUSES[$patientFile['marital_status']] ?? $patientFile['marital_status'];
         $feedbackCount = $answeredForms->count() + $legacyFeedbacks->count();
         $allFeedbacks = $answeredForms->map(fn ($item) => $item + ['title' => $item['form']])
             ->concat($legacyFeedbacks->map(fn ($item) => $item + ['title' => 'نظرسنجی پس از ویزیت']))
@@ -152,6 +155,59 @@
                         </div>
                     </div>
                 @endforeach
+                <div class="pf-form-section">
+                    <div class="pf-form-section-title"><i class="fa fa-address-book-o" aria-hidden="true"></i>اطلاعات تکمیلی مراجع</div>
+                    <div class="pf-form-grid">
+                        <div>
+                            <label class="form-label" for="profile-father_name">نام پدر</label>
+                            <div class="input-group pf-input @error('profile.father_name') is-invalid @enderror">
+                                <span class="input-group-text"><i class="fa fa-male" aria-hidden="true"></i></span>
+                                <input id="profile-father_name" type="text" wire:model="profile.father_name"
+                                    class="form-control @error('profile.father_name') is-invalid @enderror" placeholder="اختیاری">
+                            </div>
+                            @error('profile.father_name')<div class="invalid-feedback d-block">{{ $message }}</div>@enderror
+                        </div>
+                        <div>
+                            <label class="form-label" for="profile-birth_date">تاریخ تولد (شمسی)
+                                @if ($this->profileAge() !== null)<span class="badge bg-success ms-1">{{ $this->profileAge() }} سال</span>@endif
+                            </label>
+                            <div class="input-group pf-input @error('profile.birth_date') is-invalid @enderror">
+                                <span class="input-group-text"><i class="fa fa-birthday-cake" aria-hidden="true"></i></span>
+                                <input id="profile-birth_date" type="text" wire:model.live.debounce.500ms="profile.birth_date"
+                                    data-jdp data-jdp-only-date data-jdp-min-date="1300/01/01" data-jdp-max-date="today"
+                                    inputmode="numeric" maxlength="10" autocomplete="off" dir="ltr" style="text-align: left" placeholder="1370/05/21"
+                                    class="form-control @error('profile.birth_date') is-invalid @enderror">
+                            </div>
+                            @error('profile.birth_date')<div class="invalid-feedback d-block">{{ $message }}</div>@enderror
+                        </div>
+                        <div>
+                            <label class="form-label" for="profile-marital_status">وضعیت تأهل</label>
+                            <div class="input-group pf-input @error('profile.marital_status') is-invalid @enderror">
+                                <span class="input-group-text"><i class="fa fa-heart-o" aria-hidden="true"></i></span>
+                                <select id="profile-marital_status" wire:model="profile.marital_status" class="form-select @error('profile.marital_status') is-invalid @enderror">
+                                    <option value="">انتخاب نشده</option>
+                                    @foreach (\Modules\User\Support\PatientProfile::MARITAL_STATUSES as $value => $label)
+                                        <option value="{{ $value }}">{{ $label }}</option>
+                                    @endforeach
+                                </select>
+                            </div>
+                            @error('profile.marital_status')<div class="invalid-feedback d-block">{{ $message }}</div>@enderror
+                        </div>
+                        <div>
+                            <label class="form-label" for="profile-acquaintance">نحوه آشنایی با مرکز</label>
+                            <div class="input-group pf-input @error('profile.acquaintance') is-invalid @enderror">
+                                <span class="input-group-text"><i class="fa fa-bullhorn" aria-hidden="true"></i></span>
+                                <select id="profile-acquaintance" wire:model="profile.acquaintance" class="form-select @error('profile.acquaintance') is-invalid @enderror">
+                                    <option value="">انتخاب نشده</option>
+                                    @foreach (\Modules\User\Support\PatientProfile::ACQUAINTANCE_OPTIONS as $label)
+                                        <option value="{{ $label }}">{{ $label }}</option>
+                                    @endforeach
+                                </select>
+                            </div>
+                            @error('profile.acquaintance')<div class="invalid-feedback d-block">{{ $message }}</div>@enderror
+                        </div>
+                    </div>
+                </div>
                 <div class="pf-form-actions">
                     <button type="submit" class="btn btn-success" wire:loading.attr="disabled" wire:target="saveProfile">
                         <span wire:loading.remove wire:target="saveProfile"><i class="fa fa-check me-1" aria-hidden="true"></i> ذخیره تغییرات</span>
@@ -166,6 +222,10 @@
                     ['fa-mobile', 'موبایل', $user->mobile, true],
                     ['fa-id-card-o', 'کد ملی', $user->national_code, true],
                     ['fa-envelope-o', 'ایمیل', $user->email, true],
+                    ['fa-male', 'نام پدر', $patientFile['father_name'], false],
+                    ['fa-birthday-cake', 'تاریخ تولد', filled($patientFile['birth_date']) ? $patientFile['birth_date'] . ($patientAge !== null ? ' (' . $patientAge . ' سال)' : '') : null, false],
+                    ['fa-heart-o', 'وضعیت تأهل', $maritalLabel, false],
+                    ['fa-bullhorn', 'نحوه آشنایی', $patientFile['acquaintance'], false],
                 ] as [$icon, $label, $value, $ltr])
                     <span class="pf-chip {{ filled($value) ? '' : 'is-empty' }}">
                         <i class="fa {{ $icon }}" aria-hidden="true"></i>
@@ -418,5 +478,9 @@
                 showSwalError(param.message)
             });
         });
+        (function initBirthDatePicker() {
+            if (!window.jalaliDatepicker) { return setTimeout(initBirthDatePicker, 100); }
+            jalaliDatepicker.startWatch({ zIndex: 99999, autoHide: true, hideAfterChange: true });
+        })();
     </script>
 @endpush

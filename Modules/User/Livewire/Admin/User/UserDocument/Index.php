@@ -9,6 +9,9 @@ use Modules\Front\app\Models\FeedBack;
 use Modules\Front\enum\FeedbackId;
 use Modules\User\app\Models\PatientNote;
 use Modules\User\Entities\User;
+use Modules\User\Enum\UserMetaEnum;
+use Modules\User\Support\PatientProfile;
+use Illuminate\Validation\Rule;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Modules\Transaction\app\Models\Transaction;
 use Modules\AppointmentUser\app\Models\FeedbackAnswer;
@@ -50,7 +53,12 @@ class Index extends Component
             'email'           => (string) $this->user->email,
             'national_code'   => (string) $this->user->national_code,
             'document_number' => (string) $this->user->document_number,
-        ];
+        ] + array_map(fn ($value) => (string) ($value ?? ''), PatientProfile::load($this->user));
+    }
+
+    public function profileAge(): ?int
+    {
+        return PatientProfile::age((string) ($this->profile['birth_date'] ?? ''));
     }
 
     public function editProfile(): void
@@ -75,8 +83,24 @@ class Index extends Component
             'profile.last_name'       => 'nullable|string|max:100',
             'profile.mobile'          => 'required|digits:11|unique:users,mobile,' . $this->user->id,
             'profile.email'           => 'nullable|email|unique:users,email,' . $this->user->id,
-            'profile.national_code'   => 'nullable|digits:10',
+            'profile.national_code'   => ['nullable', 'digits:10', Rule::unique('users', 'national_code')->ignore($this->user->id)],
             'profile.document_number' => 'nullable|string|max:50',
+            'profile.birth_date'      => ['nullable', function ($attribute, $value, $fail) {
+                if (filled($value) && PatientProfile::parseBirthDate((string) $value) === null) {
+                    $fail('تاریخ تولد را به صورت شمسی و صحیح وارد کنید (مثلاً 1370/05/21).');
+                }
+            }],
+            'profile.father_name'     => 'nullable|string|max:100',
+            'profile.marital_status'  => ['nullable', Rule::in(array_keys(PatientProfile::MARITAL_STATUSES))],
+            'profile.acquaintance'    => ['nullable', Rule::in(PatientProfile::ACQUAINTANCE_OPTIONS)],
+        ];
+    }
+
+    protected function messages(): array
+    {
+        return [
+            'profile.national_code.digits' => 'کد ملی باید ۱۰ رقم باشد',
+            'profile.national_code.unique' => 'این کد ملی قبلاً برای مراجع دیگری ثبت شده است',
         ];
     }
 
@@ -89,12 +113,17 @@ class Index extends Component
             'profile.email'           => 'ایمیل',
             'profile.national_code'   => 'کد ملی',
             'profile.document_number' => 'شماره پرونده',
+            'profile.birth_date'      => 'تاریخ تولد',
+            'profile.father_name'     => 'نام پدر',
+            'profile.marital_status'  => 'وضعیت تأهل',
+            'profile.acquaintance'    => 'نحوه آشنایی',
         ];
     }
 
     public function saveProfile(): void
     {
         $this->authorize('update', $this->user);
+        $this->profile = array_merge($this->profile, PatientProfile::normalize($this->profile));
         $this->validate();
 
         $this->user->update([
@@ -106,11 +135,34 @@ class Index extends Component
         $this->user->last_name       = $this->profile['last_name'];
         $this->user->national_code   = $this->profile['national_code'];
         $this->user->document_number = $this->profile['document_number'];
+        $this->saveExtendedProfile();
 
         $this->user = User::find($this->user->id);
         $this->fillProfile();
         $this->editingProfile = false;
         $this->dispatch('showAlert', message: 'اطلاعات مراجع با موفقیت ذخیره شد');
+    }
+
+    /**
+     * Birthday, father name, marital status and acquaintance. Unlike the booking form, clearing a field here
+     * removes the stored value (user_metas.meta_value can not be null, so the row is deleted).
+     */
+    private function saveExtendedProfile(): void
+    {
+        $birth = PatientProfile::parseBirthDate((string) $this->profile['birth_date']);
+        $values = [
+            [UserMetaEnum::BIRTHDAY, 'birthday', $birth ? json_encode($birth) : null],
+            [UserMetaEnum::FATHER_NAME, 'father_name', filled($this->profile['father_name']) ? trim($this->profile['father_name']) : null],
+            [UserMetaEnum::MARITAL_STATUS, 'marital_status', filled($this->profile['marital_status']) ? $this->profile['marital_status'] : null],
+            [UserMetaEnum::ACQUAINTANCE, 'acquaintance', filled($this->profile['acquaintance']) ? $this->profile['acquaintance'] : null],
+        ];
+        foreach ($values as [$metaKey, $attribute, $value]) {
+            if ($value === null) {
+                $this->user->metas()->where('meta_key', $metaKey)->delete();
+            } else {
+                $this->user->{$attribute} = $value;
+            }
+        }
     }
 
     #[On('delete')]

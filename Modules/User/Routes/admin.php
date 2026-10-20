@@ -10,7 +10,9 @@ Route::get('user/report/{user}', \Modules\User\Livewire\Admin\User\UserActivityR
     ->name('user.report')
     ->can('viewReport', 'user');
 Route::get('user/edit/{user}', \Modules\User\Livewire\Admin\User\UserCreateOrUpdate::class)->name('user.edit');//access should check in liviwire component edit part
-Route::get('user/documents/{user}', \Modules\User\Livewire\Admin\User\UserDocument\Index::class)->name('user.document');
+Route::get('user/documents/{user}', \Modules\User\Livewire\Admin\User\UserDocument\Index::class)
+    ->name('user.document')
+    ->can('user.documentte');
 // doctor profile info
 Route::get('user/doctor/info/{user}', \Modules\User\Livewire\Admin\User\DoctorInfo\UpdateOrCreate::class)->name('doctor.info')->can('viewAny', \Modules\User\Entities\User::class);
 Route::get('user/doctor/gallery/{user}', \Modules\User\Livewire\Admin\User\DoctorGallery\UpdateOrCreate::class)->name('doctor.gallery')->can('viewAny', \Modules\User\Entities\User::class);

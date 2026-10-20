@@ -181,6 +181,7 @@ class Index extends Component
     {
         $user = $user ?? request()->route('user');
         $this->user = User::findOrFail($user instanceof User ? $user->getKey() : $user);
+        $this->authorize('user.documentte');
         $this->fillProfile();
     }
 

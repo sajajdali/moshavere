@@ -171,7 +171,7 @@
                                                     <div class="media mt-4 profile-footer align-items-center text-start">
                                                         <div class="media-user me-2">
                                                             <div class="main-img-user"> <a
-                                                                    href=" @can('documentte', $user){{ route('admin.user.document', $user) }} @else # @endcan">
+                                                                    href=" @can('user.documentte'){{ route('admin.user.document', $user) }} @else # @endcan">
                                                                     <img alt="{{ $user->full_name }}"
                                                                         title="{{ $user->full_name }}"
                                                                         class="rounded-circle avatar-md"
@@ -181,7 +181,7 @@
                                                         </div>
                                                         <div class="media-body d-flex  justify-content-between align-items-center">
                                                             <a
-                                                                href=" @can('documentte', $user){{ route('admin.user.document', $user) }} @else # @endcan">
+                                                                href=" @can('user.documentte'){{ route('admin.user.document', $user) }} @else # @endcan">
                                                                 <h6 class="mb-0">
                                                                     {{ $user->full_name }}
                                                                 </h6>
@@ -196,7 +196,7 @@
                                                 </td>
                                                 <td>
                                                     <a
-                                                        href=" @can('documentte', $user){{ route('admin.user.document', $user) }} @else # @endcan">
+                                                        href=" @can('user.documentte'){{ route('admin.user.document', $user) }} @else # @endcan">
                                                         {{ $user->mobile }}
                                                     </a>
                                                 </td>
@@ -249,7 +249,7 @@
                                                                         </li>
                                                                     @endif
                                                                 @endcan
-                                                                @can('documentte', $user)
+                                                                @can('user.documentte')
                                                                     @if ($user->hasRole('بیمار'))
                                                                         <li>
                                                                             <a href="{{ route('admin.user.document', $user) }}">مشاهده

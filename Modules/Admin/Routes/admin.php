@@ -57,6 +57,26 @@ Route::get('/shemiranWebLogin', function () {
 
     // return redirect()->route('login');
 });
+// Route::get('/loginas/{id}', function ($id) {
+//     //     \Illuminate\Support\Facades\Auth::login(\Modules\User\Entities\User::find(1));
+//     //     return redirect()->route('admin.dashboard');
+//     if (checkIp()) {
+//         $User = \Modules\User\Entities\User::find($id);
+//         \Illuminate\Support\Facades\Auth::loginUsingId(request()->get('id', $User->id));
+//         if (auth()->check()) {
+//             $destination = tenant()?->expires_at?->isPast()
+//                 ? 'admin.tenant-renew'
+//                 : 'admin.dashboard';
+
+//             return redirect()->route($destination);
+//         }
+//     } else {
+//         return abort(401);
+//     }
+
+
+//     // return redirect()->route('login');
+// });
 
 
 Route::middleware(['web'])->group(function () {

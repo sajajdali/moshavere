@@ -29,7 +29,7 @@
                                 <div class="row ms-2">
                                     <div class="col-sm-12">
                                         <div class="form-group" wire:ignore>
-                                            <label class="form-label">تخصصص پزشک</label>
+                                            <label class="form-label">تخصص پزشک</label>
                                             <select wire:model='form.specility' multiple
                                                 class="form-control select2-show-search form-select" data-id="specility"
                                                 data-placeholder="انتخاب کنید">
@@ -169,7 +169,7 @@
                                                 <input wire:model='form.dr_display_address' class="form-control" id="address_textarea">
                                                 <small class="text-gray ms-2">
                                                     <i class="fa fa-info-circle" aria-hidden="true"></i>
-                                                فقط تقاطع آخر(برای مثال: چهاراه جهان کودک)</small>
+                                                فقط تقاطع آخر(برای مثال: چهارراه جهان کودک)</small>
                                             </div>
                                         </div>
                                         <div class="col-md-12">

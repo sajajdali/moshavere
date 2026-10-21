@@ -121,7 +121,7 @@
                         @if ($appointmentUser->details[Modules\AppointmentUser\app\Models\AppointmentUser::DETAIL_PAYMENT]['status'])
                             <hr class="border-secondary-200" />
                             <div class="space-y-3 text-sm">
-                                <p class="font-bold text-lg">جزیات پرداخت</p>
+                                <p class="font-bold text-lg">جزئیات پرداخت</p>
                                 <main class="flex flex-col gap-3">
                                     <div
                                         class="border border-secondary-200 rounded-lg p-4 flex items-center justify-between">

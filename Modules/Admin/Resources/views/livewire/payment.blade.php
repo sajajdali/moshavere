@@ -47,7 +47,7 @@
                                 <div class="text-center mb-4">
                                     <img src="{{asset('default/admin/logo.png')}}" alt="lockscreen image"
                                          class="avatar avatar-xxl brround mb-2">
-                                    <h4>پر داخت آنلاین برای نوبت شماره {{$appointmentUser->tracking_code}}</h4>
+                                    <h4>پرداخت آنلاین برای نوبت شماره {{$appointmentUser->tracking_code}}</h4>
                                 </div>
 
                                 @if($appointmentUser->status == \Modules\AppointmentUser\Enum\AppointmentUserStatusEnum::STATUS_SUCCESSFUL)
@@ -66,7 +66,7 @@
                                                 wire:loading.class="bg-gray btn-loading disabled"
                                                 wire:click="successfulPayment"
                                         >
-                                            پرداخت موفقت
+                                            پرداخت موفق
                                         </button>
                                     </div>
                                     <div class="container-login100-form-btn">

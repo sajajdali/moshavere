@@ -55,7 +55,7 @@
                             class="text-blue-400 hover:text-blue-700 cursor-pointer">{{ $form['place_name'] }}</a>
                     </p>
                 </div>
-                <p class="font-semibold">لطفا بخش مورد نظر خود را امتخاب کنید</p>
+                <p class="font-semibold">لطفا بخش مورد نظر خود را انتخاب کنید</p>
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
                     @isset($fetchData['services'])
                         @foreach ($fetchData['services'] as $key => $item)

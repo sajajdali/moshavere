@@ -74,9 +74,9 @@ class Invoice extends Component
             } elseif ($total_usage < $discount->usage_counter) {
                 return $this->addError('discountCode', 'سقف استفاده از این کد تخفیف به اتمام رسیده است');
             } elseif ($this->transaction->total_cost < $minum_pice) {
-                return $this->addError('discountCode', 'مبلغ قابل پرداخت شما ، از حداقل مبلق قابل استفاده برای کد تخفیف کمتر است');
+                return $this->addError('discountCode', 'مبلغ قابل پرداخت شما ، از حداقل مبلغ قابل استفاده برای کد تخفیف کمتر است');
             } elseif ($this->transaction->total_cost > $maximum_price) {
-                return $this->addError('discountCode', 'مبلغ قابل پرداخت شما ، از حداکثر مبلق قابل استفاده برای کد تخفیف بیشتر است');
+                return $this->addError('discountCode', 'مبلغ قابل پرداخت شما ، از حداکثر مبلغ قابل استفاده برای کد تخفیف بیشتر است');
             } else {
                 if ($discount_type == 'percentage') {
                     $discouted_amount = $this->transaction->total_cost - (($this->transaction->total_cost * $discount_amount) / 100);

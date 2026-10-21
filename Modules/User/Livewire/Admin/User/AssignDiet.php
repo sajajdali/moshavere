@@ -31,7 +31,7 @@ class AssignDiet extends Component
         $dietPlan = app('dietService')->insertUserDietPlan($this->user,$diet_plan);
         $rejim = app('dietService')->makeRejim($dietPlan['dietRequestModel'] , DietRequest::ACTION_REQUEST_INSERT);
 
-        session()->flash('success','رژریم با موفقیت برای کابر تجویز شد');
+        session()->flash('success','رژیم با موفقیت برای کاربر تجویز شد');
         return redirect()->route('admin.user.document',[$this->user]);
     }
     public function mount($user)

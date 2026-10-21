@@ -59,10 +59,10 @@
                                     </div>
                                     <div class="collapse show row" id="userDataCollaps" wire:ignore.self>
                                         <div class="row mb-4">
-                                            <label for="ID" class="col-md-2 form-label">ایدی</label>
+                                            <label for="ID" class="col-md-2 form-label">آیدی</label>
                                             <div class="col-md-10">
                                                 <input class="form-control" id="ID" wire:model="search.id"
-                                                    placeholder="ایدی کاربر مورد نظر" type="text">
+                                                    placeholder="آیدی کاربر مورد نظر" type="text">
                                             </div>
                                         </div>
                                         <div class="row mb-4">

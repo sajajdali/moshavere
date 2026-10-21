@@ -113,7 +113,7 @@
                 </div>
                 <div class="col-md-12 mb-5">
                     <div class="form-group">
-                        <label class="form-label">محدودییت نمایش این پیام برای دکتر</label>
+                        <label class="form-label">محدودیت نمایش این پیام برای دکتر</label>
                         <select wire:model='form.limitToDoctor' wire:igonre.self multiple
                             class="form-control select2-show-search form-select" data-id="Doc_id"
                             data-placeholder="انتخاب کنید..">
@@ -200,10 +200,10 @@
                     wire:ignore.self>
                     <form class="form-horizontal example" autocomplete="off">
                         <div class="row mb-4">
-                            <label for="search-id" class="col-md-2 form-label">ایدی</label>
+                            <label for="search-id" class="col-md-2 form-label">آیدی</label>
                             <div class="col-md-10">
                                 <input class="form-control" id="search-id" wire:model="search.id"
-                                    tempMessageholder="ایدی مطب مورد نظر" type="text">
+                                    tempMessageholder="آیدی مطب مورد نظر" type="text">
                             </div>
                         </div>
                         <div class="row mb-4">

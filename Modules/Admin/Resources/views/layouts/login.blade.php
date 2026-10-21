@@ -10,7 +10,7 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="description" content="سیستم مدیریت">
     <meta name="author" content="شمیرات وب">
-    <meta name="keywords" content="مدیرت">
+    <meta name="keywords" content="مدیریت">
 
     <!-- TITLE -->
     <title>{{ $title ?? 'ورود امن مدیریت' }}</title>

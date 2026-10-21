@@ -86,9 +86,9 @@
                                         </div>
                                         <div class=" col-12 collapse show row" id="userDataCollaps">
                                             <div class="col-md-6 form-group">
-                                                <label for="search-id" class=" form-label"><strong>ایدی</strong></label>
+                                                <label for="search-id" class=" form-label"><strong>آیدی</strong></label>
                                                 <input class="form-control" id="search-id" wire:model="search.user_id"
-                                                    placeholder="ایدی کاربر مورد نظر" type="text">
+                                                    placeholder="آیدی کاربر مورد نظر" type="text">
 
                                             </div>
                                             <div class="col-md-6">
@@ -170,7 +170,7 @@
                                                 <label for="search-docNumberId" class="form-label"><strong>شماره
                                                         پرونده</strong></label>
                                                 <input class="form-control" id="search-docNumberId"
-                                                    wire:model="search.docNumber" placeholder="ایدی رژیم مورد نظر"
+                                                    wire:model="search.docNumber" placeholder="آیدی رژیم مورد نظر"
                                                     type="text">
 
                                             </div>
@@ -250,7 +250,7 @@
                                             href="{{ route('admin.appointment_user.message.detail', ['onlineAppId' => $message->online->id]) }}">{{ $message->user->full_name }}</a>
                                     </div>
                                     <div class="text-end">
-                                        <span class=" badge bg-light small d-block mt-1  px-1"><strong>اخرین
+                                        <span class=" badge bg-light small d-block mt-1  px-1"><strong>آخرین
                                                 پیام</strong>: {{ $message->updated_at->diffForHumans() }}
                                         </span>
                                         <span class="mt-1 d-block bg-light bg-light">

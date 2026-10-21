@@ -205,7 +205,7 @@ class Menu extends Component
             'پیامک' => ['fa-comment', 'icon-chat'],
             'پیغامهایضبطشده' => ['fa-voicemail', 'icon-prompt'],
             'تماسهایورودی' => ['fa-phone-volume', 'icon-online'],
-            'تنظماتوبسایت' => ['fa-globe', 'icon-settings'],
+            'تنظیماتوبسایت' => ['fa-globe', 'icon-settings'],
             'تنظیماتAPI' => ['fa-plug', 'icon-settings'],
             'تنظیماتVoip' => ['fa-phone', 'icon-settings'],
             'تنظیماتاپ' => ['fa-mobile-screen', 'icon-settings'],

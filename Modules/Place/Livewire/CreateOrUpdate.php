@@ -38,7 +38,7 @@ class CreateOrUpdate extends Component
 
     protected $messages = [
         'form.name.required' => 'نام مطب یا کلینیک را وارد کنید',
-        'form.priority.numeric' => 'مقدار وارد شده اولیت نمایش باید از نوع عدد باشد',
+        'form.priority.numeric' => 'مقدار وارد شده اولویت نمایش باید از نوع عدد باشد',
     ];
 
     public function addCounter()

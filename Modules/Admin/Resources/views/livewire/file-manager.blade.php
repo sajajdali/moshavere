@@ -198,7 +198,7 @@
         <div class="modal-dialog modal-dialog-centered" role="document">
             <div class="modal-content modal-content-demo">
                 <div class="modal-header">
-                    <h6 class="modal-title">اپلود فایل</h6>
+                    <h6 class="modal-title">آپلود فایل</h6>
                     <button aria-label="Close" class="btn-close" data-bs-dismiss="modal" type="button"
                         id="btn_close_upload"><span aria-hidden="true">&times;</span></button>
                 </div>

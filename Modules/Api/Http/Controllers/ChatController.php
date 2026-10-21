@@ -26,7 +26,7 @@ class ChatController extends Controller
         $user = auth()->user();
 
         if ($chat->user->id <> $user->id) {
-            return $this->badRequest('شما درسترسی به این چت را ندارید');
+            return $this->badRequest('شما دسترسی به این چت را ندارید');
         }
         $chatDetail = $chat->chatDetails()->orderByDesc('id')->paginate();
         if ($chatDetail->first()){

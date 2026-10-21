@@ -25,14 +25,14 @@
                         <label for="search-id" class="col-md-2 form-label"> نام اپراتور</label>
                         <div class="col-md-10">
                             <input class="form-control" id="search-id" wire:model="search.operator_name"
-                                absenteeholder="ایدی پزشک" type="text">
+                                absenteeholder="آیدی پزشک" type="text">
                         </div>
                     </div>
                     <div class="row mb-4">
                         <label for="search-id" class="col-md-2 form-label">شماره تلفن اپراتور</label>
                         <div class="col-md-10">
                             <input class="form-control" id="search-id" wire:model="search.operator_mobile"
-                                absenteeholder="ایدی پزشک" type="text">
+                                absenteeholder="آیدی پزشک" type="text">
                         </div>
                     </div>
                     <button class="btn btn-primary" type="button" wire:click="searchOperators"

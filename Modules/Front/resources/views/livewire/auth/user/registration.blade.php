@@ -35,7 +35,7 @@
                     <select id="gender" name="gender" wire:model='form.gender'
                         class="w-full border  @error('form.gender') border-rose-500 @else  border-secondary-300 @enderror  rounded-lg bg-primary-tint-100 py-2 px-3 focus:outline-none focus:border-primary-500">
                         <option value="" selected>انتخاب کنید...</option>
-                        <option value="male">اقا</option>
+                        <option value="male">آقا</option>
                         <option value="female">خانم</option>
                     </select>
                     @error('form.gender')

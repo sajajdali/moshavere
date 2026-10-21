@@ -139,7 +139,7 @@ class VoipController extends Controller
         if (! $appointmentSetting) {
             return $this->ok([
                 'status' => false,
-                'error' => 'مشکلی در سیستم به وجود آمده است! لطفا با پشتیبانی تماس حاص فرمایید.',
+                'error' => 'مشکلی در سیستم به وجود آمده است! لطفا با پشتیبانی تماس حاصل فرمایید.',
             ]);
         }
 

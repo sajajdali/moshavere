@@ -20,9 +20,9 @@
             <div class="mb-5 collapse {{ $searchPanel }}" id="advanceSearch" wire:ignore>
                 <form class="form-horizontal example" autocomplete="off">
                     <div class="row mb-4">
-                        <label for="search-id" class="col-md-2 form-label">ایدی</label>
+                        <label for="search-id" class="col-md-2 form-label">آیدی</label>
                         <div class="col-md-10">
-                            <input class="form-control" id="search-id" wire:model="search.id" absenteeholder="ایدی پزشک"
+                            <input class="form-control" id="search-id" wire:model="search.id" absenteeholder="آیدی پزشک"
                                 type="text">
                         </div>
                     </div>

@@ -125,7 +125,7 @@
                         </div>
                         <div class="col-md-6">
                             <label for="maximum_usage_each_user" class="form-label">تعداد قابل استفاده برای هر
-                                کابر</label>
+                                کاربر</label>
                             <input wire:model='form.maximum_usage_each_user' class="form-control"
                                 id="maximum_usage_each_user" placeholder="تعداد قابل استفاده" type="number">
                             @error('form.form.maximum_usage_each_user')

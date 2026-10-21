@@ -29,10 +29,10 @@
                     <div class="mb-5 collapse {{ $searchPanel }}" id="advanceSearch">
                         <form class="form-horizontal example">
                             <div class="row mb-4">
-                                <label for="ID" class="col-md-2 form-label">ایدی</label>
+                                <label for="ID" class="col-md-2 form-label">آیدی</label>
                                 <div class="col-md-10">
                                     <input class="form-control" id="id" wire:model.defer="search.id"
-                                           placeholder="ایدی  مورد نظر"
+                                           placeholder="آیدی  مورد نظر"
                                            type="text">
                                 </div>
                             </div>
@@ -58,7 +58,7 @@
                             <tr>
                                 <th scope="col">#</th>
                                 <th scope="col">نام </th>
-                                <th scope="col">تعداد ایتم ها</th>
+                                <th scope="col">تعداد آیتم ها</th>
                                 <th scope="col">عملیات</th>
                             </tr>
                             </thead>

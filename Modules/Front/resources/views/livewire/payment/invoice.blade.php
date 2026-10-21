@@ -67,7 +67,7 @@
                                             class="custom-control-input" id="rulesAndConditionCheckBox">
                                         <label for="rulesAndConditionCheckBox" class="custom-control-label mt-1">
                                             با <a type="button" data-bs-toggle="modal" class="text-primary"
-                                                data-bs-target="#exampleModal">شرابط و قوانین </a> پرداخت موافق هستم
+                                                data-bs-target="#exampleModal">شرایط و قوانین </a> پرداخت موافق هستم
                                         </label>
                                     </div>
                                 </div>

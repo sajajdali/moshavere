@@ -151,7 +151,7 @@
                             <label class="form-label" for="placeorder">ترتیب نمایش :</label>
                             <input wire:key="prioruty" type="text" class="form-control" id="placeorder"
                                 wire:model='form.priority'
-                                placeholder="اواویت نمایش مربوط به این مطب در صورتی که چند مطب داشته باشید را به عدد وارد کنید.">
+                                placeholder="اولویت نمایش مربوط به این مطب در صورتی که چند مطب داشته باشید را به عدد وارد کنید.">
                         </div>
                     </div>
                     {{-- <div class="col-12 mt-5">

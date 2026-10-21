@@ -35,7 +35,7 @@
                                         class="form-control @error('form.food_unit_id') is-invalid @enderror"
                                         data-placeholder="انتخاب نشده" id="food_unit_id">
                                     <option value="1">تک انتخابی</option>
-                                    <option value="0">انخاب چند بخش</option>
+                                    <option value="0">انتخاب چند بخش</option>
 
                                 </select>
                                 @error('form.food_unit_id')

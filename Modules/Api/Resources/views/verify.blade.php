@@ -52,7 +52,7 @@
                             </tr>
                             <tr>
                                 <td class="border-top-0">مبلغ کل</td>
-                                <td class="text-end border-top-0">۳۶۰،۰۰۰ تورمان</td>
+                                <td class="text-end border-top-0">۳۶۰،۰۰۰ تومان</td>
                             </tr>
 
                             <tr>

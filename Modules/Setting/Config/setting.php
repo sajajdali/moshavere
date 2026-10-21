@@ -94,7 +94,7 @@ $setting = [
         ],
     ],
     'website' => [
-        'title' => 'تنظمات وبسایت',
+        'title' => 'تنظیمات وبسایت',
         'icon' => 'fa fa-globe',
         'settings' => [
             \Modules\Setting\Enum\SettingKeyEnum::SITE_LOGO_URL,

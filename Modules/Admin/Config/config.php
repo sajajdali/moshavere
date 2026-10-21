@@ -12,7 +12,7 @@ return [
             'permissions' => [
                 'admin.dashboard.appointments' => 'مشاهده نوبت ها',
                 'admin.dashboard.payment'      => 'مشاهده پرداختی ها',
-                'admin.dashboard.analytic'     => 'مشاهده امار نوبت ها',
+                'admin.dashboard.analytic'     => 'مشاهده آمار نوبت ها',
             ],
         ],
     ],

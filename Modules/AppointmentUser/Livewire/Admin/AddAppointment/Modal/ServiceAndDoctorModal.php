@@ -245,11 +245,11 @@ class ServiceAndDoctorModal extends Component
                         ]);
                     });
                 });
-            })->orderBy('id')->take(30)
+            })->displayOrder()->take(30)
                 ->with('metas')
                 ->get();
         } else {
-            $query = User::doctors()->take(30);
+            $query = User::doctors_query()->displayOrder()->take(30)->get();
         }
 
         return view(

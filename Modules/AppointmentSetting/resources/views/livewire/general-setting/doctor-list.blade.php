@@ -6,6 +6,13 @@
         </div>
     </div>
     @include('admin::layouts.components.alert')
+    @can('viewAny', \Modules\AppointmentSetting\app\Models\AppointmentSetting::class)
+        <div class="mb-3">
+            <a href="{{ route('admin.appointment.doctor.order') }}" class="btn btn-outline-primary btn-sm">
+                <i class="fa-solid fa-arrow-down-1-9 me-1" aria-hidden="true"></i>تغییر ترتیب نمایش پزشکان
+            </a>
+        </div>
+    @endcan
     <div class="card doctor-picker">
         <div class="card-header border-bottom doctor-picker-header">
             <div>

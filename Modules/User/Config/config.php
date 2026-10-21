@@ -76,6 +76,15 @@ return [
                         'has_child' => false,
                         'children' => null,
                     ],
+                    [
+                        'title' => 'ترتیب نمایش پزشکان',
+                        'gate' => 'viewAny',
+                        'policy_class' => \Modules\AppointmentSetting\app\Models\AppointmentSetting::class,
+                        'icon' => 'fa fa-sort',
+                        'route' => 'admin.appointment.doctor.order',
+                        'has_child' => false,
+                        'children' => null,
+                    ],
                 ],
             ],
             [

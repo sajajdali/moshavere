@@ -238,6 +238,20 @@ class User extends Authenticatable
         return Role::find(4)?->users();
     }
 
+    /**
+     * ترتیب نمایش پزشکان که از صفحه «ترتیب نمایش پزشکان» تعیین می شود؛ پزشکان بدون ترتیب آخر و بر اساس شناسه می آیند.
+     */
+    public function scopeDisplayOrder($query)
+    {
+        // raw SQL is not table-prefixed, so the column is wrapped through the grammar
+        $column = $query->getQuery()->getGrammar()->wrap('users.display_order');
+
+        return $query
+            ->orderByRaw("CASE WHEN {$column} IS NULL THEN 1 ELSE 0 END")
+            ->orderBy('users.display_order')
+            ->orderBy('users.id');
+    }
+
     public function age(): int
     {
         $birthDayData = $this->birthday;

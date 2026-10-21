@@ -21,6 +21,7 @@ use Modules\AppointmentSetting\Livewire\Segment\SegmentCreateOrUpdate;
 
 Route::group([], function () {
     Route::get('appointment/setting/doctors', DoctorList::class)->name('appointment.doctor.list');
+    Route::get('appointment/setting/doctors/order', \Modules\AppointmentSetting\Livewire\GeneralSetting\DoctorOrder::class)->name('appointment.doctor.order')->can('viewAny', \Modules\AppointmentSetting\app\Models\AppointmentSetting::class);
     Route::get('appointment/setting/{user}', GeneralSetting::class)->name('appointment.setting');
     Route::get('appointment/setting/special/section/{user}', SpecialSectionSetting::class)->name('appointment.specialsection');
     Route::get('appointment/setting/{user}/{service}/{place}', GeneralSetting::class)->name('appointment.setting.specialservice');

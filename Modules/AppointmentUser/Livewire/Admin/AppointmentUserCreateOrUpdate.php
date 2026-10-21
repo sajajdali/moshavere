@@ -301,7 +301,7 @@ class AppointmentUserCreateOrUpdate extends Component
                         ]);
                     });
                 });
-            })->with(['metas', 'specialities', 'services', 'places'])->orderByDesc('id')->paginate(20);
+            })->with(['metas', 'specialities', 'services', 'places'])->displayOrder()->paginate(20);
         }
         $Services = Service::withCount('user')->when($permitionCondition, function ($q) {
             return $q->whereHas('user', function ($qq) {

@@ -111,7 +111,7 @@ class DoctorList extends Component
                         ]);
                     });
                 })
-                ->orderByDesc('users.id')->paginate(20);
+                ->displayOrder()->paginate(20);
         } else {
             $doctorsQuery = null;
         }

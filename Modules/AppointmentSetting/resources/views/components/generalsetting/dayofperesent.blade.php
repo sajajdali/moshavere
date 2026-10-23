@@ -79,13 +79,11 @@
                                 <div class="row align-items-end">
                                     <div class="col-12 col-md-5">
                                         <label for="input-time" class="form-label">از ساعت</label>
-                                        <input wire:model='form.timeFrame.saturday.{{ $i }}.start'
-                                            type="time" wire:ignore.self class="form-control" id="input-time">
+                                        @include('appointmentsetting::components.generalsetting.time24', ['model' => "form.timeFrame.saturday.{$i}.start"])
                                     </div>
                                     <div class="col-12 col-md-5"> <label for="input-label" class="form-label">تا
                                             ساعت:</label>
-                                        <input wire:model='form.timeFrame.saturday.{{ $i }}.end'
-                                            type="time" wire:ignore.self class="form-control" id="input-time">
+                                        @include('appointmentsetting::components.generalsetting.time24', ['model' => "form.timeFrame.saturday.{$i}.end"])
                                     </div>
                                     <div class="col-12 col-md-2 mb-3">
                                         @if ($counter['saturday'] > 1)
@@ -174,13 +172,11 @@
                                 <div class="row align-items-end">
                                     <div class="col-12 col-md-5">
                                         <label for="input-time" class="form-label">از ساعت</label>
-                                        <input wire:model='form.timeFrame.sunday.{{ $i }}.start'
-                                            type="time" wire:ignore.self class="form-control" id="input-time">
+                                        @include('appointmentsetting::components.generalsetting.time24', ['model' => "form.timeFrame.sunday.{$i}.start"])
                                     </div>
                                     <div class="col-12 col-md-5"> <label for="input-label" class="form-label">تا
                                             ساعت:</label>
-                                        <input wire:model='form.timeFrame.sunday.{{ $i }}.end'
-                                            type="time" wire:ignore.self class="form-control" id="input-time">
+                                        @include('appointmentsetting::components.generalsetting.time24', ['model' => "form.timeFrame.sunday.{$i}.end"])
                                     </div>
                                     <div class="col-12 col-md-2 mb-3">
                                         @if ($counter['sunday'] > 1)
@@ -270,13 +266,11 @@
                                 <div class="row align-items-end">
                                     <div class="col-12 col-md-5">
                                         <label for="input-time" class="form-label">از ساعت</label>
-                                        <input wire:model='form.timeFrame.monday.{{ $i }}.start'
-                                            type="time" wire:ignore.self class="form-control" id="input-time">
+                                        @include('appointmentsetting::components.generalsetting.time24', ['model' => "form.timeFrame.monday.{$i}.start"])
                                     </div>
                                     <div class="col-12 col-md-5"> <label for="input-label" class="form-label">تا
                                             ساعت:</label>
-                                        <input wire:model='form.timeFrame.monday.{{ $i }}.end'
-                                            type="time" wire:ignore.self class="form-control" id="input-time">
+                                        @include('appointmentsetting::components.generalsetting.time24', ['model' => "form.timeFrame.monday.{$i}.end"])
                                     </div>
                                     <div class="col-12 col-md-2 mb-3">
                                         @if ($counter['monday'] > 1)
@@ -365,13 +359,11 @@
                                 <div class="row align-items-end">
                                     <div class="col-12 col-md-5">
                                         <label for="input-time" class="form-label">از ساعت</label>
-                                        <input wire:model='form.timeFrame.tuesday.{{ $i }}.start'
-                                            type="time" wire:ignore.self class="form-control" id="input-time">
+                                        @include('appointmentsetting::components.generalsetting.time24', ['model' => "form.timeFrame.tuesday.{$i}.start"])
                                     </div>
                                     <div class="col-12 col-md-5"> <label for="input-label" class="form-label">تا
                                             ساعت:</label>
-                                        <input wire:model='form.timeFrame.tuesday.{{ $i }}.end'
-                                            type="time" wire:ignore.self class="form-control" id="input-time">
+                                        @include('appointmentsetting::components.generalsetting.time24', ['model' => "form.timeFrame.tuesday.{$i}.end"])
                                     </div>
                                     <div class="col-12 col-md-2 mb-3">
                                         @if ($counter['tuesday'] > 1)
@@ -460,13 +452,11 @@
                                 <div class="row align-items-end">
                                     <div class="col-12 col-md-5">
                                         <label for="input-time" class="form-label">از ساعت</label>
-                                        <input wire:model='form.timeFrame.wednesday.{{ $i }}.start'
-                                            type="time" wire:ignore.self class="form-control" id="input-time">
+                                        @include('appointmentsetting::components.generalsetting.time24', ['model' => "form.timeFrame.wednesday.{$i}.start"])
                                     </div>
                                     <div class="col-12 col-md-5"> <label for="input-label" class="form-label">تا
                                             ساعت:</label>
-                                        <input wire:model='form.timeFrame.wednesday.{{ $i }}.end'
-                                            type="time" wire:ignore.self class="form-control" id="input-time">
+                                        @include('appointmentsetting::components.generalsetting.time24', ['model' => "form.timeFrame.wednesday.{$i}.end"])
                                     </div>
                                     <div class="col-12 col-md-2 mb-3">
                                         @if ($counter['wednesday'] > 1)
@@ -555,13 +545,11 @@
                                 <div class="row align-items-end">
                                     <div class="col-12 col-md-5">
                                         <label for="input-time" class="form-label">از ساعت</label>
-                                        <input wire:model='form.timeFrame.thursday.{{ $i }}.start'
-                                            type="time" wire:ignore.self class="form-control" id="input-time">
+                                        @include('appointmentsetting::components.generalsetting.time24', ['model' => "form.timeFrame.thursday.{$i}.start"])
                                     </div>
                                     <div class="col-12 col-md-5"> <label for="input-label" class="form-label">تا
                                             ساعت:</label>
-                                        <input wire:model='form.timeFrame.thursday.{{ $i }}.end'
-                                            type="time" wire:ignore.self class="form-control" id="input-time">
+                                        @include('appointmentsetting::components.generalsetting.time24', ['model' => "form.timeFrame.thursday.{$i}.end"])
                                     </div>
                                     <div class="col-12 col-md-2 mb-3">
                                         @if ($counter['thursday'] > 1)
@@ -637,13 +625,11 @@
                                 <div class="row align-items-end">
                                     <div class="col-12 col-md-5">
                                         <label for="input-time" class="form-label">از ساعت</label>
-                                        <input wire:model='form.timeFrame.friday.{{ $i }}.start'
-                                            type="time" wire:ignore.self class="form-control" id="input-time">
+                                        @include('appointmentsetting::components.generalsetting.time24', ['model' => "form.timeFrame.friday.{$i}.start"])
                                     </div>
                                     <div class="col-12 col-md-5"> <label for="input-label" class="form-label">تا
                                             ساعت:</label>
-                                        <input wire:model='form.timeFrame.friday.{{ $i }}.end'
-                                            type="time" wire:ignore.self class="form-control" id="input-time">
+                                        @include('appointmentsetting::components.generalsetting.time24', ['model' => "form.timeFrame.friday.{$i}.end"])
                                     </div>
                                     <div class="col-12 col-md-2 mb-3">
                                         @if ($counter['friday'] > 1)

@@ -41,6 +41,16 @@ return [
                 'has_child' => false,
                 'children' => null,
             ],
+            [
+                'title' => 'وارد کردن پرونده بیماران',
+                'gate' => 'create',
+                'policy_class' => \Modules\User\Entities\User::class,
+                'icon' => 'fa fa-file-excel-o',
+                'route' => 'admin.user.import-patients',
+                'has_badge' => false,
+                'has_child' => false,
+                'children' => null,
+            ],
         ],
 
     ],

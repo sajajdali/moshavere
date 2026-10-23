@@ -707,6 +707,9 @@ class GeneralSetting extends Component
     }
     public function mount()
     {
+        // remove special dates that have passed, before the form is filled so they are never shown
+        AppointmentSettingTime::whereNotNull('special_date')->where('special_date', '<', today()->toDateString())->delete();
+
         $routeUser = request()->route('user');
         $routeService = request()->route('service');
         $routePlace = request()->route('place');
@@ -750,8 +753,6 @@ class GeneralSetting extends Component
         if (AppointmentSegment::exists()) {
             $this->fetchData['segments'] = AppointmentSegment::all();
         }
-        // remove old special dates
-        AppointmentSettingTime::whereNotNull('special_date')->where('special_date', '<', now()->subDay())->delete();
     }
 
     /**

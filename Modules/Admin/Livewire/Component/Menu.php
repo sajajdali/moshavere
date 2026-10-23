@@ -236,6 +236,8 @@ class Menu extends Component
             'داشبوردمالی' => ['fa-chart-line', 'icon-chart'],
             'پرداختها' => ['fa-money-check-dollar', 'icon-money'],
             'گزارشمالیبیماران' => ['fa-file-invoice-dollar', 'icon-accounting'],
+            'گزارشمالیمراجعین' => ['fa-file-invoice-dollar', 'icon-accounting'],
+            'واردکردنپروندهبیماران' => ['fa-file-import', 'icon-excel'],
             'دلایلپرداخت' => ['fa-tags', 'icon-gift'],
             // گزارش نوبت‌ها (فقط مدیر کل)
             'تاریخچهوضعیتنوبتها' => ['fa-clock-rotate-left', 'icon-calendar'],

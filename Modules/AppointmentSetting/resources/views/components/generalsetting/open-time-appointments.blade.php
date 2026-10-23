@@ -26,8 +26,7 @@
             <div class="col-12 mb-2">
                 <div class="row">
                     <label for="input-time" class="form-label col-md-3">در ساعت</label>
-                    <input wire:model='form.openTime.time'
-                        type="time" wire:ignore.self class="form-control col-md-9" id="input-time">
+                    <div class="col-md-9 px-0">@include('appointmentsetting::components.generalsetting.time24', ['model' => 'form.openTime.time', 'id' => 'input-time'])</div>
                 </div>
             </div>
             <div class="d-flex flex-column mt-2">

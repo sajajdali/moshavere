@@ -679,8 +679,8 @@ class GeneralSetting extends Component
             $this->counter[AppintmentSettingDayNumber::tryFrom($dayNumber)->getEnName()] = count($eachDayColleciton);
             foreach ($eachDayColleciton as $iterator => $value) {
                 $dayEnName = AppintmentSettingDayNumber::tryFrom($dayNumber)->getEnName();
-                $this->form['timeFrame'][$dayEnName][$iterator]['start'] = $value->start_at;
-                $this->form['timeFrame'][$dayEnName][$iterator]['end'] = $value->end_at;
+                $this->form['timeFrame'][$dayEnName][$iterator]['start'] = substr((string) $value->start_at, 0, 5);
+                $this->form['timeFrame'][$dayEnName][$iterator]['end'] = substr((string) $value->end_at, 0, 5);
                 if (! is_null($value->time_for_visit)) {
                     $this->form['specialVisitTime'][$dayEnName] = $value->time_for_visit;
                     $this->hasSpecialTimeForVisit = true;
@@ -696,8 +696,8 @@ class GeneralSetting extends Component
 
                 $this->form['specialDaydateValues'][$i] = verta($SpEachDayColleciton->first()->special_date)->format('Y/m/d');
                 foreach ($SpEachDayColleciton as $Spiterator => $Spvalue) {
-                    $this->form['specialDaytimeValues'][$i][$Spiterator]['start'] = $Spvalue->start_at;
-                    $this->form['specialDaytimeValues'][$i][$Spiterator]['end']   = $Spvalue->end_at;
+                    $this->form['specialDaytimeValues'][$i][$Spiterator]['start'] = substr((string) $Spvalue->start_at, 0, 5);
+                    $this->form['specialDaytimeValues'][$i][$Spiterator]['end']   = substr((string) $Spvalue->end_at, 0, 5);
                     $this->form['specialTimeCounter'][$i] = count($sorted_special_day[$spDayNum]);
                 }
                 $this->form['timeitrator'][$i] = 0;

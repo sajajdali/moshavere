@@ -263,12 +263,35 @@ class TenantAppController extends Controller
      * وقتی مودال رزرو فقط با شناسه خدمت باز می شود (نه پزشک مشخص)،
      * اپ ابتدا این مسیر را صدا میزند تا در صورت وجود چند پزشک، انتخاب پزشک را نشان دهد.
      */
+    /**
+     * صفحه «خدمات»: بخش های قابل نمایش که دست کم یک پزشک قابل رزرو دارند.
+     * شمارش پزشکان همان قاعده صفحه هر بخش (serviceDoctors) است.
+     */
+    public function servicesIndex(): \Illuminate\Http\JsonResponse
+    {
+        $doctors = $this->bookableDoctorsQuery()->with('services:services.id')->get()
+            ->filter(fn (User $doctor) => $this->doctorIsBookable($doctor));
+
+        $services = Service::query()->whereNull('parent_id')->active()->showToUser()->orderBy('priority')->get()
+            ->map(fn (Service $s) => [
+                'id' => $s->id,
+                'title' => $s->title,
+                'image' => $s->icon ?: null,
+                'description' => $s->descriptionText(220),
+                'doctors_count' => $doctors->filter(fn (User $d) => $d->services->contains('id', $s->id))->count(),
+            ])
+            ->filter(fn (array $s) => $s['doctors_count'] > 0)
+            ->values();
+
+        return $this->ok([
+            'status' => true,
+            'services' => $services,
+        ]);
+    }
+
     public function serviceDoctors(Service $service): \Illuminate\Http\JsonResponse
     {
-        $doctors = User::doctors_query()
-            ->whereHas('metas', function ($q) {
-                $q->where('meta_key', UserMetaEnum::ACTIVE_APPOINTMENT)->where('meta_value', true);
-            })
+        $doctors = $this->bookableDoctorsQuery()
             ->whereHas('services', fn ($q) => $q->where('services.id', $service->id))
             ->get()
             ->filter(fn (User $doctor) => $this->doctorIsBookable($doctor))
@@ -280,8 +303,11 @@ class TenantAppController extends Controller
             'service' => [
                 'id' => $service->id,
                 'title' => $service->title,
-                'description' => $service->description,
+                // متن ساده برای توضیح متا، HTML پاکسازی شده برای متن صفحه
+                'description' => $service->descriptionText(160),
+                'description_html' => $service->descriptionHtml(),
                 'image' => $service->icon ?: null,
+                'banner' => $service->bannerPath() ? assetStorage($service->bannerPath()) : null,
             ],
             'doctors' => $this->clinicDoctorRows($doctors),
         ]);
@@ -2289,6 +2315,15 @@ class TenantAppController extends Controller
      * اگر هیچ پزشکی برای «معرفی» علامت نخورده باشد، همه پزشکان فعال نمایش داده
      * می شوند تا صفحه اصلی خالی نماند.
      */
+    /** پزشکانی که نوبت دهی آنها فعال است */
+    private function bookableDoctorsQuery()
+    {
+        return User::doctors_query()
+            ->whereHas('metas', function ($q) {
+                $q->where('meta_key', UserMetaEnum::ACTIVE_APPOINTMENT)->where('meta_value', true);
+            });
+    }
+
     private function listedDoctors(): \Illuminate\Support\Collection
     {
         $listed = User::introductionDoctors()->get()
@@ -2638,7 +2673,7 @@ class TenantAppController extends Controller
             $dep['doctors_count'] = $doctors->filter(
                 fn (User $d) => $d->services->contains('id', $dep['id'])
             )->count();
-            $dep['description'] = Service::find($dep['id'])?->description;
+            $dep['description'] = Service::find($dep['id'])?->descriptionText(220);
 
             return $dep;
         })->all();

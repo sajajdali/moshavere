@@ -33,6 +33,74 @@ class Service extends Model
     ];
     const APP_QUESTION_TITLE  = 'app_question_title';
     const NOT_SHOW_TO_USER    = 'not_show_to_user';
+    // توضیحات بخش (HTML ویرایشگر) و تصویر صفحه بخش در سایت
+    const DESCRIPTION         = 'description';
+    const BANNER              = 'banner';
+
+    public function getDescriptionAttribute(): ?string
+    {
+        return $this->detail[self::DESCRIPTION] ?? null;
+    }
+
+    /**
+     * توضیحات امن برای نمایش HTML؛ متن ساده قدیمی به پاراگراف تبدیل میشود.
+     */
+    public function descriptionHtml(): ?string
+    {
+        $raw = trim((string) $this->description);
+        if ($raw === '') {
+            return null;
+        }
+
+        if (! preg_match('#</?(p|h[1-6]|br|ul|ol|li|strong|b|em|i|u|s|a|blockquote|div|span)\b[^>]*>#i', $raw)) {
+            return collect(preg_split('/\R{2,}/u', $raw))
+                ->map(fn ($p) => '<p>'.nl2br(e(trim($p)), false).'</p>')
+                ->implode('');
+        }
+
+        return self::sanitizeDescription($raw);
+    }
+
+    /** متن بدون برچسب، برای کارت ها و توضیح متا */
+    public function descriptionText(?int $limit = null): ?string
+    {
+        $html = preg_replace('#<(br|/p|/h[1-6]|/li|/blockquote)\s*/?>#i', ' ', (string) $this->descriptionHtml());
+        $text = trim(preg_replace('/\s+/u', ' ', html_entity_decode(strip_tags($html), ENT_QUOTES | ENT_HTML5, 'UTF-8')));
+
+        if ($text === '') {
+            return null;
+        }
+
+        return $limit ? \Illuminate\Support\Str::limit($text, $limit) : $text;
+    }
+
+    public function bannerPath(): ?string
+    {
+        return $this->detail[self::BANNER] ?? null;
+    }
+
+    /**
+     * فقط برچسب های ویرایشگر (عنوان، پاراگراف، لیست، لینک و ...) نگه داشته میشوند.
+     */
+    public static function sanitizeDescription(?string $html): ?string
+    {
+        $html = trim((string) $html);
+        if ($html === '' || trim(strip_tags($html)) === '') {
+            return null;
+        }
+
+        $config = \HTMLPurifier_Config::createDefault();
+        $config->set('Cache.DefinitionImpl', null);
+        $config->set('HTML.Allowed', 'h2[class],h3[class],h4[class],p[class],br,strong,b,em,i,u,s,ul,ol,li[class],a[href|title|target|rel],blockquote[class]');
+        // کلاس های ترازبندی و جهت Quill
+        $config->set('Attr.AllowedClasses', ['ql-align-right', 'ql-align-center', 'ql-align-justify', 'ql-direction-rtl', 'ql-indent-1', 'ql-indent-2', 'ql-indent-3']);
+        $config->set('Attr.AllowedFrameTargets', ['_blank']);
+        $config->set('URI.AllowedSchemes', ['http' => true, 'https' => true, 'mailto' => true, 'tel' => true]);
+
+        $clean = trim((new \HTMLPurifier($config))->purify($html));
+
+        return $clean !== '' ? $clean : null;
+    }
 
     public function user()
     {

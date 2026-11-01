@@ -30,6 +30,31 @@ class CreateOrUpdate extends Component
     ];
     public array $fetchdata = [];
 
+    // تصویر صفحه بخش در سایت (جدا از ایکون)
+    public $bannerUpload;
+    public ?string $bannerUrl = null;
+
+    public function updatedBannerUpload()
+    {
+        $this->validate(['bannerUpload' => 'image|max:4096'], [], ['bannerUpload' => 'تصویر صفحه بخش']);
+        $path = $this->bannerUpload->store(tenant('id').'/temp/'.$this->filePath, ['disk' => 'tenant']);
+
+        $this->bannerUrl = Storage::disk('tenant')->url($path);
+        $this->form['banner'] = $path;
+    }
+
+    public function deleteBanner()
+    {
+        // فایل موقت آپلود نشده حذف میشود؛ تصویر ذخیره شده با ذخیره فرم کنار گذاشته میشود
+        if (str_contains((string) ($this->form['banner'] ?? ''), '/temp/')) {
+            Storage::disk('tenant')->delete($this->form['banner']);
+        }
+
+        $this->bannerUpload = null;
+        $this->bannerUrl = null;
+        $this->form['banner'] = null;
+    }
+
     public function rules()
     {
         return [
@@ -40,6 +65,7 @@ class CreateOrUpdate extends Component
             'form.active'    => 'nullable',
             'form.show_type' => 'nullable',
             'form.place'     => 'nullable',
+            'form.description' => 'nullable|string|max:200000',
         ];
     }
 
@@ -84,6 +110,15 @@ class CreateOrUpdate extends Component
         if (isset($this->form['notShowToUser'])) {
             $modelCreateOrUpdate['detail'][Service::NOT_SHOW_TO_USER] =   $this->form['notShowToUser'];
         }
+        $modelCreateOrUpdate['detail'][Service::DESCRIPTION] = Service::sanitizeDescription($this->form['description'] ?? null);
+
+        $banner = $this->form['banner'] ?? null;
+        if ($banner && str_contains($banner, '/temp/')) {
+            $finalBanner = str_replace('temp/', '', $banner);
+            Storage::disk('tenant')->move($banner, $finalBanner);
+            $banner = $finalBanner;
+        }
+        $modelCreateOrUpdate['detail'][Service::BANNER] = $banner ?: null;
         if ($this->isEdited) {
             $this->service->update($modelCreateOrUpdate);
             $msg = 'بخش با موفقیت ویرایش شد';
@@ -122,6 +157,9 @@ class CreateOrUpdate extends Component
         if (isset($this->service->detail[Service::APP_QUESTION_TITLE])) {
             $this->form['qestion'] = $this->service->detail[Service::APP_QUESTION_TITLE];
         }
+        $this->form['description'] = $this->service->descriptionHtml();
+        $this->form['banner'] = $this->service->bannerPath();
+        $this->bannerUrl = $this->form['banner'] ? Storage::disk('tenant')->url($this->form['banner']) : null;
         if (isset($this->service->detail[Service::NOT_SHOW_TO_USER])) {
             $this->form['notShowToUser'] = $this->service->detail[Service::NOT_SHOW_TO_USER];
         }

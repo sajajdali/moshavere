@@ -22,6 +22,7 @@ Route::prefix('tenant')->group(function () {
     Route::post('contact-us', [TenantAppController::class, 'sendContactMessage'])
         ->middleware('throttle:10,1');
     Route::get('search', [TenantAppController::class, 'search']);
+    Route::get('services', [TenantAppController::class, 'servicesIndex']);
     // پزشکان ارائه دهنده یک خدمت؛ برای وقتی مودال رزرو فقط با شناسه خدمت باز می شود
     Route::get('service/{service}/doctors', [TenantAppController::class, 'serviceDoctors']);
     Route::get('doctor/{doctor}', [TenantAppController::class, 'doctor']);

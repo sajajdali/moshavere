@@ -151,6 +151,8 @@ export const api = {
   doctor: (id, params) => request(`/doctor/${id}` + (params && Object.keys(params).length ? '?' + qs(params) : '')),
   // پزشکان ارائه دهنده یک خدمت؛ برای شروع رزرو فقط با شناسه خدمت
   serviceDoctors: (id) => request(`/service/${id}/doctors`),
+  // صفحه خدمات: بخش هایی که پزشک قابل رزرو دارند
+  services: () => request('/services'),
   // گزینه های رزرو (مطب/بخش/ناحیه/اپراتور)
   bookingOptions: (id, params) => request(`/doctor/${id}/booking-options?` + qs(params)),
   doctorDays: (id, params) => request(`/doctor/${id}/days?` + qs(params)),

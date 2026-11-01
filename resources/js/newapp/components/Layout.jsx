@@ -22,6 +22,7 @@ export function Header({ doctor, sections, onBook } = {}) {
   const links = [
     { to: '/', label: 'خانه' },
     { to: '/search', label: 'پزشکان' },
+    { to: '/services', label: 'خدمات' },
     { to: '/aboutus', label: 'درباره ما' },
     { to: '/contact-us', label: 'تماس با ما' },
     ...(user ? [{ to: '/profile', label: 'نوبت های من' }] : []),
@@ -131,6 +132,7 @@ export function Footer({ singleDoctor = false, onBook, contact } = {}) {
               <a href="#services">خدمات</a>
               <button type="button" className="sd-footer-book" onClick={onBook}>نوبت‌دهی</button>
             </> : <Link to="/search">پزشکان</Link>}
+            <Link to="/services">خدمات</Link>
             <Link to="/aboutus">درباره ما</Link>
             <Link to="/contact-us">تماس با ما</Link>
             <Link to="/profile">نوبت های من</Link>

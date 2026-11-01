@@ -17,6 +17,7 @@ import Login from './pages/Login.jsx';
 import AdminLogin from './pages/AdminLogin.jsx';
 import Feedback from './pages/Feedback.jsx';
 import ServicePage from './pages/ServicePage.jsx';
+import ServicesPage from './pages/ServicesPage.jsx';
 import NotFound from './pages/NotFound.jsx';
 
 export default function App({ bootstrap }) {
@@ -37,6 +38,7 @@ export default function App({ bootstrap }) {
                 <Route path="/" element={<Home />} />
                 <Route path="/search" element={<Search />} />
                 <Route path="/feedback/:code" element={<Feedback />} />
+                <Route path="/services" element={<ServicesPage />} />
                 <Route path="/service/:id" element={<ServicePage />} />
                 <Route path="/service/:id/:name" element={<ServicePage />} />
                 <Route path="/aboutus" element={<AboutUs />} />

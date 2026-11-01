@@ -85,22 +85,19 @@
                                 @enderror
                             </div>
                         </div>
-                        <div class="row mt-4 mb-3" id="questionContainer" wire:ignore.self>
-                            <label for="questionTitle" class="col-md-3 form-label  d-flex align-item-center">
-                                <i class="fa fa-mobile fa-2x me-2 mb-1" aria-hidden="true"></i>
-                                <span>عنوان سوال:</span>
-                            </label>
+                        <div class="row mt-4 mb-3">
+                            <label for="serviceDescription" class="col-md-3 form-label">توضیحات بخش:</label>
                             <div class="col-md-9">
-                                <textarea rows="3" class="form-control mb-1  @error('form.qestion') is-invalid @enderror" id="questionTitle"
-                                    wire:model='form.qestion' type="number"></textarea>
-                                @error('form.qestion')
+                                <div wire:ignore>
+                                    <div id="serviceDescription" class="service-desc-editor"></div>
+                                </div>
+                                @error('form.description')
                                     <span class="text-danger">{{ $message }}</span>
                                 @enderror
                                 <p class="text-muted mt-1 ms-1">
                                     <i class="fa fa-info-circle text-info" aria-hidden="true"></i>
-                                    در صورتی که زیر بخش های این بخش باید در اپلیکیشن به صورت سوال نمایش داده شوند
-                                    ،
-                                    عنوان سوال را وارد کنید.
+                                    در صفحه این بخش در سایت، زیر پزشکان بخش نمایش داده می‌شود. برای سئو از عنوان‌های
+                                    «عنوان ۲» و «عنوان ۳» برای سرفصل‌ها و از پاراگراف‌های کوتاه استفاده کنید.
                                 </p>
                             </div>
                         </div>
@@ -194,6 +191,17 @@
                                 uploadedFileType="{{ $uploadedFileType }}" deleteAction="deleteFile" model="photo"
                                 id="fileUpload" />
                         </div>
+                        <div class="row mb-5 mt-3">
+                            <x-admin.core.form.image-upload label="تصویر صفحه بخش در سایت"
+                                uploadedPhotoUrl="{{ $bannerUrl }}"
+                                uploadedFileName="{{ $bannerUrl ? basename($bannerUrl) : '' }}"
+                                uploadedFileType="image" deleteAction="deleteBanner" model="bannerUpload"
+                                id="bannerUpload" />
+                            <p class="text-muted mt-1 ms-1">
+                                <i class="fa fa-info-circle text-info" aria-hidden="true"></i>
+                                در صفحه بخش، بالای توضیحات نمایش داده می‌شود. اندازه پیشنهادی ۱۶۰۰×۶۰۰ پیکسل، حداکثر ۴ مگابایت.
+                            </p>
+                        </div>
                         @if (!empty($fetchdata['doctors']))
                             <div class="row mt-5">
                                 <h4>پزشکان مربوط به این بخش</h4>
@@ -263,6 +271,14 @@
 @endpush
 @push('scripts')
     <script src="{{ admin_asset('plugins/select2/select2.full.min.js') }}"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/quill/1.3.6/quill.snow.min.css" />
+    <script src="{{ admin_asset('plugins/quill/quill.min.js') }}"></script>
+    <style>
+        .service-desc-editor { min-height: 320px; background: #fff; }
+        .service-desc-editor .ql-editor { direction: rtl; text-align: right; min-height: 320px; font-size: 14px; line-height: 2; }
+        .ql-toolbar.ql-snow { direction: ltr; border-radius: 6px 6px 0 0; }
+        .service-desc-editor.ql-container.ql-snow { border-radius: 0 0 6px 6px; }
+    </style>
     <script>
         $(document).ready(function() {
             setTimeout(() => {
@@ -272,17 +288,27 @@
                 var name = $(this).data('name');
                 var value = $(this).val();
                 @this.set('form.' + name, value);
-                if (name == 'parent') {
-                    if (value == 0) {
-                        $('#questionContainer').fadeIn();
-                    } else {
-                        $('#questionContainer').fadeOut();
-                    }
-                }
             });
-            if ($('#js-select2').val() != 0) {
-                $('#questionContainer').css("display", "none");
-            };
+
+            // ویرایشگر توضیحات بخش؛ HTML روی سرور پاکسازی میشود (Service::sanitizeDescription)
+            const descriptionEditor = new Quill('#serviceDescription', {
+                theme: 'snow',
+                modules: {
+                    toolbar: [
+                        [{ header: [2, 3, 4, false] }],
+                        ['bold', 'italic', 'underline'],
+                        [{ list: 'ordered' }, { list: 'bullet' }],
+                        ['blockquote', 'link'],
+                        [{ align: [] }],
+                        ['clean'],
+                    ],
+                },
+            });
+            descriptionEditor.root.innerHTML = @json($form['description'] ?? '');
+            descriptionEditor.on('text-change', () => {
+                const html = descriptionEditor.getText().trim() ? descriptionEditor.root.innerHTML : '';
+                @this.set('form.description', html, false);
+            });
             Livewire.on('select_file', (param) => {
                 @this.set('form.img', param.url);
                 //close modal

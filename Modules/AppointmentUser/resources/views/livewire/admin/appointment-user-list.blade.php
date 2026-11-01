@@ -44,7 +44,6 @@
         .appointment-selection{display:flex;align-items:center;gap:14px;padding:12px 18px;background:#eefaf8;border-bottom:1px solid #cdeae5}
         .appointment-selection strong{font-size:13.5px;color:#0f5f59}
         .appointment-table-wrap{overflow-x:auto}
-        .appointment-card.has-open-operation,.appointment-table-wrap.has-open-operation{overflow:visible}
         .appointment-row.operation-is-open{position:relative;z-index:20}
         .appointment-row .dropdown-menu{z-index:1090;min-width:230px;border:1px solid #e4e7ec;border-radius:11px;padding:6px;box-shadow:0 14px 32px rgba(16,24,40,.16)}
         .appointment-row .dropdown-menu li a{display:flex;align-items:center;gap:9px;padding:8px 10px;border-radius:7px;color:#344054;font-size:12.5px;white-space:nowrap}
@@ -517,15 +516,14 @@
             window.clearInterval(window.appointmentPaymentCountdownTimer);
             window.appointmentPaymentCountdownTimer = window.setInterval(updatePaymentCountdowns, 1000);
             $(document).off('show.bs.dropdown.appointmentOperations hidden.bs.dropdown.appointmentOperations')
-                .on('show.bs.dropdown.appointmentOperations', '.appointment-row .btn-group', function() {
+                .on('show.bs.dropdown.appointmentOperations', '.appointment-row .btn-group', function(event) {
+                    // Fixed positioning lets the menu escape the scroll container without changing its overflow (which shifted the page).
+                    const dropdown = bootstrap.Dropdown.getInstance(event.target);
+                    if (dropdown) dropdown._config.popperConfig = { strategy: 'fixed' };
                     $(this).closest('.appointment-row').addClass('operation-is-open');
-                    $(this).closest('.appointment-table-wrap').addClass('has-open-operation');
-                    $(this).closest('.appointment-card').addClass('has-open-operation');
                 })
                 .on('hidden.bs.dropdown.appointmentOperations', '.appointment-row .btn-group', function() {
                     $(this).closest('.appointment-row').removeClass('operation-is-open');
-                    $(this).closest('.appointment-table-wrap').removeClass('has-open-operation');
-                    $(this).closest('.appointment-card').removeClass('has-open-operation');
                 });
             Livewire.on('loadJs', function() { setTimeout(js, 500); });
             Livewire.on('openQuickTimeEditModal', function() {

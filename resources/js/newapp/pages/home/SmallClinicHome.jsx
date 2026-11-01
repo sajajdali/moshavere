@@ -1,4 +1,5 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 import { useSite } from '../../lib/SiteContext.jsx';
 import ServiceCard from '../../components/ServiceCard.jsx';
 import DoctorCard from '../../components/DoctorCard.jsx';
@@ -69,17 +70,21 @@ export default function SmallClinicHome({ data, onBook }) {
             display: 'flex', gap: 16, alignItems: 'center', flexWrap: 'wrap',
             marginBottom: 16, borderColor: 'var(--c-brand)', background: 'var(--c-brand-soft)',
           }}>
-            {(images?.doctor_avatar || owner.avatar)
-              ? <img src={images?.doctor_avatar ?? owner.avatar} alt={owner.name ?? ''}
-                  style={{ width: 82, height: 82, borderRadius: 22, objectFit: 'cover', flex: '0 0 auto' }} />
-              : <Placeholder label="عکس" style={{ width: 82, height: 82, borderRadius: 22, flex: '0 0 auto' }} />}
+            <Link to={`/doctor/${owner.id}`} aria-label={`پروفایل ${owner.name ?? ''}`} style={{ flex: '0 0 auto', lineHeight: 0 }}>
+              {(images?.doctor_avatar || owner.avatar)
+                ? <img src={images?.doctor_avatar ?? owner.avatar} alt={owner.name ?? ''}
+                    style={{ width: 82, height: 82, borderRadius: 22, objectFit: 'cover' }} />
+                : <Placeholder label="عکس" style={{ width: 82, height: 82, borderRadius: 22 }} />}
+            </Link>
 
             <div style={{ flex: '1 1 220px', minWidth: 0 }}>
               <span style={{
                 display: 'inline-block', fontSize: 11, fontWeight: 700, marginBottom: 6,
                 background: 'var(--c-brand)', color: '#fff', borderRadius: 999, padding: '4px 10px',
               }}>مؤسس کلینیک</span>
-              <strong style={{ display: 'block', fontSize: 16, marginBottom: 4 }}>{owner.name}</strong>
+              <Link to={`/doctor/${owner.id}`} style={{ color: 'inherit', textDecoration: 'none' }}>
+                <strong style={{ display: 'block', fontSize: 16, marginBottom: 4 }}>{owner.name}</strong>
+              </Link>
               <span style={{ fontSize: 13, color: 'var(--c-muted)' }}>{owner.specialty}</span>
             </div>
 

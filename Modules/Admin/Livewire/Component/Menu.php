@@ -130,6 +130,7 @@ class Menu extends Component
 
             $childIcons = [
                 'لیست' => 'fa-list',
+                'پزشکان' => 'fa-user-doctor',
                 'افزودن' => 'fa-plus',
                 'اضافهکردن' => 'fa-plus',
                 'لیستدادهها' => 'fa-database',

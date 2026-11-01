@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { Link } from 'react-router-dom';
 import { fa } from '../lib/format';
 import '../styles/clinic.css';
 
@@ -22,11 +23,16 @@ export default function DoctorTile({ d, featured, onBook }) {
   return (
     <article className={`cl-doc${featured ? ' cl-doc--featured' : ''}`}>
       <div className="cl-doc__head">
-        {d.avatar
-          ? <img src={d.avatar} alt={d.name} className="cl-doc__avatar" style={{ width: size, height: size }} />
-          : <span className="cl-doc__avatar cl-doc__avatar--ph" style={{ width: size, height: size }}>عکس</span>}
+        {/* عکس و نام، پروفایل پزشک را باز می کنند */}
+        <Link to={`/doctor/${d.id}`} aria-label={`پروفایل ${d.name}`} style={{ flex: '0 0 auto', lineHeight: 0 }}>
+          {d.avatar
+            ? <img src={d.avatar} alt={d.name} className="cl-doc__avatar" style={{ width: size, height: size }} />
+            : <span className="cl-doc__avatar cl-doc__avatar--ph" style={{ width: size, height: size }}>عکس</span>}
+        </Link>
         <span className="cl-doc__info">
-          <strong>{d.name}</strong>
+          <Link to={`/doctor/${d.id}`} style={{ color: 'inherit', textDecoration: 'none' }}>
+            <strong>{d.name}</strong>
+          </Link>
           <span className="cl-doc__spec">
             {[d.specialty, d.department && `بخش ${d.department}`].filter(Boolean).join(' · ')}
           </span>

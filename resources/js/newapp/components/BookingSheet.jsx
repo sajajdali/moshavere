@@ -923,6 +923,7 @@ export default function BookingSheet({ doctorId, serviceId, onClose }) {
       {confirming && (
         <ConfirmDialog
           doctorName={state.doctorName}
+          serviceName={state.serviceTitle}
           day={confirming.day}
           time={confirming.time}
           error={bookError}
@@ -944,7 +945,7 @@ export default function BookingSheet({ doctorId, serviceId, onClose }) {
  * پنجره تایید نهایی.
  * پیش از ثبت، پزشک و روز و ساعت انتخابی به بیمار نشان داده می شود.
  */
-function ConfirmDialog({ doctorName, serviceName, day, time, online, error, submitting, onCancel, onConfirm }) {
+export function ConfirmDialog({ doctorName, serviceName, day, time, online, error, submitting, onCancel, onConfirm }) {
   return (
     <div
       role="alertdialog" aria-modal="true" aria-label="تایید ثبت نوبت"
@@ -978,6 +979,7 @@ function ConfirmDialog({ doctorName, serviceName, day, time, online, error, subm
             <>
               آیا می‌خواهید
               {doctorName ? <> با <b>{doctorName}</b></> : null}
+              {serviceName ? <> در بخش <b>{serviceName}</b></> : null}
               {' '}در روز <b>{day?.label ?? ''}</b>
               {' '}ساعت <b>{time?.label ?? ''}</b> نوبت بگیرید؟
             </>

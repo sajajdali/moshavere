@@ -1,8 +1,11 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
-import { Link, useParams } from 'react-router-dom';
+import { Link, useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import api from '../lib/api';
 import useAsync from '../lib/useAsync';
+import { useSite } from '../lib/SiteContext.jsx';
 import { Loading, ErrorBox, Placeholder } from '../components/States.jsx';
+import BookingSheet, { ConfirmDialog } from '../components/BookingSheet.jsx';
+import LoginPanel from '../components/LoginPanel.jsx';
 import { fa, money } from '../lib/format';
 
 /* ————— سبک ها، عیناً از طرح Doctor Profile.dc.html ————— */
@@ -49,6 +52,11 @@ const slotStyle = (state) => {
   };
 };
 
+const LINK_BTN = {
+  display: 'inline-block', marginBottom: 10, padding: 0, border: 0, background: 'transparent',
+  color: 'var(--c-brand)', fontSize: 12.5, fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit',
+};
+
 const CARD = {
   background: '#fff', border: '1px solid var(--c-line)',
   borderRadius: 22, padding: 18,
@@ -65,14 +73,40 @@ const SECTIONS = [
 /** معادل طرح: Doctor Profile.dc.html */
 export default function DoctorProfile() {
   const { id } = useParams();
-  const { data, error, loading, reload } = useAsync(() => api.doctor(id), [id]);
+  // بخش و مطب: از لینک خدمت مشخص (/s/...) یا انتخاب بیمار در همین صفحه
+  const [searchParams] = useSearchParams();
+  const serviceId = searchParams.get('service_id') ?? '';
+  const placeId = searchParams.get('place_id') ?? '';
+  const { data, error, loading, reload } = useAsync(
+    () => api.doctor(id, { service_id: serviceId, place_id: placeId }),
+    [id, serviceId, placeId],
+  );
 
   const [dayIdx, setDayIdx] = useState(0);
   const [picked, setPicked] = useState(null);
   const [submitting, setSubmitting] = useState(false);
+  // پنجره تایید نوبت و فرم ورود، هر دو در همین صفحه (بدون رفتن به checkout لایوایر)
+  const [confirming, setConfirming] = useState(false);
+  const [bookError, setBookError] = useState(null);
+  const [needLogin, setNeedLogin] = useState(null);
+  // مودال رزرو (BookingSheet)؛ برای پزشک چندبخشی، انتخاب بخش در همین مودال انجام میشود
+  const [sheetOpen, setSheetOpen] = useState(false);
   const timesRef = useRef(null);
+  const nav = useNavigate();
 
-  useEffect(() => { setDayIdx(0); setPicked(null); }, [id]);
+  const { user, site, setUser } = useSite();
+  const registrationIncomplete = user && (
+    !user.first_name?.trim() || !user.last_name?.trim()
+    || (site?.nationalCodeRequired && !user.national_code?.trim())
+    || (site?.birthdayRequired && !user.birthday?.trim())
+  );
+
+  useEffect(() => { setDayIdx(0); setPicked(null); }, [id, serviceId, placeId]);
+
+  // بدون لینک خدمت مشخص و با بیش از یک بخش، ابتدا مودال انتخاب بخش باز میشود
+  useEffect(() => {
+    if (data?.booking?.needs_service) setSheetOpen(true);
+  }, [data]);
 
   const booking = data?.booking ?? {};
   const days = booking.days ?? [];
@@ -94,24 +128,67 @@ export default function DoctorProfile() {
   const places = data?.places ?? [];
   const reviews = data?.reviews ?? [];
   const related = data?.related ?? [];
-  const fee = services.find((s) => s.price)?.price ?? null;
+  const place = places.find((p) => p.id === booking.place_id) ?? places[0];
+  const bookingServices = booking.services ?? [];
+  const needsService = !!booking.needs_service;
+  const service = booking.preselected
+    ? (services.find((s) => s.id === booking.service_id)
+      ?? bookingServices.filter((s) => s.id === booking.service_id).map((s) => ({ id: s.id, name: s.title }))[0])
+    : null;
+
+  const fee = service?.price ?? services.find((s) => s.price)?.price ?? null;
 
   const jumpToTimes = () => {
     timesRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
   };
 
+  // «تایید و ادامه»: مهمان ابتدا وارد می شود، سپس پنجره تایید باز می شود
   const confirm = () => {
     if (!picked || submitting) return;
-    const q = new URLSearchParams({
-      doctor_id: String(booking.doctor_id ?? doc.id),
-      place_id: String(booking.place_id ?? ''),
-      service_id: String(booking.service_id ?? ''),
-      start_time: String(picked.start_time ?? picked.id),
-      end_time: String(picked.end_time ?? picked.until ?? ''),
-    });
-    setSubmitting(true);
-    window.location.href = '/appointment/checkout?' + q.toString();
+    setBookError(null);
+    if (!user) setNeedLogin({});
+    else if (registrationIncomplete) setNeedLogin({ registration: true });
+    else setConfirming(true);
   };
+
+  /** ثبت نهایی نوبت از طریق API، مانند BookingSheet */
+  async function book() {
+    if (!picked || submitting) return;
+    setSubmitting(true);
+    setBookError(null);
+
+    try {
+      const res = await api.bookAppointment(booking.doctor_id ?? doc.id, {
+        visit_type: 'in_person',
+        start_time: picked.start_time ?? picked.id,
+        place_id: booking.place_id ?? null,
+        service_id: booking.service_id ?? null,
+        segment_ids: [],
+      });
+      nav(res?.redirect ?? `/appointment/${res?.tracking_code ?? ''}`);
+    } catch (err) {
+      setSubmitting(false);
+      setBookError(err?.message ?? 'ثبت نوبت انجام نشد.');
+
+      // ساعت در این فاصله پر شده: زمان ها دوباره خوانده می شوند
+      if (err?.data?.refresh_times) {
+        setConfirming(false);
+        setPicked(null);
+        reload();
+      }
+
+      if (err?.data?.need_registration) {
+        setBookError(null);
+        if (err.data.user) setUser(err.data.user);
+        setConfirming(false);
+        setNeedLogin({ registration: true, registrationUser: err.data.user });
+      } else if (err?.data?.need_login || err?.status === 401) {
+        setBookError(null);
+        setConfirming(false);
+        setNeedLogin({});
+      }
+    }
+  }
 
   return (
     <div style={{ paddingBottom: 84 }}>
@@ -203,9 +280,9 @@ export default function DoctorProfile() {
                   <strong style={{ fontSize: 15, color: 'var(--c-accent)' }}>
                     {nearest.day.label} — {nearest.time.label}
                   </strong>
-                  {places[0]?.title && (
+                  {place?.title && (
                     <span style={{ display: 'block', fontSize: 12, color: 'var(--c-muted)', marginTop: 2 }}>
-                      {places[0].title}
+                      {place.title}
                     </span>
                   )}
                 </span>
@@ -219,6 +296,14 @@ export default function DoctorProfile() {
                   دریافت این نوبت
                 </button>
               </div>
+            )}
+
+            {/* هنوز بخش انتخاب نشده: نزدیک ترین نوبت معنا ندارد */}
+            {needsService && (
+              <button type="button" className="na-btn" onClick={() => setSheetOpen(true)}
+                style={{ width: '100%', marginTop: 16 }}>
+                انتخاب بخش و دریافت نوبت
+              </button>
             )}
           </article>
 
@@ -258,7 +343,8 @@ export default function DoctorProfile() {
                     {services.map((s) => (
                       <span key={s.id} style={{
                         fontSize: 12, fontWeight: 600, borderRadius: 999, padding: '7px 13px',
-                        background: 'var(--c-brand-soft)', color: 'var(--c-brand)',
+                        background: s.id === service?.id ? 'var(--c-brand)' : 'var(--c-brand-soft)',
+                        color: s.id === service?.id ? '#fff' : 'var(--c-brand)',
                       }}>{s.name}</span>
                     ))}
                   </div>
@@ -316,17 +402,35 @@ export default function DoctorProfile() {
         <aside id="sec-times" ref={timesRef} className="dp-aside"
           style={{ display: 'flex', flexDirection: 'column', gap: 14, scrollMarginTop: 84, minWidth: 0 }}>
           <div style={{ ...CARD, borderRadius: 22 }}>
-            <h2 style={{ margin: '0 0 4px', fontSize: 17, fontWeight: 800 }}>زمان‌های خالی</h2>
+            <h2 style={{ margin: '0 0 4px', fontSize: 17, fontWeight: 800 }}>
+              {needsService ? 'دریافت نوبت' : 'زمان‌های خالی'}
+            </h2>
             <p style={{ margin: '0 0 14px', fontSize: 12, color: 'var(--c-muted)', lineHeight: 1.9 }}>
-              روز و سپس ساعت موردنظر خود را انتخاب کنید.
+              {needsService
+                ? 'این پزشک در چند بخش نوبت می‌دهد؛ ابتدا بخش موردنظر را انتخاب کنید.'
+                : 'روز و سپس ساعت موردنظر خود را انتخاب کنید.'}
             </p>
 
-            {places[0] && (
+            {needsService ? (
+              <button type="button" className="na-btn" style={{ width: '100%' }}
+                onClick={() => setSheetOpen(true)}>
+                انتخاب بخش و دریافت نوبت
+              </button>
+            ) : (<>
+            {service && bookingServices.length > 1 && (
+              <button type="button" onClick={() => setSheetOpen(true)} style={LINK_BTN}>
+                › تغییر بخش
+              </button>
+            )}
+
+            {place && (
               <div style={{
                 background: 'var(--c-bg)', borderRadius: 12, padding: 12, marginBottom: 12,
                 fontSize: 12, lineHeight: 1.9, color: 'var(--c-muted)',
               }}>
-                زمان‌های زیر مربوط به <strong style={{ color: 'var(--c-ink)' }}>{places[0].title}</strong> است.
+                زمان‌های زیر مربوط به
+                {service && <> بخش <strong style={{ color: 'var(--c-ink)' }}>{service.name}</strong> در</>}
+                {' '}<strong style={{ color: 'var(--c-ink)' }}>{place.title}</strong> است.
               </div>
             )}
 
@@ -386,7 +490,8 @@ export default function DoctorProfile() {
                 }}>
                   <Row label="نوبت انتخابی"
                     value={picked ? `${day?.label} — ${picked.label}` : 'انتخاب نشده'} />
-                  {places[0]?.title && <Row label="محل مراجعه" value={places[0].title} />}
+                  {service && <Row label="بخش" value={service.name} />}
+                  {place?.title && <Row label="محل مراجعه" value={place.title} />}
                   {fee && <Row label="هزینه ویزیت" value={`${money(fee)} ریال`} />}
 
                   <button type="button" className="na-btn"
@@ -396,11 +501,12 @@ export default function DoctorProfile() {
                     {submitting && <span className="na-spinner"
                       style={{ borderTopColor: '#fff', borderColor: 'rgba(255,255,255,.4)' }}
                       aria-hidden="true" />}
-                    {submitting ? 'در حال انتقال…' : picked ? 'تایید و ادامه' : 'یک زمان را انتخاب کنید'}
+                    {submitting ? 'در حال ثبت…' : picked ? 'تایید و ادامه' : 'یک زمان را انتخاب کنید'}
                   </button>
                 </div>
               </>
             )}
+            </>)}
           </div>
 
           {/* اطلاعات ویزیت */}
@@ -456,6 +562,52 @@ export default function DoctorProfile() {
         </section>
       )}
 
+      {/* همان فلو صفحه اصلی: بخش، مطب، نوع ویزیت، ناحیه، اپراتور، زمان و تایید */}
+      {sheetOpen && (
+        <BookingSheet doctorId={Number(id)} onClose={() => setSheetOpen(false)} />
+      )}
+
+      {confirming && picked && (
+        <ConfirmDialog
+          doctorName={doc.name}
+          serviceName={service?.name
+            ?? services.find((s) => s.id === booking.service_id)?.name
+            ?? bookingServices.find((s) => s.id === booking.service_id)?.title}
+          day={day}
+          time={picked}
+          error={bookError}
+          submitting={submitting}
+          onCancel={() => {
+            if (submitting) return;
+            setConfirming(false);
+            setBookError(null);
+          }}
+          onConfirm={book}
+        />
+      )}
+
+      {needLogin && (
+        <LoginDialog onClose={() => setNeedLogin(null)}>
+          <div style={{
+            background: 'var(--c-brand-soft)', border: '1px solid var(--c-line)',
+            borderRadius: 14, padding: '11px 13px', marginBottom: 16,
+            fontSize: 12.5, lineHeight: 1.9, color: 'var(--c-ink-2)',
+          }}>
+            زمان انتخابی شما: <b>{day?.label ?? ''}</b>{' · ساعت '}<b>{picked?.label ?? ''}</b>
+          </div>
+          <LoginPanel
+            registrationOnly={!!needLogin.registration}
+            registrationUser={needLogin.registrationUser}
+            hint="برای ثبت این نوبت، شماره موبایل خود را وارد کنید."
+            onDone={() => {
+              // پس از ورود، همان ساعت به مرحله تایید می رود
+              setNeedLogin(null);
+              setConfirming(true);
+            }}
+          />
+        </LoginDialog>
+      )}
+
       {/* نوار ثابت پایین صفحه - فقط موبایل */}
       {nearest && (
         <div className="dp-sticky" style={{
@@ -483,6 +635,38 @@ export default function DoctorProfile() {
           </button>
         </div>
       )}
+    </div>
+  );
+}
+
+/** پنجره ورود/تکمیل اطلاعات پیش از ثبت نوبت */
+function LoginDialog({ onClose, children }) {
+  useEffect(() => {
+    const onKey = (e) => { if (e.key === 'Escape') onClose(); };
+    document.addEventListener('keydown', onKey);
+    return () => document.removeEventListener('keydown', onKey);
+  }, [onClose]);
+
+  return (
+    <div role="dialog" aria-modal="true" aria-label="ورود برای ثبت نوبت" style={{
+      position: 'fixed', inset: 0, zIndex: 90, background: 'rgba(9,28,42,0.5)',
+      backdropFilter: 'blur(2px)', display: 'grid', placeItems: 'center', padding: 16,
+    }}>
+      <div onClick={onClose} style={{ position: 'absolute', inset: 0 }} />
+      <div style={{
+        position: 'relative', width: '100%', maxWidth: 420, maxHeight: '90vh', overflowY: 'auto',
+        background: '#fff', borderRadius: 20, padding: 22,
+        boxShadow: '0 24px 60px -20px rgba(9,28,42,.55)', animation: 'naUp .18s ease',
+      }}>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 14 }}>
+          <strong style={{ fontSize: 15 }}>ورود برای ثبت نوبت</strong>
+          <button type="button" onClick={onClose} aria-label="بستن" style={{
+            border: 0, background: 'transparent', fontSize: 22, lineHeight: 1,
+            cursor: 'pointer', color: 'var(--c-muted)',
+          }}>×</button>
+        </div>
+        {children}
+      </div>
     </div>
   );
 }

@@ -3,6 +3,7 @@
 
 //user routes
 Route::get('user', \Modules\User\Livewire\Admin\User\UserList::class)->name('user.index')->can('viewAny', \Modules\User\Entities\User::class);
+Route::get('user/doctors', \Modules\User\Livewire\Admin\User\DoctorList::class)->name('user.doctors')->can('viewAny', \Modules\User\Entities\User::class);
 Route::get('doctor-service-management', \Modules\User\Livewire\Admin\User\DoctorServiceManagement::class)->name('doctor-service-management')->can('viewAny', \Modules\User\Entities\User::class);
 Route::get('user/create', \Modules\User\Livewire\Admin\User\UserCreateOrUpdate::class)->name('user.create')->can('create', \Modules\User\Entities\User::class);
 Route::get('user/import-patients', \Modules\User\Livewire\Admin\User\ImportPatients::class)->name('user.import-patients')->can('create', \Modules\User\Entities\User::class);

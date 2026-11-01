@@ -351,14 +351,36 @@ class TenantAppController extends Controller
     /**
      * پروفایل کامل یک پزشک.
      */
-    public function doctor(User $doctor): \Illuminate\Http\JsonResponse
+    public function doctor(User $doctor, Request $request): \Illuminate\Http\JsonResponse
     {
         if (! $doctor->IsDoctor()) {
             return $this->notFound();
         }
 
+        // بخش های قابل رزرو، همراه مطب های هرکدام؛ همان قواعد bookingOptions
+        $bookableServices = $this->availableServices($doctor)->sortBy('priority')->values();
+
+        // بخش و مطب از لینک خدمت مشخص (/s/...) یا انتخاب بیمار در خود پروفایل می آید؛
+        // مقدار نامعتبر نادیده گرفته میشود تا پروفایل عادی نمایش داده شود
+        $serviceId = (int) $request->get('service_id') ?: null;
+        if ($serviceId && ! $bookableServices->contains('id', $serviceId)) {
+            $serviceId = null;
+        }
+        $placeId = (int) $request->get('place_id') ?: null;
+        if ($placeId && ! $this->availablePlaces($doctor, $serviceId)->contains('id', $placeId)) {
+            $placeId = null;
+        }
+
+        // با بیش از یک بخش، ابتدا باید بخش پرسیده شود (مانند BookingSheet)؛
+        // تا آن موقع روزهای بخش پیش فرض فرستاده نمی شود
+        $needsService = ! $serviceId && $bookableServices->count() > 1;
+
         // پنل نوبت دهی در خود صفحه پروفایل است، پس روزها را همینجا می فرستیم
-        $setting = $this->resolveAppointmentSetting($doctor, null);
+        $setting = match (true) {
+            $needsService => null,
+            $serviceId && $placeId => AppointmentSetting::resolveFor($doctor->id, $serviceId, $placeId, true),
+            default => $this->resolveAppointmentSetting($doctor, $serviceId),
+        };
         $days = [];
         if ($setting) {
             try {
@@ -383,10 +405,19 @@ class TenantAppController extends Controller
             'booking' => [
                 'appointment_setting_id' => $setting?->id,
                 'doctor_id' => $doctor->id,
-                'place_id' => $setting?->place_id
+                'place_id' => $placeId ?? $setting?->place_id
                     ?? $doctor->places()->active()->orderBy('priority')->value('places.id'),
-                'service_id' => $setting?->service_id
+                'service_id' => $serviceId ?? $setting?->service_id
                     ?? $doctor->services()->active()->orderBy('priority')->value('services.id'),
+                'preselected' => (bool) $serviceId,
+                'needs_service' => $needsService,
+                'services' => $bookableServices->map(fn (Service $s) => [
+                    'id' => $s->id,
+                    'title' => $s->title,
+                    'places' => $this->availablePlaces($doctor, $s->id)
+                        ->map(fn (Place $p) => ['id' => $p->id, 'title' => $p->title, 'address' => $p->detail[Place::DETAIL_ADDRESS] ?? null])
+                        ->values(),
+                ])->all(),
                 'days' => $days,
             ],
             'related' => $this->relatedDoctors($doctor),
@@ -637,6 +668,7 @@ class TenantAppController extends Controller
         );
 
         $days = [];
+        $now = Carbon::now('Asia/Tehran');
 
         foreach (($list['data'] ?? []) as $months) {
             foreach ($months as $daysOfMonth) {
@@ -662,9 +694,19 @@ class TenantAppController extends Controller
 
                     $times = [];
                     $shown = 0;
+                    $pastFree = 0;
 
                     foreach (($appointment['times'] ?? []) as $time) {
                         $free = (bool) ($time['status'] ?? false);
+
+                        // ساعت های گذشته امروز قابل رزرو نیستند و نمایش داده نمی شوند
+                        $startsAt = isset($time['timestamp'])
+                            ? Carbon::createFromTimestamp((int) $time['timestamp'], 'Asia/Tehran')
+                            : Carbon::parse($gmt . ' ' . ($time['from'] ?? '00:00:00'), 'Asia/Tehran');
+                        if ($startsAt->lte($now)) {
+                            $pastFree += $free ? 1 : 0;
+                            continue;
+                        }
 
                         if (! $free && ! $showBooked) {
                             continue;
@@ -692,7 +734,8 @@ class TenantAppController extends Controller
                         }
                     }
 
-                    if ($times === []) {
+                    // روزی که همه ساعت های آزادش گذشته، دیگر نمایش داده نمی شود
+                    if ($times === [] || ! collect($times)->contains('free', true)) {
                         continue;
                     }
 
@@ -700,7 +743,7 @@ class TenantAppController extends Controller
                         'key' => $gmt,
                         'date' => $gmt,
                         'label' => $appointment['day_number'] ?? $gmt,
-                        'free_count' => $appointment['empty_appoints'] ?? 0,
+                        'free_count' => max(0, ($appointment['empty_appoints'] ?? 0) - $pastFree),
                         'times' => $times,
                     ];
                 }

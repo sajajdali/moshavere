@@ -59,6 +59,15 @@ return [
                         'children' => null,
                     ],
                     [
+                        'title' => 'پزشکان',
+                        'gate' => 'viewAny',
+                        'policy_class' => \Modules\User\Entities\User::class,
+                        'icon' => 'fa fa-user-md',
+                        'route' => 'admin.user.doctors',
+                        'has_child' => false,
+                        'children' => null,
+                    ],
+                    [
                         'title' => 'افزودن',
                         'gate' => 'create',
                         'policy_class' => \Modules\User\Entities\User::class,

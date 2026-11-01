@@ -6,13 +6,17 @@ export default function DoctorCard({ doctor, onBook }) {
   return (
     <article className="na-card" style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
       <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-        {doctor.avatar
-          ? <img src={doctor.avatar} alt={doctor.name}
-              style={{ width: 62, height: 62, borderRadius: 16, objectFit: 'cover', flex: '0 0 auto' }} />
-          : <span className="na-ph" style={{ width: 62, height: 62, borderRadius: 16, flex: '0 0 auto' }}>عکس</span>}
+        <Link to={`/doctor/${doctor.id}`} aria-label={`پروفایل ${doctor.name}`} style={{ flex: '0 0 auto', lineHeight: 0 }}>
+          {doctor.avatar
+            ? <img src={doctor.avatar} alt={doctor.name}
+                style={{ width: 62, height: 62, borderRadius: 16, objectFit: 'cover' }} />
+            : <span className="na-ph" style={{ width: 62, height: 62, borderRadius: 16 }}>عکس</span>}
+        </Link>
 
         <div style={{ minWidth: 0, flex: '1 1 auto' }}>
-          <strong style={{ display: 'block', fontSize: 15, marginBottom: 3 }}>{doctor.name}</strong>
+          <Link to={`/doctor/${doctor.id}`} style={{ color: 'inherit', textDecoration: 'none' }}>
+            <strong style={{ display: 'block', fontSize: 15, marginBottom: 3 }}>{doctor.name}</strong>
+          </Link>
           <span style={{ fontSize: 12, color: 'var(--c-muted)' }}>{doctor.specialty}</span>
         </div>
 

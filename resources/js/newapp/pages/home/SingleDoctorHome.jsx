@@ -1,4 +1,5 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 import { useSite } from '../../lib/SiteContext.jsx';
 import ServiceCard from '../../components/ServiceCard.jsx';
 import OpenStreetMap from '../../components/OpenStreetMap.jsx';
@@ -98,7 +99,11 @@ export default function SingleDoctorHome({ data, onBook }) {
           <div className="na-wrap na-hero__grid">
             <div>
               {hero.badge && <span className="na-hero__badge"><span className="na-hero__dot" />{hero.badge}</span>}
-              <h1 className="na-hero__name">{hero.title || doctor.name}</h1>
+              <h1 className="na-hero__name">
+                {doctor.id
+                  ? <Link to={`/doctor/${doctor.id}`} style={{ color: 'inherit', textDecoration: 'none' }}>{hero.title || doctor.name}</Link>
+                  : (hero.title || doctor.name)}
+              </h1>
               {(hero.subtitle || doctor.specialty) && <p className="na-hero__specialty">{hero.subtitle || doctor.specialty}</p>}
               {hero.description && <p className="na-hero__bio">{hero.description}</p>}
               <div className="sd-credentials">
@@ -114,7 +119,11 @@ export default function SingleDoctorHome({ data, onBook }) {
             </div>
             <div className="na-hero__figure">
               {(images?.doctor_avatar || doctor.avatar)
-                ? <img src={images?.doctor_avatar || doctor.avatar} alt={doctor.name || ''} className="na-hero__photo" />
+                ? (doctor.id
+                  ? <Link to={`/doctor/${doctor.id}`} aria-label={`پروفایل ${doctor.name || ''}`} style={{ display: 'contents' }}>
+                      <img src={images?.doctor_avatar || doctor.avatar} alt={doctor.name || ''} className="na-hero__photo" />
+                    </Link>
+                  : <img src={images?.doctor_avatar || doctor.avatar} alt={doctor.name || ''} className="na-hero__photo" />)
                 : <Placeholder label="عکس پرتره دکتر" className="na-hero__photo" />}
               <dl className="na-hero__stats">
                 {[

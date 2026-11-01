@@ -147,7 +147,8 @@ export const api = {
   contactUs: () => request('/contact-us'),
   sendContactMessage: (body) => request('/contact-us', { method: 'POST', body }),
   search: (params) => request('/search?' + new URLSearchParams(params)),
-  doctor: (id) => request(`/doctor/${id}`),
+  // params: service_id / place_id از لینک خدمت مشخص (اختیاری)
+  doctor: (id, params) => request(`/doctor/${id}` + (params && Object.keys(params).length ? '?' + qs(params) : '')),
   // پزشکان ارائه دهنده یک خدمت؛ برای شروع رزرو فقط با شناسه خدمت
   serviceDoctors: (id) => request(`/service/${id}/doctors`),
   // گزینه های رزرو (مطب/بخش/ناحیه/اپراتور)

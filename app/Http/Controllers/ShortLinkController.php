@@ -3,22 +3,19 @@
 namespace App\Http\Controllers;
 
 use App\Models\ShortLink;
-use Illuminate\Http\Request;
 
 class ShortLinkController extends Controller
 {
     public function index($param)
     {
         $shortLink = ShortLink::firstWhere('link_code', $param);
-        if ($shortLink->exists()) {
-            $number_visited_old =  $shortLink->$shortLink ?? 0;
-            $shortLink->update([
-                'number_visited' => $number_visited_old + 1,
-                'visited_at' => \now(),
-            ]);
-            return redirect()->away($shortLink->link_url);
-        } else {
-            return abort(404);
-        }
+        abort_unless($shortLink, 404);
+
+        $shortLink->increment('number_visited', 1, ['visited_at' => now()]);
+
+        $target = $shortLink->targetUrl();
+
+        // لینک های قدیمی آدرس کامل دارند و لینک های جدید روی همین دامنه ساخته می شوند
+        return str_starts_with($target, 'http') ? redirect()->away($target) : redirect()->to($target);
     }
 }

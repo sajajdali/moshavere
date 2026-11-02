@@ -2,6 +2,7 @@
 
 namespace Modules\Front\Livewire\SetAppointment;
 
+use App\Rules\NationalCodeRule;
 use Carbon\Carbon;
 use Livewire\Component;
 use Livewire\Attributes\Title;
@@ -70,7 +71,9 @@ class Checkout extends Component
                 'form.otherApp.first_name' => 'required|string|max:225',
                 'form.otherApp.last_name' => 'required|string|max:225',
                 'form.otherApp.gender'         => 'required|string|max:225',
-                'form.otherApp.national_code' => 'required_if:form.otherApp.withOutNational_code,false|max:225',
+                'form.otherApp.national_code' => empty($this->form['otherApp']['withOutNational_code'])
+                    ? ['required_if:form.otherApp.withOutNational_code,false', 'max:225', new NationalCodeRule]
+                    : 'required_if:form.otherApp.withOutNational_code,false|max:225',
                 'form.otherApp.mobile'        => 'required|digits:11',
                 'form.otherApp.insurence'      => 'nullable|string|max:225',
 

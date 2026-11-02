@@ -2,6 +2,7 @@
 
 namespace Modules\User\Livewire\Admin\User;
 
+use App\Rules\NationalCodeRule;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\Rule;
@@ -147,7 +148,7 @@ class AddPatient extends Component
             'form.mobile' => ['required', 'digits:11'],
             'form.first_name' => ['required', 'string', 'max:225'],
             'form.last_name' => ['required', 'string', 'max:225'],
-            'form.national_code' => ['required', 'digits:10', Rule::unique('users', 'national_code')->ignore($existingId)],
+            'form.national_code' => ['required', 'digits:10', new NationalCodeRule, Rule::unique('users', 'national_code')->ignore($existingId)],
             'form.birth_date' => ['required', function ($attribute, $value, $fail) {
                 if (PatientProfile::parseBirthDate((string) $value) === null) {
                     $fail('تاریخ تولد را به صورت شمسی و صحیح وارد کنید (مثلاً 1370/05/21).');

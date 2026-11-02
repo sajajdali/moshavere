@@ -2,6 +2,7 @@
 
 namespace Modules\Front\Livewire\Auth\User;
 
+use App\Rules\NationalCodeRule;
 use Livewire\Component;
 use Livewire\Attributes\Title;
 use Livewire\Attributes\Layout;
@@ -45,10 +46,10 @@ class Registration extends Component
             'form.last_name'  => 'required|string|max:225',
             'form.gender'     => 'required|string|max:225',
             'form.email'      => 'nullable|email|max:225',
-            'form.national_code'  => ['nullable', 'digits:10', $nationalCodeUnique],
+            'form.national_code'  => ['nullable', 'digits:10', new NationalCodeRule, $nationalCodeUnique],
         ];
         if ($this->fetchData['is_national_code_required']) {
-            $rules['form.national_code'] = ['required', 'digits:10', $nationalCodeUnique];
+            $rules['form.national_code'] = ['required', 'digits:10', new NationalCodeRule, $nationalCodeUnique];
         }
         return $rules;
     }

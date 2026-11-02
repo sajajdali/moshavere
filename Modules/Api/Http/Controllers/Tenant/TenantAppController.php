@@ -3,6 +3,7 @@
 namespace Modules\Api\Http\Controllers\Tenant;
 
 use App\Enum\ActiveEnum;
+use App\Rules\NationalCodeRule;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
@@ -2076,6 +2077,12 @@ class TenantAppController extends Controller
                 'message' => 'کد ملی باید ۱۰ رقم باشد.',
             ]);
         }
+        if ($nationalCode !== '' && ! NationalCodeRule::isValid($nationalCode)) {
+            return $this->badRequest([
+                'status' => false,
+                'message' => 'کد ملی معتبر نیست.',
+            ]);
+        }
         if ($nationalCode !== '' && User::where('national_code', $nationalCode)->whereKeyNot($user->id)->exists()) {
             return $this->badRequest([
                 'status' => false,
@@ -2192,6 +2199,13 @@ class TenantAppController extends Controller
                     return $this->badRequest([
                         'status' => false,
                         'message' => 'کد ملی باید ۱۰ رقم باشد.',
+                    ]);
+                }
+
+                if (! NationalCodeRule::isValid($code)) {
+                    return $this->badRequest([
+                        'status' => false,
+                        'message' => 'کد ملی معتبر نیست.',
                     ]);
                 }
 

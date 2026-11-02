@@ -4,7 +4,7 @@ import api from '../lib/api';
 import useAsync from '../lib/useAsync';
 import { useSite } from '../lib/SiteContext.jsx';
 import { Loading, ErrorBox } from '../components/States.jsx';
-import { fa, toEnDigits } from '../lib/format';
+import { fa, toEnDigits, isValidNationalCode } from '../lib/format';
 
 const TABS = [
   { key: 'upcoming', label: 'پیش‌رو' },
@@ -311,12 +311,18 @@ function EditDialog({ info, onClose, onSaved }) {
   const set = (k) => (e) => { setForm((f) => ({ ...f, [k]: e.target.value })); setError(''); };
 
   const save = async () => {
+    const nationalCode = toEnDigits(form.national_code).trim();
+    if (nationalCode && !isValidNationalCode(nationalCode)) {
+      setError('کد ملی معتبر نیست.');
+      return;
+    }
+
     setBusy(true);
     setError('');
     try {
       const res = await api.updateProfile({
         ...form,
-        national_code: toEnDigits(form.national_code).trim(),
+        national_code: nationalCode,
       });
       onSaved(res);
     } catch (err) {

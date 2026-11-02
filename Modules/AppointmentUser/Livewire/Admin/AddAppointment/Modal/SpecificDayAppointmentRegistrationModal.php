@@ -2,6 +2,7 @@
 
 namespace Modules\AppointmentUser\Livewire\Admin\AddAppointment\Modal;
 
+use App\Rules\NationalCodeRule;
 use Carbon\Carbon;
 use Illuminate\Validation\Rule;
 use Livewire\Component;
@@ -166,7 +167,7 @@ class SpecificDayAppointmentRegistrationModal extends Component
             $rules = [
                 'form.first_name' => 'required',
                 'form.last_name' => 'required',
-                'form.national_code' => ['required', 'digits:10', Rule::unique('users', 'national_code')->ignore($this->fetchData['user']->id ?? null)],
+                'form.national_code' => ['required', 'digits:10', new NationalCodeRule, Rule::unique('users', 'national_code')->ignore($this->fetchData['user']->id ?? null)],
                 'form.birth_date' => ['required', function ($attribute, $value, $fail) {
                     if ($this->parseBirthDate((string) $value) === null) {
                         $fail('تاریخ تولد را به صورت شمسی و صحیح وارد کنید (مثلاً 1370/05/21).');

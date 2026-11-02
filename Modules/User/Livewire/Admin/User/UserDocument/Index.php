@@ -2,6 +2,7 @@
 
 namespace Modules\User\Livewire\Admin\User\UserDocument;
 
+use App\Rules\NationalCodeRule;
 use Livewire\Component;
 use Livewire\Attributes\On;
 use Livewire\WithPagination;
@@ -83,7 +84,7 @@ class Index extends Component
             'profile.last_name'       => 'nullable|string|max:100',
             'profile.mobile'          => 'required|digits:11|unique:users,mobile,' . $this->user->id,
             'profile.email'           => 'nullable|email|unique:users,email,' . $this->user->id,
-            'profile.national_code'   => ['nullable', 'digits:10', Rule::unique('users', 'national_code')->ignore($this->user->id)],
+            'profile.national_code'   => ['nullable', 'digits:10', new NationalCodeRule, Rule::unique('users', 'national_code')->ignore($this->user->id)],
             'profile.document_number' => 'nullable|string|max:50',
             'profile.birth_date'      => ['nullable', function ($attribute, $value, $fail) {
                 if (filled($value) && PatientProfile::parseBirthDate((string) $value) === null) {

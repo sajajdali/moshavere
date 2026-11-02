@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import api from '../lib/api';
 import { useSite } from '../lib/SiteContext.jsx';
-import { toEnDigits, fa } from '../lib/format';
+import { toEnDigits, fa, isValidNationalCode } from '../lib/format';
 
 const OTP_LENGTH = 4;
 const birthdayParts = (value) => {
@@ -184,6 +184,10 @@ export default function LoginPanel({ title, hint, onDone, registrationOnly = fal
     }
     if (code && !/^\d{10}$/.test(code)) {
       setError('کد ملی باید ۱۰ رقم باشد.');
+      return;
+    }
+    if (code && !isValidNationalCode(code)) {
+      setError('کد ملی معتبر نیست.');
       return;
     }
 

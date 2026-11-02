@@ -2,6 +2,7 @@
 
 namespace Modules\User\Support;
 
+use App\Rules\NationalCodeRule;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
@@ -252,7 +253,7 @@ class PatientImporter
             $digits = str_pad($digits, 10, '0', STR_PAD_LEFT);
         }
 
-        return strlen($digits) === 10 ? $digits : null;
+        return NationalCodeRule::isValid($digits) ? $digits : null;
     }
 
     private function normalizeGender(mixed $code, mixed $description): ?string

@@ -12,7 +12,7 @@ class servicePolicy
 
     public function viewAny(User $user): bool
     {
-        return $user->hasPermissionTo('service');
+        return $user->checkPermissionTo('service') || $this->editContent($user);
     }
 
     public function create(User $user): bool
@@ -20,13 +20,23 @@ class servicePolicy
         return $user->hasPermissionTo('service.create');
     }
 
-    public function delete(User $user, Service $service): bool
+    // مسیرها با کلاس (نه نمونه) چک می شوند، پس مدل اختیاری است
+    public function delete(User $user, ?Service $service = null): bool
     {
         return $user->hasPermissionTo('service.delete');
     }
 
-    public function update(User $user, Service $service): bool
+    public function update(User $user, ?Service $service = null): bool
     {
         return $user->hasPermissionTo('service.update');
+    }
+
+    /**
+     * توضیحات و تصویر صفحه بخش در سایت: همه کاربران دارای دسترسی مدیریت.
+     * سایر فیلدهای بخش همچنان به «ویرایش بخش» نیاز دارند.
+     */
+    public function editContent(User $user, ?Service $service = null): bool
+    {
+        return $user->checkPermissionTo('ADMIN_ACCESS') || $user->checkPermissionTo('service.update');
     }
 }

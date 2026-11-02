@@ -123,7 +123,7 @@
                                                 <td>{{ $service->user?->count() ?? 0 }} </td>
                                                 <td>{!! $service->show_type->getBadge()!!} </td>
                                                 <td>
-                                                    @canany(['update', 'delete'], $service)
+                                                    @canany(['update', 'delete', 'editContent'], $service)
                                                         <div class="btn-group mt-2 mb-2">
                                                             <button type="button" class="btn btn-primary dropdown-toggle"
                                                                 data-bs-toggle="dropdown">
@@ -138,6 +138,10 @@
                                                                 @can('update', $service)
                                                                     <li><a href="{{ route('admin.service.edit', ['service' => $service]) }}"
                                                                             data-label="ویرایش">ویرایش</a>
+                                                                    </li>
+                                                                @elsecan('editContent', $service)
+                                                                    <li><a href="{{ route('admin.service.edit', ['service' => $service]) }}"
+                                                                            data-label="ویرایش">ویرایش توضیحات و تصویر</a>
                                                                     </li>
                                                                 @endcan
                                                             </ul>

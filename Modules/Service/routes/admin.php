@@ -18,7 +18,8 @@ use Modules\Service\Livewire\CreateOrUpdate;
 
 Route::group([], function () {
     Route::get('service/craete', CreateOrUpdate::class)->name('service.create')->can('create', Service::class);
-    Route::get('service/edit/{service}', CreateOrUpdate::class)->name('service.edit')->can('update', Service::class);
+    // ویرایش کامل با «ویرایش بخش»؛ بقیه کاربران مدیریت فقط توضیحات و تصویر (CreateOrUpdate::$contentOnly)
+    Route::get('service/edit/{service}', CreateOrUpdate::class)->name('service.edit')->can('editContent', Service::class);
     Route::get('service/list', ServiceList::class)->name('service.list')->can('viewAny', Service::class);
 
 });

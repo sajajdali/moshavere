@@ -2,7 +2,9 @@
 
 namespace Modules\Service\Livewire;
 
+use Livewire\Attributes\Locked;
 use Livewire\Component;
+use Illuminate\Support\Facades\Gate;
 use App\Enum\ActiveEnum;
 use App\trait\UploadFile;
 use Modules\User\Entities\User;
@@ -29,6 +31,10 @@ class CreateOrUpdate extends Component
         'place'     => null,
     ];
     public array $fetchdata = [];
+
+    // کاربر مدیریت بدون «ویرایش بخش»: فقط توضیحات و تصویر صفحه بخش
+    #[Locked]
+    public bool $contentOnly = false;
 
     // تصویر صفحه بخش در سایت (جدا از ایکون)
     public $bannerUpload;
@@ -71,6 +77,12 @@ class CreateOrUpdate extends Component
 
     public function createOrUpdateSection()
     {
+        // دسترسی از روی سرور دوباره سنجیده میشود، نه از روی contentOnly
+        if ($this->isEdited && Gate::denies('update', $this->service)) {
+            return $this->saveContentOnly();
+        }
+        $this->authorize($this->isEdited ? 'update' : 'create', $this->isEdited ? $this->service : Service::class);
+
         $this->validate();
         if (! app()->environment('local')) {
             Cache::forget('most_viewed_service');
@@ -112,13 +124,7 @@ class CreateOrUpdate extends Component
         }
         $modelCreateOrUpdate['detail'][Service::DESCRIPTION] = Service::sanitizeDescription($this->form['description'] ?? null);
 
-        $banner = $this->form['banner'] ?? null;
-        if ($banner && str_contains($banner, '/temp/')) {
-            $finalBanner = str_replace('temp/', '', $banner);
-            Storage::disk('tenant')->move($banner, $finalBanner);
-            $banner = $finalBanner;
-        }
-        $modelCreateOrUpdate['detail'][Service::BANNER] = $banner ?: null;
+        $modelCreateOrUpdate['detail'][Service::BANNER] = $this->storeBanner();
         if ($this->isEdited) {
             $this->service->update($modelCreateOrUpdate);
             $msg = 'بخش با موفقیت ویرایش شد';
@@ -141,6 +147,33 @@ class CreateOrUpdate extends Component
             $this->service->place()->sync($this->form['place']);
         }
         return redirect()->route('admin.service.list')->with('success', $msg);
+    }
+
+    /** ذخیره فقط توضیحات و تصویر؛ بقیه detail دست نخورده میماند */
+    private function saveContentOnly()
+    {
+        $this->authorize('editContent', $this->service);
+        $this->validate(['form.description' => 'nullable|string|max:200000']);
+
+        $detail = $this->service->detail ?? [];
+        $detail[Service::DESCRIPTION] = Service::sanitizeDescription($this->form['description'] ?? null);
+        $detail[Service::BANNER] = $this->storeBanner();
+        $this->service->update(['detail' => $detail]);
+
+        return redirect()->route('admin.service.list')->with('success', 'توضیحات و تصویر بخش ذخیره شد');
+    }
+
+    /** انتقال تصویر تازه آپلود شده از پوشه موقت؛ مسیر نهایی یا null */
+    private function storeBanner(): ?string
+    {
+        $banner = $this->form['banner'] ?? null;
+        if ($banner && str_contains($banner, '/temp/')) {
+            $finalBanner = str_replace('temp/', '', $banner);
+            Storage::disk('tenant')->move($banner, $finalBanner);
+            $banner = $finalBanner;
+        }
+
+        return $banner ?: null;
     }
 
     private function addInitialValues()
@@ -175,6 +208,7 @@ class CreateOrUpdate extends Component
         if ($service instanceof Service) {
             $this->service           =  $service;
             $this->isEdited          = true;
+            $this->contentOnly       = Gate::denies('update', $service);
             $this->addInitialValues();
 
             //  load  image

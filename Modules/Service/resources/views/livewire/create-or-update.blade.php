@@ -45,6 +45,13 @@
                 </div>
                 <div class="card-body">
                     <form wire:submit='createOrUpdateSection' class="form-horizontal">
+                        @if ($contentOnly)
+                            <div class="alert alert-info mt-3">
+                                <i class="fa fa-info-circle me-1"></i>
+                                شما می‌توانید توضیحات و تصویر صفحه این بخش در سایت را ویرایش کنید. تغییر سایر تنظیمات بخش نیاز به دسترسی «ویرایش بخش» دارد.
+                            </div>
+                        @endif
+                        @unless ($contentOnly)
                         <div class="row mt-5 mb-3">
                             <label for="specialityName" class="col-md-3 form-label">نام بخش:</label>
                             <div class="col-md-9">
@@ -85,6 +92,7 @@
                                 @enderror
                             </div>
                         </div>
+                        @endunless
                         <div class="row mt-4 mb-3">
                             <label for="serviceDescription" class="col-md-3 form-label">توضیحات بخش:</label>
                             <div class="col-md-9">
@@ -101,6 +109,7 @@
                                 </p>
                             </div>
                         </div>
+                        @unless ($contentOnly)
                         <div class="row mt-4 mb-3">
                             <label for="form_priority" class="col-md-3 form-label">ترتیب نمایش:</label>
                             <div class="col-md-9">
@@ -191,6 +200,7 @@
                                 uploadedFileType="{{ $uploadedFileType }}" deleteAction="deleteFile" model="photo"
                                 id="fileUpload" />
                         </div>
+                        @endunless
                         <div class="row mb-5 mt-3">
                             <x-admin.core.form.image-upload label="تصویر صفحه بخش در سایت"
                                 uploadedPhotoUrl="{{ $bannerUrl }}"
@@ -202,6 +212,7 @@
                                 در صفحه بخش، بالای توضیحات نمایش داده می‌شود. اندازه پیشنهادی ۱۶۰۰×۶۰۰ پیکسل، حداکثر ۴ مگابایت.
                             </p>
                         </div>
+                        @unless ($contentOnly)
                         @if (!empty($fetchdata['doctors']))
                             <div class="row mt-5">
                                 <h4>پزشکان مربوط به این بخش</h4>
@@ -242,6 +253,7 @@
                                 </div>
                             </div>
                         </div>
+                        @endunless
                         <div class="row">
                             <div class="form-group mt-3  d-flex justify-content-end">
                                 <div>

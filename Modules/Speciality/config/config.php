@@ -19,7 +19,7 @@ return [
 
     'menu' => [
         'title' => 'تعاریف پایه',
-        'gate' => ['speciality','reminder','place','service'],
+        'gate' => ['speciality','reminder','place','service','ADMIN_ACCESS'],
         'policy_class' => null,
         'has_divider' => true,
         'priority' => 90,

@@ -100,11 +100,17 @@ class SmsChannel
                         $response = \Illuminate\Support\Facades\Http::withToken($apiToken)->get('https://shsms.ir/api/v1/sendms', $condition);
                     }
                     if (! $response->successful()) {
-                        throw new \RuntimeException('SHSMS request failed with HTTP '.$response->status());
+                        // log only: a rejected SMS must not break the request/job that triggered it
+                        Log::error('shsms request failed', [
+                            'status' => $response->status(),
+                            'response' => $response->body(),
+                            'receptor' => $data['receptor'],
+                            'template' => $data['template'],
+                        ]);
                     }
                 } catch (\Throwable $th) {
+                    // timeouts / connection errors: log and carry on
                     Log::error('shsms has issue:' .  $th->getMessage());
-                    throw $th;
                 }
             }
         }
@@ -127,11 +133,10 @@ class SmsChannel
                     'payload' => $payload,
                     'response' => $response->body(),
                 ]);
-                throw new \RuntimeException('StarPayam request failed with HTTP '.$response->status());
             }
         } catch (\Throwable $e) {
+            // log only: an SMS failure must not reach the user
             Log::error('starPayam Exception: ' . $e->getMessage());
-            throw $e;
         }
     }
     private function sendWithIpPanel($apiToken, $data, $settings): void
@@ -162,11 +167,10 @@ class SmsChannel
                     'payload' => $payload,
                     'response' => $response->body(),
                 ]);
-                throw new \RuntimeException('IPPANEL request failed with HTTP '.$response->status());
             }
-        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
+            // log only: an SMS failure must not reach the user
             Log::error('IPPANEL exception: ' . $e->getMessage());
-            throw $e;
         }
     }
     private function normalizeIpPanelMobile(?string $mobile): ?string
@@ -240,12 +244,12 @@ class SmsChannel
             if (! $r->successful()) {
                 throw new \RuntimeException('Pars SMS request failed with HTTP '.$r->status());
             }
-        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
+            // log only: an SMS failure must not reach the user
             Log::error('pars sms send error', [
                 'error message' => $e->getMessage(),
                 'error line' => $e->getTrace(),
             ]);
-            throw $e;
         }
         return;
     }
@@ -263,12 +267,12 @@ class SmsChannel
             if (! $r->successful()) {
                 throw new \RuntimeException('Faraz SMS request failed with HTTP '.$r->status());
             }
-        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
+            // log only: an SMS failure must not reach the user
             Log::error('farzSms send error', [
                 'error message' => $e->getMessage(),
                 'error line'    => $e->getTrace(),
             ]);
-            throw $e;
         }
         return;
     }

@@ -38,6 +38,11 @@ class RenewCacheCommand extends Command
                 ->orWhereDate('updated_log_at', '<', \now()->subDays(5)->toDateString()))
             ->get();
         $appointmentSettings->each(function ($appointmentSetting) {
+            // a setting whose doctor was deleted cannot generate a list; skip it instead of aborting every other setting
+            if (! $appointmentSetting->user) {
+                $this->warn('appointment setting ' . $appointmentSetting->id . ' skipped: it has no doctor');
+                return;
+            }
             Cache::forget('appointmentList.' . $appointmentSetting->id);
             Cache::rememberForever('appointmentList.' . $appointmentSetting->id, function () use ($appointmentSetting) {
                 $appointmentSetting->update(['updated_log_at' => \now()]);

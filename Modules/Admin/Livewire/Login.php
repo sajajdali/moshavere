@@ -3,6 +3,7 @@
 namespace Modules\Admin\Livewire;
 
 use Livewire\Attributes\Layout;
+use Livewire\Attributes\Locked;
 use Livewire\Attributes\Rule;
 use Livewire\Attributes\Title;
 use Livewire\Component;
@@ -20,6 +21,8 @@ class Login extends Component
 
     public $recaptcha;
 
+    // server-only: a client-tampered (array) value made the view crash in htmlspecialchars()
+    #[Locked]
     public $message;
 
     public function mount()

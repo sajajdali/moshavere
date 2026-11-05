@@ -46,7 +46,19 @@ class SpecificDayAvailableAppointment extends Component
     public function loadDifferentDayDetail()
     {
         // if date has been change , this functio would be call
-        $this->fetchData['selectedDate']      =  Verta::parse($this->form['changeDate'])->tocarbon();
+        // the input may be cleared (or half typed) by the user: keep the current date instead of failing
+        $changeDate = trim((string) ($this->form['changeDate'] ?? ''));
+        if ($changeDate === '') {
+            $this->form['changeDate'] = verta($this->fetchData['selectedDate'])->format('Y/m/d');
+            return;
+        }
+        try {
+            $selectedDate = Verta::parse($changeDate)->tocarbon();
+        } catch (\Throwable $e) {
+            $this->form['changeDate'] = verta($this->fetchData['selectedDate'])->format('Y/m/d');
+            return;
+        }
+        $this->fetchData['selectedDate']      =  $selectedDate;
         $this->RecreatelistOfAppointment();
         $this->dispatch('loadJs', true);
         $this->dateHasBeenChange();

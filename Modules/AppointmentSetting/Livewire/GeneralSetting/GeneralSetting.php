@@ -5,6 +5,7 @@ namespace Modules\AppointmentSetting\Livewire\GeneralSetting;
 use Livewire\Component;
 use App\Enum\ActiveEnum;
 use Illuminate\Validation\Rule;
+use Illuminate\Support\Facades\DB;
 use Modules\User\Entities\User;
 use Hekmatinasser\Verta\Facades\Verta;
 use Modules\Place\app\Models\Place;
@@ -474,35 +475,116 @@ class GeneralSetting extends Component
 
 
 
-        if ($this->isEdited) {
-            if (isset($this->fetchData['service_id'])) {
-                if ($this->isSpecialTimeEdited) {
-                    //is user editing the times for special section
-                    $this->appointment_setting->update($updateOrCreateModel);
+        $appointment_setting_times = $this->storeTimes();
+        $syncSegments = isset($this->form['segments']['status']) && $this->form['segments']['status'] == true;
+        $savedSettings = [];
+
+        DB::transaction(function () use ($updateOrCreateModel, $appointment_setting_times, $syncSegments, &$savedSettings) {
+            if ($this->isEdited) {
+                if (isset($this->fetchData['service_id'])) {
+                    if ($this->isSpecialTimeEdited) {
+                        //is user editing the times for special section
+                        $this->appointment_setting->update($updateOrCreateModel);
+                    } else {
+                        $this->appointment_setting = AppointmentSetting::create($updateOrCreateModel);
+                    }
                 } else {
-                    $this->appointment_setting = AppointmentSetting::create($updateOrCreateModel);
+                    $this->appointment_setting->update($updateOrCreateModel);
                 }
             } else {
-                $this->appointment_setting->update($updateOrCreateModel);
+                $this->appointment_setting = AppointmentSetting::create($updateOrCreateModel);
             }
-        } else {
-            $this->appointment_setting =   AppointmentSetting::create($updateOrCreateModel);
-        }
-        $appointment_setting_times =  $this->storeTimes();
-        //store days and times
-        if ($this->isEdited) {
-            $this->appointment_setting->times()->delete();
-        }
-        foreach ($appointment_setting_times as $objectForStore) {
-            $this->appointment_setting->times()->create($objectForStore);
-        }
-        if (isset($this->form['segments']['status']) && $this->form['segments']['status'] == true) {
-            $this->appointment_setting->segments()->sync($this->form['segments']['value']);
-        }
+            //store days and times
+            $this->replaceTimesAndSegments($this->appointment_setting, $appointment_setting_times, $syncSegments, $this->isEdited);
+            $savedSettings[] = $this->appointment_setting;
+
+            // The same special setting can be applied to several sections at once:
+            // store (or overwrite) one AppointmentSetting per additional selected section.
+            foreach ($this->validExtraServiceIds() as $extraServiceId) {
+                $attributes = array_merge($updateOrCreateModel, ['service_id' => $extraServiceId]);
+                $existing = $this->specialSettingQuery($extraServiceId)->first();
+                if ($existing) {
+                    $existing->update($attributes);
+                    $setting = $existing;
+                } else {
+                    $setting = AppointmentSetting::create($attributes);
+                }
+                $this->replaceTimesAndSegments($setting, $appointment_setting_times, $syncSegments, true);
+                $savedSettings[] = $setting;
+            }
+        });
+
         // make appointment log
-        CacheJob::dispatch($this->appointment_setting);
+        foreach ($savedSettings as $savedSetting) {
+            CacheJob::dispatch($savedSetting);
+        }
 
         return redirect()->route('admin.appointment.doctor.list')->with('success', 'تنظیمات با موفقیت ذخیره شد');
+    }
+    private function replaceTimesAndSegments(AppointmentSetting $setting, array $times, bool $syncSegments, bool $deleteOldTimes): void
+    {
+        if ($deleteOldTimes) {
+            $setting->times()->delete();
+        }
+        foreach ($times as $objectForStore) {
+            $setting->times()->create($objectForStore);
+        }
+        if ($syncSegments) {
+            $setting->segments()->sync($this->form['segments']['value']);
+        } elseif ($deleteOldTimes && $setting->segments()->exists()) {
+            // an overwritten setting must not keep segments the new values don't ask for
+            $setting->segments()->detach();
+        }
+    }
+    private function specialSettingQuery($serviceId)
+    {
+        return AppointmentSetting::where('user_id', $this->fetchData['user']->id)
+            ->where('service_id', $serviceId)
+            ->when(
+                filled($this->fetchData['place'] ?? null),
+                fn ($query) => $query->where('place_id', $this->fetchData['place']),
+                fn ($query) => $query->whereNull('place_id'),
+            );
+    }
+    /**
+     * Extra sections (besides the one in the route) that receive the same special setting.
+     * Component state comes from the browser, so ids are re-checked against the doctor's own sections.
+     */
+    private function validExtraServiceIds(): array
+    {
+        $ids = array_filter(array_map('intval', $this->fetchData['extra_services'] ?? []));
+        if (empty($ids) || empty($this->fetchData['service_id'])) {
+            return [];
+        }
+        return $this->fetchData['user']->service()
+            ->whereIn('services.id', $ids)
+            ->where('services.id', '!=', (int) $this->fetchData['service_id'])
+            ->pluck('services.id')
+            ->map(fn ($id) => (int) $id)
+            ->all();
+    }
+    /**
+     * Extra sections come from the section selection modal as ?services=1,2,3.
+     */
+    private function resolveExtraServices(): void
+    {
+        $this->fetchData['extra_services'] = [];
+        $this->fetchData['extra_service_titles'] = [];
+        if (empty($this->fetchData['service_id'])) {
+            return;
+        }
+        $ids = collect(explode(',', (string) request()->query('services', '')))
+            ->map(fn ($id) => (int) trim($id))
+            ->filter(fn ($id) => $id > 0 && $id != (int) $this->fetchData['service_id'])
+            ->unique()
+            ->values();
+        if ($ids->isEmpty()) {
+            return;
+        }
+        $services = $this->fetchData['user']->service()->whereIn('services.id', $ids)->get(['services.id', 'services.title']);
+        $this->fetchData['extra_services'] = $services->pluck('id')->all();
+        $this->fetchData['extra_service_titles'] = $services->pluck('title')->all();
+        $this->fetchData['service_title'] = Service::whereKey($this->fetchData['service_id'])->value('title');
     }
     private function checkInterfaceStatus()
     {
@@ -729,6 +811,7 @@ class GeneralSetting extends Component
         } else {
             return redirect()->route('admin.appointment.doctor.list')->with('error', 'پزشک مورد نظر یافت نشد');
         }
+        $this->resolveExtraServices();
         //  check if the setting for sections exist
         //   wich means this section is not the first time that set setting for
         $generalSetting_exists = AppointmentSetting::whereNull('service_id')

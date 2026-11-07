@@ -95,6 +95,24 @@
         </div>
     </div>
 
+    @if (!empty($fetchData['extra_services']))
+        <div class="alert alert-primary mb-4" role="alert">
+            <p class="mb-2">
+                <i class="fa fa-clone me-1" aria-hidden="true"></i>
+                این تنظیمات پس از ذخیره، به صورت جداگانه برای
+                <strong>{{ count($fetchData['extra_services']) + 1 }}</strong>
+                بخش زیر ثبت می‌شود:
+            </p>
+            <div class="d-flex flex-wrap gap-2">
+                <span class="badge bg-primary p-2">{{ $fetchData['service_title'] ?? '' }}</span>
+                @foreach ($fetchData['extra_service_titles'] as $extraTitle)
+                    <span class="badge bg-primary p-2">{{ $extraTitle }}</span>
+                @endforeach
+            </div>
+            <small class="d-block mt-2 text-muted">اگر برای هر یک از این بخش‌ها قبلاً تنظیم اختصاصی در این مطب ثبت شده باشد، با این تنظیمات جایگزین می‌شود.</small>
+        </div>
+    @endif
+
     @php
         $scheduleSettingsHasErrors = collect([
             'form.visitType.*',

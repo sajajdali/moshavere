@@ -5,6 +5,7 @@ import useAsync from '../lib/useAsync';
 import { useSite } from '../lib/SiteContext.jsx';
 import { Loading, ErrorBox } from '../components/States.jsx';
 import { fa, toEnDigits, isValidNationalCode } from '../lib/format';
+import PayLink from '../components/PayLink.jsx';
 
 const TABS = [
   { key: 'upcoming', label: 'پیش‌رو' },
@@ -220,11 +221,11 @@ export default function PatientProfile() {
                     </span>
 
                     {a.can_pay && a.payment_url && (
-                      <a href={a.payment_url} style={{
+                      <PayLink href={a.payment_url} busyLabel="در حال انتقال…" style={{
                         minHeight: 42, display: 'flex', alignItems: 'center', padding: '0 16px',
                         borderRadius: 12, background: 'var(--c-brand)', color: '#fff',
                         fontSize: 13, fontWeight: 700,
-                      }}>پرداخت</a>
+                      }}>پرداخت</PayLink>
                     )}
 
                     {a.can_cancel && (

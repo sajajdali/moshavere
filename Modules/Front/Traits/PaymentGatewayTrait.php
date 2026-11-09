@@ -77,7 +77,7 @@ trait PaymentGatewayTrait
      * تراکنش را در درگاه ثبت میکند.
      * در صورت خطای سامان null برمیگردد؛ خطای سایر درگاه ها به صورت exception منتقل میشود.
      *
-     * @return array{transactionId: string, url: string}|null
+     * @return array{transactionId: string, url: string, orderId?: string|null}|null
      */
     protected function purchaseFromGateway(string $gateway, int $amount, string $description, string $callbackUrl, ?string $mobile = null): ?array
     {
@@ -123,7 +123,12 @@ trait PaymentGatewayTrait
             ? route('payment.saman.form', ['token' => $transactionId])
             : $this->gatewayRedirectUrl($form);
 
-        return ['transactionId' => $transactionId, 'url' => $url];
+        return [
+            'transactionId' => $transactionId,
+            'url' => $url,
+            // سداد شماره سفارش را از uuid فاکتور میسازد و در بازگشت همان را برمیگرداند
+            'orderId' => $gateway === 'sadad' ? (string) crc32($invoice->getUuid()) : null,
+        ];
     }
 
     /**
@@ -185,10 +190,16 @@ trait PaymentGatewayTrait
                 'card_hash' => request()->post('SecurePan', null),
                 'ref_id'    => request()->post('ResNum', null),
             ],
-            'sadad' => [
-                'ref_id'   => $details['referenceNo'] ?? null,
-                'trace_no' => $details['traceNo'] ?? null,
-            ],
+            // شماره مرجع (RetrivalRefNo)، شماره پیگیری (SystemTraceNo) و شماره سفارش از پاسخ تایید؛
+            // شماره کارت ماسک شده و هش آن از داده هایی که بانک به callback برمیگرداند
+            'sadad' => array_filter([
+                'ref_id'      => $details['referenceNo'] ?? null,
+                'trace_no'    => $details['traceNo'] ?? null,
+                'order_id'    => $details['orderId'] ?? request()->input('OrderId'),
+                'description' => $details['description'] ?? null,
+                'card_number' => request()->input('PrimaryAccNo'),
+                'card_hash'   => request()->input('HashedCardNo'),
+            ], fn ($value) => $value !== null && $value !== ''),
             default => isset($details['card_hash'], $details['ref_id'])
                 ? ['card_hash' => $details['card_hash'], 'ref_id' => $details['ref_id']]
                 : [],

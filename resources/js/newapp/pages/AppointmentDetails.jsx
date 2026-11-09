@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { Link, Navigate, useParams } from 'react-router-dom';
+import { Link, Navigate, useParams, useSearchParams } from 'react-router-dom';
 import api from '../lib/api';
 import useAsync from '../lib/useAsync';
 import { useSite } from '../lib/SiteContext.jsx';
@@ -7,6 +7,7 @@ import { Loading, ErrorBox, Placeholder } from '../components/States.jsx';
 import OpenStreetMap from '../components/OpenStreetMap.jsx';
 import { fa, money } from '../lib/format';
 import { directionLinks } from '../lib/workingHours';
+import PayLink from '../components/PayLink.jsx';
 
 const REASONS = [
   'برنامه‌ام تغییر کرده است',
@@ -40,6 +41,18 @@ export default function AppointmentDetails() {
   const [copied, setCopied] = useState(false);
   const [mapPickerOpen, setMapPickerOpen] = useState(false);
   const copyTimer = useRef(null);
+  // نتیجه بازگشت از بانک: یک بار خوانده و از آدرس پاک می شود تا با رفرش تکرار نشود
+  const [searchParams, setSearchParams] = useSearchParams();
+  const [bankResult] = useState(() => {
+    const status = searchParams.get('payment');
+    const msg = searchParams.get('msg');
+    return status || msg ? { status: status || 'failed', msg } : null;
+  });
+  useEffect(() => {
+    if (searchParams.has('payment') || searchParams.has('msg')) {
+      setSearchParams({}, { replace: true });
+    }
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   const { data, error, loading, reload } = useAsync(() => api.appointment(code), [code]);
 
@@ -59,7 +72,7 @@ export default function AppointmentDetails() {
 
   // نوبت آنلاین: فقط پس از پرداخت مستقیم به گفتگو هدایت می شود؛
   // تا وقتی در انتظار پرداخت است، همین صفحه با گزینه پرداخت نمایش داده می شود
-  if (appt.is_online && appt.online_chat_id && !cancelled && !pending && !awaitingConfirmation) {
+  if (appt.is_online && appt.online_chat_id && !cancelled && !pending && !awaitingConfirmation && !bankResult) {
     return <Navigate to={`/chat/${appt.online_chat_id}`} replace />;
   }
   const paid = !pending && !cancelled && !awaitingConfirmation;
@@ -124,6 +137,10 @@ export default function AppointmentDetails() {
         </nav>
       )}
 
+      {bankResult && (
+        <PaymentResult result={bankResult} payment={appt.payment} chatId={appt.is_online ? appt.online_chat_id : null} />
+      )}
+
       {/* هشدار در انتظار تایید */}
       {awaitingConfirmation && (
         <section style={{
@@ -185,10 +202,10 @@ export default function AppointmentDetails() {
           )}
 
           {appt.payment_url && (
-            <a href={appt.payment_url} style={{
+            <PayLink href={appt.payment_url} style={{
               minHeight: 56, display: 'flex', alignItems: 'center', justifyContent: 'center',
               borderRadius: 15, background: '#8a6a3b', color: '#fff', fontSize: 16, fontWeight: 800,
-            }}>اقدام به پرداخت</a>
+            }}>{bankResult && bankResult.status !== 'success' ? 'تلاش دوباره برای پرداخت' : 'اقدام به پرداخت'}</PayLink>
           )}
         </section>
       )}
@@ -304,6 +321,13 @@ export default function AppointmentDetails() {
           </div>
         )}
       </section>
+
+      {!bankResult && appt.payment?.status === 'successful' && (
+        <section className="na-card">
+          <h2 style={{ margin: '0 0 12px', fontSize: 16, fontWeight: 800 }}>رسید پرداخت</h2>
+          <ReceiptRows payment={appt.payment} />
+        </section>
+      )}
 
       {/* نقشه */}
       {appt.address && (
@@ -497,5 +521,69 @@ function MapPickerDialog({ links, onClose }) {
         </div>
       </div>
     </div>
+  );
+}
+
+/** سطرهای رسید پرداخت بانکی */
+function ReceiptRows({ payment }) {
+  const rows = [
+    ['شماره پیگیری', payment.trace_no],
+    ['شماره مرجع', payment.ref_id],
+    ['شماره سفارش', payment.order_id],
+    ['کد تراکنش', payment.transaction_code],
+    ['مبلغ', payment.amount ? money(payment.amount) + ' ریال' : null],
+    ['کارت', payment.card_number],
+    ['درگاه', payment.gateway],
+    ['زمان پرداخت', payment.paid_at],
+  ].filter(([, v]) => v);
+
+  if (rows.length === 0) return null;
+
+  return (
+    <dl style={{ margin: 0, display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))', gap: 10 }}>
+      {rows.map(([k, v]) => (
+        <div key={k} style={{
+          background: 'var(--c-bg)', border: '1px solid var(--c-line)', borderRadius: 15, padding: '12px 14px',
+        }}>
+          <dt style={{ fontSize: 12, color: 'var(--c-muted)' }}>{k}</dt>
+          <dd dir="auto" style={{ margin: '5px 0 0', fontSize: 14, fontWeight: 700, lineHeight: 1.7, wordBreak: 'break-all' }}>
+            {fa(String(v))}
+          </dd>
+        </div>
+      ))}
+    </dl>
+  );
+}
+
+/** نتیجه بازگشت از درگاه بانک به همراه جزئیات تراکنش */
+function PaymentResult({ result, payment, chatId }) {
+  const ok = result.status === 'success';
+  const uncertain = result.status === 'error';
+  const tone = ok
+    ? { background: 'var(--c-ok-soft)', border: '1px solid #bfdccf', color: 'var(--c-accent)' }
+    : uncertain
+      ? { background: 'var(--c-gold-soft)', border: '1px solid #e6d7b8', color: '#7d6231' }
+      : { background: 'var(--c-danger-soft)', border: '1px solid #e8d3ce', color: 'var(--c-danger)' };
+
+  const title = ok ? 'پرداخت موفق' : uncertain ? 'نتیجه پرداخت نامشخص است' : 'پرداخت ناموفق';
+  const message = result.msg || (ok ? 'پرداخت با موفقیت انجام شد.' : payment?.error || 'پرداخت انجام نشد.');
+
+  return (
+    <section role="status" style={{
+      ...tone, borderRadius: 20, padding: 18, display: 'flex', flexDirection: 'column', gap: 12,
+    }}>
+      <strong style={{ fontSize: 17 }}>{title}</strong>
+      <p style={{ margin: 0, fontSize: 13, lineHeight: 1.95, color: 'var(--c-ink-2)' }}>{fa(message)}</p>
+
+      {payment && (ok || payment.trace_no || payment.order_id) && <ReceiptRows payment={payment} />}
+
+      {ok && chatId && (
+        <Link to={`/chat/${chatId}`} style={{
+          alignSelf: 'flex-start', minHeight: 48, display: 'flex', alignItems: 'center',
+          padding: '0 20px', borderRadius: 14, background: 'var(--c-brand)',
+          color: '#fff', fontSize: 14, fontWeight: 800,
+        }}>ورود به گفتگو با پزشک</Link>
+      )}
+    </section>
   );
 }

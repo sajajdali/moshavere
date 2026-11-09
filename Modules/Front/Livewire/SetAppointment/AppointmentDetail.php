@@ -24,6 +24,7 @@ use Modules\AppointmentUser\Enum\AppointmentOnlineMessageTypeEnum;
 use Modules\AppointmentUser\Enum\AppointmentUserKindEnum;
 use Modules\AppointmentUser\Enum\AppointmentUserStatusEnum;
 use Modules\Discount\app\Models\Discount;
+use Modules\Front\Services\AppointmentGatewayPayment;
 use Modules\Front\Traits\PaymentGatewayTrait;
 use Modules\Front\Traits\Paymenttrait;
 use Modules\OnlineConsultation\Models\ConsultationSetting;
@@ -183,36 +184,26 @@ class AppointmentDetail extends Component
     }
     public function GotoPayment()
     {
+        $app = $this->fetchData['app'];
         $amount = $this->payableAmount();
-        $activeGateway = $this->activePaymentGateway();
-        $t_data = [
-            'amount' => $this->payableAmount(),
-            'base_amount' => (int) $this->fetchData['stauts']['price'],
-            'user_id' => $this->fetchData['app']->user->id,
-            'mobile' =>  $this->fetchData['app']->user->mobile,
-            'appointmentUser_id' =>  $this->fetchData['app']->id,
-            'tracking_code' =>  $this->fetchData['app']->tracking_code,
-        ];
+        $extra = ['cost' => (int) $this->fetchData['stauts']['price']];
         if (isset($this->fetchData['discount_data'])) {
-            $t_data['discount']['discount_id'] = $this->fetchData['discount_data']->id;
-            $t_data['discount']['discount_amount'] = max(0, (int) $this->fetchData['stauts']['price'] - $t_data['amount']);
-            $t_data['discount']['discount_code'] = $this->fetchData['discount_data']->code;
-            $amount = $t_data['amount'];
+            $extra['discount'] = [
+                'discount_id' => $this->fetchData['discount_data']->id,
+                'discount_amount' => max(0, (int) $this->fetchData['stauts']['price'] - $amount),
+                'discount_code' => $this->fetchData['discount_data']->code,
+            ];
         }
-        // set the callback URL dynamically
-        $callbackUrl = route('front.setAppointment.detail', ['tracking_code' => $this->fetchData['app']->tracking_code, 'call_back' => true]);
-        $description = 'کاربر پرداخت کننده : ' . $this->fetchData['app']->user?->full_name ?? 'بدون نام' . 'شماره تماس: ' . $this->fetchData['app']->user?->mobile ?? 'بدون موبایل' . 'شماره ردیف: ' . $this->fetchData['app']->id;
-        $transaction =   $this->createTransaction($t_data);
-        $payment = $this->purchaseFromGateway($activeGateway, $this->payableGatewayAmount((int) $amount), $description, $callbackUrl, $this->fetchData['app']->user?->mobile);
-        if (! $payment) {
-            return;
-        }
-        $u_data['detail']['transactionId'] = $payment['transactionId'];
-        $u_data['detail']['callback'] = $callbackUrl;
-        $u_data['detail']['driver'] = $activeGateway;
-        $this->updateTransaction($u_data, $transaction);
+        $callbackUrl = route('front.setAppointment.detail', ['tracking_code' => $app->tracking_code, 'call_back' => true]);
 
-        return redirect()->to($payment['url']);
+        $result = app(AppointmentGatewayPayment::class)->start($app, $amount, $callbackUrl, $extra);
+        if (! $result['status']) {
+            $this->fetchData['alert'] = $result['message'];
+
+            return null;
+        }
+
+        return redirect()->to($result['url']);
     }
     private function createTransaction($initial_data)
     {
@@ -455,65 +446,31 @@ class AppointmentDetail extends Component
             }
         }
     }
-    private function updateTranastionDetail(AppointmentUser $appointment, string $gateway, $receipt)
-    {
-        return array_merge($appointment->transaction->detail ?? [], $this->gatewayReceiptDetail($gateway, $receipt));
-    }
 
     public function bankCallback()
     {
-        $activeGateway = $this->transactionPaymentGateway($this->fetchData['app']->transaction?->detail);
-        if (! $this->fetchData['app']->details[AppointmentUser::DETAIL_PAYMENT]['status']) {
-            $this->fetchData['sweetAlert']['msg'] = 'خطا در انجام تراکنش.';
-            $this->fetchData['sweetAlert']['icon'] = 'danger';
-            $this->fetchData['app']->transaction->update(['status' => TransactionStatusEnum::REJECTED]);
-            return;
+        $result = app(AppointmentGatewayPayment::class)->complete($this->fetchData['app']->id, request());
+        $success = $result['status'] === AppointmentGatewayPayment::RESULT_SUCCESS;
+        $this->fetchData['sweetAlert']['icon'] = $success ? 'success' : 'danger';
+        $this->fetchData['sweetAlert']['msg'] = $result['message'].$this->receiptSummary();
+        // وضعیت تازه نوبت و تراکنش برای ادامه رندر صفحه
+        $this->fetchData['app'] = $this->fetchData['app']->fresh() ?? $this->fetchData['app'];
+    }
+
+    /** شماره پیگیری و مرجع پرداخت موفق برای نمایش به کاربر */
+    private function receiptSummary(): string
+    {
+        $transaction = $this->fetchData['app']->transaction()->first();
+        if (! $transaction || $transaction->status !== TransactionStatusEnum::SUCCESSFUL) {
+            return '';
         }
-        if ($this->fetchData['app']->status == AppointmentUserStatusEnum::STATUS_WAIT_PAYMENT) {
-            try {
-                $amount      = (int) data_get(
-                    $this->fetchData['app']->details,
-                    AppointmentUser::DETAIL_PAYMENT . '.' . AppointmentUser::DETAIL_PAYMENT_PRICE . '.int'
-                );
-                $receipt = $this->verifyGatewayPayment(
-                    $activeGateway,
-                    $this->payableGatewayAmount($amount),
-                    $this->fetchData['app']->transaction->detail['transactionId']
-                );
-                DB::transaction(function () use ($receipt, $activeGateway) {
-                    $appointment = $this->fetchData['app'];
-                    $appointment->update([
-                        'status' => AppointmentUserStatusEnum::STATUS_SUCCESSFUL,
-                        'deadline_at' => null
-                    ]);
+        $detail = $transaction->detail ?? [];
+        $parts = array_filter([
+            isset($detail['trace_no']) ? 'شماره پیگیری: '.$detail['trace_no'] : null,
+            isset($detail['ref_id']) ? 'شماره مرجع: '.$detail['ref_id'] : null,
+        ]);
 
-                    $this->sendSmsSuccessfulSms($appointment);
-                    $this->sendOnlineAppointmentFirstMessage($appointment);
-
-                    $this->fetchData['sweetAlert']['icon'] = 'success';
-                    $this->fetchData['sweetAlert']['msg']  = 'پرداخت باموفقیت انجام شد و نوبت شما فعال شد ';
-
-                    $newTdetail = $this->updateTranastionDetail($appointment, $activeGateway, $receipt);
-                    $appointment->transaction->update(['status' => TransactionStatusEnum::SUCCESSFUL, 'detail' => $newTdetail]);
-                });
-                return;
-            } catch (InvalidPaymentException $exception) {
-                $this->fetchData['sweetAlert']['msg'] = 'خطا در انجام تراکنش.';
-                $this->fetchData['sweetAlert']['icon'] = 'danger';
-                Log::error('Error in payment verification process', [
-                    'error_message' => $exception->getMessage(),
-                    'stack_trace' => $exception->getTraceAsString(),
-                ]);
-                $this->fetchData['app']->transaction->update(['status' => TransactionStatusEnum::REJECTED]);
-            } catch (Exception $e) {
-                $this->fetchData['sweetAlert']['msg'] = 'خطا در انجام تراکنش.';
-                $this->fetchData['sweetAlert']['icon'] = 'danger';
-                Log::error('Error in payment verification process', [
-                    'error_message' => $e->getMessage(),
-                    'stack_trace' => $e->getTraceAsString(),
-                ]);
-            }
-        }
+        return $parts ? ' ('.implode(' - ', $parts).')' : '';
     }
     public function mount()
     {
@@ -550,7 +507,7 @@ class AppointmentDetail extends Component
         }
         $this->fetchData['authCheck'] = auth()->check();
         if (request()->has('msg')) {
-            if (request()->get('msg') == 'پرداخت با موفقیت انجام شد') {
+            if (request()->get('payment') === 'success' || request()->get('msg') == 'پرداخت با موفقیت انجام شد') {
                 $this->fetchData['success'] = request()->get('msg');
             } else {
                 $this->fetchData['alert'] = request()->get('msg');

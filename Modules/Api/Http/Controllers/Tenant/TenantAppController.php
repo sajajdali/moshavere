@@ -790,7 +790,7 @@ class TenantAppController extends Controller
             return $this->badRequest(['message' => 'ابتدا وارد حساب خود شوید.']);
         }
 
-        $appointments = AppointmentUser::with(['doctor', 'service', 'place'])
+        $appointments = AppointmentUser::with(['doctor', 'service', 'place', 'setting'])
             ->where('user_id', $user->id)
             ->orderByDesc('date_visit')
             ->limit(100)
@@ -871,12 +871,7 @@ class TenantAppController extends Controller
                 ? $price['string'].' '.($price['currency'] ?? '')
                 : null,
             'can_pay' => $waitingPayment,
-            'can_cancel' => ! $cancelled && $visit?->isFuture() && in_array($status, [
-                AppointmentUserStatusEnum::STATUS_PENDING,
-                AppointmentUserStatusEnum::STATUS_SUCCESSFUL,
-                AppointmentUserStatusEnum::STATUS_WAIT_PAYMENT,
-                AppointmentUserStatusEnum::STATUS_MONITORING,
-            ], true),
+            'can_cancel' => $this->userCanCancel($a),
             'payment_url' => $waitingPayment
                 ? route('api.appointment.payment.create', ['appointmentUser' => $a->id])
                 : null,
@@ -1249,7 +1244,7 @@ class TenantAppController extends Controller
      */
     public function appointment(string $trackingCode): \Illuminate\Http\JsonResponse
     {
-        $appointment = AppointmentUser::with(['doctor', 'service', 'place', 'user'])
+        $appointment = AppointmentUser::with(['doctor', 'service', 'place', 'user', 'setting', 'transaction'])
             ->where('tracking_code', $trackingCode)
             ->first();
 
@@ -1272,12 +1267,8 @@ class TenantAppController extends Controller
         // endpoint لغو فقط برای صاحب نوبت کار میکند، پس دکمه لغو هم فقط به او نشان داده میشود
         $isOwner = Auth::id() !== null && (int) Auth::id() === (int) $appointment->user_id;
 
-        $canCancel = $isOwner && in_array($status, [
-            AppointmentUserStatusEnum::STATUS_PENDING,
-            AppointmentUserStatusEnum::STATUS_SUCCESSFUL,
-            AppointmentUserStatusEnum::STATUS_WAIT_PAYMENT,
-            AppointmentUserStatusEnum::STATUS_MONITORING,
-        ], true) && $visit?->isFuture();
+        // علاوه بر مالکیت، لغو باید در تنظیمات نوبت دهی فعال و مهلت آن نگذشته باشد
+        $canCancel = $isOwner && $this->userCanCancel($appointment);
 
         $isOnline = $appointment->kind === AppointmentUserKindEnum::ONLINE;
         // برای هدایت به صفحه گفتگو؛ فقط نوبت های آنلاین این را دارند
@@ -1327,6 +1318,8 @@ class TenantAppController extends Controller
                     : null,
                 'can_cancel' => (bool) $canCancel,
                 'can_pay' => $status === AppointmentUserStatusEnum::STATUS_WAIT_PAYMENT,
+                // نتیجه آخرین پرداخت آنلاین (شماره پیگیری، مرجع و ...)
+                'payment' => $this->paymentReceipt($appointment, $isOwner),
                 // پرداخت سمت سرور انجام میشود؛ مسیر جزئیات در قالب جدید خود
                 // اپ React است و نباید به خودش برگردد.
                 'payment_url' => $status === AppointmentUserStatusEnum::STATUS_WAIT_PAYMENT
@@ -1334,6 +1327,80 @@ class TenantAppController extends Controller
                     : null,
             ],
         ]);
+    }
+
+    /**
+     * اطلاعات تراکنش آنلاین نوبت برای نمایش رسید پرداخت.
+     * شماره کارت (ماسک شده) فقط به صاحب نوبت نشان داده میشود.
+     */
+    private function paymentReceipt(AppointmentUser $appointment, bool $isOwner): ?array
+    {
+        $transaction = $appointment->transaction;
+        $detail = $transaction?->detail ?? [];
+
+        // فقط تراکنش هایی که به درگاه رفته اند (کیف پول و پرداخت حضوری رسید بانکی ندارند)
+        if (! $transaction || empty($detail['driver'])) {
+            return null;
+        }
+
+        $status = match ($transaction->status) {
+            \Modules\Transaction\Enum\TransactionStatusEnum::SUCCESSFUL => 'successful',
+            \Modules\Transaction\Enum\TransactionStatusEnum::REJECTED => 'failed',
+            default => 'pending',
+        };
+        $paidAt = $detail['paid_at'] ?? null;
+        $amount = (int) ($detail['paid_amount'] ?? $transaction->total_cost ?? 0);
+
+        return [
+            'status' => $status,
+            'status_label' => $transaction->status?->getName(),
+            'gateway' => match ($detail['driver']) {
+                'sadad' => 'سداد (بانک ملی)',
+                'saman', 'sep' => 'سامان',
+                'parsian' => 'پارسیان',
+                'zibal' => 'زیبال',
+                default => 'زرین پال',
+            },
+            'transaction_code' => $transaction->transaction_code,
+            'trace_no' => $detail['trace_no'] ?? null,
+            'ref_id' => $detail['ref_id'] ?? null,
+            'order_id' => $detail['order_id'] ?? null,
+            'card_number' => $isOwner ? ($detail['card_number'] ?? null) : null,
+            'amount' => $amount ?: null,
+            'paid_at' => $paidAt ? verta(Carbon::parse($paidAt))->format('j F Y ساعت H:i') : null,
+            'error' => $status === 'failed' ? ($detail['verify_error']['message'] ?? null) : null,
+        ];
+    }
+
+    /**
+     * آیا بیمار اجازه لغو این نوبت را دارد؟
+     * cancellation_by_user در تنظیمات نوبت دهی: null یعنی لغو غیرفعال،
+     * عدد یعنی لغو تا حداکثر چند روز قبل از زمان ویزیت مجاز است.
+     */
+    private function userCanCancel(AppointmentUser $appointment): bool
+    {
+        if (! in_array($appointment->status, [
+            AppointmentUserStatusEnum::STATUS_PENDING,
+            AppointmentUserStatusEnum::STATUS_SUCCESSFUL,
+            AppointmentUserStatusEnum::STATUS_WAIT_PAYMENT,
+            AppointmentUserStatusEnum::STATUS_MONITORING,
+        ], true)) {
+            return false;
+        }
+
+        $days = $appointment->setting?->cancellation_by_user;
+        if ($days === null || $days === '' || ! $appointment->date_visit) {
+            return false;
+        }
+
+        $visitAt = Carbon::parse($appointment->date_visit)->startOfDay();
+        if ($appointment->start_time) {
+            [$h, $m] = array_pad(explode(':', (string) $appointment->start_time), 2, 0);
+            $visitAt->setTime((int) $h, (int) $m);
+        }
+
+        // مهلت لغو: N روز قبل از زمان ویزیت
+        return $visitAt->subDays(max(0, (int) $days))->isFuture();
     }
 
     /**
@@ -1360,14 +1427,7 @@ class TenantAppController extends Controller
             return $this->notFound();
         }
 
-        $cancellable = [
-            AppointmentUserStatusEnum::STATUS_PENDING,
-            AppointmentUserStatusEnum::STATUS_SUCCESSFUL,
-            AppointmentUserStatusEnum::STATUS_WAIT_PAYMENT,
-            AppointmentUserStatusEnum::STATUS_MONITORING,
-        ];
-
-        if (! in_array($appointment->status, $cancellable, true)) {
+        if (! $this->userCanCancel($appointment)) {
             return $this->badRequest([
                 'status' => false,
                 'message' => 'این نوبت قابل لغو نیست.',

@@ -2,6 +2,7 @@
 
 namespace Modules\AppointmentSetting\Livewire\GeneralSetting;
 
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Livewire\Attributes\Title;
 use Livewire\Component;
@@ -33,6 +34,9 @@ class DoctorOrder extends Component
                 DB::table('users')->where('id', $id)->update(['display_order' => $index + 1]);
             }
         });
+
+        Cache::forget('Introduction_doctors');
+        Cache::forget('emergency_doctors');
     }
 
     public function moveUp(int $id): void

@@ -313,7 +313,7 @@ class User extends Authenticatable
                 ->where(function ($qqq) {
                     $qqq->where('meta_value', true);
                 });
-        });
+        })->displayOrder();
     }
 
     public function scopeIntroductionDoctors($query)
@@ -331,7 +331,7 @@ class User extends Authenticatable
                 ->where(function ($qqq) {
                     $qqq->where('meta_value', true);
                 });
-        });
+        })->displayOrder();
     }
 
     public function scopeNewestDocs()

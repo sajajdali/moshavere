@@ -38,24 +38,16 @@ class AboutUsLiveWire extends Component
         if (config('app.without_cache')) {
             $this->fetchData['comments'] = Comment::where('status', CommentStatusEnum::ACCEPTED)->where('show_in_homePage', CommentShowHomePage::SHOW)->get()->take(4);
             $this->fetchData['EmergencyDoctors'] = User::emergencyDoctors()->get()->filter(function ($doc) {
-                if ($doc->services()->exists() && $doc->places()->exists() && $doc->appointmentSettings()->exists()) {
-                    return true;
-                };
-            })->sortBy(function ($model) {
-                return $model->dr_emergencyvisit_order;
+                return $doc->services()->exists() && $doc->places()->exists() && $doc->appointmentSettings()->exists();
             });
         } else {
             $this->fetchData['comments'] = Cache::rememberForever('homepageComments', function () {
                 return Comment::where('status', CommentStatusEnum::ACCEPTED)->where('show_in_homePage', CommentShowHomePage::SHOW)->get()->take(4);
             });
             $cacheKey = 'emergency_doctors';
-            $this->fetchData['EmergencyDoctors'] =   Cache::rememberForever($cacheKey, function () {
+            $this->fetchData['EmergencyDoctors'] = Cache::rememberForever($cacheKey, function () {
                 return User::emergencyDoctors()->get()->filter(function ($doc) {
-                    if ($doc->services()->exists() && $doc->places()->exists() && $doc->appointmentSettings()->exists()) {
-                        return true;
-                    };
-                })->sortBy(function ($model) {
-                    return $model->dr_emergencyvisit_order;
+                    return $doc->services()->exists() && $doc->places()->exists() && $doc->appointmentSettings()->exists();
                 });
             });
         }

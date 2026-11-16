@@ -38,58 +38,33 @@ class HomePageLivewire extends Component
         //    Define a unique cache key
         $cacheKey = 'Introduction_doctors';
         if (app()->environment('local')) {
-            return   User::introductionDoctors()->get()->filter(function ($doc) {
-                if ($doc->services()->exists() && $doc->places()->exists() && $doc->appointmentSettings()->exists()) {
-                    return true;
-                } else {
-                    return false;
-                };
-            })->sortBy(function ($model) {
-                return $model->dr_info_order;
-            });
-        } else {
-            return Cache::rememberForever($cacheKey,  function () {
-                return   User::introductionDoctors()->get()->filter(function ($doc) {
-                    if ($doc->services()->exists() && $doc->places()->exists() && $doc->appointmentSettings()->exists()) {
-                        return true;
-                    } else {
-                        return false;
-                    };
-                })->sortBy(function ($model) {
-                    return $model->dr_info_order;
-                });
+            return User::introductionDoctors()->get()->filter(function ($doc) {
+                return $doc->services()->exists() && $doc->places()->exists() && $doc->appointmentSettings()->exists();
             });
         }
+
+        return Cache::rememberForever($cacheKey, function () {
+            return User::introductionDoctors()->get()->filter(function ($doc) {
+                return $doc->services()->exists() && $doc->places()->exists() && $doc->appointmentSettings()->exists();
+            });
+        });
     }
     private function emergencyDoctors()
     {
-
         // Define a unique cache key
         $cacheKey = 'emergency_doctors';
         // Attempt to get the data from the cache
         if (app()->environment('local')) {
             return User::emergencyDoctors()->get()->filter(function ($doc) {
-                if ($doc->services()->exists() && $doc->places()->exists() && $doc->appointmentSettings()->exists()) {
-                    return true;
-                } else {
-                    return false;
-                };
-            })->sortBy(function ($model) {
-                return $model->dr_emergencyvisit_order;
-            });
-        } else {
-            return  Cache::rememberForever($cacheKey, function () {
-                return User::emergencyDoctors()->get()->filter(function ($doc) {
-                    if ($doc->services()->exists() && $doc->places()->exists() && $doc->appointmentSettings()->exists()) {
-                        return true;
-                    } else {
-                        return false;
-                    };
-                })->sortBy(function ($model) {
-                    return $model->dr_emergencyvisit_order;
-                });
+                return $doc->services()->exists() && $doc->places()->exists() && $doc->appointmentSettings()->exists();
             });
         }
+
+        return Cache::rememberForever($cacheKey, function () {
+            return User::emergencyDoctors()->get()->filter(function ($doc) {
+                return $doc->services()->exists() && $doc->places()->exists() && $doc->appointmentSettings()->exists();
+            });
+        });
     }
     private function getNewestDoc()
     {

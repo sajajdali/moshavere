@@ -14,6 +14,7 @@ use Modules\Transaction\app\Models\Transaction;
 use Modules\Transaction\Enum\TransactionPaidEnum;
 use Modules\Transaction\Enum\TransactionStatusEnum;
 use Modules\User\Entities\User;
+use Modules\User\Enum\UserMetaEnum;
 
 /**
  * گزارش عمومی نوبت دهی (فقط مدیر کل).
@@ -165,7 +166,7 @@ class AppointmentReport extends Component
 
         // ---------- KPI ----------
         $total = (int) $appointments->sum('c');
-        $bySource = $appointments->groupBy('src')->map(fn ($g) => (int) $g->sum('c'));
+        $bySource = $appointments->groupBy('src')->map(fn($g) => (int) $g->sum('c'));
         $canceled = (int) $appointments->whereIn('status', $cancelStatuses)->sum('c');
         $attended = (int) $appointments->where('status', AppointmentUserStatusEnum::STATUS_ATTENDED->value)->sum('c');
         $paySum = (int) $payments->sum('s');
@@ -188,14 +189,14 @@ class AppointmentReport extends Component
             'pay_avg' => $payCount ? (int) round($paySum / $payCount) : 0,
             'patients' => $this->uniquePatients($from, $to),
             'doctors' => $appointments->pluck('doctor_id')->filter()->unique()->count(),
-            'previous_label' => verta($previous['from'])->format('Y/m/d').' تا '.verta($previous['to'])->format('Y/m/d'),
+            'previous_label' => verta($previous['from'])->format('Y/m/d') . ' تا ' . verta($previous['to'])->format('Y/m/d'),
         ];
 
         // ---------- روند نوبت ها ----------
         $buckets = $this->buckets($from, $to, $this->granularity);
         $trend = ['labels' => array_values($buckets)];
         foreach (['self', 'staff', 'voip'] as $source) {
-            $trend[$source] = $this->series($appointments->filter(fn ($r) => $this->sourceGroup($r->src) === $source), $buckets, 'c', $this->granularity);
+            $trend[$source] = $this->series($appointments->filter(fn($r) => $this->sourceGroup($r->src) === $source), $buckets, 'c', $this->granularity);
         }
         $trend['canceled'] = $this->series($appointments->whereIn('status', $cancelStatuses), $buckets, 'c', $this->granularity);
 
@@ -207,9 +208,9 @@ class AppointmentReport extends Component
                 'id' => $doctorId,
                 'name' => $names[$doctorId] ?? 'نامشخص',
                 'total' => (int) $rows->sum('c'),
-                'self' => (int) $rows->filter(fn ($r) => $this->sourceGroup($r->src) === 'self')->sum('c'),
+                'self' => (int) $rows->filter(fn($r) => $this->sourceGroup($r->src) === 'self')->sum('c'),
                 'voip' => (int) $rows->where('src', 'voip')->sum('c'),
-                'staff' => (int) $rows->filter(fn ($r) => $this->sourceGroup($r->src) === 'staff')->sum('c'),
+                'staff' => (int) $rows->filter(fn($r) => $this->sourceGroup($r->src) === 'staff')->sum('c'),
                 'canceled' => (int) $rows->whereIn('status', $cancelStatuses)->sum('c'),
                 'attended' => (int) $rows->where('status', AppointmentUserStatusEnum::STATUS_ATTENDED->value)->sum('c'),
                 'pay_sum' => (int) $doctorPayments->sum('s'),
@@ -220,9 +221,16 @@ class AppointmentReport extends Component
         foreach ($payments->groupBy('doctor_id') as $doctorId => $rows) {
             if (! $doctorRows->has($doctorId)) {
                 $doctorRows->put($doctorId, [
-                    'id' => $doctorId, 'name' => $names[$doctorId] ?? 'نامشخص',
-                    'total' => 0, 'self' => 0, 'voip' => 0, 'staff' => 0, 'canceled' => 0, 'attended' => 0,
-                    'pay_sum' => (int) $rows->sum('s'), 'pay_count' => (int) $rows->sum('c'),
+                    'id' => $doctorId,
+                    'name' => $names[$doctorId] ?? 'نامشخص',
+                    'total' => 0,
+                    'self' => 0,
+                    'voip' => 0,
+                    'staff' => 0,
+                    'canceled' => 0,
+                    'attended' => 0,
+                    'pay_sum' => (int) $rows->sum('s'),
+                    'pay_count' => (int) $rows->sum('c'),
                 ]);
             }
         }
@@ -231,9 +239,9 @@ class AppointmentReport extends Component
         $topDoctorPayments = $doctorRows->where('pay_sum', '>', 0)->sortByDesc('pay_sum')->take(15)->values();
 
         // ---------- ثبت کنندگان ----------
-        $registrarRows = $appointments->filter(fn ($r) => $this->sourceGroup($r->src) === 'staff')
-            ->groupBy(fn ($r) => (string) ($r->reg ?? 0))
-            ->map(fn (Collection $rows, $id) => [
+        $registrarRows = $appointments->filter(fn($r) => $this->sourceGroup($r->src) === 'staff')
+            ->groupBy(fn($r) => (string) ($r->reg ?? 0))
+            ->map(fn(Collection $rows, $id) => [
                 'id' => (int) $id,
                 'name' => $id ? ($names[$id] ?? 'نامشخص') : 'نامشخص',
                 'total' => (int) $rows->sum('c'),
@@ -266,8 +274,8 @@ class AppointmentReport extends Component
 
         // ---------- جدول ماهانه ----------
         $monthAppointments = $this->series($appointments, $monthBuckets, 'c', 'month');
-        $monthSelf = $this->series($appointments->filter(fn ($r) => $this->sourceGroup($r->src) === 'self'), $monthBuckets, 'c', 'month');
-        $monthStaff = $this->series($appointments->filter(fn ($r) => $this->sourceGroup($r->src) === 'staff'), $monthBuckets, 'c', 'month');
+        $monthSelf = $this->series($appointments->filter(fn($r) => $this->sourceGroup($r->src) === 'self'), $monthBuckets, 'c', 'month');
+        $monthStaff = $this->series($appointments->filter(fn($r) => $this->sourceGroup($r->src) === 'staff'), $monthBuckets, 'c', 'month');
         $monthVoip = $this->series($appointments->where('src', 'voip'), $monthBuckets, 'c', 'month');
         $monthPayCount = $this->series($payments, $monthBuckets, 'c', 'month');
         $monthly = [];
@@ -285,10 +293,10 @@ class AppointmentReport extends Component
         }
 
         // ---------- توزیع ها ----------
-        $statusCounts = $appointments->groupBy('status')->map(fn ($g) => (int) $g->sum('c'));
+        $statusCounts = $appointments->groupBy('status')->map(fn($g) => (int) $g->sum('c'));
         $status = collect(AppointmentUserStatusEnum::cases())
-            ->filter(fn ($case) => $statusCounts->get($case->value, 0) > 0)
-            ->map(fn ($case) => [
+            ->filter(fn($case) => $statusCounts->get($case->value, 0) > 0)
+            ->map(fn($case) => [
                 'label' => $case->getName(),
                 'count' => $statusCounts->get($case->value, 0),
                 'color' => $this->statusColor($case),
@@ -301,15 +309,39 @@ class AppointmentReport extends Component
             $weekday[(Carbon::parse($row->d)->dayOfWeek + 1) % 7] += (int) $row->c;
         }
 
-        $paidBy = $payments->groupBy('paid_by')->map(fn ($g, $paidBy) => [
+        $paidBy = $payments->groupBy('paid_by')->map(fn($g, $paidBy) => [
             'label' => $this->paidByLabel((int) $paidBy),
             'sum' => (int) $g->sum('s'),
             'count' => (int) $g->sum('c'),
         ])->sortByDesc('sum')->values();
 
         $sources = collect(['self', 'staff', 'voip', 'import'])
-            ->map(fn ($s) => ['label' => self::SOURCE_LABELS[$s], 'count' => $bySource->get($s, 0)])
-            ->filter(fn ($s) => $s['count'] > 0)->values();
+            ->map(fn($s) => ['label' => self::SOURCE_LABELS[$s], 'count' => $bySource->get($s, 0)])
+            ->filter(fn($s) => $s['count'] > 0)->values();
+
+        // ---------- توزیع آشنایان ----------
+        $acquaintanceMetaKey = UserMetaEnum::ACQUAINTANCE->value;
+        $patientIds = $appointments->pluck('user_id')->filter()->unique()->values();
+        $acquaintanceByUser = collect();
+
+        if ($patientIds->isNotEmpty()) {
+            $acquaintanceByUser = DB::table('user_metas')
+                ->whereIn('user_id', $patientIds)
+                ->where('meta_key', $acquaintanceMetaKey)
+                ->whereNotNull('meta_value')
+                ->where('meta_value', '<>', '')
+                ->get(['user_id', 'meta_value'])
+                ->keyBy('user_id')
+                ->map(fn($meta) => (string) $meta->meta_value);
+        }
+
+        $acquaintanceCounts = $appointments
+            ->groupBy(fn($row) => $acquaintanceByUser->get((int) $row->user_id, 'ثبت نشده'))
+            ->map(fn($group) => (int) $group->sum('c'))
+            ->sortDesc();
+        $acquaintanceDistribution = $acquaintanceCounts
+            ->map(fn($count, $label) => ['label' => $label, 'count' => $count])
+            ->values();
 
         return [
             'kpi' => $kpi,
@@ -359,6 +391,10 @@ class AppointmentReport extends Component
                     'labels' => $paidBy->pluck('label'),
                     'sums' => $paidBy->pluck('sum'),
                 ],
+                'acquaintance' => [
+                    'labels' => $acquaintanceDistribution->pluck('label'),
+                    'counts' => $acquaintanceDistribution->pluck('count'),
+                ],
             ],
         ];
     }
@@ -372,8 +408,8 @@ class AppointmentReport extends Component
         $source = $this->sourceSql();
 
         return $this->appointmentQuery($from, $to)
-            ->selectRaw("DATE({$column}) as d, doctor_id, {$source} as src, CASE WHEN ({$source}) IN ('staff', 'import') THEN agent_id END as reg, status, COUNT(*) as c")
-            ->groupByRaw('d, doctor_id, src, reg, status')
+            ->selectRaw("DATE({$column}) as d, doctor_id, {$source} as src, CASE WHEN ({$source}) IN ('staff', 'import') THEN agent_id END as reg, user_id, status, COUNT(*) as c")
+            ->groupByRaw('d, doctor_id, src, reg, user_id, status')
             ->get();
     }
 
@@ -389,7 +425,7 @@ class AppointmentReport extends Component
             ->selectRaw("DATE({$prefix}t.created_at) as d, {$prefix}a.doctor_id as doctor_id, {$prefix}t.paid_by as paid_by, {$source} as src, CASE WHEN ({$source}) IN ('staff', 'import') THEN {$prefix}a.agent_id END as reg, SUM({$prefix}t.total_cost) as s, COUNT(*) as c")
             ->groupByRaw('d, doctor_id, paid_by, src, reg')
             ->get()
-            ->each(fn ($row) => $row->src_group = $this->sourceGroup($row->src));
+            ->each(fn($row) => $row->src_group = $this->sourceGroup($row->src));
     }
 
     private function appointmentQuery(Carbon $from, Carbon $to)
@@ -397,7 +433,7 @@ class AppointmentReport extends Component
         $query = AppointmentUser::query()
             ->toBase()
             ->whereBetween($this->dateColumn(), [$from, $to])
-            ->when($this->doctorId !== '', fn ($q) => $q->where('doctor_id', (int) $this->doctorId));
+            ->when($this->doctorId !== '', fn($q) => $q->where('doctor_id', (int) $this->doctorId));
 
         return $this->applyRegistrarFilter($query, $this->sourceSql(), 'agent_id');
     }
@@ -407,13 +443,13 @@ class AppointmentReport extends Component
         $appointment = new AppointmentUser;
 
         // پرداختی که نوبتش دیگر وجود ندارد هم در مجموع پرداختی ها حساب میشود (پزشک «نامشخص»)
-        $query = DB::table((new Transaction)->getTable().' as t')
-            ->leftJoin($appointment->getTable().' as a', 'a.id', '=', 't.transactionable_id')
+        $query = DB::table((new Transaction)->getTable() . ' as t')
+            ->leftJoin($appointment->getTable() . ' as a', 'a.id', '=', 't.transactionable_id')
             ->where('t.transactionable_type', $appointment->getMorphClass())
             ->where('t.status', TransactionStatusEnum::SUCCESSFUL->value)
             ->where('t.total_cost', '>', 0)
             ->whereBetween('t.created_at', [$from, $to])
-            ->when($this->doctorId !== '', fn ($q) => $q->where('a.doctor_id', (int) $this->doctorId));
+            ->when($this->doctorId !== '', fn($q) => $q->where('a.doctor_id', (int) $this->doctorId));
 
         if ($this->registrar !== '') {
             $query->whereNotNull('a.id');
@@ -439,20 +475,20 @@ class AppointmentReport extends Component
      */
     private function sourceSql(string $table = ''): string
     {
-        $column = fn (string $name) => $table === ''
+        $column = fn(string $name) => $table === ''
             ? $name
-            : DB::connection()->getTablePrefix().$table.'.'.$name;
+            : DB::connection()->getTablePrefix() . $table . '.' . $name;
         $details = $column('details');
         $agent = $column('agent_id');
         $user = $column('user_id');
-        $via = fn (int $value) => "({$details} LIKE '%\"appointment_via\":{$value}%' OR {$details} LIKE '%\"appointment_via\": {$value}%')";
+        $via = fn(int $value) => "({$details} LIKE '%\"appointment_via\":{$value}%' OR {$details} LIKE '%\"appointment_via\": {$value}%')";
         $voip = $via(4);
         $byAdmin = $via(2);
         $import = $via(3);
         $self = $via(1);
 
         return "(CASE WHEN {$voip} THEN 'voip' WHEN {$byAdmin} THEN 'staff' WHEN {$import} THEN 'import' WHEN {$self} THEN 'self'"
-            ." WHEN {$agent} IS NOT NULL AND {$agent} <> {$user} THEN 'staff' ELSE 'self' END)";
+            . " WHEN {$agent} IS NOT NULL AND {$agent} <> {$user} THEN 'staff' ELSE 'self' END)";
     }
 
     private function sourceGroup(?string $source): string
@@ -565,7 +601,7 @@ class AppointmentReport extends Component
             AppointmentUser::query()->min('created_at'),
             AppointmentUser::query()->min('date_visit'),
             $this->paymentQuery(Carbon::create(2000), now()->addYears(10))->min('t.created_at'),
-        ])->filter()->map(fn ($date) => Carbon::parse($date));
+        ])->filter()->map(fn($date) => Carbon::parse($date));
 
         return $dates->isEmpty() ? null : $dates->min();
     }
@@ -579,13 +615,13 @@ class AppointmentReport extends Component
 
     private function userNames(Collection $ids): array
     {
-        $ids = $ids->filter()->map(fn ($id) => (int) $id)->unique()->values();
+        $ids = $ids->filter()->map(fn($id) => (int) $id)->unique()->values();
         if ($ids->isEmpty()) {
             return [];
         }
 
         return User::query()->whereIn('id', $ids)->get()
-            ->mapWithKeys(fn ($user) => [$user->id => trim((string) $user->full_name) ?: ('کاربر #'.$user->id)])
+            ->mapWithKeys(fn($user) => [$user->id => trim((string) $user->full_name) ?: ('کاربر #' . $user->id)])
             ->all();
     }
 
